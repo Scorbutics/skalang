@@ -307,6 +307,90 @@ namespace ska {
         return allowed;
     }
 
+	struct Token {
+		char letter = -1;
+		std::vector<Token> subtoken;
+	};
+
+	void CreateTokenAtIndex(const std::string& line, std::vector<Token>& tokens, unsigned int tokenIndex = 0, unsigned int lineIndex = 0) {
+		if (lineIndex >= line.size() || line[lineIndex] == ')') {
+			return;
+		}
+
+		if (line[lineIndex] == '(') {
+			//parts.back() = ss.str();
+			//ss.clear();
+			
+			tokens.emplace_back();
+			auto& tokenListChildren = tokens[tokenIndex];
+			tokenListChildren.subtoken.emplace_back();
+			auto& newToken = tokenListChildren.subtoken.back();
+			//std::cout << &range;
+			CreateTokenAtIndex(line, newToken.subtoken, 0, lineIndex + 1);
+			auto indexl = lineIndex + 1;
+			for (; indexl < line.size() && line[indexl] != ')'; indexl++);
+			if (indexl < line.size()) {
+				CreateTokenAtIndex(line, tokens, tokenIndex, indexl + 1);
+			}
+		} else {
+			//ss << expression[index];
+			//std::cout << expression[index];
+			tokens.emplace_back();
+			auto& lastToken = tokens.back();
+			lastToken.letter = line[lineIndex];	
+			CreateTokenAtIndex(line, tokens, tokenIndex + 1, lineIndex + 1);
+		}
+		
+	}
+
+	std::vector<Token> BuildTokenStream(const std::string& line) {
+		/*auto parenthesisRanges = RangeDetector<RangeOperators[0], RangeOperators[1]>::detect(line);
+		
+		if (parenthesisRanges != nullptr) {*/
+			//auto rangeNumber = 0u;
+			//const auto allowed = BuildRangeCollisionSegment(*parenthesisRanges);
+			//const auto expression = line.substr(parenthesisRanges->min, parenthesisRanges->size);
+			//auto parts = std::vector<std::string>{};
+			//parts.resize(1);
+			//auto ss = std::stringstream{};
+		std::vector<Token> roots;
+			CreateTokenAtIndex(line, roots);
+
+			/*ActOnTreeRootFirst<Range>(*parenthesisRanges, [&](const Range& rangeIt) {
+				
+
+				//std::cout << "R" << rangeNumber << " (" << &rangeIt << ")" << std::endl;
+
+				const auto expression = line.substr(rangeIt.min, rangeIt.size);
+				//auto parts = std::vector<std::string>{};
+				//parts.resize(1);
+				//auto ss = std::stringstream{};
+				
+				CreateTokenAtIndex(expression, allowed, roots);
+
+				//std::cout << std::endl << std::endl;
+				//rangeNumber++;
+			});*/
+		//}
+		return roots;
+	}
+
+	template <class TreeNode>
+	void ActOnTokenRootFirst(const TreeNode& rangeTree, const std::function<void(const TreeNode& r)>& func) {
+		func(rangeTree);
+		for (const auto& r : rangeTree.subtoken) {
+			ActOnTokenRootFirst(r, func);			
+		}
+	}
+
+	template <class TreeNode>
+	void ActOnTokenChildrenFirst(const TreeNode& rangeTree, const std::function<void(const TreeNode& r)>& func) {
+		for (const auto& r : rangeTree.subtoken) {
+			ActOnTokenChildrenFirst(r, func);
+		}
+		func(rangeTree);
+	}
+
 	ASTNode CreateAST(const std::string& line) {
 		auto root = ASTNode{};
 
@@ -323,35 +407,15 @@ namespace ska {
         }
 
 		std::cout << "Parenthesis :" << std::endl;
-		auto parenthesisRanges = RangeDetector<RangeOperators[0], RangeOperators[1]>::detect(line);
-        if(parenthesisRanges != nullptr) {
-            auto rangeNumber = 0u;
-            ActOnTreeRootFirst<Range>(*parenthesisRanges, [&](const Range& rangeIt) {
-                auto allowed = BuildRangeCollisionSegment(rangeIt);
+		auto rootToken = BuildTokenStream(line);
+		
+		for (auto& root : rootToken) {
+			ActOnTokenChildrenFirst<Token>(root, [&](const auto& r) {
+				std::cout << r.letter;
+			});
+			std::cout << std::endl;
+		}
 
-                std::cout << "R" << rangeNumber << " (" << &rangeIt << ")" << std::endl;
-
-                const auto expression = line.substr(rangeIt.min, rangeIt.size);
-                auto parts = std::vector<std::string>{};
-                parts.resize(1);
-                auto ss = std::stringstream{};
-                for(auto index = 0u; index < rangeIt.size; index++) {
-                    if(allowed[index + 1] != nullptr) {
-                        parts.back() = ss.str();
-                        ss.clear();
-                        const auto& range = *allowed[index + 1];
-                        std::cout << &range;
-                        index += range.size + 1;
-                    } else {
-                        ss << expression[index];
-                        std::cout << expression[index];
-                    }
-                }
-
-                std::cout << std::endl << std::endl;
-                rangeNumber++;
-            });
-        }
 		return root;
 	}
 
