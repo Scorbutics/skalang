@@ -60,6 +60,7 @@ namespace ska {
 		Numeric,
 		Logical,
 		Arithmetic,
+		SubRange,
 		Root
 	};
 
@@ -280,13 +281,39 @@ namespace ska {
 		func(rangeTree);
     }
 
+    template <class TreeNode>
+    void ActOnTreeRootFirst(const TreeNode& rangeTree, const std::function<void(const TreeNode& r)>& func) {
+        func(rangeTree);
+        for (const auto& r : rangeTree.next) {
+            if(r != nullptr){
+                ActOnTreeRootFirst(*r, func);
+            }
+		}
+    }
+
+    std::vector<Range*> BuildRangeCollisionSegment(const Range& rangeIt) {
+        auto allowed = std::vector<Range*>();
+        allowed.resize(rangeIt.size + 1);
+
+        for(auto i = rangeIt.min; i < rangeIt.size + rangeIt.min; i++) {
+            for(const auto& child: rangeIt.next) {
+                if(child != nullptr && i >= child->min && i < (child->min + child->size)) {
+                    i = child->min + child->size;
+                    allowed[child->min - rangeIt.min] = child.get();
+                    break;
+                }
+            }
+        }
+        return allowed;
+    }
+
 	ASTNode CreateAST(const std::string& line) {
 		auto root = ASTNode{};
 
         std::cout << "String Litterals :" << std::endl;
 		auto stringRanges = RangeDetector<RangeOperators[2], RangeOperators[2]>::detect(line);
         if(stringRanges != nullptr) {
-            ActOnTreeChildrenFirst<Range>(*stringRanges, [&](const Range& rangeIt) {
+            ActOnTreeRootFirst<Range>(*stringRanges, [&](const Range& rangeIt) {
                std::cout << line.substr(rangeIt.min, rangeIt.size) << std::endl;
                 /*const auto expressionParts = ska::split(line.substr(rangeIt.min + 1, rangeIt.min + rangeIt.max - 2), ' ');
                 for(const auto& e : expressionParts) {
@@ -298,8 +325,31 @@ namespace ska {
 		std::cout << "Parenthesis :" << std::endl;
 		auto parenthesisRanges = RangeDetector<RangeOperators[0], RangeOperators[1]>::detect(line);
         if(parenthesisRanges != nullptr) {
-            ActOnTreeChildrenFirst<Range>(*parenthesisRanges, [&](const Range& rangeIt) {
-                std::cout << line.substr(rangeIt.min, rangeIt.size) << std::endl;
+            auto rangeNumber = 0u;
+            ActOnTreeRootFirst<Range>(*parenthesisRanges, [&](const Range& rangeIt) {
+                auto allowed = BuildRangeCollisionSegment(rangeIt);
+
+                std::cout << "R" << rangeNumber << " (" << &rangeIt << ")" << std::endl;
+
+                const auto expression = line.substr(rangeIt.min, rangeIt.size);
+                auto parts = std::vector<std::string>{};
+                parts.resize(1);
+                auto ss = std::stringstream{};
+                for(auto index = 0u; index < rangeIt.size; index++) {
+                    if(allowed[index + 1] != nullptr) {
+                        parts.back() = ss.str();
+                        ss.clear();
+                        const auto& range = *allowed[index + 1];
+                        std::cout << &range;
+                        index += range.size + 1;
+                    } else {
+                        ss << expression[index];
+                        std::cout << expression[index];
+                    }
+                }
+
+                std::cout << std::endl << std::endl;
+                rangeNumber++;
             });
         }
 		return root;
