@@ -5,6 +5,7 @@
 #include <functional>
 #include <string>
 #include <cassert>
+#include <bitset>
 
 #include <sstream>
 #include <algorithm>
@@ -307,73 +308,99 @@ namespace ska {
         return allowed;
     }
 
-	struct Token {
-		char letter = -1;
-		std::vector<Token> subtoken;
+	enum class TokenType {
+		REQUIRED,
+		IDENTIFIER,
+		DIGIT,
+		SPACE,
+		SYMBOL,
+		EMPTY,
+		UNUSED_LAST_Length
 	};
 
-	void CreateTokenAtIndex(const std::string& line, std::vector<Token>& tokens, unsigned int tokenIndex = 0, unsigned int lineIndex = 0) {
-		if (lineIndex >= line.size() || line[lineIndex] == ')') {
-			return;
+	struct Token {
+		std::string content;
+		TokenType type;
+	};
+
+	class Tokenizer {
+	public:
+		Tokenizer(std::string input) :
+			m_input(std::move(input)) {
 		}
 
-		if (line[lineIndex] == '(') {
-			//parts.back() = ss.str();
-			//ss.clear();
-			
-			tokens.emplace_back();
-			auto& tokenListChildren = tokens[tokenIndex];
-			tokenListChildren.subtoken.emplace_back();
-			auto& newToken = tokenListChildren.subtoken.back();
-			//std::cout << &range;
-			CreateTokenAtIndex(line, newToken.subtoken, 0, lineIndex + 1);
-			auto indexl = lineIndex + 1;
-			for (; indexl < line.size() && line[indexl] != ')'; indexl++);
-			if (indexl < line.size()) {
-				CreateTokenAtIndex(line, tokens, tokenIndex, indexl + 1);
+		Token tokenize(std::size_t index = 0) {
+		
+			if (index >= m_input.size()) {
+				auto token = Token{};
+				token.type = TokenType::EMPTY;
+				return token;
 			}
-		} else {
-			//ss << expression[index];
-			//std::cout << expression[index];
-			tokens.emplace_back();
-			auto& lastToken = tokens.back();
-			lastToken.letter = line[lineIndex];	
-			CreateTokenAtIndex(line, tokens, tokenIndex + 1, lineIndex + 1);
+
+			auto charTokenType = calculateCharacterTokenType(m_input[index]);
+			const auto isFirstCharacterOfToken = m_startIndex == index;
+			if (
+				(m_required && !m_requiredOrUntil[static_cast<std::size_t>(charTokenType)] 
+				|| !m_required && m_requiredOrUntil[static_cast<std::size_t>(charTokenType)]) 
+				&& !isFirstCharacterOfToken) {
+				auto token = Token{};
+				token.type = charTokenType;
+				token.content = m_input.substr(m_startIndex, index);
+				m_startIndex = index;
+				m_requiredOrUntil.reset();
+				m_required = true;
+				return token;
+			}
+
+			switch (charTokenType) {
+			case TokenType::DIGIT:
+				if (isFirstCharacterOfToken) {
+					m_required = true;
+					m_requiredOrUntil[static_cast<std::size_t>(TokenType::DIGIT)] = true;
+				}
+				return tokenize(index + 1);
+
+			case TokenType::SPACE:
+				m_required = true;
+				m_startIndex = index + 1;
+				return tokenize(index + 1);
+
+			case TokenType::SYMBOL:
+				m_required = true;
+				return tokenize(index + 1);
+
+			default:
+			case TokenType::IDENTIFIER:
+				if (isFirstCharacterOfToken) {
+					m_required = true;
+					m_requiredOrUntil[static_cast<std::size_t>(TokenType::DIGIT)] = true;
+					m_requiredOrUntil[static_cast<std::size_t>(TokenType::IDENTIFIER)] = true;
+				}
+				return tokenize(index + 1);
+			}
 		}
-		
-	}
 
-	std::vector<Token> BuildTokenStream(const std::string& line) {
-		/*auto parenthesisRanges = RangeDetector<RangeOperators[0], RangeOperators[1]>::detect(line);
-		
-		if (parenthesisRanges != nullptr) {*/
-			//auto rangeNumber = 0u;
-			//const auto allowed = BuildRangeCollisionSegment(*parenthesisRanges);
-			//const auto expression = line.substr(parenthesisRanges->min, parenthesisRanges->size);
-			//auto parts = std::vector<std::string>{};
-			//parts.resize(1);
-			//auto ss = std::stringstream{};
-		std::vector<Token> roots;
-			CreateTokenAtIndex(line, roots);
+	private:
+		TokenType calculateCharacterTokenType(const char c) const {
+			if (std::isdigit(static_cast<unsigned char>(c))) {
+				return TokenType::DIGIT;
+			} else if (isWordCharacter(static_cast<unsigned char>(c))) {
+				return TokenType::IDENTIFIER;
+			} else if (std::isspace(static_cast<unsigned char>(c))) {
+				return TokenType::SPACE;
+			}
+			return TokenType::SYMBOL;
+		}
 
-			/*ActOnTreeRootFirst<Range>(*parenthesisRanges, [&](const Range& rangeIt) {
-				
+		static bool isWordCharacter(const int c) {
+			return std::isalnum(c) || c == '_';
+		}
 
-				//std::cout << "R" << rangeNumber << " (" << &rangeIt << ")" << std::endl;
-
-				const auto expression = line.substr(rangeIt.min, rangeIt.size);
-				//auto parts = std::vector<std::string>{};
-				//parts.resize(1);
-				//auto ss = std::stringstream{};
-				
-				CreateTokenAtIndex(expression, allowed, roots);
-
-				//std::cout << std::endl << std::endl;
-				//rangeNumber++;
-			});*/
-		//}
-		return roots;
-	}
+		std::size_t m_startIndex = 0;
+		std::string m_input;
+		bool m_required;
+		std::bitset<static_cast<std::size_t>(TokenType::UNUSED_LAST_Length)> m_requiredOrUntil;
+	};
 
 	template <class TreeNode>
 	void ActOnTokenRootFirst(const TreeNode& rangeTree, const std::function<void(const TreeNode& r)>& func) {
@@ -391,7 +418,7 @@ namespace ska {
 		func(rangeTree);
 	}
 
-	ASTNode CreateAST(const std::string& line) {
+	/*ASTNode CreateAST(const std::string& line) {
 		auto root = ASTNode{};
 
         std::cout << "String Litterals :" << std::endl;
@@ -399,16 +426,16 @@ namespace ska {
         if(stringRanges != nullptr) {
             ActOnTreeRootFirst<Range>(*stringRanges, [&](const Range& rangeIt) {
                std::cout << line.substr(rangeIt.min, rangeIt.size) << std::endl;
-                /*const auto expressionParts = ska::split(line.substr(rangeIt.min + 1, rangeIt.min + rangeIt.max - 2), ' ');
+                const auto expressionParts = ska::split(line.substr(rangeIt.min + 1, rangeIt.min + rangeIt.max - 2), ' ');
                 for(const auto& e : expressionParts) {
                     std::cout << e << std::endl;
-                }*/
+                }
             });
         }
 
 		std::cout << "Parenthesis :" << std::endl;
-		auto rootToken = BuildTokenStream(line);
-		
+
+
 		for (auto& root : rootToken) {
 			ActOnTokenChildrenFirst<Token>(root, [&](const auto& r) {
 				std::cout << r.letter;
@@ -417,7 +444,7 @@ namespace ska {
 		}
 
 		return root;
-	}
+	}*/
 
 	int InterpretAST(const ASTNode& ast) {
 		if (ast.type == OperatorType::Logical) {
@@ -449,7 +476,15 @@ int main() {
 		std::getline(std::cin, line);
 
 
-		auto ast = ska::CreateAST(line);
+		//auto ast = ska::CreateAST(line);
+		auto tokenizer = ska::Tokenizer{ "for (int test = 0; test < 200; test++);" };
+
+		std::cout << tokenizer.tokenize().content << std::endl;
+		std::cout << tokenizer.tokenize().content << std::endl;
+		std::cout << tokenizer.tokenize().content << std::endl;
+		std::cout << tokenizer.tokenize().content << std::endl;
+		std::cout << tokenizer.tokenize().content << std::endl;
+
 		//auto result = ska::InterpretAST(ast);
 
 		//std::cout << result << std::endl;
