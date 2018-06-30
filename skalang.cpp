@@ -6,6 +6,7 @@
 #include <string>
 #include <cassert>
 #include <bitset>
+#include <iomanip>
 
 #include <sstream>
 #include <algorithm>
@@ -313,9 +314,23 @@ namespace ska {
 		IDENTIFIER,
 		DIGIT,
 		SPACE,
+		STRING,
+		RANGE,
 		SYMBOL,
 		EMPTY,
 		UNUSED_LAST_Length
+	};
+
+	constexpr const char* TokenTypeSTR[]  = {
+		"REQUIRED",
+		"IDENTIFIER",
+		"DIGIT",
+		"SPACE",
+		"STRING",
+		"RANGE",
+		"SYMBOL",
+		"EMPTY",
+		"UNUSED_LAST_Length"
 	};
 
 	struct Token {
@@ -330,27 +345,27 @@ namespace ska {
 		}
 
 		Token tokenize(std::size_t index = 0) {
-		
-			if (index >= m_input.size()) {
-				auto token = Token{};
-				token.type = TokenType::EMPTY;
-				return token;
+			if (index == 0) {
+				index = m_startIndex;
 			}
 
-			auto charTokenType = calculateCharacterTokenType(m_input[index]);
+			if (index >= m_input.size()) {
+				return finalizeToken(index);
+			}
+
+			const auto charTokenType = calculateCharacterTokenType(m_input[index]);
 			const auto isFirstCharacterOfToken = m_startIndex == index;
 			if (
 				(m_required && !m_requiredOrUntil[static_cast<std::size_t>(charTokenType)] 
 				|| !m_required && m_requiredOrUntil[static_cast<std::size_t>(charTokenType)]) 
 				&& !isFirstCharacterOfToken) {
-				auto token = Token{};
-				token.type = charTokenType;
-				token.content = m_input.substr(m_startIndex, index);
-				m_startIndex = index;
-				m_requiredOrUntil.reset();
-				m_required = true;
-				return token;
+				return finalizeToken(index);
 			}
+			
+			if (isFirstCharacterOfToken) {
+				m_currentToken = charTokenType;
+			}
+
 
 			switch (charTokenType) {
 			case TokenType::DIGIT:
@@ -361,12 +376,30 @@ namespace ska {
 				return tokenize(index + 1);
 
 			case TokenType::SPACE:
-				m_required = true;
-				m_startIndex = index + 1;
+				if (isFirstCharacterOfToken) {
+					m_required = true;
+					m_startIndex = index + 1;
+				}
 				return tokenize(index + 1);
 
 			case TokenType::SYMBOL:
-				m_required = true;
+				if (isFirstCharacterOfToken) {
+					m_required = true;
+					m_requiredOrUntil[static_cast<std::size_t>(TokenType::SYMBOL)] = true;
+				}
+				return tokenize(index + 1);
+
+			case TokenType::RANGE:
+				if (isFirstCharacterOfToken) {
+					m_required = true;
+				}
+				return tokenize(index + 1);
+
+			case TokenType::STRING:
+				if (isFirstCharacterOfToken) {
+					m_required = false;
+					m_requiredOrUntil[static_cast<std::size_t>(TokenType::STRING)] = true;
+				}
 				return tokenize(index + 1);
 
 			default:
@@ -381,15 +414,54 @@ namespace ska {
 		}
 
 	private:
+		Token finalizeToken(std::size_t index)  {
+			auto token = Token{};
+
+			token.type = m_currentToken;
+			m_currentToken = TokenType::EMPTY;
+			index += (!m_required ? 1 : 0);
+			token.content = m_input.substr(m_startIndex, index - m_startIndex);
+			m_startIndex = index;
+			m_requiredOrUntil.reset();
+			m_required = true;
+
+			return token;
+		}
+
 		TokenType calculateCharacterTokenType(const char c) const {
-			if (std::isdigit(static_cast<unsigned char>(c))) {
+			switch (c) {
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
 				return TokenType::DIGIT;
-			} else if (isWordCharacter(static_cast<unsigned char>(c))) {
-				return TokenType::IDENTIFIER;
-			} else if (std::isspace(static_cast<unsigned char>(c))) {
+			
+			case ' ':
+			case '\t':
+			case '\v':
+			case '\f':
+			case '\n':
+			case '\r':
 				return TokenType::SPACE;
+			
+			case '"':
+				return TokenType::STRING;
+
+			case '(':
+			case ')':
+			case '{':
+			case '}':
+				return TokenType::RANGE;
+
+			default :
+				return isWordCharacter(c) ? TokenType::IDENTIFIER : TokenType::SYMBOL;
 			}
-			return TokenType::SYMBOL;
 		}
 
 		static bool isWordCharacter(const int c) {
@@ -398,6 +470,7 @@ namespace ska {
 
 		std::size_t m_startIndex = 0;
 		std::string m_input;
+		TokenType m_currentToken = TokenType::EMPTY;
 		bool m_required;
 		std::bitset<static_cast<std::size_t>(TokenType::UNUSED_LAST_Length)> m_requiredOrUntil;
 	};
@@ -476,18 +549,15 @@ int main() {
 		std::getline(std::cin, line);
 
 
-		//auto ast = ska::CreateAST(line);
-		auto tokenizer = ska::Tokenizer{ "for (int test = 0; test < 200; test++);" };
+		std::cout << std::endl;
 
-		std::cout << tokenizer.tokenize().content << std::endl;
-		std::cout << tokenizer.tokenize().content << std::endl;
-		std::cout << tokenizer.tokenize().content << std::endl;
-		std::cout << tokenizer.tokenize().content << std::endl;
-		std::cout << tokenizer.tokenize().content << std::endl;
-
-		//auto result = ska::InterpretAST(ast);
-
-		//std::cout << result << std::endl;
+		auto tokenizer = ska::Tokenizer{ line };
+		
+		ska::Token token;
+		do {
+			token = tokenizer.tokenize();
+			std::cout << "[" << std::setw(10)<< ska::TokenTypeSTR[static_cast<std::size_t>(token.type)] << "]\t" << token.content << std::endl;
+		} while (token.type != ska::TokenType::EMPTY);
 	}
 
     return 0;
