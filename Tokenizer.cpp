@@ -91,7 +91,7 @@ ska::Token ska::Tokenizer::finalizeToken(std::size_t index, const ska::RequiredT
 	if (index != startIndex) {
 		token.type = requiredToken.current;
 		token.content = m_input.substr(startIndex, index - startIndex);
-		if (m_reserved.pool.find(token.content) != m_reserved.pool.end()) {
+		if (token.type == ska::TokenType::IDENTIFIER && m_reserved.pool.find(token.content) != m_reserved.pool.end()) {
 			token.type = ska::TokenType::RESERVED;
 		}
 	} else {
