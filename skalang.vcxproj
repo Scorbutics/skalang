@@ -148,6 +148,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="skalang.cpp" />
+    <ClCompile Include="Tokenizer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ReservedKeywordsPool.h" />
+    <ClInclude Include="Tokenizer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
