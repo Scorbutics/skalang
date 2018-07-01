@@ -84,7 +84,7 @@ namespace ska {
 				break;
 			case ReservedKeywords::VAR:
 				match(scope, Token{ ReservedKeywords::VAR, TokenType::RESERVED });
-				expr(scope);
+				//matchUnknown(scope, TokenType::IDENTIFIER);
 				match(scope, Token{ "=", TokenType::SYMBOL });
 				optexpr(scope);
 				match(scope, Token{ ";", TokenType::SYMBOL });
@@ -104,11 +104,12 @@ namespace ska {
 		}
 
 		void expr(Scope& scope) {
-			//match(scope, *m_lookAhead);
+			statement(&scope);
 		}
 
 		void match(Scope& scope, Token t) {
 			if (m_lookAhead != nullptr && *m_lookAhead == t) {
+				scope.addToken(t);
 				m_lookAhead = m_lookAheadIndex  < m_input.size() ? &m_input[++m_lookAheadIndex] : nullptr;
 			} else {
 				throw std::runtime_error("syntax error");
