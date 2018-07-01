@@ -14,7 +14,7 @@ std::vector<ska::Token> ska::Tokenizer::tokenize() const {
 	do {
 		auto token = tokenizeNext(currentTokenToRead, startIndex);
 
-		startIndex += token.content.size();
+		startIndex += token.type == TokenType::RESERVED ? m_reserved.poolList.at(std::get<std::size_t>(token.content)).size() : std::get<std::string>(token.content).size();
 		if (currentTokenToRead.current != ska::TokenType::EMPTY && currentTokenToRead.current != ska::TokenType::SPACE) {
 			result.push_back(std::move(token));
 		}
@@ -91,8 +91,9 @@ ska::Token ska::Tokenizer::finalizeToken(std::size_t index, const ska::RequiredT
 	if (index != startIndex) {
 		token.type = requiredToken.current;
 		token.content = m_input.substr(startIndex, index - startIndex);
-		if (token.type == ska::TokenType::IDENTIFIER && m_reserved.pool.find(token.content) != m_reserved.pool.end()) {
+		if (token.type == ska::TokenType::IDENTIFIER && m_reserved.pool.find(std::get<std::string>(token.content)) != m_reserved.pool.end()) {
 			token.type = ska::TokenType::RESERVED;
+			token.content = m_reserved.pool.at(std::get<std::string>(token.content));
 		}
 	} else {
 		token.type = ska::TokenType::EMPTY;

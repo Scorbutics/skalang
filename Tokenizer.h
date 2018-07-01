@@ -5,37 +5,9 @@
 #include <cctype>
 
 #include "ReservedKeywordsPool.h"
+#include "Token.h"
 
 namespace ska {
-
-	enum class TokenType {
-		RESERVED,
-		IDENTIFIER,
-		DIGIT,
-		SPACE,
-		STRING,
-		RANGE,
-		SYMBOL,
-		EMPTY,
-		UNUSED_LAST_Length
-	};
-
-	constexpr const char* TokenTypeSTR[] = {
-		"RESERVED",
-		"IDENTIFIER",
-		"DIGIT",
-		"SPACE",
-		"STRING",
-		"RANGE",
-		"SYMBOL",
-		"EMPTY",
-		"UNUSED_LAST_Length"
-	};
-
-	struct Token {
-		std::string content;
-		TokenType type;
-	};
 
 	struct RequiredToken {
 		ska::TokenType current = ska::TokenType::EMPTY;
