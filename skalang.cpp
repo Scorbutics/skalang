@@ -5,6 +5,7 @@
 
 #include "Tokenizer.h"
 #include "Scope.h"
+#include "AST.h"
 #include "ReservedKeywordsPool.h"
 
 constexpr const char* TokenTypeSTR[] = {
@@ -27,15 +28,19 @@ namespace ska {
 			m_input(std::move(input)) {
 		}
 
-		Scope parse() {
+		std::pair<ASTNode, Scope> parse() {
 			auto scope = ska::Scope { nullptr };
+			auto ast = ska::ASTNode{};
+			m_currentAst = &ast;
+
 			if (!m_input.empty()) {
 				auto* currentScope = &scope;
 				m_lookAhead = &m_input[0];
 				statement(currentScope);
 				
 			}
-			return scope;
+			m_currentAst = nullptr;
+			return std::make_pair(std::move(ast), std::move(scope));
 		}
 
 	private:
@@ -52,73 +57,199 @@ namespace ska {
 				break;
 
 			case TokenType::RANGE:
-				content = &std::get<std::string>(m_lookAhead->content);
-				if (*content == "{") {
-					currentScope = &currentScope->add();
-				} else if (*content == "}") {
-					currentScope = &currentScope->parent();
-				}
+				matchRange(*currentScope, std::get<std::string>(m_lookAhead->content));
 				break;
 			
 			default:
-				currentScope->addToken(*m_lookAhead);
+				expr(*currentScope);
+				
 				break;
+			}
+		}
+
+		void matchRange(Scope& scope, const std::string& content) {
+			if (content[0] == '{' ) {
+				
+				branch();
+				match(scope, Token{ "{", TokenType::RANGE });
+				scope = &scope.add();
+				do {
+					optstatement(scope);
+				} while (m_lookAhead != nullptr && (*m_lookAhead) != Token{ "}", TokenType::RANGE });
+				match(scope, Token{ "}", TokenType::RANGE });
+				unbranch();
+
+				scope = &scope.parent();
+			} else {
+				nextToken();
 			}
 		}
 
 		void matchReservedKeyword(Scope& scope, const std::size_t keywordIndex) {
 			switch (keywordIndex) {
+
 			case ReservedKeywords::FOR:
 				match(scope, Token{ ReservedKeywords::FOR, TokenType::RESERVED });
-				match(scope, Token{ "(", TokenType::RANGE });
-				optexpr(scope);
+				branch();
+				match(scope, Token{ "(", TokenType::RANGE });			
+				optstatement(scope);
+				unbranch();
+				
+				branch();
+				optexpr(scope, Token{ ";", TokenType::SYMBOL });
 				match(scope, Token{ ";", TokenType::SYMBOL });
-				optexpr(scope);
-				match(scope, Token{ ";", TokenType::SYMBOL });
-				optexpr(scope);
+				unbranch();
+				
+				branch();
+				optexpr(scope, Token{ ")", TokenType::SYMBOL });
 				match(scope, Token{ ")", TokenType::RANGE });
+				unbranch();
+
 				statement(&scope);
 				break;
 				
-			case ReservedKeywords::IF:
+			case ReservedKeywords::ELSE:
+				match(scope, Token{ ReservedKeywords::ELSE, TokenType::RESERVED });
 				break;
+			case ReservedKeywords::IF:
+				match(scope, Token{ ReservedKeywords::IF, TokenType::RESERVED });
+				break;
+
 			case ReservedKeywords::VAR:
 				match(scope, Token{ ReservedKeywords::VAR, TokenType::RESERVED });
-				//matchUnknown(scope, TokenType::IDENTIFIER);
-				match(scope, Token{ "=", TokenType::SYMBOL });
-				optexpr(scope);
-				match(scope, Token{ ";", TokenType::SYMBOL });
-				statement(&scope);
+				{
+					const auto& identifier = matchUnknown(scope, TokenType::IDENTIFIER);
+					match(scope, Token{ "=", TokenType::SYMBOL });
+					const auto& value = expr(scope);
+					match(scope, Token{ ";", TokenType::SYMBOL });
+					scope.registerIdentifier(std::get<std::string>(identifier.content), value);
+				}
 				break;
+
+			case ReservedKeywords::FUNCTION:
+				match(scope, Token{ ReservedKeywords::FUNCTION, TokenType::RESERVED });
+				break;
+
 			default:
 				throw std::runtime_error("syntax error");
-				break;
 			}
 
 		}
 		
-		void optexpr(Scope& scope) {
-			if (m_lookAhead != nullptr && m_lookAhead->type != TokenType::EMPTY) {
-				expr(scope);
+		const Token* optexpr(Scope& scope, const Token& mustNotBe = Token{}) {
+			if (m_lookAhead != nullptr && (*m_lookAhead) != mustNotBe) {
+				return &expr(scope);
+			}
+			return nullptr;
+		}
+
+		void optstatement(Scope& scope, const Token& mustNotBe = Token{ }) {
+			if (m_lookAhead != nullptr && (*m_lookAhead) != mustNotBe) {
+				statement(&scope);
+			} else {
+				match(scope, Token{ ";", TokenType::SYMBOL });
 			}
 		}
 
-		void expr(Scope& scope) {
-			statement(&scope);
+		const Token& expr(Scope& scope) {
+			const auto& result = *m_lookAhead;
+			const auto& value = std::get<std::string>(m_lookAhead->content);
+			
+			switch (m_lookAhead->type) {
+			case TokenType::IDENTIFIER:
+				matchUnknown(scope, TokenType::IDENTIFIER);
+				break;
+			
+			case TokenType::DIGIT:
+				matchUnknown(scope, TokenType::DIGIT);
+				break;
+			
+			case TokenType::STRING:
+				matchUnknown(scope, TokenType::STRING);
+				break;
+			
+			case TokenType::RANGE:
+				//pushToken(result);
+				switch (value[0]) {
+				case '(' :
+					break;
+				case ')':
+					break;
+				default:
+					throw std::runtime_error("syntax error");
+				}
+				nextToken();
+				break;
+
+			case TokenType::SYMBOL:
+				switch (value[0]) {
+				case '=':
+					match(scope, Token{ "=", TokenType::SYMBOL });
+					expr(scope);
+					break;
+				
+				default:
+					matchUnknown(scope, TokenType::SYMBOL);
+					break;
+				}
+				break;
+
+			default:
+				throw std::runtime_error("syntax error");
+			}
+			return result;
+		}
+
+		const Token& matchUnknown(Scope& scope, const TokenType type) {
+			if (m_lookAhead != nullptr && m_lookAhead->type == type) {
+				const auto& result = *m_lookAhead;
+				pushToken();
+				nextToken();
+				return result;
+			}
+			throw std::runtime_error("syntax error");
 		}
 
 		void match(Scope& scope, Token t) {
 			if (m_lookAhead != nullptr && *m_lookAhead == t) {
-				scope.addToken(t);
-				m_lookAhead = m_lookAheadIndex  < m_input.size() ? &m_input[++m_lookAheadIndex] : nullptr;
+				pushToken();
+				nextToken();
 			} else {
 				throw std::runtime_error("syntax error");
 			}
 		}
 
+		void pushToken() {
+			assert(m_lookAhead != nullptr);
+			if (m_lookAhead->type != TokenType::RANGE) {
+				if (m_currentAst->empty()) {
+					m_currentAst->token = *m_lookAhead;
+				} else {
+					m_currentAst->addChild(*m_lookAhead);
+				}
+			}
+		}
+
+		void unbranch() {
+			m_currentAst = &m_currentAst->parent();			
+		}
+
+		void branch() {
+			assert(m_lookAhead != nullptr);
+			if (m_currentAst != nullptr) {
+				auto& newToken = m_currentAst->addChild(Token{});
+				m_currentAst = &newToken;
+			}
+		}
+
+		void nextToken() {
+			m_lookAhead = (m_lookAheadIndex + 1) < m_input.size() ? &m_input[++m_lookAheadIndex] : nullptr;
+		}
+
 		std::vector<Token> m_input;
 		std::size_t m_lookAheadIndex = 0;
 		Token* m_lookAhead = nullptr;
+		ASTNode* m_currentAst;
 	};
 }
 

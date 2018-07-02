@@ -33,8 +33,16 @@ namespace ska {
 		std::variant<std::size_t, double, std::string> content;
 		TokenType type = TokenType::EMPTY;
 
+		bool empty() const {
+			return type == TokenType::EMPTY;
+		}
+
 		bool operator==(const Token& t1) const {
 			return type == t1.type && content == t1.content;
+		}
+
+		bool operator!=(const Token& t1) const {
+			return type != t1.type || content != t1.content;
 		}
 	};
 

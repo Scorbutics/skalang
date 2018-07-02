@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
+
 #include "Token.h"
 
 namespace ska {
@@ -13,10 +15,6 @@ namespace ska {
 			m_parent(parent) {
 		}
 
-		const std::vector<Token>& token() const {
-			return m_nodeBlock;
-		}
-
 		Scope& parent() {
 			return m_parent == nullptr ? *this : *m_parent;
 		}
@@ -26,13 +24,13 @@ namespace ska {
 			return m_subScopes.back();
 		}
 
-		void addToken(Token token) {
-			m_nodeBlock.push_back(std::move(token));
+		void registerIdentifier(const std::string& identifier, const Token& value) {
+			m_identifierMap.emplace(identifier, value);
 		}
 
 	private:
-		Scope* m_parent;
-		std::vector<Token> m_nodeBlock;
+		Scope* m_parent = nullptr;
 		std::vector<Scope> m_subScopes;
+		std::unordered_map<std::string, Token> m_identifierMap;
 	};
 }

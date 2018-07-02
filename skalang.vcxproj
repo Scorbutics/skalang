@@ -153,6 +153,7 @@
     <ClCompile Include="Tokenizer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AST.h" />
     <ClInclude Include="ReservedKeywordsPool.h" />
     <ClInclude Include="Scope.h" />
     <ClInclude Include="Token.h" />
