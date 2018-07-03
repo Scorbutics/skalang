@@ -39,6 +39,9 @@ ska::Token ska::Tokenizer::tokenizeNext(const ska::RequiredToken& requiredToken,
 		for (; index < m_input.size(); index++) {
 			charTokenType = calculateCharacterTokenType(m_input[index]);
 			if (requiredToken.required ^ requiredToken.requiredOrUntil[static_cast<std::size_t>(charTokenType)]) {
+				if (index == 0) {
+					index++;
+				}
 				break;
 			}
 		}

@@ -46,11 +46,4 @@ namespace ska {
 		}
 	};
 
-	/*struct TokenNode {
-		TokenNode() = default;
-		TokenNode(Token token) : token(std::move(token)) {}
-
-		Token token;
-		std::vector<TokenNode> subTokens;
-	};*/
 };

@@ -4,6 +4,12 @@
 #include "Token.h"
 
 namespace ska {
+
+	enum class Operator {
+		BINARY,
+		UNARY
+	};
+
 	class ASTNode {
 	public:
 		ASTNode() = default;

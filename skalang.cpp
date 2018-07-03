@@ -32,20 +32,19 @@ namespace ska {
 			auto scope = ska::Scope { nullptr };
 			auto ast = ska::ASTNode{};
 			m_currentAst = &ast;
+			m_currentScope = &scope;
 
 			if (!m_input.empty()) {
-				auto* currentScope = &scope;
 				m_lookAhead = &m_input[0];
-				statement(currentScope);
-				
+				expr();
 			}
 			m_currentAst = nullptr;
+			m_currentScope = nullptr;
 			return std::make_pair(std::move(ast), std::move(scope));
 		}
 
 	private:
-		void statement(Scope* currentScope) {
-			assert(currentScope != nullptr);
+		void statement() {
 			if (m_lookAhead == nullptr) {
 				return;
 			}
@@ -53,180 +52,186 @@ namespace ska {
 			std::string* content = nullptr;
 			switch (m_lookAhead->type) {
 			case TokenType::RESERVED:
-				matchReservedKeyword(*currentScope, std::get<std::size_t>(m_lookAhead->content));
+				matchReservedKeyword(std::get<std::size_t>(m_lookAhead->content));
 				break;
 
 			case TokenType::RANGE:
-				matchRange(*currentScope, std::get<std::string>(m_lookAhead->content));
+				matchRange(std::get<std::string>(m_lookAhead->content));
 				break;
 			
 			default:
-				expr(*currentScope);
-				
+				expr();
 				break;
 			}
 		}
 
-		void matchRange(Scope& scope, const std::string& content) {
+		void matchRange(const std::string& content) {
 			if (content[0] == '{' ) {
 				
 				branch();
-				match(scope, Token{ "{", TokenType::RANGE });
-				scope = &scope.add();
+				match(Token{ "{", TokenType::RANGE });
+				m_currentScope = &m_currentScope->add();
 				do {
-					optstatement(scope);
+					optstatement();
 				} while (m_lookAhead != nullptr && (*m_lookAhead) != Token{ "}", TokenType::RANGE });
-				match(scope, Token{ "}", TokenType::RANGE });
+				match(Token{ "}", TokenType::RANGE });
 				unbranch();
 
-				scope = &scope.parent();
+				m_currentScope = &m_currentScope->parent();
 			} else {
-				nextToken();
+				optexpr(Token{ ";", TokenType::SYMBOL });
 			}
 		}
 
-		void matchReservedKeyword(Scope& scope, const std::size_t keywordIndex) {
+		void matchReservedKeyword(const std::size_t keywordIndex) {
 			switch (keywordIndex) {
 
 			case ReservedKeywords::FOR:
-				match(scope, Token{ ReservedKeywords::FOR, TokenType::RESERVED });
+				match(Token{ ReservedKeywords::FOR, TokenType::RESERVED });
 				branch();
-				match(scope, Token{ "(", TokenType::RANGE });			
-				optstatement(scope);
+				match(Token{ "(", TokenType::RANGE });			
+				optstatement();
 				unbranch();
 				
 				branch();
-				optexpr(scope, Token{ ";", TokenType::SYMBOL });
-				match(scope, Token{ ";", TokenType::SYMBOL });
+				optexpr(Token{ ";", TokenType::SYMBOL });
+				match(Token{ ";", TokenType::SYMBOL });
 				unbranch();
 				
 				branch();
-				optexpr(scope, Token{ ")", TokenType::SYMBOL });
-				match(scope, Token{ ")", TokenType::RANGE });
+				optexpr(Token{ ")", TokenType::SYMBOL });
+				match(Token{ ")", TokenType::RANGE });
 				unbranch();
 
-				statement(&scope);
+				statement();
 				break;
 				
 			case ReservedKeywords::ELSE:
-				match(scope, Token{ ReservedKeywords::ELSE, TokenType::RESERVED });
+				match(Token{ ReservedKeywords::ELSE, TokenType::RESERVED });
+				statement();
 				break;
 			case ReservedKeywords::IF:
-				match(scope, Token{ ReservedKeywords::IF, TokenType::RESERVED });
+				match(Token{ ReservedKeywords::IF, TokenType::RESERVED });
 				break;
 
 			case ReservedKeywords::VAR:
-				match(scope, Token{ ReservedKeywords::VAR, TokenType::RESERVED });
 				{
-					const auto& identifier = matchUnknown(scope, TokenType::IDENTIFIER);
-					match(scope, Token{ "=", TokenType::SYMBOL });
-					const auto& value = expr(scope);
-					match(scope, Token{ ";", TokenType::SYMBOL });
-					scope.registerIdentifier(std::get<std::string>(identifier.content), value);
+					match(Token{ ReservedKeywords::VAR, TokenType::RESERVED });
+					const auto& identifier = match(TokenType::IDENTIFIER);
+					match(Token{ "=", TokenType::SYMBOL });
+					const auto& value = expr();
+					match(Token{ ";", TokenType::SYMBOL });
+					m_currentScope->registerIdentifier(std::get<std::string>(identifier.content), value);
 				}
 				break;
 
-			case ReservedKeywords::FUNCTION:
-				match(scope, Token{ ReservedKeywords::FUNCTION, TokenType::RESERVED });
+			case ReservedKeywords::FUNCTION: {
+					match(Token{ ReservedKeywords::FUNCTION, TokenType::RESERVED });
+					match(Token{ "(", TokenType::RANGE });
+
+					auto isRightParenthesis = m_lookAhead->type == TokenType::SYMBOL && std::get<std::string>(m_lookAhead->content) == ")";
+					while (!isRightParenthesis) {
+						if (m_lookAhead->type == TokenType::SYMBOL) {
+							expr();
+							match(Token{ ",", TokenType::SYMBOL });
+						}
+						isRightParenthesis = m_lookAhead->type == TokenType::SYMBOL && std::get<std::string>(m_lookAhead->content) == ")";
+					}
+
+					match(Token{ ")", TokenType::RANGE });
+				}
 				break;
 
 			default:
-				throw std::runtime_error("syntax error");
+				error();
 			}
 
 		}
-		
-		const Token* optexpr(Scope& scope, const Token& mustNotBe = Token{}) {
-			if (m_lookAhead != nullptr && (*m_lookAhead) != mustNotBe) {
-				return &expr(scope);
-			}
-			return nullptr;
-		}
 
-		void optstatement(Scope& scope, const Token& mustNotBe = Token{ }) {
-			if (m_lookAhead != nullptr && (*m_lookAhead) != mustNotBe) {
-				statement(&scope);
-			} else {
-				match(scope, Token{ ";", TokenType::SYMBOL });
-			}
-		}
-
-		const Token& expr(Scope& scope) {
+		const Token& expr() {
 			const auto& result = *m_lookAhead;
 			const auto& value = std::get<std::string>(m_lookAhead->content);
 			
 			switch (m_lookAhead->type) {
 			case TokenType::IDENTIFIER:
-				matchUnknown(scope, TokenType::IDENTIFIER);
+				match(TokenType::IDENTIFIER);
+				optexpr(Token{ ";", TokenType::SYMBOL });
 				break;
 			
 			case TokenType::DIGIT:
-				matchUnknown(scope, TokenType::DIGIT);
+				match(TokenType::DIGIT);
+				optexpr(Token{ ";", TokenType::SYMBOL });
 				break;
 			
 			case TokenType::STRING:
-				matchUnknown(scope, TokenType::STRING);
+				match(TokenType::STRING);
 				break;
 			
+			case TokenType::RESERVED:
+				matchReservedKeyword(ReservedKeywords::FUNCTION);
+				break;
+
 			case TokenType::RANGE:
-				//pushToken(result);
 				switch (value[0]) {
 				case '(' :
+					match(Token{ "(", TokenType::RANGE });
+					expr();
 					break;
 				case ')':
+					match(Token{ ")", TokenType::RANGE });
+					optexpr(Token{ ";", TokenType::SYMBOL });
 					break;
 				default:
-					throw std::runtime_error("syntax error");
+					error();
 				}
-				nextToken();
 				break;
 
 			case TokenType::SYMBOL:
 				switch (value[0]) {
 				case '=':
-					match(scope, Token{ "=", TokenType::SYMBOL });
-					expr(scope);
+					match(Token{ "=", TokenType::SYMBOL });
+					expr();
 					break;
 				
 				default:
-					matchUnknown(scope, TokenType::SYMBOL);
+					match(TokenType::SYMBOL);
+					expr();
 					break;
 				}
 				break;
 
 			default:
-				throw std::runtime_error("syntax error");
+				error();
 			}
 			return result;
 		}
 
-		const Token& matchUnknown(Scope& scope, const TokenType type) {
+		static void error() {
+			throw std::runtime_error("syntax error");
+		}
+
+		const Token& match(const TokenType type) {
 			if (m_lookAhead != nullptr && m_lookAhead->type == type) {
 				const auto& result = *m_lookAhead;
 				pushToken();
 				nextToken();
 				return result;
 			}
-			throw std::runtime_error("syntax error");
+			error();
 		}
 
-		void match(Scope& scope, Token t) {
+		void match(Token t) {
 			if (m_lookAhead != nullptr && *m_lookAhead == t) {
-				pushToken();
-				nextToken();
+				match(t.type);
 			} else {
-				throw std::runtime_error("syntax error");
+				error();
 			}
 		}
 
 		void pushToken() {
 			assert(m_lookAhead != nullptr);
 			if (m_lookAhead->type != TokenType::RANGE) {
-				if (m_currentAst->empty()) {
-					m_currentAst->token = *m_lookAhead;
-				} else {
-					m_currentAst->addChild(*m_lookAhead);
-				}
+				m_currentAst->addChild(*m_lookAhead);
 			}
 		}
 
@@ -246,10 +251,28 @@ namespace ska {
 			m_lookAhead = (m_lookAheadIndex + 1) < m_input.size() ? &m_input[++m_lookAheadIndex] : nullptr;
 		}
 
+		const Token* optexpr(const Token& mustNotBe = Token{}) {
+			if (m_lookAhead != nullptr && (*m_lookAhead) != mustNotBe) {
+				return &expr();
+			}
+			return nullptr;
+		}
+
+		void optstatement(const Token& mustNotBe = Token{}) {
+			if (m_lookAhead != nullptr && (*m_lookAhead) != mustNotBe) {
+				statement();
+			}
+			else {
+				match(Token{ ";", TokenType::SYMBOL });
+			}
+		}
+
 		std::vector<Token> m_input;
 		std::size_t m_lookAheadIndex = 0;
 		Token* m_lookAhead = nullptr;
+		
 		ASTNode* m_currentAst;
+		Scope* m_currentScope;
 	};
 }
 
