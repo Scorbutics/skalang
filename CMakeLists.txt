@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 3.9)
+project(skalang)
+
+set(CMAKE_CXX_STANDARD 17)
+
+file(GLOB_RECURSE SOURCES
+	RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    *.h
+    *.cpp
+)
+
+string(REGEX REPLACE "CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
+
+set(SKA_DEBUG_DIR "Debug")
+set(SKA_RELEASE_DIR "Release")
+
+add_executable(skalang ${SOURCES})
+set_target_properties(skalang PROPERTIES
+		ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/${SKA_DEBUG_DIR}
+	      	ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/${SKA_DEBUG_DIR}
+        	ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/${SKA_RELEASE_DIR})
+
