@@ -7,17 +7,22 @@ namespace ska {
 
 	enum class Operator {
 		BINARY,
-		UNARY
+		UNARY,
+		NUMERIC
 	};
 
 	class ASTNode {
 	public:
 		ASTNode() = default;
 
+		ASTNode(Token t) :
+			token(std::move(t)) {
+		}
+
 		ASTNode(ASTNode&&) noexcept = default;
 		ASTNode(const ASTNode&) = delete;
 
-		ASTNode& addChild(Token token) {
+		ASTNode& addOtherChild(Token token) {
 			m_children.emplace_back(std::make_unique<ASTNode>());
 			auto& last = *m_children.back().get();
 			last.token = std::move(token);
@@ -37,8 +42,15 @@ namespace ska {
 			return *m_parent;
 		}
 
+		Operator getOperator() const {
+			return m_operator;
+		}
+
 		Token token;
+		std::unique_ptr<ASTNode> left;
+		std::unique_ptr<ASTNode> right;
 	private:
+		Operator m_operator;
 		ASTNode* m_parent = this;
 		std::vector<std::unique_ptr<ASTNode>> m_children;
 	};

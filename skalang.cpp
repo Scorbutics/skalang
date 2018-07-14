@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <deque>
 #include <cassert>
 
 #include "Tokenizer.h"
@@ -149,22 +150,24 @@ namespace ska {
 		}
 
 		const Token& expr() {
+			auto nodeStack = std::deque<ASTNode>{};
+			auto node = ASTNode{};
 			const auto& result = *m_lookAhead;
 			const auto& value = std::get<std::string>(m_lookAhead->content);
 			
 			switch (m_lookAhead->type) {
 			case TokenType::IDENTIFIER:
-				match(TokenType::IDENTIFIER);
+				nodeStack.emplace_back(match(TokenType::IDENTIFIER));
 				optexpr(Token{ ";", TokenType::SYMBOL });
 				break;
 			
 			case TokenType::DIGIT:
-				match(TokenType::DIGIT);
+				nodeStack.emplace_back(match(TokenType::DIGIT));
 				optexpr(Token{ ";", TokenType::SYMBOL });
 				break;
 			
 			case TokenType::STRING:
-				match(TokenType::STRING);
+				nodeStack.emplace_back(match(TokenType::STRING));
 				break;
 			
 			case TokenType::RESERVED:
@@ -174,11 +177,11 @@ namespace ska {
 			case TokenType::RANGE:
 				switch (value[0]) {
 				case '(' :
-					match(Token{ "(", TokenType::RANGE });
+					nodeStack.emplace_back(match(Token{ "(", TokenType::RANGE }));
 					expr();
 					break;
 				case ')':
-					match(Token{ ")", TokenType::RANGE });
+					nodeStack.emplace_back(match(Token{ ")", TokenType::RANGE }));
 					optexpr(Token{ ";", TokenType::SYMBOL });
 					break;
 				default:
@@ -189,12 +192,12 @@ namespace ska {
 			case TokenType::SYMBOL:
 				switch (value[0]) {
 				case '=':
-					match(Token{ "=", TokenType::SYMBOL });
+					nodeStack.emplace_back(match(Token{ "=", TokenType::SYMBOL }));
 					expr();
 					break;
 				
 				default:
-					match(TokenType::SYMBOL);
+					nodeStack.emplace_back(match(TokenType::SYMBOL));
 					expr();
 					break;
 				}
@@ -220,18 +223,19 @@ namespace ska {
 			error();
 		}
 
-		void match(Token t) {
+		Token match(Token t) {
 			if (m_lookAhead != nullptr && *m_lookAhead == t) {
-				match(t.type);
+				return match(t.type);
 			} else {
 				error();
+				return t;
 			}
 		}
 
 		void pushToken() {
 			assert(m_lookAhead != nullptr);
 			if (m_lookAhead->type != TokenType::RANGE) {
-				m_currentAst->addChild(*m_lookAhead);
+				//m_currentAst->addChild(*m_lookAhead);
 			}
 		}
 
