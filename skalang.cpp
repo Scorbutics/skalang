@@ -66,7 +66,7 @@ namespace ska {
 				case TokenType::RESERVED:
 				case TokenType::IDENTIFIER:
 				case TokenType::DIGIT:
-					std::cout << "Pushing digit " << value << std::endl;
+					std::cout << "Pushing operand digit " << value << std::endl;
 					m_operands.push(std::make_unique<ASTNode>(match(result.type())));
 					break;
 
@@ -78,16 +78,17 @@ namespace ska {
 						break;
 					case ')':
 						m_operators.emplace(match(Token{ ")", TokenType::RANGE }));
-						std::cout << "Range end, poping" << std::endl;
+						std::cout << "Range end" << std::endl;
 						m_operands.push(popUntil([](const Token& t) {
 							const auto& strValue = t.asString();
 							if(t.type() == TokenType::RANGE) {
-								std::cout << "\tRange " << strValue << std::endl;
+								//std::cout << "\tRange " << strValue << std::endl;
 								return (strValue.empty() || strValue[0] == '(' )  ? -1 : 1;
 							}
 							std::cout << "\tPoping " << strValue << std::endl;
 							return 0;
 						}));
+						std::cout << m_operators.top().asString() << std::endl;
 						break;
 					default:
 						error();
@@ -95,19 +96,23 @@ namespace ska {
 					break;
 
 				case TokenType::SYMBOL: {
-					std::cout << "Pushing symbol " << value << std::endl;
+					std::cout << "Pushing operator symbol " << value << std::endl;
 						const auto shouldPopOperatorsStack = checkLessPriorityToken(value[0]);
+						auto operatorTop = m_operators.empty() ? Token{} : m_operators.top();
 						m_operators.emplace(match(TokenType::SYMBOL));
 						if(shouldPopOperatorsStack) {
-							std::cout << "Less precedence, poping" << std::endl;
-							m_operands.push(popUntil([this](const Token& t) {
-								const auto& strValue = t.asString();
-								const auto result = !strValue.empty() && checkLessPriorityToken(strValue[0]) ? 0 : -1;
-								if(result == 0) {
-									//std::cout << "\tPoping " << t.asString() << std::endl;
+							std::cout << "Less precedence, poping " << value << " and " << operatorTop.asString() << std::endl;
+							auto poped = 0u;
+							auto popedToken = popUntil([&](const Token& t) {
+								if(poped >= 2) {
+									return -1;
 								}
-								return result;
-							}));
+								poped++;
+								return 0;
+							});
+							if(popedToken != nullptr) {
+								m_operands.push(std::move(popedToken));
+							}
 						}
 					}
 					break;
@@ -130,10 +135,11 @@ namespace ska {
 		}
 
 		std::unique_ptr<ASTNode> popUntil(PopPredicate predicate) {
-			std::unique_ptr<ASTNode> currentNode;
+			auto currentNode = std::unique_ptr<ASTNode> {};
+			auto nextNode = std::unique_ptr<ASTNode> {};
 			
 			while(true) {
-				if(m_operators.empty()) {
+				if(m_operators.empty() || m_operands.empty()) {
 					break;
 				}
 				
@@ -146,21 +152,21 @@ namespace ska {
 					continue;
 				}
 				
-				//TODO a revoir
-				if(currentNode == nullptr) {
-					currentNode = std::make_unique<ASTNode>();
-					currentNode->left = std::move(m_operands.top()); m_operands.pop();
-				}
+				currentNode = std::make_unique<ASTNode>();
 				currentNode->token = op;
 				currentNode->right = std::move(m_operands.top()); m_operands.pop();
 				
-				auto newChildNode = std::move(currentNode);
-				currentNode = std::make_unique<ASTNode>();
-				currentNode->left = std::move(newChildNode);
-				std::cout << "\tPoped " << op.asString() << std::endl; 
+				if(nextNode != nullptr) {
+					currentNode->left = std::move(nextNode);
+				}else {
+					currentNode->left = std::move(m_operands.top()); m_operands.pop();
+				}
+				
+				nextNode = std::move(currentNode);
+				std::cout << "\tPoped " << op.asString() << std::endl;//<< " with " <<  nextNode->left->token.asString() << " and " << nextNode->right->token.asString() << std::endl; 
 			}
 			
-			return currentNode == nullptr ? nullptr : std::move(currentNode->left);
+			return currentNode == nullptr ? nullptr : std::move(nextNode);
 		}
 
 		static void error() {
@@ -462,6 +468,9 @@ namespace ska {
 
 void PrintTokenTree(const std::unique_ptr<ska::ASTNode>& node) {	
 	
+	std::cout << node->token.asString() << " | ";
+
+	
 	if(node->left != nullptr) {
 		PrintTokenTree(node->left);
 	}
@@ -469,9 +478,7 @@ void PrintTokenTree(const std::unique_ptr<ska::ASTNode>& node) {
 	if(node->right != nullptr) {
 		PrintTokenTree(node->right);
 	}
-	std::cout << node->token.asString() << " ";
-	//std::cout << "\t"; 
-	//std::cout << std::endl;
+	
 }
 
 int main() {
