@@ -32,6 +32,13 @@ namespace ska {
 			return m_operator;
 		}
 
+		std::string asString() const {
+			if(left != nullptr || right != nullptr) {
+				return "¤";
+			}
+			return token.asString();
+		}
+
 		Token token;
 		std::unique_ptr<ASTNode> left;
 		std::unique_ptr<ASTNode> right;
