@@ -3,7 +3,6 @@
 #include <variant>
 #include <sstream>
 #include <cassert>
-#include <iostream>
 
 namespace ska {
 	constexpr const char* TokenTypeSTR[] = {

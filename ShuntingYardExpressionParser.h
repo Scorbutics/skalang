@@ -25,6 +25,7 @@ public:
 
 namespace ska {
 	class ASTNode;
+	class Parser;
 	
 	class ShuntingYardExpressionParser {
 		using PopPredicate = std::function<int(const Token&)>;
@@ -33,10 +34,12 @@ namespace ska {
 		static std::unordered_map<char, int> PRIORITY_MAP;
 		
 	public:
-		ShuntingYardExpressionParser(const std::vector<Token>& input);
-		std::unique_ptr<ASTNode> parse(std::size_t indexStart);
+		ShuntingYardExpressionParser(Parser& parser, const std::vector<Token>& input);
+		std::pair<std::unique_ptr<ska::ASTNode>, std::size_t> parse(std::size_t indexStart);
 		
 	private:
+		void clear();
+		bool matchReserved();
 		std::unique_ptr<ASTNode> expression();
 		bool checkLessPriorityToken(const char tokenChar) const;
 		std::unique_ptr<ASTNode> popUntil(PopPredicate predicate);
@@ -46,6 +49,7 @@ namespace ska {
 		Token match(Token t);
 		void nextToken();
 	
+		Parser& m_parser;
 		const Token* m_lookAhead {};
 		std::size_t m_lookAheadIndex = 0;
 		const std::vector<Token>& m_input;

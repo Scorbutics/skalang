@@ -1,6 +1,8 @@
+#include <iostream>
 #include "ShuntingYardExpressionParser.h"
+#include "Parser.h"
 #include "AST.h"
-
+#include "ReservedKeywordsPool.h"
 
 template <class Container>
 void Print(const Container& c, const std::string& name = " ") {
@@ -35,66 +37,77 @@ void PrintPtr(const Container& c, const std::string& name = " ") {
 		
 		std::unordered_map<char, int> ska::ShuntingYardExpressionParser::PRIORITY_MAP = BuildPriorityMap();
 		
-		ska::ShuntingYardExpressionParser::ShuntingYardExpressionParser(const std::vector<Token>& input) : 
+		ska::ShuntingYardExpressionParser::ShuntingYardExpressionParser(Parser& parser, const std::vector<Token>& input) : 
+			m_parser(parser), 
 			m_input(input) {
 		}
 		
-		std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::parse(const std::size_t indexStart) {
+		std::pair<std::unique_ptr<ska::ASTNode>, std::size_t> ska::ShuntingYardExpressionParser::parse(const std::size_t indexStart) {
 			m_lookAheadIndex = indexStart;
 			m_lookAhead = &m_input[m_lookAheadIndex];
-			return expression();
+			auto result = expression();
+			return std::make_pair(std::move(result), m_lookAheadIndex);
 		}
 		
 		std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::expression() {
 			auto node = ASTNode{};
 			
-			std::cout << "Shunting Yards steps :" << std::endl;
+			//std::cout << "Shunting Yards steps :" << std::endl;
 			
 			while(m_lookAhead != nullptr && m_lookAhead->type() != TokenType::EMPTY && (*m_lookAhead) != Token {";", TokenType::SYMBOL}) {
 				const auto& result = *m_lookAhead;
-				const auto& value = std::get<std::string>(result.content());
+				
 				
 				PrintPtr(m_operands, "Operands");
 				Print(m_operators, "Operators");
 				
 				switch (result.type()) {
-				case TokenType::STRING:
 				case TokenType::RESERVED:
+					std::cout << "Pushing reserved" << std::endl;
+						if(matchReserved()) {
+							clear();
+							break;
+						} 
+				case TokenType::STRING:
 				case TokenType::IDENTIFIER:
 				case TokenType::DIGIT:
-					std::cout << "Pushing operand digit " << value << std::endl;
+					std::cout << "Pushing operand " << result.asString() << std::endl;
 					m_operands.push(std::make_unique<ASTNode>(match(result.type())));
 					break;
 
-				case TokenType::RANGE:
-					switch (value[0]) {
-					case '(' :
-						std::cout << "Range begin" << std::endl;
-						m_operators.emplace(match(Token{ "(", TokenType::RANGE }));
-						break;
-					case ')': {
-							m_operators.emplace(match(Token{ ")", TokenType::RANGE }));
-							std::cout << "Range end" << std::endl;
-							auto rangeOperandResult = popUntil([](const Token& t) {
-								const auto& strValue = t.asString();
-								if(t.type() == TokenType::RANGE) {
-									return (strValue.empty() || strValue[0] == '(' )  ? -1 : 1;
-								}
-								std::cout << "\tPoping " << strValue << std::endl;
-								return 0;
-							});
-							assert(rangeOperandResult != nullptr);
-							m_operands.push(std::move(rangeOperandResult));
-							m_operators.pop();
+				case TokenType::RANGE: {
+						const auto& value = std::get<std::string>(result.content());
+						switch (value[0]) {
+						case '(' :
+							std::cout << "Range begin" << std::endl;
+							m_operators.emplace(match(Token{ "(", TokenType::RANGE }));
+							break;
+						case ')': {
+								m_operators.emplace(match(Token{ ")", TokenType::RANGE }));
+								std::cout << "Range end" << std::endl;
+								auto rangeOperandResult = popUntil([](const Token& t) {
+									const auto& strValue = t.asString();
+									if(t.type() == TokenType::RANGE) {
+										return (strValue.empty() || strValue[0] == '(' )  ? -1 : 1;
+									}
+									std::cout << "\tPoping " << strValue << std::endl;
+									return 0;
+								});
+								assert(rangeOperandResult != nullptr);
+								m_operands.push(std::move(rangeOperandResult));
+								m_operators.pop();
+							}
+							break;
+							
+						default:
+							error();
 						}
-						break;
-						
-					default:
-						error();
+				
 					}
 					break;
 
 				case TokenType::SYMBOL: {
+					const auto& value = std::get<std::string>(result.content());
 					std::cout << "Pushing operator symbol " << value << std::endl;
 						const auto shouldPopOperatorsStack = checkLessPriorityToken(value[0]);
 						auto operatorTop = m_operators.empty() ? Token{} : m_operators.top();
@@ -121,9 +134,11 @@ void PrintPtr(const Container& c, const std::string& name = " ") {
 			
 			}
 			std::cout << "Poping everything" << std::endl;
-			return popUntil([](const auto& t) {
+			auto result = popUntil([](const auto& t) {
 				return 0;
 			});
+			clear();
+			return result;
 		}
 
 		bool ska::ShuntingYardExpressionParser::checkLessPriorityToken(const char tokenChar) const {
@@ -131,6 +146,48 @@ void PrintPtr(const Container& c, const std::string& name = " ") {
 			return PRIORITY_MAP.find(tokenChar) != PRIORITY_MAP.end() &&
 					PRIORITY_MAP.find(topOperatorContent) != PRIORITY_MAP.end() &&
 					PRIORITY_MAP.at(tokenChar) < PRIORITY_MAP.at(topOperatorContent);
+		}
+
+		void ska::ShuntingYardExpressionParser::clear() {
+			m_lookAhead = nullptr;
+			m_operators = decltype(m_operators){};
+			m_operands = decltype(m_operands){};
+		}
+
+		bool ska::ShuntingYardExpressionParser::matchReserved() {
+			const auto& result = *m_lookAhead;
+			
+			switch(std::get<std::size_t>(result.content())) {
+				case ReservedKeywords::FUNCTION: {
+						std::cout << "function creation" << std::endl;
+						match(Token{ ReservedKeywords::FUNCTION, TokenType::RESERVED });
+						match(Token{ "(", TokenType::RANGE });
+						
+						auto isRightParenthesis = (*m_lookAhead) == Token {")", TokenType::SYMBOL};
+						auto isComma = true;
+						while (!isRightParenthesis && isComma) {
+							if (m_lookAhead->type() != TokenType::SYMBOL) {
+								std::cout << "parameter detected, reading identifier" << std::endl;
+								match(TokenType::IDENTIFIER);
+								isComma = (*m_lookAhead) == Token {",", TokenType::SYMBOL};
+								if(isComma) {
+									match(Token{ ",", TokenType::SYMBOL });
+								}
+							}
+							isRightParenthesis = (*m_lookAhead) == Token {")", TokenType::SYMBOL};
+						}
+
+						match(Token{ ")", TokenType::RANGE });
+						std::cout << "reading function statement" << std::endl;
+						m_parser.m_lookAhead = m_lookAhead;
+						m_parser.m_lookAheadIndex = m_lookAheadIndex;
+						m_parser.statement();
+					}
+					return true;
+					
+				default:
+					return false;
+			}
 		}
 
 		std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::popUntil(PopPredicate predicate) {

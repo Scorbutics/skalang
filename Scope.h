@@ -3,7 +3,7 @@
 #include <vector>
 #include <unordered_map>
 
-#include "Token.h"
+#include "AST.h"
 
 namespace ska {
 
@@ -24,13 +24,13 @@ namespace ska {
 			return m_subScopes.back();
 		}
 
-		void registerIdentifier(const std::string& identifier, const Token& value) {
-			m_identifierMap.emplace(identifier, value);
+		void registerIdentifier(const std::string& identifier, std::unique_ptr<ASTNode> value) {
+			m_identifierMap.emplace(identifier, std::move(value));
 		}
 
 	private:
 		Scope* m_parent = nullptr;
 		std::vector<Scope> m_subScopes;
-		std::unordered_map<std::string, Token> m_identifierMap;
+		std::unordered_map<std::string, std::unique_ptr<ASTNode>> m_identifierMap;
 	};
 }
