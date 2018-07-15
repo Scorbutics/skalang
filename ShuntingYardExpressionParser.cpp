@@ -35,11 +35,12 @@ void PrintPtr(const Container& c, const std::string& name = " ") {
 		
 		std::unordered_map<char, int> ska::ShuntingYardExpressionParser::PRIORITY_MAP = BuildPriorityMap();
 		
-		ska::ShuntingYardExpressionParser::ShuntingYardExpressionParser(std::vector<Token> input) : 
-			m_input(std::move(input)) {
+		ska::ShuntingYardExpressionParser::ShuntingYardExpressionParser(const std::vector<Token>& input) : 
+			m_input(input) {
 		}
 		
-		std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::parse() {
+		std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::parse(const std::size_t indexStart) {
+			m_lookAheadIndex = indexStart;
 			m_lookAhead = &m_input[m_lookAheadIndex];
 			return expression();
 		}
@@ -49,7 +50,7 @@ void PrintPtr(const Container& c, const std::string& name = " ") {
 			
 			std::cout << "Shunting Yards steps :" << std::endl;
 			
-			while(m_lookAhead != nullptr && m_lookAhead->type() != TokenType::EMPTY) {
+			while(m_lookAhead != nullptr && m_lookAhead->type() != TokenType::EMPTY && (*m_lookAhead) != Token {";", TokenType::SYMBOL}) {
 				const auto& result = *m_lookAhead;
 				const auto& value = std::get<std::string>(result.content());
 				

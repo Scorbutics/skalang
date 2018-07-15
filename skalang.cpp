@@ -30,7 +30,8 @@ namespace ska {
 	class Parser {
 	public:
 		Parser(std::vector<Token> input) :
-			m_input(std::move(input)) {
+			m_input(std::move(input)),
+			m_shuntingYardParser(m_input) {
 		}
 
 		std::pair<ASTNode, Scope> parse() {
@@ -126,7 +127,7 @@ namespace ska {
 					match(Token{ "=", TokenType::SYMBOL });
 					const auto& value = expr();
 					match(Token{ ";", TokenType::SYMBOL });
-					m_currentScope->registerIdentifier(std::get<std::string>(identifier.content()), value);
+					m_currentScope->registerIdentifier(std::get<std::string>(identifier.content()), value->token);
 				}
 				break;
 
@@ -153,64 +154,8 @@ namespace ska {
 
 		}
 
-		const Token& expr() {
-			auto nodeStack = std::deque<ASTNode>{};
-			auto node = ASTNode{};
-			const auto& result = *m_lookAhead;
-			const auto& value = std::get<std::string>(m_lookAhead->content());
-			
-			switch (m_lookAhead->type()) {
-			case TokenType::IDENTIFIER:
-				nodeStack.emplace_back(match(TokenType::IDENTIFIER));
-				optexpr(Token{ ";", TokenType::SYMBOL });
-				break;
-			
-			case TokenType::DIGIT:
-				nodeStack.emplace_back(match(TokenType::DIGIT));
-				optexpr(Token{ ";", TokenType::SYMBOL });
-				break;
-			
-			case TokenType::STRING:
-				nodeStack.emplace_back(match(TokenType::STRING));
-				break;
-			
-			case TokenType::RESERVED:
-				matchReservedKeyword(ReservedKeywords::FUNCTION);
-				break;
-
-			case TokenType::RANGE:
-				switch (value[0]) {
-				case '(' :
-					nodeStack.emplace_back(match(Token{ "(", TokenType::RANGE }));
-					expr();
-					break;
-				case ')':
-					nodeStack.emplace_back(match(Token{ ")", TokenType::RANGE }));
-					optexpr(Token{ ";", TokenType::SYMBOL });
-					break;
-				default:
-					error();
-				}
-				break;
-
-			case TokenType::SYMBOL:
-				switch (value[0]) {
-				case '=':
-					nodeStack.emplace_back(match(Token{ "=", TokenType::SYMBOL }));
-					expr();
-					break;
-				
-				default:
-					nodeStack.emplace_back(match(TokenType::SYMBOL));
-					expr();
-					break;
-				}
-				break;
-
-			default:
-				error();
-			}
-			return result;
+		std::unique_ptr<ska::ASTNode> expr() {
+			return m_shuntingYardParser.parse(m_lookAheadIndex);
 		}
 
 		static void error() {
@@ -220,7 +165,7 @@ namespace ska {
 		const Token& match(const TokenType type) {
 			if (m_lookAhead != nullptr && m_lookAhead->type() == type) {
 				const auto& result = *m_lookAhead;
-				pushToken();
+				//pushToken();
 				nextToken();
 				return result;
 			}
@@ -259,9 +204,9 @@ namespace ska {
 			m_lookAhead = (m_lookAheadIndex + 1) < m_input.size() ? &m_input[++m_lookAheadIndex] : nullptr;
 		}
 
-		const Token* optexpr(const Token& mustNotBe = Token{}) {
+		std::unique_ptr<ska::ASTNode> optexpr(const Token& mustNotBe = Token{}) {
 			if (m_lookAhead != nullptr && (*m_lookAhead) != mustNotBe) {
-				return &expr();
+				return expr();
 			}
 			return nullptr;
 		}
@@ -276,6 +221,7 @@ namespace ska {
 		}
 
 		std::vector<Token> m_input;
+		ShuntingYardExpressionParser m_shuntingYardParser;
 		std::size_t m_lookAheadIndex = 0;
 		Token* m_lookAhead = nullptr;
 		
@@ -319,12 +265,11 @@ int main() {
 			std::cout << "[" << std::setw(10) << TokenTypeSTR[static_cast<std::size_t>(token.type())] << "]\t" << (token.type() == ska::TokenType::RESERVED ? "" : std::get<std::string>(token.content())) << std::endl;
 		}
 
-		auto parser = ska::ShuntingYardExpressionParser { std::move(tokens) };
+		auto parser = ska::Parser { std::move(tokens) };
 		auto tokenTree = parser.parse();
 		
-		PrintTokenTreeRPN(tokenTree);
+		//PrintTokenTreeRPN(tokenTree);
 		std::cout << std::endl;
-		break;
 	}
     return 0;
 }

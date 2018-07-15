@@ -33,8 +33,8 @@ namespace ska {
 		static std::unordered_map<char, int> PRIORITY_MAP;
 		
 	public:
-		ShuntingYardExpressionParser(std::vector<Token> input);
-		std::unique_ptr<ASTNode> parse();
+		ShuntingYardExpressionParser(const std::vector<Token>& input);
+		std::unique_ptr<ASTNode> parse(std::size_t indexStart);
 		
 	private:
 		std::unique_ptr<ASTNode> expression();
@@ -46,9 +46,9 @@ namespace ska {
 		Token match(Token t);
 		void nextToken();
 	
-		Token* m_lookAhead {};
+		const Token* m_lookAhead {};
 		std::size_t m_lookAheadIndex = 0;
-		std::vector<Token> m_input;
+		const std::vector<Token>& m_input;
 		iterable_stack<Token> m_operators;
 		iterable_stack<std::unique_ptr<ASTNode>> m_operands;
 	};
