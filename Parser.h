@@ -5,11 +5,11 @@
 #include "ShuntingYardExpressionParser.h"
 
 namespace ska {
-	
+
 	class Parser {
 		friend class ShuntingYardExpressionParser;
 	public:
-		Parser(std::vector<Token> input) ;
+		Parser(TokenReader& input) ;
 
 		std::pair<ASTNode, Scope> parse() ;
 
@@ -24,27 +24,19 @@ namespace ska {
 
 		static void error() ;
 
-		const Token& match(const TokenType type) ;
-
-		Token match(Token t) ;
-
 		void pushToken() ;
 
 		void unbranch() ;
 
 		void branch() ;
 
-		void nextToken() ;
-
 		std::unique_ptr<ska::ASTNode> optexpr(const Token& mustNotBe = Token{}) ;
 
 		void optstatement(const Token& mustNotBe = Token{}) ;
 
-		std::vector<Token> m_input;
+		TokenReader& m_input;
 		ShuntingYardExpressionParser m_shuntingYardParser;
-		std::size_t m_lookAheadIndex = 0;
-		const Token* m_lookAhead = nullptr;
-		
+
 		ASTNode* m_currentAst;
 		Scope* m_currentScope;
 	};

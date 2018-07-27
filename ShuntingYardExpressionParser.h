@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <functional>
 
-#include "Token.h"
+#include "TokenReader.h"
 
 template<typename T, typename Container = std::deque<T>>
 class iterable_stack
@@ -26,17 +26,17 @@ public:
 namespace ska {
 	class ASTNode;
 	class Parser;
-	
+
 	class ShuntingYardExpressionParser {
 		using PopPredicate = std::function<int(const Token&)>;
-		
+
 		static std::unordered_map<char, int> BuildPriorityMap() ;
 		static std::unordered_map<char, int> PRIORITY_MAP;
-		
+
 	public:
-		ShuntingYardExpressionParser(Parser& parser, const std::vector<Token>& input);
-		std::pair<std::unique_ptr<ska::ASTNode>, std::size_t> parse(std::size_t indexStart);
-		
+		ShuntingYardExpressionParser(Parser& parser, TokenReader& input);
+		std::unique_ptr<ska::ASTNode> parse();
+
 	private:
 		void clear();
 		bool matchReserved();
@@ -44,17 +44,12 @@ namespace ska {
 		bool checkLessPriorityToken(const char tokenChar) const;
 		std::unique_ptr<ASTNode> popUntil(PopPredicate predicate);
 		static void error();
-		
-		const Token& match(const TokenType type);
-		Token match(Token t);
-		void nextToken();
-	
+
+		TokenReader& m_input;
+
 		Parser& m_parser;
-		const Token* m_lookAhead {};
-		std::size_t m_lookAheadIndex = 0;
-		const std::vector<Token>& m_input;
 		iterable_stack<Token> m_operators;
 		iterable_stack<std::unique_ptr<ASTNode>> m_operands;
 	};
-	
+
 }
