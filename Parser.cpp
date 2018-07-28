@@ -13,10 +13,8 @@
 			m_currentAst = &ast;
 			m_currentScope = &scope;
 
-			if (!m_input.empty()) {
-				//m_lookAhead = &m_input[0];
-				statement();
-			}
+			statement();
+			
 			m_currentAst = nullptr;
 			m_currentScope = nullptr;
 			return std::make_pair(std::move(ast), std::move(scope));
@@ -44,7 +42,7 @@
 					auto expressionResult = expr();
 					m_input.match(Token{ ";", TokenType::SYMBOL });
 					if(expressionResult == nullptr) {
-						std::cout << "null" << std::endl;
+						std::cout << "null expression" << std::endl;
 						return;
 					}
 				}
@@ -74,7 +72,7 @@
 			switch (keywordIndex) {
 
 			case ReservedKeywords::FOR:
-				std::cout << "for loop 1st expression" << std::endl;
+				std::cout << "1st for loop expression" << std::endl;
 				m_input.match(Token{ ReservedKeywords::FOR, TokenType::RESERVED });
 				//branch();
 				m_input.match(Token{ "(", TokenType::RANGE });
@@ -89,11 +87,12 @@
 
 				std::cout << "3rd for loop expression" << std::endl;
 				//branch();
-				optexpr(Token{ ")", TokenType::SYMBOL });
+				optexpr(Token{ ")", TokenType::RANGE });
 				m_input.match(Token{ ")", TokenType::RANGE });
 				//unbranch();
 
 				statement();
+				std::cout << "end for loop statement" << std::endl;
 				break;
 
 			case ReservedKeywords::ELSE:
@@ -119,27 +118,7 @@
 				break;
 
 			case ReservedKeywords::FUNCTION: {
-					std::cout << "function creation" << std::endl;
-					m_input.match(Token{ ReservedKeywords::FUNCTION, TokenType::RESERVED });
-					m_input.match(Token{ "(", TokenType::RANGE });
-
-					auto isRightParenthesis = m_input.expect(Token {")", TokenType::SYMBOL});
-					auto isComma = true;
-					while (!isRightParenthesis && isComma) {
-						if (!m_input.expect(TokenType::SYMBOL)) {
-							std::cout << "parameter detected, reading identifier" << std::endl;
-							m_input.match(TokenType::IDENTIFIER);
-							isComma = m_input.expect(Token {",", TokenType::SYMBOL});
-							if(isComma) {
-								m_input.match(Token{ ",", TokenType::SYMBOL });
-							}
-						}
-						isRightParenthesis = m_input.expect(Token {")", TokenType::SYMBOL});
-					}
-
-					m_input.match(Token{ ")", TokenType::RANGE });
-					std::cout << "reading function statement" << std::endl;
-					statement();
+					matchFunction();
 				}
 				break;
 
@@ -149,14 +128,38 @@
 
 		}
 
-		std::unique_ptr<ska::ASTNode> ska::Parser::expr() {
-			return m_shuntingYardParser.parse();
+		std::unique_ptr<ska::ASTNode> ska::Parser::expr(const Token& token) {
+			return m_shuntingYardParser.parse(token);
 		}
 
 		void ska::Parser::error() {
 			throw std::runtime_error("syntax error");
 		}
 
+		void ska::Parser::matchFunction() {
+			std::cout << "function creation" << std::endl;
+			m_input.match(Token{ ReservedKeywords::FUNCTION, TokenType::RESERVED });
+			m_input.match(Token{ "(", TokenType::RANGE });
+
+			auto isRightParenthesis = m_input.expect(Token{ ")", TokenType::SYMBOL });
+			auto isComma = true;
+			while (!isRightParenthesis && isComma) {
+				if (!m_input.expect(TokenType::SYMBOL)) {
+					std::cout << "parameter detected, reading identifier" << std::endl;
+					m_input.match(TokenType::IDENTIFIER);
+					isComma = m_input.expect(Token{ ",", TokenType::SYMBOL });
+					if (isComma) {
+						m_input.match(Token{ ",", TokenType::SYMBOL });
+					}
+				}
+				isRightParenthesis = m_input.expect(Token{ ")", TokenType::SYMBOL });
+			}
+
+			m_input.match(Token{ ")", TokenType::RANGE });
+			std::cout << "reading function statement" << std::endl;
+			statement();
+			std::cout << "function read." << std::endl;
+		}
 
 		void ska::Parser::unbranch() {
 			//m_currentAst = &m_currentAst->parent;
@@ -172,7 +175,7 @@
 
 		std::unique_ptr<ska::ASTNode> ska::Parser::optexpr(const Token& mustNotBe) {
 			if (!m_input.expect(mustNotBe)) {
-				return expr();
+				return expr(mustNotBe);
 			}
 			return nullptr;
 		}

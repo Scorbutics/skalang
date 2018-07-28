@@ -8,6 +8,9 @@ namespace ska {
         TokenReader(const std::vector<ska::Token>& input, std::size_t startIndex = 0) :
             m_input{ input },
             m_lookAheadIndex{ startIndex } {
+			if (!m_input.empty()) {
+				m_lookAhead = &m_input[m_lookAheadIndex];
+			}
         }
 
 		const Token& match(Token t);

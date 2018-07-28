@@ -20,9 +20,11 @@ namespace ska {
 
 		void matchReservedKeyword(const std::size_t keywordIndex) ;
 
-		std::unique_ptr<ska::ASTNode> expr() ;
+		std::unique_ptr<ska::ASTNode> expr(const Token& token = Token{ ";", TokenType::SYMBOL }) ;
 
 		static void error() ;
+
+		void matchFunction();
 
 		void pushToken() ;
 

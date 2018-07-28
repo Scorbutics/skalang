@@ -29,27 +29,28 @@ namespace ska {
 
 	class ShuntingYardExpressionParser {
 		using PopPredicate = std::function<int(const Token&)>;
+		template <class T>
+		using stack = iterable_stack<T>;
 
 		static std::unordered_map<char, int> BuildPriorityMap() ;
 		static std::unordered_map<char, int> PRIORITY_MAP;
 
 	public:
 		ShuntingYardExpressionParser(Parser& parser, TokenReader& input);
-		std::unique_ptr<ska::ASTNode> parse();
+		std::unique_ptr<ska::ASTNode> parse(const Token& expectedEnd = Token{ ";", TokenType::SYMBOL });
+
+		bool parseTokenExpression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const Token& token, const Token& expectedEnd);
 
 	private:
-		void clear();
 		bool matchReserved();
-		std::unique_ptr<ASTNode> expression();
-		bool checkLessPriorityToken(const char tokenChar) const;
-		std::unique_ptr<ASTNode> popUntil(PopPredicate predicate);
+		std::unique_ptr<ASTNode> expression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const Token& expectedEnd);
+		bool checkLessPriorityToken(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const char tokenChar) const;
+		std::unique_ptr<ASTNode> popUntil(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, PopPredicate predicate);
 		static void error();
 
 		TokenReader& m_input;
 
 		Parser& m_parser;
-		iterable_stack<Token> m_operators;
-		iterable_stack<std::unique_ptr<ASTNode>> m_operands;
 	};
 
 }
