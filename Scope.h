@@ -2,7 +2,9 @@
 
 #include <vector>
 #include <unordered_map>
-
+#include <memory>
+#include <string>
+#include <utility>
 #include "AST.h"
 
 namespace ska {
@@ -15,6 +17,9 @@ namespace ska {
 			m_parent(parent) {
 		}
 
+		Scope(const Scope&) = delete;
+		Scope(Scope&&) = default;
+
 		Scope& parent() {
 			return m_parent == nullptr ? *this : *m_parent;
 		}
@@ -25,7 +30,8 @@ namespace ska {
 		}
 
 		void registerIdentifier(const std::string& identifier, std::unique_ptr<ASTNode> value) {
-			m_identifierMap.emplace(identifier, std::move(value));
+			auto pair = std::make_pair(identifier, std::move(value));
+			m_identifierMap.insert(std::move(pair));
 		}
 
 	private:

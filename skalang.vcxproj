@@ -148,16 +148,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Scope.cpp" />
+    <ClCompile Include="ShuntingYardExpressionParser.cpp" />
     <ClCompile Include="skalang.cpp" />
     <ClCompile Include="Tokenizer.cpp" />
+    <ClCompile Include="TokenReader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AST.h" />
+    <ClInclude Include="Parser.h" />
     <ClInclude Include="ReservedKeywordsPool.h" />
     <ClInclude Include="Scope.h" />
+    <ClInclude Include="ShuntingYardExpressionParser.h" />
     <ClInclude Include="Token.h" />
     <ClInclude Include="Tokenizer.h" />
+    <ClInclude Include="TokenReader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
