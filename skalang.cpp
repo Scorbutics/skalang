@@ -20,13 +20,8 @@ constexpr const char* TokenTypeSTR[] = {
 
 void PrintTokenTreeRPN(const std::unique_ptr<ska::ASTNode>& node) {
 
-
-	if(node->left != nullptr) {
-		PrintTokenTreeRPN(node->left);
-	}
-
-	if(node->right != nullptr) {
-		PrintTokenTreeRPN(node->right);
+	for (const auto& child : (*node)) {
+		PrintTokenTreeRPN(child);
 	}
 
 	std::cout << node->token.asString() << " ";

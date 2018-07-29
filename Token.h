@@ -32,36 +32,15 @@ namespace ska {
 	struct Token {
 		using Variant = std::variant<std::size_t, double, std::string>;
 		
-		Token() {
-			//std::cout << "Empty " << asString() << std::endl;
-		}
-		
-		Token(const Token& t) {
-			*this = t;
-		}
-		
-		Token(Token&& t) noexcept {
-			*this = std::move(t);
-		}
-		
-		Token& operator=(const Token& t) {
-			m_content = t.m_content;
-			m_type = t.m_type;
-			//std::cout << "Copy " << asString() << std::endl;
-			return *this;
-		}
-		
-		Token& operator=(Token&& t) noexcept {
-			m_content = std::move(t.m_content);
-			m_type = std::move(t.m_type);
-			//std::cout << "Move " << asString() << std::endl;
-			return *this;
-		}
+		Token() = default;
+		Token(const Token& t) = default;
+		Token(Token&& t) noexcept = default;
+		Token& operator=(const Token& t) = default;
+		Token& operator=(Token&& t) noexcept = default;
 		
 		Token(std::string c, TokenType t) : 
 			m_type(std::move(t)) {
 			init(c, m_type);
-			//std::cout << "From string" << asString() << std::endl;
 		}
 
 		Token(std::size_t c, TokenType t) :
@@ -71,7 +50,6 @@ namespace ska {
 			} else {
 				init(c, m_type);
 			}
-			//std::cout << "From int " << asString() << std::endl;
 		}
 
 		void init(std::size_t c, TokenType t) {
@@ -105,7 +83,6 @@ namespace ska {
 				return ss.str();
 			}
 			
-			//std::cout << TokenTypeSTR[static_cast<int>(m_type)] << std::endl;
 			return std::holds_alternative<std::string>(m_content) ? std::get<std::string>(m_content) : "error variant";
 		}
 

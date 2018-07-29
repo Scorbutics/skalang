@@ -24,188 +24,263 @@ void PrintPtr(const Container& c, const std::string& name = " ") {
 	std::cout << std::endl;
 }
 
-		std::unordered_map<char, int> ska::ShuntingYardExpressionParser::BuildPriorityMap() {
-			auto result = std::unordered_map<char, int>{};
+std::unordered_map<char, int> ska::ShuntingYardExpressionParser::BuildPriorityMap() {
+	auto result = std::unordered_map<char, int>{};
 
-			result.emplace('+', 100);
-			result.emplace('-', 100);
-			result.emplace('*', 200);
-			result.emplace('/', 200);
+	result.emplace('+', 100);
+	result.emplace('-', 100);
+	result.emplace('*', 200);
+	result.emplace('/', 200);
 
-			return result;
+	return result;
+}
+
+std::unordered_map<char, int> ska::ShuntingYardExpressionParser::PRIORITY_MAP = BuildPriorityMap();
+
+ska::ShuntingYardExpressionParser::ShuntingYardExpressionParser(Parser& parser, TokenReader& input) :
+	m_parser(parser),
+	m_input(input) {
+}
+
+std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::parse() {
+	auto operators = stack<Token>{};
+	auto operands = stack<std::unique_ptr<ASTNode>> {};
+	return expression(operators, operands);
+}
+
+bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const Token& token, Token& lastToken) {
+	
+	switch (token.type()) {
+		case TokenType::RESERVED: {
+			std::cout << "\tPushing reserved" << std::endl;
+			auto reservedNode = matchReserved();
+			if (reservedNode != nullptr) {
+				operands.push(std::move(reservedNode));
+				break;
+			}
 		}
+		case TokenType::IDENTIFIER:
+			lastToken = token;
+		case TokenType::STRING:
+		case TokenType::DIGIT:
+			std::cout << "\tPushing operand " << token.asString() << std::endl;
+			operands.push(std::make_unique<ASTNode>(m_input.match(token.type())));
+			return true;
 
-		std::unordered_map<char, int> ska::ShuntingYardExpressionParser::PRIORITY_MAP = BuildPriorityMap();
+		case TokenType::RANGE: {
+			const auto& value = std::get<std::string>(token.content());
+			switch (value[0]) {
+			case '(':
 
-		ska::ShuntingYardExpressionParser::ShuntingYardExpressionParser(Parser& parser, TokenReader& input) :
-			m_parser(parser),
-			m_input(input) {
-		}
-
-		std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::parse(const Token& expectedEnd) {
-			auto operators = stack<Token>{};
-			auto operands = stack<std::unique_ptr<ASTNode>> {};
-			return expression(operators, operands, expectedEnd);
-		}
-
-		bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const Token& token, const Token& expectedEnd) {
-			switch (token.type()) {
-				case TokenType::RESERVED:
-					std::cout << "\tPushing reserved" << std::endl;
-					if (matchReserved()) {
-						break;
-					}
-				case TokenType::STRING:
-				case TokenType::IDENTIFIER:
-				case TokenType::DIGIT:
-					std::cout << "\tPushing operand " << token.asString() << std::endl;
-					operands.push(std::make_unique<ASTNode>(m_input.match(token.type())));
-					break;
-
-				case TokenType::RANGE: {
-					const auto& value = std::get<std::string>(token.content());
-					switch (value[0]) {
-					case '(':
-						std::cout << "\tRange begin" << std::endl;
-						operators.emplace(m_input.match(Token{ "(", TokenType::RANGE }));
-						break;
-					case ')': {
-						operators.emplace(m_input.match(Token{ ")", TokenType::RANGE }));
-						std::cout << "\tRange end" << std::endl;
-						auto rangeOperandResult = popUntil(operators, operands, [](const Token& t) {
-							const auto& strValue = t.asString();
-							if (t.type() == TokenType::RANGE) {
-								return (strValue.empty() || strValue[0] == '(') ? -1 : 1;
-							}
-							std::cout << "\t\tPoping " << strValue << std::endl;
-							return 0;
-						});
-						if (rangeOperandResult != nullptr) {
-							operands.push(std::move(rangeOperandResult));
-						}
-						if (!operators.empty()) {
-							operators.pop();
-						}
-						if (expectedEnd == Token{ ")", TokenType::RANGE }) {
-							return false;
-						}
-					}
-					break;
-
-					default:
-						error();
-					}
-				
+				if (!lastToken.empty()) {
+					std::cout << "\tFunction call !" << std::endl;
+					//We already pushed the identifier as an operand, but in fact it's a function call.
+					//We have to pop it, then matching the function call as the new operand.
+					operands.pop();
+					operands.push(matchFunctionCall(lastToken));
+				} else {
+					std::cout << "\tRange begin" << std::endl;
+					operators.emplace(m_input.match(Token{ "(", TokenType::RANGE }));
 				}
 				break;
-
-				case TokenType::SYMBOL: {
-					const auto& value = std::get<std::string>(token.content());
-					std::cout << "\tPushing operator symbol " << value << std::endl;
-					const auto shouldPopOperatorsStack = checkLessPriorityToken(operators, operands, value[0]);
-					auto operatorTop = operators.empty() ? Token{} : operators.top();
-					if (shouldPopOperatorsStack) {
-						std::cout << "\tLess precedence, poping " << operatorTop.asString() << " before adding " << value << std::endl;
-						auto poped = 0u;
-						auto popedToken = popUntil(operators, operands, [&](const Token& t) {
-							if (poped >= 1) {
-								return -1;
-							}
-							poped++;
-							return 0;
-						});
-						assert(popedToken != nullptr);
-						operands.push(std::move(popedToken));
+			case ')': {
+				operators.emplace(m_input.match(Token{ ")", TokenType::RANGE }));
+				std::cout << "\tRange end" << std::endl;
+				auto rangeOperandResult = popUntil(operators, operands, [](const Token& t) {
+					const auto& strValue = t.asString();
+					if (t.type() == TokenType::RANGE) {
+						return (strValue.empty() || strValue[0] == '(') ? -1 : 1;
 					}
-					operators.emplace(m_input.match(TokenType::SYMBOL));
+					std::cout << "\t\tPoping " << strValue << std::endl;
+					return 0;
+				});
+				if (rangeOperandResult != nullptr) {
+					operands.push(std::move(rangeOperandResult));
 				}
-				break;
+				if (!operators.empty()) {
+					operators.pop();
+				}
+			}
+			break;
 
 			default:
 				error();
 			}
-			return true;
+				
 		}
+		break;
 
-		std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::expression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const Token& expectedEnd) {
-			auto node = ASTNode{};
-
-			//std::cout << "Shunting Yards steps :" << std::endl;
-			while(!m_input.empty() && !m_input.expect(expectedEnd)) {
-				//PrintPtr(operands, "Operands");
-				//Print(operators, "Operators");
-
-				parseTokenExpression(operators, operands, m_input.actual(), expectedEnd);
-
-			}
-			std::cout << "\tPoping everything" << std::endl;
-			auto result = popUntil(operators, operands, [](const auto& t) {
-				return 0;
-			});
-			return result;
-		}
-
-		bool ska::ShuntingYardExpressionParser::checkLessPriorityToken(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const char tokenChar) const {
-			const auto& topOperatorContent = (operators.empty() || operators.top().asString().empty()) ? '\0' : operators.top().asString()[0];
-			return PRIORITY_MAP.find(tokenChar) != PRIORITY_MAP.end() &&
-					PRIORITY_MAP.find(topOperatorContent) != PRIORITY_MAP.end() &&
-					PRIORITY_MAP.at(tokenChar) < PRIORITY_MAP.at(topOperatorContent);
-		}
-
-		bool ska::ShuntingYardExpressionParser::matchReserved() {
-			const auto& result = m_input.actual();
-
-			switch(std::get<std::size_t>(result.content())) {
-				case ReservedKeywords::FUNCTION: {
-						m_parser.matchFunction();
+		case TokenType::SYMBOL: {
+			const auto& value = std::get<std::string>(token.content());
+			std::cout << "\tPushing operator symbol " << value << std::endl;
+			const auto shouldPopOperatorsStack = checkLessPriorityToken(operators, operands, value[0]);
+			auto operatorTop = operators.empty() ? Token{} : operators.top();
+			if (shouldPopOperatorsStack) {
+				std::cout << "\tLess precedence, poping " << operatorTop.asString() << " before adding " << value << std::endl;
+				auto poped = 0u;
+				auto popedToken = popUntil(operators, operands, [&](const Token& t) {
+					if (poped >= 1) {
+						return -1;
 					}
-					return true;
+					poped++;
+					return 0;
+				});
+				assert(popedToken != nullptr);
+				operands.push(std::move(popedToken));
+			}
+			operators.emplace(m_input.match(TokenType::SYMBOL));
+		}
+		break;
 
-				default:
-					return false;
+	default:
+		error();
+	}
+
+	lastToken = Token{};
+	return false;
+}
+
+std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionCall(Token identifierFunctionName) {
+	auto functionCallNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_CALL, std::move(identifierFunctionName));
+	
+	const auto endParametersToken = Token{ ")", TokenType::RANGE };
+	while (!m_input.expect(endParametersToken)) {
+		auto expressionOpt = parse();
+		if (expressionOpt != nullptr) {
+			functionCallNode->add(std::move(expressionOpt));
+		} else {
+			break;
+		}
+	}
+	return functionCallNode;
+}
+
+std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::expression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands) {
+	auto node = ASTNode{};
+	auto rangeCounter = 0;
+	auto lastToken = Token{};
+	while (!m_input.expect(Token{ ";", TokenType::SYMBOL }) && !m_input.expect(Token{ ",", TokenType::SYMBOL }) && rangeCounter >= 0) {
+		//PrintPtr(operands, "Operands");
+		//Print(operators, "Operators");
+		rangeCounter += m_input.expect(Token{ "(", TokenType::RANGE }) ? 1 : 0;
+		rangeCounter -= m_input.expect(Token{ ")", TokenType::RANGE }) ? 1 : 0;
+		auto token = m_input.actual();
+		if (rangeCounter >= 0) {
+			parseTokenExpression(operators, operands, token, lastToken);
+		}
+		if (!operands.empty() && operands.top()->op == Operator::FUNCTION_CALL) {
+			rangeCounter = 0;
+		}
+
+	}
+	std::cout << "\tPoping everything" << std::endl;
+	auto result = popUntil(operators, operands, [](const auto& t) {
+		return 0;
+	});
+	return result;
+}
+
+bool ska::ShuntingYardExpressionParser::checkLessPriorityToken(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const char tokenChar) const {
+	const auto& topOperatorContent = (operators.empty() || operators.top().asString().empty()) ? '\0' : operators.top().asString()[0];
+	return PRIORITY_MAP.find(tokenChar) != PRIORITY_MAP.end() &&
+			PRIORITY_MAP.find(topOperatorContent) != PRIORITY_MAP.end() &&
+			PRIORITY_MAP.at(tokenChar) < PRIORITY_MAP.at(topOperatorContent);
+}
+
+std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchReserved() {
+	const auto& result = m_input.actual();
+
+	switch(std::get<std::size_t>(result.content())) {
+		case ReservedKeywords::FUNCTION:
+			return matchFunctionDeclaration();
+		
+		default:
+			return nullptr;
+	}
+}
+
+std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
+	auto functionDeclarationNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_DECLARATION);
+	
+	std::cout << "function declaration" << std::endl;
+	m_input.match(Token{ ReservedKeywords::FUNCTION, TokenType::RESERVED });
+	m_input.match(Token{ "(", TokenType::RANGE });
+
+	auto isRightParenthesis = m_input.expect(Token{ ")", TokenType::RANGE });
+	auto isComma = true;
+	while (!isRightParenthesis && isComma) {
+		if (!m_input.expect(TokenType::SYMBOL)) {
+			std::cout << "parameter detected, reading identifier : ";
+			const auto& id = m_input.match(TokenType::IDENTIFIER);
+			std::cout << id.asString() << std::endl;
+			functionDeclarationNode->add(std::make_unique<ASTNode>(id));
+			isComma = m_input.expect(Token{ ",", TokenType::SYMBOL });
+			if (isComma) {
+				m_input.match(Token{ ",", TokenType::SYMBOL });
 			}
 		}
+		isRightParenthesis = m_input.expect(Token{ ")", TokenType::RANGE });
+	}
 
-		std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::popUntil(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, PopPredicate predicate) {
-			auto currentNode = std::unique_ptr<ASTNode> {};
-			auto nextNode = std::unique_ptr<ASTNode> {};
+	m_input.match(Token{ ")", TokenType::RANGE });
+	std::cout << "reading function statement" << std::endl;
+	functionDeclarationNode->add(m_parser.statement());
+	std::cout << "function read." << std::endl;
+	return functionDeclarationNode;
+}
 
-			while(true) {
-				if(operators.empty() || operands.empty()) {
-					break;
-				}
+std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::popUntil(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, PopPredicate predicate) {
+	auto currentNode = std::unique_ptr<ASTNode> {};
+	auto nextNode = std::unique_ptr<ASTNode> {};
 
-				const auto op = operators.top();
-				const auto analyzeToken = predicate(op);
-				//Flow control loop predicate by token
-				if(analyzeToken < 0) {
-					break;
-				} else if (analyzeToken > 0) {
-					operators.pop();
-					continue;
-				}
-				operators.pop();
-
-				currentNode = std::make_unique<ASTNode>();
-				currentNode->token = op;
-				currentNode->right = std::move(operands.top()); operands.pop();
-
-				if(nextNode != nullptr) {
-					currentNode->left = std::move(nextNode);
-				}else {
-					currentNode->left = std::move(operands.top()); operands.pop();
-				}
-
-				nextNode = std::move(currentNode);
-				std::cout << "\t\tPoped " << op.asString() << std::endl;//<< " with " <<  nextNode->left->token.asString() << " and " << nextNode->right->token.asString() << std::endl;
-			}
-
-			return (currentNode == nullptr  && nextNode == nullptr) ? nullptr : std::move(nextNode);
+	if (operators.empty() && !operands.empty()) {
+		auto result = std::move(operands.top());
+		operands.pop();
+		return result;
+	}
+	
+	while(true) {
+		if (operators.empty() || operands.empty()) {
+			break;
 		}
 
-		 void ska::ShuntingYardExpressionParser::error() {
-			throw std::runtime_error("syntax error");
+		const auto op = operators.top();
+		const auto analyzeToken = predicate(op);
+		//Flow control loop predicate by token
+		if(analyzeToken < 0) {
+			break;
+		} else if (analyzeToken > 0) {
+			operators.pop();
+			continue;
 		}
+		operators.pop();
+
+		currentNode = std::make_unique<ASTNode>(Operator::BINARY, op);
+		
+		auto rightOperand = std::move(operands.top());
+		operands.pop();
+
+		if(nextNode != nullptr) {
+			currentNode->add(std::move(nextNode));
+		} else if(!operands.empty()) {
+			currentNode->add(std::move(operands.top())); operands.pop();
+		} else {
+			//Unary operator ?
+			//currentNode->add(std::make_unique<ASTNode>(Token{ "0", TokenType::DIGIT }));
+			currentNode->op = Operator::UNARY;
+		}
+		currentNode->add(std::move(rightOperand));
+
+		nextNode = std::move(currentNode);
+		std::cout << "\t\tPoped " << op.asString() << std::endl;//<< " with " <<  nextNode->left->token.asString() << " and " << nextNode->right->token.asString() << std::endl;
+	}
+
+	return (currentNode == nullptr  && nextNode == nullptr) ? nullptr : std::move(nextNode);
+}
+
+void ska::ShuntingYardExpressionParser::error() {
+	throw std::runtime_error("syntax error");
+}
 
 
 

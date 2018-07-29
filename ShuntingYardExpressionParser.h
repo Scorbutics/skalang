@@ -37,13 +37,16 @@ namespace ska {
 
 	public:
 		ShuntingYardExpressionParser(Parser& parser, TokenReader& input);
-		std::unique_ptr<ska::ASTNode> parse(const Token& expectedEnd = Token{ ";", TokenType::SYMBOL });
+		std::unique_ptr<ska::ASTNode> parse();
 
-		bool parseTokenExpression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const Token& token, const Token& expectedEnd);
+		bool parseTokenExpression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const Token& token, Token& lastToken);
 
 	private:
-		bool matchReserved();
-		std::unique_ptr<ASTNode> expression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const Token& expectedEnd);
+		std::unique_ptr<ska::ASTNode> matchReserved();
+		std::unique_ptr<ska::ASTNode> matchFunctionCall(Token identifierFunctionName);
+		std::unique_ptr<ska::ASTNode> matchFunctionDeclaration();
+
+		std::unique_ptr<ASTNode> expression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands);
 		bool checkLessPriorityToken(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const char tokenChar) const;
 		std::unique_ptr<ASTNode> popUntil(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, PopPredicate predicate);
 		static void error();

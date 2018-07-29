@@ -5,6 +5,7 @@ const ska::Token& ska::TokenReader::match(Token t) {
         return match(t.type());
     }
     error();
+	throw std::runtime_error("unexpected error");
 }
 
 const ska::Token& ska::TokenReader::match(const TokenType type) {
@@ -14,6 +15,7 @@ const ska::Token& ska::TokenReader::match(const TokenType type) {
         return result;
     }
     error();
+	throw std::runtime_error("unexpected error");
 }
 
 ska::Token ska::TokenReader::actual() const {
@@ -25,6 +27,12 @@ ska::Token ska::TokenReader::actual() const {
 
 bool ska::TokenReader::expect(const Token& token) const {
     return m_lookAhead != nullptr && (*m_lookAhead) == token;
+}
+
+void ska::TokenReader::rollbackOne() {
+	if (m_lookAheadIndex > 0) {
+		m_lookAhead = &m_input[--m_lookAheadIndex];
+	}
 }
 
 bool ska::TokenReader::expect(const TokenType& tokenType) const {

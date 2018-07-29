@@ -19,6 +19,7 @@ namespace ska {
 		bool expect(const TokenType& type) const;
 		bool empty() const;
 		Token actual() const;
+		void rollbackOne();
 
     private:
         void nextToken();
