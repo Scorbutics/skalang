@@ -91,10 +91,6 @@ ska::Parser::ASTNodePtr ska::Parser::matchReservedKeyword(const std::size_t keyw
 		std::cout << "end for loop statement" << std::endl;
 		break;
 
-	case ReservedKeywords::ELSE:
-		//TODO delete
-		//???
-		break;
 	case ReservedKeywords::IF: {
 		reservedKeywordNode = std::make_unique<ska::ASTNode>(Operator::IF);
 

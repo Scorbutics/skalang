@@ -167,9 +167,9 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::expression(stac
 		auto token = m_input.actual();
 		if (rangeCounter >= 0) {
 			parseTokenExpression(operators, operands, token, lastToken);
-		}
-		if (!operands.empty() && operands.top()->op == Operator::FUNCTION_CALL) {
-			rangeCounter = 0;
+			if (!operands.empty() && operands.top()->op == Operator::FUNCTION_CALL) {
+				rangeCounter = 0;
+			}
 		}
 
 	}
