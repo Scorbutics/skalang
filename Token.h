@@ -47,7 +47,7 @@ namespace ska {
 			m_type(std::move(t)) {
 			if (m_type == TokenType::EMPTY) {
 				m_content = "";
-			} else {
+			} else {				
 				init(c, m_type);
 			}
 		}

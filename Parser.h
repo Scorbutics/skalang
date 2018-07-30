@@ -5,12 +5,13 @@
 #include "ShuntingYardExpressionParser.h"
 
 namespace ska {
+	struct ReservedKeywordsPool;
 
 	class Parser {
 		friend class ShuntingYardExpressionParser;
 		using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 	public:
-		Parser(TokenReader& input);
+		Parser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReader& input);
 		std::pair<ASTNodePtr, Scope> parse();
 
 	private:
@@ -31,6 +32,7 @@ namespace ska {
 		static void error();
 
 		TokenReader& m_input;
+		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		ShuntingYardExpressionParser m_shuntingYardParser;
 	};
 }

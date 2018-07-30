@@ -26,6 +26,7 @@ public:
 namespace ska {
 	class ASTNode;
 	class Parser;
+	struct ReservedKeywordsPool;
 
 	class ShuntingYardExpressionParser {
 		using PopPredicate = std::function<int(const Token&)>;
@@ -36,7 +37,7 @@ namespace ska {
 		static std::unordered_map<char, int> PRIORITY_MAP;
 
 	public:
-		ShuntingYardExpressionParser(Parser& parser, TokenReader& input);
+		ShuntingYardExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, Parser& parser, TokenReader& input);
 		std::unique_ptr<ska::ASTNode> parse();
 
 		bool parseTokenExpression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const Token& token, Token& lastToken);
@@ -51,6 +52,7 @@ namespace ska {
 		std::unique_ptr<ASTNode> popUntil(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, PopPredicate predicate);
 		static void error();
 
+		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		Parser& m_parser;
 		TokenReader& m_input;
 	};

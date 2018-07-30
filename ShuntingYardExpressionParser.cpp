@@ -37,7 +37,8 @@ std::unordered_map<char, int> ska::ShuntingYardExpressionParser::BuildPriorityMa
 
 std::unordered_map<char, int> ska::ShuntingYardExpressionParser::PRIORITY_MAP = BuildPriorityMap();
 
-ska::ShuntingYardExpressionParser::ShuntingYardExpressionParser(Parser& parser, TokenReader& input) :
+ska::ShuntingYardExpressionParser::ShuntingYardExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, Parser& parser, TokenReader& input) :
+	m_reservedKeywordsPool(reservedKeywordsPool),
 	m_parser(parser),
 	m_input(input) {
 }
@@ -80,11 +81,11 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 					operands.push(matchFunctionCall(lastToken));
 				} else {
 					std::cout << "\tRange begin" << std::endl;
-					operators.emplace(m_input.match(Token{ "(", TokenType::RANGE }));
+					operators.emplace(m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()));
 				}
 				break;
 			case ')': {
-				operators.emplace(m_input.match(Token{ ")", TokenType::RANGE }));
+				operators.emplace(m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()));
 				std::cout << "\tRange end" << std::endl;
 				auto rangeOperandResult = popUntil(operators, operands, [](const Token& t) {
 					const auto& strValue = t.asString();
@@ -143,7 +144,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionCall(Token identifierFunctionName) {
 	auto functionCallNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_CALL, std::move(identifierFunctionName));
 	
-	const auto endParametersToken = Token{ ")", TokenType::RANGE };
+	const auto endParametersToken = m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>();
 	while (!m_input.expect(endParametersToken)) {
 		auto expressionOpt = parse();
 		if (expressionOpt != nullptr) {
@@ -162,8 +163,8 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::expression(stac
 	while (!m_input.expect(Token{ ";", TokenType::SYMBOL }) && !m_input.expect(Token{ ",", TokenType::SYMBOL }) && rangeCounter >= 0) {
 		//PrintPtr(operands, "Operands");
 		//Print(operators, "Operators");
-		rangeCounter += m_input.expect(Token{ "(", TokenType::RANGE }) ? 1 : 0;
-		rangeCounter -= m_input.expect(Token{ ")", TokenType::RANGE }) ? 1 : 0;
+		rangeCounter += m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()) ? 1 : 0;
+		rangeCounter -= m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) ? 1 : 0;
 		auto token = m_input.actual();
 		if (rangeCounter >= 0) {
 			parseTokenExpression(operators, operands, token, lastToken);
@@ -191,7 +192,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchReserved()
 	const auto& result = m_input.actual();
 
 	switch(std::get<std::size_t>(result.content())) {
-		case ReservedKeywords::FUNCTION:
+		case static_cast<std::size_t>(TokenGrammar::FUNCTION):
 			return matchFunctionDeclaration();
 		
 		default:
@@ -203,10 +204,10 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 	auto functionDeclarationNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_DECLARATION);
 	
 	std::cout << "function declaration" << std::endl;
-	m_input.match(Token{ ReservedKeywords::FUNCTION, TokenType::RESERVED });
-	m_input.match(Token{ "(", TokenType::RANGE });
+	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::FUNCTION>());
+	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
-	auto isRightParenthesis = m_input.expect(Token{ ")", TokenType::RANGE });
+	auto isRightParenthesis = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 	auto isComma = true;
 	while (!isRightParenthesis && isComma) {
 		if (!m_input.expect(TokenType::SYMBOL)) {
@@ -214,15 +215,15 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 			const auto& id = m_input.match(TokenType::IDENTIFIER);
 			std::cout << id.asString() << std::endl;
 			functionDeclarationNode->add(std::make_unique<ASTNode>(id));
-			isComma = m_input.expect(Token{ ",", TokenType::SYMBOL });
+			isComma = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
 			if (isComma) {
-				m_input.match(Token{ ",", TokenType::SYMBOL });
+				m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
 			}
 		}
-		isRightParenthesis = m_input.expect(Token{ ")", TokenType::RANGE });
+		isRightParenthesis = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 	}
 
-	m_input.match(Token{ ")", TokenType::RANGE });
+	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 	std::cout << "reading function statement" << std::endl;
 	functionDeclarationNode->add(m_parser.statement());
 	std::cout << "function read." << std::endl;
