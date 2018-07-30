@@ -18,13 +18,13 @@ constexpr const char* TokenTypeSTR[] = {
 	"UNUSED_LAST_Length"
 };
 
-void PrintTokenTreeRPN(const std::unique_ptr<ska::ASTNode>& node) {
+void PrintTokenTree(const std::unique_ptr<ska::ASTNode>& node) {
+
+    std::cout << node->token.asString() << " ";
 
 	for (const auto& child : (*node)) {
-		PrintTokenTreeRPN(child);
+		PrintTokenTree(child);
 	}
-
-	std::cout << node->token.asString() << " ";
 
 }
 
@@ -52,7 +52,7 @@ int main() {
 		auto parser = ska::Parser { reader };
 		auto tokenTree = parser.parse();
 
-		//PrintTokenTreeRPN(tokenTree);
+		PrintTokenTree(tokenTree.first);
 		std::cout << std::endl;
 	}
     return 0;

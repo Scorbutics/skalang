@@ -31,7 +31,7 @@ namespace ska {
 			return std::isalnum(c) || c == '_';
 		}
 
-		std::string m_input;
 		const ReservedKeywordsPool& m_reserved;
+		std::string m_input;
 	};
 }

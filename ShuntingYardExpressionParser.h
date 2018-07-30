@@ -51,9 +51,8 @@ namespace ska {
 		std::unique_ptr<ASTNode> popUntil(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, PopPredicate predicate);
 		static void error();
 
-		TokenReader& m_input;
-
 		Parser& m_parser;
+		TokenReader& m_input;
 	};
 
 }

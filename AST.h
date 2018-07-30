@@ -65,6 +65,13 @@ namespace ska {
 			children.emplace_back(std::move(c));
 		}
 
+        template<class T>
+        void addIfExists(std::unique_ptr<T> c) {
+            if(c != nullptr) {
+                children.emplace_back(std::move(c));
+            }
+        }
+
 		ASTNode& left() {
 			assert(op == Operator::BINARY && !children.empty());
 			return *children[0].get();
@@ -82,7 +89,7 @@ namespace ska {
 		auto end() const { return std::end(children); }
 
 		std::optional<Operator> op;
-		Token token;		
+		Token token;
 		//ASTNode* parent = this;
 
 	private:

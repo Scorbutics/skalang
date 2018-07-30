@@ -9,7 +9,7 @@ ska::Parser::Parser(TokenReader& input) :
 
 std::pair<ska::Parser::ASTNodePtr, ska::Scope> ska::Parser::parse() {
 	auto scope = ska::Scope { nullptr };
-	return std::make_pair(statement(), std::move(scope));			
+	return std::make_pair(statement(), std::move(scope));
 }
 
 ska::Parser::ASTNodePtr ska::Parser::statement() {
@@ -17,31 +17,30 @@ ska::Parser::ASTNodePtr ska::Parser::statement() {
 		return nullptr;
 	}
 
-	std::string* content = nullptr;
 	const auto token = m_input.actual();
 	switch (token.type()) {
 	case TokenType::RESERVED:
 		return matchReservedKeyword(std::get<std::size_t>(token.content()));
-		break;
+
 
 	case TokenType::RANGE:
 		return matchBlock(std::get<std::string>(token.content()));
-		break;
 
 	default:
-		{
-			std::cout << "expression found" << std::endl;
-			auto expressionResult = expr();
-			m_input.match(Token{ ";", TokenType::SYMBOL });
-			if(expressionResult == nullptr) {
-				std::cout << "null expression" << std::endl;
-				return nullptr;
-			} 
-			return std::move(expressionResult);
-		}
-		break;
+        return matchExpressionStatement();
 	}
-	return nullptr;
+}
+
+ska::Parser::ASTNodePtr ska::Parser::matchExpressionStatement() {
+    std::cout << "Expression-statement found" << std::endl;
+
+    auto expressionResult = expr();
+    m_input.match(Token{ ";", TokenType::SYMBOL });
+    if(expressionResult == nullptr) {
+        std::cout << "NOP statement" << std::endl;
+        return nullptr;
+    }
+    return expressionResult;
 }
 
 ska::Parser::ASTNodePtr ska::Parser::matchBlock(const std::string& content) {
@@ -57,85 +56,96 @@ ska::Parser::ASTNodePtr ska::Parser::matchBlock(const std::string& content) {
 			}
 		} while (!m_input.expect(Token{ "}", TokenType::RANGE }));
 		m_input.match(Token{ "}", TokenType::RANGE });
-				
+
 		std::cout << "block end" << std::endl;
 		return blockNode;
-	} 
-			
-	optexpr(Token{ ";", TokenType::SYMBOL });	
+	} else {
+	    error();
+	}
+
+	optexpr(Token{ ";", TokenType::SYMBOL });
 	return nullptr;
 }
 
+ska::Parser::ASTNodePtr ska::Parser::matchForKeyword() {
+    auto forNode = std::make_unique<ska::ASTNode>(Operator::FOR_LOOP);
+    m_input.match(Token{ ReservedKeywords::FOR, TokenType::RESERVED });
+    m_input.match(Token{ "(", TokenType::RANGE });
+
+    std::cout << "1st for loop expression (= statement)" << std::endl;
+    forNode->add(optstatement());
+
+    std::cout << "2nd for loop expression" << std::endl;
+    forNode->add(optexpr(Token{ ";", TokenType::SYMBOL }));
+    m_input.match(Token{ ";", TokenType::SYMBOL });
+
+    std::cout << "3rd for loop expression" << std::endl;
+    forNode->add(optexpr(Token{ ")", TokenType::RANGE }));
+    m_input.match(Token{ ")", TokenType::RANGE });
+
+    forNode->addIfExists(statement());
+
+    std::cout << "end for loop statement" << std::endl;
+
+    return forNode;
+}
+
+ska::Parser::ASTNodePtr ska::Parser::matchIfOrIfElseKeyword() {
+    auto ifNode = std::make_unique<ska::ASTNode>(Operator::IF);
+
+    m_input.match(Token{ ReservedKeywords::IF, TokenType::RESERVED });
+    m_input.match(Token{ "(", TokenType::RANGE });
+
+    ifNode->add(expr());
+    m_input.match(Token{ ")", TokenType::RANGE });
+
+    ifNode->add(statement());
+
+    const auto elseToken = Token{ ReservedKeywords::ELSE, TokenType::RESERVED };
+    if (m_input.expect(elseToken)) {
+        ifNode->op = Operator::IF_ELSE;
+        m_input.match(elseToken);
+        ifNode->add(statement());
+    }
+    return ifNode;
+}
+
+ska::Parser::ASTNodePtr ska::Parser::matchVarKeyword() {
+    auto varNode = std::make_unique<ASTNode>(Operator::VARIABLE_DECLARATION);
+    std::cout << "variable declaration" << std::endl;
+    m_input.match(Token{ ReservedKeywords::VAR, TokenType::RESERVED });
+    const auto& identifier = m_input.match(TokenType::IDENTIFIER);
+    varNode->add(std::make_unique<ska::ASTNode>(identifier));
+
+    m_input.match(Token{ "=", TokenType::SYMBOL });
+    std::cout << "equal sign matched, reading expression" << std::endl;
+    varNode->add(expr());
+
+    m_input.match(Token{ ";", TokenType::SYMBOL });
+    std::cout << "expression end with symbol ;" << std::endl;
+
+    //m_currentScope->registerIdentifier(std::get<std::string>(identifier.content()), std::move(value));
+    return varNode;
+}
+
 ska::Parser::ASTNodePtr ska::Parser::matchReservedKeyword(const std::size_t keywordIndex) {
-	auto reservedKeywordNode = ASTNodePtr{};
-
 	switch (keywordIndex) {
-
 	case ReservedKeywords::FOR:
-		reservedKeywordNode = std::make_unique<ska::ASTNode>(Operator::FOR_LOOP);
-		m_input.match(Token{ ReservedKeywords::FOR, TokenType::RESERVED });
-		m_input.match(Token{ "(", TokenType::RANGE });
+		return matchForKeyword();
 
-		std::cout << "1st for loop expression (= statement)" << std::endl;
-		reservedKeywordNode->add(optstatement());
+	case ReservedKeywords::IF:
+		return matchIfOrIfElseKeyword();
 
-		std::cout << "2nd for loop expression" << std::endl;
-		reservedKeywordNode->add(optexpr(Token{ ";", TokenType::SYMBOL }));
-		m_input.match(Token{ ";", TokenType::SYMBOL });
+	case ReservedKeywords::VAR:
+		return matchVarKeyword();
 
-		std::cout << "3rd for loop expression" << std::endl;
-		reservedKeywordNode->add(optexpr(Token{ ")", TokenType::RANGE }));
-		m_input.match(Token{ ")", TokenType::RANGE });
-
-		reservedKeywordNode->add(statement());
-		std::cout << "end for loop statement" << std::endl;
-		break;
-
-	case ReservedKeywords::IF: {
-		reservedKeywordNode = std::make_unique<ska::ASTNode>(Operator::IF);
-
-		m_input.match(Token{ ReservedKeywords::IF, TokenType::RESERVED });
-		m_input.match(Token{ "(", TokenType::RANGE });
-
-		reservedKeywordNode->add(expr());
-		m_input.match(Token{ ")", TokenType::RANGE });
-
-		reservedKeywordNode->add(statement());
-
-		const auto elseToken = Token{ ReservedKeywords::ELSE, TokenType::RESERVED };
-		if (m_input.expect(elseToken)) {
-			reservedKeywordNode->op = Operator::IF_ELSE;
-			m_input.match(elseToken);
-			reservedKeywordNode->add(statement());
-		}
-	}
-	break;
-
-	case ReservedKeywords::VAR: {
-		reservedKeywordNode = std::make_unique<ASTNode>(Operator::VARIABLE_DECLARATION);
-		std::cout << "variable declaration" << std::endl;
-		m_input.match(Token{ ReservedKeywords::VAR, TokenType::RESERVED });
-		const auto& identifier = m_input.match(TokenType::IDENTIFIER);
-		reservedKeywordNode->add(std::make_unique<ska::ASTNode>(identifier));
-
-		m_input.match(Token{ "=", TokenType::SYMBOL });
-		std::cout << "equal sign matched, reading expression" << std::endl;
-		reservedKeywordNode->add(expr());
-
-		m_input.match(Token{ ";", TokenType::SYMBOL });
-		std::cout << "expression end with symbol ;" << std::endl;
-					
-		//m_currentScope->registerIdentifier(std::get<std::string>(identifier.content()), std::move(value));
-	}
-	break;
-
-	case ReservedKeywords::FUNCTION: 
+	case ReservedKeywords::FUNCTION:
 		return expr();
-				
+
 	default:
 		error();
+		return nullptr;
 	}
-	return reservedKeywordNode;
 }
 
 ska::Parser::ASTNodePtr ska::Parser::expr() {
@@ -146,18 +156,19 @@ void ska::Parser::error() {
 	throw std::runtime_error("syntax error");
 }
 
-
 ska::Parser::ASTNodePtr ska::Parser::optexpr(const Token& mustNotBe) {
+	auto node = ASTNodePtr {};
 	if (!m_input.expect(mustNotBe)) {
-		return expr();
+		node = expr();
 	}
-	return nullptr;
+	return node != nullptr ? std::move(node) : std::make_unique<ASTNode>(Token{});
 }
 
 ska::Parser::ASTNodePtr ska::Parser::optstatement(const Token& mustNotBe) {
+	auto node = ASTNodePtr {};
 	if (!m_input.expect(mustNotBe)) {
-		return statement();
-	} 
+		node = statement();
+	}
 	m_input.match(Token{ ";", TokenType::SYMBOL });
-	return nullptr;
+	return node != nullptr ? std::move(node) : std::make_unique<ASTNode>(Token{});
 }

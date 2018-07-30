@@ -25,8 +25,8 @@ namespace ska {
         void nextToken();
         static void error();
 
+        const std::vector<ska::Token>& m_input;
         std::size_t m_lookAheadIndex {};
         const Token* m_lookAhead {};
-        const std::vector<ska::Token>& m_input;
     };
 }
