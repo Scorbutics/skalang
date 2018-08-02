@@ -43,6 +43,7 @@ int main() {
 		const auto reservedKeywords = ska::ReservedKeywordsPool{};
 
 		auto tokenizer = ska::Tokenizer { reservedKeywords, ss.str() };
+		std::cout << "Tokenize : " << std::endl;
 		const auto tokens = tokenizer.tokenize();
 		for (const auto& token : tokens) {
 			std::cout << "[" << std::setw(10) << TokenTypeSTR[static_cast<std::size_t>(token.type())] << "]\t" << (token.type() == ska::TokenType::RESERVED ? reservedKeywords.pattern(std::get<std::size_t>(token.content())).asString() : std::get<std::string>(token.content())) << std::endl;

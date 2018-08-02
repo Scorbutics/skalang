@@ -1,5 +1,6 @@
-#include "Tokenizer.h"
+#include <iostream>
 
+#include "Tokenizer.h"
 
 ska::Tokenizer::Tokenizer(const ReservedKeywordsPool& reserved, std::string input) :
 	m_reserved(reserved),
@@ -13,8 +14,10 @@ std::vector<ska::Token> ska::Tokenizer::tokenize() const {
 	auto startIndex = 0u;
 	do {
 		auto token = tokenizeNext(currentTokenToRead, startIndex);
+		const auto tokenContent = token.type() == TokenType::RESERVED ? m_reserved.patternString(std::get<std::size_t>(token.content())) : token.asString();
 
-		startIndex += token.type() == TokenType::RESERVED ? m_reserved.pattern(std::get<std::size_t>(token.content())).asString().size() : std::get<std::string>(token.content()).size();
+		startIndex += tokenContent.size();
+
 		if (currentTokenToRead.current != ska::TokenType::EMPTY && currentTokenToRead.current != ska::TokenType::SPACE) {
 			result.push_back(std::move(token));
 		}
@@ -26,7 +29,7 @@ std::vector<ska::Token> ska::Tokenizer::tokenize() const {
 ska::RequiredToken ska::Tokenizer::determineCurrentToken(const std::size_t startIndex) const {
 	if (startIndex < m_input.size()) {
 		const auto charTokenType = calculateCharacterTokenType(m_input[startIndex]);
-		auto requiredToken = initializeCharType(charTokenType);
+		const auto requiredToken = initializeCharType(charTokenType);
 		return requiredToken;
 	}
 	return RequiredToken{};
