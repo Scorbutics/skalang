@@ -1,3 +1,0 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E remove -f CMakeFiles\skalang.dir/objects.a
-C:\mingw\bin\ar.exe cr CMakeFiles\skalang.dir/objects.a @CMakeFiles\skalang.dir\objects1.rsp
-C:\mingw\bin\g++.exe -g   -Wl,--whole-archive CMakeFiles\skalang.dir/objects.a -Wl,--no-whole-archive  -o skalang.exe -Wl,--out-implib,Debug\libskalang.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\skalang.dir\linklibs.rsp
