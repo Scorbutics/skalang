@@ -59,6 +59,10 @@ namespace ska {
 			return token.asString();
 		}
 
+		std::size_t size() const {
+            return children.size();
+		}
+
 		template<class T>
 		void add(std::unique_ptr<T> c) {
 			assert(c != nullptr);
@@ -82,6 +86,14 @@ namespace ska {
 			return *children[1].get();
 		}
 
+		auto& operator[](const std::size_t index) {
+		    return *children[index];
+		}
+
+		const auto& operator[](const std::size_t index) const {
+		    return *children[index];
+		}
+
 		auto begin() { return std::begin(children); }
 		auto end() { return std::end(children); }
 
@@ -96,4 +108,6 @@ namespace ska {
 		std::vector<std::unique_ptr<ASTNode>> children;
 
 	};
+
+	using ASTNodePtr = std::unique_ptr<ASTNode>;
 }

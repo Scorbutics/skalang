@@ -23,7 +23,7 @@ namespace ska {
 
     private:
         void nextToken();
-        static void error();
+        void error(Token* token = nullptr);
 
         const std::vector<ska::Token>& m_input;
         std::size_t m_lookAheadIndex {};

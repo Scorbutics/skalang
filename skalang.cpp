@@ -5,6 +5,7 @@
 #include "Tokenizer.h"
 #include "Parser.h"
 #include "TokenReader.h"
+#include "SymbolTable.h"
 
 constexpr const char* TokenTypeSTR[] = {
 	"RESERVED",
@@ -51,6 +52,7 @@ int main() {
 
 		auto reader = ska::TokenReader { tokens };
 		auto parser = ska::Parser { reservedKeywords, reader };
+		auto symbolTable = ska::SymbolTable { parser };
 		auto tokenTree = parser.parse();
 
 		PrintTokenTree(tokenTree.first);

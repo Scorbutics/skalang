@@ -61,9 +61,17 @@ namespace ska {
 			for (const auto& p : pool) {
                 if(p.second.token.type() == TokenType::RESERVED) {
                     patterns[std::get<std::size_t>(p.second.token.content())] = p.second;
-                    std::cout << patterns[index++].patternString << std::endl;
                 }
 			}
+
+            patterns[static_cast<std::size_t>(ska::TokenGrammar::AFFECTATION)]           = pool.at("=");
+			patterns[static_cast<std::size_t>(ska::TokenGrammar::BLOCK_BEGIN)]           = pool.at("{");
+			patterns[static_cast<std::size_t>(ska::TokenGrammar::BLOCK_END)]             = pool.at("}");
+			patterns[static_cast<std::size_t>(ska::TokenGrammar::PARENTHESIS_BEGIN)]     = pool.at("(");
+			patterns[static_cast<std::size_t>(ska::TokenGrammar::PARENTHESIS_END)]       = pool.at(")");
+			patterns[static_cast<std::size_t>(ska::TokenGrammar::STRING_DELIMITER)]      = pool.at("\"");
+			patterns[static_cast<std::size_t>(ska::TokenGrammar::STATEMENT_END)]         = pool.at(";");
+			patterns[static_cast<std::size_t>(ska::TokenGrammar::ARGUMENT_DELIMITER)]    = pool.at(",");
 
 			return patterns;
 		}
@@ -78,6 +86,7 @@ namespace ska {
 			pool.emplace("function", TokenInfo{ "function", Token{ static_cast<std::size_t>(TokenGrammar::FUNCTION), TokenType::RESERVED } });
 			pool.emplace("return", TokenInfo{ "return", Token{ static_cast<std::size_t>(TokenGrammar::RETURN), TokenType::RESERVED } });
 
+			pool.emplace("=", TokenInfo{ "=", Token{ "=", TokenType::SYMBOL } });
 			pool.emplace("{", TokenInfo{ "{", Token{ "{", TokenType::RANGE } });
 			pool.emplace("}", TokenInfo{ "}", Token{ "}", TokenType::RANGE } });
 			pool.emplace("(", TokenInfo{ "(", Token{ "(", TokenType::RANGE }});

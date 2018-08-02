@@ -1,13 +1,27 @@
 #pragma once
 #include <vector>
+#include <Data/Events/EventDispatcher.h>
+
 #include "Token.h"
 #include "Scope.h"
 #include "ShuntingYardExpressionParser.h"
 
+#include "ForTokenEvent.h"
+#include "IfElseTokenEvent.h"
+#include "VarTokenEvent.h"
+#include "BlockTokenEvent.h"
+
 namespace ska {
 	struct ReservedKeywordsPool;
 
-	class Parser {
+	class Parser :
+	    public EventDispatcher<
+            ForTokenEvent,
+            IfElseTokenEvent,
+            VarTokenEvent,
+            BlockTokenEvent
+	    > {
+
 		friend class ShuntingYardExpressionParser;
 		using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 	public:

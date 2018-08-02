@@ -4,7 +4,7 @@ const ska::Token& ska::TokenReader::match(Token t) {
     if (m_lookAhead != nullptr && *m_lookAhead == t) {
         return match(t.type());
     }
-    error();
+    error(&t);
 	throw std::runtime_error("unexpected error");
 }
 
@@ -43,8 +43,8 @@ bool ska::TokenReader::empty() const {
     return m_lookAhead == nullptr || m_lookAhead->type() == ska::TokenType::EMPTY;
 }
 
-void ska::TokenReader::error() {
-    throw std::runtime_error("syntax error : bad token matching");
+void ska::TokenReader::error(Token* token) {
+    throw std::runtime_error("syntax error : bad token matching : expected " + (token == nullptr ? "UNKNOWN_TOKEN" : token->asString()) + " but got " + (m_lookAhead == nullptr ? "EMPTY_TOKEN" : m_lookAhead->asString()));
 }
 
 void ska::TokenReader::nextToken() {

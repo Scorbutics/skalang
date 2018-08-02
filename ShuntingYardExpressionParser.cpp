@@ -50,7 +50,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::parse() {
 }
 
 bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const Token& token, Token& lastToken) {
-	
+
 	switch (token.type()) {
 		case TokenType::RESERVED: {
 			std::cout << "\tPushing reserved" << std::endl;
@@ -107,7 +107,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 			default:
 				error();
 			}
-				
+
 		}
 		break;
 
@@ -143,7 +143,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 
 std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionCall(Token identifierFunctionName) {
 	auto functionCallNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_CALL, std::move(identifierFunctionName));
-	
+
 	const auto endParametersToken = m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>();
 	while (!m_input.expect(endParametersToken)) {
 		auto expressionOpt = parse();
@@ -194,7 +194,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchReserved()
 	switch(std::get<std::size_t>(result.content())) {
 		case static_cast<std::size_t>(TokenGrammar::FUNCTION):
 			return matchFunctionDeclaration();
-		
+
 		default:
 			return nullptr;
 	}
@@ -202,7 +202,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchReserved()
 
 std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
 	auto functionDeclarationNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_DECLARATION);
-	
+
 	std::cout << "function declaration" << std::endl;
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::FUNCTION>());
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
@@ -227,6 +227,10 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 	std::cout << "reading function statement" << std::endl;
 	functionDeclarationNode->add(m_parser.statement());
 	std::cout << "function read." << std::endl;
+
+	auto event = FunctionTokenEvent {*functionDeclarationNode};
+    Observable<FunctionTokenEvent>::notifyObservers(event);
+
 	return functionDeclarationNode;
 }
 
@@ -239,7 +243,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::popUntil(stack<
 		operands.pop();
 		return result;
 	}
-	
+
 	while(true) {
 		if (operators.empty() || operands.empty()) {
 			break;
@@ -257,7 +261,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::popUntil(stack<
 		operators.pop();
 
 		currentNode = std::make_unique<ASTNode>(Operator::BINARY, op);
-		
+
 		auto rightOperand = std::move(operands.top());
 		operands.pop();
 

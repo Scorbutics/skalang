@@ -23,7 +23,6 @@ ska::Parser::ASTNodePtr ska::Parser::statement() {
 	case TokenType::RESERVED:
 		return matchReservedKeyword(std::get<std::size_t>(token.content()));
 
-
 	case TokenType::RANGE:
 		return matchBlock(std::get<std::string>(token.content()));
 
@@ -59,6 +58,8 @@ ska::Parser::ASTNodePtr ska::Parser::matchBlock(const std::string& content) {
 		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
 
 		std::cout << "block end" << std::endl;
+		auto event = BlockTokenEvent {*blockNode};
+		Observable<BlockTokenEvent>::notifyObservers(event);
 		return blockNode;
 	} else {
 	    error();
@@ -88,6 +89,8 @@ ska::Parser::ASTNodePtr ska::Parser::matchForKeyword() {
 
     std::cout << "end for loop statement" << std::endl;
 
+    auto event = ForTokenEvent {*forNode};
+    Observable<ForTokenEvent>::notifyObservers(event);
     return forNode;
 }
 
@@ -108,12 +111,15 @@ ska::Parser::ASTNodePtr ska::Parser::matchIfOrIfElseKeyword() {
         m_input.match(elseToken);
         ifNode->add(statement());
     }
+    auto event = IfElseTokenEvent {*ifNode};
+    Observable<IfElseTokenEvent>::notifyObservers(event);
     return ifNode;
 }
 
 ska::Parser::ASTNodePtr ska::Parser::matchVarKeyword() {
     auto varNode = std::make_unique<ASTNode>(Operator::VARIABLE_DECLARATION);
     std::cout << "variable declaration" << std::endl;
+
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>());
     const auto& identifier = m_input.match(TokenType::IDENTIFIER);
     varNode->add(std::make_unique<ska::ASTNode>(identifier));
@@ -122,10 +128,11 @@ ska::Parser::ASTNodePtr ska::Parser::matchVarKeyword() {
     std::cout << "equal sign matched, reading expression" << std::endl;
     varNode->add(expr());
 
-    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
+    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
     std::cout << "expression end with symbol ;" << std::endl;
 
-    //m_currentScope->registerIdentifier(std::get<std::string>(identifier.content()), std::move(value));
+    auto event = VarTokenEvent {*varNode};
+    Observable<VarTokenEvent>::notifyObservers(event);
     return varNode;
 }
 
@@ -170,6 +177,6 @@ ska::Parser::ASTNodePtr ska::Parser::optstatement(const Token& mustNotBe) {
 	if (!m_input.expect(mustNotBe)) {
 		node = statement();
 	}
-	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+
 	return node != nullptr ? std::move(node) : std::make_unique<ASTNode>(Token{});
 }

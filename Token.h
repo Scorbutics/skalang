@@ -16,7 +16,7 @@ namespace ska {
 	"EMPTY",
 	"UNUSED_LAST_Length"
 };
-	
+
 	enum class TokenType {
 		RESERVED,
 		IDENTIFIER,
@@ -31,14 +31,14 @@ namespace ska {
 
 	struct Token {
 		using Variant = std::variant<std::size_t, double, std::string>;
-		
+
 		Token() = default;
 		Token(const Token& t) = default;
 		Token(Token&& t) noexcept = default;
 		Token& operator=(const Token& t) = default;
 		Token& operator=(Token&& t) noexcept = default;
-		
-		Token(std::string c, TokenType t) : 
+
+		Token(std::string c, TokenType t) :
 			m_type(std::move(t)) {
 			init(c, m_type);
 		}
@@ -47,7 +47,7 @@ namespace ska {
 			m_type(std::move(t)) {
 			if (m_type == TokenType::EMPTY) {
 				m_content = "";
-			} else {				
+			} else {
 				init(c, m_type);
 			}
 		}
@@ -67,22 +67,22 @@ namespace ska {
 		const Variant& content() const {
 			return m_content;
 		}
-		
+
 		const TokenType& type() const {
 			return m_type;
 		}
 
 		std::string asString() const {
 			if(m_type == TokenType::EMPTY) {
-				return "";
+				return "EMPTY_TOKEN";
 			}
-			
+
 			if(m_type == TokenType::RESERVED) {
 				std::stringstream ss;
 				ss << std::get<std::size_t>(m_content);
 				return ss.str();
 			}
-			
+
 			return std::holds_alternative<std::string>(m_content) ? std::get<std::string>(m_content) : "error variant";
 		}
 
@@ -97,7 +97,7 @@ namespace ska {
 		bool operator!=(const Token& t1) const {
 			return m_type != t1.m_type || m_content != t1.m_content;
 		}
-		
+
 	private:
 		Variant m_content = std::string{};
 		TokenType m_type = TokenType::EMPTY;

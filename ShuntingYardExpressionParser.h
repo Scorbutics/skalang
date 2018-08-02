@@ -4,8 +4,10 @@
 #include <memory>
 #include <unordered_map>
 #include <functional>
+#include <Data/Events/EventDispatcher.h>
 
 #include "TokenReader.h"
+#include "FunctionTokenEvent.h"
 
 template<typename T, typename Container = std::deque<T>>
 class iterable_stack
@@ -28,7 +30,9 @@ namespace ska {
 	class Parser;
 	struct ReservedKeywordsPool;
 
-	class ShuntingYardExpressionParser {
+	class ShuntingYardExpressionParser :
+        public EventDispatcher<FunctionTokenEvent> {
+
 		using PopPredicate = std::function<int(const Token&)>;
 		template <class T>
 		using stack = iterable_stack<T>;
