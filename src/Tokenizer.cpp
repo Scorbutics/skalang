@@ -41,7 +41,7 @@ ska::Token ska::Tokenizer::tokenizeNext(const ska::RequiredToken& requiredToken,
 		auto charTokenType = requiredToken.current;
 		for (; index < m_input.size(); index++) {
 			charTokenType = calculateCharacterTokenType(m_input[index]);
-			if (requiredToken.required ^ requiredToken.requiredOrUntil[static_cast<std::size_t>(charTokenType)]) {
+			if (index > startIndex && requiredToken.required ^ requiredToken.requiredOrUntil[static_cast<std::size_t>(charTokenType)]) {
 				if (index == 0) {
 					index++;
 				}
@@ -61,6 +61,7 @@ ska::RequiredToken ska::Tokenizer::initializeCharType(const ska::TokenType charT
 	case ska::TokenType::DIGIT:
 		required.required = true;
 		required.requiredOrUntil[static_cast<std::size_t>(ska::TokenType::DIGIT)] = true;
+		//TODO dot symbol
 		break;
 
 	case ska::TokenType::SPACE:
