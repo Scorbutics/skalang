@@ -2,6 +2,7 @@
 # Ce fichier .gitignore a été automatiquement créé par Microsoft(R) Visual Studio.
 ################################################################################
 
-/Debug/skalang.tlog
-/Debug
-/CMakeFiles
+**/Debug/*.tlog
+**/Debug
+**/CMakeFiles
+**/CMakeCache.txt
