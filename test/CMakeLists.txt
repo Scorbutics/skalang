@@ -26,6 +26,7 @@ file(GLOB_RECURSE SOURCES
 
 string(REGEX REPLACE "CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
 string(REGEX REPLACE "skalang.cpp" "" SOURCES "${SOURCES}")
+#string(REGEX REPLACE "\\W*/CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
 
 add_executable(skalang_test ${SOURCES})
 set_target_properties(skalang_test PROPERTIES

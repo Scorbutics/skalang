@@ -145,16 +145,28 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 
 std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionCall(Token identifierFunctionName) {
 	auto functionCallNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_CALL, std::move(identifierFunctionName));
-
+	
+	//First match left parenthesis
+	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
+				
 	const auto endParametersToken = m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>();
 	while (!m_input.expect(endParametersToken)) {
+		
+		const auto commaToken = m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>();
+		if(m_input.expect(commaToken)) {
+			m_input.match(commaToken);
+		}
+
 		auto expressionOpt = parse();
 		if (expressionOpt != nullptr) {
+			std::cout << "Expression not null" << std::endl;
 			functionCallNode->add(std::move(expressionOpt));
 		} else {
+			std::cout << "Expression null" << std::endl;
 			break;
 		}
 	}
+	m_input.match(endParametersToken);
 	return functionCallNode;
 }
 
@@ -165,6 +177,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::expression(stac
 	while (!m_input.expect(Token{ ";", TokenType::SYMBOL }) && !m_input.expect(Token{ ",", TokenType::SYMBOL }) && rangeCounter >= 0) {
 		//PrintPtr(operands, "Operands");
 		//Print(operators, "Operators");
+		
 		rangeCounter += m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()) ? 1 : 0;
 		rangeCounter -= m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) ? 1 : 0;
 		auto token = m_input.actual();
