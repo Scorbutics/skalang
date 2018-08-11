@@ -58,10 +58,11 @@ ska::RequiredToken ska::Tokenizer::initializeCharType(const ska::TokenType charT
 	auto required = ska::RequiredToken{};
 	required.current = charTokenType;
 	switch (charTokenType) {
+	case ska::TokenType::DOT_SYMBOL:
 	case ska::TokenType::DIGIT:
 		required.required = true;
 		required.requiredOrUntil[static_cast<std::size_t>(ska::TokenType::DIGIT)] = true;
-		//TODO dot symbol
+		required.requiredOrUntil[static_cast<std::size_t>(ska::TokenType::DOT_SYMBOL)] = true;
 		break;
 
 	case ska::TokenType::SPACE:
@@ -117,7 +118,8 @@ ska::TokenType ska::Tokenizer::calculateCharacterTokenType(const char c) const {
 	case '8':
 	case '9':
 		return ska::TokenType::DIGIT;
-
+	case '.':
+		return ska::TokenType::DOT_SYMBOL;
 	case ' ':
 	case '\t':
 	case '\v':

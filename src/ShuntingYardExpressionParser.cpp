@@ -110,7 +110,9 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 
 		}
 		break;
-
+		
+		case TokenType::DOT_SYMBOL:
+		//Method call only (digits are DIGIT token type, even real ones)
 		case TokenType::SYMBOL: {
 			const auto& value = std::get<std::string>(token.content());
 			std::cout << "\tPushing operator symbol " << value << std::endl;

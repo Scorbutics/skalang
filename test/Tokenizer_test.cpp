@@ -163,8 +163,7 @@ TEST_CASE("Symbol by symbol") {
 		CHECK(tokens.size() == 1);
 		CHECK(tokens[0] == ska::Token { "234", ska::TokenType::DIGIT});
 	}
-/*
- * Not supported. TODO
+	
 	SUBCASE("real number") {
 		const auto input = std::string("32.1");
 		auto t = ska::Tokenizer {keywords, input};
@@ -173,7 +172,16 @@ TEST_CASE("Symbol by symbol") {
 		CHECK(tokens.size() == 1);
 		CHECK(tokens[0] == ska::Token {"32.1", ska::TokenType::DIGIT});
 	}
-*/
+
+	SUBCASE("Dot symbol (for method call)") {
+		const auto input = std::string(".");
+		auto t = ska::Tokenizer {keywords, input};
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 1);
+		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::METHOD_CALL_OPERATOR>());
+	}
+
 	SUBCASE("string") {
 		const auto input = std::string("\"tettttt\"");
 		auto t = ska::Tokenizer {keywords, input};
