@@ -191,5 +191,56 @@ TEST_CASE("Symbol by symbol") {
 		CHECK(tokens[0] == ska::Token {"\"tettttt\"", ska::TokenType::STRING});
 	}
 
+	SUBCASE("Full method call 0 args") {
+		const auto input = std::string("test.call()");
+		auto t = ska::Tokenizer {keywords, input};
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 5);
+		CHECK(tokens[0] == ska::Token { "test", ska::TokenType::IDENTIFIER});
+		CHECK(tokens[1] == keywords.pattern<ska::TokenGrammar::METHOD_CALL_OPERATOR>());
+		CHECK(tokens[2] == ska::Token { "call", ska::TokenType::IDENTIFIER});
+		CHECK(tokens[3] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_BEGIN>());
+		CHECK(tokens[4] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_END>());
+	}
+
+	SUBCASE("only spaces") {
+		const auto input = std::string("  \t \n ");
+		auto t = ska::Tokenizer { keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.empty());
+	}
+
+	SUBCASE("spaces with not space in middle") {
+		const auto input = std::string("  \t o \n ");
+		auto t = ska::Tokenizer { keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 1);
+		CHECK(tokens[0] == ska::Token { "o", ska::TokenType::IDENTIFIER});
+	}
+	
+	SUBCASE("string with noise around") {
+		const auto input = std::string(" 13.23  \"testString\" var");
+		auto t = ska::Tokenizer { keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 3);
+		CHECK(tokens[0] == ska::Token { "13.23", ska::TokenType::DIGIT });
+		CHECK(tokens[1] == ska::Token { "\"testString\"", ska::TokenType::STRING});
+		CHECK(tokens[2] == keywords.pattern<ska::TokenGrammar::VARIABLE>());
+	}
+
+	SUBCASE("string with reserved symbols and keywords") {
+		const auto input = std::string("\"var i = 0; {}\"");
+		auto t = ska::Tokenizer { keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 1);
+		CHECK(tokens[0] == ska::Token { "\"var i = 0; {}\"", ska::TokenType::STRING});
+	}
+
+
 }
 
