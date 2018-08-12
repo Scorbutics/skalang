@@ -54,7 +54,7 @@ namespace ska {
 		std::unique_ptr<ASTNode> expression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands);
 		bool checkLessPriorityToken(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const char tokenChar) const;
 		std::unique_ptr<ASTNode> popUntil(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, PopPredicate predicate);
-		static void error();
+		static void error(const std::string& message);
 
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		Parser& m_parser;

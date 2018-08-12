@@ -27,7 +27,7 @@ ska::Parser::ASTNodePtr ska::Parser::statement() {
 		return matchBlock(std::get<std::string>(token.content()));
 
 	default:
-        return matchExpressionStatement();
+        	return matchExpressionStatement();
 	}
 }
 
@@ -44,25 +44,31 @@ ska::Parser::ASTNodePtr ska::Parser::matchExpressionStatement() {
 }
 
 ska::Parser::ASTNodePtr ska::Parser::matchBlock(const std::string& content) {
-	auto blockNode = std::make_unique<ska::ASTNode>(Operator::BLOCK);
 	if (content == m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>().asString()) {
+		auto blockNode = std::make_unique<ska::ASTNode>(Operator::BLOCK);
+	
 		std::cout << "block start detected" << std::endl;
 
 		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
-		do {
+		 
+		while (!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
 			auto optionalStatement = optstatement();
-			if (optionalStatement != nullptr) {
+			if (!optionalStatement->empty()) {
 				blockNode->add(std::move(optionalStatement));
+			} else {
+				break;
 			}
-		} while (!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()));
+		}
 		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
 
 		std::cout << "block end" << std::endl;
 		auto event = BlockTokenEvent {*blockNode};
 		Observable<BlockTokenEvent>::notifyObservers(event);
 		return blockNode;
+	} else if (content == m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>().asString()) {
+		error("Block end token encountered when not expected");
 	} else {
-	    error();
+		return matchExpressionStatement();
 	}
 
 	optexpr(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
@@ -150,9 +156,12 @@ ska::Parser::ASTNodePtr ska::Parser::matchReservedKeyword(const std::size_t keyw
 	case static_cast<std::size_t>(TokenGrammar::FUNCTION):
 		return expr();
 
-	default:
-		error();
-		return nullptr;
+	default: {
+			std::stringstream ss;
+			ss << keywordIndex;
+			error("Unhandled keyword type of index : " + ss.str());
+			return nullptr;
+		}
 	}
 }
 
@@ -160,8 +169,8 @@ ska::Parser::ASTNodePtr ska::Parser::expr() {
 	return m_shuntingYardParser.parse();
 }
 
-void ska::Parser::error() {
-	throw std::runtime_error("syntax error");
+void ska::Parser::error(const std::string& message) {
+	throw std::runtime_error("syntax error : " + message);
 }
 
 ska::Parser::ASTNodePtr ska::Parser::optexpr(const Token& mustNotBe) {
@@ -180,3 +189,4 @@ ska::Parser::ASTNodePtr ska::Parser::optstatement(const Token& mustNotBe) {
 
 	return node != nullptr ? std::move(node) : std::make_unique<ASTNode>(Token{});
 }
+

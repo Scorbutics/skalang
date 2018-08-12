@@ -16,10 +16,10 @@ namespace ska {
 
 	class Parser :
 	    public EventDispatcher<
-            ForTokenEvent,
-            IfElseTokenEvent,
-            VarTokenEvent,
-            BlockTokenEvent
+            	ForTokenEvent,
+            	IfElseTokenEvent,
+            	VarTokenEvent,
+            	BlockTokenEvent
 	    > {
 
 		friend class ShuntingYardExpressionParser;
@@ -30,20 +30,20 @@ namespace ska {
 
 	private:
 		ASTNodePtr statement();
-        ASTNodePtr optstatement(const Token& mustNotBe = Token{});
+        	ASTNodePtr optstatement(const Token& mustNotBe = Token{});
 
 		ASTNodePtr matchReservedKeyword(const std::size_t keywordIndex);
 
-        ASTNodePtr matchBlock(const std::string& content);
-        ASTNodePtr matchForKeyword();
-        ASTNodePtr matchIfOrIfElseKeyword();
-        ASTNodePtr matchVarKeyword();
-        ASTNodePtr matchExpressionStatement();
+        	ASTNodePtr matchBlock(const std::string& content);
+        	ASTNodePtr matchForKeyword();
+        	ASTNodePtr matchIfOrIfElseKeyword();
+        	ASTNodePtr matchVarKeyword();
+        	ASTNodePtr matchExpressionStatement();
 
 		ASTNodePtr expr();
 		ASTNodePtr optexpr(const Token& mustNotBe = Token{});
 
-		static void error();
+		static void error(const std::string& message);
 
 		TokenReader& m_input;
 		const ReservedKeywordsPool& m_reservedKeywordsPool;

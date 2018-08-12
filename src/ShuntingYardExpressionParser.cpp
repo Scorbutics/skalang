@@ -105,7 +105,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 			break;
 
 			default:
-				error();
+				error("Unexpected token (range type) : " + token.asString());
 			}
 
 		}
@@ -136,7 +136,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 		break;
 
 	default:
-		error();
+		error("Expected a symbol, a litteral, an identifier or a reserved keyword, but got the token : " + token.asString());
 	}
 
 	lastToken = Token{};
@@ -298,8 +298,8 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::popUntil(stack<
 	return (currentNode == nullptr  && nextNode == nullptr) ? nullptr : std::move(nextNode);
 }
 
-void ska::ShuntingYardExpressionParser::error() {
-	throw std::runtime_error("syntax error");
+void ska::ShuntingYardExpressionParser::error(const std::string& message) {
+	throw std::runtime_error("syntax error : " + message);
 }
 
 
