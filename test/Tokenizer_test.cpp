@@ -242,5 +242,16 @@ TEST_CASE("Symbol by symbol") {
 	}
 
 
+	SUBCASE("symbols in queue") {
+		const auto input = std::string(";;++--");
+		auto t = ska::Tokenizer { keywords, input };
+		auto tokens = t.tokenize();
+		
+		CHECK(tokens.size() == 4);
+		CHECK(tokens[0] == ska::Token {";", ska::TokenType::SYMBOL});
+		CHECK(tokens[1] == ska::Token {";", ska::TokenType::SYMBOL});
+		CHECK(tokens[2] == ska::Token {"++", ska::TokenType::SYMBOL});
+		CHECK(tokens[3] == ska::Token {"--", ska::TokenType::SYMBOL});
+	}
 }
 
