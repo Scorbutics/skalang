@@ -241,7 +241,6 @@ TEST_CASE("Symbol by symbol") {
 		CHECK(tokens[0] == ska::Token { "\"var i = 0; {}\"", ska::TokenType::STRING});
 	}
 
-
 	SUBCASE("symbols in queue") {
 		const auto input = std::string(";;++--");
 		auto t = ska::Tokenizer { keywords, input };
@@ -252,6 +251,15 @@ TEST_CASE("Symbol by symbol") {
 		CHECK(tokens[1] == ska::Token {";", ska::TokenType::SYMBOL});
 		CHECK(tokens[2] == ska::Token {"++", ska::TokenType::SYMBOL});
 		CHECK(tokens[3] == ska::Token {"--", ska::TokenType::SYMBOL});
+	}
+
+	SUBCASE("double symbols tokens") {
+		const auto input = std::string("--");
+		auto t = ska::Tokenizer { keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 1);
+		CHECK(tokens[0] == ska::Token {"--", ska::TokenType::SYMBOL} );
 	}
 }
 

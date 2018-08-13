@@ -2,6 +2,8 @@
 #include "Parser.h"
 #include "ReservedKeywordsPool.h"
 
+//#define SKALANG_LOG_PARSER
+
 ska::Parser::Parser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReader& input) :
 	m_input(input),
 	m_reservedKeywordsPool(reservedKeywordsPool),
@@ -32,13 +34,16 @@ ska::Parser::ASTNodePtr ska::Parser::statement() {
 }
 
 ska::Parser::ASTNodePtr ska::Parser::matchExpressionStatement() {
-    std::cout << "Expression-statement found" << std::endl;
-
+#ifdef SKALANG_LOG_PARSER
+	std::cout << "Expression-statement found" << std::endl;
+#endif
     auto expressionResult = expr();
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
     if(expressionResult == nullptr) {
-        std::cout << "NOP statement" << std::endl;
-        return nullptr;
+#ifdef SKALANG_LOG_PARSER
+	std::cout << "NOP statement" << std::endl;
+#endif
+	return nullptr;
     }
     return expressionResult;
 }
@@ -46,9 +51,9 @@ ska::Parser::ASTNodePtr ska::Parser::matchExpressionStatement() {
 ska::Parser::ASTNodePtr ska::Parser::matchBlock(const std::string& content) {
 	if (content == m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>().asString()) {
 		auto blockNode = std::make_unique<ska::ASTNode>(Operator::BLOCK);
-	
+#ifdef SKALANG_LOG_PARSER	
 		std::cout << "block start detected" << std::endl;
-
+#endif
 		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
 		 
 		while (!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
@@ -60,8 +65,9 @@ ska::Parser::ASTNodePtr ska::Parser::matchBlock(const std::string& content) {
 			}
 		}
 		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
-
+#ifdef SKALANG_LOG_PARSER
 		std::cout << "block end" << std::endl;
+#endif
 		auto event = BlockTokenEvent {*blockNode};
 		Observable<BlockTokenEvent>::notifyObservers(event);
 		return blockNode;
@@ -79,22 +85,25 @@ ska::Parser::ASTNodePtr ska::Parser::matchForKeyword() {
     auto forNode = std::make_unique<ska::ASTNode>(Operator::FOR_LOOP);
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::FOR>());
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
-
+#ifdef SKALANG_LOG_PARSER
     std::cout << "1st for loop expression (= statement)" << std::endl;
+#endif
     forNode->add(optstatement());
-
+#ifdef SKALANG_LOG_PARSER
     std::cout << "2nd for loop expression" << std::endl;
+#endif
     forNode->add(optexpr(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()));
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
-
+#ifdef SKALANG_LOG_PARSER
     std::cout << "3rd for loop expression" << std::endl;
+#endif
     forNode->add(optexpr(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()));
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 
     forNode->addIfExists(statement());
-
+#ifdef SKALANG_LOG_PARSER
     std::cout << "end for loop statement" << std::endl;
-
+#endif
     auto event = ForTokenEvent {*forNode};
     Observable<ForTokenEvent>::notifyObservers(event);
     return forNode;
@@ -124,19 +133,23 @@ ska::Parser::ASTNodePtr ska::Parser::matchIfOrIfElseKeyword() {
 
 ska::Parser::ASTNodePtr ska::Parser::matchVarKeyword() {
     auto varNode = std::make_unique<ASTNode>(Operator::VARIABLE_DECLARATION);
+#ifdef SKALANG_LOG_PARSER
     std::cout << "variable declaration" << std::endl;
-
+#endif
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>());
     const auto& identifier = m_input.match(TokenType::IDENTIFIER);
     varNode->add(std::make_unique<ska::ASTNode>(identifier));
 
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
+#ifdef SKALANG_LOG_PARSER
     std::cout << "equal sign matched, reading expression" << std::endl;
+#endif
     varNode->add(expr());
 
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+#ifdef SKALANG_LOG_PARSER
     std::cout << "expression end with symbol ;" << std::endl;
-
+#endif
     auto event = VarTokenEvent {*varNode};
     Observable<VarTokenEvent>::notifyObservers(event);
     return varNode;

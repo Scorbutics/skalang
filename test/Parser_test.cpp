@@ -87,7 +87,11 @@ TEST_CASE("for") {
 		const auto astPtr = ASTFromInput("for(;;);", keywords);
 		auto& ast = *astPtr;
 		CHECK(ast.op == ska::Operator::FOR_LOOP);
-		CHECK(ast.empty());
+		CHECK(ast.size() == 3);
+		CHECK(ast[0].empty());
+		CHECK(ast[1].empty());
+		CHECK(ast[2].empty());
+
 	}
 }
 

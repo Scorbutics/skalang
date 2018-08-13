@@ -2,6 +2,7 @@
 
 #include "Tokenizer.h"
 
+//#define SKALANG_LOG_TOKENIZER
 
 const std::unordered_set<std::string> ska::Tokenizer::ALLOWED_MULTIPLE_CHAR_TOKEN_SYMBOLS = BuildAllowedMultipleCharTokenSymbolsSet();
 
@@ -41,8 +42,11 @@ std::vector<ska::Token> ska::Tokenizer::tokenize() const {
 
 		if (currentTokenToRead.current != ska::TokenType::EMPTY && currentTokenToRead.current != ska::TokenType::SPACE) {	
 			if(currentTokenToRead.current == ska::TokenType::SYMBOL) {
-				if(isFinalizedSymbol(token.asString()[0], stackSymbol)) {
-					push(std::move(token), stackSymbol, result);	
+				const auto& charToken = token.asString()[0];
+				stackSymbol.push_back(std::move(token));
+				
+				if(isFinalizedSymbol(charToken, stackSymbol)) {
+					push(Token{}, stackSymbol, result);	
 				} else {
 					stackSymbol.push_back(std::move(token));
 				}
@@ -53,6 +57,8 @@ std::vector<ska::Token> ska::Tokenizer::tokenize() const {
 
 		currentTokenToRead = determineCurrentToken(startIndex);
 	} while (currentTokenToRead.current != ska::TokenType::EMPTY);
+	push(Token{}, stackSymbol, result);
+	
 	return result;
 }
 
@@ -62,11 +68,17 @@ void ska::Tokenizer::push(Token t, std::vector<Token>& symbolStack, std::vector<
 		for(const auto& s : symbolStack) {
 			ss << s.asString();
 		}
+#ifdef SKALANG_LOG_TOKENIZER
+		std::cout << "Pushing compound symbol : " <<  ss.str() << std::endl;
+#endif
 		auto symbolToken = ska::Token { ss.str(), TokenType::SYMBOL };
 		output.push_back(std::move(symbolToken));
 		symbolStack.clear();
 	}
 	if(!t.empty()) {
+#ifdef SKALANG_LOG_TOKENIZER
+		std::cout << "Pushing symbol : " << t.asString() << std::endl;
+#endif
 		output.push_back(std::move(t));
 	}
 }
@@ -103,9 +115,13 @@ bool ska::Tokenizer::isFinalizedSymbol(char nextSymbol, const std::vector<Token>
 	symbol.resize(2);
 	symbol[0] = topStackSymbol;
 	symbol[1] = nextSymbol;
+#ifdef SKALANG_LOG_TOKENIZER
 	std::cout << "Stack symbol : " << symbol;
+#endif
 	const auto result = ALLOWED_MULTIPLE_CHAR_TOKEN_SYMBOLS.find(symbol) == ALLOWED_MULTIPLE_CHAR_TOKEN_SYMBOLS.end();
+#ifdef SKALANG_LOG_TOKENIZER
 	std::cout << " which is " << (!result ? "correct" : "incorrect") << std::endl;
+#endif
 	return result;
 }
 
