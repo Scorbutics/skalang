@@ -48,7 +48,7 @@ namespace ska {
 		ASTNode(const ASTNode&) = delete;
 
 		bool empty() const {
-			return token.type() == TokenType::EMPTY && !op.has_value();
+			return token.type() == TokenType::EMPTY || !op.has_value();
 		}
 
 		std::string asString() const {
