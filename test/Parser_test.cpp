@@ -88,7 +88,6 @@ TEST_CASE("for") {
 		auto& ast = *astPtr;
 		CHECK(ast.op == ska::Operator::FOR_LOOP);
 		CHECK(ast.size() == 3);
-		std::cout << ast[0].asString();
 		CHECK(ast[0].empty());
 		CHECK(ast[1].empty());
 		CHECK(ast[2].empty());

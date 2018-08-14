@@ -36,7 +36,7 @@ namespace ska {
 			patterns(BuildPatterns(pool)){
 		}
 
-		const std::unordered_map<std::string, TokenInfo> pool;
+		const std::unordered_map<std::string, TokenInfo> pool {};
 
 		template <TokenGrammar token>
 		const Token& pattern() const {
@@ -47,7 +47,7 @@ namespace ska {
 			return patterns[token].token;
 		}
 
-        const std::string& patternString(const std::size_t token) const {
+        	const std::string& patternString(const std::size_t token) const {
 			return patterns[token].patternString;
 		}
 
@@ -56,16 +56,16 @@ namespace ska {
 
 		static std::vector<TokenInfo> BuildPatterns(const std::unordered_map<std::string, TokenInfo>& pool) {
 			auto patterns = std::vector<TokenInfo>();
-            patterns.resize(pool.size());
+			patterns.resize(pool.size());
 
 			auto index = 0u;
 			for (const auto& p : pool) {
-                if(p.second.token.type() == TokenType::RESERVED) {
-                    patterns[std::get<std::size_t>(p.second.token.content())] = p.second;
-                }
+                		if(p.second.token.type() == TokenType::RESERVED) {
+                    			patterns[std::get<std::size_t>(p.second.token.content())] = p.second;
+                		}
 			}
 
-            patterns[static_cast<std::size_t>(ska::TokenGrammar::AFFECTATION)]           = pool.at("=");
+            		patterns[static_cast<std::size_t>(ska::TokenGrammar::AFFECTATION)]           	= pool.at("=");
 			patterns[static_cast<std::size_t>(ska::TokenGrammar::BLOCK_BEGIN)]           	= pool.at("{");
 			patterns[static_cast<std::size_t>(ska::TokenGrammar::BLOCK_END)]             	= pool.at("}");
 			patterns[static_cast<std::size_t>(ska::TokenGrammar::PARENTHESIS_BEGIN)]     	= pool.at("(");

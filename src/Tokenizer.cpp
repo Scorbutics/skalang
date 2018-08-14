@@ -44,11 +44,8 @@ std::vector<ska::Token> ska::Tokenizer::tokenize() const {
 			if(currentTokenToRead.current == ska::TokenType::SYMBOL) {
 				const auto& charToken = token.asString()[0];
 				stackSymbol.push_back(std::move(token));
-				
 				if(isFinalizedSymbol(charToken, stackSymbol)) {
 					push(Token{}, stackSymbol, result);	
-				} else {
-					stackSymbol.push_back(std::move(token));
 				}
 			} else {
 				push(std::move(token), stackSymbol, result);
@@ -57,6 +54,7 @@ std::vector<ska::Token> ska::Tokenizer::tokenize() const {
 
 		currentTokenToRead = determineCurrentToken(startIndex);
 	} while (currentTokenToRead.current != ska::TokenType::EMPTY);
+	
 	push(Token{}, stackSymbol, result);
 	
 	return result;
