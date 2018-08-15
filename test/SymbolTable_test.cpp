@@ -5,9 +5,8 @@
 #include "Parser.h"
 
 using SymbolTablePtr = std::unique_ptr<ska::SymbolTable>;
-SymbolTablePtr table_test;
 
-std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input) {
+std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, SymbolTablePtr& table_test) {
 	const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
@@ -19,11 +18,14 @@ std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input) {
 }
 
 TEST_CASE("test") {
-	std::cout << std::endl << "symbol table" << std::endl;
-	auto astPtr = ASTFromInput("{ var i = 0; { var toto = 2; var i = 9; }}");
+	SymbolTablePtr table_test;
+	auto astPtr = ASTFromInput("var i = 0; { var toto = 2; var i = 9; }", table_test);
 	auto& table = *table_test;
-	std::cout << "ok" << std::endl;
-
+	
 	CHECK(table.nested().size() == 1);
-	CHECK(table["i"] != nullptr);
+	auto nestedI = (*table.nested()[0])["i"];
+	auto i = table["i"];
+	CHECK(i != nullptr);
+	CHECK(nestedI  != nullptr);
+	CHECK(i != nestedI);
 }

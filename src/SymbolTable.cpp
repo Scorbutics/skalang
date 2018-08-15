@@ -33,6 +33,9 @@ bool ska::SymbolTable::match(VarTokenEvent& token) {
 	assert(m_currentTable != nullptr);
 
 	m_currentTable->emplace(std::move(token.node[0].asString()), (token.node[1].op.has_value() ? token.node[1].op.value() : Operator::VARIABLE_DECLARATION)); 
+	
+	std::cout << "Matching new variable : " << token.node[0].asString() << std::endl;
+	
 	return true;
 }
 
