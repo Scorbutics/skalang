@@ -3,6 +3,7 @@
 #include "TokenReader.h"
 #include "ReservedKeywordsPool.h"
 #include "Tokenizer.h"
+#include "Operator.h"
 
 TEST_CASE("test") {
 	const auto inputStr = std::string("for(var i = 0; i < 5; i++) { lol(\"mdr\", 12); }");

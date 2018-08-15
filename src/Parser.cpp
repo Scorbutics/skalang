@@ -55,7 +55,10 @@ ska::Parser::ASTNodePtr ska::Parser::matchBlock(const std::string& content) {
 		std::cout << "block start detected" << std::endl;
 #endif
 		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
-		 
+		
+		auto startEvent = BlockTokenEvent { *blockNode, BlockTokenEventType::START };
+		Observable<BlockTokenEvent>::notifyObservers(startEvent);
+
 		while (!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
 			auto optionalStatement = optstatement();
 			if (!optionalStatement->empty()) {
@@ -68,8 +71,8 @@ ska::Parser::ASTNodePtr ska::Parser::matchBlock(const std::string& content) {
 #ifdef SKALANG_LOG_PARSER
 		std::cout << "block end" << std::endl;
 #endif
-		auto event = BlockTokenEvent {*blockNode};
-		Observable<BlockTokenEvent>::notifyObservers(event);
+		auto endEvent = BlockTokenEvent { *blockNode, BlockTokenEventType::END };
+		Observable<BlockTokenEvent>::notifyObservers(endEvent);
 		return blockNode;
 	} else if (content == m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>().asString()) {
 		error("Block end token encountered when not expected");
