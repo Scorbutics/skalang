@@ -2,7 +2,7 @@
 #include "Parser.h"
 #include "ReservedKeywordsPool.h"
 
-//#define SKALANG_LOG_PARSER
+#define SKALANG_LOG_PARSER
 
 ska::Parser::Parser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReader& input) :
 	m_input(input),
@@ -12,7 +12,20 @@ ska::Parser::Parser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReade
 
 std::pair<ska::Parser::ASTNodePtr, ska::Scope> ska::Parser::parse() {
 	auto scope = ska::Scope { nullptr };
-	return std::make_pair(statement(), std::move(scope));
+	if(m_input.empty()) {
+		return std::make_pair(nullptr, std::move(scope));
+	}
+
+	auto astBlockRootNode = std::make_unique<ASTNode>(Operator::BLOCK);
+	while (!m_input.empty()) {
+		auto optionalStatement = optstatement();
+		if (optionalStatement != nullptr && !optionalStatement->empty()) {
+			astBlockRootNode->add(std::move(optionalStatement));
+		} else {
+			break;
+		}
+	}
+	return std::make_pair(std::move(astBlockRootNode), std::move(scope));
 }
 
 ska::Parser::ASTNodePtr ska::Parser::statement() {
@@ -91,7 +104,7 @@ ska::Parser::ASTNodePtr ska::Parser::matchForKeyword() {
 #ifdef SKALANG_LOG_PARSER
     std::cout << "1st for loop expression (= statement)" << std::endl;
 #endif
-    forNode->add(optstatement());
+    	forNode->add(optstatement());
 #ifdef SKALANG_LOG_PARSER
     std::cout << "2nd for loop expression" << std::endl;
 #endif
@@ -182,6 +195,9 @@ ska::Parser::ASTNodePtr ska::Parser::matchReservedKeyword(const std::size_t keyw
 }
 
 ska::Parser::ASTNodePtr ska::Parser::expr() {
+#ifdef SKALANG_LOG_PARSER
+	std::cout << "Parsing expression..." << std::endl; 
+#endif
 	return m_shuntingYardParser.parse();
 }
 

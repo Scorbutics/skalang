@@ -19,9 +19,11 @@ std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input) {
 }
 
 TEST_CASE("test") {
-	auto astPtr = ASTFromInput("var i = 0; { var toto = 2; var i = 9; }");
+	std::cout << std::endl << "symbol table" << std::endl;
+	auto astPtr = ASTFromInput("{ var i = 0; { var toto = 2; var i = 9; }}");
 	auto& table = *table_test;
+	std::cout << "ok" << std::endl;
 
-	table[]
-	CHECK(true);
+	CHECK(table.nested().size() == 1);
+	CHECK(table["i"] != nullptr);
 }

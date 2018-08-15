@@ -24,7 +24,7 @@ namespace ska {
 			}
 
 			if (r == nullptr && l == nullptr) {
-				op = Operator::LITERAL;
+				op = token.empty() ? std::optional<Operator>() : Operator::LITERAL;
 			}
 		}
 
@@ -37,7 +37,7 @@ namespace ska {
 		ASTNode(const ASTNode&) = delete;
 
 		bool empty() const {
-			return token.type() == TokenType::EMPTY || !op.has_value();
+			return token.type() == TokenType::EMPTY && !op.has_value();
 		}
 
 		std::string asString() const {

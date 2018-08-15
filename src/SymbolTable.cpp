@@ -11,10 +11,12 @@ ska::SymbolTable::SymbolTable(Observable<VarTokenEvent>& variableDeclarer, Obser
 bool ska::SymbolTable::nestedTable(BlockTokenEvent& event) {
 	switch(event.type) {
 		case BlockTokenEventType::START:
+			std::cout << "New block : adding a nested symbol table" << std::endl;
 			m_currentTable = &m_currentTable->createNested();
 			break;
 		
 		case BlockTokenEventType::END:
+			std::cout << "Block end : going up in nested symbol table hierarchy" << std::endl;
 			assert(m_currentTable != nullptr);
 			m_currentTable = &m_currentTable->parent();
 			break;
@@ -27,20 +29,10 @@ bool ska::SymbolTable::nestedTable(BlockTokenEvent& event) {
 
 
 bool ska::SymbolTable::match(VarTokenEvent& token) {
-	//TODO
 	assert(token.node.size() == 2);
 	assert(m_currentTable != nullptr);
 
 	m_currentTable->emplace(std::move(token.node[0].asString()), (token.node[1].op.has_value() ? token.node[1].op.value() : Operator::VARIABLE_DECLARATION)); 
-
-	/*
-	std::cout
-	<< "Symbol table updated : name = "
-	<< token.node[0].asString()
-	<< "\tcategory = "
-	<< (token.node[1].op.has_value() ? (token.node[1].op == Operator::FUNCTION_DECLARATION ? "function" : "variable") : "")
-	<< std::endl;
-	*/
 	return true;
 }
 

@@ -14,7 +14,9 @@ TEST_CASE("test") {
 	auto p = ska::Parser { keywords, reader };
 	auto ast = p.parse();
 	
-	auto& tree = *ast.first;
+	CHECK(ast.first->size() == 1);
+
+	auto& tree = (*ast.first)[0];
 	
 	CHECK(tree.size() == 4);
 	const auto& declaration = tree[0];
@@ -59,14 +61,14 @@ TEST_CASE("Block") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	SUBCASE("Empty block statement") {
 		auto astPtr = ASTFromInput("{}", keywords);
-		auto& ast = *astPtr;
+		auto& ast = (*astPtr)[0];
 		CHECK(ast.op == ska::Operator::BLOCK);
 		CHECK(ast.size() == 0);
 	}
 
 	SUBCASE("1 statement block statement") {
 		auto astPtr = ASTFromInput("{ test; }", keywords);
-		auto& ast = *astPtr;
+		auto& ast = (*astPtr)[0];
 		CHECK(ast.op == ska::Operator::BLOCK);
 		CHECK(ast.size() == 1);
 		CHECK(ast[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
@@ -74,11 +76,20 @@ TEST_CASE("Block") {
 
 	SUBCASE("1 statement block statement") {
 		auto astPtr = ASTFromInput("{ test; titi; }", keywords);
-		auto& ast = *astPtr;
+		auto& ast = (*astPtr)[0];
 		CHECK(ast.op == ska::Operator::BLOCK);
 		CHECK(ast.size() == 2);
 		CHECK(ast[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
 		CHECK(ast[1].token == ska::Token { "titi", ska::TokenType::IDENTIFIER});
+	}
+
+	SUBCASE("1 statement, then a block statement") {
+		auto astPtr = ASTFromInput("tititi; { test; titi; }", keywords);
+		auto& ast = *astPtr;
+		CHECK(ast.op == ska::Operator::BLOCK);
+		CHECK(ast.size() == 2);
+		CHECK(ast[1].op == ska::Operator::BLOCK);
+		CHECK(ast[1].size() == 2);
 	}
 }
 
@@ -86,7 +97,7 @@ TEST_CASE("for") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	SUBCASE("All empty") {
 		const auto astPtr = ASTFromInput("for(;;);", keywords);
-		auto& ast = *astPtr;
+		auto& ast = (*astPtr)[0];
 		CHECK(ast.op == ska::Operator::FOR_LOOP);
 		CHECK(ast.size() == 3);
 		CHECK(ast[0].empty());
@@ -100,7 +111,7 @@ TEST_CASE("If keyword pattern") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	SUBCASE("If only with cond and block statement") {
 		auto astPtr = ASTFromInput("if (test) {}", keywords);
-		auto& ast = *astPtr;
+		auto& ast = (*astPtr)[0];
 		CHECK(ast.op == ska::Operator::IF);
 		CHECK(ast.size() == 2);
 		CHECK(ast[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
@@ -112,7 +123,7 @@ TEST_CASE("Expression and priorities") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	SUBCASE("Simple mul") {
 		auto astPtr = ASTFromInput("5 * 2;", keywords);
-		auto& ast = *astPtr;
+		auto& ast = (*astPtr)[0];
 		CHECK(ast.op == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
 		CHECK(ast.token == ska::Token { "*", ska::TokenType::SYMBOL });
@@ -132,7 +143,7 @@ TEST_CASE("Expression and priorities") {
 	
 	SUBCASE("Simple div") {
 		auto astPtr = ASTFromInput("5 / 2;", keywords);
-		auto& ast = *astPtr;
+		auto& ast = (*astPtr)[0];
 		CHECK(ast.op == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
 		CHECK(ast.token == ska::Token { "/", ska::TokenType::SYMBOL });
@@ -142,7 +153,7 @@ TEST_CASE("Expression and priorities") {
 	
 	SUBCASE("Simple add") {
 		auto astPtr = ASTFromInput("5 + 2;", keywords);
-		auto& ast = *astPtr;
+		auto& ast = (*astPtr)[0];
 		CHECK(ast.op == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
 		CHECK(ast.token == ska::Token { "+", ska::TokenType::SYMBOL });
@@ -152,7 +163,7 @@ TEST_CASE("Expression and priorities") {
 
 	SUBCASE("Simple sub") {
 		auto astPtr = ASTFromInput("5 - 2;", keywords);
-		auto& ast = *astPtr;
+		auto& ast = (*astPtr)[0];
 		CHECK(ast.op == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
 		CHECK(ast.token == ska::Token { "-", ska::TokenType::SYMBOL });
@@ -162,7 +173,7 @@ TEST_CASE("Expression and priorities") {
 
 	SUBCASE("Priorization with mul before add") {
 		auto astPtr = ASTFromInput("5 * 2 + 4;", keywords);
-		auto& ast = *astPtr;
+		auto& ast = (*astPtr)[0];
 		CHECK(ast.op == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
 		CHECK(ast.token == ska::Token { "+", ska::TokenType::SYMBOL });
@@ -176,7 +187,7 @@ TEST_CASE("Expression and priorities") {
 
 	SUBCASE("Priorization with mul after add") {
 		auto astPtr = ASTFromInput("5 + 2 * 4;", keywords);
-		auto& ast = *astPtr;
+		auto& ast = (*astPtr)[0];
 		CHECK(ast.op == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
 		CHECK(ast.token == ska::Token { "+", ska::TokenType::SYMBOL });
@@ -191,7 +202,7 @@ TEST_CASE("Expression and priorities") {
 
 	SUBCASE("Priorization with mul after add with parenthesis") {
 		auto astPtr = ASTFromInput("(5 + 2) * 4;", keywords);
-		auto& ast = *astPtr;
+		auto& ast = (*astPtr)[0];
 		CHECK(ast.op == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
 		CHECK(ast.token == ska::Token { "*", ska::TokenType::SYMBOL });
