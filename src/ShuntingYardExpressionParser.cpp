@@ -126,7 +126,10 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 		break;
 		
 		case TokenType::DOT_SYMBOL:
-		//Method call only (digits are DIGIT token type, even real ones)
+			//Field access only (digits are DIGIT token type, even real ones)
+			operands.pop();
+			operands.push(matchObjectFieldAccess(lastToken));
+		break;
 		case TokenType::SYMBOL: {
 			const auto& value = std::get<std::string>(token.content());
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
@@ -190,6 +193,26 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionCa
 	}
 	m_input.match(endParametersToken);
 	return functionCallNode;
+}
+
+std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchObjectFieldAccess(Token objectAccessed) {
+	auto fieldAccessNode = std::make_unique<ska::ASTNode>(Operator::FIELD_ACCESS, std::move(objectAccessed));
+	fieldAccessNode->add(std::make_unique<ska::ASTNode>(m_input.match(TokenType::IDENTIFIER)));
+	auto event = VarTokenEvent { *fieldAccessNode, VarTokenEventType::USE };
+	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
+	return fieldAccessNode;
+}
+
+std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchAffectation(Token identifierFieldAffected) {
+	auto affectationNode = std::make_unique<ska::ASTNode>(Operator::VARIABLE_AFFECTATION, std::move(identifierFieldAffected));
+	auto expressionNode = parse();
+	if(expressionNode == nullptr) {
+		error("Affectation incomplete : no expression");
+	}
+	affectationNode->add(std::move(expressionNode));
+	auto event = VarTokenEvent { *affectationNode, VarTokenEventType::AFFECTATION };
+	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
+	return affectationNode;
 }
 
 std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::expression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands) {
@@ -276,7 +299,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 	std::cout << "function read." << std::endl;
 #endif
 	auto event = FunctionTokenEvent {*functionDeclarationNode};
-    Observable<FunctionTokenEvent>::notifyObservers(event);
+	m_parser.Observable<FunctionTokenEvent>::notifyObservers(event);
 
 	return functionDeclarationNode;
 }

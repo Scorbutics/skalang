@@ -8,6 +8,7 @@
 
 #include "TokenReader.h"
 #include "FunctionTokenEvent.h"
+#include "VarTokenEvent.h"
 
 template<typename T, typename Container = std::deque<T>>
 class iterable_stack
@@ -30,8 +31,7 @@ namespace ska {
 	class Parser;
 	struct ReservedKeywordsPool;
 
-	class ShuntingYardExpressionParser :
-        public EventDispatcher<FunctionTokenEvent> {
+	class ShuntingYardExpressionParser {
 
 		using PopPredicate = std::function<int(const Token&)>;
 		template <class T>
@@ -47,9 +47,11 @@ namespace ska {
 		bool parseTokenExpression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const Token& token, Token& lastToken);
 
 	private:
-		std::unique_ptr<ska::ASTNode> matchReserved();
-		std::unique_ptr<ska::ASTNode> matchFunctionCall(Token identifierFunctionName);
-		std::unique_ptr<ska::ASTNode> matchFunctionDeclaration();
+		std::unique_ptr<ASTNode> matchReserved();
+		std::unique_ptr<ASTNode> matchFunctionCall(Token identifierFunctionName);
+		std::unique_ptr<ASTNode> matchFunctionDeclaration();
+		std::unique_ptr<ASTNode> matchObjectFieldAccess(Token objectAccessed);
+		std::unique_ptr<ASTNode> matchAffectation(Token identifierFieldAffected);
 
 		std::unique_ptr<ASTNode> expression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands);
 		bool checkLessPriorityToken(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const char tokenChar) const;

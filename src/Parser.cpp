@@ -2,7 +2,7 @@
 #include "Parser.h"
 #include "ReservedKeywordsPool.h"
 
-#define SKALANG_LOG_PARSER
+//#define SKALANG_LOG_PARSER
 
 ska::Parser::Parser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReader& input) :
 	m_input(input),

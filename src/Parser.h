@@ -10,6 +10,7 @@
 #include "IfElseTokenEvent.h"
 #include "VarTokenEvent.h"
 #include "BlockTokenEvent.h"
+#include "FunctionTokenEvent.h"
 
 namespace ska {
 	struct ReservedKeywordsPool;
@@ -19,6 +20,7 @@ namespace ska {
             	ForTokenEvent,
             	IfElseTokenEvent,
             	VarTokenEvent,
+		FunctionTokenEvent,
             	BlockTokenEvent
 	    > {
 

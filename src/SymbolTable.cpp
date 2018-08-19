@@ -31,11 +31,23 @@ bool ska::SymbolTable::nestedTable(BlockTokenEvent& event) {
 bool ska::SymbolTable::match(VarTokenEvent& token) {
 	assert(token.node.size() == 2);
 	assert(m_currentTable != nullptr);
+	switch(token.type) {
+		case VarTokenEventType::DECLARATION:
+			m_currentTable->emplace(std::move(token.node[0].asString()), (token.node[1].op.has_value() ? token.node[1].op.value() : Operator::VARIABLE_DECLARATION)); 
+			
+			std::cout << "Matching new variable : " << token.node[0].asString() << std::endl;
+		break;
 
-	m_currentTable->emplace(std::move(token.node[0].asString()), (token.node[1].op.has_value() ? token.node[1].op.value() : Operator::VARIABLE_DECLARATION)); 
-	
-	std::cout << "Matching new variable : " << token.node[0].asString() << std::endl;
-	
+		default:
+		case VarTokenEventType::AFFECTATION:
+		case VarTokenEventType::USE:
+			
+			std::cout << "Using variable : " << token.node[0].asString() << std::endl;
+			if((*this)[token.node[0].asString()] == nullptr) {
+				throw std::runtime_error("Symbol not found : " + token.node[0].asString());
+			}
+		break;
+	}
 	return true;
 }
 
