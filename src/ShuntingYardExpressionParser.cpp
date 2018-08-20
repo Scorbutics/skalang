@@ -132,27 +132,32 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 		break;
 		case TokenType::SYMBOL: {
 			const auto& value = std::get<std::string>(token.content());
+			if(value == "=") {
+				operands.pop();
+				operands.push(matchAffectation(lastToken));
+			} else {
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
-			std::cout << "\tPushing operator symbol " << value << std::endl;
+				std::cout << "\tPushing operator symbol " << value << std::endl;
 #endif
-			const auto shouldPopOperatorsStack = checkLessPriorityToken(operators, operands, value[0]);
-			auto operatorTop = operators.empty() ? Token{} : operators.top();
-			if (shouldPopOperatorsStack) {
+				const auto shouldPopOperatorsStack = checkLessPriorityToken(operators, operands, value[0]);
+				auto operatorTop = operators.empty() ? Token{} : operators.top();
+				if (shouldPopOperatorsStack) {
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
-				std::cout << "\tLess precedence, poping " << operatorTop.asString() << " before adding " << value << std::endl;
+					std::cout << "\tLess precedence, poping " << operatorTop.asString() << " before adding " << value << std::endl;
 #endif
-				auto poped = 0u;
-				auto popedToken = popUntil(operators, operands, [&](const Token& t) {
-					if (poped >= 1) {
-						return -1;
-					}
-					poped++;
-					return 0;
-				});
-				assert(popedToken != nullptr);
-				operands.push(std::move(popedToken));
+					auto poped = 0u;
+					auto popedToken = popUntil(operators, operands, [&](const Token& t) {
+						if (poped >= 1) {
+							return -1;
+						}
+						poped++;
+						return 0;
+					});
+					assert(popedToken != nullptr);
+					operands.push(std::move(popedToken));
+				}
+				operators.emplace(m_input.match(TokenType::SYMBOL));
 			}
-			operators.emplace(m_input.match(TokenType::SYMBOL));
 		}
 		break;
 
@@ -197,6 +202,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionCa
 
 std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchObjectFieldAccess(Token objectAccessed) {
 	auto fieldAccessNode = std::make_unique<ska::ASTNode>(Operator::FIELD_ACCESS, std::move(objectAccessed));
+	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::METHOD_CALL_OPERATOR>());;
 	fieldAccessNode->add(std::make_unique<ska::ASTNode>(m_input.match(TokenType::IDENTIFIER)));
 	auto event = VarTokenEvent { *fieldAccessNode, VarTokenEventType::USE };
 	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
@@ -205,6 +211,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchObjectFiel
 
 std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchAffectation(Token identifierFieldAffected) {
 	auto affectationNode = std::make_unique<ska::ASTNode>(Operator::VARIABLE_AFFECTATION, std::move(identifierFieldAffected));
+	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
 	auto expressionNode = parse();
 	if(expressionNode == nullptr) {
 		error("Affectation incomplete : no expression");

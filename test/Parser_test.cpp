@@ -21,9 +21,9 @@ TEST_CASE("test") {
 	CHECK(tree.size() == 4);
 	const auto& declaration = tree[0];
 	CHECK(declaration.op == ska::Operator::VARIABLE_DECLARATION);
-	CHECK(declaration.size() == 2);
-	CHECK(declaration[0].token == ska::Token { "i", ska::TokenType::IDENTIFIER });
-	CHECK(declaration[1].token == ska::Token { "0", ska::TokenType::DIGIT });
+	CHECK(declaration.size() == 1);
+	CHECK(declaration.token == ska::Token { "i", ska::TokenType::IDENTIFIER });
+	CHECK(declaration[0].token == ska::Token { "0", ska::TokenType::DIGIT });
 
 	const auto& checkStatement = tree[1];
 	CHECK(checkStatement.op == ska::Operator::BINARY);

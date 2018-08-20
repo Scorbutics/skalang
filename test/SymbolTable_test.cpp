@@ -44,4 +44,33 @@ TEST_CASE("test") {
 }
 
 TEST_CASE("Matching") {
+	SUBCASE("Matching OK") {
+		ParserPtr parser_test;
+		{
+			SymbolTablePtr table_test;
+			auto astPtr = ASTFromInput("var i = 0; i = \"llllll\"; { i = 9; }", parser_test, table_test);
+			auto& table = *table_test;
+			
+			CHECK(table.nested().size() == 1);
+			auto nestedI = (*table.nested()[0])["i"];
+			auto i = table["i"];
+
+			CHECK(i != nullptr);
+		}
+	}
+
+	SUBCASE("Matching failed") {
+		ParserPtr parser_test;
+		{
+			SymbolTablePtr table_test;
+			auto astPtr = ASTFromInput("var i = 0; titi = \"llllll\"; { i = 9; }", parser_test, table_test);
+			auto& table = *table_test;
+			
+			CHECK(table.nested().size() == 1);
+			auto nestedI = (*table.nested()[0])["i"];
+			auto i = table["i"];
+
+			CHECK(i != nullptr);
+		}
+	}
 }

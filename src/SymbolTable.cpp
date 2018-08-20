@@ -29,22 +29,24 @@ bool ska::SymbolTable::nestedTable(BlockTokenEvent& event) {
 
 
 bool ska::SymbolTable::match(VarTokenEvent& token) {
-	assert(token.node.size() == 2);
+	std::cout << token.node.size() << std::endl;
+	assert(token.node.size() == 1);
 	assert(m_currentTable != nullptr);
+	std::cout << "VarTokenEvent" << std::endl;
 	switch(token.type) {
 		case VarTokenEventType::DECLARATION:
-			m_currentTable->emplace(std::move(token.node[0].asString()), (token.node[1].op.has_value() ? token.node[1].op.value() : Operator::VARIABLE_DECLARATION)); 
+			m_currentTable->emplace(std::move(token.node.token.asString()), (token.node[0].op.has_value() ? token.node[0].op.value() : Operator::VARIABLE_DECLARATION)); 
 			
-			std::cout << "Matching new variable : " << token.node[0].asString() << std::endl;
+			std::cout << "Matching new variable : " << token.node.token.asString() << std::endl;
 		break;
 
 		default:
 		case VarTokenEventType::AFFECTATION:
 		case VarTokenEventType::USE:
 			
-			std::cout << "Using variable : " << token.node[0].asString() << std::endl;
-			if((*this)[token.node[0].asString()] == nullptr) {
-				throw std::runtime_error("Symbol not found : " + token.node[0].asString());
+			std::cout << "Using variable : " << token.node.token.asString() << std::endl;
+			if((*this)[token.node.token.asString()] == nullptr) {
+				throw std::runtime_error("Symbol not found : " + token.node.token.asString());
 			}
 		break;
 	}

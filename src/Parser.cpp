@@ -148,14 +148,11 @@ ska::Parser::ASTNodePtr ska::Parser::matchIfOrIfElseKeyword() {
 }
 
 ska::Parser::ASTNodePtr ska::Parser::matchVarKeyword() {
-    auto varNode = std::make_unique<ASTNode>(Operator::VARIABLE_DECLARATION);
 #ifdef SKALANG_LOG_PARSER
-    std::cout << "variable declaration" << std::endl;
+	std::cout << "variable declaration" << std::endl;
 #endif
-    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>());
-    const auto& identifier = m_input.match(TokenType::IDENTIFIER);
-    varNode->add(std::make_unique<ska::ASTNode>(identifier));
-
+	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>());
+	auto varNode = std::make_unique<ASTNode>(Operator::VARIABLE_DECLARATION, m_input.match(TokenType::IDENTIFIER));
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
 #ifdef SKALANG_LOG_PARSER
     std::cout << "equal sign matched, reading expression" << std::endl;
