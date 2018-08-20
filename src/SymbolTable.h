@@ -5,6 +5,7 @@
 #include "AST.h"
 #include "VarTokenEvent.h"
 #include "BlockTokenEvent.h"
+#include "FunctionTokenEvent.h"
 
 namespace ska {
     	struct Symbol {
@@ -61,12 +62,17 @@ namespace ska {
 
 	class SymbolTable :
         public SubObserver<VarTokenEvent>,
-       	public SubObserver<BlockTokenEvent> {
+       	public SubObserver<BlockTokenEvent>,
+        public SubObserver<FunctionTokenEvent> {
 
         using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 
     	public:
-		SymbolTable(Observable<VarTokenEvent>& variableDeclarer, Observable<BlockTokenEvent>& scopeMaker);
+		SymbolTable(
+				Observable<VarTokenEvent>& variableDeclarer, 
+				Observable<BlockTokenEvent>& scopeMaker,
+				Observable<FunctionTokenEvent>& functionUser
+		);
 		~SymbolTable() = default;
 		
 		auto* operator[](const std::string& key) {
@@ -88,6 +94,7 @@ namespace ska {
     	private:
         	bool match(VarTokenEvent&);
 		bool nestedTable(BlockTokenEvent&);
+		bool matchFunction(FunctionTokenEvent&);
 
         	std::unique_ptr<ScopedSymbolTable> m_rootTable;
 		ScopedSymbolTable* m_currentTable = nullptr;

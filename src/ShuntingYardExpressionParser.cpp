@@ -87,6 +87,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 					//We have to pop it, then matching the function call as the new operand.
 					operands.pop();
 					operands.push(matchFunctionCall(lastToken));
+					
 				} else {
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
 					std::cout << "\tRange begin" << std::endl;
@@ -197,6 +198,8 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionCa
 		}
 	}
 	m_input.match(endParametersToken);
+	auto event = FunctionTokenEvent { *functionCallNode };
+	m_parser.Observable<FunctionTokenEvent>::notifyObservers(event);
 	return functionCallNode;
 }
 
