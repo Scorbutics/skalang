@@ -21,7 +21,11 @@ namespace ska {
 		PARENTHESIS_END,
 		STRING_DELIMITER,
 		STATEMENT_END,
-		ARGUMENT_DELIMITER
+		ARGUMENT_DELIMITER,
+		TYPE_DELIMITER,
+		INT,
+		FLOAT,
+		STRING
 	};
 
 
@@ -74,7 +78,8 @@ namespace ska {
 			patterns[static_cast<std::size_t>(ska::TokenGrammar::STATEMENT_END)]         	= pool.at(";");
 			patterns[static_cast<std::size_t>(ska::TokenGrammar::ARGUMENT_DELIMITER)]    	= pool.at(",");
 			patterns[static_cast<std::size_t>(ska::TokenGrammar::METHOD_CALL_OPERATOR)]	= pool.at(".");
-			
+			patterns[static_cast<std::size_t>(ska::TokenGrammar::TYPE_DELIMITER)] 		= pool.at(":");
+
 			return patterns;
 		}
 
@@ -87,6 +92,9 @@ namespace ska {
 			pool.emplace("var", TokenInfo{ "var", Token{ static_cast<std::size_t>(TokenGrammar::VARIABLE), TokenType::RESERVED } });
 			pool.emplace("function", TokenInfo{ "function", Token{ static_cast<std::size_t>(TokenGrammar::FUNCTION), TokenType::RESERVED } });
 			pool.emplace("return", TokenInfo{ "return", Token{ static_cast<std::size_t>(TokenGrammar::RETURN), TokenType::RESERVED } });
+			pool.emplace("int", TokenInfo { "int", Token{ static_cast<std::size_t>(TokenGrammar::INT), TokenType::RESERVED} });
+			pool.emplace("float", TokenInfo { "float", Token{ static_cast<std::size_t>(TokenGrammar::FLOAT), TokenType::RESERVED} });
+			pool.emplace("string", TokenInfo { "string", Token{ static_cast<std::size_t>(TokenGrammar::STRING), TokenType::RESERVED} });
 
 			pool.emplace(".", TokenInfo{ ".", Token{ ".", TokenType::DOT_SYMBOL } });
 			pool.emplace("=", TokenInfo{ "=", Token{ "=", TokenType::SYMBOL } });
@@ -97,6 +105,7 @@ namespace ska {
 			pool.emplace("\"", TokenInfo{ "\"", Token{ "\"", TokenType::SYMBOL } });
 			pool.emplace(";", TokenInfo{ ";", Token{ ";", TokenType::SYMBOL } });
 			pool.emplace(",", TokenInfo{ ",", Token{ ",", TokenType::SYMBOL } });
+			pool.emplace(":", TokenInfo{ ":", Token{ ":", TokenType::SYMBOL } });
 
 			return pool;
 		}

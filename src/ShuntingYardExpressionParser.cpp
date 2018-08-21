@@ -272,6 +272,29 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchReserved()
 	}
 }
 
+std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDeclarationParameter() {
+	const auto isRightParenthesis = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
+	if(isRightParenthesis) {
+		return nullptr;
+	}
+	const auto& id = m_input.match(TokenType::IDENTIFIER);
+#ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
+	std::cout << id.asString() << std::endl;
+#endif
+	
+	auto node = std::make_unique<ASTNode>(id);
+	if(m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>())) {	
+		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
+		const auto type = m_input.match(TokenType::IDENTIFIER);
+#ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
+		std::cout << "type is : " << type << std::endl;
+#endif
+		//TODO
+		//node->type = 
+	}
+	return node;
+}
+
 std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
 	auto functionDeclarationNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_DECLARATION);
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
@@ -287,11 +310,8 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
 			std::cout << "parameter detected, reading identifier : ";
 #endif
-			const auto& id = m_input.match(TokenType::IDENTIFIER);
-#ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
-			std::cout << id.asString() << std::endl;
-#endif
-			functionDeclarationNode->add(std::make_unique<ASTNode>(id));
+			auto parameterNode = matchFunctionDeclarationParameter();
+			functionDeclarationNode->add(std::move(parameterNode));
 			isComma = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
 			if (isComma) {
 				m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
@@ -301,6 +321,15 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 	}
 
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());		
+
+	if(m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>())) {
+		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
+		const auto type = m_input.match(TokenType::IDENTIFIER);	
+#ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
+		std::cout << "function type detected : " << type << std::endl;
+#endif
+	}
+
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
 	std::cout << "reading function statement" << std::endl;
 #endif

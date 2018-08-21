@@ -5,6 +5,7 @@
 #include "Token.h"
 
 #include "Operator.h"
+#include "ExpressionType.h"
 
 namespace ska {
 
@@ -49,7 +50,7 @@ namespace ska {
 		}
 
 		std::size_t size() const {
-            return children.size();
+			return children.size();
 		}
 
 		template<class T>
@@ -58,12 +59,12 @@ namespace ska {
 			children.emplace_back(std::move(c));
 		}
 
-        template<class T>
-        void addIfExists(std::unique_ptr<T> c) {
-            if(c != nullptr) {
-                children.emplace_back(std::move(c));
-            }
-        }
+		template<class T>
+		void addIfExists(std::unique_ptr<T> c) {
+		    if(c != nullptr) {
+			children.emplace_back(std::move(c));
+		    }
+		}
 
 		ASTNode& left() {
 			assert(op == Operator::BINARY && !children.empty());
@@ -91,7 +92,7 @@ namespace ska {
 
 		std::optional<Operator> op;
 		Token token;
-		//ASTNode* parent = this;
+		std::optional<ExpressionType> type;
 
 	private:
 		std::vector<std::unique_ptr<ASTNode>> children;

@@ -119,6 +119,18 @@ TEST_CASE("If keyword pattern") {
 	}
 }
 
+TEST_CASE("function") {
+	const auto keywords = ska::ReservedKeywordsPool {};
+	SUBCASE("with 2 arguments built-in types and no return type") {
+		auto astPtr = ASTFromInput("var f = function(titi:int, toto:string):var { };", keywords);
+		auto& ast = (*astPtr)[0];
+		CHECK(ast.op == ska::Operator::FUNCTION_DECLARATION);
+		CHECK(ast.size() == 3);
+		//CHECK(ast[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
+		
+	}
+}
+
 TEST_CASE("Expression and priorities") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	SUBCASE("Simple mul") {

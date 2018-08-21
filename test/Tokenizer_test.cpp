@@ -56,6 +56,33 @@ TEST_CASE("Symbol by symbol") {
 		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::VARIABLE>());
 	}
 
+	SUBCASE("int") {
+		const auto input = std::string("int");
+		auto t = ska::Tokenizer { keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 1);
+		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::INT>());
+	}
+	
+	SUBCASE("float") {
+		const auto input = std::string("float");
+		auto t = ska::Tokenizer { keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 1);
+		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::FLOAT>());
+	}
+	
+	SUBCASE("string") {
+		const auto input = std::string("string");
+		auto t = ska::Tokenizer { keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 1);
+		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::STRING>());
+	}
+	
 	SUBCASE("if") {
 		const auto input = std::string("if");
 		auto t = ska::Tokenizer {keywords, input};

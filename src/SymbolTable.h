@@ -9,7 +9,7 @@
 
 namespace ska {
     	struct Symbol {
-        	Operator category;
+        	ExpressionType category;
     	};
 
 	class SymbolTable;
@@ -28,7 +28,7 @@ namespace ska {
 
 		ScopedSymbolTable& parent();
 		ScopedSymbolTable& createNested();
-		void emplace(std::string name, Operator op);
+		void emplace(std::string name, ExpressionType type);
 		
 		Symbol* operator[](const std::string& key) {
                 	auto valueIt = m_symbols.find(key);
@@ -92,7 +92,11 @@ namespace ska {
 		}
 
     	private:
-        	bool match(VarTokenEvent&);
+		ExpressionType getExpressionType(ASTNode& node) const;
+        	ExpressionType calculateNodeExpressionType(ASTNode& node) const;
+		static ExpressionType crossTypes(char op, ExpressionType type1, ExpressionType type2);
+		
+		bool match(VarTokenEvent&);
 		bool nestedTable(BlockTokenEvent&);
 		bool matchFunction(FunctionTokenEvent&);
 

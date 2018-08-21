@@ -50,6 +50,7 @@ namespace ska {
 		std::unique_ptr<ASTNode> matchReserved();
 		std::unique_ptr<ASTNode> matchFunctionCall(Token identifierFunctionName);
 		std::unique_ptr<ASTNode> matchFunctionDeclaration();
+		std::unique_ptr<ASTNode> matchFunctionDeclarationParameter();
 		std::unique_ptr<ASTNode> matchObjectFieldAccess(Token objectAccessed);
 		std::unique_ptr<ASTNode> matchAffectation(Token identifierFieldAffected);
 
