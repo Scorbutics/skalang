@@ -285,7 +285,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 	auto node = std::make_unique<ASTNode>(id);
 	if(m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>())) {	
 		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
-		const auto type = m_input.match(TokenType::IDENTIFIER);
+		const auto type = m_input.match(TokenType::RESERVED);
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
 		std::cout << "type is : " << type << std::endl;
 #endif
@@ -324,7 +324,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 
 	if(m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>())) {
 		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
-		const auto type = m_input.match(TokenType::IDENTIFIER);	
+		const auto type = m_input.match(TokenType::RESERVED);	
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
 		std::cout << "function type detected : " << type << std::endl;
 #endif

@@ -44,11 +44,12 @@ TEST_CASE("test") {
 }
 
 TEST_CASE("Matching") {
+	
 	SUBCASE("Matching OK") {
 		ParserPtr parser_test;
 		{
 			SymbolTablePtr table_test;
-			auto astPtr = ASTFromInput("var i = 0; i = \"llllll\"; { i = 9; }", parser_test, table_test);
+			auto astPtr = ASTFromInput("var i = 0; i = 123; { i = 9; }", parser_test, table_test);
 			auto& table = *table_test;
 			
 			CHECK(table.nested().size() == 1);
@@ -73,12 +74,22 @@ TEST_CASE("Matching") {
 
 			SUBCASE("Because of non-matching type (variable then function)") {
 				SymbolTablePtr table_test;
-				ASTFromInput("var i = 0; i = function() {};", parser_test, table_test);
+				try {
+					std::cout << "toto" << std::endl;
+					ASTFromInput("var i = 0; i = function() {};", parser_test, table_test);
+				} catch(std::exception& e) {
+					std::cout << "titi" << std::endl;
+					CHECK(true);
+				}
 			}
 
 			SUBCASE("Because of non-matching type (function then variable)") {
 				SymbolTablePtr table_test;
-				ASTFromInput("var titi = function() {}; titi = 9;", parser_test, table_test);
+				try {
+					ASTFromInput("var titi = function() {}; titi = 9;", parser_test, table_test);
+				} catch(std::exception& e) {
+					CHECK(true);
+				}
 			}
 		}
 	}
