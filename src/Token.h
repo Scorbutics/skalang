@@ -4,6 +4,8 @@
 #include <sstream>
 #include <cassert>
 
+#include "TokenGrammar.h"
+
 namespace ska {
 	constexpr const char* TokenTypeSTR[] = {
 	"RESERVED",
@@ -16,7 +18,7 @@ namespace ska {
 	"SYMBOL",
 	"EMPTY",
 	"UNUSED_LAST_Length"
-};
+	};
 
 	enum class TokenType {
 		RESERVED,
@@ -81,7 +83,7 @@ namespace ska {
 
 			if(m_type == TokenType::RESERVED) {
 				std::stringstream ss;
-				ss << std::get<std::size_t>(m_content);
+				ss << TokenGrammarSTR[std::get<std::size_t>(m_content)];
 				return ss.str();
 			}
 

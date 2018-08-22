@@ -14,7 +14,10 @@ const ska::Token& ska::TokenReader::match(const TokenType type) {
         nextToken();
         return result;
     }
-    error();
+    auto ss = std::stringstream {};
+    ss << "\"Token with type " << TokenTypeSTR[static_cast<std::size_t>(type)] << "\"" ;
+    auto t = Token { ss.str(), type };
+    error(&t);
 	throw std::runtime_error("unexpected error");
 }
 
@@ -44,7 +47,7 @@ bool ska::TokenReader::empty() const {
 }
 
 void ska::TokenReader::error(Token* token) {
-    throw std::runtime_error("syntax error : bad token matching : expected " + (token == nullptr ? "UNKNOWN_TOKEN" : token->asString()) + " but got " + (m_lookAhead == nullptr ? "EMPTY_TOKEN" : m_lookAhead->asString()));
+    throw std::runtime_error("syntax error : bad token matching : expected " + (token == nullptr ? "UNKNOWN_TOKEN" : token->asString()) + " but got \"" + (m_lookAhead == nullptr ? "EMPTY_TOKEN" : m_lookAhead->asString()) + "\"");
 }
 
 void ska::TokenReader::nextToken() {
