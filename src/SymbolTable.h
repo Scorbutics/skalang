@@ -92,9 +92,7 @@ namespace ska {
 		}
 
     	private:
-		ExpressionType getExpressionType(ASTNode& node) const;
-        	ExpressionType calculateNodeExpressionType(ASTNode& node) const;
-		static ExpressionType crossTypes(char op, ExpressionType type1, ExpressionType type2);
+		
 		
 		bool match(VarTokenEvent&);
 		bool nestedTable(BlockTokenEvent&);

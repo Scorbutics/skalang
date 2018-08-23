@@ -250,6 +250,10 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::expression(stac
 	auto result = popUntil(operators, operands, [](const auto& t) {
 		return 0;
 	});
+
+	auto event = ExpressionTokenEvent { *result };
+	m_parser.Observable<ExpressionTokenEvent>::notifyObservers(event);
+
 	return result;
 }
 

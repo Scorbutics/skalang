@@ -11,4 +11,14 @@ namespace ska {
 		//??
 		ARRAY
 	};
+
+	static constexpr char* ExpressionTypeSTR[] = {
+		"void",
+		"object",
+		"function",
+		"int",
+		"float",
+		"string",
+		"array"
+	};
 }

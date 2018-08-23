@@ -60,161 +60,15 @@ bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
 	return true;
 }
 
-ska::ExpressionType ska::SymbolTable::crossTypes(char op, ExpressionType type1, ExpressionType type2) {
-	constexpr auto TypeMapSize = 7;
-
-	static int typeMapOperatorPlus[TypeMapSize][TypeMapSize] = { 
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 3, 4, 5, 0 },
-		{ 0, 0, 0, 4, 4, 0, 0 },
-		{ 0, 0, 0, 5, 0, 5, 0 },
-		{ 0, 0, 0, 0, 0, 0, 6 }
-	};
-
-	static int typeMapOperatorMinus[TypeMapSize][TypeMapSize] = { 
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 3, 4, 0, 0 },
-		{ 0, 0, 0, 4, 4, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0 }
-	};
-
-	static int typeMapOperatorMul[TypeMapSize][TypeMapSize] = { 
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 3, 4, 5, 0 },
-		{ 0, 0, 0, 4, 4, 0, 0 },
-		{ 0, 0, 0, 5, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0 }
-	};
-
-	static int typeMapOperatorDiv[TypeMapSize][TypeMapSize] = { 
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 3, 4, 0, 0 },
-		{ 0, 0, 0, 4, 4, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0 }
-	};
-
-	int (*selectedTypeMap)[TypeMapSize];
-
-	switch(op) {
-		case '-':
-			selectedTypeMap = typeMapOperatorMinus;
-			break;
-		case '+':
-			selectedTypeMap = typeMapOperatorPlus;
-			break;
-		case '/':
-			selectedTypeMap = typeMapOperatorDiv;
-			break;
-		case '*':
-			selectedTypeMap = typeMapOperatorMul;
-			break;
-
-		default: {
-			std::cout << "Unknown operator \"" << op << "\", returning by default first type (of index " << 
-				static_cast<std::size_t>(type1) << ") without checking type map" << std::endl;  
-		} return type1;
-	}
-
-	const auto typeIdResult = selectedTypeMap[static_cast<std::size_t>(type1)][static_cast<std::size_t>(type2)];
-	if(typeIdResult == 0) {
-		auto ss = std::stringstream {};
-		ss << "Unable to use operator \"" << op << "\" on types of index " << static_cast<std::size_t>(type1) << " and " << static_cast<std::size_t>(type2);
-		throw std::runtime_error(ss.str()); 
-	}
-
-	return static_cast<ExpressionType>(typeIdResult);
-
-}
-
-ska::ExpressionType ska::SymbolTable::calculateNodeExpressionType(ASTNode& node) const {
-	if(node.op.has_value() && node.op.value() != Operator::LITERAL) {
-		const auto& op = node.op.value();
-		switch(op) {
-			case Operator::FUNCTION_DECLARATION:
-				return ExpressionType::FUNCTION;
-
-			case Operator::FUNCTION_CALL: {
-				const auto functionName = node.token.asString();
-				const auto symbol = (*this)[functionName];
-				return symbol == nullptr ? ExpressionType::VOID : symbol->category;
-			}
-			
-			case Operator::FIELD_ACCESS:
-				//TODO
-				throw std::runtime_error("TODO");
-			
-			case Operator::BINARY: {
-				assert(node.size() == 2 && !node.token.asString().empty());
-				const auto type1 = getExpressionType(node[0]);
-				const auto type2 = getExpressionType(node[1]);
-				return crossTypes(node.token.asString()[0], type1, type2);
-			}
-
-			case Operator::VARIABLE_AFFECTATION:
-			case Operator::UNARY:
-				assert(node.size() == 1);
-				return getExpressionType(node[0]);
-
-			default:
-				return ExpressionType::VOID;
-		}
-	}
-
-	const auto& token = node.token;
-	switch(token.type()) {
-		case TokenType::SYMBOL:
-		case TokenType::SPACE:
-		case TokenType::RANGE:
-		case TokenType::DOT_SYMBOL:
-			return ExpressionType::VOID;
-
-		case TokenType::STRING:
-			return ExpressionType::STRING;
-
-		case TokenType::DIGIT:
-			return ExpressionType::FLOAT;
-		
-		case TokenType::IDENTIFIER: {
-			const auto symbol = (*this)[token.asString()];
-			return symbol == nullptr ? ExpressionType::VOID : symbol->category;
-		}
-		default:
-			break;
-	}
-
-	return ExpressionType::VOID;
-
-}
-
-ska::ExpressionType ska::SymbolTable::getExpressionType(ASTNode& node) const {
-	if(node.type.has_value()) {
-		return node.type.value();
-	}
-
-	const auto expressionType = calculateNodeExpressionType(node);
-	node.type = expressionType;
-	return expressionType;
-}
-
 bool ska::SymbolTable::match(VarTokenEvent& token) {
 	assert(token.node.size() == 1);
 	assert(m_currentTable != nullptr);
 	
 	switch(token.type) {
 		case VarTokenEventType::DECLARATION:
-			m_currentTable->emplace(std::move(token.node.token.asString()), getExpressionType(token.node)); 
+			m_currentTable->emplace(std::move(token.node.token.asString()), token.node[0].type.value()); 
 #ifdef SKALANG_LOG_SYMBOL_TABLE	
-			std::cout << "Matching new variable : " << token.node.token.asString() << std::endl;
+			std::cout << "Matching new variable : " << token.node.token.asString() << " with type " << ExpressionTypeSTR[static_cast<std::size_t>(token.node[0].type.value())] << std::endl;
 #endif
 		break;
 
@@ -229,12 +83,15 @@ bool ska::SymbolTable::match(VarTokenEvent& token) {
 			if(symbol == nullptr) {
 				throw std::runtime_error("Symbol not found : " + variableName);
 			}
-			const auto tokenNodeExpressionType = getExpressionType(token.node[0]);
+			/*
+            const auto tokenNodeExpressionType = getExpressionType(token.node[0]);
 			if(token.type == VarTokenEventType::AFFECTATION && symbol->category != tokenNodeExpressionType) {
-				throw std::runtime_error("The symbol \"" + variableName + "\" has already been declared as a " + 
-						(symbol->category != ExpressionType::FUNCTION ? "variable": "function" ) + " but is now wanted to be a " +
-						(symbol->category == ExpressionType::FUNCTION ? "variable" : "function"));
-			}
+				const auto expressionTypeIndex = tokenNodeExpressionType;
+				throw std::runtime_error("The symbol \"" + variableName + "\" has already been declared as " + 
+						 std::string(ExpressionTypeSTR[static_cast<std::size_t>(symbol->category)]) + " but is now wanted to be " +
+						 std::string(ExpressionTypeSTR[static_cast<std::size_t>(expressionTypeIndex)]));		
+            }
+            */
 		}
 		break;
 	}
