@@ -19,7 +19,7 @@ std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, ParserPtr& 
     table_test = std::make_unique<ska::SymbolTable> (*parser_test, *parser_test, *parser_test);
 	semanticTypeChecker_test->setSymbolTable(*table_test);
     auto tokenTree = parser_test->parse();
-	return std::move(tokenTree.first);
+	return tokenTree;
 }
 
 TEST_CASE("test") {
@@ -102,12 +102,7 @@ TEST_CASE("Matching") {
 				}
 			}
 
-            SUBCASE("TODO: a supprimer. Test pour semantic check (temporaire)") {
-				SemanticTypeCheckerPtr type_test;
-                SymbolTablePtr table_test;
-				
-				ASTFromInput("var titi = \"strrrr\"; var ttt = \"looool\"; ttt * titi;", parser_test, table_test, type_test);
-            }		
+            		
 		}
 	}
 }

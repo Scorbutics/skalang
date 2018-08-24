@@ -137,9 +137,11 @@ ska::ExpressionType ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNod
 		case TokenType::STRING:
 			return ExpressionType::STRING;
 
-		case TokenType::DIGIT:
-			return ExpressionType::FLOAT;
-		
+		case TokenType::DIGIT: {
+			const auto isDecimal = token.asString().find_first_of('.') != std::string::npos;
+            return isDecimal ? ExpressionType::FLOAT : ExpressionType::INT;
+        }
+
 		case TokenType::IDENTIFIER: {
 			const auto symbol = (*m_symbols)[token.asString()];
 			return symbol == nullptr ? ExpressionType::VOID : symbol->category;
@@ -149,7 +151,6 @@ ska::ExpressionType ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNod
 	}
 
 	return ExpressionType::VOID;
-
 }
 
 ska::ExpressionType ska::SemanticTypeChecker::getExpressionType(ASTNode& node) const {

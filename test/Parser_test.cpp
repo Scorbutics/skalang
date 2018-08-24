@@ -1,4 +1,5 @@
 #include <doctest.h>
+#include "AST.h"
 #include "Parser.h"
 #include "TokenReader.h"
 #include "ReservedKeywordsPool.h"
@@ -14,9 +15,9 @@ TEST_CASE("test") {
 	auto p = ska::Parser { keywords, reader };
 	auto ast = p.parse();
 	
-	CHECK(ast.first->size() == 1);
+	CHECK(ast->size() == 1);
 
-	auto& tree = (*ast.first)[0];
+	auto& tree = (*ast)[0];
 	
 	CHECK(tree.size() == 4);
 	const auto& declaration = tree[0];
@@ -54,7 +55,7 @@ std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, const ska::
 	auto tokens = t.tokenize();
 	auto reader = ska::TokenReader { tokens };
 	auto p = ska::Parser { keywords, reader };
-	return std::move(p.parse().first);
+	return p.parse();
 }
 
 TEST_CASE("Block") {
@@ -135,7 +136,7 @@ TEST_CASE("Expression and priorities") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	SUBCASE("Simple mul") {
 		auto astPtr = ASTFromInput("5 * 2;", keywords);
-		auto& ast = (*astPtr)[0];
+    auto& ast = (*astPtr)[0];
 		CHECK(ast.op == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
 		CHECK(ast.token == ska::Token { "*", ska::TokenType::SYMBOL });

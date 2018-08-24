@@ -1,4 +1,6 @@
 #include <iostream>
+#include "AST.h"
+#include "Operator.h"
 #include "Parser.h"
 #include "ReservedKeywordsPool.h"
 
@@ -10,10 +12,9 @@ ska::Parser::Parser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReade
 	m_shuntingYardParser(reservedKeywordsPool, *this, m_input) {
 }
 
-std::pair<ska::Parser::ASTNodePtr, ska::Scope> ska::Parser::parse() {
-	auto scope = ska::Scope { nullptr };
-	if(m_input.empty()) {
-		return std::make_pair(nullptr, std::move(scope));
+ska::Parser::ASTNodePtr ska::Parser::parse() {
+    if(m_input.empty()) {
+		return nullptr;
 	}
 
 	auto astBlockRootNode = std::make_unique<ASTNode>(Operator::BLOCK);
@@ -25,7 +26,7 @@ std::pair<ska::Parser::ASTNodePtr, ska::Scope> ska::Parser::parse() {
 			break;
 		}
 	}
-	return std::make_pair(std::move(astBlockRootNode), std::move(scope));
+	return astBlockRootNode;
 }
 
 ska::Parser::ASTNodePtr ska::Parser::statement() {
