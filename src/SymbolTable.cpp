@@ -1,6 +1,6 @@
 #include "SymbolTable.h"
 
-#define SKALANG_LOG_SYMBOL_TABLE
+//#define SKALANG_LOG_SYMBOL_TABLE
 
 ska::SymbolTable::SymbolTable(Observable<VarTokenEvent>& variableDeclarer, Observable<BlockTokenEvent>& scopeMaker, Observable<FunctionTokenEvent>& functionUser) :
 	SubObserver<VarTokenEvent>(std::bind(&ska::SymbolTable::match, this, std::placeholders::_1), variableDeclarer),
@@ -83,15 +83,9 @@ bool ska::SymbolTable::match(VarTokenEvent& token) {
 			if(symbol == nullptr) {
 				throw std::runtime_error("Symbol not found : " + variableName);
 			}
-			/*
-            const auto tokenNodeExpressionType = getExpressionType(token.node[0]);
-			if(token.type == VarTokenEventType::AFFECTATION && symbol->category != tokenNodeExpressionType) {
-				const auto expressionTypeIndex = tokenNodeExpressionType;
-				throw std::runtime_error("The symbol \"" + variableName + "\" has already been declared as " + 
-						 std::string(ExpressionTypeSTR[static_cast<std::size_t>(symbol->category)]) + " but is now wanted to be " +
-						 std::string(ExpressionTypeSTR[static_cast<std::size_t>(expressionTypeIndex)]));		
-            }
-            */
+			
+            
+            
 		}
 		break;
 	}

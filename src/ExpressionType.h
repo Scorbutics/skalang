@@ -12,7 +12,7 @@ namespace ska {
 		ARRAY
 	};
 
-	static constexpr char* ExpressionTypeSTR[] = {
+	static constexpr const char* ExpressionTypeSTR[] = {
 		"void",
 		"object",
 		"function",

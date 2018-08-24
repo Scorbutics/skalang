@@ -125,8 +125,10 @@ TEST_CASE("function") {
 	SUBCASE("with 2 arguments built-in types and no return type") {
 		auto astPtr = ASTFromInput("var f = function(titi:int, toto:string):var { };", keywords);
 		auto& ast = (*astPtr)[0];
-		CHECK(ast.op == ska::Operator::FUNCTION_DECLARATION);
-		CHECK(ast.size() == 3);
+        CHECK(ast.op == ska::Operator::VARIABLE_DECLARATION);
+        const auto& astFunc = ast[0];
+        CHECK(astFunc.op == ska::Operator::FUNCTION_DECLARATION);
+		CHECK(astFunc.size() == 3);
 		//CHECK(ast[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
 		
 	}

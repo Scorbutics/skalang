@@ -15,7 +15,7 @@ std::unique_ptr<ska::ASTNode> ASTFromInputSemanticTC(const std::string& input, P
 	const auto tokens = tokenizer.tokenize();
 	auto reader = ska::TokenReader { tokens };
 	parser_test = std::make_unique<ska::Parser> ( reservedKeywords, reader );
-	semanticTypeChecker_test = std::make_unique<ska::SemanticTypeChecker>(*parser_test);
+	semanticTypeChecker_test = std::make_unique<ska::SemanticTypeChecker>(*parser_test, *parser_test);
     table_test = std::make_unique<ska::SymbolTable> (*parser_test, *parser_test, *parser_test);
 	semanticTypeChecker_test->setSymbolTable(*table_test);
     auto tokenTree = parser_test->parse();
@@ -23,10 +23,10 @@ std::unique_ptr<ska::ASTNode> ASTFromInputSemanticTC(const std::string& input, P
 }
 
 TEST_CASE("Semantic type checker") {
+    ParserPtr parser_test;
     SemanticTypeCheckerPtr type_test;
     SymbolTablePtr table_test;
-    ParserPtr parser_test;
-
+    
     SUBCASE("OK") {
         SUBCASE("float x float") {
             ASTFromInputSemanticTC("var titi = 2.0; var toto = 5.2; titi * toto;", parser_test, table_test, type_test);
@@ -68,5 +68,23 @@ TEST_CASE("Semantic type checker") {
                 CHECK(true);
             }
         }
+
+        SUBCASE("Because of non-matching type (variable then function)") {
+				try {
+					ASTFromInputSemanticTC("var i = 0; i = function() {};", parser_test, table_test, type_test);
+				    CHECK(false);
+                } catch(std::exception& e) {
+					CHECK(true);
+				}
+			}
+
+			SUBCASE("Because of non-matching type (function then variable)") {
+				try {
+					ASTFromInputSemanticTC("var titi = function() {}; titi = 9;", parser_test, table_test, type_test);
+				    CHECK(false);
+                } catch(std::exception& e) {
+					CHECK(true);
+				}
+			}
     }
 }

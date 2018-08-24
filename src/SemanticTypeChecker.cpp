@@ -2,13 +2,33 @@
 #include "SymbolTable.h"
 #include "AST.h"
 
-ska::SemanticTypeChecker::SemanticTypeChecker(Observable<ExpressionTokenEvent>& expressionDeclarer) :
-	SubObserver<ExpressionTokenEvent>(std::bind(&SemanticTypeChecker::matchExpression, this, std::placeholders::_1), expressionDeclarer) {
+#define SKALANG_LOG_SEMANTIC_TYPE_CHECK
+
+ska::SemanticTypeChecker::SemanticTypeChecker(Observable<ExpressionTokenEvent>& expressionDeclarer, Observable<VarTokenEvent>& varDeclarer) :
+	SubObserver<ExpressionTokenEvent>(std::bind(&SemanticTypeChecker::matchExpression, this, std::placeholders::_1), expressionDeclarer),
+    SubObserver<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), varDeclarer){
 
 }
 
 bool ska::SemanticTypeChecker::matchExpression(ExpressionTokenEvent& token) {
 	getExpressionType(token.node);
+    return true;
+}
+
+bool ska::SemanticTypeChecker::matchVariable(VarTokenEvent& token) {
+    const auto tokenNodeExpressionType = getExpressionType(token.node[0]);
+	const auto symbol = (*m_symbols)[token.node[0].asString()];		
+    
+#ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
+    std::cout << "symbol = " << token.node[0].asString() << std::endl;
+#endif
+
+    if(symbol != nullptr && token.type == VarTokenEventType::AFFECTATION && symbol->category != tokenNodeExpressionType) {
+        const auto expressionTypeIndex = tokenNodeExpressionType;
+        throw std::runtime_error("The symbol \"" + token.node[0].asString() + "\" has already been declared as " + 
+                 std::string(ExpressionTypeSTR[static_cast<std::size_t>(symbol->category)]) + " but is now wanted to be " +
+                 std::string(ExpressionTypeSTR[static_cast<std::size_t>(expressionTypeIndex)]));		
+    }
     return true;
 }
 
