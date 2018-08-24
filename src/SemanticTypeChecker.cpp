@@ -26,12 +26,16 @@ bool ska::SemanticTypeChecker::matchVariable(VarTokenEvent& token) {
         ";\told symbol = " << (symbol == nullptr ? "nullptr" : ExpressionTypeSTR[static_cast<std::size_t>(symbol->category)]) << std::endl;
 #endif
 
-    if(symbol != nullptr && token.type == VarTokenEventType::AFFECTATION && symbol->category != tokenNodeExpressionType) {
-        const auto expressionTypeIndex = tokenNodeExpressionType;
-        throw std::runtime_error("The symbol \"" + variable + "\" has already been declared as " + 
-                 std::string(ExpressionTypeSTR[static_cast<std::size_t>(symbol->category)]) + " but is now wanted to be " +
-                 std::string(ExpressionTypeSTR[static_cast<std::size_t>(expressionTypeIndex)]));		
+    if(symbol != nullptr && token.type == VarTokenEventType::AFFECTATION) {
+        const auto newTokenType = crossTypes('=', symbol->category, tokenNodeExpressionType);
+        if(newTokenType == ExpressionType::VOID) {
+            const auto expressionTypeIndex = tokenNodeExpressionType;
+            throw std::runtime_error("The symbol \"" + variable + "\" has already been declared as " + 
+                     std::string(ExpressionTypeSTR[static_cast<std::size_t>(symbol->category)]) + " but is now wanted to be " +
+                     std::string(ExpressionTypeSTR[static_cast<std::size_t>(expressionTypeIndex)]));		
+        }
     }
+
     return true;
 }
 
@@ -78,6 +82,16 @@ ska::ExpressionType ska::SemanticTypeChecker::crossTypes(char op, ExpressionType
 		{ 0, 0, 0, 0, 0, 0, 0 }
 	};
 
+    static int typeMapOperatorEqual[TypeMapSize][TypeMapSize] = { 
+		{ 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 0, 3, 4, 5, 0 },
+		{ 0, 0, 0, 3, 4, 5, 0 },
+		{ 0, 0, 0, 3, 4, 5, 0 },
+		{ 0, 0, 0, 0, 0, 0, 0 }
+	};
+
 	int (*selectedTypeMap)[TypeMapSize];
 
 	switch(op) {
@@ -93,6 +107,9 @@ ska::ExpressionType ska::SemanticTypeChecker::crossTypes(char op, ExpressionType
 		case '*':
 			selectedTypeMap = typeMapOperatorMul;
 			break;
+        case '=':
+            selectedTypeMap = typeMapOperatorEqual;
+            break;
 
 		default: {
 			std::cout << "Unknown operator \"" << op << "\", returning by default first type (of index " << 

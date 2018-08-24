@@ -48,43 +48,38 @@ TEST_CASE("Semantic type checker") {
             ASTFromInputSemanticTC("var titi = \"tititititit\"; var toto = 6; titi * toto;", parser_test, table_test, type_test);
         }
 
+        SUBCASE("string = int") {    
+            ASTFromInputSemanticTC("var titi = \"strrrr\"; titi = 3;", parser_test, table_test, type_test);  
+        }
+
+        SUBCASE("float = string") {
+            ASTFromInputSemanticTC("var titi = 0.1; titi = \"toto\";", parser_test, table_test, type_test);
+        }
+
+        SUBCASE("float = string (variable)") {
+            ASTFromInputSemanticTC("var titi = 0.1; var toto = \"toto\"; titi = toto;", parser_test, table_test, type_test);
+        }
+
     }
 
     SUBCASE("Fail") {
-        SUBCASE("string x string") {
-            try {    
-                ASTFromInputSemanticTC("var titi = \"strrrr\"; var ttt = \"looool\"; ttt * titi;", parser_test, table_test, type_test);
-                CHECK(false);
-            } catch(std::exception& e) {
-                CHECK(true);
-            }  
-        }
-
-        SUBCASE("float x string") {
+        SUBCASE("Because of non-matching type (variable then function)") {
             try {
-                ASTFromInputSemanticTC("var titi = 0.1; var toto = \"test\"; titi * toto;", parser_test, table_test, type_test);
+                ASTFromInputSemanticTC("var i = 120; i = function() {};", parser_test, table_test, type_test);
                 CHECK(false);
             } catch(std::exception& e) {
                 CHECK(true);
             }
         }
 
-        SUBCASE("Because of non-matching type (variable then function)") {
-				try {
-					ASTFromInputSemanticTC("var i = 120; i = function() {};", parser_test, table_test, type_test);
-				    CHECK(false);
-                } catch(std::exception& e) {
-					CHECK(true);
-				}
-			}
-
-			SUBCASE("Because of non-matching type (function then variable)") {
-				try {
-					ASTFromInputSemanticTC("var titi = function() {}; titi = 9;", parser_test, table_test, type_test);
-				    CHECK(false);
-                } catch(std::exception& e) {
-					CHECK(true);
-				}
-			}
+        SUBCASE("Because of non-matching type (function then variable)") {
+            try {
+                ASTFromInputSemanticTC("var titi = function() {}; titi = 9;", parser_test, table_test, type_test);
+                CHECK(false);
+            } catch(std::exception& e) {
+                CHECK(true);
+            }
+        }
+        
     }
 }
