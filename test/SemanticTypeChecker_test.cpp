@@ -71,7 +71,7 @@ TEST_CASE("Semantic type checker") {
 
         SUBCASE("Because of non-matching type (variable then function)") {
 				try {
-					ASTFromInputSemanticTC("var i = 0; i = function() {};", parser_test, table_test, type_test);
+					ASTFromInputSemanticTC("var i = 120; i = function() {};", parser_test, table_test, type_test);
 				    CHECK(false);
                 } catch(std::exception& e) {
 					CHECK(true);

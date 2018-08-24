@@ -17,15 +17,18 @@ bool ska::SemanticTypeChecker::matchExpression(ExpressionTokenEvent& token) {
 
 bool ska::SemanticTypeChecker::matchVariable(VarTokenEvent& token) {
     const auto tokenNodeExpressionType = getExpressionType(token.node[0]);
-	const auto symbol = (*m_symbols)[token.node[0].asString()];		
+	const auto value = token.node[0].asString();
+    const auto variable = token.node.token.asString();
+    const auto symbol = (*m_symbols)[variable];
     
 #ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
-    std::cout << "symbol = " << token.node[0].asString() << std::endl;
+    std::cout << variable << " = " << value << ";\tsymbol = " << ExpressionTypeSTR[static_cast<std::size_t>(tokenNodeExpressionType)] << 
+        ";\told symbol = " << (symbol == nullptr ? "nullptr" : ExpressionTypeSTR[static_cast<std::size_t>(symbol->category)]) << std::endl;
 #endif
 
     if(symbol != nullptr && token.type == VarTokenEventType::AFFECTATION && symbol->category != tokenNodeExpressionType) {
         const auto expressionTypeIndex = tokenNodeExpressionType;
-        throw std::runtime_error("The symbol \"" + token.node[0].asString() + "\" has already been declared as " + 
+        throw std::runtime_error("The symbol \"" + variable + "\" has already been declared as " + 
                  std::string(ExpressionTypeSTR[static_cast<std::size_t>(symbol->category)]) + " but is now wanted to be " +
                  std::string(ExpressionTypeSTR[static_cast<std::size_t>(expressionTypeIndex)]));		
     }
