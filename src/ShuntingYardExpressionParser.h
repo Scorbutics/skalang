@@ -53,7 +53,8 @@ namespace ska {
 		std::unique_ptr<ASTNode> matchFunctionDeclarationParameter();
 		std::unique_ptr<ASTNode> matchObjectFieldAccess(Token objectAccessed);
 		std::unique_ptr<ASTNode> matchAffectation(Token identifierFieldAffected);
-
+        
+        bool isAtEndOfExpression() const;
 		std::unique_ptr<ASTNode> expression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands);
 		bool checkLessPriorityToken(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const char tokenChar) const;
 		std::unique_ptr<ASTNode> popUntil(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, PopPredicate predicate);

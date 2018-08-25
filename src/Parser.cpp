@@ -102,25 +102,33 @@ ska::Parser::ASTNodePtr ska::Parser::matchForKeyword() {
     auto forNode = std::make_unique<ska::ASTNode>(Operator::FOR_LOOP);
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::FOR>());
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
+
 #ifdef SKALANG_LOG_PARSER
     std::cout << "1st for loop expression (= statement)" << std::endl;
 #endif
-    	forNode->add(optstatement());
+
+    forNode->add(optstatement());
+
 #ifdef SKALANG_LOG_PARSER
     std::cout << "2nd for loop expression" << std::endl;
 #endif
+
     forNode->add(optexpr(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()));
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+
 #ifdef SKALANG_LOG_PARSER
     std::cout << "3rd for loop expression" << std::endl;
 #endif
+
     forNode->add(optexpr(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()));
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 
     forNode->addIfExists(statement());
+
 #ifdef SKALANG_LOG_PARSER
     std::cout << "end for loop statement" << std::endl;
 #endif
+
     auto event = ForTokenEvent {*forNode};
     Observable<ForTokenEvent>::notifyObservers(event);
     return forNode;
@@ -199,23 +207,26 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::RETURN>());
 	auto returnNode = std::make_unique<ASTNode>(Operator::USER_DEFINED_OBJECT);
 
+    std::cout << "return detected" << std::endl;
+
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
     while(!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
         auto field = m_input.match(TokenType::IDENTIFIER);
         m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
-        auto fieldValue = m_input.match(TokenType::IDENTIFIER);
+        
+        auto fieldValue = expr();
 
-        const std::string name = "";
-        std::cout << "New constructor created " << name << " with field " << field.asString() << " and field value " << fieldValue.asString() <<  std::endl;
+        const std::string name = "???";
+        std::cout << "Constructor " << name << " with field \"" << field.asString() << "\" and field value \"" << fieldValue->asString() << "\"" <<  std::endl;
     }
+    
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
+    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+    
     return returnNode;
 }
 
 ska::Parser::ASTNodePtr ska::Parser::expr() {
-#ifdef SKALANG_LOG_PARSER
-	std::cout << "Parsing expression..." << std::endl; 
-#endif
 	return m_shuntingYardParser.parse();
 }
 

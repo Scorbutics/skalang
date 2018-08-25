@@ -88,6 +88,10 @@ TEST_CASE("Semantic type checker") {
             ASTFromInputSemanticTC("var titi = function(test:string) {}; titi(23);", parser_test, table_test, type_test);
         }
 
+        SUBCASE("constructor with 1 parameter") {
+            ASTFromInputSemanticTC("var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", parser_test, table_test, type_test);
+        }
+
     }
 
     SUBCASE("Fail") {

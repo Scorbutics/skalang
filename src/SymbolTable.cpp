@@ -17,6 +17,12 @@ std::size_t ska::Symbol::size() const {
     return m_subTypes.size();
 }
 
+void ska::Symbol::link(std::vector<Symbol> subtypes, ScopedSymbolTable& table) {
+    m_scopedTable = &table;
+    m_scopedTable->link(*this);
+    m_subTypes = std::move(subtypes);
+}
+
 ska::SymbolTable::SymbolTable(Observable<VarTokenEvent>& variableDeclarer, Observable<BlockTokenEvent>& scopeMaker, Observable<FunctionTokenEvent>& functionUser) :
 	SubObserver<VarTokenEvent>(std::bind(&ska::SymbolTable::match, this, std::placeholders::_1), variableDeclarer),
 	SubObserver<BlockTokenEvent>(std::bind(&ska::SymbolTable::nestedTable, this, std::placeholders::_1), scopeMaker),

@@ -51,7 +51,7 @@ const ska::Token& ska::TokenReader::readPrevious(std::size_t offset) const {
 }
 
 void ska::TokenReader::error(Token* token) {
-    throw std::runtime_error("syntax error : bad token matching : expected " + (token == nullptr ? "UNKNOWN_TOKEN" : token->asString()) + " but got \"" + (m_lookAhead == nullptr ? "EMPTY_TOKEN" : m_lookAhead->asString()) + "\"");
+    throw std::runtime_error("syntax error : bad token matching : expected " + (token == nullptr ? "UNKNOWN_TOKEN" : token->asString()) + " but got \"" + (m_lookAhead == nullptr ? "EMPTY_TOKEN (no more lookahead)" : m_lookAhead->asString()) + "\"");
 }
 
 void ska::TokenReader::nextToken() {

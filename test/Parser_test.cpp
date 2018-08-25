@@ -138,13 +138,17 @@ TEST_CASE("User defined object") {
     const auto keywords = ska::ReservedKeywordsPool {};
 	
     SUBCASE("constructor with 1 parameter") {
-		auto astPtr = ASTFromInput("var Joueur = function(nom:string) : var { return { nom : nom }; }; ff var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", keywords);
+        std::cout << std::endl << std::endl << std::endl;
+        
+        auto astPtr = ASTFromInput("var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", keywords);
 		auto& ast = (*astPtr)[0];
         CHECK(ast.op == ska::Operator::VARIABLE_DECLARATION);
         const auto& astFunc = ast[0];
         CHECK(astFunc.op == ska::Operator::FUNCTION_DECLARATION);
 		CHECK(astFunc.size() == 2);
 		//TODO suite des verifs
+        
+        std::cout << std::endl << std::endl << std::endl;
 	}
 
 }
@@ -153,7 +157,7 @@ TEST_CASE("Expression and priorities") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	SUBCASE("Simple mul") {
 		auto astPtr = ASTFromInput("5 * 2;", keywords);
-    auto& ast = (*astPtr)[0];
+        auto& ast = (*astPtr)[0];
 		CHECK(ast.op == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
 		CHECK(ast.token == ska::Token { "*", ska::TokenType::SYMBOL });
@@ -171,6 +175,15 @@ TEST_CASE("Expression and priorities") {
 		CHECK(!toCheck);
 	}
 	
+    SUBCASE("Syntax error : no existing operator") {
+        try {
+            ASTFromInput("5 ' 3;", keywords);
+            CHECK(false);
+        } catch(std::exception& e) {
+            CHECK(true);
+        }
+    }
+
 	SUBCASE("Simple div") {
 		auto astPtr = ASTFromInput("5 / 2;", keywords);
 		auto& ast = (*astPtr)[0];

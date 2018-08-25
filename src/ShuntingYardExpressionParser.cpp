@@ -29,6 +29,9 @@ void PrintPtr(const Container& c, const std::string& name = " ") {
 std::unordered_map<char, int> ska::ShuntingYardExpressionParser::BuildPriorityMap() {
 	auto result = std::unordered_map<char, int>{};
 
+    result.emplace('=', 50);
+    result.emplace('>', 50);
+    result.emplace('<', 50);
 	result.emplace('+', 100);
 	result.emplace('-', 100);
 	result.emplace('*', 200);
@@ -225,28 +228,36 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchAffectatio
 	return affectationNode;
 }
 
+bool ska::ShuntingYardExpressionParser::isAtEndOfExpression() const {
+    return m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()) || 
+            m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>()) ||
+            m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()); 
+}
+
 std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::expression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands) {
-	auto node = ASTNode{};
 	auto rangeCounter = 0;
 	auto lastToken = Token{};
-	while (!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()) && !m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>()) && rangeCounter >= 0) {
+
+    while (!isAtEndOfExpression() && rangeCounter >= 0) {
 		//PrintPtr(operands, "Operands");
 		//Print(operators, "Operators");
-		
+        
 		rangeCounter += m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()) ? 1 : 0;
 		rangeCounter -= m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) ? 1 : 0;
-		auto token = m_input.actual();
+		
+        auto token = m_input.actual();
 		if (rangeCounter >= 0) {
 			parseTokenExpression(operators, operands, token, lastToken);
 			if (!operands.empty() && operands.top()->op == Operator::FUNCTION_CALL) {
 				rangeCounter = 0;
 			}
 		}
-
 	}
+
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
 	std::cout << "\tPoping everything" << std::endl;
 #endif
+
 	auto result = popUntil(operators, operands, [](const auto& t) {
 		return 0;
 	});
@@ -259,8 +270,13 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::expression(stac
 
 bool ska::ShuntingYardExpressionParser::checkLessPriorityToken(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const char tokenChar) const {
 	const auto& topOperatorContent = (operators.empty() || operators.top().asString().empty()) ? '\0' : operators.top().asString()[0];
-	return PRIORITY_MAP.find(tokenChar) != PRIORITY_MAP.end() &&
-			PRIORITY_MAP.find(topOperatorContent) != PRIORITY_MAP.end() &&
+    if(PRIORITY_MAP.find(tokenChar) == PRIORITY_MAP.end()) {
+        auto ss = std::stringstream {};
+        ss << "bad operator : " << tokenChar;
+        throw std::runtime_error(ss.str());
+    }
+
+    return PRIORITY_MAP.find(topOperatorContent) != PRIORITY_MAP.end() &&
 			PRIORITY_MAP.at(tokenChar) < PRIORITY_MAP.at(topOperatorContent);
 }
 

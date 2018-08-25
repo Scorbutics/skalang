@@ -28,10 +28,7 @@ namespace ska {
 
             std::size_t size() const;
 
-            void link(std::vector<Symbol> subtypes, ScopedSymbolTable& table) {
-                m_scopedTable = &table;
-                m_subTypes = std::move(subtypes);
-            }
+            void link(std::vector<Symbol> subtypes, ScopedSymbolTable& table);
 
         private:
             std::vector<Symbol> m_subTypes;
@@ -56,6 +53,14 @@ namespace ska {
 		ScopedSymbolTable& createNested();
 		Symbol& emplace(std::string name, ExpressionType type);
 		
+        void link(Symbol& s) {
+            m_parentSymbol = &s;
+        }
+
+        Symbol* parentSymbol() {
+            return m_parentSymbol;
+        }
+
 		Symbol* operator[](const std::string& key) {
             auto valueIt = m_symbols.find(key);
 			if(valueIt == m_symbols.end()) {
@@ -84,6 +89,7 @@ namespace ska {
         std::unordered_map<std::string, Symbol> m_symbols;
 		ChildrenScopedSymbolTable m_children;
 		ScopedSymbolTable& m_parent = *this;
+        Symbol* m_parentSymbol = nullptr;
 	};
 
 	class SymbolTable :
