@@ -19,8 +19,8 @@ namespace ska {
 		bool expect(const TokenType& type) const;
 		bool empty() const;
 		Token actual() const;
-		void rollbackOne();
-
+        const Token& readPrevious(std::size_t offset) const;
+    
     private:
         void nextToken();
         void error(Token* token = nullptr);

@@ -66,12 +66,30 @@ TEST_CASE("Matching") {
 			CHECK(i != nullptr);
 		}
 
-        SUBCASE("Unknown symbol outside when declared as function parameter") {
+        SUBCASE("var in upper scope used into inner function scope") {
             SemanticTypeCheckerPtr type_test;
             SymbolTablePtr table_test;
-            std::cout << std::endl << std::endl << std::endl;
+            ASTFromInput("var test = 21; var func = function() { test = 123; };", parser_test, table_test, type_test);
+        }
+
+        SUBCASE("function parameter use into function") {
+            SemanticTypeCheckerPtr type_test;
+            SymbolTablePtr table_test;
             ASTFromInput("var func = function(test:int) { test = 123; };", parser_test, table_test, type_test);
-        }           
+        }
+        
+        SUBCASE("function declared and used in another function with upper variable") {
+            SemanticTypeCheckerPtr type_test;
+            SymbolTablePtr table_test;
+            ASTFromInput("var func = function(test:int) { var tout = function(blurp:string) { test = 123; }; test = 78; tout(\"llll\"); };", parser_test, table_test, type_test);
+        }
+
+        SUBCASE("shadowing variable into inner function") {
+            SemanticTypeCheckerPtr type_test;
+            SymbolTablePtr table_test;
+            ASTFromInput("var test = 3; var func = function(test:function) { test(); };", parser_test, table_test, type_test);
+        }
+
 	}
 
 	SUBCASE("Matching failed") {
@@ -98,6 +116,18 @@ TEST_CASE("Matching") {
 					CHECK(true);
 				}
 			}
+
+            SUBCASE("used out of function scope") {
+                SemanticTypeCheckerPtr type_test;
+                SymbolTablePtr table_test;
+                try {
+                    ASTFromInput("var func = function(test:int) { var tout = function(blurp:string) {};}; tout = 332;", parser_test, table_test, type_test);
+                    CHECK(false);
+                } catch (std::exception& e) {
+					CHECK(true);
+				}
+            }
+
         }   
 	}
 }

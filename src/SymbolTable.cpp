@@ -1,6 +1,21 @@
 #include "SymbolTable.h"
 
-#define SKALANG_LOG_SYMBOL_TABLE
+//#define SKALANG_LOG_SYMBOL_TABLE
+
+
+const ska::Symbol* ska::Symbol::operator[](const std::string& symbol) const {
+    assert(m_scopedTable != nullptr);
+    return (*m_scopedTable)[symbol];
+}
+
+ska::Symbol* ska::Symbol::operator[](const std::string& symbol) {
+    assert(m_scopedTable != nullptr);
+    return (*m_scopedTable)[symbol];
+}
+
+std::size_t ska::Symbol::size() const {
+    return m_subTypes.size();
+}
 
 ska::SymbolTable::SymbolTable(Observable<VarTokenEvent>& variableDeclarer, Observable<BlockTokenEvent>& scopeMaker, Observable<FunctionTokenEvent>& functionUser) :
 	SubObserver<VarTokenEvent>(std::bind(&ska::SymbolTable::match, this, std::placeholders::_1), variableDeclarer),
@@ -14,14 +29,14 @@ bool ska::SymbolTable::nestedTable(BlockTokenEvent& event) {
 	switch(event.type) {
 		case BlockTokenEventType::START:
 #ifdef SKALANG_LOG_SYMBOL_TABLE
-			std::cout << "New block : adding a nested symbol table" << std::endl;
+			std::cout << "\tNew block : adding a nested symbol table" << std::endl;
 #endif
 			m_currentTable = &m_currentTable->createNested();
 			break;
 		
 		case BlockTokenEventType::END:
 #ifdef SKALANG_LOG_SYMBOL_TABLE
-			std::cout << "Block end : going up in nested symbol table hierarchy" << std::endl;
+			std::cout << "\tBlock end : going up in nested symbol table hierarchy" << std::endl;
 #endif
 			assert(m_currentTable != nullptr);
 			m_currentTable = &m_currentTable->parent();
@@ -36,23 +51,53 @@ bool ska::SymbolTable::nestedTable(BlockTokenEvent& event) {
 bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
 	//TODO gsl::not_null<...> pour m_currentTable
 	assert(m_currentTable != nullptr);
-    const auto functionName = token.node.token.asString();
 			
 	switch(token.type) {
-		case FunctionTokenEventType::DECLARATION: {
-            //Already handled with the variable declaration, here we just add parameters types
+
+		case FunctionTokenEventType::DECLARATION_PARAMETERS: {
+            auto& symbol = m_currentTable->emplace(token.name, ExpressionType::FUNCTION); 
+
+#ifdef SKALANG_LOG_SYMBOL_TABLE
+            std::cout << "\t\tNew function : adding a nested symbol table" << std::endl;
+#endif
+
+            m_currentTable = &m_currentTable->createNested();
+#ifdef SKALANG_LOG_SYMBOL_TABLE
+            std::cout << "this function (" << token.name << ") has " << (token.node.size()) << " parameters with the following types : " << std::endl;
+#endif
+            auto currentArgList = std::vector<Symbol>{};
+            for(auto index = 0u; index < token.node.size(); index++) {
+                auto& param = token.node[index];
+#ifdef SKALANG_LOG_SYMBOL_TABLE
+                std::cout << token.node[index].asString() << " = " << ExpressionTypeSTR[static_cast<std::size_t>(param.type.value())] << std::endl;
+#endif
+                m_currentTable->emplace(param.asString(), param.type.value());
+                currentArgList.push_back(param.type.value());
+            }
+            
+            symbol.link(std::move(currentArgList), *m_currentTable);
+
+            //Already handled with the variable declaration, here we juste create the function scope
             token.node.type = ExpressionType::FUNCTION;
         } break;
 
+        case FunctionTokenEventType::DECLARATION_STATEMENT:
+#ifdef SKALANG_LOG_SYMBOL_TABLE
+			std::cout << "\t\tFunction end: going up in nested symbol table hierarchy" << std::endl;
+#endif
+            m_currentTable = &m_currentTable->parent();
+        break;
+
 		default:
 		case FunctionTokenEventType::CALL: {
-            const auto symbol = (*this)[functionName];
+            const auto name = token.node.token.asString();
+            const auto symbol = (*this)[name];
 			if(symbol == nullptr) {
-				throw std::runtime_error("Symbol function not found : " + functionName);
+				throw std::runtime_error("Symbol function not found : " + name);
 			}
 
 			if(symbol->category != ExpressionType::FUNCTION) {
-				throw std::runtime_error("Symbol \"" + functionName + "\" declared as normal variable but used as a function");
+				throw std::runtime_error("Symbol \"" + name + "\" declared as normal variable but used as a function");
 			}	
 		} break;
 	}
@@ -73,24 +118,8 @@ bool ska::SymbolTable::match(VarTokenEvent& token) {
 			std::cout << "Matching new variable : " << name << " with type " << ExpressionTypeSTR[static_cast<std::size_t>(type)] << std::endl;
 #endif
             if(type == ExpressionType::FUNCTION) {
-                token.node[0].token = Token { name, TokenType::IDENTIFIER };
-                
-                auto symbol = (*this)[name];
-                assert(symbol != nullptr);
-                
-#ifdef SKALANG_LOG_SYMBOL_TABLE
-                std::cout << "this new variable is a function with the following parameters types : ";
-#endif
-                for(auto index = 0u; index < token.node[0].size() - 1; index++) {
-                    auto& param = token.node[0][index];
-#ifdef SKALANG_LOG_SYMBOL_TABLE
-            std::cout  << ExpressionTypeSTR[static_cast<std::size_t>(param.type.value())] << std::endl;
-#endif
-                    symbol->add(param.type.value());
-                }
-
-            }
-
+                //token.node.token = Token { name, TokenType::IDENTIFIER };
+            }   
         } break;
 
 		default:
@@ -116,8 +145,9 @@ ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
 }
 
 
-void ska::ScopedSymbolTable::emplace(std::string name, ExpressionType type) {
-	m_symbols.emplace(std::move(name), Symbol { type });
+ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, ExpressionType type) {
+	m_symbols.emplace(name, Symbol { type });
+    return m_symbols.at(std::move(name));
 }
 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested() {

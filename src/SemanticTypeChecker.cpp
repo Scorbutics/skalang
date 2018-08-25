@@ -2,7 +2,7 @@
 #include "SymbolTable.h"
 #include "AST.h"
 
-#define SKALANG_LOG_SEMANTIC_TYPE_CHECK
+//#define SKALANG_LOG_SEMANTIC_TYPE_CHECK
 
 ska::SemanticTypeChecker::SemanticTypeChecker(Observable<ExpressionTokenEvent>& expressionDeclarer, Observable<VarTokenEvent>& varDeclarer, Observable<FunctionTokenEvent>& functionCaller) :
 	SubObserver<ExpressionTokenEvent>(std::bind(&SemanticTypeChecker::matchExpression, this, std::placeholders::_1), expressionDeclarer),
@@ -19,8 +19,17 @@ bool ska::SemanticTypeChecker::matchFunction(FunctionTokenEvent& token) {
     const auto variable = token.node.token.asString();
  
     switch(token.type) {
-        case FunctionTokenEventType::DECLARATION: {
-                    } break;
+        case FunctionTokenEventType::DECLARATION_STATEMENT:break;
+        
+        case FunctionTokenEventType::DECLARATION_PARAMETERS: {
+            const auto parameters = token.node.size();
+        
+            for(auto index = 0u; index < parameters; index++) {
+                auto& param = token.node[index];
+                getExpressionType(param);
+            }
+
+        } break;
 
         default:
         case FunctionTokenEventType::CALL: {
@@ -64,8 +73,7 @@ bool ska::SemanticTypeChecker::matchVariable(VarTokenEvent& token) {
     const auto symbol = (*m_symbols)[variable];
     
 #ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
-    std::cout << variable << " = " << value << ";\tsymbol = " << ExpressionTypeSTR[static_cast<std::size_t>(tokenNodeExpressionType)] << 
-        ";\told symbol = " << (symbol == nullptr ? "nullptr" : ExpressionTypeSTR[static_cast<std::size_t>(symbol->category)]) << std::endl;
+    std::cout << variable << " = " << value << ";\tsymbol = " << ExpressionTypeSTR[static_cast<std::size_t>(tokenNodeExpressionType)] << std::endl;
 #endif
 
     if(symbol != nullptr && token.type == VarTokenEventType::AFFECTATION) {
@@ -75,17 +83,6 @@ bool ska::SemanticTypeChecker::matchVariable(VarTokenEvent& token) {
             throw std::runtime_error("The symbol \"" + variable + "\" has already been declared as " + 
                      std::string(ExpressionTypeSTR[static_cast<std::size_t>(symbol->category)]) + " but is now wanted to be " +
                      std::string(ExpressionTypeSTR[static_cast<std::size_t>(expressionTypeIndex)]));		
-        }
-    }
-
-    if(tokenNodeExpressionType == ExpressionType::FUNCTION) {
-       const auto parameters = token.node[0].size() - 1;
-        
-        for(auto index = 0u; index < parameters; index++) {
-            auto& param = token.node[0][index];
-            const auto type = getExpressionType(param);
-
-            //std::cout << "parameter number " << index << "(" << token.node[0][0].asString()  << ") type = " << ExpressionTypeSTR[static_cast<std::size_t>(type)] << std::endl;
         }
     }
 
@@ -215,6 +212,7 @@ ska::ExpressionType ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNod
                 if(ExpressionTypeMap.find(node[0].asString()) == ExpressionTypeMap.end()) {
                     throw std::runtime_error("bad type detected as function parameter : " + node[0].asString());
                 }
+                getExpressionType(node[0]);
                 return ExpressionTypeMap.at(node[0].asString());
 
 			case Operator::VARIABLE_AFFECTATION:

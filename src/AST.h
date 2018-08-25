@@ -42,7 +42,7 @@ namespace ska {
 		}
 
 		std::string asString() const {
-			if(!children.empty()) {
+			if(op != Operator::PARAMETER_DECLARATION && !children.empty()) {
 				//Compound ASTNode
 				return "¤";
 			}

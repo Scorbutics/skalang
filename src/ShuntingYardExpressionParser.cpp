@@ -198,7 +198,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionCa
 		}
 	}
 	m_input.match(endParametersToken);
-	auto event = FunctionTokenEvent { *functionCallNode, FunctionTokenEventType::CALL };
+	auto event = FunctionTokenEvent {functionCallNode->token.asString(),  *functionCallNode, FunctionTokenEventType::CALL };
 	m_parser.Observable<FunctionTokenEvent>::notifyObservers(event);
 	return functionCallNode;
 }
@@ -229,7 +229,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::expression(stac
 	auto node = ASTNode{};
 	auto rangeCounter = 0;
 	auto lastToken = Token{};
-	while (!m_input.expect(Token{ ";", TokenType::SYMBOL }) && !m_input.expect(Token{ ",", TokenType::SYMBOL }) && rangeCounter >= 0) {
+	while (!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()) && !m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>()) && rangeCounter >= 0) {
 		//PrintPtr(operands, "Operands");
 		//Print(operators, "Operators");
 		
@@ -304,6 +304,10 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 	std::cout << "function declaration" << std::endl;
 #endif
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::FUNCTION>());
+
+    //With this grammar, no other way than reading previously to retrieve the function name.
+    const auto functionName = m_input.readPrevious(3); 
+
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
 	auto isRightParenthesis = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
@@ -333,6 +337,9 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 #endif
 	}
 
+    auto startEvent = FunctionTokenEvent {functionName.asString(), *functionDeclarationNode, FunctionTokenEventType::DECLARATION_PARAMETERS};
+	m_parser.Observable<FunctionTokenEvent>::notifyObservers(startEvent);
+
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
 	std::cout << "reading function statement" << std::endl;
 #endif
@@ -340,8 +347,9 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
 	std::cout << "function read." << std::endl;
 #endif
-	auto event = FunctionTokenEvent {*functionDeclarationNode};
-	m_parser.Observable<FunctionTokenEvent>::notifyObservers(event);
+	
+    auto endEvent = FunctionTokenEvent {functionName.asString(), *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT};
+	m_parser.Observable<FunctionTokenEvent>::notifyObservers(endEvent);
 
 	return functionDeclarationNode;
 }

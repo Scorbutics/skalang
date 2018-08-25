@@ -32,18 +32,22 @@ bool ska::TokenReader::expect(const Token& token) const {
     return m_lookAhead != nullptr && (*m_lookAhead) == token;
 }
 
-void ska::TokenReader::rollbackOne() {
-	if (m_lookAheadIndex > 0) {
-		m_lookAhead = &m_input[--m_lookAheadIndex];
-	}
-}
-
 bool ska::TokenReader::expect(const TokenType& tokenType) const {
     return m_lookAhead != nullptr && m_lookAhead->type() == tokenType;
 }
 
 bool ska::TokenReader::empty() const {
     return m_lookAhead == nullptr || m_lookAhead->type() == ska::TokenType::EMPTY;
+}
+
+const ska::Token& ska::TokenReader::readPrevious(std::size_t offset) const {
+    if(m_lookAheadIndex < offset) {
+        auto ss = std::stringstream {};
+        ss << "unable to rollback the current token stream from an offset of " << offset << " because the lookahead is only at an index of " << m_lookAheadIndex;
+        throw std::runtime_error(ss.str());
+    }
+
+    return m_input[m_lookAheadIndex - offset];
 }
 
 void ska::TokenReader::error(Token* token) {

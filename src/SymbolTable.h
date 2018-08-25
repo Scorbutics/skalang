@@ -8,30 +8,35 @@
 #include "FunctionTokenEvent.h"
 
 namespace ska {
-    	class Symbol {
-            public:
-                Symbol(ExpressionType cat) : category(std::move(cat)) {}
-                ExpressionType category;
-                
-                Symbol& operator[](std::size_t index) {
-                    return m_subTypes[index];
-                }
+    class ScopedSymbolTable;
+    	
+    class Symbol {
+        public:
+            Symbol(ExpressionType cat) : category(std::move(cat)) {}
+            ExpressionType category;
+            
+            Symbol& operator[](std::size_t index) {
+                return m_subTypes[index];
+            }
 
-                const Symbol& operator[](std::size_t index) const {
-                    return m_subTypes[index];
-                }
+            const Symbol& operator[](std::size_t index) const {
+                return m_subTypes[index];
+            }
 
-                std::size_t size() const {
-                    return m_subTypes.size();
-                }
+            const Symbol* operator[](const std::string& symbol) const;
+            Symbol* operator[](const std::string& symbol);
 
-                void add(ExpressionType t) {
-                    m_subTypes.push_back(std::move(t));
-                }
+            std::size_t size() const;
 
-            private:
-                std::vector<Symbol> m_subTypes;
-        };
+            void link(std::vector<Symbol> subtypes, ScopedSymbolTable& table) {
+                m_scopedTable = &table;
+                m_subTypes = std::move(subtypes);
+            }
+
+        private:
+            std::vector<Symbol> m_subTypes;
+            ScopedSymbolTable* m_scopedTable = nullptr;
+    };
 
 	class SymbolTable;
 
@@ -49,7 +54,7 @@ namespace ska {
 
 		ScopedSymbolTable& parent();
 		ScopedSymbolTable& createNested();
-		void emplace(std::string name, ExpressionType type);
+		Symbol& emplace(std::string name, ExpressionType type);
 		
 		Symbol* operator[](const std::string& key) {
             auto valueIt = m_symbols.find(key);
@@ -88,7 +93,7 @@ namespace ska {
 
         using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 
-    	public:
+    public:
 		SymbolTable(
 				Observable<VarTokenEvent>& variableDeclarer, 
 				Observable<BlockTokenEvent>& scopeMaker,
@@ -97,12 +102,12 @@ namespace ska {
 		~SymbolTable() = default;
 		
 		auto* operator[](const std::string& key) {
-                	return (*m_currentTable)[key];
-                }
+            return (*m_currentTable)[key];
+        }
 
-                const auto* operator[](const std::string& key) const {
-                	return (*m_currentTable)[key];
-                }
+        const auto* operator[](const std::string& key) const {
+            return (*m_currentTable)[key];
+        }
 
 		ScopedSymbolTable::ChildrenScopedSymbolTable& nested() {
 			return m_currentTable->children();
@@ -112,14 +117,12 @@ namespace ska {
 			return m_currentTable->children();
 		}
 
-    	private:
-		
-		
+    private:
 		bool match(VarTokenEvent&);
 		bool nestedTable(BlockTokenEvent&);
 		bool matchFunction(FunctionTokenEvent&);
 
-        	std::unique_ptr<ScopedSymbolTable> m_rootTable;
+        std::unique_ptr<ScopedSymbolTable> m_rootTable;
 		ScopedSymbolTable* m_currentTable = nullptr;
-	};
+    };
 }
