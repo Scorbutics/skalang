@@ -89,7 +89,7 @@ TEST_CASE("Matching") {
             SymbolTablePtr table_test;
             ASTFromInput("var test = 3; var func = function(test:function) { test(); };", parser_test, table_test, type_test);
         }
-
+        
 	}
 
 	SUBCASE("Matching failed") {

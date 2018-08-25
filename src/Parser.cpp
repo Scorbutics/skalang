@@ -183,13 +183,33 @@ ska::Parser::ASTNodePtr ska::Parser::matchReservedKeyword(const std::size_t keyw
 	case static_cast<std::size_t>(TokenGrammar::FUNCTION):
 		return expr();
 
+    case static_cast<std::size_t>(TokenGrammar::RETURN):
+        return matchReturnKeyword();
+
 	default: {
 			std::stringstream ss;
-			ss << keywordIndex;
-			error("Unhandled keyword type of index : " + ss.str());
+			ss << (keywordIndex < static_cast<std::size_t>(TokenGrammar::UNUSED_Last_Length) ? TokenGrammarSTR[keywordIndex] : "UNKNOWN TYPE" );
+			error("Unhandled keyword type : " + ss.str());
 			return nullptr;
 		}
 	}
+}
+
+ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
+    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::RETURN>());
+	auto returnNode = std::make_unique<ASTNode>(Operator::USER_DEFINED_OBJECT);
+
+    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
+    while(!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
+        auto field = m_input.match(TokenType::IDENTIFIER);
+        m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
+        auto fieldValue = m_input.match(TokenType::IDENTIFIER);
+
+        const std::string name = "";
+        std::cout << "New constructor created " << name << " with field " << field.asString() << " and field value " << fieldValue.asString() <<  std::endl;
+    }
+    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
+    return returnNode;
 }
 
 ska::Parser::ASTNodePtr ska::Parser::expr() {

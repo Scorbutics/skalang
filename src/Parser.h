@@ -41,6 +41,7 @@ namespace ska {
         ASTNodePtr matchForKeyword();
         ASTNodePtr matchIfOrIfElseKeyword();
         ASTNodePtr matchVarKeyword();
+        ASTNodePtr matchReturnKeyword();
         ASTNodePtr matchExpressionStatement();
 
 		ASTNodePtr expr();

@@ -123,7 +123,7 @@ TEST_CASE("If keyword pattern") {
 TEST_CASE("function") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	SUBCASE("with 2 arguments built-in types and no return type") {
-		auto astPtr = ASTFromInput("var f = function(titi:int, toto:string):var { };", keywords);
+		auto astPtr = ASTFromInput("var f = function(titi:int, toto:string) : var { };", keywords);
 		auto& ast = (*astPtr)[0];
         CHECK(ast.op == ska::Operator::VARIABLE_DECLARATION);
         const auto& astFunc = ast[0];
@@ -132,6 +132,21 @@ TEST_CASE("function") {
 		//CHECK(ast[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
 		
 	}
+}
+
+TEST_CASE("User defined object") {
+    const auto keywords = ska::ReservedKeywordsPool {};
+	
+    SUBCASE("constructor with 1 parameter") {
+		auto astPtr = ASTFromInput("var Joueur = function(nom:string) : var { return { nom : nom }; }; ff var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", keywords);
+		auto& ast = (*astPtr)[0];
+        CHECK(ast.op == ska::Operator::VARIABLE_DECLARATION);
+        const auto& astFunc = ast[0];
+        CHECK(astFunc.op == ska::Operator::FUNCTION_DECLARATION);
+		CHECK(astFunc.size() == 2);
+		//TODO suite des verifs
+	}
+
 }
 
 TEST_CASE("Expression and priorities") {
