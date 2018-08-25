@@ -1,13 +1,14 @@
+#include "Parser.h"
 #include "SemanticTypeChecker.h"
 #include "SymbolTable.h"
 #include "AST.h"
 
 //#define SKALANG_LOG_SEMANTIC_TYPE_CHECK
 
-ska::SemanticTypeChecker::SemanticTypeChecker(Observable<ExpressionTokenEvent>& expressionDeclarer, Observable<VarTokenEvent>& varDeclarer, Observable<FunctionTokenEvent>& functionCaller) :
-	SubObserver<ExpressionTokenEvent>(std::bind(&SemanticTypeChecker::matchExpression, this, std::placeholders::_1), expressionDeclarer),
-    SubObserver<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), varDeclarer),
-    SubObserver<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), functionCaller) {
+ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser) :
+	SubObserver<ExpressionTokenEvent>(std::bind(&SemanticTypeChecker::matchExpression, this, std::placeholders::_1), parser),
+    SubObserver<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser),
+    SubObserver<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser) {
 }
 
 bool ska::SemanticTypeChecker::matchExpression(ExpressionTokenEvent& token) {

@@ -6,6 +6,7 @@
 #include "VarTokenEvent.h"
 #include "BlockTokenEvent.h"
 #include "FunctionTokenEvent.h"
+#include "ReturnTokenEvent.h"
 
 namespace ska {
     class ScopedSymbolTable;
@@ -92,19 +93,18 @@ namespace ska {
         Symbol* m_parentSymbol = nullptr;
 	};
 
+    class Parser;
+
 	class SymbolTable :
         public SubObserver<VarTokenEvent>,
        	public SubObserver<BlockTokenEvent>,
-        public SubObserver<FunctionTokenEvent> {
+        public SubObserver<FunctionTokenEvent>,
+        public SubObserver<ReturnTokenEvent> {
 
         using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 
     public:
-		SymbolTable(
-				Observable<VarTokenEvent>& variableDeclarer, 
-				Observable<BlockTokenEvent>& scopeMaker,
-				Observable<FunctionTokenEvent>& functionUser
-		);
+		SymbolTable(Parser& parser);
 		~SymbolTable() = default;
 		
 		auto* operator[](const std::string& key) {

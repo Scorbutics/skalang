@@ -8,13 +8,14 @@
 
 namespace ska {
 	class SymbolTable;
+    class Parser;
 
     class SemanticTypeChecker :
 	public SubObserver<ExpressionTokenEvent>,
     public SubObserver<VarTokenEvent>,
     public SubObserver<FunctionTokenEvent> {
 		public:
-			SemanticTypeChecker(Observable<ExpressionTokenEvent>& expressionDeclarer, Observable<VarTokenEvent>& varDeclarer, Observable<FunctionTokenEvent>& functionCaller);
+			SemanticTypeChecker(Parser& parser);
 			void setSymbolTable(const SymbolTable& symbolTable);
             ~SemanticTypeChecker() = default;
 		private:

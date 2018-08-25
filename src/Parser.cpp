@@ -207,22 +207,30 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::RETURN>());
 	auto returnNode = std::make_unique<ASTNode>(Operator::USER_DEFINED_OBJECT);
 
+    //TODO handle native (= built-in) types
+
     std::cout << "return detected" << std::endl;
 
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
     while(!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
         auto field = m_input.match(TokenType::IDENTIFIER);
         m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
-        
         auto fieldValue = expr();
 
         const std::string name = "???";
         std::cout << "Constructor " << name << " with field \"" << field.asString() << "\" and field value \"" << fieldValue->asString() << "\"" <<  std::endl;
+        
+        auto fieldNode = std::make_unique<ASTNode>(Operator::VARIABLE_DECLARATION, std::move(field));
+        fieldNode->add(std::move(fieldValue));
+        returnNode->add(std::move(fieldNode));
     }
     
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
     
+    auto event = ReturnTokenEvent { *returnNode, ReturnTokenEventType::OBJECT };
+    Observable<ReturnTokenEvent>::notifyObservers(event);
+
     return returnNode;
 }
 

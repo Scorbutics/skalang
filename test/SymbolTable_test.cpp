@@ -15,8 +15,8 @@ std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, ParserPtr& 
 	const auto tokens = tokenizer.tokenize();
 	auto reader = ska::TokenReader { tokens };
 	parser_test = std::make_unique<ska::Parser> ( reservedKeywords, reader );
-	semanticTypeChecker_test = std::make_unique<ska::SemanticTypeChecker>(*parser_test, *parser_test, *parser_test);
-    table_test = std::make_unique<ska::SymbolTable> (*parser_test, *parser_test, *parser_test);
+	semanticTypeChecker_test = std::make_unique<ska::SemanticTypeChecker>(*parser_test);
+    table_test = std::make_unique<ska::SymbolTable> (*parser_test);
 	semanticTypeChecker_test->setSymbolTable(*table_test);
     auto tokenTree = parser_test->parse();
 	return tokenTree;
