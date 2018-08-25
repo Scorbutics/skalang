@@ -8,9 +8,30 @@
 #include "FunctionTokenEvent.h"
 
 namespace ska {
-    	struct Symbol {
-        	ExpressionType category;
-    	};
+    	class Symbol {
+            public:
+                Symbol(ExpressionType cat) : category(std::move(cat)) {}
+                ExpressionType category;
+                
+                Symbol& operator[](std::size_t index) {
+                    return m_subTypes[index];
+                }
+
+                const Symbol& operator[](std::size_t index) const {
+                    return m_subTypes[index];
+                }
+
+                std::size_t size() const {
+                    return m_subTypes.size();
+                }
+
+                void add(ExpressionType t) {
+                    m_subTypes.push_back(std::move(t));
+                }
+
+            private:
+                std::vector<Symbol> m_subTypes;
+        };
 
 	class SymbolTable;
 
@@ -31,20 +52,20 @@ namespace ska {
 		void emplace(std::string name, ExpressionType type);
 		
 		Symbol* operator[](const std::string& key) {
-                	auto valueIt = m_symbols.find(key);
+            auto valueIt = m_symbols.find(key);
 			if(valueIt == m_symbols.end()) {
 				return &m_parent == this ? nullptr : m_parent[key];
 			}
 			return &m_symbols.at(key);
-                }
+        }
 
-                const Symbol* operator[](const std::string& key) const {
-                    const auto valueIt = m_symbols.find(key);
-		    if(valueIt == m_symbols.end()) {
-			    return &m_parent == this ? nullptr : m_parent[key];
-		    }
-		    return &m_symbols.at(key);
-                }
+        const Symbol* operator[](const std::string& key) const {
+            const auto valueIt = m_symbols.find(key);
+            if(valueIt == m_symbols.end()) {
+                return &m_parent == this ? nullptr : m_parent[key];
+            }
+            return &m_symbols.at(key);
+        }
 		
 		ChildrenScopedSymbolTable& children() {
 			return m_children;
@@ -55,7 +76,7 @@ namespace ska {
 		}
 
 	private:
-        	std::unordered_map<std::string, Symbol> m_symbols;
+        std::unordered_map<std::string, Symbol> m_symbols;
 		ChildrenScopedSymbolTable m_children;
 		ScopedSymbolTable& m_parent = *this;
 	};

@@ -1,6 +1,6 @@
 #include "SymbolTable.h"
 
-//#define SKALANG_LOG_SYMBOL_TABLE
+#define SKALANG_LOG_SYMBOL_TABLE
 
 ska::SymbolTable::SymbolTable(Observable<VarTokenEvent>& variableDeclarer, Observable<BlockTokenEvent>& scopeMaker, Observable<FunctionTokenEvent>& functionUser) :
 	SubObserver<VarTokenEvent>(std::bind(&ska::SymbolTable::match, this, std::placeholders::_1), variableDeclarer),
@@ -36,17 +36,17 @@ bool ska::SymbolTable::nestedTable(BlockTokenEvent& event) {
 bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
 	//TODO gsl::not_null<...> pour m_currentTable
 	assert(m_currentTable != nullptr);
-	
+    const auto functionName = token.node.token.asString();
+			
 	switch(token.type) {
-		case FunctionTokenEventType::DECLARATION:
-		//Already handled with the variable declaration
-		token.node.type = ExpressionType::FUNCTION;
-		break;
+		case FunctionTokenEventType::DECLARATION: {
+            //Already handled with the variable declaration, here we just add parameters types
+            token.node.type = ExpressionType::FUNCTION;
+        } break;
 
 		default:
 		case FunctionTokenEventType::CALL: {
-			const auto functionName = token.node.token.asString();
-			const auto symbol = (*this)[functionName];
+            const auto symbol = (*this)[functionName];
 			if(symbol == nullptr) {
 				throw std::runtime_error("Symbol function not found : " + functionName);
 			}
@@ -65,12 +65,33 @@ bool ska::SymbolTable::match(VarTokenEvent& token) {
 	assert(m_currentTable != nullptr);
 	
 	switch(token.type) {
-		case VarTokenEventType::DECLARATION:
-			m_currentTable->emplace(std::move(token.node.token.asString()), token.node[0].type.value()); 
+		case VarTokenEventType::DECLARATION: {
+            const auto type = token.node[0].type.value();
+			const auto name = token.node.token.asString();
+            m_currentTable->emplace(name, type); 
 #ifdef SKALANG_LOG_SYMBOL_TABLE	
-			std::cout << "Matching new variable : " << token.node.token.asString() << " with type " << ExpressionTypeSTR[static_cast<std::size_t>(token.node[0].type.value())] << std::endl;
+			std::cout << "Matching new variable : " << name << " with type " << ExpressionTypeSTR[static_cast<std::size_t>(type)] << std::endl;
 #endif
-		break;
+            if(type == ExpressionType::FUNCTION) {
+                token.node[0].token = Token { name, TokenType::IDENTIFIER };
+                
+                auto symbol = (*this)[name];
+                assert(symbol != nullptr);
+                
+#ifdef SKALANG_LOG_SYMBOL_TABLE
+                std::cout << "this new variable is a function with the following parameters types : ";
+#endif
+                for(auto index = 0u; index < token.node[0].size() - 1; index++) {
+                    auto& param = token.node[0][index];
+#ifdef SKALANG_LOG_SYMBOL_TABLE
+            std::cout  << ExpressionTypeSTR[static_cast<std::size_t>(param.type.value())] << std::endl;
+#endif
+                    symbol->add(param.type.value());
+                }
+
+            }
+
+        } break;
 
 		default:
 		case VarTokenEventType::AFFECTATION:
@@ -82,10 +103,7 @@ bool ska::SymbolTable::match(VarTokenEvent& token) {
 			const auto symbol = (*this)[variableName];
 			if(symbol == nullptr) {
 				throw std::runtime_error("Symbol not found : " + variableName);
-			}
-			
-            
-            
+			}       
 		}
 		break;
 	}

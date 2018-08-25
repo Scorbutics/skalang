@@ -198,7 +198,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionCa
 		}
 	}
 	m_input.match(endParametersToken);
-	auto event = FunctionTokenEvent { *functionCallNode };
+	auto event = FunctionTokenEvent { *functionCallNode, FunctionTokenEventType::CALL };
 	m_parser.Observable<FunctionTokenEvent>::notifyObservers(event);
 	return functionCallNode;
 }
@@ -286,17 +286,16 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 	std::cout << id.asString() << std::endl;
 #endif
 	
-	auto node = std::make_unique<ASTNode>(id);
-	if(m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>())) {	
-		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
-		const auto type = m_input.match(TokenType::RESERVED);
+	auto node = std::make_unique<ASTNode>(Operator::PARAMETER_DECLARATION, id);
+	
+    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
+    const auto type = m_input.match(TokenType::RESERVED);
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
-		std::cout << "type is : " << type << std::endl;
+    std::cout << "type is : " << type.asString() << std::endl;
 #endif
-		//TODO
-		//node->type = 
-	}
-	return node;
+    node->add(std::make_unique<ASTNode>(type));
+	
+    return node;
 }
 
 std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
@@ -330,7 +329,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
 		const auto type = m_input.match(TokenType::RESERVED);	
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
-		std::cout << "function type detected : " << type << std::endl;
+		std::cout << "function type detected : " << type.asString() << std::endl;
 #endif
 	}
 

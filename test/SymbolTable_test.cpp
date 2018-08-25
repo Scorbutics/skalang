@@ -15,7 +15,7 @@ std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, ParserPtr& 
 	const auto tokens = tokenizer.tokenize();
 	auto reader = ska::TokenReader { tokens };
 	parser_test = std::make_unique<ska::Parser> ( reservedKeywords, reader );
-	semanticTypeChecker_test = std::make_unique<ska::SemanticTypeChecker>(*parser_test, *parser_test);
+	semanticTypeChecker_test = std::make_unique<ska::SemanticTypeChecker>(*parser_test, *parser_test, *parser_test);
     table_test = std::make_unique<ska::SymbolTable> (*parser_test, *parser_test, *parser_test);
 	semanticTypeChecker_test->setSymbolTable(*table_test);
     auto tokenTree = parser_test->parse();
@@ -52,7 +52,8 @@ TEST_CASE("Matching") {
 	
 	SUBCASE("Matching OK") {
 		ParserPtr parser_test;
-		{
+
+		SUBCASE("Overriding into subscope") {
             SemanticTypeCheckerPtr type_test;
 			SymbolTablePtr table_test;
 			auto astPtr = ASTFromInput("var i = 0; i = 123; { i = 9; }", parser_test, table_test, type_test);
@@ -64,6 +65,13 @@ TEST_CASE("Matching") {
 
 			CHECK(i != nullptr);
 		}
+
+        SUBCASE("Unknown symbol outside when declared as function parameter") {
+            SemanticTypeCheckerPtr type_test;
+            SymbolTablePtr table_test;
+            std::cout << std::endl << std::endl << std::endl;
+            ASTFromInput("var func = function(test:int) { test = 123; };", parser_test, table_test, type_test);
+        }           
 	}
 
 	SUBCASE("Matching failed") {
@@ -80,7 +88,16 @@ TEST_CASE("Matching") {
 				}
 			}
 
-			
+			SUBCASE("Unknown symbol outside when declared as function parameter") {
+				SemanticTypeCheckerPtr type_test;
+                SymbolTablePtr table_test;
+				try {
+					ASTFromInput("var func = function(test:int) {}; test = 123;", parser_test, table_test, type_test);
+				    CHECK(false);
+                } catch (std::exception& e) {
+					CHECK(true);
+				}
+			}
         }   
 	}
 }

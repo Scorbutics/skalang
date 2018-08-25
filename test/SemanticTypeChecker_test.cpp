@@ -15,7 +15,7 @@ std::unique_ptr<ska::ASTNode> ASTFromInputSemanticTC(const std::string& input, P
 	const auto tokens = tokenizer.tokenize();
 	auto reader = ska::TokenReader { tokens };
 	parser_test = std::make_unique<ska::Parser> ( reservedKeywords, reader );
-	semanticTypeChecker_test = std::make_unique<ska::SemanticTypeChecker>(*parser_test, *parser_test);
+	semanticTypeChecker_test = std::make_unique<ska::SemanticTypeChecker>(*parser_test, *parser_test, *parser_test);
     table_test = std::make_unique<ska::SymbolTable> (*parser_test, *parser_test, *parser_test);
 	semanticTypeChecker_test->setSymbolTable(*table_test);
     auto tokenTree = parser_test->parse();
@@ -59,6 +59,34 @@ TEST_CASE("Semantic type checker") {
         SUBCASE("float = string (variable)") {
             ASTFromInputSemanticTC("var titi = 0.1; var toto = \"toto\"; titi = toto;", parser_test, table_test, type_test);
         }
+        
+        SUBCASE("float = float") {
+            ASTFromInputSemanticTC("var titi = 0.1; titi = 0.2;", parser_test, table_test, type_test);
+        }
+
+        SUBCASE("float = int") {
+            ASTFromInputSemanticTC("var titi = 0.1; titi = 2;", parser_test, table_test, type_test);
+        }
+
+        SUBCASE("int = float") {
+            ASTFromInputSemanticTC("var titi = 1; titi = 0.2;", parser_test, table_test, type_test);
+        }
+        
+        SUBCASE("int = string") {
+            ASTFromInputSemanticTC("var titi = 7; titi = \"123\";", parser_test, table_test, type_test);
+        }
+        
+        SUBCASE("float = string") {
+            ASTFromInputSemanticTC("var titi = 7.8; titi = \"123\";", parser_test, table_test, type_test);
+        }
+        
+        SUBCASE("function call : string") {
+            ASTFromInputSemanticTC("var titi = function(test:string) {}; titi(\"lol\");", parser_test, table_test, type_test);
+        }
+
+        SUBCASE("Calling a function with a type convertible argument") {
+            ASTFromInputSemanticTC("var titi = function(test:string) {}; titi(23);", parser_test, table_test, type_test);
+        }
 
     }
 
@@ -81,5 +109,23 @@ TEST_CASE("Semantic type checker") {
             }
         }
         
+        SUBCASE("Reassigning function (function = function)") {
+            try {
+                ASTFromInputSemanticTC("var titi = function() {}; titi = function(ttt:string) {};", parser_test, table_test, type_test);
+                CHECK(false);
+            } catch(std::exception& e) {
+                CHECK(true);
+            }
+        }
+
+        SUBCASE("Calling a function with wrong type arguments") {
+            try {
+                ASTFromInputSemanticTC("var titi = function(test:function) {}; titi(23);", parser_test, table_test, type_test);
+                CHECK(false);
+            } catch(std::exception& e) {
+                CHECK(true);
+            }
+
+        }
     }
 }
