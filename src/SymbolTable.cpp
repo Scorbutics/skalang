@@ -1,7 +1,7 @@
 #include "SymbolTable.h"
 #include "Parser.h"
-//#define SKALANG_LOG_SYMBOL_TABLE
 
+#define SKALANG_LOG_SYMBOL_TABLE
 
 const ska::Symbol* ska::Symbol::operator[](const std::string& symbol) const {
     assert(m_scopedTable != nullptr);
@@ -56,7 +56,30 @@ bool ska::SymbolTable::nestedTable(BlockTokenEvent& event) {
 }
 
 bool ska::SymbolTable::matchReturn(ReturnTokenEvent& token) {
-	
+	//currentTable is the return table, so we have to look at the parent (the function's one) which is named.
+	auto& classSymbolTable = m_currentTable->parent();
+	const auto actualNameSymbol =  classSymbolTable.parentSymbol();
+	if (actualNameSymbol == nullptr) {
+		throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
+	}
+#ifdef SKALANG_LOG_SYMBOL_TABLE
+	std::cout << "\tReturn : nested named symbol table with name : " << actualNameSymbol->name << std::endl;
+#endif
+	for (auto index = 0u; index < token.node.size(); index++) {
+		auto& field = token.node[index];
+		const auto fieldType = field[0].type.value();
+		const auto valueName = field.token.asString();
+		
+		auto symbol = (*this)[valueName];
+		if (symbol == nullptr) {
+			m_currentTable->emplace(valueName, fieldType);
+			symbol = (*this)[valueName];
+		}
+		
+#ifdef SKALANG_LOG_SYMBOL_TABLE
+		std::cout << actualNameSymbol->name << " class has field " << valueName << " with type " << ExpressionTypeSTR[static_cast<std::size_t>(symbol->category)] << std::endl;
+#endif
+	}
 	return true;
 }
 
@@ -80,11 +103,12 @@ bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
             auto currentArgList = std::vector<Symbol>{};
             for(auto index = 0u; index < token.node.size(); index++) {
                 auto& param = token.node[index];
+				auto name = param.asString();
 #ifdef SKALANG_LOG_SYMBOL_TABLE
                 std::cout << token.node[index].asString() << " = " << ExpressionTypeSTR[static_cast<std::size_t>(param.type.value())] << std::endl;
 #endif
-                m_currentTable->emplace(param.asString(), param.type.value());
-                currentArgList.push_back(param.type.value());
+                m_currentTable->emplace(name, param.type.value());
+				currentArgList.push_back(Symbol{ std::move(name), param.type.value() });
             }
             
             symbol.link(std::move(currentArgList), *m_currentTable);
@@ -158,7 +182,7 @@ ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
 
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, ExpressionType type) {
-	m_symbols.emplace(name, Symbol { type });
+	m_symbols.emplace(name, Symbol { name, type });
     return m_symbols.at(std::move(name));
 }
 

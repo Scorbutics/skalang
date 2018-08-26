@@ -13,9 +13,13 @@ namespace ska {
     	
     class Symbol {
         public:
-            Symbol(ExpressionType cat) : category(std::move(cat)) {}
-            ExpressionType category;
-            
+            Symbol(std::string name, ExpressionType cat) : 
+				name(std::move(name)), 
+				category(std::move(cat)) {}
+
+			std::string name;
+			ExpressionType category;		
+
             Symbol& operator[](std::size_t index) {
                 return m_subTypes[index];
             }
@@ -41,7 +45,7 @@ namespace ska {
 	class ScopedSymbolTable {
 	using ChildrenScopedSymbolTable = std::vector<std::unique_ptr<ScopedSymbolTable>>;
 	
-	friend class SymbolTable;	
+	friend class SymbolTable;
 	public:
 		ScopedSymbolTable(ScopedSymbolTable& parent) :
 			m_parent(parent) {
