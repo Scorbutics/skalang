@@ -6,3 +6,14 @@
 **/Debug
 **/CMakeFiles
 **/CMakeCache.txt
+/test/.vs/skalang_test/v15
+/test/ZERO_CHECK.vcxproj.filters
+/test/ZERO_CHECK.vcxproj
+/test/skalang_test.vcxproj.user
+/test/skalang_test.vcxproj.filters
+/test/skalang_test.vcxproj
+/test/skalang_test.sln
+/test/cmake_install.cmake
+/test/ALL_BUILD.vcxproj.user
+/test/ALL_BUILD.vcxproj.filters
+/test/ALL_BUILD.vcxproj

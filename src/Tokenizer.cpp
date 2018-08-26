@@ -42,7 +42,7 @@ std::vector<ska::Token> ska::Tokenizer::tokenize() const {
 
 		if (currentTokenToRead.current != ska::TokenType::EMPTY && currentTokenToRead.current != ska::TokenType::SPACE) {	
 			if(currentTokenToRead.current == ska::TokenType::SYMBOL) {
-				const auto& charToken = token.asString()[0];
+				const auto charToken = token.asString()[0];
 				stackSymbol.push_back(std::move(token));
 				if(isFinalizedSymbol(charToken, stackSymbol)) {
 					push(Token{}, stackSymbol, result);	
@@ -100,7 +100,7 @@ bool ska::Tokenizer::isFinalizedSymbol(char nextSymbol, const std::vector<Token>
 		return false;
 	}
 
-	const auto& topStackSymbol = symbolStack[0].asString()[0];
+	const auto topStackSymbol = symbolStack[0].asString()[0];
 	if(stopSymbolCharAggregation(topStackSymbol) < 0) {
 		return true;
 	}

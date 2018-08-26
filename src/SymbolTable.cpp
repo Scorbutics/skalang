@@ -1,5 +1,5 @@
 #include "SymbolTable.h"
-
+#include "Parser.h"
 //#define SKALANG_LOG_SYMBOL_TABLE
 
 
@@ -52,6 +52,11 @@ bool ska::SymbolTable::nestedTable(BlockTokenEvent& event) {
 		default:
 			break;
 	}
+	return true;
+}
+
+bool ska::SymbolTable::matchReturn(ReturnTokenEvent& token) {
+	
 	return true;
 }
 
