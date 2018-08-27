@@ -209,7 +209,7 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
 
     //TODO handle native (= built-in) types
 
-    std::cout << "return detected" << std::endl;
+    //std::cout << "return detected" << std::endl;
 
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
     while(!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
@@ -223,6 +223,10 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
         auto fieldNode = std::make_unique<ASTNode>(Operator::VARIABLE_DECLARATION, std::move(field));
         fieldNode->add(std::move(fieldValue));
         returnNode->add(std::move(fieldNode));
+
+		if (m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>())) {
+			m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
+		}
     }
     
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());

@@ -87,7 +87,7 @@ TEST_CASE("Matching") {
         SUBCASE("shadowing variable into inner function") {
             SemanticTypeCheckerPtr type_test;
             SymbolTablePtr table_test;
-            ASTFromInput("var test = 3; var func = function(test:function) { test(); };", parser_test, table_test, type_test);
+            ASTFromInput("var test = 3; var func = function(test:string) { test; };", parser_test, table_test, type_test);
         }
         
 	}

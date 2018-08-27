@@ -19,9 +19,8 @@ namespace ska {
 			void setSymbolTable(const SymbolTable& symbolTable);
             ~SemanticTypeChecker() = default;
 		private:
-			ExpressionType getExpressionType(ASTNode& node) const;
-        	ExpressionType calculateNodeExpressionType(ASTNode& node) const;
-		    static ExpressionType crossTypes(char op, ExpressionType type1, ExpressionType type2);
+			Type getExpressionType(ASTNode& node) const;
+			Type calculateNodeExpressionType(ASTNode& node) const;
             bool matchExpression(ExpressionTokenEvent& event);
 	        bool matchVariable(VarTokenEvent& token); 		
             bool matchFunction(FunctionTokenEvent& token);

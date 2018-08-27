@@ -88,16 +88,19 @@ TEST_CASE("Semantic type checker") {
         }
 
         SUBCASE("constructor with 1 parameter") {
-            ASTFromInputSemanticTC("var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom; joueur1.test;", parser_test, table_test, type_test);
+            ASTFromInputSemanticTC("var Joueur = function(nomL:string) : var { return { nom : nomL }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", parser_test, table_test, type_test);
         }
 
-		SUBCASE("constructor complex with contained function using the current type...") {
+		SUBCASE("constructor with 1 parameter same name") {
+			ASTFromInputSemanticTC("var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", parser_test, table_test, type_test);
+		}
+
+		SUBCASE("constructor complex with contained function NOT USING the current type...") {
 			ASTFromInputSemanticTC(
 			"var Joueur = function(nom:string) : var { "
 				"var puissance = 10;"
 
 				"var attaquer = function(cible:Joueur) {"
-					"cible.pv -= puissance;"
 				"};"
 
 				"return {"
@@ -112,6 +115,28 @@ TEST_CASE("Semantic type checker") {
 			"joueur1.attaquer(joueur2);"
 				, parser_test, table_test, type_test);
 		}
+
+		/*SUBCASE("constructor complex with contained function USING the current type...") {
+			ASTFromInputSemanticTC(
+				"var Joueur = function(nom:string) : var { "
+				"var puissance = 10;"
+
+				"var attaquer = function(cible:Joueur) {"
+					"cible.pv = cible.pv - puissance;"
+				"};"
+
+				"return {"
+				"nom: nom,"
+				"puissance : puissance,"
+				"pv : 100,"
+				"attaquer : attaquer"
+				"};"
+				"};"
+				"var joueur1 = Joueur(\"joueur1\");"
+				"var joueur2 = Joueur(\"joueur2\");"
+				"joueur1.attaquer(joueur2);"
+				, parser_test, table_test, type_test);
+		}*/
     }
 
     SUBCASE("Fail") {
@@ -149,7 +174,43 @@ TEST_CASE("Semantic type checker") {
             } catch(std::exception& e) {
                 CHECK(true);
             }
-
         }
+
+		SUBCASE("constructor with 1 parameter + bad field access") {
+			try {
+				ASTFromInputSemanticTC("var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.ttetetetet;", parser_test, table_test, type_test);
+				CHECK(false);
+			} catch (std::exception& e) {
+				CHECK(true);
+			}
+		}
+
+		SUBCASE("constructor complex with contained function NOT USING the current type and calling member function with a wrong type...") {
+			try {
+				ASTFromInputSemanticTC(
+				"var Joueur = function(nom:string) : var { "
+					"var puissance = 10;"
+
+					"var attaquer = function(cible:Joueur) {"
+					"};"
+
+					"return {"
+						"nom: nom,"
+						"puissance : puissance,"
+						"pv : 100,"
+						"attaquer : attaquer"
+					"};"
+				"};"
+				"var joueur1 = Joueur(\"joueur1\");"
+				"var joueur2 = Joueur(\"joueur2\");"
+				"var toto = 1;"
+				"joueur1.attaquer(toto);"
+				, parser_test, table_test, type_test);
+				CHECK(false);
+			} catch (std::exception& e) {
+				std::cout << e.what() << std::endl;
+				CHECK(true);
+			}
+		}
     }
 }

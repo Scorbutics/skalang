@@ -15,8 +15,8 @@ const ska::Token& ska::TokenReader::match(const TokenType type) {
         return result;
     }
     auto ss = std::stringstream {};
-    ss << "\"Token with type " << TokenTypeSTR[static_cast<std::size_t>(type)] << "\"" ;
-    auto t = Token { ss.str(), type };
+    ss << "a token with type \"" << TokenTypeSTR[static_cast<std::size_t>(type)] << "\"" ;
+    auto t = Token { ss.str(), TokenType::IDENTIFIER };
     error(&t);
 	throw std::runtime_error("unexpected error");
 }

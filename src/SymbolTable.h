@@ -7,25 +7,22 @@
 #include "BlockTokenEvent.h"
 #include "FunctionTokenEvent.h"
 #include "ReturnTokenEvent.h"
+#include "ExpressionType.h"
 
 namespace ska {
     class ScopedSymbolTable;
     	
     class Symbol {
         public:
-            Symbol(std::string name, ExpressionType cat) : 
+            Symbol(std::string name, Type cat) : 
 				name(std::move(name)), 
 				category(std::move(cat)) {}
 
 			std::string name;
-			ExpressionType category;		
+			Type category;		
 
-            Symbol& operator[](std::size_t index) {
-                return m_subTypes[index];
-            }
-
-            const Symbol& operator[](std::size_t index) const {
-                return m_subTypes[index];
+            const Type& operator[](std::size_t index) const {
+                return category.compound()[index];
             }
 
             const Symbol* operator[](const std::string& symbol) const;
@@ -35,9 +32,8 @@ namespace ska {
 
             void link(std::vector<Symbol> subtypes, ScopedSymbolTable& table);
 
-        private:
-            std::vector<Symbol> m_subTypes;
-            ScopedSymbolTable* m_scopedTable = nullptr;
+        /*private:
+			ScopedSymbolTable* m_scopedTable = nullptr;*/
     };
 
 	class SymbolTable;
@@ -56,7 +52,7 @@ namespace ska {
 
 		ScopedSymbolTable& parent();
 		ScopedSymbolTable& createNested();
-		Symbol& emplace(std::string name, ExpressionType type);
+		Symbol& emplace(std::string name, Type type);
 		
         void link(Symbol& s) {
             m_parentSymbol = &s;

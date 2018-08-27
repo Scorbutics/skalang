@@ -37,16 +37,17 @@ namespace ska {
 		ASTNode(ASTNode&&) noexcept = default;
 		ASTNode(const ASTNode&) = delete;
 
+		bool has(const Token& t) const {
+			return token == t;
+		}
+
 		bool empty() const {
 			return token.type() == TokenType::EMPTY && !op.has_value();
 		}
 
 		std::string asString() const {
-			if(op != Operator::PARAMETER_DECLARATION && !children.empty()) {
-				//Compound ASTNode
-				return "¤";
-			}
-			return token.asString();
+			const auto stringRepresentation = token.asString();
+			return stringRepresentation.empty() && !children.empty() ? "¤" : stringRepresentation;
 		}
 
 		std::size_t size() const {
@@ -62,8 +63,12 @@ namespace ska {
 		template<class T>
 		void addIfExists(std::unique_ptr<T> c) {
 		    if(c != nullptr) {
-			children.emplace_back(std::move(c));
+				children.emplace_back(std::move(c));
 		    }
+		}
+
+		TokenType tokenType() const {
+			return token.type();
 		}
 
 		ASTNode& left() {
@@ -91,10 +96,10 @@ namespace ska {
 		auto end() const { return std::end(children); }
 
 		std::optional<Operator> op;
-		Token token;
-		std::optional<ExpressionType> type;
+		std::optional<Type> type;
 
 	private:
+		Token token;
 		std::vector<std::unique_ptr<ASTNode>> children;
 
 	};

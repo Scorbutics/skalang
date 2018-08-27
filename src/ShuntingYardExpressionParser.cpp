@@ -81,15 +81,16 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 			const auto& value = std::get<std::string>(token.content());
 			switch (value[0]) {
 			case '(':
-
-				if (!lastToken.empty()) {
+				
+				if (!operands.empty() && (operands.top()->op == Operator::FIELD_ACCESS || operands.top()->op == Operator::LITERAL && operands.top()->tokenType() == TokenType::IDENTIFIER)) {
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
 					std::cout << "\tFunction call !" << std::endl;
 #endif
 					//We already pushed the identifier as an operand, but in fact it's a function call.
 					//We have to pop it, then matching the function call as the new operand.
+					auto functionToCallNode = std::move(operands.top());
 					operands.pop();
-					operands.push(matchFunctionCall(lastToken));
+					operands.push(matchFunctionCall(std::move(functionToCallNode)));
 					
 				} else {
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
@@ -133,7 +134,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 			//Field access only (digits are DIGIT token type, even real ones)
 			operands.pop();
 			operands.push(matchObjectFieldAccess(lastToken));
-		break;
+			break;
 		case TokenType::SYMBOL: {
 			const auto& value = std::get<std::string>(token.content());
 			if(value == "=") {
@@ -173,9 +174,11 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 	return false;
 }
 
-std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionCall(Token identifierFunctionName) {
-	auto functionCallNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_CALL, std::move(identifierFunctionName));
+std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr identifierFunctionName) {
+	auto functionCallNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_CALL);
 	
+	functionCallNode->add(std::move(identifierFunctionName));
+
 	//First match left parenthesis
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 				
@@ -201,7 +204,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionCa
 		}
 	}
 	m_input.match(endParametersToken);
-	auto event = FunctionTokenEvent {functionCallNode->token.asString(),  *functionCallNode, FunctionTokenEventType::CALL };
+	auto event = FunctionTokenEvent {functionCallNode->asString(),  *functionCallNode, FunctionTokenEventType::CALL };
 	m_parser.Observable<FunctionTokenEvent>::notifyObservers(event);
 	return functionCallNode;
 }
@@ -273,7 +276,7 @@ bool ska::ShuntingYardExpressionParser::checkLessPriorityToken(stack<Token>& ope
     if(PRIORITY_MAP.find(tokenChar) == PRIORITY_MAP.end()) {
         auto ss = std::stringstream {};
         ss << "bad operator : " << tokenChar;
-        throw std::runtime_error(ss.str());
+        error(ss.str());
     }
 
     return PRIORITY_MAP.find(topOperatorContent) != PRIORITY_MAP.end() &&
@@ -305,17 +308,24 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 	auto node = std::make_unique<ASTNode>(Operator::PARAMETER_DECLARATION, id);
 	
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
-    const auto type = m_input.match(TokenType::RESERVED);
+    const auto typeToken = 
+		m_input.expect(TokenType::RESERVED) ?
+		m_input.match(TokenType::RESERVED) : m_input.match(TokenType::IDENTIFIER);
+	const auto typeStr = typeToken.asString();
+
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
-    std::cout << "type is : " << type.asString() << std::endl;
+    std::cout << "type is : " << typeStr << std::endl;
 #endif
-    node->add(std::make_unique<ASTNode>(type));
 	
+	//TODO handle array 
+
+    node->add(std::make_unique<ASTNode>(typeToken));
+
     return node;
 }
 
 std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
-	auto functionDeclarationNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_DECLARATION);
+	
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
 	std::cout << "function declaration" << std::endl;
 #endif
@@ -323,6 +333,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 
     //With this grammar, no other way than reading previously to retrieve the function name.
     const auto functionName = m_input.readPrevious(3); 
+	auto functionDeclarationNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_DECLARATION, functionName);
 
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
@@ -347,10 +358,13 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 
 	if(m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>())) {
 		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
-		const auto type = m_input.match(TokenType::RESERVED);	
+		const auto type = m_input.match(TokenType::RESERVED);
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
 		std::cout << "function type detected : " << type.asString() << std::endl;
 #endif
+		functionDeclarationNode->add(std::make_unique<ASTNode>(type));
+	} else {
+		functionDeclarationNode->add(std::make_unique<ASTNode>(Token{ "", TokenType::IDENTIFIER }));
 	}
 
     auto startEvent = FunctionTokenEvent {functionName.asString(), *functionDeclarationNode, FunctionTokenEventType::DECLARATION_PARAMETERS};
@@ -359,7 +373,21 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
 	std::cout << "reading function statement" << std::endl;
 #endif
-	functionDeclarationNode->add(m_parser.statement());
+
+	auto blockNode = std::make_unique<ska::ASTNode>(Operator::BLOCK);
+	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
+
+	while (!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
+		auto optionalStatement = m_parser.statement();
+		if (!optionalStatement->empty()) {
+			blockNode->add(std::move(optionalStatement));
+		} else {
+			break;
+		}
+	}
+	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
+
+	functionDeclarationNode->add(std::move(blockNode));
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
 	std::cout << "function read." << std::endl;
 #endif
