@@ -142,29 +142,47 @@ TEST_CASE("User defined object") {
         std::cout << std::endl << std::endl << std::endl;
         
         auto astPtr = ASTFromInput("var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", keywords);
-		auto& ast = (*astPtr)[0];
-        CHECK(ast.op == ska::Operator::VARIABLE_DECLARATION);
-        const auto& astFunc = ast[0];
+		CHECK(astPtr->size() == 3);
+        CHECK((*astPtr).op == ska::Operator::BLOCK);
+        
+        auto& varJoueurNode = (*astPtr)[0];
+        CHECK(varJoueurNode.size() == 1);
+        CHECK(varJoueurNode.op == ska::Operator::VARIABLE_DECLARATION);
+        const auto& astFunc = varJoueurNode[0];
         CHECK(astFunc.op == ska::Operator::FUNCTION_DECLARATION);
 		CHECK(astFunc.size() == 3);
     
         //Checks the parameter name and type
-        std::cout << astFunc[0].asString() << std::endl;
         CHECK(astFunc[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER})); 
         CHECK(astFunc[0].size() == 1);
         CHECK(astFunc[0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
 
         //Checks the return type
-        std::cout << astFunc[1].asString() << std::endl;
-        
-        CHECK(astFunc[1].has(ska::Token { "var", ska::TokenType::IDENTIFIER}));
+        CHECK(astFunc[1].has(keywords.pattern<ska::TokenGrammar::VARIABLE>()));
 
         //Checks the function body
-        std::cout << astFunc[2].asString() << std::endl;
         CHECK(astFunc[2].size() == 1);
-        std::cout << astFunc[2][0].asString() << std::endl;
-        std::cout << static_cast<std::size_t>(astFunc[2][0].op.value()) << std::endl;
-        //CHECK(astFunc[2][0].op == );
+        
+        const auto& userDefinedObjectNode = astFunc[2][0];
+        CHECK(userDefinedObjectNode.op == ska::Operator::USER_DEFINED_OBJECT);
+        CHECK(userDefinedObjectNode.size() == 1);
+
+        const auto& returnNomNode = userDefinedObjectNode[0];
+        CHECK(returnNomNode.size() == 1);
+        CHECK(returnNomNode.has(ska::Token { "nom", ska::TokenType::IDENTIFIER }));
+        
+        //Checks the variable declaration and the function call
+        const auto& varJoueur1Node = (*astPtr)[1];
+        CHECK(varJoueur1Node.op == ska::Operator::VARIABLE_DECLARATION);
+        CHECK(varJoueur1Node.has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER } ));
+        CHECK(varJoueur1Node.size() == 1);
+        const auto& joueurFunctionCallNode = varJoueur1Node[0];
+        CHECK(joueurFunctionCallNode.op == ska::Operator::FUNCTION_CALL);
+
+        //Checks the field access
+        const auto& nomJoueur1FieldNode = (*astPtr)[2];
+        CHECK(nomJoueur1FieldNode.op == ska::Operator::FIELD_ACCESS);
+        CHECK(nomJoueur1FieldNode.has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER } ));
 
         std::cout << std::endl << std::endl << std::endl;
 	}
