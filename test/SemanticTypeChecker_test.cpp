@@ -208,7 +208,7 @@ TEST_CASE("Semantic type checker") {
 				, parser_test, table_test, type_test);
 				CHECK(false);
 			} catch (std::exception& e) {
-				std::cout << e.what() << std::endl;
+				//std::cout << e.what() << std::endl;
 				CHECK(true);
 			}
 		}

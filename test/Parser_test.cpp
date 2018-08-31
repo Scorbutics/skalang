@@ -147,8 +147,25 @@ TEST_CASE("User defined object") {
         const auto& astFunc = ast[0];
         CHECK(astFunc.op == ska::Operator::FUNCTION_DECLARATION);
 		CHECK(astFunc.size() == 3);
-		//TODO suite des verifs
+    
+        //Checks the parameter name and type
+        std::cout << astFunc[0].asString() << std::endl;
+        CHECK(astFunc[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER})); 
+        CHECK(astFunc[0].size() == 1);
+        CHECK(astFunc[0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
+
+        //Checks the return type
+        std::cout << astFunc[1].asString() << std::endl;
         
+        CHECK(astFunc[1].has(ska::Token { "var", ska::TokenType::IDENTIFIER}));
+
+        //Checks the function body
+        std::cout << astFunc[2].asString() << std::endl;
+        CHECK(astFunc[2].size() == 1);
+        std::cout << astFunc[2][0].asString() << std::endl;
+        std::cout << static_cast<std::size_t>(astFunc[2][0].op.value()) << std::endl;
+        //CHECK(astFunc[2][0].op == );
+
         std::cout << std::endl << std::endl << std::endl;
 	}
 
