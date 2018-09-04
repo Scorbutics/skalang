@@ -175,7 +175,10 @@ bool ska::SymbolTable::match(VarTokenEvent& token) {
 	switch(token.type) {
 		case VarTokenEventType::DECLARATION: {
             auto type = token.node[0].type.value();
-			const auto name = token.node.asString();
+            if(type == ExpressionType::VOID) {
+                throw std::runtime_error("Unable to declare the variable " + token.node.asString() + " with a void type");
+            }
+            const auto name = token.node.asString();
             m_currentTable->emplace(name, std::move(type)); 
 #ifdef SKALANG_LOG_SYMBOL_TABLE	
 			std::cout << "Matching new variable : " << name << " with type " << type.asString() << std::endl;

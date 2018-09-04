@@ -101,32 +101,45 @@ TEST_CASE("Semantic type checker") {
             auto astPtr = ASTFromInputSemanticTC("var titi = 1; titi = 0.2;", parser_test, table_test, type_test);
             auto& ast = (*astPtr);
             CHECK(ast.size() == 2);
-            CHECK(ast[1].type == ska::ExpressionType::FLOAT);
+            CHECK(ast[1].type == ska::ExpressionType::INT);
         }
         
         SUBCASE("int = string") {
-            ASTFromInputSemanticTC("var titi = 7; titi = \"123\";", parser_test, table_test, type_test);
+            auto astPtr = ASTFromInputSemanticTC("var titi = 7; titi = \"123\";", parser_test, table_test, type_test);
+            auto& ast = (*astPtr);
+            CHECK(ast.size() == 2);
+            CHECK(ast[1].type == ska::ExpressionType::INT);
         }
         
         SUBCASE("float = string") {
-            ASTFromInputSemanticTC("var titi = 7.8; titi = \"123\";", parser_test, table_test, type_test);
+            auto astPtr = ASTFromInputSemanticTC("var titi = 7.8; titi = \"123\";", parser_test, table_test, type_test);
+            auto& ast = (*astPtr);
+            CHECK(ast.size() == 2);
+            CHECK(ast[1].type == ska::ExpressionType::FLOAT);
         }
         
         SUBCASE("function call : string") {
-            ASTFromInputSemanticTC("var titi = function(test:string) {}; titi(\"lol\");", parser_test, table_test, type_test);
+            auto astPtr = ASTFromInputSemanticTC("var titi = function(test:string) {}; titi(\"lol\");", parser_test, table_test, type_test);
+            auto& ast = (*astPtr);
+            CHECK(ast.size() == 2);
+            std::cout << ast[1].type.value().asString() << std::endl;
+            CHECK(ast[1].type == ska::ExpressionType::VOID);
         }
 
         SUBCASE("Calling a function with a type convertible argument") {
             ASTFromInputSemanticTC("var titi = function(test:string) {}; titi(23);", parser_test, table_test, type_test);
+        
         }
 
         SUBCASE("constructor with 1 parameter") {
             ASTFromInputSemanticTC("var Joueur = function(nomL:string) : var { return { nom : nomL }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", parser_test, table_test, type_test);
+        
         }
 
 		SUBCASE("constructor with 1 parameter same name") {
 			ASTFromInputSemanticTC("var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", parser_test, table_test, type_test);
-		}
+		
+        }
 
 		SUBCASE("constructor complex with contained function NOT USING the current type...") {
 			ASTFromInputSemanticTC(
