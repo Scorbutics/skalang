@@ -28,47 +28,80 @@ TEST_CASE("Semantic type checker") {
     
     SUBCASE("OK") {
         SUBCASE("float x float") {
-            ASTFromInputSemanticTC("var titi = 2.0; var toto = 5.2; titi * toto;", parser_test, table_test, type_test);
+            auto astPtr = ASTFromInputSemanticTC("var titi = 2.0; var toto = 5.2; titi * toto;", parser_test, table_test, type_test);
+            auto& ast = (*astPtr);
+            CHECK(ast.size() == 3);
+            CHECK(ast[2].type == ska::ExpressionType::FLOAT);
         }
 
         SUBCASE("int x string") {    
-            ASTFromInputSemanticTC("var titi = 2; var toto = \"test\"; titi * toto;", parser_test, table_test, type_test);
+            auto astPtr = ASTFromInputSemanticTC("var titi = 2; var toto = \"test\"; titi * toto;", parser_test, table_test, type_test);
+            auto& ast = (*astPtr);
+            CHECK(ast.size() == 3);
+            CHECK(ast[2].type == ska::ExpressionType::STRING);
         }
 
         SUBCASE("int x float") {
-            ASTFromInputSemanticTC("var titi = 2; var toto = 5.2; titi * toto;", parser_test, table_test, type_test);
+            auto astPtr = ASTFromInputSemanticTC("var titi = 2; var toto = 5.2; titi * toto;", parser_test, table_test, type_test);
+            auto& ast = (*astPtr);
+            CHECK(ast.size() == 3);
+            CHECK(ast[2].type == ska::ExpressionType::FLOAT);
         }
 
         SUBCASE("float x int") {
-            ASTFromInputSemanticTC("var titi = 2.0; var toto = 5; titi * toto;", parser_test, table_test, type_test);
+            auto astPtr = ASTFromInputSemanticTC("var titi = 2.0; var toto = 5; titi * toto;", parser_test, table_test, type_test);
+            auto& ast = (*astPtr);
+            CHECK(ast.size() == 3);
+            CHECK(ast[2].type == ska::ExpressionType::FLOAT);
         }
 
         SUBCASE("string x int") {    
-            ASTFromInputSemanticTC("var titi = \"tititititit\"; var toto = 6; titi * toto;", parser_test, table_test, type_test);
+            auto astPtr = ASTFromInputSemanticTC("var titi = \"tititititit\"; var toto = 6; titi * toto;", parser_test, table_test, type_test);
+            auto& ast = (*astPtr);
+            CHECK(ast.size() == 3);
+            CHECK(ast[2].type == ska::ExpressionType::STRING);
         }
 
         SUBCASE("string = int") {    
-            ASTFromInputSemanticTC("var titi = \"strrrr\"; titi = 3;", parser_test, table_test, type_test);  
+            auto astPtr = ASTFromInputSemanticTC("var titi = \"strrrr\"; titi = 3;", parser_test, table_test, type_test);  
+            auto& ast = (*astPtr);
+            CHECK(ast.size() == 2);
+            CHECK(ast[1].type == ska::ExpressionType::STRING);
         }
 
         SUBCASE("float = string") {
-            ASTFromInputSemanticTC("var titi = 0.1; titi = \"toto\";", parser_test, table_test, type_test);
+            auto astPtr = ASTFromInputSemanticTC("var titi = 0.1; titi = \"toto\";", parser_test, table_test, type_test);
+            auto& ast = (*astPtr);
+            CHECK(ast.size() == 2);
+            CHECK(ast[1].type == ska::ExpressionType::FLOAT);
         }
 
         SUBCASE("float = string (variable)") {
-            ASTFromInputSemanticTC("var titi = 0.1; var toto = \"toto\"; titi = toto;", parser_test, table_test, type_test);
+            auto astPtr = ASTFromInputSemanticTC("var titi = 0.1; var toto = \"toto\"; titi = toto;", parser_test, table_test, type_test);
+            auto& ast = (*astPtr);
+            CHECK(ast.size() == 3);
+            CHECK(ast[2].type == ska::ExpressionType::FLOAT);
         }
         
         SUBCASE("float = float") {
-            ASTFromInputSemanticTC("var titi = 0.1; titi = 0.2;", parser_test, table_test, type_test);
+            auto astPtr = ASTFromInputSemanticTC("var titi = 0.1; titi = 0.2;", parser_test, table_test, type_test);
+            auto& ast = (*astPtr);
+            CHECK(ast.size() == 2);
+            CHECK(ast[1].type == ska::ExpressionType::FLOAT);
         }
 
         SUBCASE("float = int") {
-            ASTFromInputSemanticTC("var titi = 0.1; titi = 2;", parser_test, table_test, type_test);
+            auto astPtr = ASTFromInputSemanticTC("var titi = 0.1; titi = 2;", parser_test, table_test, type_test);
+            auto& ast = (*astPtr);
+            CHECK(ast.size() == 2);
+            CHECK(ast[1].type == ska::ExpressionType::FLOAT);
         }
 
         SUBCASE("int = float") {
-            ASTFromInputSemanticTC("var titi = 1; titi = 0.2;", parser_test, table_test, type_test);
+            auto astPtr = ASTFromInputSemanticTC("var titi = 1; titi = 0.2;", parser_test, table_test, type_test);
+            auto& ast = (*astPtr);
+            CHECK(ast.size() == 2);
+            CHECK(ast[1].type == ska::ExpressionType::FLOAT);
         }
         
         SUBCASE("int = string") {
@@ -208,7 +241,6 @@ TEST_CASE("Semantic type checker") {
 				, parser_test, table_test, type_test);
 				CHECK(false);
 			} catch (std::exception& e) {
-				//std::cout << e.what() << std::endl;
 				CHECK(true);
 			}
 		}

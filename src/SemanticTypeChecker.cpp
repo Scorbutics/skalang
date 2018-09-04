@@ -117,7 +117,7 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
 					currentSymbolTable = currentSymbolTable->children()[0].get();
 					const auto& fieldName = n->asString();
 					auto* fieldSymbol = (*currentSymbolTable)[fieldName];
-					std::cout << "field symbol : " << (fieldSymbol != nullptr ? fieldSymbol->category.asString() : "null") << std::endl;
+					//std::cout << "field symbol : " << (fieldSymbol != nullptr ? fieldSymbol->category.asString() : "null") << std::endl;
 					symbol = fieldSymbol;
 				}
 				return symbol == nullptr ? ExpressionType::VOID : symbol->category;
@@ -145,7 +145,7 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
 			}
 
 			case Operator::PARAMETER_DECLARATION: {
-				std::cout << node.asString() << " " << node.size() << std::endl;
+				//std::cout << node.asString() << " " << node.size() << std::endl;
 				assert(node.size() == 1);
 				const auto typeStr = node[0].asString();
 				
@@ -162,14 +162,20 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
 			}
 
 			case Operator::VARIABLE_DECLARATION:
-			case Operator::VARIABLE_AFFECTATION:
 			case Operator::UNARY: {
 				assert(node.size() == 1);
 				const auto childType = getExpressionType(node[0]);
-				return childType;
+                return childType;
 			}
 
-			default:
+            case Operator::VARIABLE_AFFECTATION: {                                    
+                const auto varTypeSymbol = (*m_symbols)[node.asString()];
+                assert(varTypeSymbol != nullptr);
+                return varTypeSymbol->category;
+            }
+			
+
+            default:
 				return ExpressionType::VOID;
 		}
 	}
