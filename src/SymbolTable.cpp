@@ -114,17 +114,20 @@ bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
             for(auto index = 0u; index < token.node.size(); index++) {
                 auto& param = token.node[index];
 				auto name = param.asString();
-				const auto typeStr = param.type.value().asString();
+                if(param.type.has_value()) {
+                    const auto typeStr = param.type.value().asString();
 
 #ifdef SKALANG_LOG_SYMBOL_TABLE
-                std::cout << "\t\t" << token.node[index].asString() << " = " << typeStr << std::endl;
+                    std::cout << "\t\t" << token.node[index].asString() << " = " << typeStr << std::endl;
 #endif
-				//Return type : mustn't be declared as a scope variable
-				if (index != token.node.size() - 1) {
-					m_currentTable->emplace(name, param.type.value());
-				}
+                    //Return type : mustn't be declared as a scope variable
+                    if (index != token.node.size() - 1) {
+                        m_currentTable->emplace(name, param.type.value());
+                    }
 
-				currentArgList.push_back(Symbol{ std::move(name), param.type.value() });
+                    currentArgList.push_back(Symbol{ std::move(name), param.type.value() });
+                    
+                }
             }
             
             symbol.link(std::move(currentArgList), *functionSymbolTable);
@@ -174,15 +177,18 @@ bool ska::SymbolTable::match(VarTokenEvent& token) {
 	
 	switch(token.type) {
 		case VarTokenEventType::DECLARATION: {
-            auto type = token.node[0].type.value();
-            if(type == ExpressionType::VOID) {
-                throw std::runtime_error("Unable to declare the variable " + token.node.asString() + " with a void type");
-            }
-            const auto name = token.node.asString();
-            m_currentTable->emplace(name, std::move(type)); 
+            if(token.node[0].type.has_value()) {
+                 auto type = token.node[0].type.value();
+                if(type == ExpressionType::VOID) {
+                    throw std::runtime_error("Unable to declare the variable " + token.node.asString() + " with a void type");
+                }
+                const auto name = token.node.asString();
+                m_currentTable->emplace(name, std::move(type)); 
 #ifdef SKALANG_LOG_SYMBOL_TABLE	
-			std::cout << "Matching new variable : " << name << " with type " << type.asString() << std::endl;
+                std::cout << "Matching new variable : " << name << " with type " << type.asString() << std::endl;
 #endif
+
+            }
         } break;
 
 		default:
@@ -211,6 +217,7 @@ ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, Type type) {
 	assert(!name.empty());
 	assert(type != ExpressionType::VOID);
+    std::cout << "Emplacing symbol " << name << " with type " << type.asString() << std::endl;
 	m_symbols.emplace(name, Symbol { name, std::move(type) });
     return m_symbols.at(std::move(name));
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <unordered_map>
-#include "ExpressionType.h"
+#include <vector>
+#include <sstream>
 
 namespace ska {
 
@@ -39,7 +40,7 @@ namespace ska {
 				return m_alias + " " + ExpressionTypeSTR[static_cast<std::size_t>(m_type)];
 			}
 			auto ss = std::stringstream{}; 
-			ss << m_alias << "(" << ExpressionTypeSTR[static_cast<std::size_t>(m_type)];
+			ss << m_alias << " (" << ExpressionTypeSTR[static_cast<std::size_t>(m_type)];
 			for (const auto& childType : m_compound) {
 				ss << " - " << childType.asString();
 			}
@@ -58,6 +59,14 @@ namespace ska {
 
 			return m_type == t.m_type && m_compound == t.m_compound;
 		}
+
+        void name(std::string n) {
+            m_alias = std::move(n);
+        }
+
+        const std::string& getName() const {
+            return m_alias;
+        }
 
 		bool operator==(const ExpressionType& t) const {
 			return m_type == t;

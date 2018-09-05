@@ -102,13 +102,16 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
 				for (auto index = 0u; index < node.size() - 1; index++) {
 					type.add(getExpressionType(node[index]));
 				}
-                std::cout << "type function declaration !!!!!!" << std::endl;
                 if(node.size() > 1) {
                     auto returnType = getExpressionType(node[node.size() - 1]);
-                    std::cout << "return type of function " << node.asString() << returnType.asString() << std::endl; 
-                    //returnType
-                    type.add(returnType);
+                    if(returnType == ExpressionType::OBJECT) {
+                        returnType.name(node.asString());
+                        //std::cout << "!!!! return type of function " << node.asString() << returnType.asString() << std::endl; 
+                        type.add(returnType);
+                    }
                 }
+                auto typeCopy = type;
+                std::cout << "function declaration \""<< node.asString() <<"\" with type "<< typeCopy.asString() << std::endl;
 				return type;
 			}
 
@@ -124,11 +127,11 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
 					currentSymbolTable = currentSymbolTable->children()[0].get();
 					const auto& fieldName = n->asString();
 					auto* fieldSymbol = (*currentSymbolTable)[fieldName];
-					//std::cout << "field symbol : " << (fieldSymbol != nullptr ? fieldSymbol->category.asString() : "null") << std::endl;
+					std::cout << "field symbol : " << (fieldSymbol != nullptr ? fieldSymbol->category.asString() : "null") << std::endl;
 					symbol = fieldSymbol;
 				}
                 if(symbol != nullptr) {
-                    std::cout << symbol->category.asString() << std::endl;
+                    std::cout << "function call with type : " << symbol->category.asString() << std::endl;
                 }
                 if(symbol == nullptr || symbol->category.compound().empty() || symbol->category.compound()[0] == ExpressionType::VOID) {
                     return ExpressionType::VOID;
