@@ -218,8 +218,9 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
         auto fieldValue = expr();
 
         const std::string name = "???";
+#ifdef SKALANG_LOG_PARSER
         std::cout << "Constructor " << name << " with field \"" << field.asString() << "\" and field value \"" << fieldValue->asString() << "\"" <<  std::endl;
-        
+#endif
         auto fieldNode = std::make_unique<ASTNode>(Operator::VARIABLE_DECLARATION, std::move(field));
         fieldNode->add(std::move(fieldValue));
         returnNode->add(std::move(fieldNode));

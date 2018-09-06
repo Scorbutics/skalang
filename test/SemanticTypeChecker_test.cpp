@@ -122,7 +122,7 @@ TEST_CASE("Semantic type checker") {
             auto astPtr = ASTFromInputSemanticTC("var titi = function(test:string) {}; titi(\"lol\");", parser_test, table_test, type_test);
             auto& ast = (*astPtr);
             CHECK(ast.size() == 2);
-            std::cout << ast[1].type.value().asString() << std::endl;
+            //std::cout << ast[1].type.value().asString() << std::endl;
             CHECK(ast[1].type == ska::ExpressionType::VOID);
         }
 

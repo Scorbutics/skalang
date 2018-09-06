@@ -25,9 +25,11 @@ bool ska::SemanticTypeChecker::matchFunction(FunctionTokenEvent& token) {
         case FunctionTokenEventType::DECLARATION_PARAMETERS: {			
 			getExpressionType(token.node);
 			const auto returnType = token.node[token.node.size() - 1].type;
-			if (returnType.has_value() && returnType.value() == ExpressionType::OBJECT) {
+#ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
+            if (returnType.has_value() && returnType.value() == ExpressionType::OBJECT) {
 				std::cout << "user defined object type detected" << std::endl;
 			}
+#endif
         } break;
 
         default:
@@ -111,8 +113,10 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
                     }
                 }
                 auto typeCopy = type;
+#ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
                 std::cout << "function declaration \""<< node.asString() <<"\" with type "<< typeCopy.asString() << std::endl;
-				return type;
+#endif
+                return type;
 			}
 
 			case Operator::FUNCTION_CALL: {
@@ -127,12 +131,16 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
 					currentSymbolTable = currentSymbolTable->children()[0].get();
 					const auto& fieldName = n->asString();
 					auto* fieldSymbol = (*currentSymbolTable)[fieldName];
-					std::cout << "field symbol : " << (fieldSymbol != nullptr ? fieldSymbol->category.asString() : "null") << std::endl;
-					symbol = fieldSymbol;
+#ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
+                    std::cout << "field symbol : " << (fieldSymbol != nullptr ? fieldSymbol->category.asString() : "null") << std::endl;
+#endif
+                    symbol = fieldSymbol;
 				}
+#ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
                 if(symbol != nullptr) {
                     std::cout << "function call with type : " << symbol->category.asString() << std::endl;
                 }
+#endif
                 if(symbol == nullptr || symbol->category.compound().empty() || symbol->category.compound()[0] == ExpressionType::VOID) {
                     return ExpressionType::VOID;
                 }
@@ -162,7 +170,7 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
 			}
 
 			case Operator::PARAMETER_DECLARATION: {
-				std::cout << node.asString() << " " << node.size() << std::endl;
+				//std::cout << node.asString() << " " << node.size() << std::endl;
 				assert(node.size() == 1);
 				const auto typeStr = node[0].asString();
 				

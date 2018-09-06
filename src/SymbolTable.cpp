@@ -154,8 +154,10 @@ bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
 				currentSymbolTable = currentSymbolTable->children()[0].get();
 				const auto& fieldName = n->asString();
 				auto* fieldSymbol = (*currentSymbolTable)[fieldName];
-				std::cout << "field symbol : " << (fieldSymbol != nullptr ? fieldSymbol->category.asString() : "null") << std::endl;
-				symbol = fieldSymbol;
+#ifdef SKALANG_LOG_SYMBOL_TABLE
+                std::cout << "field symbol : " << (fieldSymbol != nullptr ? fieldSymbol->category.asString() : "null") << std::endl;
+#endif
+                symbol = fieldSymbol;
 			}
 
 			if(symbol == nullptr) {
@@ -217,7 +219,7 @@ ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, Type type) {
 	assert(!name.empty());
 	assert(type != ExpressionType::VOID);
-    std::cout << "Emplacing symbol " << name << " with type " << type.asString() << std::endl;
+    //std::cout << "Emplacing symbol " << name << " with type " << type.asString() << std::endl;
 	m_symbols.emplace(name, Symbol { name, std::move(type) });
     return m_symbols.at(std::move(name));
 }

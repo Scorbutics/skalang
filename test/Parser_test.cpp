@@ -139,7 +139,7 @@ TEST_CASE("User defined object") {
     const auto keywords = ska::ReservedKeywordsPool {};
 	
     SUBCASE("constructor with 1 parameter") {
-        std::cout << std::endl << std::endl << std::endl;
+        //std::cout << std::endl << std::endl << std::endl;
         
         auto astPtr = ASTFromInput("var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", keywords);
 		CHECK(astPtr->size() == 3);
@@ -184,7 +184,7 @@ TEST_CASE("User defined object") {
         CHECK(nomJoueur1FieldNode.op == ska::Operator::FIELD_ACCESS);
         CHECK(nomJoueur1FieldNode.has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER } ));
 
-        std::cout << std::endl << std::endl << std::endl;
+        //std::cout << std::endl << std::endl << std::endl;
 	}
 
 }
