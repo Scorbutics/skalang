@@ -3,6 +3,12 @@
 #include <vector>
 #include <sstream>
 
+//#define SKALANG_LOG_TYPE
+
+#ifdef SKALANG_LOG_TYPE
+#include <iostream>
+#endif
+
 namespace ska {
 
 	enum class ExpressionType {
@@ -34,9 +40,50 @@ namespace ska {
 		Type(ExpressionType t) : m_type(std::move(t)) {}
 
 		Type(std::string name, ScopedSymbolTable& typeSymbolTable, const Type& t) : m_type(t.m_type), m_symbolTable(&typeSymbolTable), m_alias(std::move(name)) {};
+        Type(Type&& t) noexcept {
+            *this = std::move(t);
+        }
+
+        Type(const Type& t) {
+            *this = t;
+        }
+
+        Type& operator=(const Type& t) {
+            m_type = t.m_type;
+            m_alias = t.m_alias;
+            m_compound = t.m_compound;
+            m_symbolTable = t.m_symbolTable;
+            m_moved = t.m_moved;
+#ifdef SKALANG_LOG_TYPE
+            std::cout << "   Copy, Type " << t.asString() << " copied to " << asString() << std::endl;
+#endif
+            return *this;
+        }
+
+        Type& operator=(Type&& t) {
+#ifdef SKALANG_LOG_TYPE
+            std::cout << "   Move, Type " << t.asString(); 
+#endif
+            m_type = std::move(t.m_type);
+            m_alias = std::move(t.m_alias);
+            m_compound = std::move(t.m_compound);
+            m_symbolTable = std::move(t.m_symbolTable);
+            t.m_symbolTable = nullptr; 
+            t.m_moved = true;
+#ifdef SKALANG_LOG_TYPE
+            std::cout << " moved  to " << asString() << std::endl;
+#endif
+            return *this;
+        }
+
+        ~Type() = default;
 
 		std::string asString() const {
-			if (m_compound.empty()) {
+            if(m_moved) {
+                return "INVALID_MOVED";
+            }
+
+            if (m_compound.empty()) {
 				return m_alias + " " + ExpressionTypeSTR[static_cast<std::size_t>(m_type)];
 			}
 			auto ss = std::stringstream{}; 
@@ -61,6 +108,9 @@ namespace ska {
 		}
 
         void name(std::string n) {
+#ifdef SKALANG_LOG_TYPE
+            std::cout << "Naming type " << asString() << " : \"" << n << "\"" << std::endl;
+#endif
             m_alias = std::move(n);
         }
 
@@ -200,7 +250,8 @@ namespace ska {
 		std::string m_alias;
 		std::vector<Type> m_compound;
 		ScopedSymbolTable* m_symbolTable = nullptr;
-	};
+	    bool m_moved = false;
+    };
 
     static std::unordered_map<std::string, ExpressionType> ExpressionTypeMapBuild() {
         auto result = std::unordered_map<std::string, ExpressionType>{};

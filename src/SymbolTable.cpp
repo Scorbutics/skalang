@@ -1,11 +1,11 @@
 #include "SymbolTable.h"
 #include "Parser.h"
 
-//#define SKALANG_LOG_SYMBOL_TABLE
+#define SKALANG_LOG_SYMBOL_TABLE
 
 const ska::Symbol* ska::Symbol::operator[](const std::string& symbol) const {
-	if (category.symbolTable() != nullptr && !category.symbolTable()->children().empty()) {
-		auto& st = *category.symbolTable()->children()[0];
+	if (m_category.symbolTable() != nullptr && !m_category.symbolTable()->children().empty()) {
+		auto& st = *m_category.symbolTable()->children()[0];
 		return st[symbol];
 	}
 	return nullptr;
@@ -16,16 +16,16 @@ ska::Symbol* ska::Symbol::operator[](const std::string& symbol) {
 }
 
 std::size_t ska::Symbol::size() const {
-    return category.compound().size();
+    return m_category.compound().size();
 }
 
 void ska::Symbol::link(std::vector<Symbol> subtypes, ScopedSymbolTable& table) {
 	table.link(*this);
-	category.link(table);
+	m_category.link(table);
 	//m_scopedTable = &table;
     
 	for (const auto& t : subtypes) {
-		category.add(std::move(t.category));
+		m_category.add(t.getType());
 	}
 }
 
@@ -69,7 +69,7 @@ bool ska::SymbolTable::matchReturn(ReturnTokenEvent& token) {
 
 	m_currentTable = &m_currentTable->createNested();
 #ifdef SKALANG_LOG_SYMBOL_TABLE
-	std::cout << "\tReturn : nested named symbol table with name : " << actualNameSymbol->name << std::endl;
+	std::cout << "\tReturn : nested named symbol table with name : " << actualNameSymbol->getName() << std::endl;
 #endif
 	for (auto index = 0u; index < token.node.size(); index++) {
 		auto& field = token.node[index];
@@ -146,16 +146,16 @@ bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
 		default:
 		case FunctionTokenEventType::CALL: {
             const auto name = token.node[0].asString();
-			auto* symbol = (*this)[name];
+			const auto* symbol = (*this)[name];
 			auto* n = &token.node[0];
-			auto* currentSymbolTable = symbol->category.symbolTable();
+			auto* currentSymbolTable = symbol->getType().symbolTable();
 			while (n != nullptr && n->size() > 0 &&  !currentSymbolTable->children().empty()) {
 				n = &(*n)[0];
 				currentSymbolTable = currentSymbolTable->children()[0].get();
 				const auto& fieldName = n->asString();
 				auto* fieldSymbol = (*currentSymbolTable)[fieldName];
 #ifdef SKALANG_LOG_SYMBOL_TABLE
-                std::cout << "field symbol : " << (fieldSymbol != nullptr ? fieldSymbol->category.asString() : "null") << std::endl;
+                std::cout << "field symbol : " << (fieldSymbol != nullptr ? fieldSymbol->getType().asString() : "null") << std::endl;
 #endif
                 symbol = fieldSymbol;
 			}
@@ -164,7 +164,7 @@ bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
 				throw std::runtime_error("Symbol function not found : " + name);
 			}
 
-			if(symbol->category != ExpressionType::FUNCTION) {
+			if(symbol->getType() != ExpressionType::FUNCTION) {
 				throw std::runtime_error("Symbol \"" + name + "\" declared as normal variable but used as a function");
 			}	
 		} break;
@@ -185,11 +185,12 @@ bool ska::SymbolTable::match(VarTokenEvent& token) {
                     throw std::runtime_error("Unable to declare the variable " + token.node.asString() + " with a void type");
                 }
                 const auto name = token.node.asString();
-                m_currentTable->emplace(name, std::move(type)); 
 #ifdef SKALANG_LOG_SYMBOL_TABLE	
                 std::cout << "Matching new variable : " << name << " with type " << type.asString() << std::endl;
 #endif
-
+                m_currentTable->emplace(name, std::move(type)); 
+                
+                std::cout << "New variable " << name << " inserted with type " << (*m_currentTable)[name]->getType().asString() << std::endl;
             }
         } break;
 
@@ -219,9 +220,20 @@ ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, Type type) {
 	assert(!name.empty());
 	assert(type != ExpressionType::VOID);
-    //std::cout << "Emplacing symbol " << name << " with type " << type.asString() << std::endl;
-	m_symbols.emplace(name, Symbol { name, std::move(type) });
-    return m_symbols.at(std::move(name));
+    
+    {
+        auto symbol = Symbol { name, type };
+        //std::cout << "\tSymbol \"" << name << "\" \"" <<  symbol.getType().asString() << "\""<< std::endl;
+        if(m_symbols.find(name) == m_symbols.end()) {
+            m_symbols.emplace(name, std::move(symbol));
+        } else {
+            m_symbols.at(name) = std::move(symbol);
+        }
+    }
+
+    auto& s = m_symbols.at(name);
+    //std::cout << "\tSymbol Inserted \"" << name << "\" \"" << s.getType().asString() << "\"" << std::endl;
+    return s;
 }
 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested() {

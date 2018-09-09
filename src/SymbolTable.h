@@ -9,20 +9,63 @@
 #include "ReturnTokenEvent.h"
 #include "ExpressionType.h"
 
+//#define SKALANG_LOG_MOVE_COPY_SYMBOL
+
 namespace ska {
     class ScopedSymbolTable;
     	
     class Symbol {
         public:
             Symbol(std::string name, Type cat) : 
-				name(std::move(name)), 
-				category(std::move(cat)) {}
+				m_name(std::move(name)), 
+                m_category(std::move(cat)) {
+      #ifdef SKALANG_LOG_MOVE_COPY_SYMBOL
+                    std::cout << "Creating Symbol " << m_name << " with type " << m_category.asString() << std::endl;
+#endif
+                }
 
-			std::string name;
-			Type category;		
+            Symbol(const Symbol& s) {
+                *this = s;
+            }
+
+            Symbol(Symbol&& s) {
+                *this = std::move(s);
+            }
+
+            Symbol& operator=(const Symbol& s) {
+                m_scopedTable = s.m_scopedTable;
+                m_name = s.m_name;
+                m_category = s.m_category;
+#ifdef SKALANG_LOG_MOVE_COPY_SYMBOL
+                std::cout << "   Copy, Symbol " << s.getName() << " " << s.m_category.asString() << " copied to " << m_name << " " << m_category.asString() << std::endl;
+#endif
+                return *this;
+            }
+
+            Symbol& operator=(Symbol&& s) {
+                m_scopedTable = std::move(s.m_scopedTable);
+                m_name = std::move(s.m_name);
+                m_category = std::move(s.m_category);
+#ifdef SKALANG_LOG_MOVE_COPY_SYMBOL
+                std::cout << "   Move, Symbol " << s.getName() << " " << s.m_category.asString() << " moved to " << m_name << " " << m_category.asString() << std::endl;
+#endif
+                return *this;
+            }
 
             const Type& operator[](std::size_t index) const {
-                return category.compound()[index];
+                return m_category.compound()[index];
+            }
+
+            const std::string& getName() const {
+                return m_name;
+            }
+
+            const Type& getType() const {
+                return m_category;
+            }
+
+            bool empty() const {
+                return m_category.compound().empty();
             }
 
             const Symbol* operator[](const std::string& symbol) const;
@@ -32,8 +75,10 @@ namespace ska {
 
             void link(std::vector<Symbol> subtypes, ScopedSymbolTable& table);
 
-        /*private:
-			ScopedSymbolTable* m_scopedTable = nullptr;*/
+        private:
+			ScopedSymbolTable* m_scopedTable = nullptr;
+            std::string m_name;
+            Type m_category;
     };
 
 	class SymbolTable;

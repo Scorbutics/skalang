@@ -3,7 +3,7 @@
 #include "SymbolTable.h"
 #include "AST.h"
 
-//#define SKALANG_LOG_SEMANTIC_TYPE_CHECK
+#define SKALANG_LOG_SEMANTIC_TYPE_CHECK
 
 ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser) :
 	SubObserver<ExpressionTokenEvent>(std::bind(&SemanticTypeChecker::matchExpression, this, std::placeholders::_1), parser),
@@ -36,7 +36,7 @@ bool ska::SemanticTypeChecker::matchFunction(FunctionTokenEvent& token) {
         case FunctionTokenEventType::CALL: {
 			//auto type = getExpressionType(token.node);
             const auto symbol = (*m_symbols)[variable];
-            if(symbol == nullptr || symbol->category != ExpressionType::FUNCTION) {
+            if(symbol == nullptr || symbol->getType() != ExpressionType::FUNCTION) {
                 throw std::runtime_error("function " + variable + " is called before being declared (or has a bad declaration)");
             }
 
@@ -54,7 +54,7 @@ bool ska::SemanticTypeChecker::matchFunction(FunctionTokenEvent& token) {
                 auto& param = token.node[index];
                 const auto calculatedType = getExpressionType(param);
 #ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
-                std::cout << index << " \"" << ExpressionTypeSTR[static_cast<std::size_t>(calculatedType)] << "\" while a type convertible to \"" << ExpressionTypeSTR[static_cast<std::size_t>((*symbol)[index].category)] << "\" is required" << std::endl;
+                std::cout << index << " \"" << calculatedType.asString() << "\" while a type convertible to \"" << (*symbol)[index].asString() << "\" is required" << std::endl;
 #endif
                 if((*symbol)[index - 1].crossTypes('=', calculatedType) == ExpressionType::VOID) {
                     auto ss = std::stringstream {};
@@ -75,15 +75,15 @@ bool ska::SemanticTypeChecker::matchVariable(VarTokenEvent& token) {
     const auto symbol = (*m_symbols)[variable];
     
 #ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
-    std::cout << variable << " = " << value << ";\tsymbol = " << ExpressionTypeSTR[static_cast<std::size_t>(tokenNodeExpressionType)] << std::endl;
+    std::cout << variable << " = " << value << ";\tsymbol = " << tokenNodeExpressionType.asString() << std::endl;
 #endif
 
     if(symbol != nullptr && token.type == VarTokenEventType::AFFECTATION) {
-        const auto newTokenType = symbol->category.crossTypes('=', tokenNodeExpressionType);
+        const auto newTokenType = symbol->getType().crossTypes('=', tokenNodeExpressionType);
         if(newTokenType == ExpressionType::VOID) {
             const auto expressionTypeIndex = tokenNodeExpressionType;
             throw std::runtime_error("The symbol \"" + variable + "\" has already been declared as " + 
-                std::string(symbol->category.asString()) + " but is now wanted to be " +
+                std::string(symbol->getType().asString()) + " but is now wanted to be " +
                 std::string(expressionTypeIndex.asString()));		
         }
     }
@@ -108,13 +108,12 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
                     auto returnType = getExpressionType(node[node.size() - 1]);
                     if(returnType == ExpressionType::OBJECT) {
                         returnType.name(node.asString());
-                        //std::cout << "!!!! return type of function " << node.asString() << returnType.asString() << std::endl; 
+                        //std::cout << "!!!! return type of function " << node.asString() << " : " << returnType.asString() << std::endl; 
                         type.add(returnType);
                     }
                 }
-                auto typeCopy = type;
 #ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
-                std::cout << "function declaration \""<< node.asString() <<"\" with type "<< typeCopy.asString() << std::endl;
+                std::cout << "function declaration \""<< node.asString() <<"\" with type "<< type.asString() << std::endl;
 #endif
                 return type;
 			}
@@ -125,26 +124,28 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
 				const auto functionName = functionIdentifier.asString();
 				auto* symbol = (*m_symbols)[functionName];
 				auto* n = &node[0];
-				auto* currentSymbolTable = symbol->category.symbolTable();
+				auto* currentSymbolTable = symbol->getType().symbolTable();
 				while (n != nullptr && n->size() > 0 && !currentSymbolTable->children().empty()) {
 					n = &(*n)[0];
 					currentSymbolTable = currentSymbolTable->children()[0].get();
 					const auto& fieldName = n->asString();
 					auto* fieldSymbol = (*currentSymbolTable)[fieldName];
 #ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
-                    std::cout << "field symbol : " << (fieldSymbol != nullptr ? fieldSymbol->category.asString() : "null") << std::endl;
+                    std::cout << "field symbol : " << (fieldSymbol != nullptr ? fieldSymbol->getType().asString() : "null") << std::endl;
 #endif
                     symbol = fieldSymbol;
 				}
 #ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
                 if(symbol != nullptr) {
-                    std::cout << "function call with type : " << symbol->category.asString() << std::endl;
+                    std::cout << "function call with type : " << symbol->getType().asString() << std::endl;
                 }
 #endif
-                if(symbol == nullptr || symbol->category.compound().empty() || symbol->category.compound()[0] == ExpressionType::VOID) {
+                if(symbol == nullptr || symbol->empty() || (*symbol)[0] == ExpressionType::VOID) {
                     return ExpressionType::VOID;
                 }
-				return symbol->category.compound().back();
+
+                //std::cout << "returning type : " << symbol->category.compound().back().asString() << " of " << symbol->category.asString() << std::endl;
+				return symbol->getType().compound().back();
 			}
 			
 			case Operator::FIELD_ACCESS: {
@@ -156,10 +157,9 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
 				const auto fieldAccessed = node[0].asString();
 				const auto symbolField = (*symbolObject)[fieldAccessed];
 				if (symbolField == nullptr) {
-                    const auto& subSymbols = symbolObject->category.compound();
-                    throw std::runtime_error("trying to access to an undeclared field : " + fieldAccessed + (subSymbols.empty() ? (" of type " + symbolObject->category.asString()) :  " of type " + symbolObject->category.compound()[0].asString()));
+                    throw std::runtime_error("trying to access to an undeclared field : " + fieldAccessed + " of " + node.asString() + (symbolObject->empty() ? (" of type " + symbolObject->getType().asString()) :  " of type " + (*symbolObject)[0].asString()));
 				}
-				return symbolObject->category.compound()[0];
+				return (*symbolObject)[0];
 			}
 
 			case Operator::BINARY: {
@@ -179,7 +179,7 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
 					if (symbolType == nullptr) {
 						throw std::runtime_error("unknown type detected as function parameter : " + node[0].asString());
 					}
-					return (node[0].type = symbolType->category).value();
+					return (node[0].type = symbolType->getType()).value();
 				} else {
 					getExpressionType(node[0]);
 					return ExpressionTypeMap.at(node[0].asString());
@@ -196,7 +196,7 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
             case Operator::VARIABLE_AFFECTATION: {                                    
                 const auto varTypeSymbol = (*m_symbols)[node.asString()];
                 assert(varTypeSymbol != nullptr);
-                return varTypeSymbol->category;
+                return varTypeSymbol->getType();
             }
 			
 
@@ -222,7 +222,7 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
 
 		case TokenType::IDENTIFIER: {
 			const auto symbol = (*m_symbols)[node.asString()];
-			return symbol == nullptr ? ExpressionType::VOID : symbol->category;
+			return symbol == nullptr ? ExpressionType::VOID : symbol->getType();
 		}
         case TokenType::RESERVED: {
               if(node.asString() == std::string(ExpressionTypeSTR[static_cast<std::size_t>(ExpressionType::INT)])) {
