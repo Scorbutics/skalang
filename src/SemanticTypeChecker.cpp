@@ -42,7 +42,7 @@ bool ska::SemanticTypeChecker::matchFunction(FunctionTokenEvent& token) {
 
             if(symbol->size() != token.node.size()) {
                 auto ss = std::stringstream {};
-                ss << "bad function call : the function " << variable << " needs " << (symbol->size() - 1) << " parameters but is being called with " << (token.node.size() - 1) << " parameters";
+                ss << "bad function call : the function " << variable << " needs " << (symbol->size() - 1) << " parameters but is being called with " << (token.node.size() - 1) << " parameters (function type is " << symbol->getType().asString() << ")";
                 throw std::runtime_error(ss.str());
             }
 
@@ -100,22 +100,18 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
 		const auto& op = node.op.value();
 		switch(op) {
 			case Operator::FUNCTION_DECLARATION: {
-				auto type = Type{ ExpressionType::FUNCTION };
-				for (auto index = 0u; index < node.size() - 1; index++) {
-					type.add(getExpressionType(node[index]));
-				}
-                if(node.size() > 1) {
-                    auto returnType = getExpressionType(node[node.size() - 1]);
-                    if(returnType == ExpressionType::OBJECT) {
-                        returnType.name(node.asString());
-                        //std::cout << "!!!! return type of function " << node.asString() << " : " << returnType.asString() << std::endl; 
-                        type.add(returnType);
+				auto functionType = Type{ ExpressionType::FUNCTION };
+				for (auto index = 0u; index < node.size(); index++) {
+					auto varType = getExpressionType(node[index]);
+                    if(varType == ExpressionType::OBJECT) {
+                        varType.name(node.asString());
                     }
-                }
+                    functionType.add(std::move(varType));
+				}
 #ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
-                std::cout << "function declaration \""<< node.asString() <<"\" with type "<< type.asString() << std::endl;
+                std::cout << "function declaration \""<< node.asString() <<"\" with type "<< functionType.asString() << std::endl;
 #endif
-                return type;
+                return functionType;
 			}
 
 			case Operator::FUNCTION_CALL: {
@@ -145,7 +141,7 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
                 }
 
                 //std::cout << "returning type : " << symbol->category.compound().back().asString() << " of " << symbol->category.asString() << std::endl;
-				return symbol->getType().compound().back();
+                return symbol->getType().compound().back();
 			}
 			
 			case Operator::FIELD_ACCESS: {
@@ -170,9 +166,8 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
 			}
 
 			case Operator::PARAMETER_DECLARATION: {
-				//std::cout << node.asString() << " " << node.size() << std::endl;
 				assert(node.size() == 1);
-				const auto typeStr = node[0].asString();
+                const auto typeStr = node[0].asString();
 				
 				if (ExpressionTypeMap.find(typeStr) == ExpressionTypeMap.end()) {
 					const auto symbolType = (*m_symbols)[typeStr];
@@ -189,7 +184,7 @@ ska::Type ska::SemanticTypeChecker::calculateNodeExpressionType(ASTNode& node) c
 			case Operator::VARIABLE_DECLARATION:
 			case Operator::UNARY: {
 				assert(node.size() == 1);
-				const auto childType = getExpressionType(node[0]);
+                                const auto childType = getExpressionType(node[0]);
                 return childType;
 			}
 

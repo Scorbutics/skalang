@@ -81,7 +81,7 @@ TEST_CASE("Matching") {
         SUBCASE("function declared and used in another function with upper variable") {
             SemanticTypeCheckerPtr type_test;
             SymbolTablePtr table_test;
-            ASTFromInput("var func = function(test:int) { var tout = function(blurp:string) { test = 123; }; test = 78; tout(\"llll\"); };", parser_test, table_test, type_test);
+            ASTFromInput("var func = function(test:int) { var toutou = function(blurp:string) { test = 123; }; test = 78; toutou(\"llll\"); };", parser_test, table_test, type_test);
         }
 
         SUBCASE("shadowing variable into inner function") {

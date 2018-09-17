@@ -132,21 +132,21 @@ TEST_CASE("Semantic type checker") {
         }
 
         SUBCASE("constructor with 1 parameter") {
-            ASTFromInputSemanticTC("var Joueur = function(nomL:string) : var { return { nom : nomL }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", parser_test, table_test, type_test);
+            ASTFromInputSemanticTC("var Joueur1 = function(nomL:string) : var { return { nom : nomL }; }; var joueur1 = Joueur1(\"joueur 1\"); joueur1.nom;", parser_test, table_test, type_test);
         
         }
 
 		SUBCASE("constructor with 1 parameter same name") {
-			ASTFromInputSemanticTC("var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", parser_test, table_test, type_test);
+			ASTFromInputSemanticTC("var Joueur2 = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur2(\"joueur 1\"); joueur1.nom;", parser_test, table_test, type_test);
 		
         }
 
 		SUBCASE("constructor complex with contained function NOT USING the current type...") {
 			ASTFromInputSemanticTC(
-			"var Joueur = function(nom:string) : var { "
+			"var JoueurClass = function(nom:string) : var { "
 				"var puissance = 10;"
 
-				"var attaquer = function(cible:Joueur) {"
+				"var attaquer = function(cible:JoueurClass) {"
 				"};"
 
 				"return {"
@@ -156,8 +156,8 @@ TEST_CASE("Semantic type checker") {
 					"attaquer : attaquer"
 				"};"
 			"};"
-			"var joueur1 = Joueur(\"joueur1\");"
-			"var joueur2 = Joueur(\"joueur2\");"
+			"var joueur1 = JoueurClass(\"joueur1\");"
+			"var joueur2 = JoueurClass(\"joueur2\");"
 			"joueur1.attaquer(joueur2);"
 				, parser_test, table_test, type_test);
 		}

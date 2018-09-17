@@ -118,12 +118,12 @@ bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
                     const auto typeStr = param.type.value().asString();
 
 #ifdef SKALANG_LOG_SYMBOL_TABLE
-                    std::cout << "\t\t" << token.node[index].asString() << " = " << typeStr << std::endl;
+                    std::cout << "\t\t" << name << " = " << typeStr << std::endl; 
 #endif
-                    //Return type : mustn't be declared as a scope variable
-                    if (index != token.node.size() - 1) {
+                    //No -> //Return type : mustn't be declared as a scope variable
+                    //if (index != token.node.size() - 1) {
                         m_currentTable->emplace(name, param.type.value());
-                    }
+                    //}
 
                     currentArgList.push_back(Symbol{ std::move(name), param.type.value() });
                     
@@ -131,7 +131,9 @@ bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
             }
             
             symbol.link(std::move(currentArgList), *functionSymbolTable);
-
+#ifdef SKALANG_LOG_SYMBOL_TABLE
+            std::cout << "\t\tfunction type : " << symbol.getType().asString() << std::endl;
+#endif
             //Already handled with the variable declaration, here we juste create the function scope
             token.node.type = ExpressionType::FUNCTION;
         } break;
@@ -180,7 +182,7 @@ bool ska::SymbolTable::match(VarTokenEvent& token) {
 	switch(token.type) {
 		case VarTokenEventType::DECLARATION: {
             if(token.node[0].type.has_value()) {
-                 auto type = token.node[0].type.value();
+                auto type = token.node[0].type.value();
                 if(type == ExpressionType::VOID) {
                     throw std::runtime_error("Unable to declare the variable " + token.node.asString() + " with a void type");
                 }
@@ -189,8 +191,6 @@ bool ska::SymbolTable::match(VarTokenEvent& token) {
                 std::cout << "Matching new variable : " << name << " with type " << type.asString() << std::endl;
 #endif
                 m_currentTable->emplace(name, std::move(type)); 
-                
-                std::cout << "New variable " << name << " inserted with type " << (*m_currentTable)[name]->getType().asString() << std::endl;
             }
         } break;
 
@@ -218,8 +218,6 @@ ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
 
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, Type type) {
-	assert(!name.empty());
-	assert(type != ExpressionType::VOID);
     
     {
         auto symbol = Symbol { name, type };

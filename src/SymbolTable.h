@@ -19,7 +19,7 @@ namespace ska {
             Symbol(std::string name, Type cat) : 
 				m_name(std::move(name)), 
                 m_category(std::move(cat)) {
-      #ifdef SKALANG_LOG_MOVE_COPY_SYMBOL
+#ifdef SKALANG_LOG_MOVE_COPY_SYMBOL
                     std::cout << "Creating Symbol " << m_name << " with type " << m_category.asString() << std::endl;
 #endif
                 }

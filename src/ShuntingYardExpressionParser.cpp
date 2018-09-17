@@ -362,8 +362,11 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 #ifdef SKALANG_LOG_SHUNTING_YARD_PARSER
         std::cout << "function type detected : " << type.asString() << std::endl;
 #endif
-        functionDeclarationNode->add(std::make_unique<ASTNode>(type));
+        //if(type.asString() != "var") {
+            functionDeclarationNode->add(std::make_unique<ASTNode>(type));
+        //}
     } else {
+        std::cout << "void function " << functionName.asString() << std::endl;
         functionDeclarationNode->add(std::make_unique<ASTNode>(ska::Token {"", ska::TokenType::IDENTIFIER}));
     }
     auto startEvent = FunctionTokenEvent {functionName.asString(), *functionDeclarationNode, FunctionTokenEventType::DECLARATION_PARAMETERS};
