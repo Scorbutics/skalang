@@ -1,4 +1,6 @@
 #pragma once
+#include <cstddef>
+
 namespace ska {
 	enum class Operator {
 		BINARY,
