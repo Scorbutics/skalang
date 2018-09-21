@@ -4,60 +4,51 @@
 #include "Tokenizer.h"
 #include "Parser.h"
 #include "SemanticTypeChecker.h"
+#include "DataTestContainer.h"
 
-using SymbolTablePtr = std::unique_ptr<ska::SymbolTable>;
-using ParserPtr = std::unique_ptr<ska::Parser>;
-using SemanticTypeCheckerPtr = std::unique_ptr<ska::SemanticTypeChecker>;
-
-std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, ParserPtr& parser_test, SymbolTablePtr& table_test, SemanticTypeCheckerPtr& semanticTypeChecker_test) {
+std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, DataTestContainer& data) {
 	const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
 	auto reader = ska::TokenReader { tokens };
-	parser_test = std::make_unique<ska::Parser> ( reservedKeywords, reader );
-	semanticTypeChecker_test = std::make_unique<ska::SemanticTypeChecker>(*parser_test);
-    table_test = std::make_unique<ska::SymbolTable> (*parser_test);
-	semanticTypeChecker_test->setSymbolTable(*table_test);
-    auto tokenTree = parser_test->parse();
-	return tokenTree;
+	data.parser = std::make_unique<ska::Parser> ( reservedKeywords, reader );
+	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser);
+    data.symbols = std::make_unique<ska::SymbolTable> (*data.parser);
+	data.typeChecker->setSymbolTable(*data.symbols);
+    
+    return data.parser->parse();
 }
 
 TEST_CASE("test") {
-	ParserPtr parser_test;
-	{
-        SemanticTypeCheckerPtr type_test;
-		SymbolTablePtr table_test;
-		auto astPtr = ASTFromInput("var i = 0; var titi = \"llllll\"; { var toto = 2; var i = 9; }", parser_test, table_test, type_test);
-		auto& table = *table_test;
-		
-		CHECK(table.nested().size() == 1);
-		auto nestedI = (*table.nested()[0])["i"];
-		auto i = table["i"];
-		auto nestedToto = (*table.nested()[0])["toto"];
-		auto toto = table["toto"];
-		auto titi = table["titi"];
-		auto nestedTiti = (*table.nested()[0])["titi"];
+    DataTestContainer data;
+    auto astPtr = ASTFromInput("var i = 0; var titi = \"llllll\"; { var toto = 2; var i = 9; }", data);
+    auto& table = *data.symbols;
+    
+    CHECK(table.nested().size() == 1);
+    auto nestedI = (*table.nested()[0])["i"];
+    auto i = table["i"];
+    auto nestedToto = (*table.nested()[0])["toto"];
+    auto toto = table["toto"];
+    auto titi = table["titi"];
+    auto nestedTiti = (*table.nested()[0])["titi"];
 
-		CHECK(i != nullptr);
-		CHECK(nestedI  != nullptr);
-		CHECK(i != nestedI);
-		CHECK(toto == nullptr);
-		CHECK(nestedToto != nullptr);
-		CHECK(nestedTiti != nullptr);
-		CHECK(nestedTiti == titi);
-	}
+    CHECK(i != nullptr);
+    CHECK(nestedI  != nullptr);
+    CHECK(i != nestedI);
+    CHECK(toto == nullptr);
+    CHECK(nestedToto != nullptr);
+    CHECK(nestedTiti != nullptr);
+    CHECK(nestedTiti == titi);
 }
 
 TEST_CASE("Matching") {
 	
 	SUBCASE("Matching OK") {
-		ParserPtr parser_test;
-
-		SUBCASE("Overriding into subscope") {
-            SemanticTypeCheckerPtr type_test;
-			SymbolTablePtr table_test;
-			auto astPtr = ASTFromInput("var i = 0; i = 123; { i = 9; }", parser_test, table_test, type_test);
-			auto& table = *table_test;
+        DataTestContainer data;
+		
+        SUBCASE("Overriding into subscope") {
+			auto astPtr = ASTFromInput("var i = 0; i = 123; { i = 9; }", data);
+			auto& table = *data.symbols;
 			
 			CHECK(table.nested().size() == 1);
 			auto nestedI = (*table.nested()[0])["i"];
@@ -67,39 +58,29 @@ TEST_CASE("Matching") {
 		}
 
         SUBCASE("var in upper scope used into inner function scope") {
-            SemanticTypeCheckerPtr type_test;
-            SymbolTablePtr table_test;
-            ASTFromInput("var test = 21; var func = function() { test = 123; };", parser_test, table_test, type_test);
+            ASTFromInput("var test = 21; var func = function() { test = 123; };", data);
         }
 
         SUBCASE("function parameter use into function") {
-            SemanticTypeCheckerPtr type_test;
-            SymbolTablePtr table_test;
-            ASTFromInput("var func = function(test:int) { test = 123; };", parser_test, table_test, type_test);
+            ASTFromInput("var func = function(test:int) { test = 123; };", data);
         }
         
         SUBCASE("function declared and used in another function with upper variable") {
-            SemanticTypeCheckerPtr type_test;
-            SymbolTablePtr table_test;
-            ASTFromInput("var func = function(test:int) { var toutou = function(blurp:string) { test = 123; }; test = 78; toutou(\"llll\"); };", parser_test, table_test, type_test);
+            ASTFromInput("var func = function(test:int) { var toutou = function(blurp:string) { test = 123; }; test = 78; toutou(\"llll\"); };", data);
         }
 
         SUBCASE("shadowing variable into inner function") {
-            SemanticTypeCheckerPtr type_test;
-            SymbolTablePtr table_test;
-            ASTFromInput("var test = 3; var func = function(test:string) { test; };", parser_test, table_test, type_test);
+            ASTFromInput("var test = 3; var func = function(test:string) { test; };", data);
         }
         
 	}
 
 	SUBCASE("Matching failed") {
-		ParserPtr parser_test;
-		{
+		DataTestContainer data;
+        {
 			SUBCASE("Because of unknown symbol") {
-				SemanticTypeCheckerPtr type_test;
-                SymbolTablePtr table_test;
 				try {
-					ASTFromInput("var i = 0; var titi = \"llllll\"; { ti = 9; }", parser_test, table_test, type_test);
+					ASTFromInput("var i = 0; var titi = \"llllll\"; { ti = 9; }", data);
 				    CHECK(false);
                 } catch (std::exception& e) {
 					CHECK(true);
@@ -107,10 +88,8 @@ TEST_CASE("Matching") {
 			}
 
 			SUBCASE("Unknown symbol outside when declared as function parameter") {
-				SemanticTypeCheckerPtr type_test;
-                SymbolTablePtr table_test;
 				try {
-					ASTFromInput("var func = function(test:int) {}; test = 123;", parser_test, table_test, type_test);
+					ASTFromInput("var func = function(test:int) {}; test = 123;", data);
 				    CHECK(false);
                 } catch (std::exception& e) {
 					CHECK(true);
@@ -118,16 +97,13 @@ TEST_CASE("Matching") {
 			}
 
             SUBCASE("used out of function scope") {
-                SemanticTypeCheckerPtr type_test;
-                SymbolTablePtr table_test;
                 try {
-                    ASTFromInput("var func = function(test:int) { var tout = function(blurp:string) {};}; tout = 332;", parser_test, table_test, type_test);
+                    ASTFromInput("var func = function(test:int) { var tout = function(blurp:string) {};}; tout = 332;", data);
                     CHECK(false);
                 } catch (std::exception& e) {
 					CHECK(true);
 				}
             }
-
         }   
 	}
 }

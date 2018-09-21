@@ -1,4 +1,5 @@
 #pragma once
+#include <Utils/SubObserver.h>
 #include "Operator.h"
 #include "ExpressionType.h"
 
@@ -6,15 +7,15 @@
 #include "FunctionTokenEvent.h"
 #include "ExpressionTokenEvent.h"
 
-
-
 namespace ska {
     class ASTNode;
     class SymbolTable;
+    class Parser;
 
-    class TypeBuilder {
+    class TypeBuilder : 
+	    public SubObserver<ExpressionTokenEvent> {
         public:
-            TypeBuilder(const SymbolTable& symbolTable);
+            TypeBuilder(Parser& parser, const SymbolTable& symbolTable);
             ~TypeBuilder() = default;
             
         private:

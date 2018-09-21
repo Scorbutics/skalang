@@ -8,14 +8,8 @@
 #define SKALANG_LOG_SEMANTIC_TYPE_CHECK
 
 ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser) :
-	SubObserver<ExpressionTokenEvent>(std::bind(&SemanticTypeChecker::matchExpression, this, std::placeholders::_1), parser),
     SubObserver<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser),
     SubObserver<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser) {
-}
-
-bool ska::SemanticTypeChecker::matchExpression(ExpressionTokenEvent& token) {
-	getExpressionType(token.node);
-    return true;
 }
 
 bool ska::SemanticTypeChecker::matchFunction(FunctionTokenEvent& token) {
@@ -97,61 +91,4 @@ bool ska::SemanticTypeChecker::matchVariable(VarTokenEvent& token) {
 void ska::SemanticTypeChecker::setSymbolTable(const SymbolTable& symbolTable) {
     m_symbols = &symbolTable;
 }
-
-
-
-// TODO
-// MOVE
-// THOSE
-// BOTTOM
-// LINES
-
-
-
-ska::Type ska::SemanticTypeChecker::buildTypeParameterDeclaration(ASTNode& node) const {
-    assert(node.size() == 1);
-    const auto typeStr = node[0].asString();
-
-    if (ExpressionTypeMap.find(typeStr) == ExpressionTypeMap.end()) {
-        const auto symbolType = (*m_symbols)[typeStr];
-        if (symbolType == nullptr) {
-            throw std::runtime_error("unknown type detected as function parameter : " + node[0].asString());
-        }
-        return (node[0].type = symbolType->getType()).value();
-   } else {
-        getExpressionType(node[0]);
-        return ExpressionTypeMap.at(node[0].asString());
-   }
-}
-
-ska::Type ska::SemanticTypeChecker::buildTypeVariableDeclaration(ASTNode& node) const {
-    assert(node.size() == 1);
-    const auto typeStr = node[0].asString();
-    
-    if (ExpressionTypeMap.find(typeStr) == ExpressionTypeMap.end()) {
-        const auto symbolType = (*m_symbols)[typeStr];
-        if (symbolType == nullptr) {
-            throw std::runtime_error("unknown type detected as function parameter : " + node[0].asString());
-        }
-        return (node[0].type = symbolType->getType()).value();
-    } else {
-        getExpressionType(node[0]);
-        return ExpressionTypeMap.at(node[0].asString());
-    }
-}
-
-ska::Type ska::SemanticTypeChecker::buildTypeUnary(ASTNode& node) const {
-    assert(node.size() == 1);
-    const auto childType = getExpressionType(node[0]);
-    return childType;
-}
-
-ska::Type ska::SemanticTypeChecker::buildTypeVariableAffectation(ASTNode& node) const {
-    const auto varTypeSymbol = (*m_symbols)[node.asString()];
-    assert(varTypeSymbol != nullptr);
-    return varTypeSymbol->getType();
-}
-
-
-
 

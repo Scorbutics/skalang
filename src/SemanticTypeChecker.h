@@ -11,7 +11,6 @@ namespace ska {
     class Parser;
 
     class SemanticTypeChecker :
-	public SubObserver<ExpressionTokenEvent>,
     public SubObserver<VarTokenEvent>,
     public SubObserver<FunctionTokenEvent> {
 		public:
