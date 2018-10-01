@@ -1,3 +1,4 @@
+#include <Logging/Logger.h>
 #include "TypeBuilder.h"
 #include "TypeBuilderOperator.h"
 #include "TypeBuilderCalculatorDispatcher.h"
@@ -13,24 +14,17 @@ ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) :
 }
 
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
-#ifdef SKALANG_LOG_TYPE_BUILDER
-    std::cout << "[TypeBuilder] Building type for variable " << event.node.asString() << std::endl; 
-#endif
+    SKA_LOG_INFO("Building type for variable ", event.node.asString());
     TypeBuilderDispatchCalculation(m_symbols, event.node[0]);
-#ifdef SKALANG_LOG_TYPE_BUILDER
-    std::cout << "[TypeBuilder] Type built " << event.node[0].type.value().asString() << std::endl;
-#endif
+    SKA_LOG_INFO("Type built ", event.node[0].type.value().asString());
+
     return true;
 }
 
 bool ska::TypeBuilder::matchExpression(ExpressionTokenEvent& event) const {
-#ifdef SKALANG_LOG_TYPE_BUILDER
-    std::cout << "[TypeBuilder] Building type for expression " << event.node.asString() << std::endl; 
-#endif
+    SKA_LOG_INFO("Building type for expression ", event.node.asString());
 	TypeBuilderDispatchCalculation(m_symbols, event.node);
-#ifdef SKALANG_LOG_TYPE_BUILDER
-    std::cout << "[TypeBuilder] Type built " << event.node.type.value().asString() << std::endl;
-#endif
+    SKA_LOG_INFO("Type built ", event.node.type.value().asString());
     return true;
 }
 
@@ -39,13 +33,9 @@ bool ska::TypeBuilder::matchFunction(FunctionTokenEvent& event) const {
         default: break;
         
         case FunctionTokenEventType::DECLARATION_PARAMETERS: {			
-#ifdef SKALANG_LOG_TYPE_BUILDER
-            std::cout << "[TypeBuilder] Building type for parameter declaration " << event.node.asString() << std::endl; 
-#endif	    
+            SKA_LOG_INFO("Building type for parameter declaration ", event.node.asString()); 
             TypeBuilderDispatchCalculation(m_symbols, event.node);
-#ifdef SKALANG_LOG_TYPE_BUILDER
-            std::cout << "[TypeBuilder] Type built " << event.node.type.value().asString() << std::endl;
-#endif
+            SKA_LOG_INFO("Type built ", event.node.type.value().asString());
         } break;
 
     }
