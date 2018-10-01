@@ -3,10 +3,12 @@
 #include <Logging/Logger.h>
 
 class LogMinGWGlobalFormatter : 
-    public LoggerGlobalFormatter {
+    public ska::LoggerGlobalFormatter {
 public:
     std::string format(const char* className) const override {
-        return className;
+        const auto classStr = std::string (className);
+        const auto lastNamespaceDetected = classStr.rfind("11");
+        return lastNamespaceDetected != std::string::npos ? classStr.substr(lastNamespaceDetected + 2) : classStr;
     }
 };
 
@@ -16,9 +18,8 @@ int main() {
 
     ska::LoggerFactory::setGlobalFormatter<LogMinGWGlobalFormatter>();
 
-    // sort the test cases by their name
-    context.setOption("order-by", "name");
-    context.setOption("success", "true");
+    //context.setOption("order-by", "name");
+    //context.setOption("success", "true");
     resultCode = context.run();
 
     if (context.shouldExit() || resultCode != 0) {
