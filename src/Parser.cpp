@@ -1,4 +1,5 @@
 #include <iostream>
+#include "LoggerConfig.h"
 #include "AST.h"
 #include "Operator.h"
 #include "Parser.h"

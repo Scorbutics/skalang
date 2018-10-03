@@ -1,5 +1,5 @@
 #include <doctest.h>
-
+#include "LoggerConfig.h"
 #include "DataTestContainer.h"
 #include "SymbolTable.h"
 #include "ReservedKeywordsPool.h"

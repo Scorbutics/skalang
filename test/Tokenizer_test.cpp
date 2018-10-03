@@ -1,4 +1,5 @@
 #include <doctest.h>
+#include "LoggerConfig.h"
 #include "Tokenizer.h"
 #include "ReservedKeywordsPool.h"
 

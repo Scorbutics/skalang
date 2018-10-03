@@ -1,4 +1,4 @@
-#include <Logging/Logger.h>
+#include "LoggerConfig.h"
 #include "TypeBuilder.h"
 #include "TypeBuilderOperator.h"
 #include "TypeBuilderCalculatorDispatcher.h"

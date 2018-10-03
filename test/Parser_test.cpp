@@ -1,4 +1,5 @@
 #include <doctest.h>
+#include "LoggerConfig.h"
 #include "AST.h"
 #include "Parser.h"
 #include "TokenReader.h"

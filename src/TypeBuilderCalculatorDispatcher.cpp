@@ -1,7 +1,17 @@
+#include "LoggerConfig.h"
 #include "TypeBuilderCalculatorDispatcher.h"
 #include "TypeBuilderOperator.h"
 #include "SymbolTable.h"
 #include "AST.h"
+
+#include "TypeBuilderFieldAccess.h"
+#include "TypeBuilderFunctionCall.h"
+#include "TypeBuilderFunctionDeclaration.h"
+#include "TypeBuilderParameterDeclaration.h"
+#include "TypeBuilderUnary.h"
+#include "TypeBuilderBinary.h"
+#include "TypeBuilderVariableAffectation.h"
+#include "TypeBuilderVariableDeclaration.h"
 
 namespace ska {
     Type TypeBuilderBuildFromTokenType(const SymbolTable& symbols, ASTNode& node) {

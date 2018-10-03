@@ -1,3 +1,4 @@
+#include "LoggerConfig.h"
 #include "Parser.h"
 #include "SemanticTypeChecker.h"
 #include "SymbolTable.h"
