@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "LoggerConfig.h"
 #include "TypeBuilderCalculatorDispatcher.h"
 #include "TypeBuilderOperator.h"

@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "LoggerConfig.h"
 #include "SymbolTable.h"
 #include "Parser.h"

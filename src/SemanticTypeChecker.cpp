@@ -1,3 +1,4 @@
+#include <iostream>
 #include "LoggerConfig.h"
 #include "Parser.h"
 #include "SemanticTypeChecker.h"

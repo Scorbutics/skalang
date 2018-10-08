@@ -8,23 +8,33 @@
 
 #define SKALANG_LOG_TYPE_BUILDER
 
+namespace ska {
+    template <>
+    class LoggerClassLevel<TypeBuilder> {
+    public:
+        static constexpr const auto level = LogLevel::Error;
+    };
+}
+
+ska::Logger<ska::TypeBuilder> TypeBuilderLogger;
+
 ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) : 
     m_symbols(symbolTable),
     SubObserver<ExpressionTokenEvent>(std::bind(&TypeBuilder::matchExpression, this, std::placeholders::_1), parser) {
 }
 
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
-    SKA_LOG_INFO("Building type for variable ", event.node.asString());
+    TypeBuilderLogger.log<LogLevel::Info>() << "Building type for variable " << event.node.asString();
     TypeBuilderDispatchCalculation(m_symbols, event.node[0]);
-    SKA_LOG_INFO("Type built ", event.node[0].type.value().asString());
+    TypeBuilderLogger.log<LogLevel::Info>() << "Type built " << event.node[0].type.value().asString();
 
     return true;
 }
 
 bool ska::TypeBuilder::matchExpression(ExpressionTokenEvent& event) const {
-    SKA_LOG_INFO("Building type for expression ", event.node.asString());
+    TypeBuilderLogger.log<LogLevel::Info>() << "Building type for expression " << event.node.asString();
 	TypeBuilderDispatchCalculation(m_symbols, event.node);
-    SKA_LOG_INFO("Type built ", event.node.type.value().asString());
+    TypeBuilderLogger.log<LogLevel::Info>() << "Type built " << event.node.type.value().asString();
     return true;
 }
 
@@ -33,9 +43,9 @@ bool ska::TypeBuilder::matchFunction(FunctionTokenEvent& event) const {
         default: break;
         
         case FunctionTokenEventType::DECLARATION_PARAMETERS: {			
-            SKA_LOG_INFO("Building type for parameter declaration ", event.node.asString()); 
+            TypeBuilderLogger.log<LogLevel::Info>() << "Building type for parameter declaration " << event.node.asString(); 
             TypeBuilderDispatchCalculation(m_symbols, event.node);
-            SKA_LOG_INFO("Type built ", event.node.type.value().asString());
+            TypeBuilderLogger.log<LogLevel::Info>() << "Type built " << event.node.type.value().asString();
         } break;
 
     }
