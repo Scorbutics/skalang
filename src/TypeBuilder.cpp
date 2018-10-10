@@ -6,13 +6,11 @@
 
 #include "Parser.h"
 
-#define SKALANG_LOG_TYPE_BUILDER
-
 namespace ska {
     template <>
     class LoggerClassLevel<TypeBuilder> {
     public:
-        static constexpr const auto level = LogLevel::Error;
+        static constexpr const auto level = LogLevel::Info;
     };
 }
 
