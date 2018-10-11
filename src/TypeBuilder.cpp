@@ -24,15 +24,15 @@ ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) :
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
     TypeBuilderLogger.log<LogLevel::Info>() << "Building type for variable " << event.node.asString();
     TypeBuilderDispatchCalculation(m_symbols, event.node[0]);
-    TypeBuilderLogger.log<LogLevel::Info>() << "Type built " << event.node[0].type.value().asString();
+    TypeBuilderLogger.log<LogLevel::Debug>() << "Type built " << event.node[0].type.value().asString();
 
     return true;
 }
 
 bool ska::TypeBuilder::matchExpression(ExpressionTokenEvent& event) const {
-    TypeBuilderLogger.log<LogLevel::Info>() << "Building type for expression " << event.node.asString();
+    TypeBuilderLogger.log<LogLevel::Warn>() << "Building type for expression " << event.node.asString();
 	TypeBuilderDispatchCalculation(m_symbols, event.node);
-    TypeBuilderLogger.log<LogLevel::Info>() << "Type built " << event.node.type.value().asString();
+    TypeBuilderLogger.log<LogLevel::Error>() << "Type built " << event.node.type.value().asString();
     return true;
 }
 
