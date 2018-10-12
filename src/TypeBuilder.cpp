@@ -1,3 +1,6 @@
+#include <fstream>
+#include <iostream>
+
 #include "LoggerConfig.h"
 #include "TypeBuilder.h"
 #include "TypeBuilderOperator.h"
@@ -14,11 +17,18 @@ namespace ska {
     };
 }
 
-ska::Logger<ska::TypeBuilder> TypeBuilderLogger;
+std::ofstream TypeBuilderLogFileOutput {"TypeBuilderLog.txt" };
+
+ska::Logger<ska::TypeBuilder> TypeBuilderLogger {std::cout, [](const ska::LogEntry& entry) {
+    return entry.getLogLevel() == ska::LogLevel::Warn;
+}};
 
 ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) : 
     m_symbols(symbolTable),
     SubObserver<ExpressionTokenEvent>(std::bind(&TypeBuilder::matchExpression, this, std::placeholders::_1), parser) {
+    TypeBuilderLogger.addOutputTarget(TypeBuilderLogFileOutput, [](const ska::LogEntry& entry) {
+        return entry.getLogLevel() == ska::LogLevel::Error;
+    });
 }
 
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
