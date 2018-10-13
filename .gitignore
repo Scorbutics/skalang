@@ -17,3 +17,12 @@
 /test/ALL_BUILD.vcxproj.user
 /test/ALL_BUILD.vcxproj.filters
 /test/ALL_BUILD.vcxproj
+/test/TypeBuilderLogError.txt
+/test/skalang_test.pdb
+/test/skalang_test.ilk
+/test/rules.ninja
+/test/build.ninja
+/test/.ninja_log
+/test/.ninja_deps
+/src/TypeBuilder.cpp~
+/src/.TypeBuilder.cpp.un~

@@ -27,10 +27,15 @@ ska::Logger<ska::TypeBuilder, ska::LogAsync> TypeBuilderLogger {std::cout, [](co
 ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) : 
     m_symbols(symbolTable),
     SubObserver<ExpressionTokenEvent>(std::bind(&TypeBuilder::matchExpression, this, std::placeholders::_1), parser) {
-    TypeBuilderLogger.addOutputTarget(TypeBuilderLogFileOutput, [](const ska::LogEntry& entry) {
-        return entry.getLogLevel() == ska::LogLevel::Error;
-    });
-    TypeBuilderLogger.setPattern(LogLevel::Error, "%10c[%h:%m:%s:%T]%12c[Error] %8c(%i) %14c%C %15c%v");
+	static auto done = false;
+	if (!done) {
+		TypeBuilderLogger.addOutputTarget(TypeBuilderLogFileOutput, [](const ska::LogEntry& entry) {
+			return entry.getLogLevel() == ska::LogLevel::Error;
+		});
+		TypeBuilderLogger.setPattern(LogLevel::Error, "%10c[%h:%m:%s:%T]%12c[Error] %8c(%i) %14c%C %15c%v");
+		TypeBuilderLogger.setPattern(LogLevel::Warn, "%10c[%h:%m:%s:%T]%12c[Warn] %8c(%i) %14c%C %15c%v");
+		done = true;
+	}
 }
 
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
