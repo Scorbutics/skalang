@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "LoggerConfig.h"
+#include <Logging/LogAsync.h>
 #include "TypeBuilder.h"
 #include "TypeBuilderOperator.h"
 #include "TypeBuilderCalculatorDispatcher.h"
@@ -17,9 +18,9 @@ namespace ska {
     };
 }
 
-std::ofstream TypeBuilderLogFileOutput {"TypeBuilderLog.txt" };
+std::ofstream TypeBuilderLogFileOutput {"TypeBuilderLogError.txt" };
 
-ska::Logger<ska::TypeBuilder> TypeBuilderLogger {std::cout, [](const ska::LogEntry& entry) {
+ska::Logger<ska::TypeBuilder, ska::LogAsync> TypeBuilderLogger {std::cout, [](const ska::LogEntry& entry) {
     return entry.getLogLevel() == ska::LogLevel::Warn;
 }};
 
@@ -29,6 +30,7 @@ ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) :
     TypeBuilderLogger.addOutputTarget(TypeBuilderLogFileOutput, [](const ska::LogEntry& entry) {
         return entry.getLogLevel() == ska::LogLevel::Error;
     });
+    TypeBuilderLogger.setPattern(LogLevel::Error, "%10c[%h:%m:%s:%T]%12c[Error] %8c(%i) %14c%C %15c%v");
 }
 
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
