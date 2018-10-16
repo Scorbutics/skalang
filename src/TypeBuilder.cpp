@@ -20,7 +20,7 @@ namespace ska {
 
 std::ofstream TypeBuilderLogFileOutput {"TypeBuilderLogError.txt" };
 
-ska::Logger<ska::TypeBuilder, ska::LogAsync> TypeBuilderLogger {std::cout, [](const ska::LogEntry& entry) {
+ska::Logger<ska::LogLevel::Warn, ska::LogLevel::Warn, ska::LogAsync> TypeBuilderLogger {std::cout, [](const ska::LogEntry& entry) {
     return entry.getLogLevel() == ska::LogLevel::Warn;
 }};
 
@@ -39,17 +39,17 @@ ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) :
 }
 
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
-    TypeBuilderLogger.log<LogLevel::Info>() << "Building type for variable " << event.node.asString();
+	SLOG(TypeBuilderLogger, Info, ska::TypeBuilder) << "Building type for variable " << event.node.asString();
     TypeBuilderDispatchCalculation(m_symbols, event.node[0]);
-    TypeBuilderLogger.log<LogLevel::Debug>() << "Type built " << event.node[0].type.value().asString();
+	SLOG(TypeBuilderLogger, Debug, ska::TypeBuilder) << "Type built " << event.node[0].type.value().asString();
 
     return true;
 }
 
 bool ska::TypeBuilder::matchExpression(ExpressionTokenEvent& event) const {
-    TypeBuilderLogger.log<LogLevel::Warn>() << "Building type for expression " << event.node.asString();
+	SLOG(TypeBuilderLogger, Warn, ska::TypeBuilder) << "Building type for expression " << event.node.asString();
 	TypeBuilderDispatchCalculation(m_symbols, event.node);
-    TypeBuilderLogger.log<LogLevel::Error>() << "Type built " << event.node.type.value().asString();
+	SLOG(TypeBuilderLogger, Error, ska::TypeBuilder) << "Type built " << event.node.type.value().asString();
     return true;
 }
 
@@ -58,9 +58,9 @@ bool ska::TypeBuilder::matchFunction(FunctionTokenEvent& event) const {
         default: break;
         
         case FunctionTokenEventType::DECLARATION_PARAMETERS: {			
-            TypeBuilderLogger.log<LogLevel::Info>() << "Building type for parameter declaration " << event.node.asString(); 
+			SLOG(TypeBuilderLogger, Info, ska::TypeBuilder) << "Building type for parameter declaration " << event.node.asString();
             TypeBuilderDispatchCalculation(m_symbols, event.node);
-            TypeBuilderLogger.log<LogLevel::Info>() << "Type built " << event.node.type.value().asString();
+			SLOG(TypeBuilderLogger, Info, ska::TypeBuilder) << "Type built " << event.node.type.value().asString();
         } break;
 
     }

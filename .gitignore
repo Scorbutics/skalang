@@ -26,3 +26,12 @@
 /test/.ninja_deps
 /src/TypeBuilder.cpp~
 /src/.TypeBuilder.cpp.un~
+/.vs/skalang/v15
+*.vcxproj
+*.filters
+/external/doctest/cmake_install.cmake
+/external/doctest/doctest.sln
+*.sln
+*.user
+*.cmake
+/TypeBuilderLogError.txt
