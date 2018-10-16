@@ -35,3 +35,4 @@
 *.user
 *.cmake
 /TypeBuilderLogError.txt
+/src/.vs/skalang_src/v15
