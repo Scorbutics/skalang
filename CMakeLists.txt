@@ -20,12 +20,13 @@ link_directories(external/skalog/${SKA_DEBUG_DIR})
 
 #Unit Tests part
 file(GLOB_RECURSE SOURCES
-	RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+	external/*.h
+	external/*.cpp
 	test/*.h
 	test/*.cpp
 )
 
-string(REGEX REPLACE "CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
+string(REGEX REPLACE "[^;]*CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
 
 add_executable(skalang ${SOURCES})
 
