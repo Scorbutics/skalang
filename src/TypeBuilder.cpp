@@ -20,18 +20,20 @@ namespace ska {
 
 std::ofstream TypeBuilderLogFileOutput {"TypeBuilderLogError.txt" };
 
-ska::Logger<ska::LogLevel::Info, ska::LogLevel::Error, ska::LogAsync> TypeBuilderLoggerFile {TypeBuilderLogFileOutput};
-ska::Logger<ska::LogLevel::Error, ska::LogLevel::Error, ska::LogSync> TypeBuilderLoggerConsole {std::cout};
+ska::MultiLogger<
+	ska::Logger<ska::LogLevel::Info, ska::LogLevel::Error, ska::LogAsync>,
+	ska::Logger<ska::LogLevel::Error, ska::LogLevel::Error, ska::LogSync>
+> TypeBuilderLogger;
+
 
 ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) : 
     m_symbols(symbolTable),
     SubObserver<ExpressionTokenEvent>(std::bind(&TypeBuilder::matchExpression, this, std::placeholders::_1), parser) {
 	static auto done = false;
 	if (!done) {
-		/*TypeBuilderLogger.addOutputTarget(TypeBuilderLogFileOutput, [](const ska::LogEntry& entry) {
-			return entry.getLogLevel() == ska::LogLevel::Error;
-		});
-		TypeBuilderLogger.setPattern(LogLevel::Error, "%10c[%h:%m:%s:%T]%12c[Error] %8c(%i) %14c%C %15c%v");
+		TypeBuilderLogger.get<0>().addOutputTarget(TypeBuilderLogFileOutput);
+		TypeBuilderLogger.get<1>().addOutputTarget(std::cout);
+		/*TypeBuilderLogger.setPattern(LogLevel::Error, "%10c[%h:%m:%s:%T]%12c[Error] %8c(%i) %14c%C %15c%v");
 		TypeBuilderLogger.setPattern(LogLevel::Warn, "%10c[%h:%m:%s:%T]%12c[Warn] %8c(%i) %14c%C %15c%v");*/
 		done = true;
 	}
