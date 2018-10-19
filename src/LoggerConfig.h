@@ -49,11 +49,13 @@ namespace ska {
 			}
 
 		private:
-			void onDestroyEntry(LogEntry entry) {		
+			void onDestroyEntry(const LogEntry& entry) {		
+				auto copied = entry;
+				copied.resetCallback();
 				for_each(m_loggers, [&](auto& logger) {
 					using Logger = typename std::remove_reference<decltype(logger)>::type;
 					//auto callbackDestroy = std::bind(&Logger::onDestroyEntry, logger, std::placeholders::_1);
-					logger.onDestroyEntry(entry.cloneMessage([](LogEntry self) {}));
+					logger.onDestroyEntry(copied);
 				});
 			}
 
