@@ -21,7 +21,7 @@ namespace ska {
 std::ofstream TypeBuilderLogFileOutput {"TypeBuilderLogError.txt" };
 
 ska::MultiLogger<
-	ska::Logger<ska::LogLevel::Info, ska::LogLevel::Error, ska::LogAsync>,
+	ska::Logger<ska::LogLevel::Info, ska::LogLevel::Warn, ska::LogAsync>,
 	ska::Logger<ska::LogLevel::Error, ska::LogLevel::Error, ska::LogSync>
 > TypeBuilderLogger;
 

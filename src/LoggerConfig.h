@@ -25,16 +25,10 @@ namespace ska {
 
 		public:
 			template <LogLevel logLevel, class Wrapped, long line>
-			auto log(char* functionName, char* filename) {
+			auto log(const char* functionName, const char* filename) {
 				if constexpr (logLevel >= LoggerClassLevel<Wrapped>::level) {
-					return LogEntry{ 
-						std::bind(&MultiLogger::onDestroyEntry, this, std::placeholders::_1),
-						
-						/*[&](LogEntry e) {
-							std::apply([&]() { 
-								(logForLogger<LoggerC>(std::get<LoggerC>(m_loggers), e), ...); 
-							}, m_loggers);
-						},*/
+					return LogEntry { 
+						std::bind(&MultiLogger::onDestroyEntry<logLevel>, this, std::placeholders::_1),
 						loggerdetail::LogContext { logLevel, LoggerClassFormatter<Wrapped>::className, functionName, filename, line }
 					};
 				} else {
@@ -49,20 +43,17 @@ namespace ska {
 			}
 
 		private:
-			void onDestroyEntry(const LogEntry& entry) {		
+			template <LogLevel logLevel>
+			void onDestroyEntry(const LogEntry& entry) {	
 				auto copied = entry;
 				copied.resetCallback();
 				for_each(m_loggers, [&](auto& logger) {
 					using Logger = typename std::remove_reference<decltype(logger)>::type;
-					//auto callbackDestroy = std::bind(&Logger::onDestroyEntry, logger, std::placeholders::_1);
-					logger.onDestroyEntry(copied);
+					if constexpr(Logger:: template accept<logLevel>()) {
+						logger.onDestroyEntry (copied);
+					}
 				});
 			}
-
-			/*template <class Logger>
-			auto logForLogger(Logger& logger, const LogEntry& entry) {
-				logger.onDestroyEntry(entry.cloneMessage(std::bind(&Logger::onDestroyEntry, logger, std::placeholders::_1)));
-			}*/
 
 			std::tuple<LoggerC...> m_loggers;
 		};
