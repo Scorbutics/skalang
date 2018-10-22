@@ -6,7 +6,7 @@
 namespace detail {
 	using SkaLangLogger = ska::MultiLogger<
 		ska::Logger<ska::LogLevel::Info, ska::LogLevel::Error, ska::LogAsync>,
-		ska::Logger<ska::LogLevel::Error, ska::LogLevel::Error, ska::LogSync>
+		ska::Logger<ska::LogLevel::Info, ska::LogLevel::Error, ska::LogSync>
 	>;
 	SkaLangLogger BuildLogger(const char* filename);
 
