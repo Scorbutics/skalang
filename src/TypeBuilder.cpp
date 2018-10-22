@@ -17,17 +17,6 @@ namespace ska {
     };
 }
 
-<<<<<<< HEAD
-=======
-std::ofstream TypeBuilderLogFileOutput {"TypeBuilderLogError.txt" };
-
-ska::MultiLogger<
-	ska::Logger<ska::LogLevel::Info, ska::LogLevel::Warn, ska::LogAsync>,
-	ska::Logger<ska::LogLevel::Error, ska::LogLevel::Error, ska::LogSync>
-> TypeBuilderLogger;
-
-
->>>>>>> 0f35142bda004ea19addca75da07e407533b16b5
 ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) : 
     m_symbols(symbolTable),
     SubObserver<ExpressionTokenEvent>(std::bind(&TypeBuilder::matchExpression, this, std::placeholders::_1), parser) {

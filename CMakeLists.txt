@@ -35,4 +35,4 @@ set_target_properties(skalang PROPERTIES
 	      	ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${SKA_DEBUG_DIR}
         	ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${SKA_RELEASE_DIR})
 
-target_link_libraries(skalang skalang_src ska_core skalog)
+target_link_libraries(skalang skalang_src ska_core skalog pthread)
