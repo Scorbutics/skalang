@@ -9,7 +9,6 @@ add_subdirectory(src)
 set(SKA_DEBUG_DIR "Debug")
 set(SKA_RELEASE_DIR "Release")
 set(SKA_CORE_DIR ../ska/ska_core)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra")
 
 include_directories(${SKA_CORE_DIR})
 include_directories(external/doctest)
@@ -31,9 +30,11 @@ string(REGEX REPLACE "[^;]*CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
 
 add_executable(skalang ${SOURCES})
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
 set_target_properties(skalang PROPERTIES
 		ARCHIVE_OUTPUT_DIRECTORY ${SKA_DEBUG_DIR}
 	      	ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${SKA_DEBUG_DIR}
         	ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${SKA_RELEASE_DIR})
 
-target_link_libraries(skalang skalang_src ska_core skalog pthread)
+find_package(Threads REQUIRED)
+target_link_libraries(skalang skalang_src ska_core skalog Threads::Threads)
