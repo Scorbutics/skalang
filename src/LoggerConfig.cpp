@@ -11,9 +11,10 @@ detail::SkaLangLogger detail::BuildLogger(const char * filename) {
 	logger.get<0>().addOutputTarget(TypeBuilderLogFileOutput);
 	logger.get<1>().addOutputTarget(std::cout);
     
-    ska::loggerdetail::SignalHandlerAddAction([](int signalCode) {
-        std::cout << "Closing log file..." << std::endl;
-        TypeBuilderLogFileOutput.close();
+    ska::process::SignalHandlerAddAction([](int signalCode) {
+        std::cout << "Joining writing thread and closing log file..." << std::endl;
+        detail::Logger.terminate();
+		TypeBuilderLogFileOutput.close();
         std::cout << "Closed." << std::endl;
     });
     
