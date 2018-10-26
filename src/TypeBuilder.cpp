@@ -9,13 +9,7 @@
 
 #include "Parser.h"
 
-namespace ska {
-    template <>
-    class LoggerClassLevel<TypeBuilder> {
-    public:
-        static constexpr const auto level = LogLevel::Info;
-    };
-}
+SLOG_CONFIG(LogLevel::Info, TypeBuilder)
 
 ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) : 
     m_symbols(symbolTable),
