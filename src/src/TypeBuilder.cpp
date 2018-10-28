@@ -9,7 +9,7 @@
 
 #include "Parser.h"
 
-SLOG_CONFIG(LogLevel::Info, TypeBuilder)
+SKA_LOGC_CONFIG(LogLevel::Info, TypeBuilder)
 
 ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) : 
     m_symbols(symbolTable),

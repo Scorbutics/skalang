@@ -13,12 +13,5 @@ namespace detail {
 	extern SkaLangLogger Logger;
 }
 
-#define SLOG_STATIC(level, currentClass) detail::Logger.log<level, currentClass, __LINE__>(SKA_CURRENT_FUNCTION, __FILE__ )
-#define SLOG(level) SLOG_STATIC(level, std::remove_const<std::remove_reference<decltype(*this)>::type>::type)
-#define SLOG_CONFIG(logLevel, currentClass) namespace ska { \
-    template <> \
-    class LoggerClassLevel<currentClass> { \
-    public: \
-        static constexpr const auto level = logLevel; \
-    }; \
-}
+#define SLOG_STATIC(level, currentClass) SKA_LOGC_STATIC(detail::Logger, level, currentClass)
+#define SLOG(level) SKA_LOGC(detail::Logger, level)
