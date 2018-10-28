@@ -28,22 +28,22 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v141</PlatformToolset>
   </PropertyGroup>
@@ -56,34 +56,26 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
     <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\DevFast\skalang\skalang\src\Debug\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">C:\DevFast\skalang\skalang\lib\Debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">skalang.dir\Debug\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">skalang</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
-    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\DevFast\skalang\skalang\src\Release\</OutDir>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">C:\DevFast\skalang\skalang\lib\Release\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">skalang.dir\Release\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">skalang</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.exe</TargetExt>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
-    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\DevFast\skalang\skalang\src\MinSizeRel\</OutDir>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">C:\DevFast\skalang\skalang\lib\MinSizeRel\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">skalang.dir\MinSizeRel\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">skalang</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.exe</TargetExt>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkIncremental>
-    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">true</GenerateManifest>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\DevFast\skalang\skalang\src\RelWithDebInfo\</OutDir>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">C:\DevFast\skalang\skalang\lib\RelWithDebInfo\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">skalang.dir\RelWithDebInfo\</IntDir>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">skalang</TargetName>
-    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.exe</TargetExt>
-    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</LinkIncremental>
-    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</GenerateManifest>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;C:\DevFast\skalang\skalang\src\..\external\skalog\src\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Debug/</AssemblerListingLocation>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <CompileAs>CompileAsCpp</CompileAs>
@@ -101,33 +93,23 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;C:\DevFast\skalang\skalang\src\..\external\skalog\src\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;C:\DevFast\skalang\skalang\src\..\external\skalog\src\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
-    <Link>
-      <AdditionalDependencies>ska_core.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:/DevFast/skalang/skalang/src/../../ska/Debug;C:/DevFast/skalang/skalang/src/../../ska/Debug/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    <Lib>
       <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/DevFast/skalang/skalang/src/Debug/skalang.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/DevFast/skalang/skalang/src/Debug/skalang.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
-    </Link>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;C:\DevFast\skalang\skalang\src\..\external\skalog\src\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>Release/</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -145,33 +127,23 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;C:\DevFast\skalang\skalang\src\..\external\skalog\src\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;C:\DevFast\skalang\skalang\src\..\external\skalog\src\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
-    <Link>
-      <AdditionalDependencies>ska_core.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:/DevFast/skalang/skalang/src/../../ska/Debug;C:/DevFast/skalang/skalang/src/../../ska/Debug/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    <Lib>
       <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/DevFast/skalang/skalang/src/Release/skalang.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/DevFast/skalang/skalang/src/Release/skalang.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
-    </Link>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;C:\DevFast\skalang\skalang\src\..\external\skalog\src\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -189,33 +161,23 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;C:\DevFast\skalang\skalang\src\..\external\skalog\src\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;C:\DevFast\skalang\skalang\src\..\external\skalog\src\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
-    <Link>
-      <AdditionalDependencies>ska_core.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:/DevFast/skalang/skalang/src/../../ska/Debug;C:/DevFast/skalang/skalang/src/../../ska/Debug/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    <Lib>
       <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
-      <GenerateDebugInformation>false</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/DevFast/skalang/skalang/src/Debug/MinSizeRel/skalang.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/DevFast/skalang/skalang/src/MinSizeRel/skalang.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
-    </Link>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;C:\DevFast\skalang\skalang\src\..\external\skalog\src\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
       <CompileAs>CompileAsCpp</CompileAs>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -232,29 +194,19 @@
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;C:\DevFast\skalang\skalang\src\..\external\skalog\src\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Midl>
-      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\DevFast\skalang\skalang\src\..\..\ska\ska_core;C:\DevFast\skalang\skalang\src\..\external\skalog\src\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
       <HeaderFileName>%(Filename).h</HeaderFileName>
       <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
       <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
-    <Link>
-      <AdditionalDependencies>ska_core.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:/DevFast/skalang/skalang/src/../../ska/Debug;C:/DevFast/skalang/skalang/src/../../ska/Debug/$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    <Lib>
       <AdditionalOptions>%(AdditionalOptions) /machine:X86</AdditionalOptions>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ImportLibrary>C:/DevFast/skalang/skalang/src/Debug/RelWithDebInfo/skalang.lib</ImportLibrary>
-      <ProgramDataBaseFile>C:/DevFast/skalang/skalang/src/RelWithDebInfo/skalang.pdb</ProgramDataBaseFile>
-      <SubSystem>Console</SubSystem>
-    </Link>
-    <ProjectReference>
-      <LinkLibraryDependencies>false</LinkLibraryDependencies>
-    </ProjectReference>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <CustomBuild Include="C:\DevFast\skalang\skalang\src\CMakeLists.txt">
@@ -313,56 +265,56 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\AST.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\ASTBuilder.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\BlockTokenEvent.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\ExpressionTokenEvent.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\ExpressionType.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\ForTokenEvent.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\FunctionTokenEvent.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\IfElseTokenEvent.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\LoggerConfig.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\Operator.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\Parser.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\ReservedKeywordsPool.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\ReturnTokenEvent.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\SemanticTypeChecker.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\ShuntingYardExpressionParser.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\SymbolTable.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\Token.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TokenGrammar.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TokenReader.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\Tokenizer.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilder.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderBinary.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderCalculatorDispatcher.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderFieldAccess.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderFunctionCall.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderFunctionDeclaration.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderOperator.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderParameterDeclaration.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderUnary.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderVariableAffectation.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderVariableDeclaration.h" />
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\VarTokenEvent.h" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\Parser.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\ReservedKeywordsPool.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\SemanticTypeChecker.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\ShuntingYardExpressionParser.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\SymbolTable.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TokenReader.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\Tokenizer.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilder.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderBinary.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderCalculatorDispatcher.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderFieldAccess.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderFunctionCall.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderFunctionDeclaration.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderParameterDeclaration.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderUnary.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderVariableAffectation.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderVariableDeclaration.cpp" />
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\skalang.cpp" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\AST.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\ASTBuilder.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\BlockTokenEvent.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\ExpressionTokenEvent.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\ExpressionType.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\ForTokenEvent.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\FunctionTokenEvent.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\IfElseTokenEvent.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\LoggerConfig.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\Operator.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\Parser.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\ReservedKeywordsPool.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\ReturnTokenEvent.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\SemanticTypeChecker.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\ShuntingYardExpressionParser.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\SymbolTable.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\Token.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TokenGrammar.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TokenReader.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\Tokenizer.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilder.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderBinary.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderCalculatorDispatcher.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderFieldAccess.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderFunctionCall.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderFunctionDeclaration.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderOperator.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderParameterDeclaration.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderUnary.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderVariableAffectation.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderVariableDeclaration.h" />
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\VarTokenEvent.h" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\LoggerConfig.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\Parser.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\ReservedKeywordsPool.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\SemanticTypeChecker.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\ShuntingYardExpressionParser.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\SymbolTable.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TokenReader.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\Tokenizer.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilder.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderBinary.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderCalculatorDispatcher.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderFieldAccess.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderFunctionCall.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderFunctionDeclaration.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderParameterDeclaration.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderUnary.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderVariableAffectation.cpp" />
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderVariableDeclaration.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\DevFast\skalang\skalang\ZERO_CHECK.vcxproj">

@@ -1,156 +1,156 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\Parser.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\LoggerConfig.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\ReservedKeywordsPool.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\Parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\SemanticTypeChecker.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\ReservedKeywordsPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\ShuntingYardExpressionParser.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\SemanticTypeChecker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\SymbolTable.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\ShuntingYardExpressionParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TokenReader.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\SymbolTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\Tokenizer.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TokenReader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilder.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\Tokenizer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderBinary.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderCalculatorDispatcher.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderBinary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderFieldAccess.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderCalculatorDispatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderFunctionCall.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderFieldAccess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderFunctionDeclaration.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderFunctionCall.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderParameterDeclaration.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderFunctionDeclaration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderUnary.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderParameterDeclaration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderVariableAffectation.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderUnary.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\TypeBuilderVariableDeclaration.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderVariableAffectation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\DevFast\skalang\skalang\src\skalang.cpp">
+    <ClCompile Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderVariableDeclaration.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\AST.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\AST.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\ASTBuilder.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\ASTBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\BlockTokenEvent.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\BlockTokenEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\ExpressionTokenEvent.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\ExpressionTokenEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\ExpressionType.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\ExpressionType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\ForTokenEvent.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\ForTokenEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\FunctionTokenEvent.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\FunctionTokenEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\IfElseTokenEvent.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\IfElseTokenEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\LoggerConfig.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\LoggerConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\Operator.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\Operator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\Parser.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\ReservedKeywordsPool.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\ReservedKeywordsPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\ReturnTokenEvent.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\ReturnTokenEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\SemanticTypeChecker.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\SemanticTypeChecker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\ShuntingYardExpressionParser.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\ShuntingYardExpressionParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\SymbolTable.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\SymbolTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\Token.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\Token.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TokenGrammar.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TokenGrammar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TokenReader.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TokenReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\Tokenizer.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\Tokenizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilder.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderBinary.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderBinary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderCalculatorDispatcher.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderCalculatorDispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderFieldAccess.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderFieldAccess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderFunctionCall.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderFunctionCall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderFunctionDeclaration.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderFunctionDeclaration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderOperator.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderOperator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderParameterDeclaration.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderParameterDeclaration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderUnary.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderUnary.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderVariableAffectation.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderVariableAffectation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\TypeBuilderVariableDeclaration.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\TypeBuilderVariableDeclaration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="C:\DevFast\skalang\skalang\src\VarTokenEvent.h">
+    <ClInclude Include="C:\DevFast\skalang\skalang\src\src\VarTokenEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
