@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="skalang"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="C:/Documents/Perso/skalang"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="skalang">
+				<Option output="C:/Documents/Perso/skalang/skalang.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Documents/Perso/skalang"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="C:/Documents/Perso/skalang/../ska/ska_core"/>
+					<Add directory="C:/mingw/bin/../lib/gcc/i686-w64-mingw32/7.2.0/include/c++"/>
+					<Add directory="C:/mingw/bin/../lib/gcc/i686-w64-mingw32/7.2.0/include/c++/i686-w64-mingw32"/>
+					<Add directory="C:/mingw/bin/../lib/gcc/i686-w64-mingw32/7.2.0/include/c++/backward"/>
+					<Add directory="C:/mingw/bin/../lib/gcc/i686-w64-mingw32/7.2.0/include"/>
+					<Add directory="C:/mingw/bin/../lib/gcc/i686-w64-mingw32/7.2.0/include-fixed"/>
+					<Add directory="C:/mingw/bin/../lib/gcc/i686-w64-mingw32/7.2.0/../../../../i686-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 skalang"/>
+					<CompileFile command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="skalang/fast">
+				<Option output="C:/Documents/Perso/skalang/skalang.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Documents/Perso/skalang"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="C:/Documents/Perso/skalang/../ska/ska_core"/>
+					<Add directory="C:/mingw/bin/../lib/gcc/i686-w64-mingw32/7.2.0/include/c++"/>
+					<Add directory="C:/mingw/bin/../lib/gcc/i686-w64-mingw32/7.2.0/include/c++/i686-w64-mingw32"/>
+					<Add directory="C:/mingw/bin/../lib/gcc/i686-w64-mingw32/7.2.0/include/c++/backward"/>
+					<Add directory="C:/mingw/bin/../lib/gcc/i686-w64-mingw32/7.2.0/include"/>
+					<Add directory="C:/mingw/bin/../lib/gcc/i686-w64-mingw32/7.2.0/include-fixed"/>
+					<Add directory="C:/mingw/bin/../lib/gcc/i686-w64-mingw32/7.2.0/../../../../i686-w64-mingw32/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 skalang/fast"/>
+					<CompileFile command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="C:/Documents/Perso/skalang"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="C:/Documents/Perso/skalang"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="C:/mingw/bin/mingw32-make.exe -f &quot;C:/Documents/Perso/skalang/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="C:/Documents/Perso/skalang/AST.h">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/ASTBuilder.h">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/BlockTokenEvent.h">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/ForTokenEvent.h">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/FunctionTokenEvent.h">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/IfElseTokenEvent.h">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/Parser.cpp">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/Parser.h">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/ReservedKeywordsPool.h">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/Scope.cpp">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/Scope.h">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/ShuntingYardExpressionParser.cpp">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/ShuntingYardExpressionParser.h">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/SymbolTable.cpp">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/SymbolTable.h">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/Token.h">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/TokenReader.cpp">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/TokenReader.h">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/Tokenizer.cpp">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/Tokenizer.h">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/VarTokenEvent.h">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/skalang.cpp">
+			<Option target="skalang"/>
+		</Unit>
+		<Unit filename="C:/Documents/Perso/skalang/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
