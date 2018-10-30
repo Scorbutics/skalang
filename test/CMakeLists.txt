@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 project(skalang_test)
 
-include_directories(../../ska/ska_core)
+include_directories(../../ska/ska_core/src)
 include_directories(../external/doctest)
 include_directories(../external/skalog/src/src)
 include_directories(../src/src)
