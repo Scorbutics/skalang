@@ -36,3 +36,13 @@
 *.cmake
 /TypeBuilderLogError.txt
 /src/.vs/skalang_src/v15
+*/bin
+*/lib
+*.depend
+*.layout
+*.cbp
+*.a
+*.lib
+*.exe
+**/Makefile
+Makefile
