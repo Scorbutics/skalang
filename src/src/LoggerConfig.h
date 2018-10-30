@@ -12,6 +12,7 @@ namespace detail {
 
 	extern SkaLangLogger Logger;
 }
-
+#ifndef SLOG_STATIC
 #define SLOG_STATIC(level, currentClass) SKA_LOGC_STATIC(detail::Logger, level, currentClass)
 #define SLOG(level) SKA_LOGC(detail::Logger, level)
+#endif
