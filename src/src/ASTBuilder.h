@@ -1,6 +1,7 @@
 #pragma once
 #include <Utils/SubObserver.h>
 #include <Utils/Observable.h>
+#include "VarTokenEvent.h"
 #include "AST.h"
 
 namespace ska {

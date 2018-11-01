@@ -13,7 +13,7 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::VARIABLE_DECLARATION>::build(c
         if (symbolType == nullptr) {
             throw std::runtime_error("unknown type detected as function parameter : " + node[0].asString());
         }
-        return (node[0].type = symbolType->getType()).value();
+        return (node[0].type() = symbolType->getType()).value();
     } else {
         TypeBuilderDispatchCalculation(symbols, node[0]);
         return ExpressionTypeMap.at(node[0].asString());

@@ -13,7 +13,9 @@ namespace ska {
     class Parser;
 
     class TypeBuilder : 
-	    public SubObserver<ExpressionTokenEvent> {
+	    public SubObserver<ExpressionTokenEvent>,
+		public SubObserver<FunctionTokenEvent>,
+		public SubObserver<VarTokenEvent> {
         public:
             TypeBuilder(Parser& parser, const SymbolTable& symbolTable);
             ~TypeBuilder() = default;

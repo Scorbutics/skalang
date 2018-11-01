@@ -17,22 +17,9 @@ namespace ska {
 			SemanticTypeChecker(Parser& parser, const SymbolTable& symbolTable);
             ~SemanticTypeChecker() = default;
 		private:
-			Type getExpressionType(ASTNode& node) const;
-			Type calculateNodeExpressionType(ASTNode& node) const;
-            bool matchExpression(ExpressionTokenEvent& event);
-	        bool matchVariable(VarTokenEvent& token); 		
-            bool matchFunction(FunctionTokenEvent& token);
-            const SymbolTable* m_symbols = nullptr;
-
-            Type buildTypeFunctionDeclaration(ASTNode& node) const;
-            Type buildTypeFunctionCall(ASTNode& node) const;
-			Type buildTypeFieldAccess(ASTNode& node) const;
-			Type buildTypeBinary(ASTNode& node) const;
-			Type buildTypeParameterDeclaration(ASTNode& node) const;
-			Type buildTypeVariableDeclaration(ASTNode& node) const;
-			Type buildTypeUnary(ASTNode& node) const;
-            Type buildTypeVariableAffectation(ASTNode& node) const;	
-	        Type buildTypeFromTokenType(ASTNode& node) const;
+	        bool matchVariable(const VarTokenEvent& token); 		
+            bool matchFunction(const FunctionTokenEvent& token);
+            const SymbolTable& m_symbols;
     };
 
 }

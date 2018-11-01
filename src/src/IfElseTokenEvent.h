@@ -3,7 +3,19 @@
 namespace ska {
     class ASTNode;
 
-    struct IfElseTokenEvent {
+    class IfElseTokenEvent {
+	public:
+		IfElseTokenEvent(ASTNode& node) : node(node) {}
+		
+		auto& rootNode() {
+			return node;
+		}
+
+		const auto& rootNode() const {
+			return node;
+		}
+
+	private:
         ASTNode& node;
     };
 }

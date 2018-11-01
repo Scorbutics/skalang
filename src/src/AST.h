@@ -13,8 +13,8 @@ namespace ska {
 	public:
 		ASTNode() = default;
 
-		ASTNode(Token t, std::unique_ptr<ASTNode> l = nullptr, std::unique_ptr<ASTNode> r = nullptr) :
-			op(Operator::BINARY),
+		explicit ASTNode(Token t, std::unique_ptr<ASTNode> l = nullptr, std::unique_ptr<ASTNode> r = nullptr) :
+			m_op(Operator::BINARY),
 			token(std::move(t)) {
 			if (l != nullptr) {
 				add(std::move(l));
@@ -25,12 +25,12 @@ namespace ska {
 			}
 
 			if (r == nullptr && l == nullptr) {
-				op = token.empty() ? std::optional<Operator>() : Operator::LITERAL;
+				m_op = token.empty() ? std::optional<Operator>() : Operator::LITERAL;
 			}
 		}
 
-		ASTNode(Operator o, Token identifierToken = Token{}) :
-			op(std::move(o)),
+		explicit ASTNode(Operator o, Token identifierToken = Token{}) :
+			m_op(std::move(o)),
 			token(std::move(identifierToken)) {
 		}
 
@@ -42,7 +42,7 @@ namespace ska {
 		}
 
 		bool empty() const {
-			return token.type() == TokenType::EMPTY && !op.has_value();
+			return token.type() == TokenType::EMPTY && !m_op.has_value();
 		}
 
 		std::string asString() const {
@@ -72,12 +72,22 @@ namespace ska {
 		}
 
 		ASTNode& left() {
-			assert(op == Operator::BINARY && !children.empty());
+			assert(m_op == Operator::BINARY && !children.empty());
 			return *children[0].get();
 		}
 
 		ASTNode& right() {
-			assert(op == Operator::BINARY && children.size() >= 2);
+			assert(m_op == Operator::BINARY && children.size() >= 2);
+			return *children[1].get();
+		}
+
+		const ASTNode& left() const {
+			assert(m_op == Operator::BINARY && !children.empty());
+			return *children[0].get();
+		}
+
+		const ASTNode& right() const {
+			assert(m_op == Operator::BINARY && children.size() >= 2);
 			return *children[1].get();
 		}
 
@@ -92,13 +102,29 @@ namespace ska {
 		auto begin() { return std::begin(children); }
 		auto end() { return std::end(children); }
 
-		auto begin() const { return std::begin(children); }
-		auto end() const { return std::end(children); }
+		const auto begin() const { return std::begin(children); }
+		const auto end() const { return std::end(children); }
 
-		std::optional<Operator> op;
-		std::optional<Type> type;
+		auto& op() {
+			return m_op;
+		}
+
+		const auto& op() const {
+			return m_op;
+		}
+
+		auto& type() {
+			return m_type;
+		}
+
+		const auto& type() const {
+			return m_type;
+		}
 
 	private:
+		std::optional<Operator> m_op;
+		std::optional<Type> m_type;
+
 		Token token;
 		std::vector<std::unique_ptr<ASTNode>> children;
 

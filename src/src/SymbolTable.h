@@ -167,10 +167,10 @@ namespace ska {
 		}
 
     private:
-		bool match(VarTokenEvent&);
-		bool nestedTable(BlockTokenEvent&);
-		bool matchFunction(FunctionTokenEvent&);
-		bool matchReturn(ReturnTokenEvent&);
+		bool match(const VarTokenEvent&);
+		bool nestedTable(const BlockTokenEvent&);
+		bool matchFunction(const FunctionTokenEvent&);
+		bool matchReturn(const ReturnTokenEvent&);
 
         std::unique_ptr<ScopedSymbolTable> m_rootTable;
 		ScopedSymbolTable* m_currentTable = nullptr;

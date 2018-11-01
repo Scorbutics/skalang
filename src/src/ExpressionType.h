@@ -40,7 +40,7 @@ namespace ska {
 		//Type(std::string name, ScopedSymbolTable& typeSymbolTable, ExpressionType t) : m_type(std::move(t)), m_symbolTable(&typeSymbolTable), m_alias(std::move(name)) {};
 		Type(ExpressionType t) : m_type(std::move(t)) {}
 
-		Type(std::string name, ScopedSymbolTable& typeSymbolTable, const Type& t) : m_type(t.m_type), m_symbolTable(&typeSymbolTable), m_alias(std::move(name)) {};
+		Type(std::string name, const ScopedSymbolTable& typeSymbolTable, const Type& t) : m_type(t.m_type), m_symbolTable(&typeSymbolTable), m_alias(std::move(name)) {};
         Type(Type&& t) noexcept {
             *this = std::move(t);
         }
@@ -128,7 +128,7 @@ namespace ska {
 			m_compound.push_back(std::move(t));
 		}
 
-		void link(ScopedSymbolTable& t) {
+		void link(const ScopedSymbolTable& t) {
 			m_symbolTable = &t;
 		}
 
@@ -229,11 +229,6 @@ namespace ska {
 
 			return static_cast<ExpressionType>(typeIdResult);
 		}
-
-		ScopedSymbolTable* symbolTable() {
-			return m_symbolTable;
-		}
-
 		const ScopedSymbolTable* symbolTable() const {
 			return m_symbolTable;
 		}
@@ -242,7 +237,7 @@ namespace ska {
 		ExpressionType m_type = ExpressionType::VOID;
 		std::string m_alias;
 		std::vector<Type> m_compound;
-		ScopedSymbolTable* m_symbolTable = nullptr;
+		const ScopedSymbolTable* m_symbolTable = nullptr;
 	    bool m_moved = false;
     };
 

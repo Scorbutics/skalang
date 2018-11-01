@@ -10,10 +10,23 @@ namespace ska {
     	
 	struct BlockTokenEvent {
 		BlockTokenEvent(ASTNode& n, BlockTokenEventType t) : 
-			node(n), type(t) {
+			node(n), m_type(t) {
 		}
 
+		const auto& type() const {
+			return m_type;
+		}
+
+		auto& rootNode() {
+			return node;
+		}
+
+		const auto& rootNode() const {
+			return node;
+		}
+
+	private:
     		ASTNode& node;
-		BlockTokenEventType type;
+			BlockTokenEventType m_type;
     	};
 }

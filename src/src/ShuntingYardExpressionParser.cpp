@@ -79,7 +79,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 			switch (value[0]) {
 			case '(':
 				
-				if (!operands.empty() && (operands.top()->op == Operator::FIELD_ACCESS || operands.top()->op == Operator::LITERAL && operands.top()->tokenType() == TokenType::IDENTIFIER)) {
+				if (!operands.empty() && (operands.top()->op() == Operator::FIELD_ACCESS || operands.top()->op() == Operator::LITERAL && operands.top()->tokenType() == TokenType::IDENTIFIER)) {
 					SLOG(ska::LogLevel::Debug) << "\tFunction call !";
 					//We already pushed the identifier as an operand, but in fact it's a function call.
 					//We have to pop it, then matching the function call as the new operand.
@@ -232,7 +232,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(stack<Token>& oper
         auto token = m_input.actual();
 		if (rangeCounter >= 0) {
 			parseTokenExpression(operators, operands, token, lastToken);
-			if (!operands.empty() && operands.top()->op == Operator::FUNCTION_CALL) {
+			if (!operands.empty() && operands.top()->op() == Operator::FUNCTION_CALL) {
 				rangeCounter = 0;
 			}
 		}
@@ -409,7 +409,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::popUntil(stack<Token>& operat
 		} else {
 			//Unary operator ?
 			//currentNode->add(std::make_unique<ASTNode>(Token{ "0", TokenType::DIGIT }));
-			currentNode->op = Operator::UNARY;
+			currentNode->op() = Operator::UNARY;
 		}
 		currentNode->add(std::move(rightOperand));
 

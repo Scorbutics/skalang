@@ -59,12 +59,12 @@ namespace ska {
     }
     
     Type TypeBuilderDispatchCalculation(const SymbolTable& symbols, ASTNode& node) {
-        if(node.type.has_value()) {
-            return node.type.value();
+        if(node.type().has_value()) {
+            return node.type().value();
         }
 
-        if(node.op.has_value() && node.op.value() != Operator::LITERAL) {
-            const auto& op = node.op.value();
+        if(node.op().has_value() && node.op().value() != Operator::LITERAL) {
+            const auto& op = node.op().value();
             Type type;
             switch(op) {
                 case Operator::FUNCTION_DECLARATION: type = TypeBuilderOperator<Operator::FUNCTION_DECLARATION>::build(symbols, node); break;
@@ -78,11 +78,11 @@ namespace ska {
                 default:
                     type = ExpressionType::VOID;
             }
-            node.type = type;
+            node.type() = type;
         } else {
-            node.type = TypeBuilderBuildFromTokenType(symbols, node);
+            node.type() = TypeBuilderBuildFromTokenType(symbols, node);
         }
-        return node.type.value();
+        return node.type().value();
     }
     
 }

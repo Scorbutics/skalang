@@ -30,103 +30,103 @@ TEST_CASE("[SemanticTypeChecker]") {
             auto astPtr = ASTFromInputSemanticTC("var titi = 2.0; var toto = 5.2; titi * toto;", data);
             auto& ast = (*astPtr);
             CHECK(ast.size() == 3);
-            CHECK(ast[2].type == ska::ExpressionType::FLOAT);
+            CHECK(ast[2].type() == ska::ExpressionType::FLOAT);
         }
 
         SUBCASE("int x string") {    
             auto astPtr = ASTFromInputSemanticTC("var titi = 2; var toto = \"test\"; titi * toto;", data);
             auto& ast = (*astPtr);
             CHECK(ast.size() == 3);
-            CHECK(ast[2].type == ska::ExpressionType::STRING);
+            CHECK(ast[2].type() == ska::ExpressionType::STRING);
         }
 
         SUBCASE("int x float") {
             auto astPtr = ASTFromInputSemanticTC("var titi = 2; var toto = 5.2; titi * toto;", data);
             auto& ast = (*astPtr);
             CHECK(ast.size() == 3);
-            CHECK(ast[2].type == ska::ExpressionType::FLOAT);
+            CHECK(ast[2].type() == ska::ExpressionType::FLOAT);
         }
 
         SUBCASE("float x int") {
             auto astPtr = ASTFromInputSemanticTC("var titi = 2.0; var toto = 5; titi * toto;", data);
             auto& ast = (*astPtr);
             CHECK(ast.size() == 3);
-            CHECK(ast[2].type == ska::ExpressionType::FLOAT);
+            CHECK(ast[2].type() == ska::ExpressionType::FLOAT);
         }
 
         SUBCASE("string x int") {    
             auto astPtr = ASTFromInputSemanticTC("var titi = \"tititititit\"; var toto = 6; titi * toto;", data);
             auto& ast = (*astPtr);
             CHECK(ast.size() == 3);
-            CHECK(ast[2].type == ska::ExpressionType::STRING);
+            CHECK(ast[2].type() == ska::ExpressionType::STRING);
         }
 
         SUBCASE("string = int") {    
             auto astPtr = ASTFromInputSemanticTC("var titi = \"strrrr\"; titi = 3;", data);  
             auto& ast = (*astPtr);
             CHECK(ast.size() == 2);
-            CHECK(ast[1].type == ska::ExpressionType::STRING);
+            CHECK(ast[1].type() == ska::ExpressionType::STRING);
         }
 
         SUBCASE("float = string") {
             auto astPtr = ASTFromInputSemanticTC("var titi = 0.1; titi = \"toto\";", data);
             auto& ast = (*astPtr);
             CHECK(ast.size() == 2);
-            CHECK(ast[1].type == ska::ExpressionType::FLOAT);
+            CHECK(ast[1].type() == ska::ExpressionType::FLOAT);
         }
 
         SUBCASE("float = string (variable)") {
             auto astPtr = ASTFromInputSemanticTC("var titi = 0.1; var toto = \"toto\"; titi = toto;", data);
             auto& ast = (*astPtr);
             CHECK(ast.size() == 3);
-            CHECK(ast[2].type == ska::ExpressionType::FLOAT);
+            CHECK(ast[2].type() == ska::ExpressionType::FLOAT);
         }
         
         SUBCASE("float = float") {
             auto astPtr = ASTFromInputSemanticTC("var titi = 0.1; titi = 0.2;", data);
             auto& ast = (*astPtr);
             CHECK(ast.size() == 2);
-            CHECK(ast[1].type == ska::ExpressionType::FLOAT);
+            CHECK(ast[1].type() == ska::ExpressionType::FLOAT);
         }
 
         SUBCASE("float = int") {
             auto astPtr = ASTFromInputSemanticTC("var titi = 0.1; titi = 2;", data);
             auto& ast = (*astPtr);
             CHECK(ast.size() == 2);
-            CHECK(ast[1].type == ska::ExpressionType::FLOAT);
+            CHECK(ast[1].type() == ska::ExpressionType::FLOAT);
         }
 
         SUBCASE("int = float") {
             auto astPtr = ASTFromInputSemanticTC("var titi = 1; titi = 0.2;", data);
             auto& ast = (*astPtr);
             CHECK(ast.size() == 2);
-            CHECK(ast[1].type == ska::ExpressionType::INT);
+            CHECK(ast[1].type() == ska::ExpressionType::INT);
         }
         
         SUBCASE("int = string") {
             auto astPtr = ASTFromInputSemanticTC("var titi = 7; titi = \"123\";", data);
             auto& ast = (*astPtr);
             CHECK(ast.size() == 2);
-            CHECK(ast[1].type == ska::ExpressionType::INT);
+            CHECK(ast[1].type() == ska::ExpressionType::INT);
         }
         
         SUBCASE("float = string") {
             auto astPtr = ASTFromInputSemanticTC("var titi = 7.8; titi = \"123\";", data);
             auto& ast = (*astPtr);
             CHECK(ast.size() == 2);
-            CHECK(ast[1].type == ska::ExpressionType::FLOAT);
+            CHECK(ast[1].type() == ska::ExpressionType::FLOAT);
         }
         
         SUBCASE("function call : string") {
-            auto astPtr = ASTFromInputSemanticTC("var titi = function(test:string) {}; titi(\"lol\");", data);
+            auto astPtr = ASTFromInputSemanticTC("var titi121 = function(test:string) {}; titi121(\"lol\");", data);
             auto& ast = (*astPtr);
             CHECK(ast.size() == 2);
             //std::cout << ast[1].type.value().asString() << std::endl;
-            CHECK(ast[1].type == ska::ExpressionType::VOID);
+            CHECK(ast[1].type() == ska::ExpressionType::VOID);
         }
 
         SUBCASE("Calling a function with a type convertible argument") {
-            ASTFromInputSemanticTC("var titi = function(test:string) {}; titi(23);", data);
+            ASTFromInputSemanticTC("var titi129 = function(test:string) {}; titi129(23);", data);
         
         }
 
@@ -161,7 +161,9 @@ TEST_CASE("[SemanticTypeChecker]") {
 				, data);
 		}
 
-		/*SUBCASE("constructor complex with contained function USING the current type...") {
+		/*
+		//TODO : très important, mais complexe à réaliser.
+		SUBCASE("constructor complex with contained function USING the current type...") {
 			ASTFromInputSemanticTC(
 				"var Joueur = function(nom:string) : var { "
 				"var puissance = 10;"

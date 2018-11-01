@@ -148,7 +148,7 @@ ska::Parser::ASTNodePtr ska::Parser::matchIfOrIfElseKeyword() {
 
     const auto elseToken = m_reservedKeywordsPool.pattern<TokenGrammar::ELSE>();
     if (m_input.expect(elseToken)) {
-        ifNode->op = Operator::IF_ELSE;
+        ifNode->op() = Operator::IF_ELSE;
         m_input.match(elseToken);
         ifNode->add(statement());
     }
