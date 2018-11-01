@@ -108,15 +108,16 @@ bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
                 if(param.type.has_value()) {
                     const auto typeStr = param.type.value().asString();
 					SLOG(ska::LogLevel::Debug) << "\t\t" << name << " = " << typeStr;
-                    
 					//No -> //Return type : mustn't be declared as a scope variable
                     //if (index != token.node.size() - 1) {
                         m_currentTable->emplace(name, param.type.value());
                     //}
-
-                    currentArgList.push_back(Symbol{ std::move(name), param.type.value() });
-                    
-                }
+                    currentArgList.push_back(Symbol{ std::move(name), param.type.value() });                   
+				} else {
+					SLOG(ska::LogLevel::Debug) << "\t\t" << name << " = undefined type";
+					m_currentTable->emplace(name, ska::Type{});
+					currentArgList.push_back(Symbol{ std::move(name), ska::Type{} });
+				}
             }
             
             symbol.link(std::move(currentArgList), *functionSymbolTable);

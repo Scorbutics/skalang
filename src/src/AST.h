@@ -3,7 +3,7 @@
 #include <memory>
 #include <optional>
 #include "Token.h"
-
+#include "ASTNodePtr.h"
 #include "Operator.h"
 #include "ExpressionType.h"
 
@@ -104,5 +104,4 @@ namespace ska {
 
 	};
 
-	using ASTNodePtr = std::unique_ptr<ASTNode>;
 }

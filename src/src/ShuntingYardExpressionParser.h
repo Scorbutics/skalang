@@ -6,6 +6,7 @@
 #include <functional>
 #include <Data/Events/EventDispatcher.h>
 
+#include "ASTNodePtr.h"
 #include "TokenReader.h"
 #include "FunctionTokenEvent.h"
 #include "VarTokenEvent.h"
@@ -42,22 +43,25 @@ namespace ska {
 
 	public:
 		ShuntingYardExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, Parser& parser, TokenReader& input);
-		std::unique_ptr<ska::ASTNode> parse();
+		ASTNodePtr parse();
 
-		bool parseTokenExpression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const Token& token, Token& lastToken);
+		bool parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token, Token& lastToken);
 
 	private:
-		std::unique_ptr<ASTNode> matchReserved();
-		std::unique_ptr<ASTNode> matchFunctionCall(std::unique_ptr<ASTNode> identifierFunctionName);
-		std::unique_ptr<ASTNode> matchFunctionDeclaration();
-		std::unique_ptr<ASTNode> matchFunctionDeclarationParameter();
-		std::unique_ptr<ASTNode> matchObjectFieldAccess(Token objectAccessed);
-		std::unique_ptr<ASTNode> matchAffectation(Token identifierFieldAffected);
+		ASTNodePtr matchReserved();
+		ASTNodePtr matchFunctionCall(ASTNodePtr identifierFunctionName);
+		ASTNodePtr matchFunctionDeclaration();
+		ASTNodePtr matchFunctionDeclarationBody();
+		void fillFunctionDeclarationParameters(ASTNode& functionDeclarationNode);
+		ASTNodePtr matchFunctionDeclarationReturnType();
+		ASTNodePtr matchFunctionDeclarationParameter();
+		ASTNodePtr matchObjectFieldAccess(Token objectAccessed);
+		ASTNodePtr matchAffectation(Token identifierFieldAffected);
         
         bool isAtEndOfExpression() const;
-		std::unique_ptr<ASTNode> expression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands);
-		bool checkLessPriorityToken(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const char tokenChar) const;
-		std::unique_ptr<ASTNode> popUntil(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, PopPredicate predicate);
+		ASTNodePtr expression(stack<Token>& operators, stack<ASTNodePtr>& operands);
+		bool checkLessPriorityToken(stack<Token>& operators, stack<ASTNodePtr>& operands, const char tokenChar) const;
+		ASTNodePtr popUntil(stack<Token>& operators, stack<ASTNodePtr>& operands, PopPredicate predicate);
 		static void error(const std::string& message);
 
 		const ReservedKeywordsPool& m_reservedKeywordsPool;

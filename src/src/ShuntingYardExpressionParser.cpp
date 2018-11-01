@@ -49,13 +49,13 @@ ska::ShuntingYardExpressionParser::ShuntingYardExpressionParser(const ReservedKe
 	m_input(input) {
 }
 
-std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::parse() {
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::parse() {
 	auto operators = stack<Token>{};
-	auto operands = stack<std::unique_ptr<ASTNode>> {};
+	auto operands = stack<ASTNodePtr> {};
 	return expression(operators, operands);
 }
 
-bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const Token& token, Token& lastToken) {
+bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token, Token& lastToken) {
 
 	switch (token.type()) {
 		case TokenType::RESERVED: {
@@ -159,7 +159,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 	return false;
 }
 
-std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr identifierFunctionName) {
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr identifierFunctionName) {
 	auto functionCallNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_CALL);
 	
 	functionCallNode->add(std::move(identifierFunctionName));
@@ -190,7 +190,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionCa
 	return functionCallNode;
 }
 
-std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchObjectFieldAccess(Token objectAccessed) {
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchObjectFieldAccess(Token objectAccessed) {
 	auto fieldAccessNode = std::make_unique<ska::ASTNode>(Operator::FIELD_ACCESS, std::move(objectAccessed));
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::METHOD_CALL_OPERATOR>());;
 	fieldAccessNode->add(std::make_unique<ska::ASTNode>(m_input.match(TokenType::IDENTIFIER)));
@@ -199,7 +199,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchObjectFiel
 	return fieldAccessNode;
 }
 
-std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchAffectation(Token identifierFieldAffected) {
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchAffectation(Token identifierFieldAffected) {
 	auto affectationNode = std::make_unique<ska::ASTNode>(Operator::VARIABLE_AFFECTATION, std::move(identifierFieldAffected));
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
 	auto expressionNode = parse();
@@ -218,7 +218,7 @@ bool ska::ShuntingYardExpressionParser::isAtEndOfExpression() const {
             m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()); 
 }
 
-std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::expression(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands) {
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(stack<Token>& operators, stack<ASTNodePtr>& operands) {
 	auto rangeCounter = 0;
 	auto lastToken = Token{};
 
@@ -249,7 +249,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::expression(stac
 	return result;
 }
 
-bool ska::ShuntingYardExpressionParser::checkLessPriorityToken(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, const char tokenChar) const {
+bool ska::ShuntingYardExpressionParser::checkLessPriorityToken(stack<Token>& operators, stack<ASTNodePtr>& operands, const char tokenChar) const {
 	const auto& topOperatorContent = (operators.empty() || operators.top().asString().empty()) ? '\0' : operators.top().asString()[0];
     if(PRIORITY_MAP.find(tokenChar) == PRIORITY_MAP.end()) {
         auto ss = std::stringstream {};
@@ -261,7 +261,7 @@ bool ska::ShuntingYardExpressionParser::checkLessPriorityToken(stack<Token>& ope
 			PRIORITY_MAP.at(tokenChar) < PRIORITY_MAP.at(topOperatorContent);
 }
 
-std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchReserved() {
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchReserved() {
 	const auto& result = m_input.actual();
 
 	switch(std::get<std::size_t>(result.content())) {
@@ -273,7 +273,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchReserved()
 	}
 }
 
-std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDeclarationParameter() {
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationParameter() {
 	const auto isRightParenthesis = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 	if(isRightParenthesis) {
 		return nullptr;
@@ -298,14 +298,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
     return node;
 }
 
-std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
-	SLOG(ska::LogLevel::Debug) << "function declaration";
-	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::FUNCTION>());
-
-    //With this grammar, no other way than reading previously to retrieve the function name.
-    const auto functionName = m_input.readPrevious(3); 
-	auto functionDeclarationNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_DECLARATION, functionName);
-
+void ska::ShuntingYardExpressionParser::fillFunctionDeclarationParameters(ASTNode& functionDeclarationNode) {
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
 	auto isRightParenthesis = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
@@ -314,7 +307,7 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 		if (!m_input.expect(TokenType::SYMBOL)) {
 			SLOG(ska::LogLevel::Debug) << "parameter detected, reading identifier : ";
 			auto parameterNode = matchFunctionDeclarationParameter();
-			functionDeclarationNode->add(std::move(parameterNode));
+			functionDeclarationNode.add(std::move(parameterNode));
 			isComma = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
 			if (isComma) {
 				m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
@@ -322,25 +315,24 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 		}
 		isRightParenthesis = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 	}
+	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
+}
 
-	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());		
-
-	if(m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>())) {
-        m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
-        const auto type = m_input.match(TokenType::RESERVED);
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationReturnType() {
+	if (m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>())) {
+		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
+		const auto type = m_input.match(TokenType::RESERVED);
 		SLOG(ska::LogLevel::Debug) << "function type detected : " << type.asString();
-        //if(type.asString() != "var") {
-            functionDeclarationNode->add(std::make_unique<ASTNode>(type));
-        //}
-    } else {
-		SLOG(ska::LogLevel::Debug) << "void function " << functionName.asString();
-        functionDeclarationNode->add(std::make_unique<ASTNode>(ska::Token {"", ska::TokenType::IDENTIFIER}));
-    }
-    auto startEvent = FunctionTokenEvent {functionName.asString(), *functionDeclarationNode, FunctionTokenEventType::DECLARATION_PARAMETERS};
-	m_parser.Observable<FunctionTokenEvent>::notifyObservers(startEvent);
+		//if(type.asString() != "var") {
+		return std::make_unique<ASTNode>(type);
+		//}
+	} else {
+		SLOG(ska::LogLevel::Debug) << "void function detected";
+		return std::make_unique<ASTNode>(ska::Token{ "", ska::TokenType::IDENTIFIER });
+	}
+}
 
-	SLOG(ska::LogLevel::Debug) << "reading function statement";
-
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationBody() {
 	auto blockNode = std::make_unique<ska::ASTNode>(Operator::BLOCK);
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
 
@@ -353,8 +345,24 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 		}
 	}
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
+	return blockNode;
+}
 
-	functionDeclarationNode->add(std::move(blockNode));
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
+	SLOG(ska::LogLevel::Debug) << "function declaration";
+	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::FUNCTION>());
+
+    //With this grammar, no other way than reading previously to retrieve the function name.
+    const auto functionName = m_input.readPrevious(3); 
+	auto functionDeclarationNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_DECLARATION, functionName);
+	fillFunctionDeclarationParameters(*functionDeclarationNode);
+	functionDeclarationNode->add(matchFunctionDeclarationReturnType());
+
+	auto startEvent = FunctionTokenEvent {functionName.asString(), *functionDeclarationNode, FunctionTokenEventType::DECLARATION_PARAMETERS};
+	m_parser.Observable<FunctionTokenEvent>::notifyObservers(startEvent);
+
+	SLOG(ska::LogLevel::Debug) << "reading function body";
+	functionDeclarationNode->add(matchFunctionDeclarationBody());
 	SLOG(ska::LogLevel::Debug) << "function read.";
 	
     auto endEvent = FunctionTokenEvent {functionName.asString(), *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT};
@@ -363,9 +371,9 @@ std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::matchFunctionDe
 	return functionDeclarationNode;
 }
 
-std::unique_ptr<ska::ASTNode> ska::ShuntingYardExpressionParser::popUntil(stack<Token>& operators, stack<std::unique_ptr<ASTNode>>& operands, PopPredicate predicate) {
-	auto currentNode = std::unique_ptr<ASTNode> {};
-	auto nextNode = std::unique_ptr<ASTNode> {};
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::popUntil(stack<Token>& operators, stack<ASTNodePtr>& operands, PopPredicate predicate) {
+	auto currentNode = ASTNodePtr {};
+	auto nextNode = ASTNodePtr {};
 
 	if (operators.empty() && !operands.empty()) {
 		auto result = std::move(operands.top());
