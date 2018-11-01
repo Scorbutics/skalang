@@ -74,7 +74,7 @@ namespace ska {
                 case Operator::PARAMETER_DECLARATION: type = TypeBuilderOperator<Operator::PARAMETER_DECLARATION>::build(symbols, node);break;
                 case Operator::VARIABLE_DECLARATION: type = TypeBuilderOperator<Operator::VARIABLE_DECLARATION>::build(symbols, node);break;
                 case Operator::UNARY: type = TypeBuilderOperator<Operator::UNARY>::build(symbols, node);break;
-                case Operator::VARIABLE_AFFECTATION: TypeBuilderOperator<Operator::VARIABLE_AFFECTATION>::build(symbols, node);break;		
+                case Operator::VARIABLE_AFFECTATION: type = TypeBuilderOperator<Operator::VARIABLE_AFFECTATION>::build(symbols, node);break;		
                 default:
                     type = ExpressionType::VOID;
             }

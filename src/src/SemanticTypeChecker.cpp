@@ -5,9 +5,7 @@
 #include "SymbolTable.h"
 #include "AST.h"
 
-//#include "TypeBuilderCalculatorDispatcher.h"
-
-#define SKALANG_LOG_SEMANTIC_TYPE_CHECK
+SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SemanticTypeChecker)
 
 ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser) :
     SubObserver<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser),
@@ -23,11 +21,10 @@ bool ska::SemanticTypeChecker::matchFunction(FunctionTokenEvent& token) {
         case FunctionTokenEventType::DECLARATION_PARAMETERS: {			
 			//getExpressionType(token.node);
 			const auto returnType = token.node[token.node.size() - 1].type;
-#ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
             if (returnType.has_value() && returnType.value() == ExpressionType::OBJECT) {
-				std::cout << "user defined object type detected" << std::endl;
+				SLOG(ska::LogLevel::Debug) << "user defined object type detected";
 			}
-#endif
+
         } break;
 
         default:
@@ -44,19 +41,16 @@ bool ska::SemanticTypeChecker::matchFunction(FunctionTokenEvent& token) {
                 throw std::runtime_error(ss.str());
             }
 
-#ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
-            std::cout << variable << " function has the following arguments types during its call : " << std::endl;
-#endif
+			SLOG(ska::LogLevel::Debug) << variable << " function has the following arguments types during its call : ";
 
             for(auto index = 1u; index < token.node.size(); index++) {
                 auto& param = token.node[index];
                 const auto calculatedType = param.type.value();
-#ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
-                std::cout << index << " \"" << calculatedType.asString() << "\" while a type convertible to \"" << (*symbol)[index].asString() << "\" is required" << std::endl;
-#endif
+				SLOG(ska::LogLevel::Debug) << index << " \"" << calculatedType.asString() << "\" while a type convertible to \"" << (*symbol)[index].asString() << "\" is required";
+
                 if((*symbol)[index - 1].crossTypes('=', calculatedType) == ExpressionType::VOID) {
                     auto ss = std::stringstream {};
-                    ss << "Type  \"" << calculatedType.asString() << "\" is encountered while a type convertible to \"" << (*symbol)[index].asString() << "\" is required" << std::endl;
+                    ss << "Type  \"" << calculatedType.asString() << "\" is encountered while a type convertible to \"" << (*symbol)[index].asString() << "\" is required";
                     throw std::runtime_error(ss.str());
                 }
             }
@@ -67,15 +61,13 @@ bool ska::SemanticTypeChecker::matchFunction(FunctionTokenEvent& token) {
 }
 
 bool ska::SemanticTypeChecker::matchVariable(VarTokenEvent& token) {
-    assert(token.node.size() >= 1 && token.node[0].type.has_value());
+    assert((token.node.size() >= 1 && token.node[0].type.has_value()) && "The current variable has no type. Maybe you forgot to add a type builder ?");
     const auto tokenNodeExpressionType = token.node[0].type.value();
 	const auto value = token.node[0].asString();
     const auto variable = token.node.asString();
     const auto symbol = (*m_symbols)[variable];
     
-#ifdef SKALANG_LOG_SEMANTIC_TYPE_CHECK
-    std::cout << variable << " = " << value << ";\tsymbol = " << tokenNodeExpressionType.asString() << std::endl;
-#endif
+	SLOG(ska::LogLevel::Debug) << variable << " = " << value << ";\tsymbol = " << tokenNodeExpressionType.asString();
 
     if(symbol != nullptr && token.type == VarTokenEventType::AFFECTATION) {
         const auto newTokenType = symbol->getType().crossTypes('=', tokenNodeExpressionType);

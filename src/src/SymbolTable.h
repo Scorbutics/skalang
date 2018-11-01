@@ -9,7 +9,11 @@
 #include "ReturnTokenEvent.h"
 #include "ExpressionType.h"
 
-//#define SKALANG_LOG_MOVE_COPY_SYMBOL
+namespace ska {
+	class Symbol;
+}
+
+SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::Symbol)
 
 namespace ska {
     class ScopedSymbolTable;
@@ -19,9 +23,7 @@ namespace ska {
             Symbol(std::string name, Type cat) : 
 				m_name(std::move(name)), 
                 m_category(std::move(cat)) {
-#ifdef SKALANG_LOG_MOVE_COPY_SYMBOL
-                    std::cout << "Creating Symbol " << m_name << " with type " << m_category.asString() << std::endl;
-#endif
+					SLOG(ska::LogLevel::Debug) << "Creating Symbol " << m_name << " with type " << m_category.asString();
                 }
 
             Symbol(const Symbol& s) {
@@ -36,9 +38,7 @@ namespace ska {
                 m_scopedTable = s.m_scopedTable;
                 m_name = s.m_name;
                 m_category = s.m_category;
-#ifdef SKALANG_LOG_MOVE_COPY_SYMBOL
-                std::cout << "   Copy, Symbol " << s.getName() << " " << s.m_category.asString() << " copied to " << m_name << " " << m_category.asString() << std::endl;
-#endif
+				SLOG(ska::LogLevel::Debug) << "   Copy, Symbol " << s.getName() << " " << s.m_category.asString() << " copied to " << m_name << " " << m_category.asString();
                 return *this;
             }
 
@@ -46,9 +46,7 @@ namespace ska {
                 m_scopedTable = std::move(s.m_scopedTable);
                 m_name = std::move(s.m_name);
                 m_category = std::move(s.m_category);
-#ifdef SKALANG_LOG_MOVE_COPY_SYMBOL
-                std::cout << "   Move, Symbol " << s.getName() << " " << s.m_category.asString() << " moved to " << m_name << " " << m_category.asString() << std::endl;
-#endif
+				SLOG(ska::LogLevel::Debug) << "   Move, Symbol " << s.getName() << " " << s.m_category.asString() << " moved to " << m_name << " " << m_category.asString();
                 return *this;
             }
 

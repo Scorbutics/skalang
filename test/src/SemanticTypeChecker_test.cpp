@@ -23,7 +23,7 @@ std::unique_ptr<ska::ASTNode> ASTFromInputSemanticTC(const std::string& input, D
     return data.parser->parse();
 }
 
-TEST_CASE("Semantic type checker") {
+TEST_CASE("[SemanticTypeChecker]") {
     DataTestContainer data;
     
     SUBCASE("OK") {
