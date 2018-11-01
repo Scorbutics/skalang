@@ -1,10 +1,9 @@
 #include <doctest.h>
-#include "LoggerConfig.h"
+#include "LoggerConfigLang.h"
 #include "SymbolTable.h"
 #include "ReservedKeywordsPool.h"
 #include "Tokenizer.h"
 #include "Parser.h"
-#include "SemanticTypeChecker.h"
 #include "DataTestContainer.h"
 
 std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, DataTestContainer& data) {
@@ -14,10 +13,7 @@ std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, DataTestCon
 	auto reader = ska::TokenReader { tokens };
 	data.parser = std::make_unique<ska::Parser> ( reservedKeywords, reader );
 	data.symbols = std::make_unique<ska::SymbolTable>(*data.parser);
-	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, *data.symbols);
-	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser);
-	data.typeChecker->setSymbolTable(*data.symbols);
-    
+
     return data.parser->parse();
 }
 

@@ -1,7 +1,7 @@
 #include <fstream>
 #include <iostream>
 
-#include "LoggerConfig.h"
+#include "LoggerConfigLang.h"
 #include "TypeBuilder.h"
 #include "TypeBuilderOperator.h"
 #include "TypeBuilderCalculatorDispatcher.h"

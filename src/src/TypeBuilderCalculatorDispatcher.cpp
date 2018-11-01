@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "LoggerConfig.h"
+#include "LoggerConfigLang.h"
 #include "TypeBuilderCalculatorDispatcher.h"
 #include "TypeBuilderOperator.h"
 #include "SymbolTable.h"

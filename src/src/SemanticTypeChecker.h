@@ -14,8 +14,7 @@ namespace ska {
     public SubObserver<VarTokenEvent>,
     public SubObserver<FunctionTokenEvent> {
 		public:
-			SemanticTypeChecker(Parser& parser);
-			void setSymbolTable(const SymbolTable& symbolTable);
+			SemanticTypeChecker(Parser& parser, const SymbolTable& symbolTable);
             ~SemanticTypeChecker() = default;
 		private:
 			Type getExpressionType(ASTNode& node) const;

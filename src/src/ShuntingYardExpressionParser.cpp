@@ -1,5 +1,5 @@
 #include <iostream>
-#include "LoggerConfig.h"
+#include "LoggerConfigLang.h"
 #include "ShuntingYardExpressionParser.h"
 #include "Parser.h"
 #include "AST.h"

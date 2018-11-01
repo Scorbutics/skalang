@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "LoggerConfig.h"
+#include "LoggerConfigLang.h"
 #include "Tokenizer.h"
 
 //#define SKALANG_LOG_TOKENIZER

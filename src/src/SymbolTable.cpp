@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "LoggerConfig.h"
+#include "LoggerConfigLang.h"
 #include "SymbolTable.h"
 #include "Parser.h"
 
@@ -172,7 +172,11 @@ bool ska::SymbolTable::match(VarTokenEvent& token) {
                 const auto name = token.node.asString();
 				SLOG(ska::LogLevel::Info) << "Matching new variable : " << name << " with type " << type.asString();
                 m_currentTable->emplace(name, std::move(type)); 
-            }
+			} else {
+				const auto name = token.node.asString();
+				SLOG(ska::LogLevel::Info) << "Matching new variable : " << name << " with an undefined type";
+				m_currentTable->emplace(name, ska::Type{});
+			}
         } break;
 
 		default:

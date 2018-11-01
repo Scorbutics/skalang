@@ -1,5 +1,5 @@
 #include <vector>
-#include "LoggerConfig.h"
+#include "LoggerConfigLang.h"
 #include "ReservedKeywordsPool.h"
 
 std::unordered_map<std::string, ska::ReservedKeywordsPool::TokenInfo> ska::ReservedKeywordsPool::BuildPool() {

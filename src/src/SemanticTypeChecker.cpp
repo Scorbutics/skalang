@@ -1,5 +1,5 @@
 #include <iostream>
-#include "LoggerConfig.h"
+#include "LoggerConfigLang.h"
 #include "Parser.h"
 #include "SemanticTypeChecker.h"
 #include "SymbolTable.h"
@@ -7,9 +7,10 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SemanticTypeChecker)
 
-ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser) :
+ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser, const SymbolTable& symbolTable) :
     SubObserver<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser),
-    SubObserver<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser) {
+    SubObserver<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser),
+	m_symbols(&symbolTable) {
 }
 
 bool ska::SemanticTypeChecker::matchFunction(FunctionTokenEvent& token) {
@@ -81,8 +82,3 @@ bool ska::SemanticTypeChecker::matchVariable(VarTokenEvent& token) {
 
     return true;
 }
-
-void ska::SemanticTypeChecker::setSymbolTable(const SymbolTable& symbolTable) {
-    m_symbols = &symbolTable;
-}
-

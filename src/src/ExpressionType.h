@@ -2,12 +2,13 @@
 #include <unordered_map>
 #include <vector>
 #include <sstream>
+#include "LoggerConfigLang.h"
 
-//#define SKALANG_LOG_TYPE
+namespace ska {
+	struct Type;
+}
 
-#ifdef SKALANG_LOG_TYPE
-#include <iostream>
-#endif
+SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::Type)
 
 namespace ska {
 
@@ -54,25 +55,19 @@ namespace ska {
             m_compound = t.m_compound;
             m_symbolTable = t.m_symbolTable;
             m_moved = t.m_moved;
-#ifdef SKALANG_LOG_TYPE
-            std::cout << "   Copy, Type " << t.asString() << " copied to " << asString() << std::endl;
-#endif
+            SLOG(ska::LogLevel::Debug) << "   Copy, Type " << t.asString() << " copied to " << asString();
             return *this;
         }
 
         Type& operator=(Type&& t) {
-#ifdef SKALANG_LOG_TYPE
-            std::cout << "   Move, Type " << t.asString(); 
-#endif
+			SLOG(ska::LogLevel::Debug) << "   Move, Type " << t.asString();
             m_type = std::move(t.m_type);
             m_alias = std::move(t.m_alias);
             m_compound = std::move(t.m_compound);
             m_symbolTable = std::move(t.m_symbolTable);
             t.m_symbolTable = nullptr; 
             t.m_moved = true;
-#ifdef SKALANG_LOG_TYPE
-            std::cout << " moved  to " << asString() << std::endl;
-#endif
+			SLOG(ska::LogLevel::Debug) << " moved  to " << asString();
             return *this;
         }
 
@@ -108,9 +103,7 @@ namespace ska {
 		}
 
         void name(std::string n) {
-#ifdef SKALANG_LOG_TYPE
-            std::cout << "Naming type " << asString() << " : \"" << n << "\"" << std::endl;
-#endif
+			SLOG(ska::LogLevel::Info) << "Naming type " << asString() << " : \"" << n << "\"";
             m_alias = std::move(n);
         }
 

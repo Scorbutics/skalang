@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include "LoggerConfig.h"
+#include "LoggerConfigLang.h"
 #include <Signal/SignalHandler.h>
 
 detail::SkaLangLogger detail::Logger = detail::BuildLogger("TypeBuilderLogError.txt");
