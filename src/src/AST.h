@@ -8,6 +8,7 @@
 #include "ExpressionType.h"
 
 namespace ska {
+	class Symbol;
 
 	class ASTNode {
 	public:
@@ -41,7 +42,7 @@ namespace ska {
 			return token == t;
 		}
 
-		bool empty() const {
+		bool logicalEmpty() const {
 			return token.type() == TokenType::EMPTY && !m_op.has_value();
 		}
 

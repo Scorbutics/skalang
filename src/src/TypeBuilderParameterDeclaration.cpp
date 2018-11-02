@@ -5,7 +5,7 @@
 #include "SymbolTable.h"
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>::build(const SymbolTable& symbols, ASTNode& node) {
-    assert(node.size() == 1);
+    assert(node.size() == 2);
     const auto typeStr = node[0].asString();
 
     if (ExpressionTypeMap.find(typeStr) == ExpressionTypeMap.end()) {
@@ -13,7 +13,7 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>::build(
         if (symbolType == nullptr) {
             throw std::runtime_error("unknown type detected as function parameter : " + node[0].asString());
         }
-        return (node[0].type() = symbolType->getType()).value();
+        return symbolType->getType();
    } else {
         TypeBuilderDispatchCalculation(symbols, node[0]);
         return ExpressionTypeMap.at(node[0].asString());

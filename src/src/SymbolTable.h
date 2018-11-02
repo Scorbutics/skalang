@@ -20,9 +20,10 @@ namespace ska {
     	
     class Symbol {
         public:
-            Symbol(std::string name, Type cat) : 
+            Symbol(std::string name, Type cat, ScopedSymbolTable& symbolTable) : 
 				m_name(std::move(name)), 
-                m_category(std::move(cat)) {
+                m_category(std::move(cat)),
+				m_scopedTable(&symbolTable) {
 					SLOG(ska::LogLevel::Debug) << "Creating Symbol " << m_name << " with type " << m_category.asString();
                 }
 
@@ -54,6 +55,10 @@ namespace ska {
                 return m_category.compound()[index];
             }
 
+			Type operator[](std::size_t index) {
+				return m_category.compound()[index];
+			}
+
             const std::string& getName() const {
                 return m_name;
             }
@@ -61,6 +66,14 @@ namespace ska {
             const Type& getType() const {
                 return m_category;
             }
+
+			void setType(Type t) {
+				m_category = std::move(t);
+			}
+
+			ScopedSymbolTable* symbolTable() {
+				return m_scopedTable;
+			}
 
             bool empty() const {
                 return m_category.compound().empty();
@@ -164,6 +177,14 @@ namespace ska {
 
 		const ScopedSymbolTable::ChildrenScopedSymbolTable& nested() const {
 			return m_currentTable->children();
+		}
+
+		ScopedSymbolTable* current() {
+			return m_currentTable;
+		}
+
+		const ScopedSymbolTable* current() const {
+			return m_currentTable;
 		}
 
     private:

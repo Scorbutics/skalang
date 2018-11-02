@@ -26,13 +26,13 @@ TEST_CASE("[ExpressionType]") {
     auto& table = *symbol_test->nested()[0];
     
     SUBCASE("Type is set") {
-        auto type = ska::Type { "toto", table, ska::ExpressionType::OBJECT };
+        auto type = ska::Type { "toto", ska::ExpressionType::OBJECT };
         CHECK(type.getName() == "toto");
         CHECK(type == ska::ExpressionType::OBJECT);
     }
 
     SUBCASE("Type Copy") {
-        auto type = ska::Type { "toto", table, ska::ExpressionType::OBJECT };
+        auto type = ska::Type { "toto", ska::ExpressionType::OBJECT };
         type.add(ska::ExpressionType::INT);
         auto typeCopied = type;
         CHECK(typeCopied.getName() == "toto");
@@ -43,7 +43,7 @@ TEST_CASE("[ExpressionType]") {
     }
 
     SUBCASE("Type Move") {
-        auto type = ska::Type { "toto", table, ska::ExpressionType::OBJECT };
+        auto type = ska::Type { "toto", ska::ExpressionType::OBJECT };
         type.add(ska::ExpressionType::INT);
         auto typeMoved = std::move(type);
         CHECK(typeMoved.getName() == "toto");

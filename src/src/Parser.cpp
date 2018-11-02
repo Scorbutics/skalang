@@ -21,7 +21,7 @@ ska::Parser::ASTNodePtr ska::Parser::parse() {
 	auto astBlockRootNode = std::make_unique<ASTNode>(Operator::BLOCK);
 	while (!m_input.empty()) {
 		auto optionalStatement = optstatement();
-		if (optionalStatement != nullptr && !optionalStatement->empty()) {
+		if (optionalStatement != nullptr && !optionalStatement->logicalEmpty()) {
 			astBlockRootNode->add(std::move(optionalStatement));
 		} else {
 			break;
@@ -76,7 +76,7 @@ ska::Parser::ASTNodePtr ska::Parser::matchBlock(const std::string& content) {
 
 		while (!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
 			auto optionalStatement = optstatement();
-			if (!optionalStatement->empty()) {
+			if (!optionalStatement->logicalEmpty()) {
 				blockNode->add(std::move(optionalStatement));
 			} else {
 				break;

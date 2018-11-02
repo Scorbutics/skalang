@@ -44,9 +44,10 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 
 			SLOG(ska::LogLevel::Debug) << variable << " function has the following arguments types during its call : ";
 
-			auto index = 0u;
-            for(auto& param : token) {
-                const auto calculatedType = param->type().value();
+			;
+			for (auto index = 1u; index < token.rootNode().size(); index++) {
+				auto& param = token.rootNode()[index];
+				const auto calculatedType = param.type().value();
 				SLOG(ska::LogLevel::Debug) << "\"" << calculatedType.asString() << "\" while a type convertible to \"" << (*symbol)[index].asString() << "\" is required";
 
                 if((*symbol)[index - 1].crossTypes('=', calculatedType) == ExpressionType::VOID) {

@@ -338,7 +338,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationBody(
 
 	while (!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
 		auto optionalStatement = m_parser.statement();
-		if (!optionalStatement->empty()) {
+		if (!optionalStatement->logicalEmpty()) {
 			blockNode->add(std::move(optionalStatement));
 		} else {
 			break;

@@ -58,7 +58,7 @@ namespace ska {
             
     }
     
-    Type TypeBuilderDispatchCalculation(const SymbolTable& symbols, ASTNode& node) {
+    const ska::Type& TypeBuilderDispatchCalculation(const SymbolTable& symbols, ASTNode& node) {
         if(node.type().has_value()) {
             return node.type().value();
         }
@@ -78,7 +78,7 @@ namespace ska {
                 default:
                     type = ExpressionType::VOID;
             }
-            node.type() = type;
+            node.type() = std::move(type);
         } else {
             node.type() = TypeBuilderBuildFromTokenType(symbols, node);
         }

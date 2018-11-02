@@ -103,9 +103,9 @@ TEST_CASE("for") {
 		auto& ast = (*astPtr)[0];
 		CHECK(ast.op() == ska::Operator::FOR_LOOP);
 		CHECK(ast.size() == 3);
-		CHECK(ast[0].empty());
-		CHECK(ast[1].empty());
-		CHECK(ast[2].empty());
+		CHECK(ast[0].logicalEmpty());
+		CHECK(ast[1].logicalEmpty());
+		CHECK(ast[2].logicalEmpty());
 
 	}
 }

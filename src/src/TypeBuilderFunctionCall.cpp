@@ -6,11 +6,11 @@
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>::build(const SymbolTable& symbols, ASTNode& node) {
     const auto& functionIdentifier = node[0];
-    const auto type = TypeBuilderDispatchCalculation(symbols, node[0]);
+    const auto& type = TypeBuilderDispatchCalculation(symbols, node[0]);
     const auto functionName = functionIdentifier.asString();
     auto* symbol = symbols[functionName];
     auto* n = &node[0];
-    auto* currentSymbolTable = symbol->getType().symbolTable();
+	auto* currentSymbolTable = symbols.current();//symbol->symbolTable();
     while (n != nullptr && n->size() > 0 && !currentSymbolTable->children().empty()) {
         n = &(*n)[0];
         currentSymbolTable = currentSymbolTable->children()[0].get();

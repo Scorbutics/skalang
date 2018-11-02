@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "LoggerConfigLang.h"
 #include "SymbolTable.h"
 #include "Parser.h"
@@ -8,8 +6,9 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTable)
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScopedSymbolTable)
 
 const ska::Symbol* ska::Symbol::operator[](const std::string& symbol) const {
-	if (m_category.symbolTable() != nullptr && !m_category.symbolTable()->children().empty()) {
-		const auto& st = *m_category.symbolTable()->children()[0];
+	assert(m_scopedTable != nullptr);
+	if (!m_scopedTable->children().empty()) {
+		const auto& st = *m_scopedTable->children()[0];
 		return st[symbol];
 	}
 	return nullptr;
@@ -25,7 +24,7 @@ std::size_t ska::Symbol::size() const {
 
 void ska::Symbol::link(std::vector<Symbol> subtypes, ScopedSymbolTable& table) {
 	table.link(*this);
-	m_category.link(table);
+	//m_category.link(table);
 	//m_scopedTable = &table;
     
 	for (const auto& t : subtypes) {
@@ -62,7 +61,7 @@ bool ska::SymbolTable::nestedTable(const BlockTokenEvent& event) {
 }
 
 bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
-	auto actualNameSymbol = m_currentTable->parentSymbol();
+	const auto actualNameSymbol = m_currentTable->parentSymbol();
 	if (actualNameSymbol == nullptr) {
 		throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
 	}
@@ -92,33 +91,29 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 	switch(token.type()) {
 
 		case FunctionTokenEventType::DECLARATION_PARAMETERS: {
-			auto& symbol = m_currentTable->emplace(token.name(), Type{ token.name(), *m_currentTable, ExpressionType::FUNCTION });
+			auto& symbol = m_currentTable->emplace(token.name(), Type{ token.name(), ExpressionType::FUNCTION });
 			SLOG(ska::LogLevel::Info) << "\t\tNew function : adding a nested symbol table";
 			auto* functionSymbolTable = &m_currentTable->createNested();
             m_currentTable = functionSymbolTable;
 			SLOG(ska::LogLevel::Info) << "\t\tthis function (" << token.name() << ") has " << (token.rootNode().size() - 1) << " parameters : ";
             auto currentArgList = std::vector<Symbol>{};
-            for(auto& param : token) {
+			auto index = 0u;
+			for(auto& param : token) {
+				if (index == token.rootNode().size() - 1) {
+					continue;
+				}
 				param->add(std::make_unique<ASTNode>());
 				auto name = param->asString();
-                if(param->type().has_value()) {
-                    const auto typeStr = param->type().value().asString();
-					SLOG(ska::LogLevel::Debug) << "\t\t" << name << " = " << typeStr;
-					//No -> //Return type : mustn't be declared as a scope variable
-                    //if (index != token.node.size() - 1) {
-                        m_currentTable->emplace(name, param->type().value());
-                    //}
-                    currentArgList.push_back(Symbol{ std::move(name), param->type().value() });
-				} else {
-					SLOG(ska::LogLevel::Debug) << "\t\t" << name << " = undefined type";
-					m_currentTable->emplace(name, ska::Type{});
-					currentArgList.push_back(Symbol{ std::move(name), ska::Type{} });
-				}
+				assert(!param->type().has_value());
+				SLOG(ska::LogLevel::Debug) << "\t\t" << name;
+				currentArgList.push_back(m_currentTable->emplace(std::move(name), ska::Type{}));
+				
+				index++;
             }
             
             symbol.link(std::move(currentArgList), *functionSymbolTable);
 			SLOG(ska::LogLevel::Info) << "\t\tfunction type : " << symbol.getType().asString();
-            //Already handled with the variable declaration, here we juste create the function scope
+            //Already handled with the variable declaration, here we just create the function scope
             //token.rootNode().type() = ExpressionType::FUNCTION;
         } break;
 
@@ -130,10 +125,11 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 		default:
 		case FunctionTokenEventType::CALL: {
             const auto name = token.rootNode()[0].asString();
-			const auto* symbol = (*this)[name];
 			auto* n = &token.rootNode()[0];
-			auto* currentSymbolTable = symbol->getType().symbolTable();
-			while (n != nullptr && n->size() > 0 &&  !currentSymbolTable->children().empty()) {
+			auto* currentSymbolTable = m_currentTable;
+			assert(currentSymbolTable != nullptr);
+			const Symbol* symbol = nullptr;
+			while (n != nullptr && n->size() > 0 && !currentSymbolTable->children().empty()) {
 				n = &(*n)[0];
 				currentSymbolTable = currentSymbolTable->children()[0].get();
 				const auto& fieldName = n->asString();
@@ -143,7 +139,10 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 			}
 
 			if(symbol == nullptr) {
-				throw std::runtime_error("Symbol function not found : " + name);
+				symbol = (*this)[name];
+				if (symbol == nullptr) {
+					throw std::runtime_error("Symbol function not found : " + name);
+				}
 			}
 
 			if(symbol->getType() != ExpressionType::FUNCTION) {
@@ -160,20 +159,12 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 	assert(m_currentTable != nullptr);
 	
 	switch(token.type()) {
-		case VarTokenEventType::DECLARATION: {
-            if(token.rootNode()[0].type().has_value()) {
-                auto type = token.rootNode()[0].type().value();
-                if(type == ExpressionType::VOID) {
-                    throw std::runtime_error("Unable to declare the variable " + token.rootNode().asString() + " with a void type");
-                }
-                const auto name = token.rootNode().asString();
-				SLOG(ska::LogLevel::Info) << "Matching new variable : " << name << " with type " << type.asString();
-                m_currentTable->emplace(name, std::move(type)); 
-			} else {
-				const auto name = token.rootNode().asString();
-				SLOG(ska::LogLevel::Info) << "Matching new variable : " << name << " with an undefined type";
-				m_currentTable->emplace(name, ska::Type{});
-			}
+		case VarTokenEventType::DECLARATION: {			
+			assert(token.rootNode().size() > 0);
+			const auto type = token.rootNode()[0].type();
+			const auto name = token.rootNode().asString();
+			SLOG(ska::LogLevel::Info) << "Matching new variable : " << name << " with an undefined type";
+			m_currentTable->emplace(name, /*type.has_value() ? type.value() :*/ ska::Type{});
         } break;
 
 		default:
@@ -200,7 +191,7 @@ ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, Type type) {
     
     {
-        auto symbol = Symbol { name, type };
+        auto symbol = Symbol { name, type, *this };
 		SLOG(ska::LogLevel::Debug) << "\tSymbol \"" << name << "\" \"" <<  symbol.getType().asString() << "\"";
         if(m_symbols.find(name) == m_symbols.end()) {
             m_symbols.emplace(name, std::move(symbol));
