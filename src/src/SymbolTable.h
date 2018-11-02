@@ -74,6 +74,10 @@ namespace ska {
 			ScopedSymbolTable* symbolTable() {
 				return m_scopedTable;
 			}
+			
+			const ScopedSymbolTable* symbolTable() const {
+				return m_scopedTable;
+			}
 
             bool empty() const {
                 return m_category.compound().empty();

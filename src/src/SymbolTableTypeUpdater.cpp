@@ -10,7 +10,8 @@ ska::SymbolTableTypeUpdater::SymbolTableTypeUpdater(Parser& parser, SymbolTable&
 	m_symbols(symbolTable),
 	SubObserver<ExpressionTokenEvent>(std::bind(&SymbolTableTypeUpdater::matchExpression, this, std::placeholders::_1), parser),
 	SubObserver<FunctionTokenEvent>(std::bind(&SymbolTableTypeUpdater::matchFunction, this, std::placeholders::_1), parser),
-	SubObserver<VarTokenEvent>(std::bind(&SymbolTableTypeUpdater::matchVariable, this, std::placeholders::_1), parser) {
+	SubObserver<VarTokenEvent>(std::bind(&SymbolTableTypeUpdater::matchVariable, this, std::placeholders::_1), parser),
+	SubObserver<ReturnTokenEvent>(std::bind(&SymbolTableTypeUpdater::matchReturn, this, std::placeholders::_1), parser) {
 }
 
 bool ska::SymbolTableTypeUpdater::matchVariable(const VarTokenEvent& event) {
@@ -19,6 +20,11 @@ bool ska::SymbolTableTypeUpdater::matchVariable(const VarTokenEvent& event) {
 }
 
 bool ska::SymbolTableTypeUpdater::matchExpression(const ExpressionTokenEvent& event) {
+	updateType(event.rootNode());
+	return true;
+}
+
+bool ska::SymbolTableTypeUpdater::matchReturn(const ReturnTokenEvent & event) {
 	updateType(event.rootNode());
 	return true;
 }

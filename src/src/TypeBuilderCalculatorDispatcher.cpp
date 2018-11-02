@@ -14,6 +14,7 @@
 #include "TypeBuilderBinary.h"
 #include "TypeBuilderVariableAffectation.h"
 #include "TypeBuilderVariableDeclaration.h"
+#include "TypeBuilderUserDefinedObject.h"
 
 namespace ska {
     Type TypeBuilderBuildFromTokenType(const SymbolTable& symbols, ASTNode& node) {
@@ -75,7 +76,9 @@ namespace ska {
                 case Operator::VARIABLE_DECLARATION: type = TypeBuilderOperator<Operator::VARIABLE_DECLARATION>::build(symbols, node);break;
                 case Operator::UNARY: type = TypeBuilderOperator<Operator::UNARY>::build(symbols, node);break;
                 case Operator::VARIABLE_AFFECTATION: type = TypeBuilderOperator<Operator::VARIABLE_AFFECTATION>::build(symbols, node);break;		
+				case Operator::USER_DEFINED_OBJECT: type = TypeBuilderOperator<Operator::USER_DEFINED_OBJECT>::build(symbols, node); break;
                 default:
+					SLOG_STATIC(ska::LogLevel::Error, ska::TypeBuilderOperator<Operator::LITERAL>) << "Unknown type for the node " << node.asString();
                     type = ExpressionType::VOID;
             }
             node.type() = std::move(type);
