@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include <ostream>
 
 namespace ska {
 	enum class Operator {
@@ -39,4 +40,9 @@ namespace ska {
     static inline const char* OperatorPrint(Operator op) {
         return OperatorSTR[static_cast<std::size_t>(op)];
     }
+
+	inline std::ostream& operator<<(std::ostream& stream, const Operator& op) {
+		stream << ska::OperatorPrint(op);
+		return stream;
+	}
 }

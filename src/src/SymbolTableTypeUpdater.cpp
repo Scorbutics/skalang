@@ -42,6 +42,12 @@ bool ska::SymbolTableTypeUpdater::matchFunction(const FunctionTokenEvent& event)
 }
 
 void ska::SymbolTableTypeUpdater::updateType(const ASTNode& node) {
+	for (auto& child : node) {
+		if (child->type().has_value()) {
+			updateType(*child);
+		}
+	}
+	
 	const auto& type = node.type();
 	if (node.op().has_value() && node.op().value() != Operator::LITERAL) {
 		assert(type.has_value());
@@ -50,7 +56,7 @@ void ska::SymbolTableTypeUpdater::updateType(const ASTNode& node) {
 			symbol->setType(type.value());
 			SLOG(LogLevel::Info) << "Type updated for symbol " << node.asString() << " = " << node.type().value().asString();
 		} else {
-			SLOG(LogLevel::Info) << "No type detected for symbol " << node.asString();
+			SLOG(LogLevel::Error) << "No type detected for symbol " << node.asString() << " with operator " << node.op().value();
 		}
 	}
 }

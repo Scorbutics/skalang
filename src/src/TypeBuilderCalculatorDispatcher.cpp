@@ -53,7 +53,7 @@ namespace ska {
                 break;
         }
 
-        std::cout << "default type returned for node \"" << node.asString() << "\" of type " << TokenTypeSTR[static_cast<std::size_t>(node.tokenType())] << std::endl;
+        SLOG_STATIC(ska::LogLevel::Error, ska::TypeBuilderOperator<Operator::LITERAL>) << "default type returned for node \"" << node.asString() << "\" of type " << TokenTypeSTR[static_cast<std::size_t>(node.tokenType())];
 
         return ExpressionType::VOID;
             
@@ -78,10 +78,12 @@ namespace ska {
                 case Operator::VARIABLE_AFFECTATION: type = TypeBuilderOperator<Operator::VARIABLE_AFFECTATION>::build(symbols, node);break;		
 				case Operator::USER_DEFINED_OBJECT: type = TypeBuilderOperator<Operator::USER_DEFINED_OBJECT>::build(symbols, node); break;
                 default:
-					SLOG_STATIC(ska::LogLevel::Error, ska::TypeBuilderOperator<Operator::LITERAL>) << "Unknown type for the node " << node.asString();
+					SLOG_STATIC(ska::LogLevel::Error, ska::TypeBuilderOperator<Operator::LITERAL>) << "Unknown type for the node " << node.asString() << " based on operator " << OperatorSTR[static_cast<std::size_t>(op)];
                     type = ExpressionType::VOID;
             }
             node.type() = std::move(type);
+
+			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<Operator::LITERAL>) << "Type for the node " << node.asString() << " is now \"" << node.type().value().asString() << "\" based on the operator " << OperatorSTR[static_cast<std::size_t>(op)];
         } else {
             node.type() = TypeBuilderBuildFromTokenType(symbols, node);
         }
