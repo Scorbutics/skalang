@@ -64,8 +64,8 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 }
 
 bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& token) {
-    assert((token.rootNode().size() >= 1 && token.rootNode()[0].type().has_value()) && "The current variable has no type. Maybe you forgot to add a type builder ?");
-    const auto tokenNodeExpressionType = token.rootNode()[0].type().value();
+    assert((token.rootNode().size() >= 1 && token.rootNode().type().has_value()) && "The current variable has no type. Maybe you forgot to add a type builder ?");
+    const auto tokenNodeExpressionType = token.rootNode().type().value();
 	const auto value = token.rootNode()[0].asString();
     const auto variable = token.rootNode().asString();
     const auto symbol = m_symbols[variable];

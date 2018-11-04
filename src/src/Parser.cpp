@@ -224,7 +224,11 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
 #endif
         auto fieldNode = std::make_unique<ASTNode>(Operator::VARIABLE_DECLARATION, std::move(field));
         fieldNode->add(std::move(fieldValue));
-        returnNode->add(std::move(fieldNode));
+        
+		auto event = VarTokenEvent{ *fieldNode };
+		Observable<VarTokenEvent>::notifyObservers(event);
+		
+		returnNode->add(std::move(fieldNode));
 
 		if (m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>())) {
 			m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
