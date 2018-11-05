@@ -146,7 +146,7 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 			}
 
 			if(symbol->getType() != ExpressionType::FUNCTION) {
-				throw std::runtime_error("Symbol \"" + name + "\" declared as normal variable but used as a function");
+				throw std::runtime_error("Symbol \"" + name + "\" declared as variable of type \"" + symbol->getType().asString() + "\" but used as a function");
 			}	
 		} break;
 	}

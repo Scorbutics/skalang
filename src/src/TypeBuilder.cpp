@@ -6,7 +6,7 @@
 
 #include "Parser.h"
 
-SKA_LOGC_CONFIG(LogLevel::Info, TypeBuilder)
+SKA_LOGC_CONFIG(LogLevel::Debug, TypeBuilder)
 
 ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) : 
     m_symbols(symbolTable),
@@ -17,25 +17,20 @@ ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) :
 }
 
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
-	SLOG(LogLevel::Info) << "Building type for variable " << event.rootNode().asString();
     TypeBuilderDispatchCalculation(m_symbols, event.rootNode());
-	SLOG(LogLevel::Info) << "Type built " << event.rootNode().type().value().asString();
+	SLOG(LogLevel::Debug) << "Type built for variable \"" << event.rootNode().asString() << "\" = \"" << event.rootNode().type().value().asString() << "\"";
 
     return true;
 }
 
 bool ska::TypeBuilder::matchReturn(ReturnTokenEvent& event) const {
-	SLOG(LogLevel::Info) << "Building type for return " << event.rootNode().asString();
 	TypeBuilderDispatchCalculation(m_symbols, event.rootNode());
-	SLOG(LogLevel::Info) << "Type built " << event.rootNode().type().value().asString();
-
 	return true;
 }
 
 bool ska::TypeBuilder::matchExpression(ExpressionTokenEvent& event) const {
-	SLOG(LogLevel::Info) << "Building type for expression " << event.rootNode().asString();
 	TypeBuilderDispatchCalculation(m_symbols, event.rootNode());
-	SLOG(LogLevel::Info) << "Type built " << event.rootNode().type().value().asString();
+	SLOG(LogLevel::Debug) << "Type built for expression \"" << event.rootNode().asString() << "\" = \"" << event.rootNode().type().value().asString() << "\"";
     return true;
 }
 
@@ -45,13 +40,12 @@ bool ska::TypeBuilder::matchFunction(FunctionTokenEvent& event) const {
 		
 		case FunctionTokenEventType::CALL:
         case FunctionTokenEventType::DECLARATION_PARAMETERS: {			
-			SLOG(LogLevel::Info) << "Building type for function parameter declaration / call " << event.rootNode().asString();
 			auto& mainFunctionNode = event.rootNode();
 			for (auto& functionParametersNode : mainFunctionNode) {
 				TypeBuilderDispatchCalculation(m_symbols, *functionParametersNode);
 			}
 			TypeBuilderDispatchCalculation(m_symbols, mainFunctionNode);
-			SLOG(LogLevel::Info) << "Type built " << event.rootNode().type().value().asString();
+			SLOG(LogLevel::Debug) << "Type built for function parameter declaration / call \"" << event.rootNode().asString() << "\" = \"" << event.rootNode().type().value().asString() << "\"";
         } break;
 
     }

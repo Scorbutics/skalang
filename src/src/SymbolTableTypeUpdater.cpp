@@ -4,7 +4,7 @@
 #include "LoggerConfigLang.h"
 #include "SymbolTableTypeUpdater.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::SymbolTableTypeUpdater)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTableTypeUpdater)
 
 ska::SymbolTableTypeUpdater::SymbolTableTypeUpdater(Parser& parser, SymbolTable& symbolTable): 
 	m_symbols(symbolTable),
@@ -52,7 +52,7 @@ void ska::SymbolTableTypeUpdater::updateType(const ASTNode& node) {
 	if (node.op().has_value() && node.op().value() != Operator::LITERAL) {
 		assert(type.has_value());
 		auto* symbol = m_symbols[node.asString()];
-		if (symbol != nullptr) {
+		if (symbol != nullptr && symbol->getType() != type.value()) {
 			symbol->setType(type.value());
 			SLOG(LogLevel::Info) << "Type updated for symbol " << node.asString() << " = " << node.type().value().asString();
 		} else {

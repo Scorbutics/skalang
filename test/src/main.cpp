@@ -6,7 +6,7 @@ int main() {
     auto resultCode = 0;
 
     //context.setOption("order-by", "name");
-    //context.setOption("success", "true");
+    context.setOption("success", "true");
     resultCode = context.run();
 
     if (context.shouldExit() || resultCode != 0) {

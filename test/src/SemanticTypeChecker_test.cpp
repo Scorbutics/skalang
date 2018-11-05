@@ -155,8 +155,8 @@ TEST_CASE("[SemanticTypeChecker]") {
 					"attaquer : attaquer"
 				"};"
 			"};"
-			"var joueur1 = JoueurClass(\"joueur1\");"
-			"var joueur2 = JoueurClass(\"joueur2\");"
+			"var joueur1 = JoueurClass(\"joueur1Nom\");"
+			"var joueur2 = JoueurClass(\"joueur2Nom\");"
 			"joueur1.attaquer(joueur2);"
 				, data);
 		}

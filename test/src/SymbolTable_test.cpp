@@ -63,8 +63,8 @@ TEST_CASE("Matching") {
             ASTFromInput("var func = function(test:int) { test = 123; };", data);
         }
         
-        SUBCASE("function declared and used in another function with upper variable") {
-            ASTFromInput("var func = function(test:int) { var toutou = function(blurp:string) { test = 123; }; test = 78; toutou(\"llll\"); };", data);
+        SUBCASE("function declared in another function with upper variable") {
+            ASTFromInput("var func = function(test:int) { var toutou67 = function(blurp:string) { test = 123; }; test = 78; };", data);
         }
 
         SUBCASE("shadowing variable into inner function") {
