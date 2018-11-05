@@ -7,7 +7,7 @@ include_directories(../external/doctest)
 include_directories(../external/skalog/src/src)
 include_directories(../src/src)
 
-link_directories(../../ska/Debug)
+link_directories(../../ska/ska_core/lib)
 link_directories(../lib)
 
 #Unit Tests part
