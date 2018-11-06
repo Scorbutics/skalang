@@ -4,7 +4,7 @@
 #include "LoggerConfigLang.h"
 #include "SymbolTableTypeUpdater.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTableTypeUpdater)
+SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SymbolTableTypeUpdater)
 
 ska::SymbolTableTypeUpdater::SymbolTableTypeUpdater(Parser& parser, SymbolTable& symbolTable): 
 	m_symbols(symbolTable),
@@ -41,6 +41,17 @@ bool ska::SymbolTableTypeUpdater::matchFunction(const FunctionTokenEvent& event)
 	return true;
 }
 
+bool ska::SymbolTableTypeUpdater::isOperatorAccepted(const Operator& op) {
+    switch(op) {
+        case Operator::FUNCTION_DECLARATION:
+        case Operator::VARIABLE_DECLARATION:
+        case Operator::PARAMETER_DECLARATION:
+            return true;
+        default:
+            return false;
+    }
+}
+
 void ska::SymbolTableTypeUpdater::updateType(const ASTNode& node) {
 	for (auto& child : node) {
 		if (child->type().has_value()) {
@@ -49,7 +60,7 @@ void ska::SymbolTableTypeUpdater::updateType(const ASTNode& node) {
 	}
 	
 	const auto& type = node.type();
-	if (node.op().has_value() && node.op().value() != Operator::LITERAL) {
+	if (node.op().has_value() && isOperatorAccepted(node.op().value())) {
 		assert(type.has_value());
 		auto* symbol = m_symbols[node.asString()];
 		if (symbol != nullptr && symbol->getType() != type.value()) {

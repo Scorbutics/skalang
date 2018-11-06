@@ -71,7 +71,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 		case TokenType::STRING:
 		case TokenType::DIGIT:
 			SLOG(ska::LogLevel::Debug) << "\tPushing operand " << token.asString();
-			operands.push(std::make_unique<ASTNode>(m_input.match(token.type())));
+			operands.push(ASTNode::MakeLogicalNode(m_input.match(token.type())));
 			return true;
 
 		case TokenType::RANGE: {
@@ -160,7 +160,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr identifierFunctionName) {
-	auto functionCallNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_CALL);
+	auto functionCallNode = ASTNode::MakeNode<Operator::FUNCTION_CALL>();
 	
 	functionCallNode->add(std::move(identifierFunctionName));
 
@@ -191,16 +191,21 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr 
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchObjectFieldAccess(Token objectAccessed) {
-	auto fieldAccessNode = std::make_unique<ska::ASTNode>(Operator::FIELD_ACCESS, std::move(objectAccessed));
+	
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::METHOD_CALL_OPERATOR>());;
-	fieldAccessNode->add(std::make_unique<ska::ASTNode>(m_input.match(TokenType::IDENTIFIER)));
-	auto event = VarTokenEvent { *fieldAccessNode, VarTokenEventType::USE };
+    auto fieldAccessedIdentifier = m_input.match(TokenType::IDENTIFIER);
+
+    auto fieldAccessNode = ASTNode::MakeNode<Operator::FIELD_ACCESS>();
+	fieldAccessNode->add(ASTNode::MakeLogicalNode(fieldAccessedIdentifier));
+    fieldAccessNode->add(ASTNode::MakeLogicalNode(objectAccessed));
+    
+    auto event = VarTokenEvent { *fieldAccessNode, VarTokenEventType::USE };
 	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
 	return fieldAccessNode;
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchAffectation(Token identifierFieldAffected) {
-	auto affectationNode = std::make_unique<ska::ASTNode>(Operator::VARIABLE_AFFECTATION, std::move(identifierFieldAffected));
+	auto affectationNode = ASTNode::MakeNode<Operator::VARIABLE_AFFECTATION>(std::move(identifierFieldAffected));
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
 	auto expressionNode = parse();
 	if(expressionNode == nullptr) {
@@ -281,7 +286,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationParam
 	const auto& id = m_input.match(TokenType::IDENTIFIER);
 	SLOG(ska::LogLevel::Debug) << id.asString();
 	
-	auto node = std::make_unique<ASTNode>(Operator::PARAMETER_DECLARATION, id);
+	auto node = ASTNode::MakeNode<Operator::PARAMETER_DECLARATION>(id);
 	
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
     const auto typeToken = 
@@ -293,7 +298,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationParam
 	
 	//TODO handle arrays
 
-    node->add(std::make_unique<ASTNode>(typeToken));
+    node->add(ASTNode::MakeLogicalNode(typeToken));
 
     return node;
 }
@@ -324,16 +329,16 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationRetur
 		const auto type = m_input.match(TokenType::RESERVED);
 		SLOG(ska::LogLevel::Debug) << "function type detected : " << type.asString();
 		//if(type.asString() != "var") {
-		return std::make_unique<ASTNode>(type);
+		return ASTNode::MakeLogicalNode(type);
 		//}
 	} else {
 		SLOG(ska::LogLevel::Debug) << "void function detected";
-		return std::make_unique<ASTNode>(ska::Token{ "", ska::TokenType::IDENTIFIER });
+		return ASTNode::MakeLogicalNode(ska::Token{ "", ska::TokenType::IDENTIFIER });
 	}
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationBody() {
-	auto blockNode = std::make_unique<ska::ASTNode>(Operator::BLOCK);
+	auto blockNode = ASTNode::MakeNode<Operator::BLOCK>();
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
 
 	while (!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
@@ -354,7 +359,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
 
     //With this grammar, no other way than reading previously to retrieve the function name.
     const auto functionName = m_input.readPrevious(3); 
-	auto functionDeclarationNode = std::make_unique<ska::ASTNode>(Operator::FUNCTION_DECLARATION, functionName);
+	auto functionDeclarationNode = ASTNode::MakeNode<Operator::FUNCTION_DECLARATION>(functionName);
 	fillFunctionDeclarationParameters(*functionDeclarationNode);
 	functionDeclarationNode->add(matchFunctionDeclarationReturnType());
 
@@ -397,8 +402,8 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::popUntil(stack<Token>& operat
 		}
 		operators.pop();
 
-		currentNode = std::make_unique<ASTNode>(Operator::BINARY, op);
-
+		currentNode = ASTNode::MakeLogicalNode(op);
+        currentNode->op() = Operator::BINARY;
 		auto rightOperand = std::move(operands.top());
 		operands.pop();
 

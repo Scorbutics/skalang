@@ -18,7 +18,7 @@ ska::Parser::ASTNodePtr ska::Parser::parse() {
 		return nullptr;
 	}
 
-	auto astBlockRootNode = std::make_unique<ASTNode>(Operator::BLOCK);
+	auto astBlockRootNode = ASTNode::MakeNode<Operator::BLOCK>();
 	while (!m_input.empty()) {
 		auto optionalStatement = optstatement();
 		if (optionalStatement != nullptr && !optionalStatement->logicalEmpty()) {
@@ -65,7 +65,7 @@ ska::Parser::ASTNodePtr ska::Parser::matchExpressionStatement() {
 
 ska::Parser::ASTNodePtr ska::Parser::matchBlock(const std::string& content) {
 	if (content == m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>().asString()) {
-		auto blockNode = std::make_unique<ska::ASTNode>(Operator::BLOCK);
+		auto blockNode = ASTNode::MakeNode<Operator::BLOCK>();
 #ifdef SKALANG_LOG_PARSER	
 		std::cout << "block start detected" << std::endl;
 #endif
@@ -100,7 +100,7 @@ ska::Parser::ASTNodePtr ska::Parser::matchBlock(const std::string& content) {
 }
 
 ska::Parser::ASTNodePtr ska::Parser::matchForKeyword() {
-    auto forNode = std::make_unique<ska::ASTNode>(Operator::FOR_LOOP);
+    auto forNode = ASTNode::MakeNode<Operator::FOR_LOOP>();
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::FOR>());
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
@@ -136,7 +136,7 @@ ska::Parser::ASTNodePtr ska::Parser::matchForKeyword() {
 }
 
 ska::Parser::ASTNodePtr ska::Parser::matchIfOrIfElseKeyword() {
-    auto ifNode = std::make_unique<ska::ASTNode>(Operator::IF);
+    auto ifNode = ASTNode::MakeNode<Operator::IF>();
 
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::IF>());
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
@@ -162,7 +162,7 @@ ska::Parser::ASTNodePtr ska::Parser::matchVarKeyword() {
 	std::cout << "variable declaration" << std::endl;
 #endif
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>());
-	auto varNode = std::make_unique<ASTNode>(Operator::VARIABLE_DECLARATION, m_input.match(TokenType::IDENTIFIER));
+	auto varNode = ASTNode::MakeNode<Operator::VARIABLE_DECLARATION>(m_input.match(TokenType::IDENTIFIER));
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
 #ifdef SKALANG_LOG_PARSER
     std::cout << "equal sign matched, reading expression" << std::endl;
@@ -206,7 +206,7 @@ ska::Parser::ASTNodePtr ska::Parser::matchReservedKeyword(const std::size_t keyw
 
 ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::RETURN>());
-	auto returnNode = std::make_unique<ASTNode>(Operator::USER_DEFINED_OBJECT);
+	auto returnNode = ASTNode::MakeNode<Operator::USER_DEFINED_OBJECT>();
 
     //TODO handle native (= built-in) types
 
@@ -222,7 +222,7 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
 #ifdef SKALANG_LOG_PARSER
         std::cout << "Constructor " << name << " with field \"" << field.asString() << "\" and field value \"" << fieldValue->asString() << "\"" <<  std::endl;
 #endif
-        auto fieldNode = std::make_unique<ASTNode>(Operator::VARIABLE_DECLARATION, std::move(field));
+        auto fieldNode = ASTNode::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(field));
         fieldNode->add(std::move(fieldValue));
         
 		auto event = VarTokenEvent{ *fieldNode };
@@ -257,7 +257,7 @@ ska::Parser::ASTNodePtr ska::Parser::optexpr(const Token& mustNotBe) {
 	if (!m_input.expect(mustNotBe)) {
 		node = expr();
 	}
-	return node != nullptr ? std::move(node) : std::make_unique<ASTNode>(Token{});
+	return node != nullptr ? std::move(node) : ASTNode::MakeEmptyNode();
 }
 
 ska::Parser::ASTNodePtr ska::Parser::optstatement(const Token& mustNotBe) {
@@ -266,6 +266,6 @@ ska::Parser::ASTNodePtr ska::Parser::optstatement(const Token& mustNotBe) {
 		node = statement();
 	}
 
-	return node != nullptr ? std::move(node) : std::make_unique<ASTNode>(Token{});
+	return node != nullptr ? std::move(node) : ASTNode::MakeEmptyNode();
 }
 

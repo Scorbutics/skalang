@@ -27,7 +27,8 @@ namespace ska {
 		bool matchReturn(const ReturnTokenEvent& event);
 
 		void updateType(const ASTNode& node);
-
-		SymbolTable& m_symbols;
+        static bool isOperatorAccepted(const Operator& op);
+		
+        SymbolTable& m_symbols;
 	};
 }

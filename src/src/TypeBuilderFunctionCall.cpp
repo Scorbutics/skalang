@@ -1,8 +1,11 @@
+#include "LoggerConfigLang.h"
 #include "TypeBuilderFunctionCall.h"
 
 #include "TypeBuilderCalculatorDispatcher.h"
 #include "SymbolTable.h"
 #include "AST.h"
+
+SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>);
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>::build(const SymbolTable& symbols, ASTNode& node) {
     const auto& functionIdentifier = node[0];
@@ -30,7 +33,7 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>::build(const Sy
         return ExpressionType::VOID;
     }
 
-    //std::cout << "returning type : " << symbol->category.compound().back().asString() << " of " << symbol->category.asString() << std::endl;
+    SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>) << "returning type : " << symbol->getType().compound().back().asString() << " of " << symbol->getType().asString();
     return symbol->getType().compound().back();
 
 }

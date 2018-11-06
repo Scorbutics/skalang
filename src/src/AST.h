@@ -12,28 +12,15 @@ namespace ska {
 
 	class ASTNode {
 	public:
-		ASTNode() = default;
-
-		explicit ASTNode(Token t, std::unique_ptr<ASTNode> l = nullptr, std::unique_ptr<ASTNode> r = nullptr) :
-			m_op(Operator::BINARY),
-			token(std::move(t)) {
-			if (l != nullptr) {
-				add(std::move(l));
-			}
-
-			if (r != nullptr) {
-				add(std::move(r));
-			}
-
-			if (r == nullptr && l == nullptr) {
-				m_op = token.empty() ? std::optional<Operator>() : Operator::LITERAL;
-			}
-		}
-
-		explicit ASTNode(Operator o, Token identifierToken = Token{}) :
+        
+		/*explicit ASTNode(Operator o, Token identifierToken = Token{}) :
 			m_op(std::move(o)),
 			token(std::move(identifierToken)) {
-		}
+		    assert(!token.empty() || 
+                    (o == Operator::VARIABLE_DECLARATION ||
+                     o == Operator::FUNCTION_DECLARATION ||
+                     o == Operator::PARAMETER_DECLARATION));
+        }*/
 
 		ASTNode(ASTNode&&) noexcept = default;
 		ASTNode(const ASTNode&) = delete;
@@ -122,7 +109,52 @@ namespace ska {
 			return m_type;
 		}
 
+        template<Operator o>
+        static ASTNodePtr MakeNode(Token token = Token{}) {
+            static_assert(o != Operator::BINARY && o != Operator::UNARY, "Wrong constructor used for a logical ASTNode. Use MakeLogicalNode instead.");
+            if constexpr(
+                    o == Operator::VARIABLE_DECLARATION || 
+                    o == Operator::FUNCTION_DECLARATION || 
+                    o == Operator::PARAMETER_DECLARATION) {
+                assert(!token.empty());
+            } else {
+                assert(token.empty());
+            }
+            return std::unique_ptr<ASTNode>(new ASTNode(o, std::move(token)));
+        }
+
+        static ASTNodePtr MakeEmptyNode() {
+            return std::unique_ptr<ASTNode>(new ASTNode());
+        }
+
+        static ASTNodePtr MakeLogicalNode(Token t, ASTNodePtr l = nullptr, ASTNodePtr r = nullptr) {
+            return std::unique_ptr<ASTNode>(new ASTNode(std::move(t), std::move(l), std::move(r)));
+        }
+
 	private:
+		ASTNode() = default;
+        
+        explicit ASTNode(Token t, std::unique_ptr<ASTNode> l = nullptr, std::unique_ptr<ASTNode> r = nullptr) :
+			m_op((l == nullptr && r != nullptr || l != nullptr && r != nullptr) ? Operator::UNARY : Operator::BINARY),
+			token(std::move(t)) {
+			if (l != nullptr) {
+				add(std::move(l));
+			}
+
+			if (r != nullptr) {
+				add(std::move(r));
+			}
+
+			if (r == nullptr && l == nullptr) {
+				m_op = token.empty() ? std::optional<Operator>() : Operator::LITERAL;
+			}
+		}
+
+        ASTNode(Operator o, Token identifierToken = Token{}) :
+			m_op(std::move(o)),
+			token(std::move(identifierToken)) {
+        }
+
 		std::optional<Operator> m_op;
 		std::optional<Type> m_type;
 
@@ -130,5 +162,5 @@ namespace ska {
 		std::vector<std::unique_ptr<ASTNode>> children;
 
 	};
-
 }
+
