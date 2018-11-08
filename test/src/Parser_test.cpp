@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include <doctest.h>
 #include "LoggerConfigLang.h"
 #include "AST.h"
@@ -35,7 +37,7 @@ TEST_CASE("test") {
 	CHECK(checkStatement[1].has(ska::Token { "5", ska::TokenType::DIGIT }));
 
 	const auto& incrementStatement = tree[2];
-	CHECK(incrementStatement.op() == ska::Operator::UNARY);
+	CHECK(incrementStatement.op() == ska::Operator::LITERAL);
 	CHECK(incrementStatement.size() == 1);
 	CHECK(incrementStatement[0].has(ska::Token { "i", ska::TokenType::IDENTIFIER }));
 	
@@ -268,6 +270,7 @@ TEST_CASE("Expression and priorities") {
 	SUBCASE("Priorization with mul after add") {
 		auto astPtr = ASTFromInput("5 + 2 * 4;", keywords);
 		auto& ast = (*astPtr)[0];
+        std::cout << ast.op().value() << std::endl;
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
 		CHECK(ast.has(ska::Token { "+", ska::TokenType::SYMBOL }));

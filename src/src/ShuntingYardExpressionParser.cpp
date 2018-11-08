@@ -5,7 +5,7 @@
 #include "AST.h"
 #include "ReservedKeywordsPool.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::ShuntingYardExpressionParser)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ShuntingYardExpressionParser)
 
 template <class Container>
 void Print(const Container& c, const std::string& name = " ") {
@@ -402,21 +402,20 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::popUntil(stack<Token>& operat
 		}
 		operators.pop();
 
-		currentNode = ASTNode::MakeLogicalNode(op);
-        currentNode->op() = Operator::BINARY;
 		auto rightOperand = std::move(operands.top());
 		operands.pop();
 
+        currentNode = ASTNodePtr{};
 		if(nextNode != nullptr) {
-			currentNode->add(std::move(nextNode));
+			currentNode = ASTNode::MakeLogicalNode(op, std::move(nextNode), std::move(rightOperand));
 		} else if(!operands.empty()) {
-			currentNode->add(std::move(operands.top())); operands.pop();
+			currentNode = ASTNode::MakeLogicalNode(op, std::move(operands.top()), std::move(rightOperand)); operands.pop();
 		} else {
-			//Unary operator ?
-			//currentNode->add(std::make_unique<ASTNode>(Token{ "0", TokenType::DIGIT }));
-			currentNode->op() = Operator::UNARY;
+			//TODO handle unary operator ?
+            //assert(false && "Unsupported for now");
+            //SLOG(ska::LogLevel::Debug) << "\t\tOperator " << op.asString();
+            currentNode = ASTNode::MakeLogicalNode(op, ASTNode::MakeLogicalNode(Token { "0", TokenType::DIGIT }), std::move(rightOperand));
 		}
-		currentNode->add(std::move(rightOperand));
 
 		nextNode = std::move(currentNode);
 		SLOG(ska::LogLevel::Debug) << "\t\tPoped " << op.asString();//<< " with " <<  nextNode->left->token.asString() << " and " << nextNode->right->token.asString();

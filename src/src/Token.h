@@ -76,6 +76,16 @@ namespace ska {
 			return m_type;
 		}
 
+        const bool isLiteral() const {
+            switch(m_type) {
+                case TokenType::DIGIT:
+                case TokenType::STRING:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
 		std::string asString() const {
 			if(m_type == TokenType::EMPTY) {
 				return "EMPTY_TOKEN";

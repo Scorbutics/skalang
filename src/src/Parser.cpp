@@ -140,18 +140,23 @@ ska::Parser::ASTNodePtr ska::Parser::matchIfOrIfElseKeyword() {
 
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::IF>());
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
+    
+    {
+        auto conditionExpression = expr();
+        m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 
-    ifNode->add(expr());
-    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
+        auto conditionStatement = statement();
 
-    ifNode->add(statement());
-
-    const auto elseToken = m_reservedKeywordsPool.pattern<TokenGrammar::ELSE>();
-    if (m_input.expect(elseToken)) {
-        ifNode->op() = Operator::IF_ELSE;
-        m_input.match(elseToken);
-        ifNode->add(statement());
+        const auto elseToken = m_reservedKeywordsPool.pattern<TokenGrammar::ELSE>();
+        if (m_input.expect(elseToken)) {
+            m_input.match(elseToken);
+            auto elseBlockStatement = statement();
+            ifNode = ASTNode::MakeNode<Operator::IF_ELSE>(conditionExpression, conditionStatement, elseBlockStatement);
+        } else {
+            ifNode = ASTNode::MakeNode<Operator::IF>(conditionExpression, conditionStatement);
+        }
     }
+
     auto event = IfElseTokenEvent {*ifNode};
     Observable<IfElseTokenEvent>::notifyObservers(event);
     return ifNode;
@@ -162,12 +167,12 @@ ska::Parser::ASTNodePtr ska::Parser::matchVarKeyword() {
 	std::cout << "variable declaration" << std::endl;
 #endif
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>());
-	auto varNode = ASTNode::MakeNode<Operator::VARIABLE_DECLARATION>(m_input.match(TokenType::IDENTIFIER));
+	auto varNodeIdentifier = m_input.match(TokenType::IDENTIFIER);
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
 #ifdef SKALANG_LOG_PARSER
     std::cout << "equal sign matched, reading expression" << std::endl;
 #endif
-    varNode->add(expr());
+    auto varNodeExpression = expr();
 
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
 #ifdef SKALANG_LOG_PARSER
@@ -175,7 +180,8 @@ ska::Parser::ASTNodePtr ska::Parser::matchVarKeyword() {
 #endif
     auto event = VarTokenEvent {*varNode};
     Observable<VarTokenEvent>::notifyObservers(event);
-    return varNode;
+    
+    return ASTNode::MakeNode<Operator::VARIABLE_DECLARATION>(varNodeIdentifier, varNodeExpression);
 }
 
 ska::Parser::ASTNodePtr ska::Parser::matchReservedKeyword(const std::size_t keywordIndex) {
@@ -206,11 +212,12 @@ ska::Parser::ASTNodePtr ska::Parser::matchReservedKeyword(const std::size_t keyw
 
 ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::RETURN>());
-	auto returnNode = ASTNode::MakeNode<Operator::USER_DEFINED_OBJECT>();
 
     //TODO handle native (= built-in) types
 
     //std::cout << "return detected" << std::endl;
+    
+    auto returnFieldNodes = std::vector<ASTNodePtr>{};
 
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
     while(!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
@@ -222,13 +229,11 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
 #ifdef SKALANG_LOG_PARSER
         std::cout << "Constructor " << name << " with field \"" << field.asString() << "\" and field value \"" << fieldValue->asString() << "\"" <<  std::endl;
 #endif
-        auto fieldNode = ASTNode::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(field));
-        fieldNode->add(std::move(fieldValue));
         
 		auto event = VarTokenEvent{ *fieldNode };
 		Observable<VarTokenEvent>::notifyObservers(event);
 		
-		returnNode->add(std::move(fieldNode));
+		returnFieldNodes.push_back(ASTNode::MakeNode<Operator::VARIABLE_DECLARATION>(field, fieldValue));
 
 		if (m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>())) {
 			m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
@@ -241,7 +246,7 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
     auto event = ReturnTokenEvent { *returnNode, ReturnTokenEventType::OBJECT };
     Observable<ReturnTokenEvent>::notifyObservers(event);
 
-    return returnNode;
+	return ASTNode::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(returnFieldNodes)); 
 }
 
 ska::Parser::ASTNodePtr ska::Parser::expr() {
