@@ -63,8 +63,8 @@ namespace ska {
             return node.type().value();
         }
 
-        if(node.op().has_value() && node.op().value() != Operator::LITERAL) {
-            const auto& op = node.op().value();
+        if(node.op() != Operator::LITERAL) {
+            const auto& op = node.op();
             Type type;
             switch(op) {
                 case Operator::FUNCTION_DECLARATION: type = TypeBuilderOperator<Operator::FUNCTION_DECLARATION>::build(symbols, node); break;

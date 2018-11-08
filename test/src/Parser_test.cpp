@@ -270,7 +270,7 @@ TEST_CASE("Expression and priorities") {
 	SUBCASE("Priorization with mul after add") {
 		auto astPtr = ASTFromInput("5 + 2 * 4;", keywords);
 		auto& ast = (*astPtr)[0];
-        std::cout << ast.op().value() << std::endl;
+        std::cout << ast.op() << std::endl;
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
 		CHECK(ast.has(ska::Token { "+", ska::TokenType::SYMBOL }));

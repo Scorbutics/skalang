@@ -102,7 +102,7 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 				if (index == token.rootNode().size() - 1) {
 					continue;
 				}
-				param->add(ASTNode::MakeLogicalNode(Token{}));
+				//param->add(ASTNode::MakeLogicalNode(Token{}));
 				auto name = param->asString();
 				assert(!param->type().has_value());
 				SLOG(ska::LogLevel::Debug) << "\t\t" << name;

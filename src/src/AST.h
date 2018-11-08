@@ -32,23 +32,6 @@ namespace ska {
 			return m_children.size();
 		}
 
-        /*
-		template<class T>
-		void add(std::unique_ptr<T> c) {
-			assert(c != nullptr);
-			assert(m_op != Operator::UNARY && m_op != Operator::BINARY);
-            children.emplace_back(std::move(c));
-		}
-
-		template<class T>
-		void addIfExists(std::unique_ptr<T> c) {
-			assert(m_op != Operator::UNARY && m_op != Operator::BINARY);
-            if(c != nullptr) {
-				children.emplace_back(std::move(c));
-		    }
-		}
-        */
-
 		TokenType tokenType() const {
 			return token.type();
 		}
@@ -101,17 +84,21 @@ namespace ska {
 
         template<Operator o, class ... Node>
         static ASTNodePtr MakeNode(std::unique_ptr<Node>&& ... children) {
-            static_assert(o != Operator::BINARY && o != Operator::LITERAL, "Wrong constructor used for a logical ASTNode. Use MakeLogicalNode instead.");
-            return std::unique_ptr<ASTNode>(new ASTNode(o, Token {}, std::vector<ASTNodePtr>{std::move(children) ...}));
+			return ASTNode::template MakeNode<o>(Token{}, ASTNode::template BuildVectorFromNodePack(std::move(children)...));
         }
 
         template<Operator o, class ... Node>
-        static ASTNodePtr MakeNode(Token token, std::unique_ptr<Node>&& ... children) {
-            return ASTNode::template MakeNode<o>(std::move(token), std::vector<ASTNodePtr>{std::move(children)...});
+		static ASTNodePtr MakeNode(Token token, std::unique_ptr<Node>&& ... children) {
+            return ASTNode::template MakeNode<o>(std::move(token), ASTNode::template BuildVectorFromNodePack(std::move(children)...));
         }
 
+		template<Operator o>
+		static ASTNodePtr MakeNode(std::vector<ASTNodePtr> children) {
+			return ASTNode::template MakeNode<o>(Token {}, std::move(children));
+		}
+
         template <Operator o>
-        static ASTNodePtr MakeNode(Token token = Token {}, std::vector<ASTNodePtr> children) {
+		static ASTNodePtr MakeNode(Token token, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{}) {
             static_assert(o != Operator::BINARY && o != Operator::LITERAL, "Wrong constructor used for a logical ASTNode. Use MakeLogicalNode instead.");
             if constexpr(
                     o == Operator::VARIABLE_DECLARATION || 
@@ -170,6 +157,20 @@ namespace ska {
 			m_op(std::move(o)),
 			token(std::move(identifierToken)) {
         }
+
+		template <class Func, class ... Args>
+		static void for_each(Func&& f, Args&& ... t) {
+			(f(std::forward<Args>(t)), ...);
+		}
+
+		template <class ... Node>
+		static std::vector<ASTNodePtr> BuildVectorFromNodePack(std::unique_ptr<Node>&& ... children) {
+			auto result = std::vector<ASTNodePtr>{};
+			for_each([&result](auto&& n) {
+				result.push_back(std::forward<decltype(n)>(n));
+			}, std::forward<std::unique_ptr<Node>>(children)...);
+			return std::move(result);
+		}
 
 		Operator m_op;
 		std::optional<Type> m_type;

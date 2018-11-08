@@ -160,13 +160,13 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr identifierFunctionName) {
-	auto functionCallNode = ASTNode::MakeNode<Operator::FUNCTION_CALL>();
-	
-	functionCallNode->add(std::move(identifierFunctionName));
-
 	//First match left parenthesis
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
-				
+
+	auto functionName = identifierFunctionName->asString();
+
+	auto functionCallNodeContent = std::vector<ASTNodePtr>{};
+	functionCallNodeContent.push_back(std::move(identifierFunctionName));
 	const auto endParametersToken = m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>();
 	while (!m_input.expect(endParametersToken)) {
 		
@@ -178,14 +178,16 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr 
 		auto expressionOpt = parse();
 		if (expressionOpt != nullptr) {
 			SLOG(ska::LogLevel::Debug) << "Expression not null";
-			functionCallNode->add(std::move(expressionOpt));
+			functionCallNodeContent.push_back(std::move(expressionOpt));
 		} else {
 			SLOG(ska::LogLevel::Debug) << "Expression null";
 			break;
 		}
 	}
 	m_input.match(endParametersToken);
-	auto event = FunctionTokenEvent {functionCallNode->asString(),  *functionCallNode, FunctionTokenEventType::CALL };
+
+	auto functionCallNode = ASTNode::MakeNode<Operator::FUNCTION_CALL>(std::move(functionCallNodeContent));
+	auto event = FunctionTokenEvent { std::move(functionName),  *functionCallNode, FunctionTokenEventType::CALL };
 	m_parser.Observable<FunctionTokenEvent>::notifyObservers(event);
 	return functionCallNode;
 }
@@ -195,9 +197,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchObjectFieldAccess(Token 
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::METHOD_CALL_OPERATOR>());;
     auto fieldAccessedIdentifier = m_input.match(TokenType::IDENTIFIER);
 
-    auto fieldAccessNode = ASTNode::MakeNode<Operator::FIELD_ACCESS>();
-	fieldAccessNode->add(ASTNode::MakeLogicalNode(fieldAccessedIdentifier));
-    fieldAccessNode->add(ASTNode::MakeLogicalNode(objectAccessed));
+    auto fieldAccessNode = ASTNode::MakeNode<Operator::FIELD_ACCESS>(ASTNode::MakeLogicalNode(fieldAccessedIdentifier), ASTNode::MakeLogicalNode(objectAccessed));
     
     auto event = VarTokenEvent { *fieldAccessNode, VarTokenEventType::USE };
 	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
@@ -205,13 +205,13 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchObjectFieldAccess(Token 
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchAffectation(Token identifierFieldAffected) {
-	auto affectationNode = ASTNode::MakeNode<Operator::VARIABLE_AFFECTATION>(std::move(identifierFieldAffected));
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
 	auto expressionNode = parse();
 	if(expressionNode == nullptr) {
 		error("Affectation incomplete : no expression");
 	}
-	affectationNode->add(std::move(expressionNode));
+	
+	auto affectationNode = ASTNode::MakeNode<Operator::VARIABLE_AFFECTATION>(std::move(identifierFieldAffected), std::move(expressionNode));
 	auto event = VarTokenEvent { *affectationNode, VarTokenEventType::AFFECTATION };
 	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
 	return affectationNode;
@@ -286,8 +286,6 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationParam
 	const auto& id = m_input.match(TokenType::IDENTIFIER);
 	SLOG(ska::LogLevel::Debug) << id.asString();
 	
-	auto node = ASTNode::MakeNode<Operator::PARAMETER_DECLARATION>(id);
-	
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
     const auto typeToken = 
 		m_input.expect(TokenType::RESERVED) ?
@@ -297,22 +295,21 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationParam
 	SLOG(ska::LogLevel::Debug) << "type is : " << typeStr;
 	
 	//TODO handle arrays
-
-    node->add(ASTNode::MakeLogicalNode(typeToken));
-
+	auto node = ASTNode::MakeNode<Operator::PARAMETER_DECLARATION>(id, ASTNode::MakeLogicalNode(typeToken));
     return node;
 }
 
-void ska::ShuntingYardExpressionParser::fillFunctionDeclarationParameters(ASTNode& functionDeclarationNode) {
+std::vector<ska::ASTNodePtr> ska::ShuntingYardExpressionParser::fillFunctionDeclarationParameters() {
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
+	auto parameters = std::vector<ASTNodePtr>{};
 	auto isRightParenthesis = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 	auto isComma = true;
 	while (!isRightParenthesis && isComma) {
 		if (!m_input.expect(TokenType::SYMBOL)) {
 			SLOG(ska::LogLevel::Debug) << "parameter detected, reading identifier : ";
 			auto parameterNode = matchFunctionDeclarationParameter();
-			functionDeclarationNode.add(std::move(parameterNode));
+			parameters.push_back(std::move(parameterNode));
 			isComma = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
 			if (isComma) {
 				m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
@@ -321,6 +318,8 @@ void ska::ShuntingYardExpressionParser::fillFunctionDeclarationParameters(ASTNod
 		isRightParenthesis = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 	}
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
+	
+	return parameters;
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationReturnType() {
@@ -338,18 +337,20 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationRetur
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationBody() {
-	auto blockNode = ASTNode::MakeNode<Operator::BLOCK>();
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
 
+	auto statements = std::vector<ASTNodePtr>{};
 	while (!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
 		auto optionalStatement = m_parser.statement();
 		if (!optionalStatement->logicalEmpty()) {
-			blockNode->add(std::move(optionalStatement));
+			statements.push_back(std::move(optionalStatement));
 		} else {
 			break;
 		}
 	}
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
+
+	auto blockNode = ASTNode::MakeNode<Operator::BLOCK>(std::move(statements));
 	return blockNode;
 }
 
@@ -359,18 +360,20 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
 
     //With this grammar, no other way than reading previously to retrieve the function name.
     const auto functionName = m_input.readPrevious(3); 
-	auto functionDeclarationNode = ASTNode::MakeNode<Operator::FUNCTION_DECLARATION>(functionName);
-	fillFunctionDeclarationParameters(*functionDeclarationNode);
-	functionDeclarationNode->add(matchFunctionDeclarationReturnType());
-
-	auto startEvent = FunctionTokenEvent {functionName.asString(), *functionDeclarationNode, FunctionTokenEventType::DECLARATION_PARAMETERS};
-	m_parser.Observable<FunctionTokenEvent>::notifyObservers(startEvent);
+	
+	auto contentNode = fillFunctionDeclarationParameters();
+	contentNode.push_back(matchFunctionDeclarationReturnType());
 
 	SLOG(ska::LogLevel::Debug) << "reading function body";
-	functionDeclarationNode->add(matchFunctionDeclarationBody());
+	contentNode.push_back(matchFunctionDeclarationBody());
 	SLOG(ska::LogLevel::Debug) << "function read.";
 	
-    auto endEvent = FunctionTokenEvent {functionName.asString(), *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT};
+	auto functionDeclarationNode = ASTNode::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(contentNode));
+	
+	auto startEvent = FunctionTokenEvent{ functionName.asString(), *functionDeclarationNode, FunctionTokenEventType::DECLARATION_PARAMETERS };
+	m_parser.Observable<FunctionTokenEvent>::notifyObservers(startEvent);
+	
+	auto endEvent = FunctionTokenEvent {functionName.asString(), *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT};
 	m_parser.Observable<FunctionTokenEvent>::notifyObservers(endEvent);
 
 	return functionDeclarationNode;

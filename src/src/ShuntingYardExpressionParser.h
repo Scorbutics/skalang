@@ -52,7 +52,7 @@ namespace ska {
 		ASTNodePtr matchFunctionCall(ASTNodePtr identifierFunctionName);
 		ASTNodePtr matchFunctionDeclaration();
 		ASTNodePtr matchFunctionDeclarationBody();
-		void fillFunctionDeclarationParameters(ASTNode& functionDeclarationNode);
+		std::vector<ASTNodePtr> fillFunctionDeclarationParameters();
 		ASTNodePtr matchFunctionDeclarationReturnType();
 		ASTNodePtr matchFunctionDeclarationParameter();
 		ASTNodePtr matchObjectFieldAccess(Token objectAccessed);
