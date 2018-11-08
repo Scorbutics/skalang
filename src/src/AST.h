@@ -20,16 +20,16 @@ namespace ska {
 		}
 
 		bool logicalEmpty() const {
-			return token.type() == TokenType::EMPTY && !m_op.has_value();
+			return token.type() == TokenType::EMPTY && m_op == Operator::UNARY;
 		}
 
 		std::string asString() const {
 			const auto stringRepresentation = token.asString();
-			return stringRepresentation.empty() && !children.empty() ? "¤" : stringRepresentation;
+			return stringRepresentation.empty() && !m_children.empty() ? "¤" : stringRepresentation;
 		}
 
 		std::size_t size() const {
-			return children.size();
+			return m_children.size();
 		}
 
         /*
@@ -54,38 +54,38 @@ namespace ska {
 		}
 
 		ASTNode& left() {
-			assert(m_op == Operator::BINARY && !children.empty());
-			return *children[0].get();
+			assert(m_op == Operator::BINARY && !m_children.empty());
+			return *m_children[0].get();
 		}
 
 		ASTNode& right() {
-			assert(m_op == Operator::BINARY && children.size() >= 2);
-			return *children[1].get();
+			assert(m_op == Operator::BINARY && m_children.size() >= 2);
+			return *m_children[1].get();
 		}
 
 		const ASTNode& left() const {
-			assert(m_op == Operator::BINARY && !children.empty());
-			return *children[0].get();
+			assert(m_op == Operator::BINARY && !m_children.empty());
+			return *m_children[0].get();
 		}
 
 		const ASTNode& right() const {
-			assert(m_op == Operator::BINARY && children.size() >= 2);
-			return *children[1].get();
+			assert(m_op == Operator::BINARY && m_children.size() >= 2);
+			return *m_children[1].get();
 		}
 
 		auto& operator[](const std::size_t index) {
-		    return *children[index];
+		    return *m_children[index];
 		}
 
 		const auto& operator[](const std::size_t index) const {
-		    return *children[index];
+		    return *m_children[index];
 		}
 
-		auto begin() { return std::begin(children); }
-		auto end() { return std::end(children); }
+		auto begin() { return std::begin(m_children); }
+		auto end() { return std::end(m_children); }
 
-		const auto begin() const { return std::begin(children); }
-		const auto end() const { return std::end(children); }
+		const auto begin() const { return std::begin(m_children); }
+		const auto end() const { return std::end(m_children); }
 
 		const auto& op() const {
 			return m_op;
@@ -99,14 +99,19 @@ namespace ska {
 			return m_type;
 		}
 
-        template<Operator o, class NodePtr>
-        static ASTNodePtr MakeNode(NodePtr&& ... children) {
+        template<Operator o, class ... Node>
+        static ASTNodePtr MakeNode(std::unique_ptr<Node>&& ... children) {
             static_assert(o != Operator::BINARY && o != Operator::LITERAL, "Wrong constructor used for a logical ASTNode. Use MakeLogicalNode instead.");
-            return std::unique_ptr<ASTNode>(new ASTNode(o, std::move(token), std::move(children) ...));
+            return std::unique_ptr<ASTNode>(new ASTNode(o, Token {}, std::vector<ASTNodePtr>{std::move(children) ...}));
         }
 
-        template<Operator o, class NodePtr>
-        static ASTNodePtr MakeNode(Token token, NodePtr&& ... children) {
+        template<Operator o, class ... Node>
+        static ASTNodePtr MakeNode(Token token, std::unique_ptr<Node>&& ... children) {
+            return ASTNode::template MakeNode<o>(std::move(token), std::vector<ASTNodePtr>{std::move(children)...});
+        }
+
+        template <Operator o>
+        static ASTNodePtr MakeNode(Token token = Token {}, std::vector<ASTNodePtr> children) {
             static_assert(o != Operator::BINARY && o != Operator::LITERAL, "Wrong constructor used for a logical ASTNode. Use MakeLogicalNode instead.");
             if constexpr(
                     o == Operator::VARIABLE_DECLARATION || 
@@ -117,7 +122,7 @@ namespace ska {
                 assert(token.empty());
             }
 
-            return std::unique_ptr<ASTNode>(new ASTNode(o, std::move(token), std::move(children) ...));
+            return std::unique_ptr<ASTNode>(new ASTNode(o, std::move(token), std::move(children)));
         }
 
         static ASTNodePtr MakeEmptyNode() {
@@ -135,11 +140,11 @@ namespace ska {
 			m_op(l != nullptr && r != nullptr ? Operator::BINARY : Operator::UNARY),
 			token(std::move(t)) {
 			if (l != nullptr) {
-				add(std::move(l));
+				m_children.push_back(std::move(l));
 			}
 
 			if (r != nullptr) {
-				add(std::move(r));
+				m_children.push_back(std::move(r));
 			}
 
             if(token.isLiteral()) {
