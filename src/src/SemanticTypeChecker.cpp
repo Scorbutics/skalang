@@ -21,7 +21,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
         
         case FunctionTokenEventType::DECLARATION_PARAMETERS: {			
 			//getExpressionType(token.node);
-			const auto returnType = token.rootNode()[token.rootNode().size() - 1].type();
+			const auto returnType = token.rootNode()[2].type();
             if (returnType.has_value() && returnType.value() == ExpressionType::OBJECT) {
 				SLOG(ska::LogLevel::Debug) << "user defined object type detected";
 			}

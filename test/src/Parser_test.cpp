@@ -130,10 +130,14 @@ TEST_CASE("function") {
 		auto astPtr = ASTFromInput("var f = function(titi:int, toto:string) : var { };", keywords);
 		auto& ast = (*astPtr)[0];
         CHECK(ast.op() == ska::Operator::VARIABLE_DECLARATION);
-        const auto& astFunc = ast[0];
-        CHECK(astFunc.op() == ska::Operator::FUNCTION_DECLARATION);
-		CHECK(astFunc.size() == 4);
-		//CHECK(ast[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
+        const auto& astFunc133 = ast[0];
+        CHECK(astFunc133.op() == ska::Operator::FUNCTION_DECLARATION);
+		CHECK(astFunc133.size() == 3);
+		
+        CHECK(astFunc133[0].size() == 2);
+        CHECK(astFunc133[1].size() == 0);
+        CHECK(astFunc133[2].size() == 0);
+        //CHECK(ast[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
 		
 	}
 }
@@ -151,22 +155,24 @@ TEST_CASE("User defined object") {
         auto& varJoueurNode = (*astPtr)[0];
         CHECK(varJoueurNode.size() == 1);
         CHECK(varJoueurNode.op() == ska::Operator::VARIABLE_DECLARATION);
-        const auto& astFunc = varJoueurNode[0];
-        CHECK(astFunc.op() == ska::Operator::FUNCTION_DECLARATION);
-		CHECK(astFunc.size() == 3);
+        const auto& astFunc154 = varJoueurNode[0];
+        CHECK(astFunc154.op() == ska::Operator::FUNCTION_DECLARATION);
+		CHECK(astFunc154.size() == 3);
+        const auto& astFuncParameters154 = astFunc154[0];
+        CHECK(astFuncParameters154.size() == 1);
     
         //Checks the parameter name and type
-        CHECK(astFunc[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER})); 
-        CHECK(astFunc[0].size() == 1);
-        CHECK(astFunc[0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
+        CHECK(astFuncParameters154[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER})); 
+        CHECK(astFuncParameters154[0].size() == 1);
+        CHECK(astFuncParameters154[0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
 
         //Checks the return type
-        CHECK(astFunc[1].has(keywords.pattern<ska::TokenGrammar::VARIABLE>()));
+        CHECK(astFunc154[1].has(keywords.pattern<ska::TokenGrammar::VARIABLE>()));
 
         //Checks the function body
-        CHECK(astFunc[2].size() == 1);
+        CHECK(astFunc154[2].size() == 1);
         
-        const auto& userDefinedObjectNode = astFunc[2][0];
+        const auto& userDefinedObjectNode = astFunc154[2][0];
         CHECK(userDefinedObjectNode.op() == ska::Operator::USER_DEFINED_OBJECT);
         CHECK(userDefinedObjectNode.size() == 1);
 

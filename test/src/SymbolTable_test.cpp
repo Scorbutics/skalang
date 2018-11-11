@@ -56,19 +56,19 @@ TEST_CASE("Matching") {
 		}
 
         SUBCASE("var in upper scope used into inner function scope") {
-            ASTFromInput("var test = 21; var func = function() { test = 123; };", data);
+            ASTFromInput("var test59 = 21; var func59 = function() { test59 = 123; };", data);
         }
 
         SUBCASE("function parameter use into function") {
-            ASTFromInput("var func = function(test:int) { test = 123; };", data);
+            ASTFromInput("var func63 = function(test63:int) { test63 = 123; };", data);
         }
         
         SUBCASE("function declared in another function with upper variable") {
-            ASTFromInput("var func = function(test:int) { var toutou67 = function(blurp:string) { test = 123; }; test = 78; };", data);
+            ASTFromInput("var func67 = function(testParam67:int) { var toutou67 = function(blurp:string) { testParam67 = 123; }; testParam67 = 78; };", data);
         }
 
         SUBCASE("shadowing variable into inner function") {
-            ASTFromInput("var test = 3; var func = function(test:string) { test; };", data);
+            ASTFromInput("var test71 = 3; var func71 = function(test71:string) { test71; };", data);
         }
         
 	}
@@ -78,7 +78,7 @@ TEST_CASE("Matching") {
         {
 			SUBCASE("Because of unknown symbol") {
 				try {
-					ASTFromInput("var i = 0; var titi = \"llllll\"; { ti = 9; }", data);
+					ASTFromInput("var i81 = 0; var titi81 = \"llllll\"; { ti81 = 9; }", data);
 				    CHECK(false);
                 } catch (std::exception& e) {
 					CHECK(true);
@@ -87,7 +87,7 @@ TEST_CASE("Matching") {
 
 			SUBCASE("Unknown symbol outside when declared as function parameter") {
 				try {
-					ASTFromInput("var func = function(test:int) {}; test = 123;", data);
+					ASTFromInput("var func90 = function(test90:int) {}; test90 = 123;", data);
 				    CHECK(false);
                 } catch (std::exception& e) {
 					CHECK(true);
@@ -96,7 +96,7 @@ TEST_CASE("Matching") {
 
             SUBCASE("used out of function scope") {
                 try {
-                    ASTFromInput("var func = function(test:int) { var tout = function(blurp:string) {};}; tout = 332;", data);
+                    ASTFromInput("var func99 = function(test99:int) { var tout99 = function(blurp99:string) {};}; tout99 = 332;", data);
                     CHECK(false);
                 } catch (std::exception& e) {
 					CHECK(true);

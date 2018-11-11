@@ -5,7 +5,7 @@
 #include "AST.h"
 #include "ReservedKeywordsPool.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ShuntingYardExpressionParser)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ShuntingYardExpressionParser)
 
 template <class Container>
 void Print(const Container& c, const std::string& name = " ") {
@@ -361,18 +361,20 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
 
     //With this grammar, no other way than reading previously to retrieve the function name.
     const auto functionName = m_input.readPrevious(3); 
-	
-	auto contentNode = fillFunctionDeclarationParameters();
-	contentNode.push_back(matchFunctionDeclarationReturnType());
 
-	SLOG(ska::LogLevel::Debug) << "reading function body";
-	contentNode.push_back(matchFunctionDeclarationBody());
+	auto contentNode = fillFunctionDeclarationParameters();
+	
+    auto parametersNode = ASTNode::MakeNode<Operator::PARAMETER_PACK_DECLARATION>(std::move(contentNode));
+    auto returnTypeNode = matchFunctionDeclarationReturnType();
+
+	auto startEvent = FunctionTokenEvent{ functionName.asString(), *parametersNode, FunctionTokenEventType::DECLARATION_PARAMETERS };
+	m_parser.Observable<FunctionTokenEvent>::notifyObservers(startEvent);
+
+    SLOG(ska::LogLevel::Debug) << "reading function body";
+	auto functionBodyNode = matchFunctionDeclarationBody();
 	SLOG(ska::LogLevel::Debug) << "function read.";
 	
-	auto functionDeclarationNode = ASTNode::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(contentNode));
-	
-	auto startEvent = FunctionTokenEvent{ functionName.asString(), *functionDeclarationNode, FunctionTokenEventType::DECLARATION_PARAMETERS };
-	m_parser.Observable<FunctionTokenEvent>::notifyObservers(startEvent);
+	auto functionDeclarationNode = ASTNode::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(parametersNode), std::move(returnTypeNode), std::move(functionBodyNode));
 	
 	auto endEvent = FunctionTokenEvent {functionName.asString(), *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT};
 	m_parser.Observable<FunctionTokenEvent>::notifyObservers(endEvent);
