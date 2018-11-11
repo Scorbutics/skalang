@@ -155,7 +155,7 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 }
 
 bool ska::SymbolTable::match(const VarTokenEvent& token) {
-	assert(token.rootNode().size() == 1);
+	assert(token.rootNode().size() >= 1);
 	assert(m_currentTable != nullptr);
 	
 	switch(token.type()) {

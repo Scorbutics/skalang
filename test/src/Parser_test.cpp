@@ -37,7 +37,7 @@ TEST_CASE("test") {
 	CHECK(checkStatement[1].has(ska::Token { "5", ska::TokenType::DIGIT }));
 
 	const auto& incrementStatement = tree[2];
-	CHECK(incrementStatement.op() == ska::Operator::LITERAL);
+	CHECK(incrementStatement.op() == ska::Operator::UNARY);
 	CHECK(incrementStatement.size() == 1);
 	CHECK(incrementStatement[0].has(ska::Token { "i", ska::TokenType::IDENTIFIER }));
 	
@@ -185,7 +185,9 @@ TEST_CASE("User defined object") {
         //Checks the field access
         const auto& nomJoueur1FieldNode = (*astPtr)[2];
         CHECK(nomJoueur1FieldNode.op() == ska::Operator::FIELD_ACCESS);
-        CHECK(nomJoueur1FieldNode.has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER } ));
+		CHECK(nomJoueur1FieldNode.size() == 2);
+		CHECK(nomJoueur1FieldNode[0].has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER } ));
+		CHECK(nomJoueur1FieldNode[1].has(ska::Token{ "nom", ska::TokenType::IDENTIFIER }));
 
         //std::cout << std::endl << std::endl << std::endl;
 	}

@@ -99,16 +99,7 @@ namespace ska {
 
         template <Operator o>
 		static ASTNodePtr MakeNode(Token token, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{}) {
-            static_assert(o != Operator::BINARY && o != Operator::LITERAL, "Wrong constructor used for a logical ASTNode. Use MakeLogicalNode instead.");
-            if constexpr(
-                    o == Operator::VARIABLE_DECLARATION || 
-                    o == Operator::FUNCTION_DECLARATION || 
-                    o == Operator::PARAMETER_DECLARATION) {
-                assert(!token.empty());
-            } else {
-                assert(token.empty());
-            }
-
+			ASTNode::template CheckTokenAssociatedWithOperator<o>(token);
             return std::unique_ptr<ASTNode>(new ASTNode(o, std::move(token), std::move(children)));
         }
 
@@ -116,13 +107,27 @@ namespace ska {
             return std::unique_ptr<ASTNode>(new ASTNode());
         }
 
-        static ASTNodePtr MakeLogicalNode(Token t, ASTNodePtr l = nullptr, ASTNodePtr r = nullptr) {
-            return std::unique_ptr<ASTNode>(new ASTNode(std::move(t), std::move(l), std::move(r)));
+        static ASTNodePtr MakeLogicalNode(Token token, ASTNodePtr l = nullptr, ASTNodePtr r = nullptr) {
+			assert(!token.empty());
+            return std::unique_ptr<ASTNode>(new ASTNode(std::move(token), std::move(l), std::move(r)));
         }
 
 	private:
 		ASTNode() = default;
         
+		template<Operator o>
+		static void CheckTokenAssociatedWithOperator(const Token& token) {
+			static_assert(o != Operator::BINARY && o != Operator::LITERAL, "Wrong constructor used for a logical ASTNode. Use MakeLogicalNode instead.");
+			if constexpr (
+				o == Operator::VARIABLE_DECLARATION ||
+				o == Operator::FUNCTION_DECLARATION ||
+				o == Operator::PARAMETER_DECLARATION) {
+				assert(!token.empty());
+			} else {
+				assert(token.empty());
+			}
+		}
+
         explicit ASTNode(Token t, ASTNodePtr l = nullptr, ASTNodePtr r = nullptr) :
 			m_op(l != nullptr && r != nullptr ? Operator::BINARY : Operator::UNARY),
 			token(std::move(t)) {
@@ -142,7 +147,8 @@ namespace ska {
 		}
 
         ASTNode(Operator o, Token identifierToken = Token{}, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{}) : 
-            m_op(o) {
+            m_op(o),
+			token(std::move(identifierToken)) {
             if(!children.empty()) {
                 m_children.reserve(children.size());
                 for(auto& child : children) {
@@ -172,7 +178,7 @@ namespace ska {
 			return std::move(result);
 		}
 
-		Operator m_op;
+		Operator m_op = Operator::UNARY;
 		std::optional<Type> m_type;
 
 		Token token;

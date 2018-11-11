@@ -63,7 +63,7 @@ namespace ska {
             return node.type().value();
         }
 
-        if(node.op() != Operator::LITERAL) {
+        if(node.op() != Operator::LITERAL && !(node.op() == Operator::UNARY && node.size() == 0)) {
             const auto& op = node.op();
             Type type;
             switch(op) {

@@ -229,7 +229,7 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
 
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
     while(!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
-        auto field = ASTNode::MakeLogicalNode(m_input.match(TokenType::IDENTIFIER));
+        auto field = m_input.match(TokenType::IDENTIFIER);
         m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
         auto fieldValue = expr();
 

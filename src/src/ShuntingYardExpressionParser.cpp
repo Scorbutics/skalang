@@ -79,7 +79,8 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 			switch (value[0]) {
 			case '(':
 				
-				if (!operands.empty() && (operands.top()->op() == Operator::FIELD_ACCESS || operands.top()->op() == Operator::LITERAL && operands.top()->tokenType() == TokenType::IDENTIFIER)) {
+				if (!operands.empty() && (operands.top()->op() == Operator::FIELD_ACCESS || 
+					(operands.top()->op() == Operator::LITERAL || operands.top()->op() == Operator::UNARY) && operands.top()->tokenType() == TokenType::IDENTIFIER)) {
 					SLOG(ska::LogLevel::Debug) << "\tFunction call !";
 					//We already pushed the identifier as an operand, but in fact it's a function call.
 					//We have to pop it, then matching the function call as the new operand.
@@ -197,7 +198,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchObjectFieldAccess(Token 
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::METHOD_CALL_OPERATOR>());;
     auto fieldAccessedIdentifier = m_input.match(TokenType::IDENTIFIER);
 
-    auto fieldAccessNode = ASTNode::MakeNode<Operator::FIELD_ACCESS>(ASTNode::MakeLogicalNode(fieldAccessedIdentifier), ASTNode::MakeLogicalNode(objectAccessed));
+    auto fieldAccessNode = ASTNode::MakeNode<Operator::FIELD_ACCESS>(ASTNode::MakeLogicalNode(objectAccessed), ASTNode::MakeLogicalNode(fieldAccessedIdentifier));
     
     auto event = VarTokenEvent { *fieldAccessNode, VarTokenEventType::USE };
 	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
@@ -211,7 +212,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchAffectation(Token identi
 		error("Affectation incomplete : no expression");
 	}
 	
-	auto affectationNode = ASTNode::MakeNode<Operator::VARIABLE_AFFECTATION>(std::move(identifierFieldAffected), std::move(expressionNode));
+	auto affectationNode = ASTNode::MakeNode<Operator::VARIABLE_AFFECTATION>(ASTNode::MakeLogicalNode(std::move(identifierFieldAffected)), std::move(expressionNode));
 	auto event = VarTokenEvent { *affectationNode, VarTokenEventType::AFFECTATION };
 	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
 	return affectationNode;
@@ -417,7 +418,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::popUntil(stack<Token>& operat
 			//TODO handle unary operator ?
             //assert(false && "Unsupported for now");
             //SLOG(ska::LogLevel::Debug) << "\t\tOperator " << op.asString();
-            currentNode = ASTNode::MakeLogicalNode(op, ASTNode::MakeLogicalNode(Token { "0", TokenType::DIGIT }), std::move(rightOperand));
+            currentNode = ASTNode::MakeLogicalNode(op, /*ASTNode::MakeLogicalNode(Token { "0", TokenType::DIGIT }),*/ std::move(rightOperand));
 		}
 
 		nextNode = std::move(currentNode);
