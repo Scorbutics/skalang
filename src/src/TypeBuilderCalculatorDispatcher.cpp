@@ -58,14 +58,14 @@ namespace ska {
             
     }
     
-    const ska::Type& TypeBuilderDispatchCalculation(const SymbolTable& symbols, ASTNode& node) {
+    ska::Type TypeBuilderDispatchCalculation(const SymbolTable& symbols, ASTNode& node) {
         if(node.type().has_value()) {
             return node.type().value();
         }
 
+        Type type;
         if(node.op() != Operator::LITERAL && !(node.op() == Operator::UNARY && node.size() == 0)) {
             const auto& op = node.op();
-            Type type;
             switch(op) {
                 case Operator::FUNCTION_DECLARATION: type = TypeBuilderOperator<Operator::FUNCTION_DECLARATION>::build(symbols, node); break;
                 case Operator::FUNCTION_CALL: type = TypeBuilderOperator<Operator::FUNCTION_CALL>::build(symbols, node); break;
@@ -79,13 +79,13 @@ namespace ska {
 					SLOG_STATIC(ska::LogLevel::Warn, ska::TypeBuilderOperator<Operator::LITERAL>) << "Unknown type for the node " << node.asString() << " based on operator " << OperatorSTR[static_cast<std::size_t>(op)];
                     type = ExpressionType::VOID;
             }
-            node.type() = std::move(type);
+            type = std::move(type);
 
 			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<Operator::LITERAL>) << "Type for the node " << node.asString() << " is now \"" << node.type().value().asString() << "\" based on the operator " << OperatorSTR[static_cast<std::size_t>(op)];
         } else {
-            node.type() = TypeBuilderBuildFromTokenType(symbols, node);
+            type = TypeBuilderBuildFromTokenType(symbols, node);
         }
-        return node.type().value();
+        return type;
     }
     
 }

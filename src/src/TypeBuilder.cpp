@@ -1,7 +1,6 @@
 #include "LoggerConfigLang.h"
 #include "TypeBuilder.h"
 #include "TypeBuilderOperator.h"
-#include "TypeBuilderCalculatorDispatcher.h"
 #include "AST.h"
 
 #include "Parser.h"
@@ -17,19 +16,19 @@ ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) :
 }
 
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
-    TypeBuilderDispatchCalculation(m_symbols, event.rootNode());
+    event.rootNode().buildType(m_symbols);
 	SLOG(LogLevel::Debug) << "Type built for variable \"" << event.rootNode().asString() << "\" = \"" << event.rootNode().type().value().asString() << "\"";
 
     return true;
 }
 
 bool ska::TypeBuilder::matchReturn(ReturnTokenEvent& event) const {
-	TypeBuilderDispatchCalculation(m_symbols, event.rootNode());
+	event.rootNode().buildType(m_symbols);
 	return true;
 }
 
 bool ska::TypeBuilder::matchExpression(ExpressionTokenEvent& event) const {
-	TypeBuilderDispatchCalculation(m_symbols, event.rootNode());
+	event.rootNode().buildType(m_symbols);
 	SLOG(LogLevel::Debug) << "Type built for expression \"" << event.rootNode().asString() << "\" = \"" << event.rootNode().type().value().asString() << "\"";
     return true;
 }
@@ -42,9 +41,9 @@ bool ska::TypeBuilder::matchFunction(FunctionTokenEvent& event) const {
         case FunctionTokenEventType::DECLARATION_PARAMETERS: {			
 			auto& mainFunctionNode = event.rootNode();
 			for (auto& functionParametersNode : mainFunctionNode) {
-				TypeBuilderDispatchCalculation(m_symbols, *functionParametersNode);
+                functionParametersNode->buildType(m_symbols);
 			}
-			TypeBuilderDispatchCalculation(m_symbols, mainFunctionNode);
+			mainFunctionNode.buildType(m_symbols);
 			SLOG(LogLevel::Debug) << "Type built for function parameter declaration / call \"" << event.rootNode().asString() << "\" = \"" << event.rootNode().type().value().asString() << "\"";
         } break;
 

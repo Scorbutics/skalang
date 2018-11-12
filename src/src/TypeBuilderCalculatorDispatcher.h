@@ -6,5 +6,5 @@ namespace ska {
     class SymbolTable;
     class ASTNode;
 
-	const ska::Type& TypeBuilderDispatchCalculation(const SymbolTable& symbols, ASTNode& node);
+	Type TypeBuilderDispatchCalculation(const SymbolTable& symbols, ASTNode& node);
 }

@@ -9,6 +9,7 @@
 
 namespace ska {
 	class Symbol;
+    class SymbolTable;
 
 	class ASTNode {
 	public:
@@ -74,9 +75,7 @@ namespace ska {
 			return m_op;
 		}
 
-		auto& type() {
-			return m_type;
-		}
+	    void buildType(const SymbolTable& symbols);
 
 		const auto& type() const {
 			return m_type;
@@ -128,41 +127,9 @@ namespace ska {
 			}
 		}
 
-        explicit ASTNode(Token t, ASTNodePtr l = nullptr, ASTNodePtr r = nullptr) :
-			m_op(l != nullptr && r != nullptr ? Operator::BINARY : Operator::UNARY),
-			token(std::move(t)) {
-			if (l != nullptr) {
-				m_children.push_back(std::move(l));
-			}
-
-			if (r != nullptr) {
-				m_children.push_back(std::move(r));
-			}
-
-            if(token.isLiteral()) {
-                assert(m_op == Operator::UNARY);
-                m_op = Operator::LITERAL;
-            }
-            
-		}
-
-        ASTNode(Operator o, Token identifierToken = Token{}, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{}) : 
-            m_op(o),
-			token(std::move(identifierToken)) {
-            if(!children.empty()) {
-                m_children.reserve(children.size());
-                for(auto& child : children) {
-                    if(child != nullptr) {
-                        m_children.push_back(std::move(child));
-                    }
-                }
-            }
-        }
-
-        ASTNode(Operator o, Token identifierToken = Token{}) :
-			m_op(std::move(o)),
-			token(std::move(identifierToken)) {
-        }
+        explicit ASTNode(Token t, ASTNodePtr l = nullptr, ASTNodePtr r = nullptr);
+        ASTNode(Operator o, Token identifierToken = Token{}, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{});
+        ASTNode(Operator o, Token identifierToken = Token{});
 
 		template <class Func, class ... Args>
 		static void for_each(Func&& f, Args&& ... t) {
