@@ -13,9 +13,11 @@ namespace ska {
 
     class FunctionTokenEvent {
 	public:
-		FunctionTokenEvent(std::string name, ASTNode& node, FunctionTokenEventType type) :
+
+		FunctionTokenEvent(std::string name, ASTNode& node, ASTNode* returnTypeNode, FunctionTokenEventType type) :
 			m_name(std::move(name)),
 			m_node(node),
+			m_returnType(returnTypeNode),
 			m_type(type) {
 		}
 
@@ -41,9 +43,18 @@ namespace ska {
 			return m_node;
 		}
 
+		auto& returnTypeNode() {
+			return m_returnType;
+		}
+
+		const auto& returnTypeNode() const {
+			return m_returnType;
+		}
+
 	private:
         std::string m_name;
         ASTNode& m_node;
+		ASTNode* m_returnType = nullptr;
 	    FunctionTokenEventType m_type;
     };
 }

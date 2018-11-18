@@ -188,7 +188,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr 
 	m_input.match(endParametersToken);
 
 	auto functionCallNode = ASTNode::MakeNode<Operator::FUNCTION_CALL>(std::move(functionCallNodeContent));
-	auto event = FunctionTokenEvent { std::move(functionName),  *functionCallNode, FunctionTokenEventType::CALL };
+	auto event = FunctionTokenEvent { std::move(functionName), *functionCallNode, nullptr, FunctionTokenEventType::CALL };
 	m_parser.Observable<FunctionTokenEvent>::notifyObservers(event);
 	return functionCallNode;
 }
@@ -367,7 +367,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
     auto parametersNode = ASTNode::MakeNode<Operator::PARAMETER_PACK_DECLARATION>(std::move(contentNode));
     auto returnTypeNode = matchFunctionDeclarationReturnType();
 
-	auto startEvent = FunctionTokenEvent{ functionName.asString(), *parametersNode, FunctionTokenEventType::DECLARATION_PARAMETERS };
+	auto startEvent = FunctionTokenEvent{ functionName.asString(), *parametersNode, returnTypeNode.get(), FunctionTokenEventType::DECLARATION_PARAMETERS };
 	m_parser.Observable<FunctionTokenEvent>::notifyObservers(startEvent);
 
     SLOG(ska::LogLevel::Debug) << "reading function body";
@@ -376,7 +376,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
 	
 	auto functionDeclarationNode = ASTNode::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(parametersNode), std::move(returnTypeNode), std::move(functionBodyNode));
 	
-	auto endEvent = FunctionTokenEvent {functionName.asString(), *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT};
+	auto endEvent = FunctionTokenEvent {functionName.asString(), *functionDeclarationNode, returnTypeNode.get(), FunctionTokenEventType::DECLARATION_STATEMENT};
 	m_parser.Observable<FunctionTokenEvent>::notifyObservers(endEvent);
 
 	return functionDeclarationNode;

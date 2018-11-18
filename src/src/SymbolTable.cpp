@@ -22,16 +22,6 @@ std::size_t ska::Symbol::size() const {
     return m_category.compound().size();
 }
 
-void ska::Symbol::link(std::vector<Symbol> subtypes, ScopedSymbolTable& table) {
-	table.link(*this);
-	//m_category.link(table);
-	//m_scopedTable = &table;
-    
-	for (const auto& t : subtypes) {
-		m_category.add(t.getType());
-	}
-}
-
 ska::SymbolTable::SymbolTable(Parser& parser) :
 	SubObserver<VarTokenEvent>(std::bind(&ska::SymbolTable::match, this, std::placeholders::_1), parser),
 	SubObserver<BlockTokenEvent>(std::bind(&ska::SymbolTable::nestedTable, this, std::placeholders::_1), parser),
@@ -95,22 +85,22 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 			SLOG(ska::LogLevel::Info) << "\t\tNew function : adding a nested symbol table";
 			auto* functionSymbolTable = &m_currentTable->createNested();
             m_currentTable = functionSymbolTable;
-            auto parameterNumber = token.rootNode().size();
+			functionSymbolTable->link(symbol);
+            
+			const auto parameterNumber = token.rootNode().size();
 			SLOG(ska::LogLevel::Info) << "\t\tthis function (" << token.name() << ") has " << parameterNumber << " parameters : ";
-            auto currentArgList = std::vector<Symbol>{};
 			auto index = 0u;
 			for(auto& param : token) {
 				auto name = param->asString();
 				assert(!param->type().has_value());
 				SLOG(ska::LogLevel::Debug) << "\t\t" << name;
-				currentArgList.push_back(m_currentTable->emplace(std::move(name), ska::Type{}));
-				
+				m_currentTable->emplace(std::move(name));
 				index++;
             }
-            
-            symbol.link(std::move(currentArgList), *functionSymbolTable);
-            //Already handled with the variable declaration, here we just create the function scope
-            //token.rootNode().type() = ExpressionType::FUNCTION;
+
+			//currentArgAndReturnList.emplace_back();
+            //symbol.link(std::move(currentArgAndReturnList), *functionSymbolTable);
+			
         } break;
 
         case FunctionTokenEventType::DECLARATION_STATEMENT:
@@ -125,14 +115,14 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 			auto* currentSymbolTable = m_currentTable;
 			assert(currentSymbolTable != nullptr);
 			const Symbol* symbol = nullptr;
-			while (n != nullptr && n->size() > 0 && !currentSymbolTable->children().empty()) {
+			/*while (n != nullptr && n->size() > 0 && !currentSymbolTable->children().empty()) {
 				n = &(*n)[0];
 				currentSymbolTable = currentSymbolTable->children()[0].get();
 				const auto& fieldName = n->asString();
 				auto* fieldSymbol = (*currentSymbolTable)[fieldName];
 				SLOG(ska::LogLevel::Info) << "field symbol : " << (fieldSymbol != nullptr ? fieldSymbol->getType().asString() : "null");
                 symbol = fieldSymbol;
-			}
+			}*/
 
 			if(symbol == nullptr) {
 				symbol = (*this)[name];
@@ -158,9 +148,14 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 		case VarTokenEventType::DECLARATION: {			
 			assert(token.rootNode().size() > 0);
 			const auto type = token.rootNode()[0].type();
-			const auto name = token.rootNode().asString();
-			SLOG(ska::LogLevel::Info) << "Matching new variable : " << name;
-			m_currentTable->emplace(name, /*type.has_value() ? type.value() :*/ ska::Type{});
+			const auto variableName = token.rootNode().asString();
+			SLOG(ska::LogLevel::Info) << "Matching new variable : " << variableName;
+			auto symbolInCurrentTable = (*m_currentTable)(variableName);
+			if (symbolInCurrentTable == nullptr) {
+				m_currentTable->emplace(variableName);
+			} else if(symbolInCurrentTable->getType() != ExpressionType::FUNCTION) {
+				throw std::runtime_error("Symbol already defined : " + variableName);
+			}
         } break;
 
 		default:
@@ -188,7 +183,7 @@ ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, Type type) {
     
     {
-        auto symbol = Symbol { name, type, *this };
+        auto symbol = Symbol { name, *this, type };
 		SLOG(ska::LogLevel::Debug) << "\tSymbol \"" << name << "\" \"" <<  symbol.getType().asString() << "\"";
         if(m_symbols.find(name) == m_symbols.end()) {
             m_symbols.emplace(name, std::move(symbol));

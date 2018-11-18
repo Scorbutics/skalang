@@ -20,8 +20,9 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
         case FunctionTokenEventType::DECLARATION_STATEMENT:break;
         
         case FunctionTokenEventType::DECLARATION_PARAMETERS: {			
+			assert(token.returnTypeNode() != nullptr);
 			//getExpressionType(token.node);
-			const auto returnType = token.rootNode()[2].type();
+			const auto returnType = token.returnTypeNode()->type();
             if (returnType.has_value() && returnType.value() == ExpressionType::OBJECT) {
 				SLOG(ska::LogLevel::Debug) << "user defined object type detected";
 			}
@@ -30,12 +31,12 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 
         default:
         case FunctionTokenEventType::CALL: {
-			//auto type = getExpressionType(token.node);
             const auto symbol = m_symbols[variable];
             if(symbol == nullptr || symbol->getType() != ExpressionType::FUNCTION) {
                 throw std::runtime_error("function " + variable + " is called before being declared (or has a bad declaration)");
             }
 
+			assert(symbol->size() != 0 && "Function declaration type must have at least a return type (even if it's void)");
             if(symbol->size() != token.rootNode().size()) {
                 auto ss = std::stringstream {};
                 ss << "bad function call : the function " << variable << " needs " << (symbol->size() - 1) << " parameters but is being called with " << (token.rootNode().size() - 1) << " parameters (function type is " << symbol->getType().asString() << ")";
@@ -43,8 +44,6 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
             }
 
 			SLOG(ska::LogLevel::Debug) << variable << " function has the following arguments types during its call : ";
-
-			;
 			for (auto index = 1u; index < token.rootNode().size(); index++) {
 				auto& param = token.rootNode()[index];
 				const auto calculatedType = param.type().value();

@@ -5,6 +5,8 @@
 #include "AST.h"
 
 namespace ska {
+	struct TypeBuilderBuildFromTokenTypeTag;
+
     Type TypeBuilderBuildFromTokenType(const SymbolTable& symbols, const ASTNode& node) {
         switch(node.tokenType()) {
             case TokenType::SYMBOL:
@@ -41,7 +43,7 @@ namespace ska {
                 break;
         }
 
-        SLOG_STATIC(ska::LogLevel::Error, ska::TypeBuilderOperator<Operator::LITERAL>) << "default type returned for node \"" << node.asString() << "\" of type " << TokenTypeSTR[static_cast<std::size_t>(node.tokenType())];
+        SLOG_STATIC(ska::LogLevel::Error, TypeBuilderBuildFromTokenTypeTag) << "default type returned for node \"" << node.asString() << "\" of type " << TokenTypeSTR[static_cast<std::size_t>(node.tokenType())];
 
         return ExpressionType::VOID;
             

@@ -1,6 +1,6 @@
 #include "AST.h"
-#include "TypeBuilderUnary.h"
 #include "TypeBuilderBinary.h"
+#include "TypeBuilderLiteral.h"
 
 ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
     m_op(l != nullptr && r != nullptr ? Operator::BINARY : Operator::UNARY),
@@ -45,7 +45,11 @@ ska::ASTNode::ASTNode(Operator o, Token identifierToken) :
 }
 
 void ska::ASTNode::buildType(const SymbolTable& symbols) {
-    for(auto& child : m_children) {
+	if (m_type.has_value()) {
+		return;
+	}
+
+	for(auto& child : m_children) {
         child->buildType(symbols);
     }
 	assert(m_typeBuilder != nullptr && "Cannot calculate the node type (it might be an empty node)");

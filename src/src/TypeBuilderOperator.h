@@ -18,7 +18,7 @@ namespace ska {
     template <Operator O>
     struct TypeBuilderOperator : public TypeBuildUnit {
         Type build(const SymbolTable& symbols, const ASTNode& node) override {
-			return TypeBuilderBuildFromTokenType(symbols, node);
+			return ExpressionType::VOID;
         }
     };
 

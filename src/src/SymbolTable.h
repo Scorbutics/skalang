@@ -20,18 +20,20 @@ namespace ska {
     	
     class Symbol {
         public:
-            Symbol(std::string name, Type cat, ScopedSymbolTable& symbolTable) : 
+			Symbol(){}
+
+			Symbol(std::string name, ScopedSymbolTable& symbolTable, Type type = Type {}) :
 				m_name(std::move(name)), 
-                m_category(std::move(cat)),
+				m_category(std::move(type)),
 				m_scopedTable(&symbolTable) {
-					SLOG(ska::LogLevel::Debug) << "Creating Symbol " << m_name << " with type " << m_category.asString();
-                }
+				SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" with type " << m_category.asString();
+            }
 
             Symbol(const Symbol& s) {
                 *this = s;
             }
 
-            Symbol(Symbol&& s) {
+            Symbol(Symbol&& s) noexcept {
                 *this = std::move(s);
             }
 
@@ -43,7 +45,7 @@ namespace ska {
                 return *this;
             }
 
-            Symbol& operator=(Symbol&& s) {
+            Symbol& operator=(Symbol&& s) noexcept {
                 m_scopedTable = std::move(s.m_scopedTable);
                 m_name = std::move(s.m_name);
                 m_category = std::move(s.m_category);
@@ -67,8 +69,13 @@ namespace ska {
                 return m_category;
             }
 
-			void setType(Type t) {
+			void calculateType(Type t) {
 				m_category = std::move(t);
+				m_calculated = true;
+			}
+
+			const auto& isCalculated() const {
+				return m_calculated;
 			}
 
 			ScopedSymbolTable* symbolTable() {
@@ -88,12 +95,11 @@ namespace ska {
 
             std::size_t size() const;
 
-            void link(std::vector<Symbol> subtypes, ScopedSymbolTable& table);
-
         private:
 			ScopedSymbolTable* m_scopedTable = nullptr;
             std::string m_name;
             Type m_category;
+			bool m_calculated = false;
     };
 
 	class SymbolTable;
@@ -112,7 +118,7 @@ namespace ska {
 
 		ScopedSymbolTable& parent();
 		ScopedSymbolTable& createNested();
-		Symbol& emplace(std::string name, Type type);
+		Symbol& emplace(std::string name, Type type = Type{});
 		
         void link(Symbol& s) {
             m_parentSymbol = &s;
@@ -127,7 +133,7 @@ namespace ska {
 			if(valueIt == m_symbols.end()) {
 				return &m_parent == this ? nullptr : m_parent[key];
 			}
-			return &m_symbols.at(key);
+			return valueIt == m_symbols.end() ? nullptr : &(valueIt->second);
         }
 
         const Symbol* operator[](const std::string& key) const {
@@ -135,9 +141,19 @@ namespace ska {
             if(valueIt == m_symbols.end()) {
                 return &m_parent == this ? nullptr : m_parent[key];
             }
-            return &m_symbols.at(key);
+			return valueIt == m_symbols.end() ? nullptr : &(valueIt->second);
         }
 		
+		Symbol* operator()(const std::string& key) {
+			auto valueIt = m_symbols.find(key);
+			return valueIt == m_symbols.end() ? nullptr : &(valueIt->second);
+		}
+
+		const Symbol* operator()(const std::string& key) const {
+			const auto valueIt = m_symbols.find(key);
+			return valueIt == m_symbols.end() ? nullptr : &(valueIt->second);
+		}
+
 		ChildrenScopedSymbolTable& children() {
 			return m_children;
 		}

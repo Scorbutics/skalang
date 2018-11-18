@@ -6,6 +6,7 @@
 #include "SymbolTable.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::PARAMETER_PACK_DECLARATION>)
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>::build(const SymbolTable& symbols, const ASTNode& node) {
     assert(node.size() == 1);
@@ -25,3 +26,4 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>::build(
        return type;
    }
 }
+

@@ -63,11 +63,13 @@ void ska::SymbolTableTypeUpdater::updateType(const ASTNode& node) {
 	if (isOperatorAccepted(node.op())) {
 		assert(type.has_value());
 		auto* symbol = m_symbols[node.asString()];
-		if (symbol != nullptr && symbol->getType() != type.value()) {
-			symbol->setType(type.value());
-			SLOG(LogLevel::Info) << "Type updated for symbol " << node.asString() << " = " << node.type().value().asString();
-		} else {
-			SLOG(LogLevel::Error) << "No type detected for symbol " << node.asString() << " with operator " << node.op();
+		if (symbol != nullptr && !symbol->isCalculated()) {
+			if (symbol->getType() != type.value()) {
+				symbol->calculateType(type.value());
+				SLOG(LogLevel::Info) << "Type updated for symbol \"" << node.asString() << "\" = \"" << node.type().value().asString() << "\"";
+			} else {
+				SLOG(LogLevel::Error) << "No type detected for symbol \"" << node.asString() << "\" with operator \"" << node.op() << "\"";
+			}
 		}
 	}
 }
