@@ -240,8 +240,8 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
         
         auto fieldNode = ASTNode::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(field), std::move(fieldValue));
 		
-        auto event = VarTokenEvent{ *fieldNode };
-		Observable<VarTokenEvent>::notifyObservers(event);
+        //auto event = VarTokenEvent{ *fieldNode };
+		//Observable<VarTokenEvent>::notifyObservers(event);
 		
 		returnFieldNodes.push_back(std::move(fieldNode));
 

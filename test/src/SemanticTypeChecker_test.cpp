@@ -140,7 +140,22 @@ TEST_CASE("[SemanticTypeChecker]") {
 		
         }
 
-		SUBCASE("constructor complex with contained function NOT USING the current type...") {
+		SUBCASE("constructor with function field accessed through variable") {
+			ASTFromInputSemanticTC(
+				"var JoueurClass = function(nom:string) : var { "
+					"var attaquer = function(degats:int) {"
+					"};"
+
+					"return {"
+						"attaquer : attaquer"
+					"};"
+				"};"
+				"var joueur1 = JoueurClass(\"joueur1Nom\");"
+				"joueur1.attaquer(10);"
+				, data);
+		}
+
+		SUBCASE("constructor complex with contained function NOT USING the current type BUT mentioning it...") {
 			ASTFromInputSemanticTC(
 			"var JoueurClass = function(nom:string) : var { "
 				"var puissance = 10;"

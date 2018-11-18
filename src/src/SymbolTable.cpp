@@ -97,9 +97,6 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 				m_currentTable->emplace(std::move(name));
 				index++;
             }
-
-			//currentArgAndReturnList.emplace_back();
-            //symbol.link(std::move(currentArgAndReturnList), *functionSymbolTable);
 			
         } break;
 
@@ -127,6 +124,7 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 			if(symbol == nullptr) {
 				symbol = (*this)[name];
 				if (symbol == nullptr) {
+					//TODO : handle complex function call (ex : with field access node)
 					throw std::runtime_error("Symbol function not found : " + name);
 				}
 			}
