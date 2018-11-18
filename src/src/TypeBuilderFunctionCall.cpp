@@ -7,9 +7,9 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>);
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>::build(const SymbolTable& symbols, ASTNode& node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>::build(const SymbolTable& symbols, const ASTNode& node) {
     const auto& functionIdentifier = node[0];
-    const auto& type = TypeBuilderDispatchCalculation(symbols, node[0]);
+    const auto& type = node[0].type().value();
     const auto functionName = functionIdentifier.asString();
     auto* symbol = symbols[functionName];
     auto* n = &node[0];

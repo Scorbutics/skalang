@@ -6,6 +6,15 @@
 #include "ASTNodePtr.h"
 #include "Operator.h"
 #include "ExpressionType.h"
+#include "TypeBuildUnit.h"
+
+//Alls except Unary, Binary & Literal
+#include "TypeBuilderFieldAccess.h"
+#include "TypeBuilderFunctionCall.h"
+#include "TypeBuilderFunctionDeclaration.h"
+#include "TypeBuilderParameterDeclaration.h"
+#include "TypeBuilderVariableAffectation.h"
+#include "TypeBuilderVariableDeclaration.h"
 
 namespace ska {
 	class Symbol;
@@ -99,7 +108,9 @@ namespace ska {
         template <Operator o>
 		static ASTNodePtr MakeNode(Token token, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{}) {
 			ASTNode::template CheckTokenAssociatedWithOperator<o>(token);
-            return std::unique_ptr<ASTNode>(new ASTNode(o, std::move(token), std::move(children)));
+            auto node = std::unique_ptr<ASTNode>(new ASTNode(o, std::move(token), std::move(children)));
+			node->m_typeBuilder = std::make_unique<TypeBuilderOperator<o>>();
+			return node;
         }
 
         static ASTNodePtr MakeEmptyNode() {
@@ -147,6 +158,7 @@ namespace ska {
 
 		Operator m_op = Operator::UNARY;
 		std::optional<Type> m_type;
+		std::unique_ptr<TypeBuildUnit> m_typeBuilder;
 
 		Token token;
 		std::vector<ASTNodePtr> m_children;

@@ -3,9 +3,9 @@
 #include "AST.h"
 #include "TypeBuilderCalculatorDispatcher.h"
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::BINARY>::build(const SymbolTable& symbols, ASTNode& node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::BINARY>::build(const SymbolTable& symbols, const ASTNode& node) {
     assert(node.size() == 2 && !node.asString().empty());
-    const auto& type1 = TypeBuilderDispatchCalculation(symbols, node[0]);
-    const auto& type2 = TypeBuilderDispatchCalculation(symbols, node[1]);
+    const auto& type1 = node[0].type().value();
+    const auto& type2 = node[1].type().value();
     return type1.crossTypes(node.asString()[0], type2);
 }

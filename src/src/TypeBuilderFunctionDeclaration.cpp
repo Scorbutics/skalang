@@ -6,10 +6,10 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::FUNCTION_DECLARATION>)
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_DECLARATION>::build(const SymbolTable& symbols, ASTNode& node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_DECLARATION>::build(const SymbolTable& symbols, const ASTNode& node) {
     auto functionType = Type{ ExpressionType::FUNCTION };
     for (auto& paramNode : node[1]) {
-        auto varType = TypeBuilderDispatchCalculation(symbols, *paramNode);
+        auto varType = paramNode->type().value();
         if(varType == ExpressionType::OBJECT) {
             varType.name(node.asString());
         }

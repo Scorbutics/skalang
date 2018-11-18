@@ -6,5 +6,5 @@ namespace ska {
     class SymbolTable;
     class ASTNode;
 
-	Type TypeBuilderDispatchCalculation(const SymbolTable& symbols, ASTNode& node);
+	Type TypeBuilderBuildFromTokenType(const SymbolTable& symbols, const ASTNode& node);
 }

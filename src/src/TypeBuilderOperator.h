@@ -2,11 +2,13 @@
 
 #include "Operator.h"
 #include "ExpressionType.h"
+#include "TypeBuildUnit.h"
+#include "TypeBuilderCalculatorDispatcher.h"
 
 #define SKALANG_BUILDER_TYPE_OPERATOR_DEFINE(OperatorType)\
     template<>\
-    struct TypeBuilderOperator<OperatorType> {\
-        static Type build(const SymbolTable& symbols, ASTNode& node);\
+    struct TypeBuilderOperator<OperatorType> : public TypeBuildUnit {\
+        Type build(const SymbolTable& symbols, const ASTNode& node) override;\
     };
 
 namespace ska {
@@ -14,9 +16,9 @@ namespace ska {
     class SymbolTable;
 
     template <Operator O>
-    struct TypeBuilderOperator {
-        static Type build(const SymbolTable& symbols, ASTNode& node) {
-            return ExpressionType::VOID;
+    struct TypeBuilderOperator : public TypeBuildUnit {
+        Type build(const SymbolTable& symbols, const ASTNode& node) override {
+			return TypeBuilderBuildFromTokenType(symbols, node);
         }
     };
 

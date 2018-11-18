@@ -5,7 +5,7 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>)
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const SymbolTable& symbols, ASTNode& node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const SymbolTable& symbols, const ASTNode& node) {
     const auto symbolObject = symbols[node.asString()];
     if (symbolObject == nullptr) {
         throw std::runtime_error("trying to dereference an unknown symbol : " + node.asString());

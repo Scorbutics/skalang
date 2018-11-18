@@ -1,5 +1,6 @@
 #include "AST.h"
-#include "TypeBuilderCalculatorDispatcher.h"
+#include "TypeBuilderUnary.h"
+#include "TypeBuilderBinary.h"
 
 ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
     m_op(l != nullptr && r != nullptr ? Operator::BINARY : Operator::UNARY),
@@ -15,8 +16,14 @@ ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
     if(token.isLiteral()) {
         assert(m_op == Operator::UNARY);
         m_op = Operator::LITERAL;
-    }
-    
+		m_typeBuilder = std::make_unique<TypeBuilderOperator<Operator::LITERAL>>();
+	} else {
+		if (m_op == Operator::BINARY) {
+			m_typeBuilder = std::make_unique<TypeBuilderOperator<Operator::BINARY>>();
+		} else {
+			m_typeBuilder = std::make_unique<TypeBuilderOperator<Operator::UNARY>>();
+		}
+	}
 }
 
 ska::ASTNode:: ASTNode(Operator o, Token identifierToken, std::vector<ASTNodePtr> children) : 
@@ -38,10 +45,9 @@ ska::ASTNode::ASTNode(Operator o, Token identifierToken) :
 }
 
 void ska::ASTNode::buildType(const SymbolTable& symbols) {
-    //TODO virtual member functions ?
-    //m_type = m_typeBuildUnit.build();
     for(auto& child : m_children) {
         child->buildType(symbols);
     }
-    m_type = TypeBuilderDispatchCalculation(symbols, *this);
+	assert(m_typeBuilder != nullptr && "Cannot calculate the node type (it might be an empty node)");
+    m_type = m_typeBuilder->build(symbols, *this);
 }
