@@ -37,21 +37,28 @@ namespace ska {
 
 	struct Type {
 		Type() = default;
-		//Type(std::string name, ScopedSymbolTable& typeSymbolTable, ExpressionType t) : m_type(std::move(t)), m_symbolTable(&typeSymbolTable), m_alias(std::move(name)) {};
-		Type(ExpressionType t) : m_type(std::move(t)) {}
+		
+		Type(ExpressionType t) : m_type(std::move(t)) {
+			assert(t != ExpressionType::FUNCTION);
+		}
 
-		Type(std::string name, /*ScopedSymbolTable& typeSymbolTable, */const Type& t) : m_type(t.m_type), /*m_symbolTable(&typeSymbolTable),*/ m_alias(std::move(name)) {};
+		Type(std::string name, ExpressionType t) : m_type(std::move(t)), m_alias(std::move(name)) {
+			assert(t != ExpressionType::FUNCTION);
+		}
+
+		Type(std::string name, const ScopedSymbolTable& t) : m_type(ExpressionType::FUNCTION), m_symbolTable(&t), m_alias(std::move(name)) {}
+
         Type(Type&& t) noexcept {
             *this = std::move(t);
         }
 
-        Type& operator=(Type&& t) {
+        Type& operator=(Type&& t) noexcept {
 			SLOG(ska::LogLevel::Debug) << "   Move, Type " << t.asString();
             m_type = std::move(t.m_type);
             m_alias = std::move(t.m_alias);
             m_compound = std::move(t.m_compound);
-            /*m_symbolTable = std::move(t.m_symbolTable);
-            t.m_symbolTable = nullptr; */
+			m_symbolTable = std::move(t.m_symbolTable);
+			t.m_symbolTable = nullptr;
             t.m_moved = true;
 			SLOG(ska::LogLevel::Debug) << " moved  to " << asString();
             return *this;
@@ -67,7 +74,7 @@ namespace ska {
 			m_type = t.m_type;
 			m_alias = t.m_alias;
 			m_compound = t.m_compound;
-			//m_symbolTable = t.m_symbolTable;
+			m_symbolTable = t.m_symbolTable;
 			m_moved = t.m_moved;
 			SLOG(ska::LogLevel::Debug) << "   Copy, Type " << t.asString() << " copied to " << asString();
 			return *this;
@@ -102,11 +109,6 @@ namespace ska {
 			return m_type == t.m_type && m_compound == t.m_compound;
 		}
 
-        void name(std::string n) {
-			SLOG(ska::LogLevel::Info) << "Naming type " << asString() << " : \"" << n << "\"";
-            m_alias = std::move(n);
-        }
-
         const std::string& getName() const {
             return m_alias;
         }
@@ -127,10 +129,6 @@ namespace ska {
 		void add(Type t) {
 			m_compound.push_back(std::move(t));
 		}
-
-		/*void link(ScopedSymbolTable& t) {
-			m_symbolTable = &t;
-		}*/
 
 		const std::vector<Type>& compound() const {
 			return m_compound;
@@ -230,19 +228,15 @@ namespace ska {
 			return static_cast<ExpressionType>(typeIdResult);
 		}
 		
-		/*const ScopedSymbolTable* symbolTable() const {
+		const ScopedSymbolTable* symbolTable() const {
 			return m_symbolTable;
 		}
-
-		ScopedSymbolTable* symbolTable() {
-			return m_symbolTable;
-		}*/
 
 	private:
 		ExpressionType m_type = ExpressionType::VOID;
 		std::string m_alias;
 		std::vector<Type> m_compound;
-		//ScopedSymbolTable* m_symbolTable = nullptr;
+		const ScopedSymbolTable* m_symbolTable = nullptr;
 	    bool m_moved = false;
     };
 

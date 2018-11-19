@@ -35,7 +35,7 @@ namespace ska {
                   } else if (node.asString() == std::string(ExpressionTypeSTR[static_cast<std::size_t>(ExpressionType::STRING)])) {
                         return ExpressionType::STRING;
                   } else if(node.asString() == "var") {
-                      return ExpressionType::OBJECT;
+					  return ExpressionType::OBJECT;
                   }
             }
 

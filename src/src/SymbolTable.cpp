@@ -81,7 +81,7 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 	switch(token.type()) {
 
 		case FunctionTokenEventType::DECLARATION_PARAMETERS: {
-			auto& symbol = m_currentTable->emplace(token.name(), Type{ token.name(), ExpressionType::FUNCTION });
+			auto& symbol = m_currentTable->emplace(token.name());
 			SLOG(ska::LogLevel::Info) << "\t\tNew function : adding a nested symbol table";
 			auto* functionSymbolTable = &m_currentTable->createNested();
             m_currentTable = functionSymbolTable;
