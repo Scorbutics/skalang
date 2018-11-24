@@ -179,7 +179,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 					"};"
 				"};"
 				"var joueur1 = JoueurClass(\"joueur1Nom\");"
-				"joueur1.stats.blesser(\"1\");"
+				"joueur1.stats.blesser(1);"
 				, data);
 		}
 

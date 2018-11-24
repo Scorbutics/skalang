@@ -23,7 +23,7 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const Sym
 	const auto& userDefinedTable = symbolObjectType.userDefinedSymbolTable()->children();
 	assert(userDefinedTable.size() > 0);
 	const auto& table = userDefinedTable.back();
-    const auto symbolField = (*table)[fieldAccessed];
+    const auto symbolField = (*table)(fieldAccessed);
     if (symbolField == nullptr) {
 		auto ss = std::stringstream{};
 		ss << "trying to access to an undeclared field : " << fieldAccessed << " of " << node[0].name() << " of type " << symbolObjectType;
