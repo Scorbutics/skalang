@@ -45,7 +45,7 @@ namespace ska {
 		ShuntingYardExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, Parser& parser, TokenReader& input);
 		ASTNodePtr parse();
 
-		bool parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token, Token& lastToken);
+		bool parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token);
 
 	private:
 		ASTNodePtr matchReserved();
@@ -55,7 +55,7 @@ namespace ska {
 		std::vector<ASTNodePtr> fillFunctionDeclarationParameters();
 		ASTNodePtr matchFunctionDeclarationReturnType();
 		ASTNodePtr matchFunctionDeclarationParameter();
-		ASTNodePtr matchObjectFieldAccess(Token objectAccessed);
+		ASTNodePtr matchObjectFieldAccess(ASTNodePtr objectAccessed);
 		ASTNodePtr matchAffectation(Token identifierFieldAffected);
         
         bool isAtEndOfExpression() const;

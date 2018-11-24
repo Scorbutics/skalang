@@ -98,30 +98,7 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
         break;
 
 		default:
-		case FunctionTokenEventType::CALL: {
-			//TODO a toujours un sens ???
-			/*
-			
-			const auto& node = token.rootNode();
-			const auto name = node[0].name();
-			assert(!name.empty());
-			const Symbol* symbol = nullptr;
-
-			if(symbol == nullptr) {
-				symbol = (*this)[name];
-				if (symbol == nullptr) {
-					//TODO : handle complex function call (ex : with field access node)
-					throw std::runtime_error("Symbol function not found : " + name);
-				}
-			}
-
-			if(symbol->getType() != ExpressionType::FUNCTION) {
-				auto ss = std::stringstream{};
-				ss << "Symbol \"" << name << "\" declared as variable of type \"" << symbol->getType() << "\" but used as a function";
-				throw std::runtime_error(ss.str());
-			}	
-			*/
-		} break;
+		break;
 	}
 	
 	return true;

@@ -42,6 +42,10 @@ namespace ska {
 			return type == ExpressionType::FUNCTION || type == ExpressionType::OBJECT;
 		}
 
+		static bool isNamed(Type type) {
+			return isNamed(type.m_type);
+		}
+
 		explicit Type(ExpressionType t) : m_type(std::move(t)) {
 			//assert(!isNamed(m_type));
 		}

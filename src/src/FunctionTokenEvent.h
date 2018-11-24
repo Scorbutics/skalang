@@ -14,18 +14,18 @@ namespace ska {
     class FunctionTokenEvent {
 	public:
 
-		FunctionTokenEvent(std::string name, ASTNode& node, ASTNode* returnTypeNode, FunctionTokenEventType type) :
+		FunctionTokenEvent(ASTNode& content, ASTNode& context, FunctionTokenEventType type, std::string name = "") :
+			m_contentNode(content),
 			m_name(std::move(name)),
-			m_node(node),
-			m_returnType(returnTypeNode),
+			m_contextNode(context),
 			m_type(type) {
 		}
 
-		auto begin() { return m_node.begin(); }
-		auto end() { return m_node.end(); }
+		auto begin() { return m_contentNode.begin(); }
+		auto end() { return m_contentNode.end(); }
 
-		const auto begin() const { return m_node.begin(); }
-		const auto end() const { return m_node.end(); }
+		const auto begin() const { return m_contentNode.begin(); }
+		const auto end() const { return m_contentNode.end(); }
 
 		const auto& type() const {
 			return m_type;
@@ -36,25 +36,25 @@ namespace ska {
 		}
 
 		const auto& rootNode() const {
-			return m_node;
+			return m_contentNode;
 		}
 
 		auto& rootNode() {
-			return m_node;
+			return m_contentNode;
 		}
 
 		auto& returnTypeNode() {
-			return m_returnType;
+			return m_contextNode;
 		}
 
 		const auto& returnTypeNode() const {
-			return m_returnType;
+			return m_contextNode;
 		}
 
 	private:
-        std::string m_name;
-        ASTNode& m_node;
-		ASTNode* m_returnType = nullptr;
+		std::string m_name;
+		ASTNode& m_contextNode;
+        ASTNode& m_contentNode;
 	    FunctionTokenEventType m_type;
     };
 }

@@ -6,28 +6,32 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>)
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const SymbolTable& symbols, const ASTNode& node) {
-    const auto symbolObject = symbols[node[0].name()];
-    if (symbolObject == nullptr) {
+	assert(node[0].type() == ExpressionType::OBJECT);
+	auto symbolObjectType = node[0].type().value();
+    if (symbolObjectType.getName().empty() || symbolObjectType.userDefinedSymbolTable() == nullptr) {
         throw std::runtime_error("trying to dereference an unknown symbol : " + node[0].name());
     }
-    
-    SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Symbol type : " << symbolObject->getType();
+	auto symbolObject = symbols[symbolObjectType.getName()];
+	if (symbolObject == nullptr) {
+		throw std::runtime_error("trying to use an unknown type : " + symbolObjectType.getName());
+	} 
+	symbolObjectType = symbolObject->getType();
+	SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Symbol type : " << symbolObjectType;
 
     const auto fieldAccessed = node[1].name();
-	const auto& userDefinedTable = symbolObject->symbolTable()->children();
+	assert(!fieldAccessed.empty());
+	const auto& userDefinedTable = symbolObjectType.userDefinedSymbolTable()->children();
 	assert(userDefinedTable.size() > 0);
-	assert(userDefinedTable[0]->children().size() > 0);
-	const auto& table = (userDefinedTable[0])->children().back();
+	const auto& table = userDefinedTable.back();
     const auto symbolField = (*table)[fieldAccessed];
     if (symbolField == nullptr) {
 		auto ss = std::stringstream{};
-		ss << "trying to access to an undeclared field : " << fieldAccessed << " of " << node[0].name(); 
-		symbolObject->empty() ? (ss << " of type " << symbolObject->getType()) : ss << " of type " << (*symbolObject)[0];
+		ss << "trying to access to an undeclared field : " << fieldAccessed << " of " << node[0].name() << " of type " << symbolObjectType;
         throw std::runtime_error(ss.str());
     }
 
     SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Field accessed " << fieldAccessed << " of type " << symbolField->getType();
 
-	return symbolField->getType();//Type{ symbolField->getType(), *table };
+	return Type::isNamed(symbolField->getType()) ? Type{ symbolField->getType(), *table } : symbolField->getType();
 
 }

@@ -13,15 +13,11 @@ ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser) :
 }
 
 bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
-    //const auto variable = token.rootNode()[0].name();
- 
     switch(token.type()) {
         case FunctionTokenEventType::DECLARATION_STATEMENT:break;
         
         case FunctionTokenEventType::DECLARATION_PARAMETERS: {			
-			assert(token.returnTypeNode() != nullptr);
-			//getExpressionType(token.node);
-			const auto returnType = token.returnTypeNode()->type();
+			const auto returnType = token.returnTypeNode().type();
             if (returnType.has_value() && returnType.value() == ExpressionType::OBJECT) {
 				SLOG(ska::LogLevel::Debug) << "user defined object type detected";
 			}

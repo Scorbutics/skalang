@@ -155,7 +155,36 @@ TEST_CASE("[SemanticTypeChecker]") {
 				, data);
 		}
 
-		/*SUBCASE("constructor complex with contained function NOT USING the current type BUT mentioning it...") {
+		SUBCASE("class with internal data used in public function") {
+			ASTFromInputSemanticTC(
+				"var Stats = function() : var {"
+					"var pointsDeVie = 100;"
+					"var blesser = function(degats:int) {"
+						"pointsDeVie = pointsDeVie - degats;"
+					"};"
+					"return {"
+						"blesser : blesser"
+					"};"
+				"};"
+				"var JoueurClass = function(nom:string) : var { "
+					"var stats = Stats();"
+
+					"var attaquer = function(degats:int) {"
+						//"stats.blesser(degats);"
+					"};"
+
+					"return {"
+						"attaquer : attaquer,"
+						"stats : stats"
+					"};"
+				"};"
+				"var joueur1 = JoueurClass(\"joueur1Nom\");"
+				"joueur1.stats.blesser(\"1\");"
+				, data);
+		}
+
+		/*
+		SUBCASE("constructor complex with contained function NOT USING the current type BUT mentioning it...") {
 			ASTFromInputSemanticTC(
 			"var JoueurClass = function(nom:string) : var { "
 				"var puissance = 10;"
@@ -174,7 +203,8 @@ TEST_CASE("[SemanticTypeChecker]") {
 			"var joueur2 = JoueurClass(\"joueur2Nom\");"
 			"joueur1.attaquer(joueur2);"
 				, data);
-		}*/
+		}
+		*/
 
 		/*
 		//TODO : très important, mais complexe à réaliser.
