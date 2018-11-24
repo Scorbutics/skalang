@@ -7,14 +7,13 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SemanticTypeChecker)
 
-ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser, const SymbolTable& symbolTable) :
+ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser) :
     SubObserver<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser),
-    SubObserver<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser),
-	m_symbols(symbolTable) {
+    SubObserver<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser) {
 }
 
 bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
-    const auto variable = token.rootNode()[0].asString();
+    //const auto variable = token.rootNode()[0].name();
  
     switch(token.type()) {
         case FunctionTokenEventType::DECLARATION_STATEMENT:break;
@@ -31,27 +30,36 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 
         default:
         case FunctionTokenEventType::CALL: {
-            const auto symbol = m_symbols[variable];
-            if(symbol == nullptr || symbol->getType() != ExpressionType::FUNCTION) {
-                throw std::runtime_error("function " + variable + " is called before being declared (or has a bad declaration)");
+			assert(token.rootNode().size() > 0);
+			const auto& functionNode = token.rootNode()[0];
+			
+            const auto type = functionNode.type();
+            if(!type.has_value() || type != ExpressionType::FUNCTION) {
+				auto ss = std::stringstream{};
+				ss << "function " << functionNode << " is called before being declared (or has a bad declaration)";
+				throw std::runtime_error(ss.str());
             }
 
-			assert(symbol->size() != 0 && "Function declaration type must have at least a return type (even if it's void)");
-            if(symbol->size() != token.rootNode().size()) {
+			const auto typeSize = type.value().size();
+			assert(typeSize != 0 && "Function declaration type must have at least a return type (even if it's void)");
+			const auto callNodeParameterSize = token.rootNode().size();
+            if(typeSize != callNodeParameterSize) {
                 auto ss = std::stringstream {};
-                ss << "bad function call : the function " << variable << " needs " << (symbol->size() - 1) << " parameters but is being called with " << (token.rootNode().size() - 1) << " parameters (function type is " << symbol->getType().asString() << ")";
+                ss << "bad function call : the function " << functionNode << " needs " << (typeSize - 1) << " parameters but is being called with " << (callNodeParameterSize - 1) << " parameters (function type is " << type.value() << ")";
                 throw std::runtime_error(ss.str());
             }
 
-			SLOG(ska::LogLevel::Debug) << variable << " function has the following arguments types during its call : ";
-			for (auto index = 1u; index < token.rootNode().size(); index++) {
-				auto& param = token.rootNode()[index];
+			SLOG(ska::LogLevel::Debug) << functionNode << " function has the following arguments types during its call : ";
+			const auto& functionCallNode = token.rootNode();
+			for (auto index = 1u; index < functionCallNode.size(); index++) {
+				auto& param = functionCallNode[index];
 				const auto calculatedType = param.type().value();
-				SLOG(ska::LogLevel::Debug) << "\"" << calculatedType.asString() << "\" while a type convertible to \"" << (*symbol)[index].asString() << "\" is required";
+				const auto requiredType = (type.value().compound())[index - 1];
+				//SLOG(ska::LogLevel::Debug) << "\"" << calculatedType << "\" while a type convertible to \"" << requiredType << "\" is required";
 
-                if((*symbol)[index - 1].crossTypes('=', calculatedType) == ExpressionType::VOID) {
+                if(requiredType.crossTypes('=', calculatedType) == ExpressionType::VOID) {
                     auto ss = std::stringstream {};
-                    ss << "Type  \"" << calculatedType.asString() << "\" is encountered while a type convertible to \"" << (*symbol)[index].asString() << "\" is required";
+                    ss << "Type  \"" << calculatedType << "\" is encountered while a type convertible to \"" << requiredType << "\" is required";
                     throw std::runtime_error(ss.str());
                 }
 				index++;
@@ -65,19 +73,21 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& token) {
     assert((token.rootNode().size() >= 1 && token.rootNode().type().has_value()) && "The current variable has no type. Maybe you forgot to add a type builder ?");
     const auto tokenNodeExpressionType = token.rootNode().type().value();
-	const auto value = token.rootNode()[0].asString();
-    const auto variable = token.rootNode().asString();
-    const auto symbol = m_symbols[variable];
+	const auto value = token.rootNode()[0].name();
+    const auto variable = token.rootNode().name();
+    const auto type = token.rootNode().type();
     
-	SLOG(ska::LogLevel::Debug) << variable << " = " << value << ";\tsymbol = " << tokenNodeExpressionType.asString();
+	SLOG(ska::LogLevel::Debug) << variable << " = " << value << ";\tsymbol = " << tokenNodeExpressionType;
 
-    if(symbol != nullptr && token.type() == VarTokenEventType::AFFECTATION) {
-        const auto newTokenType = symbol->getType().crossTypes('=', tokenNodeExpressionType);
+    if(type.has_value() && token.type() == VarTokenEventType::AFFECTATION) {
+        const auto newTokenType = type.value().crossTypes('=', tokenNodeExpressionType);
         if(newTokenType == ExpressionType::VOID) {
             const auto expressionTypeIndex = tokenNodeExpressionType;
-            throw std::runtime_error("The symbol \"" + variable + "\" has already been declared as " + 
-                std::string(symbol->getType().asString()) + " but is now wanted to be " +
-                std::string(expressionTypeIndex.asString()));		
+			auto ss = std::stringstream{};
+			ss << "The symbol \"" << variable << "\" has already been declared as " <<
+				type.value() << " but is now wanted to be " <<
+				expressionTypeIndex;
+			throw std::runtime_error(ss.str());		
         }
     }
 

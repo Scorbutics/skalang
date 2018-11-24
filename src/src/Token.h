@@ -86,6 +86,7 @@ namespace ska {
             }
         }
 
+		/*
 		std::string asString() const {
 			if(m_type == TokenType::EMPTY) {
 				return "EMPTY_TOKEN";
@@ -98,6 +99,14 @@ namespace ska {
 			}
 
 			return std::holds_alternative<std::string>(m_content) ? std::get<std::string>(m_content) : "error variant";
+		}
+		*/
+
+		std::string name() const {
+			if (m_type == TokenType::RESERVED) {
+				return TokenGrammarSTR[std::get<std::size_t>(m_content)];
+			}
+			return std::holds_alternative<std::string>(m_content) ? std::get<std::string>(m_content) : "";
 		}
 
 		bool empty() const {
@@ -115,6 +124,21 @@ namespace ska {
 	private:
 		Variant m_content = std::string{};
 		TokenType m_type = TokenType::EMPTY;
+
+		friend std::ostream& operator<<(std::ostream& stream, const Token& token);
 	};
+
+	inline std::ostream& operator<<(std::ostream& stream, const Token& token) {
+		if (token.m_type == TokenType::EMPTY) {
+			stream << "EMPTY_TOKEN";
+		}
+
+		if (token.m_type == TokenType::RESERVED) {				
+			stream << TokenGrammarSTR[std::get<std::size_t>(token.m_content)];
+		}
+
+		stream << (std::holds_alternative<std::string>(token.m_content) ? std::get<std::string>(token.m_content) : "error variant");
+		return stream;
+	}
 
 };

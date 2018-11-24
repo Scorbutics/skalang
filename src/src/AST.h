@@ -4,6 +4,7 @@
 #include <optional>
 #include "Token.h"
 #include "ASTNodePtr.h"
+#include "OperatorTraits.h"
 #include "Operator.h"
 #include "ExpressionType.h"
 #include "TypeBuildUnit.h"
@@ -33,9 +34,8 @@ namespace ska {
 			return token.type() == TokenType::EMPTY && m_op == Operator::UNARY;
 		}
 
-		std::string asString() const {
-			const auto stringRepresentation = token.asString();
-			return stringRepresentation.empty() && !m_children.empty() ? "¤" : stringRepresentation;
+		std::string name() const {
+			return token.name();
 		}
 
 		std::size_t size() const {
@@ -128,10 +128,7 @@ namespace ska {
 		template<Operator o>
 		static void CheckTokenAssociatedWithOperator(const Token& token) {
 			static_assert(o != Operator::BINARY && o != Operator::LITERAL, "Wrong constructor used for a logical ASTNode. Use MakeLogicalNode instead.");
-			if constexpr (
-				o == Operator::VARIABLE_DECLARATION ||
-				o == Operator::FUNCTION_DECLARATION ||
-				o == Operator::PARAMETER_DECLARATION) {
+			if constexpr (OperatorTraits::isNamed(o)) {
 				assert(!token.empty());
 			} else {
 				assert(token.empty());
@@ -163,6 +160,12 @@ namespace ska {
 		Token token;
 		std::vector<ASTNodePtr> m_children;
 
+		friend std::ostream& operator<<(std::ostream& stream, const ASTNode& node);
 	};
+
+	inline std::ostream& operator<<(std::ostream& stream, const ASTNode& node) {
+		stream << node.token;
+		return stream;
+	}
 }
 

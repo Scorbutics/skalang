@@ -26,7 +26,7 @@ namespace ska {
 				m_name(std::move(name)), 
 				m_category(std::move(type)),
 				m_scopedTable(&symbolTable) {
-				SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" with type " << m_category.asString();
+				SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" with type " << m_category;
             }
 
             Symbol(const Symbol& s) {
@@ -41,7 +41,7 @@ namespace ska {
                 m_scopedTable = s.m_scopedTable;
                 m_name = s.m_name;
                 m_category = s.m_category;
-				SLOG(ska::LogLevel::Debug) << "   Copy, Symbol " << s.getName() << " " << s.m_category.asString() << " copied to " << m_name << " " << m_category.asString();
+				SLOG(ska::LogLevel::Debug) << "   Copy, Symbol " << s.getName() << " " << s.m_category << " copied to " << m_name << " " << m_category;
                 return *this;
             }
 
@@ -49,7 +49,7 @@ namespace ska {
                 m_scopedTable = std::move(s.m_scopedTable);
                 m_name = std::move(s.m_name);
                 m_category = std::move(s.m_category);
-				SLOG(ska::LogLevel::Debug) << "   Move, Symbol " << s.getName() << " " << s.m_category.asString() << " moved to " << m_name << " " << m_category.asString();
+				SLOG(ska::LogLevel::Debug) << "   Move, Symbol " << s.getName() << " " << s.m_category << " moved to " << m_name << " " << m_category;
                 return *this;
             }
 
@@ -70,7 +70,8 @@ namespace ska {
             }
 
 			void calculateType(Type t) {
-				m_category = std::move(t);
+				//assert(m_scopedTable != nullptr);
+				m_category = t;//Type { t.getName(), t, *m_scopedTable };
 				m_calculated = true;
 			}
 

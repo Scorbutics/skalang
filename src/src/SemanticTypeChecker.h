@@ -14,12 +14,11 @@ namespace ska {
     public SubObserver<VarTokenEvent>,
     public SubObserver<FunctionTokenEvent> {
 		public:
-			SemanticTypeChecker(Parser& parser, const SymbolTable& symbolTable);
+			SemanticTypeChecker(Parser& parser);
             ~SemanticTypeChecker() = default;
 		private:
 	        bool matchVariable(const VarTokenEvent& token); 		
             bool matchFunction(const FunctionTokenEvent& token);
-            const SymbolTable& m_symbols;
     };
 
 }

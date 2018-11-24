@@ -37,13 +37,13 @@ std::vector<ska::Token> ska::Tokenizer::tokenize() const {
 	auto startIndex = 0u;
 	do {
 		auto token = tokenizeNext(currentTokenToRead, startIndex);
-		const auto tokenContent = token.type() == TokenType::RESERVED ? m_reserved.patternString(std::get<std::size_t>(token.content())) : token.asString();
+		const auto tokenContent = token.type() == TokenType::RESERVED ? m_reserved.patternString(std::get<std::size_t>(token.content())) : token.name();
 
 		startIndex += tokenContent.size();
 
 		if (currentTokenToRead.current != ska::TokenType::EMPTY && currentTokenToRead.current != ska::TokenType::SPACE) {	
 			if(currentTokenToRead.current == ska::TokenType::SYMBOL) {
-				const auto charToken = token.asString()[0];
+				const auto charToken = token.name()[0];
 				stackSymbol.push_back(std::move(token));
 				if(isFinalizedSymbol(charToken, stackSymbol)) {
 					push(Token{}, stackSymbol, result);	
@@ -65,7 +65,7 @@ void ska::Tokenizer::push(Token t, std::vector<Token>& symbolStack, std::vector<
 	if(!symbolStack.empty()) {
 		auto ss = std::stringstream {}; 
 		for(const auto& s : symbolStack) {
-			ss << s.asString();
+			ss << s;
 		}
 #ifdef SKALANG_LOG_TOKENIZER
 		std::cout << "Pushing compound symbol : " <<  ss.str() << std::endl;
@@ -101,7 +101,7 @@ bool ska::Tokenizer::isFinalizedSymbol(char nextSymbol, const std::vector<Token>
 		return false;
 	}
 
-	const auto topStackSymbol = symbolStack[0].asString()[0];
+	const auto topStackSymbol = symbolStack[0].name()[0];
 	if(stopSymbolCharAggregation(topStackSymbol) < 0) {
 		return true;
 	}

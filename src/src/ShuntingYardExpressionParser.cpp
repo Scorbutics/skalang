@@ -70,7 +70,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 			lastToken = token;
 		case TokenType::STRING:
 		case TokenType::DIGIT:
-			SLOG(ska::LogLevel::Debug) << "\tPushing operand " << token.asString();
+			SLOG(ska::LogLevel::Debug) << "\tPushing operand " << token;
 			operands.push(ASTNode::MakeLogicalNode(m_input.match(token.type())));
 			return true;
 
@@ -97,7 +97,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 				operators.emplace(m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()));
 				SLOG(ska::LogLevel::Debug) << "\tRange end";
 				auto rangeOperandResult = popUntil(operators, operands, [](const Token& t) {
-					const auto& strValue = t.asString();
+					const auto& strValue = t.name();
 					if (t.type() == TokenType::RANGE) {
 						return (strValue.empty() || strValue[0] == '(') ? -1 : 1;
 					}
@@ -114,7 +114,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 			break;
 
 			default:
-				error("Unexpected token (range type) : " + token.asString());
+				error("Unexpected token (range type) : " + token.name());
 			}
 
 		}
@@ -135,7 +135,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 				const auto shouldPopOperatorsStack = checkLessPriorityToken(operators, operands, value[0]);
 				auto operatorTop = operators.empty() ? Token{} : operators.top();
 				if (shouldPopOperatorsStack) {
-					SLOG(ska::LogLevel::Debug) << "\tLess precedence, poping " << operatorTop.asString() << " before adding " << value;
+					SLOG(ska::LogLevel::Debug) << "\tLess precedence, poping " << operatorTop << " before adding " << value;
 					auto poped = 0u;
 					auto popedToken = popUntil(operators, operands, [&](const Token& t) {
 						if (poped >= 1) {
@@ -153,7 +153,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 		break;
 
 	default:
-		error("Expected a symbol, a litteral, an identifier or a reserved keyword, but got the token : " + token.asString());
+		error("Expected a symbol, a litteral, an identifier or a reserved keyword, but got the token : " + token.name());
 	}
 
 	lastToken = Token{};
@@ -164,7 +164,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr 
 	//First match left parenthesis
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
-	auto functionName = identifierFunctionName->asString();
+	auto functionName = identifierFunctionName->name();
 
 	auto functionCallNodeContent = std::vector<ASTNodePtr>{};
 	functionCallNodeContent.push_back(std::move(identifierFunctionName));
@@ -256,7 +256,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(stack<Token>& oper
 }
 
 bool ska::ShuntingYardExpressionParser::checkLessPriorityToken(stack<Token>& operators, stack<ASTNodePtr>& operands, const char tokenChar) const {
-	const auto& topOperatorContent = (operators.empty() || operators.top().asString().empty()) ? '\0' : operators.top().asString()[0];
+	const auto& topOperatorContent = (operators.empty() || operators.top().name().empty()) ? '\0' : operators.top().name()[0];
     if(PRIORITY_MAP.find(tokenChar) == PRIORITY_MAP.end()) {
         auto ss = std::stringstream {};
         ss << "bad operator : " << tokenChar;
@@ -285,13 +285,13 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationParam
 		return nullptr;
 	}
 	const auto& id = m_input.match(TokenType::IDENTIFIER);
-	SLOG(ska::LogLevel::Debug) << id.asString();
+	SLOG(ska::LogLevel::Debug) << id.name();
 	
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
     const auto typeToken = 
 		m_input.expect(TokenType::RESERVED) ?
 		m_input.match(TokenType::RESERVED) : m_input.match(TokenType::IDENTIFIER);
-	const auto typeStr = typeToken.asString();
+	const auto typeStr = typeToken.name();
 
 	SLOG(ska::LogLevel::Debug) << "type is : " << typeStr;
 	
@@ -327,7 +327,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationRetur
 	if (m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>())) {
 		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
 		const auto type = m_input.match(TokenType::RESERVED);
-		SLOG(ska::LogLevel::Debug) << "function type detected : " << type.asString();
+		SLOG(ska::LogLevel::Debug) << "function type detected : " << type;
 		//if(type.asString() != "var") {
 		return ASTNode::MakeLogicalNode(type);
 		//}
@@ -367,7 +367,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
     auto parametersNode = ASTNode::MakeNode<Operator::PARAMETER_PACK_DECLARATION>(std::move(contentNode));
     auto returnTypeNode = matchFunctionDeclarationReturnType();
 
-	auto startEvent = FunctionTokenEvent{ functionName.asString(), *parametersNode, returnTypeNode.get(), FunctionTokenEventType::DECLARATION_PARAMETERS };
+	auto startEvent = FunctionTokenEvent{ functionName.name(), *parametersNode, returnTypeNode.get(), FunctionTokenEventType::DECLARATION_PARAMETERS };
 	m_parser.Observable<FunctionTokenEvent>::notifyObservers(startEvent);
 
     SLOG(ska::LogLevel::Debug) << "reading function body";
@@ -376,7 +376,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
 	
 	auto functionDeclarationNode = ASTNode::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(parametersNode), std::move(returnTypeNode), std::move(functionBodyNode));
 	
-	auto endEvent = FunctionTokenEvent {functionName.asString(), *functionDeclarationNode, returnTypeNode.get(), FunctionTokenEventType::DECLARATION_STATEMENT};
+	auto endEvent = FunctionTokenEvent {functionName.name(), *functionDeclarationNode, returnTypeNode.get(), FunctionTokenEventType::DECLARATION_STATEMENT};
 	m_parser.Observable<FunctionTokenEvent>::notifyObservers(endEvent);
 
 	return functionDeclarationNode;
@@ -424,7 +424,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::popUntil(stack<Token>& operat
 		}
 
 		nextNode = std::move(currentNode);
-		SLOG(ska::LogLevel::Debug) << "\t\tPoped " << op.asString();//<< " with " <<  nextNode->left->token.asString() << " and " << nextNode->right->token.asString();
+		SLOG(ska::LogLevel::Debug) << "\t\tPoped " << op;//<< " with " <<  nextNode->left->token.asString() << " and " << nextNode->right->token.asString();
 	}
 
 	return (currentNode == nullptr  && nextNode == nullptr) ? nullptr : std::move(nextNode);

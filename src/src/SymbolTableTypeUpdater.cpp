@@ -1,5 +1,6 @@
 #include "LoggerConfigLang.h"
 #include "Parser.h"
+#include "OperatorTraits.h"
 #include "SymbolTable.h"
 #include "LoggerConfigLang.h"
 #include "SymbolTableTypeUpdater.h"
@@ -42,14 +43,7 @@ bool ska::SymbolTableTypeUpdater::matchFunction(const FunctionTokenEvent& event)
 }
 
 bool ska::SymbolTableTypeUpdater::isOperatorAccepted(const Operator& op) {
-    switch(op) {
-        case Operator::FUNCTION_DECLARATION:
-        case Operator::VARIABLE_DECLARATION:
-        case Operator::PARAMETER_DECLARATION:
-            return true;
-        default:
-            return false;
-    }
+	return OperatorTraits::isNamed(op);
 }
 
 void ska::SymbolTableTypeUpdater::updateType(const ASTNode& node) {
@@ -62,13 +56,13 @@ void ska::SymbolTableTypeUpdater::updateType(const ASTNode& node) {
 	const auto& type = node.type();
 	if (isOperatorAccepted(node.op())) {
 		assert(type.has_value());
-		auto* symbol = m_symbols[node.asString()];
+		auto* symbol = m_symbols[node.name()];
 		if (symbol != nullptr && !symbol->isCalculated()) {
 			if (symbol->getType() != type.value()) {
 				symbol->calculateType(type.value());
-				SLOG(LogLevel::Info) << "Type updated for symbol \"" << node.asString() << "\" = \"" << node.type().value().asString() << "\"";
+				SLOG(LogLevel::Info) << "Type updated for symbol \"" << node.name() << "\" = \"" << node.type().value() << "\"";
 			} else {
-				SLOG(LogLevel::Error) << "No type detected for symbol \"" << node.asString() << "\" with operator \"" << node.op() << "\"";
+				SLOG(LogLevel::Error) << "No type detected for symbol \"" << node.name() << "\" with operator \"" << node.op() << "\"";
 			}
 		}
 	}
