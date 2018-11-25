@@ -13,13 +13,15 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>::build(
     const auto typeStr = node[0].name();
 
     if (ExpressionTypeMap.find(typeStr) == ExpressionTypeMap.end()) {
+		//Object case
         const auto symbolType = symbols[typeStr];
         if (symbolType == nullptr) {
             throw std::runtime_error("unknown type detected as function parameter : " + node[0].name());
         }
         SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node << "\" = \"" << symbolType->getType() << "\"";
-        return symbolType->getType();
+		return Type{ typeStr, ExpressionType::OBJECT, *symbolType->symbolTable() };
    } else { 
+	   //Built-in case
        SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type calculating for node \"" << node << " with type-node " << typeStr;
        const auto type = ExpressionTypeMap.at(node[0].name());
        SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node << "\" = \"" << ExpressionTypeSTR[static_cast<std::size_t>(type)] << "\""; 

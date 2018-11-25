@@ -21,12 +21,12 @@ bool ska::SymbolTableTypeUpdater::matchVariable(const VarTokenEvent& event) {
 }
 
 bool ska::SymbolTableTypeUpdater::matchExpression(const ExpressionTokenEvent& event) {
-	updateType(event.rootNode());
+	//updateType(event.rootNode());
 	return true;
 }
 
 bool ska::SymbolTableTypeUpdater::matchReturn(const ReturnTokenEvent & event) {
-	updateType(event.rootNode());
+	//updateType(event.rootNode());
 	return true;
 }
 

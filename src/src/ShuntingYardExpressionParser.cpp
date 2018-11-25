@@ -161,13 +161,12 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr identifierFunctionName) {
-	//First match left parenthesis
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
-	//auto functionName = identifierFunctionName->name();
-
 	auto functionCallNodeContent = std::vector<ASTNodePtr>{};
+
 	functionCallNodeContent.push_back(std::move(identifierFunctionName));
+	
 	const auto endParametersToken = m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>();
 	while (!m_input.expect(endParametersToken)) {
 		
@@ -198,13 +197,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchObjectFieldAccess(ASTNod
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::METHOD_CALL_OPERATOR>());
     auto fieldAccessedIdentifier = m_input.match(TokenType::IDENTIFIER);
 
-    auto fieldAccessNode = ASTNode::MakeNode<Operator::FIELD_ACCESS>(std::move(objectAccessed), ASTNode::MakeLogicalNode(fieldAccessedIdentifier));
-    
-    /*
-	auto event = VarTokenEvent { *fieldAccessNode, VarTokenEventType::USE };
-	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
-	*/
-	return fieldAccessNode;
+    return ASTNode::MakeNode<Operator::FIELD_ACCESS>(std::move(objectAccessed), ASTNode::MakeLogicalNode(fieldAccessedIdentifier));
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchAffectation(Token identifierFieldAffected) {

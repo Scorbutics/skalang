@@ -5,8 +5,6 @@
 #include "Parser.h"
 #include "ReservedKeywordsPool.h"
 
-//#define SKALANG_LOG_PARSER
-
 ska::Parser::Parser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReader& input) :
 	m_input(input),
 	m_reservedKeywordsPool(reservedKeywordsPool),
@@ -49,15 +47,14 @@ ska::Parser::ASTNodePtr ska::Parser::statement() {
 }
 
 ska::Parser::ASTNodePtr ska::Parser::matchExpressionStatement() {
-#ifdef SKALANG_LOG_PARSER
-	std::cout << "Expression-statement found" << std::endl;
-#endif
+	SLOG(ska::LogLevel::Info) << "Expression-statement found";
+
     auto expressionResult = expr();
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
     if(expressionResult == nullptr) {
-#ifdef SKALANG_LOG_PARSER
-	std::cout << "NOP statement" << std::endl;
-#endif
+
+		SLOG(ska::LogLevel::Info) << "NOP statement";
+
 	return nullptr;
     }
     return expressionResult;
@@ -65,9 +62,9 @@ ska::Parser::ASTNodePtr ska::Parser::matchExpressionStatement() {
 
 ska::Parser::ASTNodePtr ska::Parser::matchBlock(const std::string& content) {
 	if (content == m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>().name()) {
-#ifdef SKALANG_LOG_PARSER	
-		std::cout << "block start detected" << std::endl;
-#endif
+
+		SLOG(ska::LogLevel::Info) << "block start detected";
+
 		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
 		
 		auto blockNode = ASTNode::MakeNode<Operator::BLOCK>();
@@ -87,9 +84,9 @@ ska::Parser::ASTNodePtr ska::Parser::matchBlock(const std::string& content) {
 		blockNode = ASTNode::MakeNode<Operator::BLOCK>(std::move(blockNodeStatements));
 
 		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
-#ifdef SKALANG_LOG_PARSER
-		std::cout << "block end" << std::endl;
-#endif
+
+		SLOG(ska::LogLevel::Info) << "block end";
+
 		auto endEvent = BlockTokenEvent { *blockNode, BlockTokenEventType::END };
 		Observable<BlockTokenEvent>::notifyObservers(endEvent);
 		return blockNode;
@@ -107,31 +104,22 @@ ska::Parser::ASTNodePtr ska::Parser::matchForKeyword() {
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::FOR>());
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
-#ifdef SKALANG_LOG_PARSER
-    std::cout << "1st for loop expression (= statement)" << std::endl;
-#endif
+	SLOG(ska::LogLevel::Info) << "1st for loop expression (= statement)";
 
     auto forNodeFirstExpression = optstatement();
 
-#ifdef SKALANG_LOG_PARSER
-    std::cout << "2nd for loop expression" << std::endl;
-#endif
+	SLOG(ska::LogLevel::Info) << "2nd for loop expression";
 
     auto forNodeMidExpression = optexpr(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
 
-#ifdef SKALANG_LOG_PARSER
-    std::cout << "3rd for loop expression" << std::endl;
-#endif
+	SLOG(ska::LogLevel::Info) << "3rd for loop expression";
 
     auto forNodeLastExpression = optexpr(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 
     auto forNodeStatement = statement();
-
-#ifdef SKALANG_LOG_PARSER
-    std::cout << "end for loop statement" << std::endl;
-#endif
+	SLOG(ska::LogLevel::Info) << "end for loop statement";
 
     auto forNode = ASTNode::MakeNode<Operator::FOR_LOOP>(std::move(forNodeFirstExpression), std::move(forNodeMidExpression), std::move(forNodeLastExpression), std::move(forNodeStatement));
     
@@ -169,21 +157,20 @@ ska::Parser::ASTNodePtr ska::Parser::matchIfOrIfElseKeyword() {
 }
 
 ska::Parser::ASTNodePtr ska::Parser::matchVarKeyword() {
-#ifdef SKALANG_LOG_PARSER
-	std::cout << "variable declaration" << std::endl;
-#endif
+	SLOG(ska::LogLevel::Info) << "variable declaration";
+
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>());
 	auto varNodeIdentifier = m_input.match(TokenType::IDENTIFIER);
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
-#ifdef SKALANG_LOG_PARSER
-    std::cout << "equal sign matched, reading expression" << std::endl;
-#endif
+
+	SLOG(ska::LogLevel::Info) << "equal sign matched, reading expression";
+
     auto varNodeExpression = expr();
 
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
-#ifdef SKALANG_LOG_PARSER
-    std::cout << "expression end with symbol ;" << std::endl;
-#endif
+
+	SLOG(ska::LogLevel::Info) << "expression end with symbol ;";
+
     auto varNode = ASTNode::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(varNodeIdentifier), std::move(varNodeExpression));
     
     auto event = VarTokenEvent {*varNode};
@@ -223,8 +210,6 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
 
     //TODO handle native (= built-in) types
 
-    //std::cout << "return detected" << std::endl;
-    
     auto returnFieldNodes = std::vector<ASTNodePtr>{};
 
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
@@ -234,15 +219,10 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
         auto fieldValue = expr();
 
         const std::string name = "???";
-#ifdef SKALANG_LOG_PARSER
-        std::cout << "Constructor " << name << " with field \"" << field.asString() << "\" and field value \"" << fieldValue->asString() << "\"" <<  std::endl;
-#endif
-        
-        auto fieldNode = ASTNode::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(field), std::move(fieldValue));
-		
-        //auto event = VarTokenEvent{ *fieldNode };
-		//Observable<VarTokenEvent>::notifyObservers(event);
-		
+
+        SLOG(ska::LogLevel::Info) << "Constructor " << name << " with field \"" << field << "\" and field value \"" << (*fieldValue) << "\"";
+
+        auto fieldNode = ASTNode::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(field), std::move(fieldValue));		
 		returnFieldNodes.push_back(std::move(fieldNode));
 
 		if (m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>())) {

@@ -170,7 +170,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 					"var stats = Stats();"
 
 					"var attaquer = function(degats:int) {"
-						//"stats.blesser(degats);"
+						"stats.blesser(degats);"
 					"};"
 
 					"return {"
@@ -179,7 +179,37 @@ TEST_CASE("[SemanticTypeChecker]") {
 					"};"
 				"};"
 				"var joueur1 = JoueurClass(\"joueur1Nom\");"
+				"joueur1.attaquer(1);"
 				"joueur1.stats.blesser(1);"
+				, data);
+		}
+
+		SUBCASE("class with internal data used in public function 2") {
+			ASTFromInputSemanticTC(
+				"var Stats = function() : var {"
+					"var pointsDeVie = 100;"
+					"var blesser = function(degats:int) {"
+						"pointsDeVie = pointsDeVie - degats;"
+					"};"
+					"return {"
+						"blesser : blesser,"
+						"pdv : pointsDeVie"
+					"};"
+				"};"
+				"var JoueurClass = function(nom:string) : var { "
+					"var stats = Stats();"
+
+					"var attaquer = function(statsDegats:Stats) {"
+						"stats.blesser(statsDegats.pdv);"
+					"};"
+
+					"return {"
+						"attaquer : attaquer"
+					"};"
+				"};"
+				"var joueur1 = JoueurClass(\"joueur1Nom\");"
+				"var statsDeg = Stats();"
+				"joueur1.attaquer(statsDeg);"
 				, data);
 		}
 

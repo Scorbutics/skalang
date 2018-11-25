@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Operator.h"
-#include "ExpressionType.h"
+#include "Type.h"
 #include "TypeBuildUnit.h"
 #include "TypeBuilderCalculatorDispatcher.h"
 
