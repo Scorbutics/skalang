@@ -6,7 +6,8 @@ namespace ska {
     class ASTNode;
 	
 	enum class FunctionTokenEventType {
-		DECLARATION_PARAMETERS,
+		DECLARATION_NAME,
+		DECLARATION_PROTOTYPE,
         DECLARATION_STATEMENT,
 		CALL
 	};

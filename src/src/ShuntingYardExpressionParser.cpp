@@ -208,7 +208,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchAffectation(Token identi
 	}
 	
 	auto affectationNode = ASTNode::MakeNode<Operator::VARIABLE_AFFECTATION>(ASTNode::MakeLogicalNode(std::move(identifierFieldAffected)), std::move(expressionNode));
-	auto event = VarTokenEvent { *affectationNode, VarTokenEventType::AFFECTATION };
+	auto event = VarTokenEvent::template Make<VarTokenEventType::AFFECTATION> (*affectationNode);
 	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
 	return affectationNode;
 }
@@ -291,7 +291,9 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationParam
 	
 	//TODO handle arrays
 	auto node = ASTNode::MakeNode<Operator::PARAMETER_DECLARATION>(id, ASTNode::MakeLogicalNode(typeToken));
-    return node;
+	auto event = VarTokenEvent::template Make<VarTokenEventType::PARAMETER_DECLARATION>(*node, (*node)[0]);
+	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
+	return node;
 }
 
 std::vector<ska::ASTNodePtr> ska::ShuntingYardExpressionParser::fillFunctionDeclarationParameters() {
@@ -356,13 +358,17 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
     //With this grammar, no other way than reading previously to retrieve the function name.
     const auto functionName = m_input.readPrevious(3); 
 
+	auto emptyNode = ASTNode::MakeEmptyNode();
+	auto startEvent = FunctionTokenEvent{ *emptyNode, *emptyNode, FunctionTokenEventType::DECLARATION_NAME, functionName.name() };
+	m_parser.Observable<FunctionTokenEvent>::notifyObservers(startEvent);
+
 	auto contentNode = fillFunctionDeclarationParameters();
-	
+
     auto parametersNode = ASTNode::MakeNode<Operator::PARAMETER_PACK_DECLARATION>(std::move(contentNode));
     auto returnTypeNode = matchFunctionDeclarationReturnType();
 
-	auto startEvent = FunctionTokenEvent{ *parametersNode, *returnTypeNode, FunctionTokenEventType::DECLARATION_PARAMETERS, functionName.name() };
-	m_parser.Observable<FunctionTokenEvent>::notifyObservers(startEvent);
+	auto prototypeEvent = FunctionTokenEvent{ *parametersNode, *returnTypeNode, FunctionTokenEventType::DECLARATION_PROTOTYPE, functionName.name() };
+	m_parser.Observable<FunctionTokenEvent>::notifyObservers(prototypeEvent);
 
     SLOG(ska::LogLevel::Debug) << "reading function body";
 	auto functionBodyNode = matchFunctionDeclarationBody();
@@ -370,9 +376,8 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclaration() {
 	
 	auto functionDeclarationNode = ASTNode::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(parametersNode), std::move(returnTypeNode), std::move(functionBodyNode));
 	
-
-	auto endEvent = FunctionTokenEvent {*functionDeclarationNode, *returnTypeNode, FunctionTokenEventType::DECLARATION_STATEMENT, functionName.name() };
-	m_parser.Observable<FunctionTokenEvent>::notifyObservers(endEvent);
+	auto statementEvent = FunctionTokenEvent {*functionDeclarationNode, *returnTypeNode, FunctionTokenEventType::DECLARATION_STATEMENT, functionName.name() };
+	m_parser.Observable<FunctionTokenEvent>::notifyObservers(statementEvent);
 
 	return functionDeclarationNode;
 }

@@ -173,7 +173,7 @@ ska::Parser::ASTNodePtr ska::Parser::matchVarKeyword() {
 
     auto varNode = ASTNode::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(varNodeIdentifier), std::move(varNodeExpression));
     
-    auto event = VarTokenEvent {*varNode};
+    auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_DECLARATION> (*varNode);
     Observable<VarTokenEvent>::notifyObservers(event);
 
     return varNode;
@@ -227,7 +227,7 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
 
         auto fieldNode = ASTNode::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(field), std::move(fieldValue));		
 
-        auto event = VarTokenEvent {*fieldNode};
+        auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_DECLARATION> (*fieldNode);
         Observable<VarTokenEvent>::notifyObservers(event);
 
 		returnFieldNodes.push_back(std::move(fieldNode));

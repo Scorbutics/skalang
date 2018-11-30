@@ -5,23 +5,6 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::SymbolTable)
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScopedSymbolTable)
 
-const ska::Symbol* ska::Symbol::operator[](const std::string& symbol) const {
-	assert(m_scopedTable != nullptr);
-	if (!m_scopedTable->children().empty()) {
-		const auto& st = *m_scopedTable->children()[0];
-		return st[symbol];
-	}
-	return nullptr;
-}
-
-ska::Symbol* ska::Symbol::operator[](const std::string& symbol) {
-	return const_cast<Symbol*>(static_cast<const Symbol*>(this)->operator[](symbol));
-}
-
-std::size_t ska::Symbol::size() const {
-    return m_category.compound().size();
-}
-
 ska::SymbolTable::SymbolTable(Parser& parser) :
 	SubObserver<VarTokenEvent>(std::bind(&ska::SymbolTable::match, this, std::placeholders::_1), parser),
 	SubObserver<BlockTokenEvent>(std::bind(&ska::SymbolTable::nestedTable, this, std::placeholders::_1), parser),
@@ -32,6 +15,9 @@ ska::SymbolTable::SymbolTable(Parser& parser) :
 }
 
 bool ska::SymbolTable::nestedTable(const BlockTokenEvent& event) {
+	//TODO gsl::not_null<...> pour m_currentTable
+	assert(m_currentTable != nullptr);
+
 	switch(event.type()) {
 		case BlockTokenEventType::START:
 			SLOG(ska::LogLevel::Debug) << "\tNew block : adding a nested symbol table";
@@ -51,9 +37,12 @@ bool ska::SymbolTable::nestedTable(const BlockTokenEvent& event) {
 }
 
 bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
+	//TODO gsl::not_null<...> pour m_currentTable
+	assert(m_currentTable != nullptr);
 
     switch(token.type()) {
 	    case ReturnTokenEventType::START: {
+			SLOG(ska::LogLevel::Debug) << "\t\tNew Return : adding a nested symbol table";
             const auto actualNameSymbol = m_currentTable->parentSymbol();
             if (actualNameSymbol == nullptr) {
                 throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
@@ -64,11 +53,7 @@ bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
       break;
 
         default:
-            /*for (auto& field :token.rootNode()) {
-                //auto& fieldValue = (*field)[0];
-                m_currentTable->emplace(field->name(), ska::Type{});//fieldValue.type().value());
-                //SLOG(ska::LogLevel::Info) << "\t\tfield " << (*field) << " with type " << field->type().value();
-            }*/
+			SLOG(ska::LogLevel::Debug) << "\t\tReturn end: going up in nested symbol table hierarchy";
             m_currentTable = &m_currentTable->parent();
         break;
     }
@@ -78,25 +63,14 @@ bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
 bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 	//TODO gsl::not_null<...> pour m_currentTable
 	assert(m_currentTable != nullptr);
+
 	switch(token.type()) {
 
-		case FunctionTokenEventType::DECLARATION_PARAMETERS: {
+		case FunctionTokenEventType::DECLARATION_NAME: {
 			auto& symbol = m_currentTable->emplace(token.name());
-			SLOG(ska::LogLevel::Info) << "\t\tNew function : adding a nested symbol table";
-			
-            auto* functionSymbolTable = &m_currentTable->createNested();
-            m_currentTable = functionSymbolTable;
-			
-            functionSymbolTable->link(symbol);
-            
-			const auto parameterNumber = token.rootNode().size();
-			SLOG(ska::LogLevel::Info) << "\t\tthis function (" << token.name() << ") has " << parameterNumber << " parameters : ";
-			for(auto& param : token) {
-				assert(!param->type().has_value());
-				SLOG(ska::LogLevel::Debug) << "\t\t" << param->name();
-				m_currentTable->emplace(param->name());
-            }
-			
+			SLOG(ska::LogLevel::Info) << "\t\tNew function : adding a nested symbol table named \"" << token.name() << "\"";
+            m_currentTable = &m_currentTable->createNested();
+			m_currentTable->link(symbol);
         } break;
 
         case FunctionTokenEventType::DECLARATION_STATEMENT:
@@ -104,6 +78,7 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
             m_currentTable = &m_currentTable->parent();
         break;
 
+		case FunctionTokenEventType::DECLARATION_PROTOTYPE:
 		default:
 		break;
 	}
@@ -112,14 +87,13 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 }
 
 bool ska::SymbolTable::match(const VarTokenEvent& token) {
-	assert(token.rootNode().size() >= 1);
+	//TODO gsl::not_null<...> pour m_currentTable
 	assert(m_currentTable != nullptr);
 	
 	switch(token.type()) {
-		case VarTokenEventType::DECLARATION: {			
-			//assert(token.rootNode().size() > 0);
-			//const auto type = token.rootNode()[0].type();
-			const auto variableName = token.rootNode().name();
+		case VarTokenEventType::VARIABLE_DECLARATION:
+		case VarTokenEventType::PARAMETER_DECLARATION: {
+			const auto variableName = token.name();
 			SLOG(ska::LogLevel::Info) << "Matching new variable : " << variableName;
 			auto symbolInCurrentTable = (*m_currentTable)(variableName);
 			if (symbolInCurrentTable == nullptr) {
@@ -134,8 +108,7 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 		default:
 		case VarTokenEventType::AFFECTATION:
 		case VarTokenEventType::USE: {
-            //assert(token.rootNode().size() > 0);
-			const auto variableName = token.rootNode()[0].name();
+			const auto variableName = token.name();
 			SLOG(ska::LogLevel::Info) << "Using variable : " << variableName;
 			const auto symbol = (*this)[variableName];
 			if(symbol == nullptr) {
@@ -148,33 +121,4 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 }
 
 
-ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
-	return m_parent;
-}
-
-
-ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, Type type) {
-    
-    {
-        auto symbol = Symbol { name, *this, type };
-		SLOG(ska::LogLevel::Debug) << "\tSymbol \"" << name << "\" \"" <<  symbol.getType() << "\"";
-        if(m_symbols.find(name) == m_symbols.end()) {
-            m_symbols.emplace(name, std::move(symbol));
-        } else {
-            m_symbols.at(name) = std::move(symbol);
-        }
-    }
-
-    auto& s = m_symbols.at(name);
-	SLOG(ska::LogLevel::Debug) << "\tSymbol Inserted \"" << name << "\" \"" << s.getType() << "\"";
-    return s;
-}
-
-ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested() {
-	m_children.push_back(std::make_unique<ska::ScopedSymbolTable>(*this));
-	auto& lastChild = *m_children.back();
-	//No bad memory access possible when unique_ptr are moved, that's why it's safe to return the address of contained item
-	//even if we move the vector or if the vector moves its content automatically 
-	return lastChild;
-}
 

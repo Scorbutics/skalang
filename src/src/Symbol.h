@@ -64,11 +64,6 @@ namespace ska {
 			void calculateType(Type t) {
 				//assert(m_scopedTable != nullptr);
 				m_category = t;//Type { t.getName(), t, *m_scopedTable };
-				m_calculated = true;
-			}
-
-			const auto& isCalculated() const {
-				return m_calculated;
 			}
 
 			ScopedSymbolTable* symbolTable() {
@@ -92,6 +87,5 @@ namespace ska {
 			ScopedSymbolTable* m_scopedTable = nullptr;
             std::string m_name;
             Type m_category;
-			bool m_calculated = false;
     };
 }

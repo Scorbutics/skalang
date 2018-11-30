@@ -13,10 +13,8 @@ ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser) :
 }
 
 bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
-    switch(token.type()) {
-        case FunctionTokenEventType::DECLARATION_STATEMENT:break;
-        
-        case FunctionTokenEventType::DECLARATION_PARAMETERS: {			
+    switch(token.type()) {       
+        case FunctionTokenEventType::DECLARATION_PROTOTYPE: {			
 			const auto returnType = token.contextNode().type();
             if (returnType.has_value() && returnType.value() == ExpressionType::OBJECT) {
 				SLOG(ska::LogLevel::Debug) << "user defined object type detected";
@@ -24,7 +22,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 
         } break;
 
-        default:
+        
         case FunctionTokenEventType::CALL: {
 			assert(token.rootNode().size() > 0);
 			const auto& functionNode = token.rootNode()[0];
@@ -61,6 +59,10 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 				index++;
             }
         } break;
+
+		case FunctionTokenEventType::DECLARATION_STATEMENT:
+		default:
+			break;
     }
     
     return true;

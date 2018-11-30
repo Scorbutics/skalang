@@ -36,8 +36,10 @@ bool ska::TypeBuilder::matchExpression(ExpressionTokenEvent& event) const {
 }
 
 bool ska::TypeBuilder::matchFunction(FunctionTokenEvent& event) const {	
-	event.rootNode().buildType(m_symbols);
-	SLOG(LogLevel::Debug) << "Type built for function parameter declaration / call \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\"";
+	if (event.type() != FunctionTokenEventType::DECLARATION_NAME) {
+		event.rootNode().buildType(m_symbols);
+		SLOG(LogLevel::Debug) << "Type built for function parameter declaration / call \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\"";
+	}
     return true;
 }
 

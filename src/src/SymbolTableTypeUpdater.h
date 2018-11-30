@@ -2,9 +2,6 @@
 #include <Utils/SubObserver.h>
 
 #include "VarTokenEvent.h"
-#include "ReturnTokenEvent.h"
-#include "FunctionTokenEvent.h"
-#include "ExpressionTokenEvent.h"
 
 namespace ska {
 	class ASTNode;
@@ -12,22 +9,15 @@ namespace ska {
 	class Parser;
 
 	class SymbolTableTypeUpdater :
-		public SubObserver<ExpressionTokenEvent>,
-		public SubObserver<FunctionTokenEvent>,
-		public SubObserver<VarTokenEvent>,
-		public SubObserver<ReturnTokenEvent> {
+		public SubObserver<VarTokenEvent>{
 	public:
 		SymbolTableTypeUpdater(Parser& parser, SymbolTable& symbolTable);
 		~SymbolTableTypeUpdater() = default;
 
 	private:
 		bool matchVariable(const VarTokenEvent& token);
-		bool matchFunction(const FunctionTokenEvent& event);
-		bool matchExpression(const ExpressionTokenEvent& event);
-		bool matchReturn(const ReturnTokenEvent& event);
 
 		void updateType(const ASTNode& node);
-        static bool isOperatorAccepted(const Operator& op);
 		
         SymbolTable& m_symbols;
 	};
