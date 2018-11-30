@@ -213,7 +213,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				, data);
 		}
 
-		/*
+		
 		SUBCASE("constructor complex with contained function NOT USING the current type BUT mentioning it...") {
 			ASTFromInputSemanticTC(
 			"var JoueurClass = function(nom:string) : var { "
@@ -234,31 +234,37 @@ TEST_CASE("[SemanticTypeChecker]") {
 			"joueur1.attaquer(joueur2);"
 				, data);
 		}
-		*/
+		
 
-		/*
-		//TODO : très important, mais complexe à réaliser.
+		
+		//TODO : complexe à réaliser mais serait bien.
 		SUBCASE("constructor complex with contained function USING the current type...") {
-			ASTFromInputSemanticTC(
-				"var Joueur = function(nom:string) : var { "
-				"var puissance = 10;"
+			try {
+				ASTFromInputSemanticTC(
+					"var Joueur = function(nom:string) : var { "
+					"var puissance = 10;"
 
-				"var attaquer = function(cible:Joueur) {"
+					"var attaquer = function(cible:Joueur) {"
 					"cible.pv = cible.pv - puissance;"
-				"};"
+					"};"
 
-				"return {"
-				"nom: nom,"
-				"puissance : puissance,"
-				"pv : 100,"
-				"attaquer : attaquer"
-				"};"
-				"};"
-				"var joueur1 = Joueur(\"joueur1\");"
-				"var joueur2 = Joueur(\"joueur2\");"
-				"joueur1.attaquer(joueur2);"
-				, parser_test, table_test, type_test);
-		}*/
+					"return {"
+					"nom: nom,"
+					"puissance : puissance,"
+					"pv : 100,"
+					"attaquer : attaquer"
+					"};"
+					"};"
+					"var joueur1 = Joueur(\"joueur1\");"
+					"var joueur2 = Joueur(\"joueur2\");"
+					"joueur1.attaquer(joueur2);"
+					, data);
+				CHECK(false);
+			} catch (std::exception& e) {
+				CHECK(std::string(e.what()) == 
+					"the class symbol table pv is not registered. Maybe you're trying to use the type you're defining in its definition...");
+			}
+		}
     }
 
     SUBCASE("Fail") {
@@ -267,7 +273,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                 ASTFromInputSemanticTC("var i = 120; i = function() {};", data);
                 CHECK(false);
             } catch(std::exception& e) {
-                CHECK(true);
+                CHECK(std::string(e.what()) == "Symbol already exists : i");
             }
         }
 
@@ -276,7 +282,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                 ASTFromInputSemanticTC("var titi = function() {}; titi = 9;", data);
                 CHECK(false);
             } catch(std::exception& e) {
-                CHECK(true);
+                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types function and function");
             }
         }
         
@@ -285,7 +291,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                 ASTFromInputSemanticTC("var titi = function() {}; titi = function(ttt:string) {};", data);
                 CHECK(false);
             } catch(std::exception& e) {
-                CHECK(true);
+                CHECK(std::string(e.what()) == "Symbol already exists : titi");
             }
         }
 
@@ -294,7 +300,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                 ASTFromInputSemanticTC("var titi = function(test:function) {}; titi(23);", data);
                 CHECK(false);
             } catch(std::exception& e) {
-                CHECK(true);
+                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types function and int");
             }
         }
 
@@ -303,7 +309,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				ASTFromInputSemanticTC("var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.ttetetetet;", data);
 				CHECK(false);
 			} catch (std::exception& e) {
-				CHECK(true);
+				CHECK(std::string(e.what()) == "trying to access to an undeclared field : ttetetetet of joueur1 of type Joueur (function -  string - Joueur var)");
 			}
 		}
 
@@ -330,7 +336,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				, data);
 				CHECK(false);
 			} catch (std::exception& e) {
-				CHECK(true);
+				CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types var and int");
 			}
 		}
     }

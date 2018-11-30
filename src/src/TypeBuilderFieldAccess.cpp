@@ -20,6 +20,9 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const Sym
 
     const auto fieldAccessed = node[1].name();
 	assert(!fieldAccessed.empty());
+	if (symbolObjectType.userDefinedSymbolTable() == nullptr) {
+		throw std::runtime_error("the class symbol table " + fieldAccessed + " is not registered. Maybe you're trying to use the type you're defining in its definition...");
+	}
 	const auto& userDefinedTable = symbolObjectType.userDefinedSymbolTable()->children();
 	assert(userDefinedTable.size() > 0);
 	const auto& table = userDefinedTable.back();
