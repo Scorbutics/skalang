@@ -17,7 +17,7 @@ const std::optional<ska::Type>& ska::VarTokenEvent::varType() const {
 	return m_node.type();
 }
 
-const std::string& ska::VarTokenEvent::value() const {
+std::string ska::VarTokenEvent::value() const {
 	if (m_node.size() > 0) {
 		return m_node[0].name();
 	}

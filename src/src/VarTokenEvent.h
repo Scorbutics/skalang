@@ -48,7 +48,7 @@ namespace ska {
 		}
 
 		const std::optional<Type>& varType() const;
-		const std::string& value() const;
+		std::string value() const;
 		std::string name() const;
 
 	private:
