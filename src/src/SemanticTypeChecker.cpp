@@ -39,17 +39,16 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 			const auto callNodeParameterSize = token.rootNode().size();
             if(typeSize != callNodeParameterSize) {
                 auto ss = std::stringstream {};
-                ss << "bad function call : the function " << functionNode << " needs " << (typeSize - 1) << " parameters but is being called with " << (callNodeParameterSize - 1) << " parameters (function type is " << type.value() << ")";
+                ss << "bad function call : the function " << token.contextNode() << " needs " << (typeSize - 1) << " parameters but is being called with " << (callNodeParameterSize - 1) << " parameters (function type is " << type.value() << ")";
                 throw std::runtime_error(ss.str());
             }
 
-			SLOG(ska::LogLevel::Debug) << functionNode << " function has the following arguments types during its call : ";
+			SLOG(ska::LogLevel::Debug) << token.contextNode() << " function has the following arguments types during its call : ";
 			const auto& functionCallNode = token.rootNode();
 			for (auto index = 1u; index < functionCallNode.size(); index++) {
 				auto& param = functionCallNode[index];
 				const auto calculatedType = param.type().value();
 				const auto requiredType = (type.value().compound())[index - 1];
-				//SLOG(ska::LogLevel::Debug) << "\"" << calculatedType << "\" while a type convertible to \"" << requiredType << "\" is required";
 
                 if(requiredType.crossTypes('=', calculatedType) == ExpressionType::VOID) {
                     auto ss = std::stringstream {};
@@ -68,22 +67,22 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
     return true;
 }
 
-bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& token) {
-    assert((token.rootNode().size() >= 1 && token.rootNode().type().has_value()) && "The current variable has no type. Maybe you forgot to add a type builder ?");
-    const auto tokenNodeExpressionType = token.rootNode().type().value();
-	const auto value = token.rootNode()[0].name();
-    const auto variable = token.rootNode().name();
-    const auto type = token.rootNode().type();
+bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
+	assert(variable.varType().has_value() && "The current variable has no type. Maybe you forgot to add a type builder ?");
+    const auto tokenNodeExpressionType = variable.varType().value();
+	const auto value = variable.value();
+    const auto name = variable.name();
+	const auto type = variable.varType().value();
     
 	SLOG(ska::LogLevel::Debug) << variable << " = " << value << ";\tsymbol = " << tokenNodeExpressionType;
 
-    if(type.has_value() && token.type() == VarTokenEventType::AFFECTATION) {
-        const auto newTokenType = type.value().crossTypes('=', tokenNodeExpressionType);
+    if(variable.type() == VarTokenEventType::AFFECTATION) {
+        const auto newTokenType = type.crossTypes('=', tokenNodeExpressionType);
         if(newTokenType == ExpressionType::VOID) {
             const auto expressionTypeIndex = tokenNodeExpressionType;
 			auto ss = std::stringstream{};
-			ss << "The symbol \"" << variable << "\" has already been declared as " <<
-				type.value() << " but is now wanted to be " <<
+			ss << "The symbol \"" << name << "\" has already been declared as " <<
+				type << " but is now wanted to be " <<
 				expressionTypeIndex;
 			throw std::runtime_error(ss.str());		
         }

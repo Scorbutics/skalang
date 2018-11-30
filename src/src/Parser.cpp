@@ -5,6 +5,8 @@
 #include "Parser.h"
 #include "ReservedKeywordsPool.h"
 
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Parser)
+
 ska::Parser::Parser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReader& input) :
 	m_input(input),
 	m_reservedKeywordsPool(reservedKeywordsPool),
