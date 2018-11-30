@@ -43,11 +43,11 @@ namespace ska {
 			return m_contentNode;
 		}
 
-		auto& returnTypeNode() {
+		auto& contextNode() {
 			return m_contextNode;
 		}
 
-		const auto& returnTypeNode() const {
+		const auto& contextNode() const {
 			return m_contextNode;
 		}
 

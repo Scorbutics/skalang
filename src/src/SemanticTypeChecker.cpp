@@ -17,7 +17,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
         case FunctionTokenEventType::DECLARATION_STATEMENT:break;
         
         case FunctionTokenEventType::DECLARATION_PARAMETERS: {			
-			const auto returnType = token.returnTypeNode().type();
+			const auto returnType = token.contextNode().type();
             if (returnType.has_value() && returnType.value() == ExpressionType::OBJECT) {
 				SLOG(ska::LogLevel::Debug) << "user defined object type detected";
 			}
@@ -32,7 +32,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
             const auto type = functionNode.type();
             if(!type.has_value() || type != ExpressionType::FUNCTION) {
 				auto ss = std::stringstream{};
-				ss << "function " << functionNode << " is called before being declared (or has a bad declaration)";
+				ss << "function " << token.contextNode() << " is called before being declared (or has a bad declaration)";
 				throw std::runtime_error(ss.str());
             }
 

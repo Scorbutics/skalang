@@ -210,6 +210,9 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
 
     //TODO handle native (= built-in) types
 
+    auto returnStartEvent = ReturnTokenEvent {};
+    Observable<ReturnTokenEvent>::notifyObservers(returnStartEvent);
+
     auto returnFieldNodes = std::vector<ASTNodePtr>{};
 
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
@@ -223,9 +226,13 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
         SLOG(ska::LogLevel::Info) << "Constructor " << name << " with field \"" << field << "\" and field value \"" << (*fieldValue) << "\"";
 
         auto fieldNode = ASTNode::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(field), std::move(fieldValue));		
-		returnFieldNodes.push_back(std::move(fieldNode));
 
-		if (m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>())) {
+        auto event = VarTokenEvent {*fieldNode};
+        Observable<VarTokenEvent>::notifyObservers(event);
+
+		returnFieldNodes.push_back(std::move(fieldNode));
+		
+        if (m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>())) {
 			m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
 		}
     }
@@ -234,8 +241,8 @@ ska::Parser::ASTNodePtr ska::Parser::matchReturnKeyword() {
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
     
     auto returnNode = ASTNode::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(returnFieldNodes)); 
-    auto event = ReturnTokenEvent { *returnNode, ReturnTokenEventType::OBJECT };
-    Observable<ReturnTokenEvent>::notifyObservers(event);
+    auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT> (*returnNode);
+    Observable<ReturnTokenEvent>::notifyObservers(returnEndEvent);
     return returnNode;
 }
 

@@ -1,22 +1,33 @@
 #pragma once
+#include <cassert>
 
 namespace ska {
     class ASTNode;
 
     enum class ReturnTokenEventType {
+        START,
         BUILTIN,
         OBJECT
     };
 
     class ReturnTokenEvent {
 	public:
-		ReturnTokenEvent(ASTNode& node, ReturnTokenEventType type) : node(node), m_type(type) {}
-		auto& rootNode() {
-			return node;
+        ReturnTokenEvent() : m_type(ReturnTokenEventType::START) {}
+		
+        template<ReturnTokenEventType type>
+        static ReturnTokenEvent Make(ASTNode& node) {
+            static_assert(type != ReturnTokenEventType::START);
+            return ReturnTokenEvent { node, type };
+        }
+		
+        auto& rootNode() {
+			assert(m_node != nullptr);
+            return *m_node;
 		}
 
 		const auto& rootNode() const {
-			return node;
+			assert(m_node != nullptr);
+            return *m_node;
 		}
 
 		const auto& type() const {
@@ -24,7 +35,10 @@ namespace ska {
 		}
 
 	private:
-		ASTNode& node;
+        ReturnTokenEvent(ASTNode& node, ReturnTokenEventType type) : m_node(&node), m_type(type) {
+        }
+
+		ASTNode* m_node = nullptr;
         ReturnTokenEventType m_type;
     };
 }

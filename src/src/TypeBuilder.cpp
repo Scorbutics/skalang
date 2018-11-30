@@ -22,8 +22,11 @@ bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
 }
 
 bool ska::TypeBuilder::matchReturn(ReturnTokenEvent& event) const {
-	event.rootNode().buildType(m_symbols);
+	if(event.type() != ReturnTokenEventType::START) {
+        event.rootNode().buildType(m_symbols);
+    }   
 	return true;
+
 }
 
 bool ska::TypeBuilder::matchExpression(ExpressionTokenEvent& event) const {

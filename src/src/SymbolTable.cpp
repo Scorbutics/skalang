@@ -51,19 +51,27 @@ bool ska::SymbolTable::nestedTable(const BlockTokenEvent& event) {
 }
 
 bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
-	const auto actualNameSymbol = m_currentTable->parentSymbol();
-	if (actualNameSymbol == nullptr) {
-		throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
-	}
 
-	m_currentTable = &m_currentTable->createNested();
-	SLOG(ska::LogLevel::Info) << "\tReturn : nested named symbol table with name : " << actualNameSymbol->getName();
-	for (auto index = 0u; index < token.rootNode().size(); index++) {
-		auto& field = token.rootNode()[index];
-		auto& fieldValue = token.rootNode()[index][0];
-		m_currentTable->emplace(field.name(), fieldValue.type().value());
-	}
-	m_currentTable = &m_currentTable->parent();
+    switch(token.type()) {
+	    case ReturnTokenEventType::START: {
+            const auto actualNameSymbol = m_currentTable->parentSymbol();
+            if (actualNameSymbol == nullptr) {
+                throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
+            }
+            m_currentTable = &m_currentTable->createNested();
+            SLOG(ska::LogLevel::Info) << "\tReturn : nested named symbol table with name : " << actualNameSymbol->getName();
+        }
+      break;
+
+        default:
+            for (auto& field :token.rootNode()) {
+                //auto& fieldValue = (*field)[0];
+                m_currentTable->emplace(field->name(), ska::Type{});//fieldValue.type().value());
+                //SLOG(ska::LogLevel::Info) << "\t\tfield " << (*field) << " with type " << field->type().value();
+            }
+            m_currentTable = &m_currentTable->parent();
+        break;
+    }
 	return true;
 }
 
@@ -75,19 +83,18 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 		case FunctionTokenEventType::DECLARATION_PARAMETERS: {
 			auto& symbol = m_currentTable->emplace(token.name());
 			SLOG(ska::LogLevel::Info) << "\t\tNew function : adding a nested symbol table";
-			auto* functionSymbolTable = &m_currentTable->createNested();
+			
+            auto* functionSymbolTable = &m_currentTable->createNested();
             m_currentTable = functionSymbolTable;
-			functionSymbolTable->link(symbol);
+			
+            functionSymbolTable->link(symbol);
             
 			const auto parameterNumber = token.rootNode().size();
 			SLOG(ska::LogLevel::Info) << "\t\tthis function (" << token.name() << ") has " << parameterNumber << " parameters : ";
-			auto index = 0u;
 			for(auto& param : token) {
-				auto name = param->name();
 				assert(!param->type().has_value());
-				SLOG(ska::LogLevel::Debug) << "\t\t" << name;
-				m_currentTable->emplace(std::move(name));
-				index++;
+				SLOG(ska::LogLevel::Debug) << "\t\t" << param->name();
+				m_currentTable->emplace(param->name());
             }
 			
         } break;
