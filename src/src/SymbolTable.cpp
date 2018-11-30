@@ -64,11 +64,11 @@ bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
       break;
 
         default:
-            for (auto& field :token.rootNode()) {
+            /*for (auto& field :token.rootNode()) {
                 //auto& fieldValue = (*field)[0];
                 m_currentTable->emplace(field->name(), ska::Type{});//fieldValue.type().value());
                 //SLOG(ska::LogLevel::Info) << "\t\tfield " << (*field) << " with type " << field->type().value();
-            }
+            }*/
             m_currentTable = &m_currentTable->parent();
         break;
     }
@@ -117,8 +117,8 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 	
 	switch(token.type()) {
 		case VarTokenEventType::DECLARATION: {			
-			assert(token.rootNode().size() > 0);
-			const auto type = token.rootNode()[0].type();
+			//assert(token.rootNode().size() > 0);
+			//const auto type = token.rootNode()[0].type();
 			const auto variableName = token.rootNode().name();
 			SLOG(ska::LogLevel::Info) << "Matching new variable : " << variableName;
 			auto symbolInCurrentTable = (*m_currentTable)(variableName);
@@ -134,7 +134,7 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 		default:
 		case VarTokenEventType::AFFECTATION:
 		case VarTokenEventType::USE: {
-            assert(token.rootNode().size() > 0);
+            //assert(token.rootNode().size() > 0);
 			const auto variableName = token.rootNode()[0].name();
 			SLOG(ska::LogLevel::Info) << "Using variable : " << variableName;
 			const auto symbol = (*this)[variableName];

@@ -35,7 +35,11 @@ bool ska::SymbolTableTypeUpdater::matchFunction(const FunctionTokenEvent& event)
 	default: break;
 		
 		case FunctionTokenEventType::DECLARATION_PARAMETERS: {
-			updateType(event.rootNode());
+			for (auto& child : event.rootNode()) {
+				if (child->type().has_value()) {
+					updateType(*child);
+				}
+			}
 		} break;
 
 	}
@@ -47,23 +51,24 @@ bool ska::SymbolTableTypeUpdater::isOperatorAccepted(const Operator& op) {
 }
 
 void ska::SymbolTableTypeUpdater::updateType(const ASTNode& node) {
-	for (auto& child : node) {
+	/*for (auto& child : node) {
 		if (child->type().has_value()) {
 			updateType(*child);
 		}
-	}
+	}*/
 	
 	const auto& type = node.type();
 	if (isOperatorAccepted(node.op())) {
-		assert(type.has_value());
-		auto* symbol = m_symbols[node.name()];
-		if (symbol != nullptr && !symbol->isCalculated()) {
+		assert(type.has_value() && !node.name().empty());
+		auto* symbol = m_symbols[node.name()];	
+		assert(symbol != nullptr && !symbol->isCalculated());
 			if (symbol->getType() != type.value()) {
 				symbol->calculateType(type.value());
 				SLOG(LogLevel::Info) << "Type updated for symbol \"" << node.name() << "\" = \"" << node.type().value() << "\"";
-			} else {
+			}
+			else {
 				SLOG(LogLevel::Error) << "No type detected for symbol \"" << node.name() << "\" with operator \"" << node.op() << "\"";
 			}
-		}
+		
 	}
 }
