@@ -1,0 +1,18 @@
+#include "TypeBuilderTestCommon.h"
+#include "Tokenizer.h"
+#include "ReservedKeywordsPool.h"
+#include "Parser.h"
+#include "SymbolTable.h"
+	
+std::unique_ptr<ska::ASTNode> TypeBuilderTestCommonBuildAST(const std::string& input, DataTestContainer& data) {
+	const auto reservedKeywords = ska::ReservedKeywordsPool{};
+	auto tokenizer = ska::Tokenizer{ reservedKeywords, input };
+	const auto tokens = tokenizer.tokenize();
+	auto reader = ska::TokenReader{ tokens };
+
+	data.parser = std::make_unique<ska::Parser>(reservedKeywords, reader);
+	data.symbols = std::make_unique<ska::SymbolTable>(*data.parser);
+	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, *data.symbols);
+	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, *data.symbols);
+	return data.parser->parse();
+}

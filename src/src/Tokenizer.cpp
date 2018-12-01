@@ -204,7 +204,7 @@ ska::Token ska::Tokenizer::finalizeToken(std::size_t index, const ska::RequiredT
 	auto token = ska::Token{};
 	index += (!requiredToken.required ? 1 : 0);
 	if (index != startIndex) {
-		token.init(m_input.substr(startIndex, index - startIndex), requiredToken.current);
+		token = ska::Token(m_input.substr(startIndex, index - startIndex), requiredToken.current);
 		if (token.type() == ska::TokenType::IDENTIFIER && m_reserved.pool.find(std::get<std::string>(token.content())) != m_reserved.pool.end()) {
 			token = m_reserved.pool.at(std::get<std::string>(token.content())).token;
 		}

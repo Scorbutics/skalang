@@ -56,18 +56,6 @@ namespace ska {
 			}
 		}
 
-		void init(std::size_t c, TokenType t) {
-			m_type = t;
-			assert(m_type == TokenType::RESERVED);
-			m_content = c;
-		}
-
-		void init(std::string c, TokenType t) {
-			m_type = t;
-			assert(m_type != TokenType::RESERVED && m_type != TokenType::UNUSED_LAST_Length);
-			m_content = std::move(c);
-		}
-
 		const Variant& content() const {
 			return m_content;
 		}
@@ -85,22 +73,6 @@ namespace ska {
                     return false;
             }
         }
-
-		/*
-		std::string asString() const {
-			if(m_type == TokenType::EMPTY) {
-				return "EMPTY_TOKEN";
-			}
-
-			if(m_type == TokenType::RESERVED) {
-				std::stringstream ss;
-				ss << TokenGrammarSTR[std::get<std::size_t>(m_content)];
-				return ss.str();
-			}
-
-			return std::holds_alternative<std::string>(m_content) ? std::get<std::string>(m_content) : "error variant";
-		}
-		*/
 
 		std::string name() const {
 			if (m_type == TokenType::RESERVED) {
@@ -122,6 +94,18 @@ namespace ska {
 		}
 
 	private:
+		void init(std::size_t c, TokenType t) {
+			m_type = t;
+			assert(m_type == TokenType::RESERVED);
+			m_content = c;
+		}
+
+		void init(std::string c, TokenType t) {
+			m_type = t;
+			assert(m_type != TokenType::RESERVED && m_type != TokenType::UNUSED_LAST_Length);
+			m_content = std::move(c);
+		}
+
 		Variant m_content = std::string{};
 		TokenType m_type = TokenType::EMPTY;
 
