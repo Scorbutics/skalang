@@ -7,7 +7,7 @@
 
 TEST_CASE("[TypeBuilderBinary]") {
 	DataTestContainer data;
-	auto ast = TypeBuilderTestCommonBuildAST("", data);
+	auto ast = TypeBuilderTestCommonBuildAST("", data, false);
 	auto typeBuilder = ska::TypeBuilderOperator<ska::Operator::BINARY>{};
 	
 	auto value1Node = ska::ASTNode::MakeLogicalNode(ska::Token{"1", ska::TokenType::DIGIT});

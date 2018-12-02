@@ -9,7 +9,7 @@
 
 TEST_CASE("[TypeBuilderVariableDeclaration]") {
 	DataTestContainer data;
-	auto ast = TypeBuilderTestCommonBuildAST("", data);
+	auto ast = TypeBuilderTestCommonBuildAST("", data, false);
 	auto& symbols = *data.symbols;
 	auto typeBuilder = ska::TypeBuilderOperator<ska::Operator::VARIABLE_DECLARATION>{};
 	
