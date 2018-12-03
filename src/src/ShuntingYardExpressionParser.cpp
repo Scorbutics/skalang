@@ -83,13 +83,8 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 					const auto& value = std::get<std::string>(lastToken.content());
 					//TODO : handle multi dimensional arrays
 					if (value != "=") {
-                        /*if(isDoingOperation) {
-                            error("");
-                        }*/
                         auto arrayNode = std::move(operands.top());
 						operands.pop();
-                        
-                        
                         operands.push(matchArrayUse(std::move(arrayNode)));
 						break;
 					}

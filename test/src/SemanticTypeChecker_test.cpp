@@ -166,19 +166,27 @@ TEST_CASE("[SemanticTypeChecker]") {
 
 			//TODO
 			SUBCASE("double array string : cell") {
-				/*
+				
                 auto astPtr = ASTFromInputSemanticTC("var str167 = [[0, 1], [2, 3]]; str167[0]; str167[0][0];", data);
 				auto& ast = (*astPtr);
 				CHECK(ast.size() == 3);
 				CHECK(ast[1].type() == ska::ExpressionType::ARRAY);
 				CHECK(ast[2].type() == ska::ExpressionType::INT);
-			    */
+			    
             }
 
 			SUBCASE("function call : array") {
 				auto astPtr = ASTFromInputSemanticTC("var titi131 = function(test131:string[]) {}; var strArray131 = [\"lol\", \"toto\"]; titi131(strArray131);", data);
 				auto& ast = (*astPtr);
 				CHECK(ast.size() == 3);
+			}
+
+			SUBCASE("expression-array") {
+				auto astPtr = ASTFromInputSemanticTC("var var186 = function() : var { var toto = [0]; return { toto : toto }; }; var186().toto[0];", data);
+				auto& ast = (*astPtr);
+				CHECK(ast.size() == 2);
+				CHECK(ast[1][0].type() == ska::ExpressionType::ARRAY);
+				CHECK(ast[1][0].type().value().compound()[0] == ska::ExpressionType::INT);
 			}
 
 			SUBCASE("Fail") {
@@ -188,7 +196,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 						auto& ast = (*astPtr);
 						CHECK(false);
 					} catch (std::exception& e) {
-						CHECK(true);
+						CHECK(std::string("expression is not an array (it's a  int)") == e.what());
 					}
 				}
                 
