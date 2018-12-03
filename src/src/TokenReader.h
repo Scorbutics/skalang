@@ -20,7 +20,8 @@ namespace ska {
 		bool empty() const;
 		Token actual() const;
         const Token& readPrevious(std::size_t offset) const;
-    
+		bool canReadPrevious(std::size_t offset) const;
+
     private:
         void nextToken();
         void error(Token* token = nullptr);

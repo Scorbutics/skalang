@@ -28,15 +28,21 @@ namespace ska {
 				return symbol == nullptr ? Type{ ExpressionType::VOID } : symbol->getType();
             }
             case TokenType::RESERVED: {
+				auto type = Type{};
                   if(node.name() == std::string(ExpressionTypeSTR[static_cast<std::size_t>(ExpressionType::INT)])) {
-					  return Type{ ExpressionType::INT };
+					  type = Type{ ExpressionType::INT };
                   } else if (node.name() == std::string(ExpressionTypeSTR[static_cast<std::size_t>(ExpressionType::FLOAT)])) {
-					  return Type{ ExpressionType::FLOAT };
+					  type = Type{ ExpressionType::FLOAT };
                   } else if (node.name() == std::string(ExpressionTypeSTR[static_cast<std::size_t>(ExpressionType::STRING)])) {
-					  return Type{ ExpressionType::STRING };
+					  type = Type{ ExpressionType::STRING };
                   } else if(node.name() == "var") {
-					  return Type{ ExpressionType::OBJECT };
+					  type = Type{ ExpressionType::OBJECT };
                   }
+				  //handles arrays
+				  if (node.size() == 1 && node[0].tokenType() == TokenType::ARRAY) {
+					  type = Type{ ExpressionType::ARRAY }.add(type);
+				  }
+				  return type;
             }
 
             default:

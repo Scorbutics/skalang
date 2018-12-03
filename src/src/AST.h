@@ -14,6 +14,8 @@
 #include "TypeBuilderFunctionCall.h"
 #include "TypeBuilderFunctionDeclaration.h"
 #include "TypeBuilderParameterDeclaration.h"
+#include "TypeBuilderArrayDeclaration.h"
+#include "TypeBuilderArrayUse.h"
 #include "TypeBuilderVariableAffectation.h"
 #include "TypeBuilderVariableDeclaration.h"
 

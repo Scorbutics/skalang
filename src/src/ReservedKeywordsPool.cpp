@@ -23,6 +23,8 @@ std::unordered_map<std::string, ska::ReservedKeywordsPool::TokenInfo> ska::Reser
 	emplacer(static_cast<std::size_t>(TokenGrammar::BLOCK_END), TokenType::RANGE);
 	emplacer(static_cast<std::size_t>(TokenGrammar::PARENTHESIS_BEGIN), TokenType::RANGE);
 	emplacer(static_cast<std::size_t>(TokenGrammar::PARENTHESIS_END), TokenType::RANGE);
+	emplacer(static_cast<std::size_t>(TokenGrammar::BRACKET_BEGIN), TokenType::ARRAY);
+	emplacer(static_cast<std::size_t>(TokenGrammar::BRACKET_END), TokenType::ARRAY);
 	emplacer(static_cast<std::size_t>(TokenGrammar::STRING_DELIMITER), TokenType::SYMBOL);
 	emplacer(static_cast<std::size_t>(TokenGrammar::STATEMENT_END), TokenType::SYMBOL);
 	emplacer(static_cast<std::size_t>(TokenGrammar::ARGUMENT_DELIMITER), TokenType::SYMBOL);

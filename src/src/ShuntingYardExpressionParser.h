@@ -45,10 +45,12 @@ namespace ska {
 		ShuntingYardExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, Parser& parser, TokenReader& input);
 		ASTNodePtr parse();
 
-		bool parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token);
-
 	private:
+		void parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token);
+
 		ASTNodePtr matchReserved();
+		ASTNodePtr matchArrayDeclaration();
+		ASTNodePtr matchArrayUse(Token identifierArrayAffected);
 		ASTNodePtr matchFunctionCall(ASTNodePtr identifierFunctionName);
 		ASTNodePtr matchFunctionDeclaration();
 		ASTNodePtr matchFunctionDeclarationBody();

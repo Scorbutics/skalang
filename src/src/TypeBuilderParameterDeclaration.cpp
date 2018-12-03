@@ -12,6 +12,7 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>::build(
     assert(node.size() == 1);
     const auto typeStr = node[0].name();
 
+	auto type = Type{};
     if (ExpressionTypeMap.find(typeStr) == ExpressionTypeMap.end()) {
 		//Object case
         const auto symbolType = symbols[typeStr];
@@ -19,13 +20,20 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>::build(
             throw std::runtime_error("unknown type detected as function parameter : " + node[0].name());
         }
         SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node << "\" = \"" << symbolType->getType() << "\"";
-		return Type{ typeStr, ExpressionType::OBJECT, *symbolType->symbolTable() };
+		type = Type{ typeStr, ExpressionType::OBJECT, *symbolType->symbolTable() };
+
    } else { 
 	   //Built-in case
        SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type calculating for node \"" << node << " with type-node " << typeStr;
-       const auto type = ExpressionTypeMap.at(node[0].name());
-       SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node << "\" = \"" << ExpressionTypeSTR[static_cast<std::size_t>(type)] << "\""; 
-	   return Type{ type };
+	   type = ExpressionTypeMap.at(node[0].name());
+       SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node << "\" = \"" << type << "\""; 
    }
+
+	//handles arrays
+	if (node[0].size() == 1) {
+		type = Type{ ExpressionType::ARRAY }.add(type);
+	}
+
+	return type;
 }
 

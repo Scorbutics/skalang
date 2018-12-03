@@ -185,6 +185,10 @@ ska::RequiredToken ska::Tokenizer::initializeCharType(const ska::TokenType charT
 		required.required = true;
 		break;
 
+	case ska::TokenType::ARRAY:
+		required.required = true;
+		break;
+
 	case ska::TokenType::STRING:
 		required.required = false;
 		required.requiredOrUntil[static_cast<std::size_t>(ska::TokenType::STRING)] = true;
@@ -243,6 +247,10 @@ ska::TokenType ska::Tokenizer::calculateCharacterTokenType(const char c) const {
 	case '{':
 	case '}':
 		return ska::TokenType::RANGE;
+
+	case '[':
+	case ']':
+		return ska::TokenType::ARRAY;
 
 	default:
 		return isWordCharacter(c) ? ska::TokenType::IDENTIFIER : ska::TokenType::SYMBOL;

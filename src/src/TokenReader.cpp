@@ -40,6 +40,10 @@ bool ska::TokenReader::empty() const {
     return m_lookAhead == nullptr || m_lookAhead->type() == ska::TokenType::EMPTY;
 }
 
+bool ska::TokenReader::canReadPrevious(std::size_t offset) const {
+	return m_lookAheadIndex >= offset;
+}
+
 const ska::Token& ska::TokenReader::readPrevious(std::size_t offset) const {
     if(m_lookAheadIndex < offset) {
         auto ss = std::stringstream {};

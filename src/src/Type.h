@@ -94,8 +94,9 @@ namespace ska {
 			return *this;
 		}
 
-		void add(Type t) {
+		Type& add(Type t) {
 			m_compound.push_back(std::move(t));
+			return *this;
 		}
 
 		const std::vector<Type>& compound() const {

@@ -9,19 +9,44 @@ SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SemanticTypeChecker)
 
 ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser) :
     SubObserver<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser),
-    SubObserver<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser) {
+    SubObserver<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser),
+	SubObserver<ArrayTokenEvent>(std::bind(&SemanticTypeChecker::matchArray, this, std::placeholders::_1), parser) {
+}
+
+bool ska::SemanticTypeChecker::matchArray(const ArrayTokenEvent& token) {
+
+	switch (token.type()) {
+	case ArrayTokenEventType::DECLARATION: {
+			const auto& node = token.rootNode();
+			assert(node.type() == ExpressionType::ARRAY);
+			if (node.size() == 0) {
+				assert(node.type().value().compound().empty());
+				return true;
+			}
+			const auto type = node[0].type().value();
+			for (const auto& arrayElementNode : node) {
+				if (type != arrayElementNode->type()) {
+					assert(arrayElementNode->type().has_value());
+					auto ss = std::stringstream{};
+					ss << "array has not uniform types in it : " << type << " and " << arrayElementNode->type().value();
+					throw std::runtime_error(ss.str());
+				}
+			}
+		} break;
+
+	case ArrayTokenEventType::USE:
+		break;
+
+	default:
+		assert(!"Unhandled event type");
+		break;
+	}
+
+	return true;
 }
 
 bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
     switch(token.type()) {       
-        case FunctionTokenEventType::DECLARATION_PROTOTYPE: {			
-			const auto returnType = token.contextNode().type();
-            if (returnType.has_value() && returnType.value() == ExpressionType::OBJECT) {
-				SLOG(ska::LogLevel::Debug) << "user defined object type detected";
-			}
-
-        } break;
-
         
         case FunctionTokenEventType::CALL: {
 			assert(token.rootNode().size() > 0);
@@ -59,6 +84,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
             }
         } break;
 
+		case FunctionTokenEventType::DECLARATION_PROTOTYPE:
 		case FunctionTokenEventType::DECLARATION_STATEMENT:
 		default:
 			break;

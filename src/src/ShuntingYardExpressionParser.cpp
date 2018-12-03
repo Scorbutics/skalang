@@ -55,25 +55,58 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::parse() {
 	return expression(operators, operands);
 }
 
-bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token) {
+void ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token) {
 
 	switch (token.type()) {
-		case TokenType::RESERVED: {
-			SLOG(ska::LogLevel::Debug) << "\tPushing reserved";
-			auto reservedNode = matchReserved();
-			if (reservedNode != nullptr) {
-				operands.push(std::move(reservedNode));
+	case TokenType::RESERVED: {
+		SLOG(ska::LogLevel::Debug) << "\tPushing reserved";
+		auto reservedNode = matchReserved();
+		if (reservedNode != nullptr) {
+			operands.push(std::move(reservedNode));
+			break;
+		}
+	}
+	case TokenType::IDENTIFIER:
+	case TokenType::STRING:
+	case TokenType::DIGIT:
+		SLOG(ska::LogLevel::Debug) << "\tPushing operand " << token;
+		operands.push(ASTNode::MakeLogicalNode(m_input.match(token.type())));
+		break;
+
+	case TokenType::ARRAY: {
+			const auto& value = std::get<std::string>(token.content());
+			switch (value[0]) {
+			case '[': {
+				SLOG(ska::LogLevel::Debug) << "\tArray begin";
+				if (m_input.canReadPrevious(1)) {
+					auto lastToken = m_input.readPrevious(1);
+					const auto& value = std::get<std::string>(lastToken.content());
+					//TODO : handle multi dimensional arrays
+					if (value != "=") {
+						operands.pop();
+						operands.push(matchArrayUse(lastToken));
+						break;
+					}
+				}
+				auto reservedNode = matchArrayDeclaration();
+				if (reservedNode != nullptr) {
+					operands.push(std::move(reservedNode));
+					break;
+				}
+				SLOG(ska::LogLevel::Debug) << "\tArray end";
+			} break;
+
+			case ']':
+				m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
+				break;
+			default:
+				assert(!"unsupported array symbol");
 				break;
 			}
-		}
-		case TokenType::IDENTIFIER:
-		case TokenType::STRING:
-		case TokenType::DIGIT:
-			SLOG(ska::LogLevel::Debug) << "\tPushing operand " << token;
-			operands.push(ASTNode::MakeLogicalNode(m_input.match(token.type())));
-			return true;
 
-		case TokenType::RANGE: {
+		} break;
+
+	case TokenType::RANGE: {
 			const auto& value = std::get<std::string>(token.content());
 			switch (value[0]) {
 			case '(':
@@ -118,18 +151,21 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 
 		}
 		break;
-		
-		case TokenType::DOT_SYMBOL: {
+
+	case TokenType::DOT_SYMBOL: {
 			//Field access only (digits are DIGIT token type, even real ones)
 			auto lastNode = std::move(operands.top());
 			operands.pop();
 			operands.push(matchObjectFieldAccess(std::move(lastNode)));
-			return true;
+			break;
 		}
-		case TokenType::SYMBOL: {
+	case TokenType::SYMBOL: {
 			const auto& value = std::get<std::string>(token.content());
 			if(value == "=") {
-				auto lastToken = ska::Token{ operands.top()->name(), operands.top()->tokenType() };
+				auto lastToken = m_input.readPrevious(1);
+				if (lastToken.type() != TokenType::IDENTIFIER) {
+					error("invalid identifier used in affectation");
+				}
 				operands.pop();
 				operands.push(matchAffectation(lastToken));
 			} else {
@@ -155,9 +191,8 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 		break;
 
 	default:
-		error("Expected a symbol, a litteral, an identifier or a reserved keyword, but got the token : " + token.name());
+		error("Expected a symbol, a literal, an identifier or a reserved keyword, but got the token : " + token.name());
 	}
-	return false;
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr identifierFunctionName) {
@@ -273,6 +308,48 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchReserved() {
 	}
 }
 
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchArrayDeclaration() {
+	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());
+
+	auto arrayNode = std::vector<ASTNodePtr>{};
+	auto isComma = true;
+	while (isComma) {
+		if (!m_input.expect(TokenType::SYMBOL)) {
+			SLOG(ska::LogLevel::Debug) << "array entry detected, reading expression : ";
+			
+			auto expression = parse();
+			arrayNode.push_back(std::move(expression));
+			isComma = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
+			if (isComma) {
+				m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
+			}
+		}
+	}
+
+	auto declarationNode = ASTNode::MakeNode<ska::Operator::ARRAY_DECLARATION>(std::move(arrayNode));
+	auto event = ArrayTokenEvent{ *declarationNode, ArrayTokenEventType::USE };
+	m_parser.Observable<ArrayTokenEvent>::notifyObservers(event);
+	return declarationNode;
+}
+
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchArrayUse(Token identifierArrayAffected) {
+	//TODO : it only handles direct use of arrays. 
+	//It means it's not possible to call a function that returns an array and the access to a cell of this array directly.
+	//ex : getArray()[0] is an invalid expression.
+	if (identifierArrayAffected.type() != TokenType::IDENTIFIER) {
+		error("unhandled case : accessing an array without a direct identifier");
+	}
+
+
+	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());
+	auto indexNode = parse();
+	
+	auto declarationNode = ASTNode::MakeNode<ska::Operator::ARRAY_USE>(ASTNode::MakeLogicalNode(identifierArrayAffected), std::move(indexNode));
+	auto event = ArrayTokenEvent{ *declarationNode, ArrayTokenEventType::USE };
+	m_parser.Observable<ArrayTokenEvent>::notifyObservers(event);
+	return declarationNode;
+}
+
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationParameter() {
 	const auto isRightParenthesis = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 	if(isRightParenthesis) {
@@ -289,8 +366,22 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationParam
 
 	SLOG(ska::LogLevel::Debug) << "type is : " << typeStr;
 	
-	//TODO handle arrays
-	auto node = ASTNode::MakeNode<Operator::PARAMETER_DECLARATION>(id, ASTNode::MakeLogicalNode(typeToken));
+	//handle arrays
+	auto typeNode = ASTNodePtr{};;
+	if (m_input.expect(TokenType::ARRAY)) {
+		auto arrayStartToken = m_input.match(TokenType::ARRAY);
+		auto arrayEndToken = m_input.match(TokenType::ARRAY);
+		if (std::get<std::string>(arrayStartToken.content()) != "[" ||
+			std::get<std::string>(arrayEndToken.content()) != "]") {
+			error("only brackets [] are supported in a parameter declaration type");
+		}
+
+		typeNode = ASTNode::MakeLogicalNode(typeToken, ASTNode::MakeLogicalNode(Token{"", TokenType::ARRAY }));
+	} else {
+		typeNode = ASTNode::MakeLogicalNode(typeToken);
+	}
+
+	auto node = ASTNode::MakeNode<Operator::PARAMETER_DECLARATION>(id, std::move(typeNode));
 	auto event = VarTokenEvent::template Make<VarTokenEventType::PARAMETER_DECLARATION>(*node, (*node)[0]);
 	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
 	return node;

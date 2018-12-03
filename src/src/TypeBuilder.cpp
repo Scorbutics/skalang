@@ -12,7 +12,8 @@ ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) :
     SubObserver<ExpressionTokenEvent>(std::bind(&TypeBuilder::matchExpression, this, std::placeholders::_1), parser),
 	SubObserver<FunctionTokenEvent>(std::bind(&TypeBuilder::matchFunction, this, std::placeholders::_1), parser),
 	SubObserver<VarTokenEvent>(std::bind(&TypeBuilder::matchVariable, this, std::placeholders::_1), parser),
-	SubObserver<ReturnTokenEvent>(std::bind(&TypeBuilder::matchReturn, this, std::placeholders::_1), parser) {
+	SubObserver<ReturnTokenEvent>(std::bind(&TypeBuilder::matchReturn, this, std::placeholders::_1), parser),
+	SubObserver<ArrayTokenEvent>(std::bind(&TypeBuilder::matchArray, this, std::placeholders::_1), parser) {
 }
 
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
@@ -27,6 +28,12 @@ bool ska::TypeBuilder::matchReturn(ReturnTokenEvent& event) const {
     }   
 	return true;
 
+}
+
+bool ska::TypeBuilder::matchArray(ArrayTokenEvent & event) const {
+	event.rootNode().buildType(m_symbols);
+	SLOG(LogLevel::Debug) << "Type built for array = \"" << event.rootNode().type().value() << "\"";
+	return true;
 }
 
 bool ska::TypeBuilder::matchExpression(ExpressionTokenEvent& event) const {

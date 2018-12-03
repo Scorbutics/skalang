@@ -15,6 +15,7 @@ namespace ska {
 	"SPACE",
 	"STRING",
 	"RANGE",
+	"ARRAY",
 	"SYMBOL",
 	"EMPTY",
 	"UNUSED_LAST_Length"
@@ -28,6 +29,7 @@ namespace ska {
 		SPACE,
 		STRING,
 		RANGE,
+		ARRAY,
 		SYMBOL,
 		EMPTY,
 		UNUSED_LAST_Length

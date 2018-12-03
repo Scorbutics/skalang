@@ -12,6 +12,7 @@
 #include "FunctionTokenEvent.h"
 #include "ExpressionTokenEvent.h"
 #include "ReturnTokenEvent.h"
+#include "ArrayTokenEvent.h"
 
 namespace ska {
 	struct ReservedKeywordsPool;
@@ -24,7 +25,8 @@ namespace ska {
 	    	FunctionTokenEvent,
             BlockTokenEvent,
 		    ExpressionTokenEvent,
-            ReturnTokenEvent
+            ReturnTokenEvent,
+			ArrayTokenEvent
 	    > {
 
 		friend class ShuntingYardExpressionParser;
