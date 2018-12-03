@@ -34,6 +34,14 @@ bool ska::SemanticTypeChecker::matchArray(const ArrayTokenEvent& token) {
 			}
 		} break;
 
+    case ArrayTokenEventType::EXPRESSION: {
+        if(token.rootNode().type() != ExpressionType::ARRAY) {
+            auto ss = std::stringstream {}; 
+            ss << "expression is not an array (it's a " << token.rootNode().type().value_or(Type {}) << ")";
+            throw std::runtime_error(ss.str());
+        }
+      } break;
+
 	case ArrayTokenEventType::USE:
 		break;
 

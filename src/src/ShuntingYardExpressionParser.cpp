@@ -55,7 +55,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::parse() {
 	return expression(operators, operands);
 }
 
-void ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token) {
+bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token, bool isDoingOperation) {
 
 	switch (token.type()) {
 	case TokenType::RESERVED: {
@@ -83,8 +83,14 @@ void ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 					const auto& value = std::get<std::string>(lastToken.content());
 					//TODO : handle multi dimensional arrays
 					if (value != "=") {
+                        /*if(isDoingOperation) {
+                            error("");
+                        }*/
+                        auto arrayNode = std::move(operands.top());
 						operands.pop();
-						operands.push(matchArrayUse(lastToken));
+                        
+                        
+                        operands.push(matchArrayUse(std::move(arrayNode)));
 						break;
 					}
 				}
@@ -99,6 +105,7 @@ void ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 			case ']':
 				m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 				break;
+
 			default:
 				assert(!"unsupported array symbol");
 				break;
@@ -186,6 +193,7 @@ void ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 					operands.push(std::move(popedToken));
 				}
 				operators.emplace(m_input.match(TokenType::SYMBOL));
+                return true;
 			}
 		}
 		break;
@@ -193,6 +201,7 @@ void ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 	default:
 		error("Expected a symbol, a literal, an identifier or a reserved keyword, but got the token : " + token.name());
 	}
+    return false;
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr identifierFunctionName) {
@@ -263,10 +272,10 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(stack<Token>& oper
         
 		rangeCounter += m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()) ? 1 : 0;
 		rangeCounter -= m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) ? 1 : 0;
-		
+		auto isDoingOperation = false;
         auto token = m_input.actual();
 		if (rangeCounter >= 0) {
-			parseTokenExpression(operators, operands, token);
+			isDoingOperation = parseTokenExpression(operators, operands, token, isDoingOperation);
 			if (!operands.empty() && operands.top()->op() == Operator::FUNCTION_CALL) {
 				rangeCounter = 0;
 			}
@@ -332,20 +341,19 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchArrayDeclaration() {
 	return declarationNode;
 }
 
-ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchArrayUse(Token identifierArrayAffected) {
-	//TODO : it only handles direct use of arrays. 
-	//It means it's not possible to call a function that returns an array and the access to a cell of this array directly.
-	//ex : getArray()[0] is an invalid expression.
-	if (identifierArrayAffected.type() != TokenType::IDENTIFIER) {
-		error("unhandled case : accessing an array without a direct identifier");
-	}
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchArrayUse(ASTNodePtr identifierArrayAffected) {
+	//Ensures array expression before the index access
+    auto expressionEvent = ArrayTokenEvent{ *identifierArrayAffected, ArrayTokenEventType::EXPRESSION };
+	m_parser.Observable<ArrayTokenEvent>::notifyObservers(expressionEvent);
 
-
+    //Gets the index part with bracket syntax
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());
 	auto indexNode = parse();
 	
-	auto declarationNode = ASTNode::MakeNode<ska::Operator::ARRAY_USE>(ASTNode::MakeLogicalNode(identifierArrayAffected), std::move(indexNode));
-	auto event = ArrayTokenEvent{ *declarationNode, ArrayTokenEventType::USE };
+	auto declarationNode = ASTNode::MakeNode<ska::Operator::ARRAY_USE>(std::move(identifierArrayAffected), std::move(indexNode));
+	
+    //Notifies the outside that we use the array
+    auto event = ArrayTokenEvent{ *declarationNode, ArrayTokenEventType::USE };
 	m_parser.Observable<ArrayTokenEvent>::notifyObservers(event);
 	return declarationNode;
 }

@@ -46,11 +46,11 @@ namespace ska {
 		ASTNodePtr parse();
 
 	private:
-		void parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token);
+		bool parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token, bool isDoingOperation);
 
 		ASTNodePtr matchReserved();
 		ASTNodePtr matchArrayDeclaration();
-		ASTNodePtr matchArrayUse(Token identifierArrayAffected);
+		ASTNodePtr matchArrayUse(ASTNodePtr identifierArrayAffected);
 		ASTNodePtr matchFunctionCall(ASTNodePtr identifierFunctionName);
 		ASTNodePtr matchFunctionDeclaration();
 		ASTNodePtr matchFunctionDeclarationBody();

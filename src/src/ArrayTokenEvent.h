@@ -4,8 +4,9 @@ namespace ska {
 	class ASTNode;
 
 	enum class ArrayTokenEventType {
-		DECLARATION,
-		USE
+        DECLARATION,
+		EXPRESSION,
+        USE
 	};
 
 	class ArrayTokenEvent {

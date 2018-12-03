@@ -144,8 +144,8 @@ TEST_CASE("[SemanticTypeChecker]") {
 		SUBCASE("Array") {
 			//TODO
 			SUBCASE("empty") {
-				auto astPtr = ASTFromInputSemanticTC("var str146 = [];", data);
-				auto& ast = (*astPtr);
+				//auto astPtr = ASTFromInputSemanticTC("var str146 = [];", data);
+				//auto& ast = (*astPtr);
 			}
 
 			SUBCASE("string") {
@@ -166,12 +166,14 @@ TEST_CASE("[SemanticTypeChecker]") {
 
 			//TODO
 			SUBCASE("double array string : cell") {
-				auto astPtr = ASTFromInputSemanticTC("var str167 = [[0, 1], [2, 3]]; str167[0]; str167[0][0];", data);
+				/*
+                auto astPtr = ASTFromInputSemanticTC("var str167 = [[0, 1], [2, 3]]; str167[0]; str167[0][0];", data);
 				auto& ast = (*astPtr);
 				CHECK(ast.size() == 3);
 				CHECK(ast[1].type() == ska::ExpressionType::ARRAY);
 				CHECK(ast[2].type() == ska::ExpressionType::INT);
-			}
+			    */
+            }
 
 			SUBCASE("function call : array") {
 				auto astPtr = ASTFromInputSemanticTC("var titi131 = function(test131:string[]) {}; var strArray131 = [\"lol\", \"toto\"]; titi131(strArray131);", data);
@@ -180,8 +182,18 @@ TEST_CASE("[SemanticTypeChecker]") {
 			}
 
 			SUBCASE("Fail") {
-				//TODO
-				SUBCASE("syntax error ']'") {
+				SUBCASE("not an array") {
+					try {
+						auto astPtr = ASTFromInputSemanticTC("var var187 = 123; var187[0];", data);
+						auto& ast = (*astPtr);
+						CHECK(false);
+					} catch (std::exception& e) {
+						CHECK(true);
+					}
+				}
+                
+                //TODO
+                SUBCASE("syntax error ']'") {
 					try {
 						auto astPtr = ASTFromInputSemanticTC("var str170 = [\"tt\", \"titi\"]];", data);
 						auto& ast = (*astPtr);
