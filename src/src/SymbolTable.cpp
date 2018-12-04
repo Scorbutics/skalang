@@ -2,8 +2,7 @@
 #include "SymbolTable.h"
 #include "Parser.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::SymbolTable)
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScopedSymbolTable)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTable)
 
 ska::SymbolTable::SymbolTable(Parser& parser) :
 	SubObserver<VarTokenEvent>(std::bind(&ska::SymbolTable::match, this, std::placeholders::_1), parser),

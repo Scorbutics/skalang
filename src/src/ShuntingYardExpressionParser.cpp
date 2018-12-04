@@ -5,13 +5,15 @@
 #include "AST.h"
 #include "ReservedKeywordsPool.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ShuntingYardExpressionParser)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ShuntingYardExpressionParser)
+
+#define SKA_LOG_SHUNTING_YARD_DETAILS
 
 template <class Container>
 void Print(const Container& c, const std::string& name = " ") {
 	std::cout << name << " : ";
 	for(const auto& it : c) {
-		std::cout << it.asString() << " ";
+		std::cout << it << " ";
 	}
 	std::cout << std::endl;
 }
@@ -21,7 +23,7 @@ void PrintPtr(const Container& c, const std::string& name = " ") {
 	std::cout << name << " : ";
 	for(const auto& it : c) {
 		if(it != nullptr) {
-			std::cout << it->asString() << " ";
+			std::cout << (*it) << " ";
 		}
 	}
 	std::cout << std::endl;
@@ -86,20 +88,25 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
                         auto arrayNode = std::move(operands.top());
 						operands.pop();
                         operands.push(matchArrayUse(std::move(arrayNode)));
-						break;
+                        SLOG(ska::LogLevel::Debug) << "\tArray end";
+                        break;
 					}
 				}
 				auto reservedNode = matchArrayDeclaration();
-				if (reservedNode != nullptr) {
-					operands.push(std::move(reservedNode));
-					break;
-				}
-				SLOG(ska::LogLevel::Debug) << "\tArray end";
+				if(reservedNode == nullptr) {
+                    error("invalid array declaration");
+                }
+                operands.push(std::move(reservedNode));
+                SLOG(ska::LogLevel::Debug) << "\tArray end";
+                break;
+			
 			} break;
 
-			case ']':
+			/*
+            case ']':
 				m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 				break;
+            */
 
 			default:
 				assert(!"unsupported array symbol");
@@ -255,16 +262,18 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchAffectation(Token identi
 bool ska::ShuntingYardExpressionParser::isAtEndOfExpression() const {
     return m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()) || 
             m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>()) ||
-            m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()); 
+            m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()) ||
+            m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>()); 
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(stack<Token>& operators, stack<ASTNodePtr>& operands) {
 	auto rangeCounter = 0;
 
     while (!isAtEndOfExpression() && rangeCounter >= 0) {
-		//PrintPtr(operands, "Operands");
-		//Print(operators, "Operators");
-        
+#ifdef SKA_LOG_SHUNTING_YARD_DETAILS
+        PrintPtr(operands, "Operands");
+		Print(operators, "Operators");
+#endif
 		rangeCounter += m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()) ? 1 : 0;
 		rangeCounter -= m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) ? 1 : 0;
 		auto isDoingOperation = false;
@@ -330,6 +339,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchArrayDeclaration() {
 		}
 	}
 
+    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 	auto declarationNode = ASTNode::MakeNode<ska::Operator::ARRAY_DECLARATION>(std::move(arrayNode));
 	auto event = ArrayTokenEvent{ *declarationNode, ArrayTokenEventType::USE };
 	m_parser.Observable<ArrayTokenEvent>::notifyObservers(event);
@@ -344,7 +354,8 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchArrayUse(ASTNodePtr iden
     //Gets the index part with bracket syntax
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());
 	auto indexNode = parse();
-	
+	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
+
 	auto declarationNode = ASTNode::MakeNode<ska::Operator::ARRAY_USE>(std::move(identifierArrayAffected), std::move(indexNode));
 	
     //Notifies the outside that we use the array

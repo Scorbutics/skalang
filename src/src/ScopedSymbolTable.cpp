@@ -1,5 +1,7 @@
 #include "ScopedSymbolTable.h"
 
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScopedSymbolTable)
+
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
 	return m_parent;
 }
