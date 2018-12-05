@@ -215,11 +215,6 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr 
 	
 	const auto endParametersToken = m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>();
 	while (!m_input.expect(endParametersToken)) {
-		
-		const auto commaToken = m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>();
-		if(m_input.expect(commaToken)) {
-			m_input.match(commaToken);
-		}
 
 		auto expressionOpt = parse();
 		if (expressionOpt != nullptr) {
@@ -227,7 +222,11 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr 
 			functionCallNodeContent.push_back(std::move(expressionOpt));
 		} else {
 			SLOG(ska::LogLevel::Debug) << "Expression null";
-			break;
+		}
+
+        const auto commaToken = m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>();
+		if(m_input.expect(commaToken)) {
+			m_input.match(commaToken);
 		}
 	}
 	m_input.match(endParametersToken);
@@ -280,9 +279,9 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(stack<Token>& oper
         auto token = m_input.actual();
 		if (rangeCounter >= 0) {
 			isDoingOperation = parseTokenExpression(operators, operands, token, isDoingOperation);
-			if (!operands.empty() && operands.top()->op() == Operator::FUNCTION_CALL) {
+			/*if (!operands.empty() && operands.top()->op() == Operator::FUNCTION_CALL) {
 				rangeCounter = 0;
-			}
+			}*/
 		}
 	}
 	SLOG(ska::LogLevel::Debug) << "\tPoping everything";
@@ -348,6 +347,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchArrayDeclaration() {
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchArrayUse(ASTNodePtr identifierArrayAffected) {
 	//Ensures array expression before the index access
+    SLOG(ska::LogLevel::Debug) << "expression-array : " << *identifierArrayAffected;
     auto expressionEvent = ArrayTokenEvent{ *identifierArrayAffected, ArrayTokenEventType::EXPRESSION };
 	m_parser.Observable<ArrayTokenEvent>::notifyObservers(expressionEvent);
 

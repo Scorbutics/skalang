@@ -68,6 +68,19 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			, data);
 	}
 
+    SUBCASE("constructor with integer field accessed through function call and used in expression") {
+		ASTFromInputSemanticComplexTC(
+			"var JoueurClass = function(nom:string) : var { "
+				"var test74 = 123;"
+
+				"return {"
+					"test : test74"
+				"};"
+			"};"
+            "(5 + JoueurClass(\"joueur1Nom\").test + 3 * 4) * 2;"
+			, data);
+	}
+
 	SUBCASE("class with internal data used in public function 2") {
 		ASTFromInputSemanticComplexTC(
 			"var Stats = function() : var {"

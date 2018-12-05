@@ -227,6 +227,13 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(ast[1][0].type() == ska::ExpressionType::INT);
 			}
 
+            SUBCASE("complex expression-array with variable used in expression") {
+				auto astPtr = ASTFromInputSemanticTC("var var203 = function() : var { var toto = [0]; return { toto : toto }; }; var totoVar = var203().toto; (5 + totoVar[0] + 3 * 4) * 2;", data);
+				auto& ast = (*astPtr);
+				CHECK(ast.size() == 3);
+				CHECK(ast[2][0].type() == ska::ExpressionType::INT);
+			}
+
 			SUBCASE("Fail") {
 				SUBCASE("not an array") {
 					try {
