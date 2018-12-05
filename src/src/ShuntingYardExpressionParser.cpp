@@ -5,7 +5,7 @@
 #include "AST.h"
 #include "ReservedKeywordsPool.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ShuntingYardExpressionParser)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ShuntingYardExpressionParser)
 
 //#define SKA_LOG_SHUNTING_YARD_DETAILS
 
@@ -57,7 +57,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::parse() {
 	return expression(operators, operands);
 }
 
-bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token, bool isDoingOperation) {
+void ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token) {
 
 	switch (token.type()) {
 	case TokenType::RESERVED: {
@@ -102,14 +102,8 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 			
 			} break;
 
-			/*
-            case ']':
-				m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
-				break;
-            */
-
 			default:
-				assert(!"unsupported array symbol");
+				error("unsupported array symbol");
 				break;
 			}
 
@@ -195,7 +189,6 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 					operands.push(std::move(popedToken));
 				}
 				operators.emplace(m_input.match(TokenType::SYMBOL));
-                return true;
 			}
 		}
 		break;
@@ -203,7 +196,6 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 	default:
 		error("Expected a symbol, a literal, an identifier or a reserved keyword, but got the token : " + token.name());
 	}
-    return false;
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr identifierFunctionName) {
@@ -275,13 +267,9 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(stack<Token>& oper
 #endif
 		rangeCounter += m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()) ? 1 : 0;
 		rangeCounter -= m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) ? 1 : 0;
-		auto isDoingOperation = false;
         auto token = m_input.actual();
 		if (rangeCounter >= 0) {
-			isDoingOperation = parseTokenExpression(operators, operands, token, isDoingOperation);
-			/*if (!operands.empty() && operands.top()->op() == Operator::FUNCTION_CALL) {
-				rangeCounter = 0;
-			}*/
+			parseTokenExpression(operators, operands, token);
 		}
 	}
 	SLOG(ska::LogLevel::Debug) << "\tPoping everything";
