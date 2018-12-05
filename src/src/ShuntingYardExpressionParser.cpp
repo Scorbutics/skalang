@@ -7,7 +7,7 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ShuntingYardExpressionParser)
 
-#define SKA_LOG_SHUNTING_YARD_DETAILS
+//#define SKA_LOG_SHUNTING_YARD_DETAILS
 
 template <class Container>
 void Print(const Container& c, const std::string& name = " ") {
