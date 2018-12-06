@@ -239,10 +239,14 @@ TEST_CASE("[SemanticTypeChecker]") {
 				}
 
                  SUBCASE("operator in wrong order : ") {
-                    auto astPtr = ASTFromInputSemanticTC("var str159 = [0, 1]; str159*[0] 2;", data);
-                    auto& ast = (*astPtr);
-                    CHECK(ast.size() == 2);
-                    CHECK(ast[1].type() == ska::ExpressionType::INT);
+                    try {
+                        auto astPtr = ASTFromInputSemanticTC("var str242 = [0, 1]; str242*[0] 2;", data);
+                        auto& ast = (*astPtr);
+                        CHECK(ast.size() == 2);
+                        CHECK(ast[1].type() == ska::ExpressionType::INT);
+                    } catch(std::exception& e) {
+                        CHECK(std::string("syntax error : invalid operator placement") == e.what());
+                    }
                 }
 
                 SUBCASE("syntax error ']'") {

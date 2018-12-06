@@ -99,7 +99,11 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::popOperandIfNoOperator(stack<ASTNodePtr>& operands, bool isMathOperator) {
-    if(!operands.empty() && isMathOperator) {
+    if(operands.empty()) {
+        return nullptr;
+    }
+
+    if(!isMathOperator) {
         auto result = std::move(operands.top());
         operands.pop();
         return result;
@@ -192,7 +196,7 @@ bool ska::ShuntingYardExpressionParser::matchSymbol(stack<Token>& operators, sta
         operands.push(matchAffectation(lastToken));
         return false;
     } else {
-        SLOG(ska::LogLevel::Debug) << "\tPushing operator symbol " << value;
+        SLOG(ska::LogLevel::Debug) << "\t\tPushing operator symbol " << value;
         const auto shouldPopOperatorsStack = checkLessPriorityToken(operators, operands, value[0]);
         auto operatorTop = operators.empty() ? Token{} : operators.top();
         if (shouldPopOperatorsStack) {
