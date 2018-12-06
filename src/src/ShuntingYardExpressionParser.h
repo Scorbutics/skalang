@@ -46,9 +46,11 @@ namespace ska {
 		ASTNodePtr parse();
 
 	private:
-		void parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token);
-
-		ASTNodePtr matchReserved();
+		bool parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token, bool isDoingOperation);
+        
+        bool matchSymbol(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token);
+		
+        ASTNodePtr matchReserved();
 		ASTNodePtr matchArrayDeclaration();
 		ASTNodePtr matchArrayUse(ASTNodePtr identifierArrayAffected);
 		ASTNodePtr matchFunctionCall(ASTNodePtr identifierFunctionName);
@@ -60,6 +62,8 @@ namespace ska {
 		ASTNodePtr matchObjectFieldAccess(ASTNodePtr objectAccessed);
 		ASTNodePtr matchAffectation(Token identifierFieldAffected);
         
+        static ASTNodePtr popOperand(stack<ASTNodePtr>& operands, bool isMathOperator);
+
         bool isAtEndOfExpression() const;
 		ASTNodePtr expression(stack<Token>& operators, stack<ASTNodePtr>& operands);
 		bool checkLessPriorityToken(stack<Token>& operators, stack<ASTNodePtr>& operands, const char tokenChar) const;

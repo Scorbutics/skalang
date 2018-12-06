@@ -5,7 +5,7 @@
 #include "AST.h"
 #include "ReservedKeywordsPool.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ShuntingYardExpressionParser)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ShuntingYardExpressionParser)
 
 //#define SKA_LOG_SHUNTING_YARD_DETAILS
 
@@ -57,7 +57,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::parse() {
 	return expression(operators, operands);
 }
 
-void ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token) {
+bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token, bool isDoingOperation) {
 
 	switch (token.type()) {
 	case TokenType::RESERVED: {
@@ -79,19 +79,18 @@ void ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 			const auto& value = std::get<std::string>(token.content());
 			switch (value[0]) {
 			case '[': {
-				SLOG(ska::LogLevel::Debug) << "\tArray begin";
 				if (m_input.canReadPrevious(1)) {
 					auto lastToken = m_input.readPrevious(1);
 					const auto& value = std::get<std::string>(lastToken.content());
 					//TODO : handle multi dimensional arrays
 					if (value != "=") {
-                        auto arrayNode = std::move(operands.top());
-						operands.pop();
-                        operands.push(matchArrayUse(std::move(arrayNode)));
+                        SLOG(ska::LogLevel::Debug) << "\tArray begin use";
+                        operands.push(matchArrayUse(popOperand(operands, isDoingOperation)));
                         SLOG(ska::LogLevel::Debug) << "\tArray end";
                         break;
 					}
 				}
+                SLOG(ska::LogLevel::Debug) << "\tArray begin declare";
 				auto reservedNode = matchArrayDeclaration();
 				if(reservedNode == nullptr) {
                     error("invalid array declaration");
@@ -119,9 +118,7 @@ void ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 					SLOG(ska::LogLevel::Debug) << "\tFunction call !";
 					//We already pushed the identifier as an operand, but in fact it's a function call.
 					//We have to pop it, then matching the function call as the new operand.
-					auto functionToCallNode = std::move(operands.top());
-					operands.pop();
-					operands.push(matchFunctionCall(std::move(functionToCallNode)));
+					operands.push(matchFunctionCall(popOperand(operands, isDoingOperation)));
 					
 				} else {
 					SLOG(ska::LogLevel::Debug) << "\tRange begin";
@@ -157,45 +154,58 @@ void ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 
 	case TokenType::DOT_SYMBOL: {
 			//Field access only (digits are DIGIT token type, even real ones)
-			auto lastNode = std::move(operands.top());
-			operands.pop();
-			operands.push(matchObjectFieldAccess(std::move(lastNode)));
+			operands.push(matchObjectFieldAccess(popOperand(operands, isDoingOperation)));
 			break;
 		}
-	case TokenType::SYMBOL: {
-			const auto& value = std::get<std::string>(token.content());
-			if(value == "=") {
-				auto lastToken = m_input.readPrevious(1);
-				if (lastToken.type() != TokenType::IDENTIFIER) {
-					error("invalid identifier used in affectation");
-				}
-				operands.pop();
-				operands.push(matchAffectation(lastToken));
-			} else {
-				SLOG(ska::LogLevel::Debug) << "\tPushing operator symbol " << value;
-				const auto shouldPopOperatorsStack = checkLessPriorityToken(operators, operands, value[0]);
-				auto operatorTop = operators.empty() ? Token{} : operators.top();
-				if (shouldPopOperatorsStack) {
-					SLOG(ska::LogLevel::Debug) << "\tLess precedence, poping " << operatorTop << " before adding " << value;
-					auto poped = 0u;
-					auto popedToken = popUntil(operators, operands, [&](const Token& t) {
-						if (poped >= 1) {
-							return -1;
-						}
-						poped++;
-						return 0;
-					});
-					assert(popedToken != nullptr);
-					operands.push(std::move(popedToken));
-				}
-				operators.emplace(m_input.match(TokenType::SYMBOL));
-			}
-		}
-		break;
+
+	case TokenType::SYMBOL:
+        return matchSymbol(operators, operands, token);
 
 	default:
 		error("Expected a symbol, a literal, an identifier or a reserved keyword, but got the token : " + token.name());
 	}
+    return false;
+}
+
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::popOperand(stack<ASTNodePtr>& operands, bool isMathOperator) {
+    if(!operands.empty() && isMathOperator) {
+        auto result = std::move(operands.top());
+        operands.pop();
+        return result;
+    }
+    error("invalid operator placement");
+}
+
+bool ska::ShuntingYardExpressionParser::matchSymbol(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token) {
+    const auto& value = std::get<std::string>(token.content());
+    if(value == "=") {
+        auto lastToken = m_input.readPrevious(1);
+        if (lastToken.type() != TokenType::IDENTIFIER) {
+            error("invalid identifier used in affectation");
+        }
+        operands.pop();
+        operands.push(matchAffectation(lastToken));
+        return false;
+    } else {
+        SLOG(ska::LogLevel::Debug) << "\tPushing operator symbol " << value;
+        const auto shouldPopOperatorsStack = checkLessPriorityToken(operators, operands, value[0]);
+        auto operatorTop = operators.empty() ? Token{} : operators.top();
+        if (shouldPopOperatorsStack) {
+            SLOG(ska::LogLevel::Debug) << "\tLess precedence, poping " << operatorTop << " before adding " << value;
+            auto poped = 0u;
+            auto popedToken = popUntil(operators, operands, [&](const Token& t) {
+                if (poped >= 1) {
+                    return -1;
+                }
+                poped++;
+                return 0;
+            });
+            assert(popedToken != nullptr);
+            operands.push(std::move(popedToken));
+        }
+        operators.emplace(m_input.match(TokenType::SYMBOL));
+        return true;
+    }
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionCall(ASTNodePtr identifierFunctionName) {
@@ -259,7 +269,7 @@ bool ska::ShuntingYardExpressionParser::isAtEndOfExpression() const {
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(stack<Token>& operators, stack<ASTNodePtr>& operands) {
 	auto rangeCounter = 0;
-
+    auto isDoingOperation = false;
     while (!isAtEndOfExpression() && rangeCounter >= 0) {
 #ifdef SKA_LOG_SHUNTING_YARD_DETAILS
         PrintPtr(operands, "Operands");
@@ -269,7 +279,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(stack<Token>& oper
 		rangeCounter -= m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) ? 1 : 0;
         auto token = m_input.actual();
 		if (rangeCounter >= 0) {
-			parseTokenExpression(operators, operands, token);
+			isDoingOperation = parseTokenExpression(operators, operands, token, isDoingOperation);
 		}
 	}
 	SLOG(ska::LogLevel::Debug) << "\tPoping everything";
