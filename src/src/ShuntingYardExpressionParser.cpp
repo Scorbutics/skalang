@@ -75,88 +75,19 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
 		operands.push(ASTNode::MakeLogicalNode(m_input.match(token.type())));
 		break;
 
-	case TokenType::ARRAY: {
-			const auto& value = std::get<std::string>(token.content());
-			switch (value[0]) {
-			case '[': {
-				if (m_input.canReadPrevious(1)) {
-					auto lastToken = m_input.readPrevious(1);
-					const auto& value = std::get<std::string>(lastToken.content());
-					//TODO : handle multi dimensional arrays
-					if (value != "=") {
-                        SLOG(ska::LogLevel::Debug) << "\tArray begin use";
-                        operands.push(matchArrayUse(popOperand(operands, isDoingOperation)));
-                        SLOG(ska::LogLevel::Debug) << "\tArray end";
-                        break;
-					}
-				}
-                SLOG(ska::LogLevel::Debug) << "\tArray begin declare";
-				auto reservedNode = matchArrayDeclaration();
-				if(reservedNode == nullptr) {
-                    error("invalid array declaration");
-                }
-                operands.push(std::move(reservedNode));
-                SLOG(ska::LogLevel::Debug) << "\tArray end";
-                break;
-			
-			} break;
-
-			default:
-				error("unsupported array symbol");
-				break;
-			}
-
-		} break;
-
-	case TokenType::RANGE: {
-			const auto& value = std::get<std::string>(token.content());
-			switch (value[0]) {
-			case '(':
-				
-				if (!operands.empty() && (operands.top()->op() == Operator::FIELD_ACCESS || 
-					(operands.top()->op() == Operator::LITERAL || operands.top()->op() == Operator::UNARY) && operands.top()->tokenType() == TokenType::IDENTIFIER)) {
-					SLOG(ska::LogLevel::Debug) << "\tFunction call !";
-					//We already pushed the identifier as an operand, but in fact it's a function call.
-					//We have to pop it, then matching the function call as the new operand.
-					operands.push(matchFunctionCall(popOperand(operands, isDoingOperation)));
-					
-				} else {
-					SLOG(ska::LogLevel::Debug) << "\tRange begin";
-					operators.emplace(m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()));
-				}
-				break;
-			case ')': {
-				operators.emplace(m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()));
-				SLOG(ska::LogLevel::Debug) << "\tRange end";
-				auto rangeOperandResult = popUntil(operators, operands, [](const Token& t) {
-					const auto& strValue = t.name();
-					if (t.type() == TokenType::RANGE) {
-						return (strValue.empty() || strValue[0] == '(') ? -1 : 1;
-					}
-					SLOG_STATIC(ska::LogLevel::Debug, ska::ShuntingYardExpressionParser) << "\t\tPoping " << strValue;
-					return 0;
-				});
-				if (rangeOperandResult != nullptr) {
-					operands.push(std::move(rangeOperandResult));
-				}
-				if (!operators.empty()) {
-					operators.pop();
-				}
-			}
-			break;
-
-			default:
-				error("Unexpected token (range type) : " + token.name());
-			}
-
-		}
+	case TokenType::ARRAY: 
+			matchArray(operators, operands, token, isDoingOperation);
 		break;
 
-	case TokenType::DOT_SYMBOL: {
-			//Field access only (digits are DIGIT token type, even real ones)
-			operands.push(matchObjectFieldAccess(popOperand(operands, isDoingOperation)));
-			break;
-		}
+	case TokenType::RANGE:
+            matchRange(operators, operands, token, isDoingOperation);	
+		break;
+
+	case TokenType::DOT_SYMBOL:
+        //Field access only (digits are DIGIT token type, even real ones)
+        operands.push(matchObjectFieldAccess(popOperandIfNoOperator(operands, isDoingOperation)));
+        break;
+		
 
 	case TokenType::SYMBOL:
         return matchSymbol(operators, operands, token);
@@ -167,13 +98,87 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(stack<Token>& opera
     return false;
 }
 
-ska::ASTNodePtr ska::ShuntingYardExpressionParser::popOperand(stack<ASTNodePtr>& operands, bool isMathOperator) {
+ska::ASTNodePtr ska::ShuntingYardExpressionParser::popOperandIfNoOperator(stack<ASTNodePtr>& operands, bool isMathOperator) {
     if(!operands.empty() && isMathOperator) {
         auto result = std::move(operands.top());
         operands.pop();
         return result;
     }
     error("invalid operator placement");
+}
+
+void ska::ShuntingYardExpressionParser::matchArray(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token, bool isDoingOperation) {
+    const auto& value = std::get<std::string>(token.content());
+    switch (value[0]) {
+    case '[': {
+        if (m_input.canReadPrevious(1)) {
+            auto lastToken = m_input.readPrevious(1);
+            const auto& value = std::get<std::string>(lastToken.content());
+            //TODO : handle multi dimensional arrays
+            if (value != "=") {
+                SLOG(ska::LogLevel::Debug) << "\tArray begin use";
+                operands.push(matchArrayUse(popOperandIfNoOperator(operands, isDoingOperation)));
+                SLOG(ska::LogLevel::Debug) << "\tArray end";
+                break;
+            }
+        }
+        SLOG(ska::LogLevel::Debug) << "\tArray begin declare";
+        auto reservedNode = matchArrayDeclaration();
+        if(reservedNode == nullptr) {
+            error("invalid array declaration");
+        }
+        operands.push(std::move(reservedNode));
+        SLOG(ska::LogLevel::Debug) << "\tArray end";
+        break;
+    
+    } break;
+
+    default:
+        error("unsupported array symbol");
+        break;
+    }
+}
+
+void ska::ShuntingYardExpressionParser::matchRange(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token, bool isDoingOperation) {
+    const auto& value = std::get<std::string>(token.content());
+    switch (value[0]) {
+    case '(':
+        
+        if (!operands.empty() && (operands.top()->op() == Operator::FIELD_ACCESS || 
+            (operands.top()->op() == Operator::LITERAL || operands.top()->op() == Operator::UNARY) && operands.top()->tokenType() == TokenType::IDENTIFIER)) {
+            SLOG(ska::LogLevel::Debug) << "\tFunction call !";
+            //We already pushed the identifier as an operand, but in fact it's a function call.
+            //We have to pop it, then matching the function call as the new operand.
+            operands.push(matchFunctionCall(popOperandIfNoOperator(operands, isDoingOperation)));
+            
+        } else {
+            SLOG(ska::LogLevel::Debug) << "\tRange begin";
+            operators.emplace(m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()));
+        }
+        break;
+    case ')': {
+        operators.emplace(m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()));
+        SLOG(ska::LogLevel::Debug) << "\tRange end";
+        auto rangeOperandResult = popUntil(operators, operands, [](const Token& t) {
+            const auto& strValue = t.name();
+            if (t.type() == TokenType::RANGE) {
+                return (strValue.empty() || strValue[0] == '(') ? -1 : 1;
+            }
+            SLOG_STATIC(ska::LogLevel::Debug, ska::ShuntingYardExpressionParser) << "\t\tPoping " << strValue;
+            return 0;
+        });
+        if (rangeOperandResult != nullptr) {
+            operands.push(std::move(rangeOperandResult));
+        }
+        if (!operators.empty()) {
+            operators.pop();
+        }
+    }
+    break;
+
+    default:
+        error("Unexpected token (range type) : " + token.name());
+    }
 }
 
 bool ska::ShuntingYardExpressionParser::matchSymbol(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token) {
