@@ -143,6 +143,24 @@ TEST_CASE("[SemanticTypeChecker]") {
 			}
 		}
 
+        SUBCASE("return") {
+            SUBCASE("built-in") {
+				auto astPtr = ASTFromInputSemanticTC("var testReturn148 = function() : int { return 2543; }; var value = testReturn148(); value;", data);
+                auto& ast = (*astPtr);
+				CHECK(ast.size() == 3);
+				CHECK(ast[2].type() == ska::ExpressionType::INT);
+            }
+
+            SUBCASE("bad built-in type (no return type mentioned = void)") {
+                try {
+                    ASTFromInputSemanticTC("var testReturn148 = function() { return 2543; }; var value = testReturn148(); value;", data);
+                    CHECK(false);
+                } catch (std::exception& e) {
+                    CHECK(true);
+                }
+            }
+        }
+
 		SUBCASE("Array") {
 
 			SUBCASE("string") {
