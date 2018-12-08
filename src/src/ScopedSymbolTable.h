@@ -30,6 +30,10 @@ namespace ska {
             return m_parentSymbol;
         }
 
+        const Symbol* enclosingType() const {
+            return m_parent.m_parentSymbol;
+        }
+
 		Symbol* operator[](const std::string& key) {
             auto valueIt = m_symbols.find(key);
 			if(valueIt == m_symbols.end()) {

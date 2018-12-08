@@ -7,10 +7,36 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SemanticTypeChecker)
 
-ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser) :
+ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser, const SymbolTable& symbols) :
     SubObserver<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser),
     SubObserver<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser),
-	SubObserver<ArrayTokenEvent>(std::bind(&SemanticTypeChecker::matchArray, this, std::placeholders::_1), parser) {
+	SubObserver<ArrayTokenEvent>(std::bind(&SemanticTypeChecker::matchArray, this, std::placeholders::_1), parser),
+    SubObserver<ReturnTokenEvent>(std::bind(&SemanticTypeChecker::matchReturn, this, std::placeholders::_1), parser), 
+    m_symbols(symbols) {
+}
+
+bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
+    switch(token.type()) {
+        case ReturnTokenEventType::START:
+            break;
+
+        case ReturnTokenEventType::BUILTIN:
+        case ReturnTokenEventType::OBJECT:
+            if(m_symbols.enclosingType() == nullptr || m_symbols.enclosingType()->getName().empty()) {
+                throw std::runtime_error("return must be place directly in the function block (not in the nested ones)");
+            }
+
+            auto type = m_symbols.enclosingType()->getType();
+
+            if(type != token.rootNode()[0].type()) {
+                auto ss = std::stringstream {};
+                ss << "bad return type : expected " << type << " on function but got " << token.rootNode()[0].type().value() << " on return";
+                throw std::runtime_error(ss.str());
+            }
+
+            break;
+    }
+    return true;
 }
 
 bool ska::SemanticTypeChecker::matchArray(const ArrayTokenEvent& token) {
