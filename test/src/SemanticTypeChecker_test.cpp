@@ -159,6 +159,15 @@ TEST_CASE("[SemanticTypeChecker]") {
                     CHECK(e.what() == std::string ("bad return type : expected  void on function but got  int on return"));
                 }
             }
+
+			SUBCASE("bad return placement") {
+				try {
+					ASTFromInputSemanticTC("var testReturn148 = function() { if(1) { return 2543; } };", data);
+					CHECK(false);
+				} catch (std::exception& e) {
+					CHECK(e.what() == std::string("bad user-defined return placing : custom return must be set in a named function-constructor"));
+				}
+			}
         }
 
 		SUBCASE("Array") {
