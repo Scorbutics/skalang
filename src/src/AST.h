@@ -12,6 +12,7 @@
 //Alls except Unary, Binary & Literal
 #include "TypeBuilderFieldAccess.h"
 #include "TypeBuilderFunctionCall.h"
+#include "TypeBuilderFunctionPrototypeDeclaration.h"
 #include "TypeBuilderFunctionDeclaration.h"
 #include "TypeBuilderParameterDeclaration.h"
 #include "TypeBuilderArrayDeclaration.h"

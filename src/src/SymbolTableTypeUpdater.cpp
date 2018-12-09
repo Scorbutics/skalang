@@ -14,12 +14,17 @@ ska::SymbolTableTypeUpdater::SymbolTableTypeUpdater(Parser& parser, SymbolTable&
 
 bool ska::SymbolTableTypeUpdater::matchVariable(const VarTokenEvent& event) {
 	switch (event.type()) {
+		case VarTokenEventType::AFFECTATION:
+		case VarTokenEventType::USE:
+			break;
+		case VarTokenEventType::FUNCTION_DECLARATION:
 		case VarTokenEventType::PARAMETER_DECLARATION:
 		case VarTokenEventType::VARIABLE_DECLARATION:
 			updateType(event.rootNode());
 		break;
 		
 		default:
+			throw std::runtime_error("bad var event");
 		break;
 	}
 	return true;

@@ -4,6 +4,7 @@ namespace ska {
     class ASTNode;
 
 	enum class VarTokenEventType {
+		FUNCTION_DECLARATION,
 		PARAMETER_DECLARATION,
 		VARIABLE_DECLARATION,
 		AFFECTATION,
@@ -12,16 +13,17 @@ namespace ska {
 
     class VarTokenEvent {
 	public:
+		static VarTokenEvent MakeFunction(ASTNode& node) {
+			return VarTokenEvent{ node, VarTokenEventType::FUNCTION_DECLARATION };
+		}
 
-		template <VarTokenEventType type>
-		static VarTokenEvent Make(ASTNode& node, ASTNode& typeNode) {
-			static_assert(type == VarTokenEventType::PARAMETER_DECLARATION);
-			return VarTokenEvent { node, typeNode, type };
+		static VarTokenEvent MakeParameter(ASTNode& node, ASTNode& typeNode) {
+			return VarTokenEvent { node, typeNode, VarTokenEventType::PARAMETER_DECLARATION };
 		}
 
 		template <VarTokenEventType type>
 		static VarTokenEvent Make(ASTNode& node) {
-			static_assert(type != VarTokenEventType::PARAMETER_DECLARATION);
+			static_assert(type != VarTokenEventType::PARAMETER_DECLARATION && type != VarTokenEventType::FUNCTION_DECLARATION);
 			return VarTokenEvent { node, type };
 		}
 

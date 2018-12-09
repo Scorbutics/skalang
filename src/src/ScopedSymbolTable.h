@@ -26,12 +26,8 @@ namespace ska {
             m_parentSymbol = &s;
         }
 
-        Symbol* parentSymbol() {
-            return m_parentSymbol;
-        }
-
         const Symbol* enclosingType() const {
-            return m_parent.m_parentSymbol;
+            return m_parentSymbol;
         }
 
 		Symbol* operator[](const std::string& key) {

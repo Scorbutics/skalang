@@ -156,7 +156,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                     ASTFromInputSemanticTC("var testReturn148 = function() { return 2543; }; var value = testReturn148(); value;", data);
                     CHECK(false);
                 } catch (std::exception& e) {
-                    CHECK(true);
+                    CHECK(e.what() == std::string ("bad return type : expected  void on function but got  int on return"));
                 }
             }
         }

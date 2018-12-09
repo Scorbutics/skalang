@@ -42,7 +42,7 @@ bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
     switch(token.type()) {
 	    case ReturnTokenEventType::START: {
 			SLOG(ska::LogLevel::Debug) << "\t\tNew Return : adding a nested symbol table";
-            const auto actualNameSymbol = m_currentTable->parentSymbol();
+            const auto actualNameSymbol = m_currentTable->enclosingType();
             if (actualNameSymbol == nullptr) {
                 throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
             }
@@ -77,7 +77,6 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
             m_currentTable = &m_currentTable->parent();
         break;
 
-		case FunctionTokenEventType::DECLARATION_PROTOTYPE:
 		default:
 		break;
 	}
@@ -90,6 +89,7 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 	assert(m_currentTable != nullptr);
 	
 	switch(token.type()) {
+		case VarTokenEventType::FUNCTION_DECLARATION:
 		case VarTokenEventType::VARIABLE_DECLARATION:
 		case VarTokenEventType::PARAMETER_DECLARATION: {
 			const auto variableName = token.name();
@@ -104,7 +104,6 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 			}
         } break;
 
-		default:
 		case VarTokenEventType::AFFECTATION:
 		case VarTokenEventType::USE: {
 			const auto variableName = token.name();
@@ -115,6 +114,10 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 			}       
 		}
 		break;
+
+		default:
+			throw std::runtime_error("Unmanaged variable event");
+			break;
 	}
 	return true;
 }

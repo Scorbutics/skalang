@@ -1,0 +1,395 @@
+[21:46:33:390][Debug](shuntingyardexpre l.0074) 	Pushing operand 2
+[21:46:33:393][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:399][Debug](shuntingyardexpre l.0074) 	Pushing operand 2
+[21:46:33:402][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:405][Debug](shuntingyardexpre l.0074) 	Pushing operand 2
+[21:46:33:407][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:409][Debug](shuntingyardexpre l.0074) 	Pushing operand 0
+[21:46:33:411][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:413][Debug](shuntingyardexpre l.0074) 	Pushing operand i
+[21:46:33:416][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol <
+[21:46:33:418][Debug](shuntingyardexpre l.0074) 	Pushing operand 5
+[21:46:33:420][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:422][Debug](shuntingyardexpre l.0539) 		Poped <
+[21:46:33:424][Debug](shuntingyardexpre l.0074) 	Pushing operand i
+[21:46:33:427][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol ++
+[21:46:33:429][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:430][Debug](shuntingyardexpre l.0539) 		Poped ++
+[21:46:33:432][Debug](shuntingyardexpre l.0074) 	Pushing operand lol
+[21:46:33:434][Debug](shuntingyardexpre l.0153) 	Function call !
+[21:46:33:436][Debug](shuntingyardexpre l.0074) 	Pushing operand "mdr"
+[21:46:33:437][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:439][Debug](shuntingyardexpre l.0232) Expression not null
+[21:46:33:441][Debug](shuntingyardexpre l.0074) 	Pushing operand 12
+[21:46:33:443][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:446][Debug](shuntingyardexpre l.0232) Expression not null
+[21:46:33:447][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:450][Debug](shuntingyardexpre l.0074) 	Pushing operand test
+[21:46:33:452][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:454][Debug](shuntingyardexpre l.0074) 	Pushing operand test
+[21:46:33:455][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:457][Debug](shuntingyardexpre l.0074) 	Pushing operand titi
+[21:46:33:459][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:462][Debug](shuntingyardexpre l.0074) 	Pushing operand tititi
+[21:46:33:463][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:465][Debug](shuntingyardexpre l.0074) 	Pushing operand test
+[21:46:33:467][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:470][Debug](shuntingyardexpre l.0074) 	Pushing operand titi
+[21:46:33:473][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:476][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:478][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:481][Debug](shuntingyardexpre l.0074) 	Pushing operand test
+[21:46:33:483][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:485][Debug](shuntingyardexpre l.0064) 	Pushing reserved
+[21:46:33:487][Debug](shuntingyardexpre l.0467) function declaration
+[21:46:33:489][Debug](shuntingyardexpre l.0419) parameter detected, reading identifier : 
+[21:46:33:491][Debug](shuntingyardexpre l.0380) titi
+[21:46:33:493][Debug](shuntingyardexpre l.0388) type is : int
+[21:46:33:494][Debug](shuntingyardexpre l.0419) parameter detected, reading identifier : 
+[21:46:33:496][Debug](shuntingyardexpre l.0380) toto
+[21:46:33:497][Debug](shuntingyardexpre l.0388) type is : string
+[21:46:33:499][Debug](shuntingyardexpre l.0438) function type detected : varerror variant
+[21:46:33:501][Debug](shuntingyardexpre l.0485) reading function body
+[21:46:33:503][Debug](shuntingyardexpre l.0487) function read.
+[21:46:33:506][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:510][Debug](shuntingyardexpre l.0064) 	Pushing reserved
+[21:46:33:512][Debug](shuntingyardexpre l.0467) function declaration
+[21:46:33:515][Debug](shuntingyardexpre l.0419) parameter detected, reading identifier : 
+[21:46:33:518][Debug](shuntingyardexpre l.0380) nom
+[21:46:33:520][Debug](shuntingyardexpre l.0388) type is : string
+[21:46:33:521][Debug](shuntingyardexpre l.0438) function type detected : varerror variant
+[21:46:33:523][Debug](shuntingyardexpre l.0485) reading function body
+[21:46:33:525][Debug](shuntingyardexpre l.0074) 	Pushing operand nom
+[21:46:33:526][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:528][Debug](shuntingyardexpre l.0487) function read.
+[21:46:33:530][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:532][Debug](shuntingyardexpre l.0074) 	Pushing operand Joueur
+[21:46:33:534][Debug](shuntingyardexpre l.0153) 	Function call !
+[21:46:33:537][Debug](shuntingyardexpre l.0074) 	Pushing operand "joueur 1"
+[21:46:33:538][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:539][Debug](shuntingyardexpre l.0232) Expression not null
+[21:46:33:541][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:543][Debug](shuntingyardexpre l.0074) 	Pushing operand joueur1
+[21:46:33:545][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:547][Debug](shuntingyardexpre l.0074) 	Pushing operand 5
+[21:46:33:548][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol *
+[21:46:33:550][Debug](shuntingyardexpre l.0074) 	Pushing operand 2
+[21:46:33:551][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:553][Debug](shuntingyardexpre l.0539) 		Poped *
+[21:46:33:555][Debug](shuntingyardexpre l.0074) 	Pushing operand 5
+[21:46:33:556][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol *
+[21:46:33:558][Debug](shuntingyardexpre l.0074) 	Pushing operand 2
+[21:46:33:561][Debug](shuntingyardexpre l.0074) 	Pushing operand 5
+[21:46:33:562][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol '
+[21:46:33:565][Debug](shuntingyardexpre l.0074) 	Pushing operand 5
+[21:46:33:566][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol /
+[21:46:33:568][Debug](shuntingyardexpre l.0074) 	Pushing operand 2
+[21:46:33:569][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:571][Debug](shuntingyardexpre l.0539) 		Poped /
+[21:46:33:572][Debug](shuntingyardexpre l.0074) 	Pushing operand 5
+[21:46:33:574][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol +
+[21:46:33:576][Debug](shuntingyardexpre l.0074) 	Pushing operand 2
+[21:46:33:577][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:579][Debug](shuntingyardexpre l.0539) 		Poped +
+[21:46:33:581][Debug](shuntingyardexpre l.0074) 	Pushing operand 5
+[21:46:33:582][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol -
+[21:46:33:584][Debug](shuntingyardexpre l.0074) 	Pushing operand 2
+[21:46:33:586][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:587][Debug](shuntingyardexpre l.0539) 		Poped -
+[21:46:33:589][Debug](shuntingyardexpre l.0074) 	Pushing operand 5
+[21:46:33:591][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol *
+[21:46:33:592][Debug](shuntingyardexpre l.0074) 	Pushing operand 2
+[21:46:33:594][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol +
+[21:46:33:595][Debug](shuntingyardexpre l.0203) 	Less precedence, poping * before adding +
+[21:46:33:597][Debug](shuntingyardexpre l.0539) 		Poped *
+[21:46:33:598][Debug](shuntingyardexpre l.0074) 	Pushing operand 4
+[21:46:33:600][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:602][Debug](shuntingyardexpre l.0539) 		Poped +
+[21:46:33:604][Debug](shuntingyardexpre l.0074) 	Pushing operand 5
+[21:46:33:605][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol +
+[21:46:33:607][Debug](shuntingyardexpre l.0074) 	Pushing operand 2
+[21:46:33:608][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol *
+[21:46:33:610][Debug](shuntingyardexpre l.0074) 	Pushing operand 4
+[21:46:33:612][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:613][Debug](shuntingyardexpre l.0539) 		Poped *
+[21:46:33:616][Debug](shuntingyardexpre l.0539) 		Poped +
+[21:46:33:618][Debug](shuntingyardexpre l.0159) 	Range begin
+[21:46:33:620][Debug](shuntingyardexpre l.0074) 	Pushing operand 5
+[21:46:33:621][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol +
+[21:46:33:622][Debug](shuntingyardexpre l.0074) 	Pushing operand 2
+[21:46:33:624][Debug](shuntingyardexpre l.0165) 	Range end
+[21:46:33:626][Debug](shuntingyardexpre l.0171) 		Poping +
+[21:46:33:627][Debug](shuntingyardexpre l.0539) 		Poped +
+[21:46:33:629][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol *
+[21:46:33:630][Debug](shuntingyardexpre l.0074) 	Pushing operand 4
+[21:46:33:632][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:635][Debug](shuntingyardexpre l.0539) 		Poped *
+[21:46:33:638][Debug](shuntingyardexpre l.0064) 	Pushing reserved
+[21:46:33:640][Debug](shuntingyardexpre l.0467) function declaration
+[21:46:33:641][Debug](shuntingyardexpre l.0419) parameter detected, reading identifier : 
+[21:46:33:643][Debug](shuntingyardexpre l.0380) nom
+[21:46:33:644][Debug](shuntingyardexpre l.0388) type is : string
+[21:46:33:649][Info ](typebuilderparame l.0027) Parameter declaration type calculating for node "nom with type-node string
+[21:46:33:652][Info ](typebuilderparame l.0029) Parameter declaration type built for node "nom" = " string"
+[21:46:33:653][Info ](symboltabletypeup l.0042) Type updated for symbol "nom" = " string"
+[21:46:33:655][Debug](shuntingyardexpre l.0438) function type detected : varerror variant
+[21:46:33:657][Info ](typebuilderfuncti l.0017) function prototype declaration "JoueurClass" with type JoueurClass (function -  string - JoueurClass var)
+[21:46:33:659][Info ](symboltabletypeup l.0042) Type updated for symbol "JoueurClass" = "JoueurClass (function -  string - JoueurClass var)"
+[21:46:33:660][Debug](shuntingyardexpre l.0485) reading function body
+[21:46:33:662][Debug](shuntingyardexpre l.0064) 	Pushing reserved
+[21:46:33:663][Debug](shuntingyardexpre l.0467) function declaration
+[21:46:33:665][Debug](shuntingyardexpre l.0419) parameter detected, reading identifier : 
+[21:46:33:667][Debug](shuntingyardexpre l.0380) degats
+[21:46:33:668][Debug](shuntingyardexpre l.0388) type is : int
+[21:46:33:670][Info ](typebuilderparame l.0027) Parameter declaration type calculating for node "degats with type-node int
+[21:46:33:671][Info ](typebuilderparame l.0029) Parameter declaration type built for node "degats" = " int"
+[21:46:33:673][Info ](symboltabletypeup l.0042) Type updated for symbol "degats" = " int"
+[21:46:33:674][Debug](shuntingyardexpre l.0443) void function detected
+[21:46:33:676][Info ](typebuilderfuncti l.0017) function prototype declaration "attaquer" with type attaquer (function -  int -  void)
+[21:46:33:678][Info ](symboltabletypeup l.0042) Type updated for symbol "attaquer" = "attaquer (function -  int -  void)"
+[21:46:33:680][Debug](shuntingyardexpre l.0485) reading function body
+[21:46:33:681][Debug](shuntingyardexpre l.0487) function read.
+[21:46:33:683][Info ](typebuilderfuncti l.0018) function declaration "attaquer" with type attaquer (function -  int -  void -  void)
+[21:46:33:685][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:688][Info ](symboltabletypeup l.0042) Type updated for symbol "attaquer" = "attaquer (function -  int -  void -  void)"
+[21:46:33:690][Debug](shuntingyardexpre l.0074) 	Pushing operand attaquer
+[21:46:33:691][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:693][Info ](symboltabletypeup l.0042) Type updated for symbol "attaquer" = "attaquer (function -  int -  void -  void)"
+[21:46:33:694][Debug](shuntingyardexpre l.0487) function read.
+[21:46:33:696][Info ](typebuilderfuncti l.0018) function declaration "JoueurClass" with type JoueurClass (function -  string -  var -  void)
+[21:46:33:698][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:700][Info ](symboltabletypeup l.0042) Type updated for symbol "JoueurClass" = "JoueurClass (function -  string -  var -  void)"
+[21:46:33:701][Debug](shuntingyardexpre l.0074) 	Pushing operand JoueurClass
+[21:46:33:703][Debug](shuntingyardexpre l.0153) 	Function call !
+[21:46:33:705][Debug](shuntingyardexpre l.0074) 	Pushing operand "joueur1Nom"
+[21:46:33:707][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:709][Debug](shuntingyardexpre l.0232) Expression not null
+[21:46:33:711][Info ](typebuilderfuncti l.0036) returning type :  void of JoueurClass (function -  string -  var -  void)
+[21:46:33:718][Debug](shuntingyardexpre l.0074) 	Pushing operand 2.0
+[21:46:33:719][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:721][Info ](symboltabletypeup l.0042) Type updated for symbol "titi" = " float"
+[21:46:33:722][Debug](shuntingyardexpre l.0074) 	Pushing operand 5.2
+[21:46:33:724][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:725][Info ](symboltabletypeup l.0042) Type updated for symbol "toto" = " float"
+[21:46:33:728][Debug](shuntingyardexpre l.0074) 	Pushing operand titi
+[21:46:33:729][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol *
+[21:46:33:731][Debug](shuntingyardexpre l.0074) 	Pushing operand toto
+[21:46:33:732][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:734][Debug](shuntingyardexpre l.0539) 		Poped *
+[21:46:33:737][Debug](shuntingyardexpre l.0074) 	Pushing operand 2
+[21:46:33:739][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:740][Info ](symboltabletypeup l.0042) Type updated for symbol "titi" = " int"
+[21:46:33:742][Debug](shuntingyardexpre l.0074) 	Pushing operand "test"
+[21:46:33:743][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:745][Info ](symboltabletypeup l.0042) Type updated for symbol "toto" = " string"
+[21:46:33:746][Debug](shuntingyardexpre l.0074) 	Pushing operand titi
+[21:46:33:748][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol *
+[21:46:33:750][Debug](shuntingyardexpre l.0074) 	Pushing operand toto
+[21:46:33:752][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:753][Debug](shuntingyardexpre l.0539) 		Poped *
+[21:46:33:755][Debug](shuntingyardexpre l.0074) 	Pushing operand 2
+[21:46:33:757][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:759][Info ](symboltabletypeup l.0042) Type updated for symbol "titi" = " int"
+[21:46:33:760][Debug](shuntingyardexpre l.0074) 	Pushing operand 5.2
+[21:46:33:761][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:763][Info ](symboltabletypeup l.0042) Type updated for symbol "toto" = " float"
+[21:46:33:764][Debug](shuntingyardexpre l.0074) 	Pushing operand titi
+[21:46:33:765][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol *
+[21:46:33:767][Debug](shuntingyardexpre l.0074) 	Pushing operand toto
+[21:46:33:769][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:771][Debug](shuntingyardexpre l.0539) 		Poped *
+[21:46:33:773][Debug](shuntingyardexpre l.0074) 	Pushing operand 2.0
+[21:46:33:774][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:776][Info ](symboltabletypeup l.0042) Type updated for symbol "titi" = " float"
+[21:46:33:777][Debug](shuntingyardexpre l.0074) 	Pushing operand 5
+[21:46:33:779][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:781][Info ](symboltabletypeup l.0042) Type updated for symbol "toto" = " int"
+[21:46:33:782][Debug](shuntingyardexpre l.0074) 	Pushing operand titi
+[21:46:33:784][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol *
+[21:46:33:785][Debug](shuntingyardexpre l.0074) 	Pushing operand toto
+[21:46:33:787][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:788][Debug](shuntingyardexpre l.0539) 		Poped *
+[21:46:33:791][Debug](shuntingyardexpre l.0074) 	Pushing operand "tititititit"
+[21:46:33:792][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:794][Info ](symboltabletypeup l.0042) Type updated for symbol "titi" = " string"
+[21:46:33:795][Debug](shuntingyardexpre l.0074) 	Pushing operand 6
+[21:46:33:797][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:798][Info ](symboltabletypeup l.0042) Type updated for symbol "toto" = " int"
+[21:46:33:800][Debug](shuntingyardexpre l.0074) 	Pushing operand titi
+[21:46:33:802][Debug](shuntingyardexpre l.0199) 		Pushing operator symbol *
+[21:46:33:803][Debug](shuntingyardexpre l.0074) 	Pushing operand toto
+[21:46:33:805][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:806][Debug](shuntingyardexpre l.0539) 		Poped *
+[21:46:33:809][Debug](shuntingyardexpre l.0074) 	Pushing operand "strrrr"
+[21:46:33:810][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:812][Info ](symboltabletypeup l.0042) Type updated for symbol "titi" = " string"
+[21:46:33:814][Debug](shuntingyardexpre l.0074) 	Pushing operand titi
+[21:46:33:815][Debug](shuntingyardexpre l.0074) 	Pushing operand 3
+[21:46:33:817][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:818][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:821][Debug](shuntingyardexpre l.0074) 	Pushing operand 0.1
+[21:46:33:822][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:824][Info ](symboltabletypeup l.0042) Type updated for symbol "titi" = " float"
+[21:46:33:826][Debug](shuntingyardexpre l.0074) 	Pushing operand titi
+[21:46:33:828][Debug](shuntingyardexpre l.0074) 	Pushing operand "toto"
+[21:46:33:829][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:831][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:834][Debug](shuntingyardexpre l.0074) 	Pushing operand 0.1
+[21:46:33:836][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:837][Info ](symboltabletypeup l.0042) Type updated for symbol "titi" = " float"
+[21:46:33:839][Debug](shuntingyardexpre l.0074) 	Pushing operand "toto"
+[21:46:33:840][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:841][Info ](symboltabletypeup l.0042) Type updated for symbol "toto" = " string"
+[21:46:33:843][Debug](shuntingyardexpre l.0074) 	Pushing operand titi
+[21:46:33:845][Debug](shuntingyardexpre l.0074) 	Pushing operand toto
+[21:46:33:846][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:849][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:851][Debug](shuntingyardexpre l.0074) 	Pushing operand 0.1
+[21:46:33:853][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:854][Info ](symboltabletypeup l.0042) Type updated for symbol "titi" = " float"
+[21:46:33:856][Debug](shuntingyardexpre l.0074) 	Pushing operand titi
+[21:46:33:858][Debug](shuntingyardexpre l.0074) 	Pushing operand 0.2
+[21:46:33:859][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:860][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:863][Debug](shuntingyardexpre l.0074) 	Pushing operand 0.1
+[21:46:33:864][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:866][Info ](symboltabletypeup l.0042) Type updated for symbol "titi" = " float"
+[21:46:33:868][Debug](shuntingyardexpre l.0074) 	Pushing operand titi
+[21:46:33:871][Debug](shuntingyardexpre l.0074) 	Pushing operand 2
+[21:46:33:872][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:874][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:876][Debug](shuntingyardexpre l.0074) 	Pushing operand 1
+[21:46:33:877][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:879][Info ](symboltabletypeup l.0042) Type updated for symbol "titi" = " int"
+[21:46:33:881][Debug](shuntingyardexpre l.0074) 	Pushing operand titi
+[21:46:33:882][Debug](shuntingyardexpre l.0074) 	Pushing operand 0.2
+[21:46:33:883][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:885][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:887][Debug](shuntingyardexpre l.0074) 	Pushing operand 7
+[21:46:33:888][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:891][Info ](symboltabletypeup l.0042) Type updated for symbol "titi" = " int"
+[21:46:33:892][Debug](shuntingyardexpre l.0074) 	Pushing operand titi
+[21:46:33:893][Debug](shuntingyardexpre l.0074) 	Pushing operand "123"
+[21:46:33:895][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:896][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:898][Debug](shuntingyardexpre l.0074) 	Pushing operand 7.8
+[21:46:33:900][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:902][Info ](symboltabletypeup l.0042) Type updated for symbol "titi" = " float"
+[21:46:33:904][Debug](shuntingyardexpre l.0074) 	Pushing operand titi
+[21:46:33:905][Debug](shuntingyardexpre l.0074) 	Pushing operand "123"
+[21:46:33:907][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:908][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:911][Debug](shuntingyardexpre l.0064) 	Pushing reserved
+[21:46:33:913][Debug](shuntingyardexpre l.0467) function declaration
+[21:46:33:914][Debug](shuntingyardexpre l.0419) parameter detected, reading identifier : 
+[21:46:33:916][Debug](shuntingyardexpre l.0380) test
+[21:46:33:917][Debug](shuntingyardexpre l.0388) type is : string
+[21:46:33:919][Info ](typebuilderparame l.0027) Parameter declaration type calculating for node "test with type-node string
+[21:46:33:921][Info ](typebuilderparame l.0029) Parameter declaration type built for node "test" = " string"
+[21:46:33:923][Info ](symboltabletypeup l.0042) Type updated for symbol "test" = " string"
+[21:46:33:924][Debug](shuntingyardexpre l.0443) void function detected
+[21:46:33:926][Info ](typebuilderfuncti l.0017) function prototype declaration "titi121" with type titi121 (function -  string -  void)
+[21:46:33:928][Info ](symboltabletypeup l.0042) Type updated for symbol "titi121" = "titi121 (function -  string -  void)"
+[21:46:33:929][Debug](shuntingyardexpre l.0485) reading function body
+[21:46:33:931][Debug](shuntingyardexpre l.0487) function read.
+[21:46:33:932][Info ](typebuilderfuncti l.0018) function declaration "titi121" with type titi121 (function -  string -  void -  void)
+[21:46:33:934][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:935][Info ](symboltabletypeup l.0042) Type updated for symbol "titi121" = "titi121 (function -  string -  void -  void)"
+[21:46:33:937][Debug](shuntingyardexpre l.0074) 	Pushing operand titi121
+[21:46:33:939][Debug](shuntingyardexpre l.0153) 	Function call !
+[21:46:33:940][Debug](shuntingyardexpre l.0074) 	Pushing operand "lol"
+[21:46:33:942][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:943][Debug](shuntingyardexpre l.0232) Expression not null
+[21:46:33:945][Info ](typebuilderfuncti l.0036) returning type :  void of titi121 (function -  string -  void -  void)
+[21:46:33:949][Debug](shuntingyardexpre l.0074) 	Pushing operand 0
+[21:46:33:951][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:952][Debug](shuntingyardexpre l.0074) 	Pushing operand "llllll"
+[21:46:33:954][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:956][Debug](shuntingyardexpre l.0074) 	Pushing operand 2
+[21:46:33:957][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:959][Debug](shuntingyardexpre l.0074) 	Pushing operand 9
+[21:46:33:960][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:963][Debug](shuntingyardexpre l.0074) 	Pushing operand 0
+[21:46:33:964][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:966][Debug](shuntingyardexpre l.0074) 	Pushing operand i
+[21:46:33:967][Debug](shuntingyardexpre l.0074) 	Pushing operand 123
+[21:46:33:969][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:970][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:972][Debug](shuntingyardexpre l.0074) 	Pushing operand i
+[21:46:33:974][Debug](shuntingyardexpre l.0074) 	Pushing operand 9
+[21:46:33:975][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:977][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:980][Debug](shuntingyardexpre l.0074) 	Pushing operand 21
+[21:46:33:981][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:983][Debug](shuntingyardexpre l.0064) 	Pushing reserved
+[21:46:33:985][Debug](shuntingyardexpre l.0467) function declaration
+[21:46:33:986][Debug](shuntingyardexpre l.0443) void function detected
+[21:46:33:988][Debug](shuntingyardexpre l.0485) reading function body
+[21:46:33:990][Debug](shuntingyardexpre l.0074) 	Pushing operand test59
+[21:46:33:991][Debug](shuntingyardexpre l.0074) 	Pushing operand 123
+[21:46:33:993][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:995][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:33:996][Debug](shuntingyardexpre l.0487) function read.
+[21:46:33:999][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:002][Debug](shuntingyardexpre l.0064) 	Pushing reserved
+[21:46:34:004][Debug](shuntingyardexpre l.0467) function declaration
+[21:46:34:005][Debug](shuntingyardexpre l.0419) parameter detected, reading identifier : 
+[21:46:34:007][Debug](shuntingyardexpre l.0380) test63
+[21:46:34:008][Debug](shuntingyardexpre l.0388) type is : int
+[21:46:34:010][Debug](shuntingyardexpre l.0443) void function detected
+[21:46:34:011][Debug](shuntingyardexpre l.0485) reading function body
+[21:46:34:013][Debug](shuntingyardexpre l.0074) 	Pushing operand test63
+[21:46:34:014][Debug](shuntingyardexpre l.0074) 	Pushing operand 123
+[21:46:34:015][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:017][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:018][Debug](shuntingyardexpre l.0487) function read.
+[21:46:34:020][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:023][Debug](shuntingyardexpre l.0064) 	Pushing reserved
+[21:46:34:024][Debug](shuntingyardexpre l.0467) function declaration
+[21:46:34:026][Debug](shuntingyardexpre l.0419) parameter detected, reading identifier : 
+[21:46:34:027][Debug](shuntingyardexpre l.0380) testParam67
+[21:46:34:028][Debug](shuntingyardexpre l.0388) type is : int
+[21:46:34:030][Debug](shuntingyardexpre l.0443) void function detected
+[21:46:34:031][Debug](shuntingyardexpre l.0485) reading function body
+[21:46:34:033][Debug](shuntingyardexpre l.0064) 	Pushing reserved
+[21:46:34:035][Debug](shuntingyardexpre l.0467) function declaration
+[21:46:34:036][Debug](shuntingyardexpre l.0419) parameter detected, reading identifier : 
+[21:46:34:038][Debug](shuntingyardexpre l.0380) blurp
+[21:46:34:039][Debug](shuntingyardexpre l.0388) type is : string
+[21:46:34:041][Debug](shuntingyardexpre l.0443) void function detected
+[21:46:34:042][Debug](shuntingyardexpre l.0485) reading function body
+[21:46:34:044][Debug](shuntingyardexpre l.0074) 	Pushing operand testParam67
+[21:46:34:046][Debug](shuntingyardexpre l.0074) 	Pushing operand 123
+[21:46:34:048][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:049][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:051][Debug](shuntingyardexpre l.0487) function read.
+[21:46:34:054][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:056][Debug](shuntingyardexpre l.0074) 	Pushing operand testParam67
+[21:46:34:058][Debug](shuntingyardexpre l.0074) 	Pushing operand 78
+[21:46:34:059][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:061][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:062][Debug](shuntingyardexpre l.0487) function read.
+[21:46:34:064][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:067][Debug](shuntingyardexpre l.0074) 	Pushing operand 3
+[21:46:34:069][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:071][Debug](shuntingyardexpre l.0064) 	Pushing reserved
+[21:46:34:072][Debug](shuntingyardexpre l.0467) function declaration
+[21:46:34:074][Debug](shuntingyardexpre l.0419) parameter detected, reading identifier : 
+[21:46:34:075][Debug](shuntingyardexpre l.0380) test71
+[21:46:34:078][Debug](shuntingyardexpre l.0388) type is : string
+[21:46:34:080][Debug](shuntingyardexpre l.0443) void function detected
+[21:46:34:081][Debug](shuntingyardexpre l.0485) reading function body
+[21:46:34:083][Debug](shuntingyardexpre l.0074) 	Pushing operand test71
+[21:46:34:085][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:086][Debug](shuntingyardexpre l.0487) function read.
+[21:46:34:088][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:090][Debug](shuntingyardexpre l.0074) 	Pushing operand 0
+[21:46:34:092][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:094][Debug](shuntingyardexpre l.0074) 	Pushing operand "llllll"
+[21:46:34:095][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:097][Debug](shuntingyardexpre l.0074) 	Pushing operand ti81
+[21:46:34:098][Debug](shuntingyardexpre l.0074) 	Pushing operand 9
+[21:46:34:100][Debug](shuntingyardexpre l.0294) 	Poping everything
+[21:46:34:102][Debug](shuntingyardexpre l.0064) 	Pushing reserved
+[21:46:34:104][Debug](shuntingyardexpre l.0467) function declaration
+[21:46:34:105][Debug](shuntingyardexpr

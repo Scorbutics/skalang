@@ -159,7 +159,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			CHECK(false);
 		} catch (std::exception& e) {
 			CHECK(std::string(e.what()) == 
-				"the class symbol table pv is not registered. Maybe you're trying to use the type you're defining in its definition...");
+			"trying to access to an undeclared field : pv of cible of type Joueur (function -  string - Joueur var)");
 		}
 	}
 }

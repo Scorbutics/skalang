@@ -132,11 +132,10 @@ TEST_CASE("function") {
         CHECK(ast.op() == ska::Operator::VARIABLE_DECLARATION);
         const auto& astFunc133 = ast[0];
         CHECK(astFunc133.op() == ska::Operator::FUNCTION_DECLARATION);
-		CHECK(astFunc133.size() == 3);
+		CHECK(astFunc133.size() == 2);
 		
-        CHECK(astFunc133[0].size() == 2);
+        CHECK(astFunc133[0].size() == 3);
         CHECK(astFunc133[1].size() == 0);
-        CHECK(astFunc133[2].size() == 0);
         //CHECK(ast[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
 		
 	}
@@ -157,9 +156,9 @@ TEST_CASE("User defined object") {
         CHECK(varJoueurNode.op() == ska::Operator::VARIABLE_DECLARATION);
         const auto& astFunc154 = varJoueurNode[0];
         CHECK(astFunc154.op() == ska::Operator::FUNCTION_DECLARATION);
-		CHECK(astFunc154.size() == 3);
+		CHECK(astFunc154.size() == 2);
         const auto& astFuncParameters154 = astFunc154[0];
-        CHECK(astFuncParameters154.size() == 1);
+        CHECK(astFuncParameters154.size() == 2);
     
         //Checks the parameter name and type
         CHECK(astFuncParameters154[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER})); 
@@ -167,12 +166,12 @@ TEST_CASE("User defined object") {
         CHECK(astFuncParameters154[0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
 
         //Checks the return type
-        CHECK(astFunc154[1].has(keywords.pattern<ska::TokenGrammar::VARIABLE>()));
+        CHECK(astFuncParameters154[1].has(keywords.pattern<ska::TokenGrammar::VARIABLE>()));
 
         //Checks the function body
-        CHECK(astFunc154[2].size() == 1);
+        CHECK(astFunc154[1].size() == 1);
         
-        const auto& userDefinedObjectNode = astFunc154[2][0];
+        const auto& userDefinedObjectNode = astFunc154[1][0];
         CHECK(userDefinedObjectNode.op() == ska::Operator::USER_DEFINED_OBJECT);
         CHECK(userDefinedObjectNode.size() == 1);
 

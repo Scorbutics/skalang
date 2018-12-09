@@ -6,8 +6,7 @@ namespace ska {
     class ASTNode;
 	
 	enum class FunctionTokenEventType {
-		DECLARATION_NAME,
-		DECLARATION_PROTOTYPE,
+		DECLARATION_NAME,		
         DECLARATION_STATEMENT,
 		CALL
 	};
@@ -15,10 +14,9 @@ namespace ska {
     class FunctionTokenEvent {
 	public:
 
-		FunctionTokenEvent(ASTNode& content, ASTNode& context, FunctionTokenEventType type, std::string name = "") :
+		FunctionTokenEvent(ASTNode& content, FunctionTokenEventType type, std::string name = "") :
 			m_contentNode(content),
 			m_name(std::move(name)),
-			m_contextNode(context),
 			m_type(type) {
 		}
 
@@ -44,17 +42,8 @@ namespace ska {
 			return m_contentNode;
 		}
 
-		auto& contextNode() {
-			return m_contextNode;
-		}
-
-		const auto& contextNode() const {
-			return m_contextNode;
-		}
-
 	private:
 		std::string m_name;
-		ASTNode& m_contextNode;
         ASTNode& m_contentNode;
 	    FunctionTokenEventType m_type;
     };

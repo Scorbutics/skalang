@@ -21,20 +21,27 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
             break;
 
         case ReturnTokenEventType::BUILTIN:
-        case ReturnTokenEventType::OBJECT:
-            if(m_symbols.enclosingType() == nullptr || m_symbols.enclosingType()->getName().empty()) {
-                throw std::runtime_error("return must be place directly in the function block (not in the nested ones)");
-            }
+		case ReturnTokenEventType::OBJECT: {
+			const auto symbol = m_symbols.enclosingType();
+			if (symbol == nullptr || symbol->getName().empty() || m_symbols[symbol->getName()] == nullptr) {
+				throw std::runtime_error("return must be place directly in the function block (not in the nested ones)");
+			}
+			
+			const auto type = m_symbols[symbol->getName()]->getType();
+			const auto& node = token.rootNode();
+			if (type.compound().empty() || !node.type().has_value()) {
+				throw std::runtime_error(symbol->getName() + " is not a function");
+			}
 
-            auto type = m_symbols.enclosingType()->getType();
+			const auto expectedReturnType = type.compound().back();
+			if ((node.op() == Operator::USER_DEFINED_OBJECT && expectedReturnType != ExpressionType::OBJECT) || 
+				node.op() != Operator::USER_DEFINED_OBJECT && expectedReturnType != node.type()) {
+				auto ss = std::stringstream{};
+				ss << "bad return type : expected " << expectedReturnType << " on function but got " << node.type().value() << " on return";
+				throw std::runtime_error(ss.str());
+			}
 
-            if(type != token.rootNode()[0].type()) {
-                auto ss = std::stringstream {};
-                ss << "bad return type : expected " << type << " on function but got " << token.rootNode()[0].type().value() << " on return";
-                throw std::runtime_error(ss.str());
-            }
-
-            break;
+		} break;
     }
     return true;
 }
@@ -80,7 +87,7 @@ bool ska::SemanticTypeChecker::matchArray(const ArrayTokenEvent& token) {
 }
 
 bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
-    switch(token.type()) {       
+    switch(token.type()) {
         
         case FunctionTokenEventType::CALL: {
 			assert(token.rootNode().size() > 0);
@@ -89,7 +96,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
             const auto type = functionNode.type();
             if(!type.has_value() || type != ExpressionType::FUNCTION) {
 				auto ss = std::stringstream{};
-				ss << "function " << token.contextNode() << " is called before being declared (or has a bad declaration)";
+				ss << "function " << functionNode << " is called before being declared (or has a bad declaration)";
 				throw std::runtime_error(ss.str());
             }
 
@@ -98,11 +105,11 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 			const auto callNodeParameterSize = token.rootNode().size();
             if(typeSize != callNodeParameterSize) {
                 auto ss = std::stringstream {};
-                ss << "bad function call : the function " << token.contextNode() << " needs " << (typeSize - 1) << " parameters but is being called with " << (callNodeParameterSize - 1) << " parameters (function type is " << type.value() << ")";
+                ss << "bad function call : the function " << functionNode << " needs " << (typeSize - 1) << " parameters but is being called with " << (callNodeParameterSize - 1) << " parameters (function type is " << type.value() << ")";
                 throw std::runtime_error(ss.str());
             }
 
-			SLOG(ska::LogLevel::Debug) << token.contextNode() << " function has the following arguments types during its call : ";
+			SLOG(ska::LogLevel::Debug) << functionNode << " function has the following arguments types during its call : ";
 			const auto& functionCallNode = token.rootNode();
 			for (auto index = 1u; index < functionCallNode.size(); index++) {
 				auto& param = functionCallNode[index];
@@ -118,7 +125,6 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
             }
         } break;
 
-		case FunctionTokenEventType::DECLARATION_PROTOTYPE:
 		case FunctionTokenEventType::DECLARATION_STATEMENT:
 		default:
 			break;
