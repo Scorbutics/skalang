@@ -48,7 +48,8 @@ std::unordered_map<char, int> ska::ShuntingYardExpressionParser::PRIORITY_MAP = 
 ska::ShuntingYardExpressionParser::ShuntingYardExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, Parser& parser, TokenReader& input) :
 	m_reservedKeywordsPool(reservedKeywordsPool),
 	m_parser(parser),
-	m_input(input) {
+	m_input(input),
+	m_matcherArray(m_input, m_reservedKeywordsPool, m_parser) {
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::parse() {
@@ -121,13 +122,13 @@ void ska::ShuntingYardExpressionParser::matchArray(stack<Token>& operators, stac
             //TODO : handle multi dimensional arrays
             if (value != "=") {
                 SLOG(ska::LogLevel::Debug) << "\tArray begin use";
-                operands.push(matchArrayUse(popOperandIfNoOperator(operands, isDoingOperation)));
+                operands.push(m_matcherArray.matchUse(popOperandIfNoOperator(operands, isDoingOperation)));
                 SLOG(ska::LogLevel::Debug) << "\tArray end";
                 break;
             }
         }
         SLOG(ska::LogLevel::Debug) << "\tArray begin declare";
-        auto reservedNode = matchArrayDeclaration();
+        auto reservedNode = m_matcherArray.matchDeclaration();
         if(reservedNode == nullptr) {
             error("invalid array declaration");
         }
@@ -325,50 +326,6 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchReserved() {
 		default:
 			return nullptr;
 	}
-}
-
-ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchArrayDeclaration() {
-	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());
-
-	auto arrayNode = std::vector<ASTNodePtr>{};
-	auto isComma = true;
-	while (isComma) {
-		if (!m_input.expect(TokenType::SYMBOL)) {
-			SLOG(ska::LogLevel::Debug) << "array entry detected, reading expression : ";
-			
-			auto expression = parse();
-			arrayNode.push_back(std::move(expression));
-			isComma = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
-			if (isComma) {
-				m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
-			}
-		}
-	}
-
-    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
-	auto declarationNode = ASTNode::MakeNode<ska::Operator::ARRAY_DECLARATION>(std::move(arrayNode));
-	auto event = ArrayTokenEvent{ *declarationNode, ArrayTokenEventType::USE };
-	m_parser.Observable<ArrayTokenEvent>::notifyObservers(event);
-	return declarationNode;
-}
-
-ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchArrayUse(ASTNodePtr identifierArrayAffected) {
-	//Ensures array expression before the index access
-    SLOG(ska::LogLevel::Debug) << "expression-array : " << *identifierArrayAffected;
-    auto expressionEvent = ArrayTokenEvent{ *identifierArrayAffected, ArrayTokenEventType::EXPRESSION };
-	m_parser.Observable<ArrayTokenEvent>::notifyObservers(expressionEvent);
-
-    //Gets the index part with bracket syntax
-	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());
-	auto indexNode = parse();
-	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
-
-	auto declarationNode = ASTNode::MakeNode<ska::Operator::ARRAY_USE>(std::move(identifierArrayAffected), std::move(indexNode));
-	
-    //Notifies the outside that we use the array
-    auto event = ArrayTokenEvent{ *declarationNode, ArrayTokenEventType::USE };
-	m_parser.Observable<ArrayTokenEvent>::notifyObservers(event);
-	return declarationNode;
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchFunctionDeclarationParameter() {

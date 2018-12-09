@@ -11,6 +11,8 @@
 #include "FunctionTokenEvent.h"
 #include "VarTokenEvent.h"
 
+#include "MatcherArray.h"
+
 template<typename T, typename Container = std::deque<T>>
 class iterable_stack
 : public std::stack<T, Container>
@@ -53,8 +55,8 @@ namespace ska {
 		void matchRange(stack<Token>& operators, stack<ASTNodePtr>& operands, const Token& token, bool isDoingOperation);
 
         ASTNodePtr matchReserved();
-		ASTNodePtr matchArrayDeclaration();
-		ASTNodePtr matchArrayUse(ASTNodePtr identifierArrayAffected);
+		//ASTNodePtr matchArrayDeclaration();
+		//ASTNodePtr matchArrayUse(ASTNodePtr identifierArrayAffected);
 		ASTNodePtr matchFunctionCall(ASTNodePtr identifierFunctionName);
 		ASTNodePtr matchFunctionDeclaration();
 		ASTNodePtr matchFunctionDeclarationBody();
@@ -75,6 +77,8 @@ namespace ska {
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		Parser& m_parser;
 		TokenReader& m_input;
+
+		MatcherArray m_matcherArray;
 	};
 
 }

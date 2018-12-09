@@ -168,6 +168,11 @@ TEST_CASE("[SemanticTypeChecker]") {
 					CHECK(e.what() == std::string("bad user-defined return placing : custom return must be set in a named function-constructor"));
 				}
 			}
+
+			//TODO : forbid the "no effect" ?
+			SUBCASE("code after return : no effect") {
+				ASTFromInputSemanticTC("var testReturn148 = function() : int { return 2543; var test = 2; };", data);
+			}
         }
 
 		SUBCASE("Array") {
