@@ -9,7 +9,7 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::MatcherVar)
 
-ska::ASTNodePtr ska::MatcherVar::match() {
+ska::ASTNodePtr ska::MatcherVar::matchDeclaration() {
 	SLOG(ska::LogLevel::Info) << "variable declaration";
 
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>());
@@ -30,4 +30,22 @@ ska::ASTNodePtr ska::MatcherVar::match() {
 	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
 
     return varNode;
+}
+
+ska::ASTNodePtr ska::MatcherVar::matchAffectation() {
+	auto lastToken = m_input.readPrevious(1);
+	if (lastToken.type() != TokenType::IDENTIFIER) {
+		throw std::runtime_error("syntax error : invalid identifier used in affectation");
+	}
+
+	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
+	auto expressionNode = m_parser.expr();
+	if (expressionNode == nullptr) {
+		throw std::runtime_error("syntax error : Affectation incomplete : no expression");
+	}
+
+	auto affectationNode = ASTNode::MakeNode<Operator::VARIABLE_AFFECTATION>(ASTNode::MakeLogicalNode(std::move(lastToken)), std::move(expressionNode));
+	auto event = VarTokenEvent::template Make<VarTokenEventType::AFFECTATION>(*affectationNode);
+	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
+	return affectationNode;
 }

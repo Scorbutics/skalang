@@ -75,7 +75,7 @@ ska::Parser::ASTNodePtr ska::Parser::matchReservedKeyword(const std::size_t keyw
 		return m_matcherIfElse.match();
 
 	case static_cast<std::size_t>(TokenGrammar::VARIABLE):
-		return m_matcherVar.match();
+		return m_matcherVar.matchDeclaration();
 
 	case static_cast<std::size_t>(TokenGrammar::FUNCTION):
 		return expr();

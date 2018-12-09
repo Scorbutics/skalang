@@ -53,3 +53,31 @@ ska::ASTNodePtr ska::MatcherArray::matchUse(ASTNodePtr identifierArrayAffected) 
 	return declarationNode;
 }
 
+ska::ASTNodePtr ska::MatcherArray::match(ExpressionStack& operands, char token, bool isDoingOperation) {
+	switch (token) {
+	case '[': {
+		if (m_input.canReadPrevious(1)) {
+			auto lastToken = m_input.readPrevious(1);
+			const auto& value = std::get<std::string>(lastToken.content());
+			//TODO : handle multi dimensional arrays
+			if (value != "=") {
+				SLOG(ska::LogLevel::Debug) << "\tArray begin use";
+				auto result = matchUse(operands.popOperandIfNoOperator(isDoingOperation));
+				SLOG(ska::LogLevel::Debug) << "\tArray end";
+				return result;
+			}
+		}
+		SLOG(ska::LogLevel::Debug) << "\tArray begin declare";
+		auto reservedNode = matchDeclaration();
+		if (reservedNode == nullptr) {
+			throw std::runtime_error("syntax error : invalid array declaration");
+		}
+		SLOG(ska::LogLevel::Debug) << "\tArray end";
+		return reservedNode;
+
+	} break;
+
+	default:
+		throw std::runtime_error("syntax error : unsupported array symbol");
+	}
+}

@@ -2,8 +2,6 @@
 #include <memory>
 #include <string>
 
-#include "iterable_stack.h"
-
 namespace ska {
 	struct ReservedKeywordsPool;
 	class TokenReader;
@@ -12,16 +10,21 @@ namespace ska {
 	class ASTNode;
 	using ASTNodePtr = std::unique_ptr<ASTNode>;
 	
-	class MatcherVar {
+	class MatcherFunction {
 	public:
-		~MatcherVar() = default;
-		MatcherVar(TokenReader& input, const ReservedKeywordsPool& pool, Parser& parser) :
+		~MatcherFunction() = default;
+		MatcherFunction(TokenReader& input, const ReservedKeywordsPool& pool, Parser& parser) :
 			m_input(input), m_reservedKeywordsPool(pool), m_parser(parser) {}
 	
+		ASTNodePtr matchCall(ASTNodePtr identifierFunctionName);
 		ASTNodePtr matchDeclaration();
-		ASTNodePtr matchAffectation();
 	
 	private:
+		ASTNodePtr matchDeclarationBody();
+		std::vector<ASTNodePtr> fillDeclarationParameters();
+		ASTNodePtr matchDeclarationReturnType();
+		ASTNodePtr matchDeclarationParameter();
+
 		TokenReader& m_input;
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		Parser& m_parser;
