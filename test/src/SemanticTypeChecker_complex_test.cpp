@@ -39,34 +39,6 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			, data);
 	}
 
-	SUBCASE("class with internal data used in public function") {
-		ASTFromInputSemanticComplexTC(
-			"var Stats = function() : var {"
-				"var pointsDeVie = 100;"
-				"var blesser = function(degats:int) {"
-					"pointsDeVie = pointsDeVie - degats;"
-				"};"
-				"return {"
-					"blesser : blesser"
-				"};"
-			"};"
-			"var JoueurClass = function(nom:string) : var { "
-				"var stats = Stats();"
-
-				"var attaquer = function(degats:int) {"
-					"stats.blesser(degats);"
-				"};"
-
-				"return {"
-					"attaquer : attaquer,"
-					"stats : stats"
-				"};"
-			"};"
-			"var joueur1 = JoueurClass(\"joueur1Nom\");"
-			"joueur1.attaquer(1);"
-			"joueur1.stats.blesser(1);"
-			, data);
-	}
 
     SUBCASE("constructor with integer field accessed through function call and used in expression") {
 		ASTFromInputSemanticComplexTC(
@@ -80,36 +52,6 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
             "(5 + JoueurClass(\"joueur1Nom\").test + 3 * 4) * 2;"
 			, data);
 	}
-
-	SUBCASE("class with internal data used in public function 2") {
-		ASTFromInputSemanticComplexTC(
-			"var Stats = function() : var {"
-				"var pointsDeVie = 100;"
-				"var blesser = function(degats:int) {"
-					"pointsDeVie = pointsDeVie - degats;"
-				"};"
-				"return {"
-					"blesser : blesser,"
-					"pdv : pointsDeVie"
-				"};"
-			"};"
-			"var JoueurClass = function(nom:string) : var { "
-				"var stats = Stats();"
-
-				"var attaquer = function(statsDegats:Stats) {"
-					"stats.blesser(statsDegats.pdv);"
-				"};"
-
-				"return {"
-					"attaquer : attaquer"
-				"};"
-			"};"
-			"var joueur1 = JoueurClass(\"joueur1Nom\");"
-			"var statsDeg = Stats();"
-			"joueur1.attaquer(statsDeg);"
-			, data);
-	}
-
 
 	SUBCASE("constructor complex with contained function NOT USING the current type BUT mentioning it...") {
 		ASTFromInputSemanticComplexTC(
@@ -132,7 +74,63 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			, data);
 	}
 
+	SUBCASE("class with internal data used in public function") {
+		ASTFromInputSemanticComplexTC(
+			"var Stats = function() : var {"
+			"var pointsDeVie = 100;"
+			"var blesser = function(degats:int) {"
+			"pointsDeVie = pointsDeVie - degats;"
+			"};"
+			"return {"
+			"blesser : blesser"
+			"};"
+			"};"
+			"var JoueurClass = function(nom:string) : var { "
+			"var stats = Stats();"
 
+			"var attaquer = function(degats:int) {"
+			"stats.blesser(degats);"
+			"};"
+
+			"return {"
+			"attaquer : attaquer,"
+			"stats : stats"
+			"};"
+			"};"
+			"var joueur1 = JoueurClass(\"joueur1Nom\");"
+			"joueur1.attaquer(1);"
+			"joueur1.stats.blesser(1);"
+			, data);
+	}
+
+	SUBCASE("class with internal data used in public function 2") {
+		ASTFromInputSemanticComplexTC(
+			"var Stats = function() : var {"
+			"var pointsDeVie = 100;"
+			"var blesser = function(degats:int) {"
+			"pointsDeVie = pointsDeVie - degats;"
+			"};"
+			"return {"
+			"blesser : blesser,"
+			"pdv : pointsDeVie"
+			"};"
+			"};"
+			"var JoueurClass = function(nom:string) : var { "
+			"var stats = Stats();"
+
+			"var attaquer = function(statsDegats:Stats) {"
+			"stats.blesser(statsDegats.pdv);"
+			"};"
+
+			"return {"
+			"attaquer : attaquer"
+			"};"
+			"};"
+			"var joueur1 = JoueurClass(\"joueur1Nom\");"
+			"var statsDeg = Stats();"
+			"joueur1.attaquer(statsDeg);"
+			, data);
+	}
 
 	//TODO : complexe à réaliser mais serait bien.
 	SUBCASE("constructor complex with contained function USING the current type...") {

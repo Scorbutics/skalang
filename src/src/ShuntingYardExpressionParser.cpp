@@ -29,22 +29,6 @@ void PrintPtr(const Container& c, const std::string& name = " ") {
 	std::cout << std::endl;
 }
 
-std::unordered_map<char, int> ska::ShuntingYardExpressionParser::BuildPriorityMap() {
-	auto result = std::unordered_map<char, int>{};
-
-    result.emplace('=', 50);
-    result.emplace('>', 50);
-    result.emplace('<', 50);
-	result.emplace('+', 100);
-	result.emplace('-', 100);
-	result.emplace('*', 200);
-	result.emplace('/', 200);
-
-	return result;
-}
-
-std::unordered_map<char, int> ska::ShuntingYardExpressionParser::PRIORITY_MAP = BuildPriorityMap();
-
 ska::ShuntingYardExpressionParser::ShuntingYardExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, Parser& parser, TokenReader& input) :
 	m_reservedKeywordsPool(reservedKeywordsPool),
 	m_parser(parser),
@@ -56,9 +40,6 @@ ska::ShuntingYardExpressionParser::ShuntingYardExpressionParser(const ReservedKe
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::parse() {
 	auto data = expression_stack<Token, ASTNodePtr>{};
-
-	/*auto operators = stack<Token>{};
-	auto operands = stack<ASTNodePtr> {};*/
 	return expression(data);
 }
 
@@ -104,57 +85,38 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(ExpressionStack& ex
     return false;
 }
 
-/*ska::ASTNodePtr ska::ShuntingYardExpressionParser::PopOperandIfNoOperator(stack<ASTNodePtr>& operands, bool isMathOperator) {
-    if(operands.empty()) {
-        return nullptr;
-    }
-
-    if(!isMathOperator) {
-        auto result = std::move(operands.top());
-        operands.pop();
-        return result;
-    }
-    error("invalid operator placement");
-	return nullptr;
-}*/
-
 void ska::ShuntingYardExpressionParser::matchRange(ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
     const auto& value = std::get<std::string>(token.content());
     switch (value[0]) {
-    case '(':
-        
-		//TODO rework (this condition should be based on the type system and the semantic checker)
-        if (!expressions.emptyOperands() && (expressions.topOperand()->op() == Operator::FIELD_ACCESS ||
-            (expressions.topOperand()->op() == Operator::LITERAL || expressions.topOperand()->op() == Operator::UNARY) && expressions.topOperand()->tokenType() == TokenType::IDENTIFIER)) {
-            SLOG(ska::LogLevel::Debug) << "\tFunction call !";
-            //We already pushed the identifier as an operand, but in fact it's a function call.
-            //We have to pop it, then matching the function call as the new operand.
+	case '(': {
+		/*
+		TODO:
+
+		auto functionNameOperand = expressions.popOperandIfNoOperator(isDoingOperation);
+		if (functionNameOperand != nullptr && functionNameOperand->type().has_value() && functionNameOperand->type() == ExpressionType::FUNCTION) {
+			SLOG(ska::LogLevel::Debug) << "\tFunction call !";
+			//We already pushed the identifier as an operand, but in fact it's a function call.
+			//We have to pop it, then matching the function call as the new operand.
+			expressions.push(m_matcherFunction.matchCall(std::move(functionNameOperand)));
+		*/
+
+		if (!expressions.emptyOperands() && (expressions.topOperand()->op() == Operator::FIELD_ACCESS ||
+			(expressions.topOperand()->op() == Operator::LITERAL || expressions.topOperand()->op() == Operator::UNARY) && 
+			expressions.topOperand()->tokenType() == TokenType::IDENTIFIER)) {
+			SLOG(ska::LogLevel::Debug) << "\tFunction call !";
+			//We already pushed the identifier as an operand, but in fact it's a function call.
+			//We have to pop it, then matching the function call as the new operand.
 			expressions.push(m_matcherFunction.matchCall(expressions.popOperandIfNoOperator(isDoingOperation)));
-            
-        } else {
-            SLOG(ska::LogLevel::Debug) << "\tRange begin";
+		} else {
+			SLOG(ska::LogLevel::Debug) << "\tRange begin";
 			expressions.push(Token{ m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()) });
-        }
-        break;
+		}		
+	} break;
     case ')': {
-		expressions.push(Token{ m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) });
-        SLOG(ska::LogLevel::Debug) << "\tRange end";
-        auto rangeOperandResult = popUntil(expressions, [](const Token& t) {
-            const auto& strValue = t.name();
-            if (t.type() == TokenType::RANGE) {
-                return (strValue.empty() || strValue[0] == '(') ? -1 : 1;
-            }
-            SLOG_STATIC(ska::LogLevel::Debug, ska::ShuntingYardExpressionParser) << "\t\tPoping " << strValue;
-            return 0;
-        });
-        if (rangeOperandResult != nullptr) {
-			expressions.push(std::move(rangeOperandResult));
-        }
-        if (!expressions.emptyOperator()) {
-			expressions.popOperator();
-        }
-    }
-    break;
+		auto tok = Token{ m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) };
+		expressions.triggerRangePoping(std::move(tok));
+		SLOG(ska::LogLevel::Debug) << "\tRange end";
+    } break;
 
     default:
         error("Unexpected token (range type) : " + token.name());
@@ -167,18 +129,16 @@ bool ska::ShuntingYardExpressionParser::matchSymbol(ExpressionStack& expressions
 		//TODO rework (this condition should be based on the type system and the semantic checker)
 		//We must check that the token before the '=' is an lvalue.
 		//Pops the variable name token (mentioned before the '=')
-		expressions.popOperand();
-		expressions.push(m_matcherVar.matchAffectation());
+		expressions.replaceTopOperand(m_matcherVar.matchAffectation());
         return false;
     } 
 
     SLOG(ska::LogLevel::Debug) << "\t\tPushing operator symbol " << value;
-    const auto shouldPopOperatorsStack = checkLessPriorityToken(expressions, value[0]);
-    auto operatorTop = expressions.emptyOperator() ? Token{} : expressions.topOperator();
+    const auto shouldPopOperatorsStack = expressions.checkLessPriorityToken(value[0]);
     if (shouldPopOperatorsStack) {
-        SLOG(ska::LogLevel::Debug) << "\tLess precedence, poping " << operatorTop << " before adding " << value;
+        SLOG(ska::LogLevel::Debug) << "\tLess precedence, poping top operator before adding " << value;
         auto poped = 0u;
-        auto popedToken = popUntil(expressions, [&](const Token& t) {
+        auto popedToken = expressions.popUntil([&](const Token& t) {
             if (poped >= 1) {
                 return -1;
             }
@@ -225,26 +185,16 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(ExpressionStack& e
 	}
 	SLOG(ska::LogLevel::Debug) << "\tPoping everything";
 
-	auto result = popUntil(expressions, [](const auto& t) {
+	auto result = expressions.popUntil([](const auto& t) {
 		return 0;
 	});
-
-	auto event = ExpressionTokenEvent { *result };
-	m_parser.Observable<ExpressionTokenEvent>::notifyObservers(event);
+	
+	if (result != nullptr) {
+		auto event = ExpressionTokenEvent{ *result };
+		m_parser.Observable<ExpressionTokenEvent>::notifyObservers(event);
+	}
 
 	return result;
-}
-
-bool ska::ShuntingYardExpressionParser::checkLessPriorityToken(ExpressionStack& expressions, const char tokenChar) const {
-	const auto& topOperatorContent = (expressions.emptyOperator() || expressions.topOperator().name().empty()) ? '\0' : expressions.topOperator().name()[0];
-    if(PRIORITY_MAP.find(tokenChar) == PRIORITY_MAP.end()) {
-        auto ss = std::stringstream {};
-        ss << "bad operator : " << tokenChar;
-        error(ss.str());
-    }
-
-    return PRIORITY_MAP.find(topOperatorContent) != PRIORITY_MAP.end() &&
-			PRIORITY_MAP.at(tokenChar) < PRIORITY_MAP.at(topOperatorContent);
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchReserved() {
@@ -257,51 +207,6 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchReserved() {
 		default:
 			return nullptr;
 	}
-}
-
-ska::ASTNodePtr ska::ShuntingYardExpressionParser::popUntil(ExpressionStack& expressions, PopPredicate predicate) {
-	auto currentNode = ASTNodePtr {};
-	auto nextNode = ASTNodePtr {};
-
-	if (expressions.emptyOperator() && !expressions.emptyOperands()) {
-		return expressions.popOperand();
-	}
-	
-	while(true) {
-		if (expressions.emptyOperator() || expressions.emptyOperands()) {
-			break;
-		}
-
-		const auto op = expressions.topOperator();
-		const auto analyzeToken = predicate(op);
-		//Flow control loop predicate by token
-		if(analyzeToken < 0) {
-			break;
-		} else if (analyzeToken > 0) {
-			expressions.popOperator();
-			continue;
-		}
-		expressions.popOperator();
-
-		auto rightOperand = expressions.popOperand();
-
-        currentNode = ASTNodePtr{};
-		if(nextNode != nullptr) {
-			currentNode = ASTNode::MakeLogicalNode(op, std::move(nextNode), std::move(rightOperand));
-		} else if(!expressions.emptyOperands()) {
-			currentNode = ASTNode::MakeLogicalNode(op, expressions.popOperand(), std::move(rightOperand));
-		} else {
-			//TODO handle unary operator ?
-            //assert(false && "Unsupported for now");
-            //SLOG(ska::LogLevel::Debug) << "\t\tOperator " << op.asString();
-            currentNode = ASTNode::MakeLogicalNode(op, /*ASTNode::MakeLogicalNode(Token { "0", TokenType::DIGIT }),*/ std::move(rightOperand));
-		}
-
-		nextNode = std::move(currentNode);
-		SLOG(ska::LogLevel::Debug) << "\t\tPoped " << op;//<< " with " <<  nextNode->left->token.asString() << " and " << nextNode->right->token.asString();
-	}
-
-	return (currentNode == nullptr  && nextNode == nullptr) ? nullptr : std::move(nextNode);
 }
 
 void ska::ShuntingYardExpressionParser::error(const std::string& message) {

@@ -25,14 +25,9 @@ namespace ska {
 		using PopPredicate = std::function<int(const Token&)>;
 		using ExpressionStack = expression_stack<Token, ASTNodePtr>;
 
-
-		static std::unordered_map<char, int> BuildPriorityMap() ;
-		static std::unordered_map<char, int> PRIORITY_MAP;
-
 	public:
 		ShuntingYardExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, Parser& parser, TokenReader& input);
 		ASTNodePtr parse();
-		//static ASTNodePtr PopOperandIfNoOperator(stack<ASTNodePtr>& operands, bool isMathOperator);
 
 	private:
 		bool parseTokenExpression(ExpressionStack& expressions, const Token& token, bool isDoingOperation);
@@ -47,8 +42,7 @@ namespace ska {
         bool isAtEndOfExpression() const;
 		
 		ASTNodePtr expression(ExpressionStack& expressions);
-		bool checkLessPriorityToken(ExpressionStack& expressions, const char tokenChar) const;
-		ASTNodePtr popUntil(ExpressionStack& expressions, PopPredicate predicate);
+		//bool checkLessPriorityToken(ExpressionStack& expressions, const char tokenChar) const;
 
 		static void error(const std::string& message);
 
