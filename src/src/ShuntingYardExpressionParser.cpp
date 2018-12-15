@@ -5,7 +5,7 @@
 #include "AST.h"
 #include "ReservedKeywordsPool.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ShuntingYardExpressionParser)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ShuntingYardExpressionParser)
 
 //#define SKA_LOG_SHUNTING_YARD_DETAILS
 
@@ -92,8 +92,7 @@ void ska::ShuntingYardExpressionParser::matchRange(ExpressionStack& expressions,
 		matchParenthesis(expressions, isDoingOperation);
 	break;
     case ')': {
-		auto tok = Token{ m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) };
-		expressions.push(std::move(tok));
+		expressions.push(Token{ m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) });
 		
 		auto groupParenthesisRange = [](const Token& t) {
 			const auto& strValue = t.name();
@@ -118,7 +117,6 @@ void ska::ShuntingYardExpressionParser::matchRange(ExpressionStack& expressions,
 bool ska::ShuntingYardExpressionParser::matchSymbol(ExpressionStack& expressions, const Token& token) {
     const auto& value = std::get<std::string>(token.content());
     if(value == "=") {
-		//TODO rework (this condition should be based on the type system and the semantic checker)
 		//We must check that the token before the '=' is an lvalue.
 		//Pops the variable name token (mentioned before the '=')
 		expressions.replaceTopOperand(m_matcherVar.matchAffectation());
@@ -126,12 +124,17 @@ bool ska::ShuntingYardExpressionParser::matchSymbol(ExpressionStack& expressions
     } 
 
     SLOG(ska::LogLevel::Debug) << "\t\tPushing operator symbol " << value;
+
     const auto shouldPopOperatorsStack = expressions.checkLessPriorityOperator(value[0]);
     if (shouldPopOperatorsStack) {
         SLOG(ska::LogLevel::Debug) << "\tLess precedence, poping first (top) operator before adding " << value;
+
 		auto poped = false;
-		auto expression = expressions.groupAndPop <ASTNode>(Group::First<Token>(poped));
-		expressions.push(std::move(expression));
+		auto expressionGroup = expressions.groupAndPop<ASTNode>(Group::FirstOnly<Token>(poped));
+		if (expressionGroup == nullptr) {
+			error("void expression on affectation");
+		}
+		expressions.push(std::move(expressionGroup));
 	} else {
 		expressions.push(Token{ m_input.match(TokenType::SYMBOL) });
 	}
@@ -145,7 +148,7 @@ void ska::ShuntingYardExpressionParser::matchParenthesis(ExpressionStack& expres
 		auto event = ExpressionTokenEvent{ *functionNameOperand };
 		m_parser.Observable<ExpressionTokenEvent>::notifyObservers(event);
 
-		if (functionNameOperand->type().has_value() && functionNameOperand->type() == ExpressionType::FUNCTION) {
+		if (functionNameOperand->type() == ExpressionType::FUNCTION) {
 			SLOG(ska::LogLevel::Debug) << "\tFunction call !";
 			//We already pushed the identifier as an operand, but in fact it's a function call.
 			//We have to pop it, then matching the function call as the new operand.
@@ -159,7 +162,6 @@ void ska::ShuntingYardExpressionParser::matchParenthesis(ExpressionStack& expres
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchObjectFieldAccess(ASTNodePtr objectAccessed) {
-	
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::METHOD_CALL_OPERATOR>());
     auto fieldAccessedIdentifier = m_input.match(TokenType::IDENTIFIER);
 
@@ -190,13 +192,13 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(ExpressionStack& e
 	}
 	SLOG(ska::LogLevel::Debug) << "\tPoping everything";
 
-	auto result = expressions.template groupAndPop <ASTNode>(Group::All<Token>);
-	if (result != nullptr) {
-		auto event = ExpressionTokenEvent { *result };
+	auto expressionGroup = expressions.template groupAndPop <ASTNode>(Group::All<Token>);
+	if (expressionGroup != nullptr) {
+		auto event = ExpressionTokenEvent { *expressionGroup };
 		m_parser.Observable<ExpressionTokenEvent>::notifyObservers(event);
 	}
 
-	return result;
+	return expressionGroup;
 
 }
 

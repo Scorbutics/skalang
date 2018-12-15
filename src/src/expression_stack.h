@@ -18,7 +18,7 @@ namespace ska {
 		static FlowPredicate<Operator> All = [](const auto&) {return FlowControl::GROUP; };
 
 		template <class Operator>
-		static FlowPredicate<Operator> First(bool& poped) {
+		static FlowPredicate<Operator> FirstOnly(bool& poped) {
 			return [&poped](const auto& t) {
 				if (poped) {
 					return FlowControl::STOP;
