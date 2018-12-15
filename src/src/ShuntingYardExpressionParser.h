@@ -42,7 +42,6 @@ namespace ska {
         bool isAtEndOfExpression() const;
 		
 		ASTNodePtr expression(ExpressionStack& expressions);
-		//bool checkLessPriorityToken(ExpressionStack& expressions, const char tokenChar) const;
 
 		static void error(const std::string& message);
 

@@ -88,23 +88,13 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(ExpressionStack& ex
 void ska::ShuntingYardExpressionParser::matchRange(ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
     const auto& value = std::get<std::string>(token.content());
     switch (value[0]) {
-	case '(': {
-		/*
-		TODO:
-
-		auto functionNameOperand = expressions.popOperandIfNoOperator(isDoingOperation);
-		if (functionNameOperand != nullptr && functionNameOperand->type().has_value() && functionNameOperand->type() == ExpressionType::FUNCTION) {
-			SLOG(ska::LogLevel::Debug) << "\tFunction call !";
-			//We already pushed the identifier as an operand, but in fact it's a function call.
-			//We have to pop it, then matching the function call as the new operand.
-			expressions.push(m_matcherFunction.matchCall(std::move(functionNameOperand)));
-		*/
-
+	case '(':
 		matchParenthesis(expressions, isDoingOperation);
-	} break;
+	break;
     case ')': {
 		auto tok = Token{ m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) };
-		expressions.triggerRangePoping(std::move(tok));
+		expressions.push(std::move(tok));
+		expressions.triggerRangePoping();
 		SLOG(ska::LogLevel::Debug) << "\tRange end";
     } break;
 
@@ -124,21 +114,21 @@ bool ska::ShuntingYardExpressionParser::matchSymbol(ExpressionStack& expressions
     } 
 
     SLOG(ska::LogLevel::Debug) << "\t\tPushing operator symbol " << value;
-    const auto shouldPopOperatorsStack = expressions.checkLessPriorityToken(value[0]);
+    const auto shouldPopOperatorsStack = expressions.checkLessPriorityOperator(value[0]);
     if (shouldPopOperatorsStack) {
         SLOG(ska::LogLevel::Debug) << "\tLess precedence, poping top operator before adding " << value;
         auto poped = 0u;
-        auto popedToken = expressions.popUntil([&](const Token& t) {
+        auto expression = expressions.template popUntil <ASTNode>([&](const Token& t) {
             if (poped >= 1) {
                 return -1;
             }
             poped++;
             return 0;
         });
-        assert(popedToken != nullptr);
-		expressions.push(std::move(popedToken));
-    }
-	expressions.push(Token{ m_input.match(TokenType::SYMBOL) });
+		expressions.push(std::move(expression));
+	} else {
+		expressions.push(Token{ m_input.match(TokenType::SYMBOL) });
+	}
     return true;
     
 }
@@ -194,16 +184,17 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(ExpressionStack& e
 	}
 	SLOG(ska::LogLevel::Debug) << "\tPoping everything";
 
-	auto result = expressions.popUntil([](const auto& t) {
+	auto result = expressions.template popUntil <ASTNode>([](const auto& t) {
 		return 0;
 	});
-	
+	//assert(expressions.emptyOperands());
 	if (result != nullptr) {
-		auto event = ExpressionTokenEvent{ *result };
+		auto event = ExpressionTokenEvent { *result };
 		m_parser.Observable<ExpressionTokenEvent>::notifyObservers(event);
 	}
 
 	return result;
+
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchReserved() {

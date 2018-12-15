@@ -10,6 +10,7 @@ namespace ska {
 	template<class Operator, class Operand>
 	class expression_stack {
 		using PopPredicate = std::function<int(const Token&)>;
+
 		static std::unordered_map<char, int> BuildPriorityMap();
 		static std::unordered_map<char, int> PRIORITY_MAP;		
 
@@ -54,9 +55,10 @@ namespace ska {
 			return popOperand();
 		}
 		
-		ska::ASTNodePtr popUntil(PopPredicate predicate) {
-			auto currentNode = ASTNodePtr{};
-			auto nextNode = ASTNodePtr{};
+		template <class NodeMaker>
+		Operand popUntil(PopPredicate predicate) {
+			auto currentNode = Operand{};
+			auto nextNode = Operand{};
 
 			if (emptyOperator() && !emptyOperands()) {
 				return popOperand();
@@ -80,50 +82,47 @@ namespace ska {
 
 				auto rightOperand = popOperand();
 
-				currentNode = ASTNodePtr{};
+				currentNode = Operand{};
 				if (nextNode != nullptr) {
-					currentNode = ASTNode::MakeLogicalNode(op, std::move(nextNode), std::move(rightOperand));
+					currentNode = NodeMaker::MakeLogicalNode(op, std::move(nextNode), std::move(rightOperand));
 				} else if (!emptyOperands()) {
-					currentNode = ASTNode::MakeLogicalNode(op, popOperand(), std::move(rightOperand));
-				}
-				else {
+					currentNode = NodeMaker::MakeLogicalNode(op, popOperand(), std::move(rightOperand));
+				} else {
 					//TODO handle unary operator ?
 					//assert(false && "Unsupported for now");
-					//SLOG(ska::LogLevel::Debug) << "\t\tOperator " << op.asString();
-					currentNode = ASTNode::MakeLogicalNode(op, /*ASTNode::MakeLogicalNode(Token { "0", TokenType::DIGIT }),*/ std::move(rightOperand));
+					currentNode = NodeMaker::MakeLogicalNode(op, /*ASTNode::MakeLogicalNode(Token { "0", TokenType::DIGIT }),*/ std::move(rightOperand));
 				}
 
 				nextNode = std::move(currentNode);
-				//SLOG(ska::LogLevel::Debug) << "\t\tPoped " << op;//<< " with " <<  nextNode->left->token.asString() << " and " << nextNode->right->token.asString();
 			}
 
 			return (currentNode == nullptr  && nextNode == nullptr) ? nullptr : std::move(nextNode);
 		}
 
-		bool checkLessPriorityToken(const char tokenChar) const {
+		bool checkLessPriorityOperator(const char tokenOperatorChar) const {
 			const auto& topOperatorContent = (emptyOperator() || topOperator().name().empty()) ? '\0' : topOperator().name()[0];
-			if (PRIORITY_MAP.find(tokenChar) == PRIORITY_MAP.end()) {
+			if (PRIORITY_MAP.find(tokenOperatorChar) == PRIORITY_MAP.end()) {
 				auto ss = std::stringstream{};
-				ss << "syntax error : bad operator : " << tokenChar;
+				ss << "syntax error : bad operator : " << tokenOperatorChar;
 				throw std::runtime_error(ss.str());
 			}
 
 			return PRIORITY_MAP.find(topOperatorContent) != PRIORITY_MAP.end() &&
-				PRIORITY_MAP.at(tokenChar) < PRIORITY_MAP.at(topOperatorContent);
+				PRIORITY_MAP.at(tokenOperatorChar) < PRIORITY_MAP.at(topOperatorContent);
 		}
 
-		void triggerRangePoping(Token tok) {
-			push(std::move(tok));
-			auto rangeOperandResult = popUntil([](const Token& t) {
+		void triggerRangePoping() {
+			auto result = this->template popUntil  <ASTNode>([](const Token& t) {
 				const auto& strValue = t.name();
 				if (t.type() == TokenType::RANGE) {
 					return (strValue.empty() || strValue[0] == '(') ? -1 : 1;
 				}
 				return 0;
 			});
-			if (rangeOperandResult != nullptr) {
-				push(std::move(rangeOperandResult));
+			if (result != nullptr) {
+				push(std::move(result));
 			}
+
 			if (!emptyOperator()) {
 				popOperator();
 			}
