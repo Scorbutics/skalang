@@ -118,7 +118,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			"var JoueurClass = function(nom:string) : var { "
 			"var stats = Stats();"
 
-			"var attaquer = function(statsDegats:Stats) {"
+			"var attaquer = function(statsDegats:Stats, test:int) {"
 			"stats.blesser(statsDegats.pdv);"
 			"};"
 
@@ -128,7 +128,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			"};"
 			"var joueur1 = JoueurClass(\"joueur1Nom\");"
 			"var statsDeg = Stats();"
-			"joueur1.attaquer(statsDeg);"
+			"joueur1.attaquer(statsDeg, 0);"
 			, data);
 	}
 

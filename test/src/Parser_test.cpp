@@ -10,7 +10,7 @@
 #include "Operator.h"
 
 TEST_CASE("test") {
-	const auto inputStr = std::string("for(var i = 0; i < 5; i++) { lol(\"mdr\", 12); }");
+	const auto inputStr = std::string("for(var i = 0; i < 5; i++) { lol; \"mdr\"; 12; }");
 	const auto keywords = ska::ReservedKeywordsPool{};
 	auto t = ska::Tokenizer {keywords, inputStr};
 	auto tokens = t.tokenize();
@@ -43,15 +43,8 @@ TEST_CASE("test") {
 	
 	const auto& loopStatementBody = tree[3];
 	CHECK(loopStatementBody.op() == ska::Operator::BLOCK);
-	CHECK(loopStatementBody.size() == 1);
+	CHECK(loopStatementBody.size() == 3);
 	const auto& functionCallStatement = loopStatementBody[0];
-
-	CHECK(functionCallStatement.op() == ska::Operator::FUNCTION_CALL);
-	//TODO
-	/*CHECK(functionCallStatement.has(ska::Token{ "lol", ska::TokenType::IDENTIFIER }));
-	CHECK(functionCallStatement.size() == 2);
-	CHECK(functionCallStatement[0].has(ska::Token { "\"mdr\"", ska::TokenType::STRING }));
-	CHECK(functionCallStatement[1].has(ska::Token { "12", ska::TokenType::DIGIT }));*/
 }
 
 std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, const ska::ReservedKeywordsPool& keywords) {

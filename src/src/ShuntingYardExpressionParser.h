@@ -34,9 +34,9 @@ namespace ska {
         
         bool matchSymbol(ExpressionStack& expressions, const Token& token);
 		void matchRange(ExpressionStack& expressions, const Token& token, bool isDoingOperation);
+		void matchParenthesis(ExpressionStack& expressions, bool isDoingOperation);
 
         ASTNodePtr matchReserved();
-		
 		ASTNodePtr matchObjectFieldAccess(ASTNodePtr objectAccessed);      
 
         bool isAtEndOfExpression() const;

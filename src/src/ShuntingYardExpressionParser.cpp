@@ -100,17 +100,7 @@ void ska::ShuntingYardExpressionParser::matchRange(ExpressionStack& expressions,
 			expressions.push(m_matcherFunction.matchCall(std::move(functionNameOperand)));
 		*/
 
-		if (!expressions.emptyOperands() && (expressions.topOperand()->op() == Operator::FIELD_ACCESS ||
-			(expressions.topOperand()->op() == Operator::LITERAL || expressions.topOperand()->op() == Operator::UNARY) && 
-			expressions.topOperand()->tokenType() == TokenType::IDENTIFIER)) {
-			SLOG(ska::LogLevel::Debug) << "\tFunction call !";
-			//We already pushed the identifier as an operand, but in fact it's a function call.
-			//We have to pop it, then matching the function call as the new operand.
-			expressions.push(m_matcherFunction.matchCall(expressions.popOperandIfNoOperator(isDoingOperation)));
-		} else {
-			SLOG(ska::LogLevel::Debug) << "\tRange begin";
-			expressions.push(Token{ m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()) });
-		}		
+		matchParenthesis(expressions, isDoingOperation);
 	} break;
     case ')': {
 		auto tok = Token{ m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) };
@@ -151,6 +141,25 @@ bool ska::ShuntingYardExpressionParser::matchSymbol(ExpressionStack& expressions
 	expressions.push(Token{ m_input.match(TokenType::SYMBOL) });
     return true;
     
+}
+
+void ska::ShuntingYardExpressionParser::matchParenthesis(ExpressionStack& expressions, bool isDoingOperation) {
+	auto functionNameOperand = expressions.popOperandIfNoOperator(isDoingOperation);
+	if (functionNameOperand != nullptr) {
+		auto event = ExpressionTokenEvent{ *functionNameOperand };
+		m_parser.Observable<ExpressionTokenEvent>::notifyObservers(event);
+
+		if (functionNameOperand->type().has_value() && functionNameOperand->type() == ExpressionType::FUNCTION) {
+			SLOG(ska::LogLevel::Debug) << "\tFunction call !";
+			//We already pushed the identifier as an operand, but in fact it's a function call.
+			//We have to pop it, then matching the function call as the new operand.
+			expressions.push(m_matcherFunction.matchCall(std::move(functionNameOperand)));
+			return;
+		}
+	}
+
+	SLOG(ska::LogLevel::Debug) << "\tRange begin";
+	expressions.push(Token{ m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()) });
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchObjectFieldAccess(ASTNodePtr objectAccessed) {
