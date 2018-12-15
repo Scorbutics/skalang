@@ -94,7 +94,19 @@ void ska::ShuntingYardExpressionParser::matchRange(ExpressionStack& expressions,
     case ')': {
 		auto tok = Token{ m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) };
 		expressions.push(std::move(tok));
-		expressions.triggerRangePoping();
+		
+		auto groupParenthesisRange = [](const Token& t) {
+			const auto& strValue = t.name();
+			if (t.type() == TokenType::RANGE) {
+				return (strValue.empty() || strValue[0] == '(') ? Group::FlowControl::STOP : Group::FlowControl::IGNORE_AND_CONTINUE;
+			}
+			return Group::FlowControl::GROUP;
+		};
+
+		auto result = expressions.groupAndPop<ASTNode>(std::move(groupParenthesisRange));
+		if (result != nullptr) {
+			expressions.push(std::move(result));
+		}
 		SLOG(ska::LogLevel::Debug) << "\tRange end";
     } break;
 
@@ -116,15 +128,9 @@ bool ska::ShuntingYardExpressionParser::matchSymbol(ExpressionStack& expressions
     SLOG(ska::LogLevel::Debug) << "\t\tPushing operator symbol " << value;
     const auto shouldPopOperatorsStack = expressions.checkLessPriorityOperator(value[0]);
     if (shouldPopOperatorsStack) {
-        SLOG(ska::LogLevel::Debug) << "\tLess precedence, poping top operator before adding " << value;
-        auto poped = 0u;
-        auto expression = expressions.template popUntil <ASTNode>([&](const Token& t) {
-            if (poped >= 1) {
-                return -1;
-            }
-            poped++;
-            return 0;
-        });
+        SLOG(ska::LogLevel::Debug) << "\tLess precedence, poping first (top) operator before adding " << value;
+		auto poped = false;
+		auto expression = expressions.groupAndPop <ASTNode>(Group::First<Token>(poped));
 		expressions.push(std::move(expression));
 	} else {
 		expressions.push(Token{ m_input.match(TokenType::SYMBOL) });
@@ -184,10 +190,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(ExpressionStack& e
 	}
 	SLOG(ska::LogLevel::Debug) << "\tPoping everything";
 
-	auto result = expressions.template popUntil <ASTNode>([](const auto& t) {
-		return 0;
-	});
-	//assert(expressions.emptyOperands());
+	auto result = expressions.template groupAndPop <ASTNode>(Group::All<Token>);
 	if (result != nullptr) {
 		auto event = ExpressionTokenEvent { *result };
 		m_parser.Observable<ExpressionTokenEvent>::notifyObservers(event);

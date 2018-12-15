@@ -2,40 +2,46 @@
 #include <unordered_map>
 #include <functional>
 #include "iterable_stack.h"
-#include "Token.h"
-#include "AST.h"
 
 namespace ska {
-	
+	namespace Group {
+		enum class FlowControl {
+			STOP,
+			IGNORE_AND_CONTINUE,
+			GROUP
+		};
+
+		template <class Operator>
+		using FlowPredicate = std::function<FlowControl(const Operator&)>;
+
+		template <class Operator>
+		static FlowPredicate<Operator> All = [](const auto&) {return FlowControl::GROUP; };
+
+		template <class Operator>
+		static FlowPredicate<Operator> First(bool& poped) {
+			return [&poped](const auto& t) {
+				if (poped) {
+					return FlowControl::STOP;
+				}
+				poped = true;
+				return FlowControl::GROUP;
+			};
+		};
+	}
+
 	template<class Operator, class Operand>
 	class expression_stack {
-		using PopPredicate = std::function<int(const Token&)>;
-
 		static std::unordered_map<char, int> BuildPriorityMap();
 		static std::unordered_map<char, int> PRIORITY_MAP;		
-
 	public:
+		
+
 		void push(Operator&& op) {
 			operators.push(std::forward<Operator>(op));
 		}
 		
 		void push(Operand&& op) {
 			operands.push(std::forward<Operand>(op));
-		}
-		
-		[[nodiscard]]
-		bool emptyOperator() const {
-			return operators.empty();
-		}
-		
-		[[nodiscard]]
-		bool emptyOperands() const {
-			return operands.empty();
-		}
-			
-		[[nodiscard]]
-		Operand& topOperand() {
-			return operands.top();
 		}
 
 		void replaceTopOperand(Operand&& op) {
@@ -56,7 +62,7 @@ namespace ska {
 		}
 		
 		template <class NodeMaker>
-		Operand popUntil(PopPredicate predicate) {
+		Operand groupAndPop(Group::FlowPredicate<Operator> predicate) {
 			auto currentNode = Operand{};
 			auto nextNode = Operand{};
 
@@ -72,9 +78,9 @@ namespace ska {
 				const auto op = topOperator();
 				const auto analyzeToken = predicate(op);
 				//Flow control loop predicate by token
-				if (analyzeToken < 0) {
+				if (analyzeToken == Group::FlowControl::STOP) {
 					break;
-				} else if (analyzeToken > 0) {
+				} else if (analyzeToken == Group::FlowControl::IGNORE_AND_CONTINUE) {
 					popOperator();
 					continue;
 				}
@@ -111,24 +117,17 @@ namespace ska {
 				PRIORITY_MAP.at(tokenOperatorChar) < PRIORITY_MAP.at(topOperatorContent);
 		}
 
-		void triggerRangePoping() {
-			auto result = this->template popUntil  <ASTNode>([](const Token& t) {
-				const auto& strValue = t.name();
-				if (t.type() == TokenType::RANGE) {
-					return (strValue.empty() || strValue[0] == '(') ? -1 : 1;
-				}
-				return 0;
-			});
-			if (result != nullptr) {
-				push(std::move(result));
-			}
-
-			if (!emptyOperator()) {
-				popOperator();
-			}
+	private:
+		[[nodiscard]]
+		bool emptyOperator() const {
+			return operators.empty();
 		}
 
-	private:
+		[[nodiscard]]
+		bool emptyOperands() const {
+			return operands.empty();
+		}
+
 		[[nodiscard]]
 		Operator& topOperator() {
 			return operators.top();
@@ -171,4 +170,5 @@ namespace ska {
 	}
 	template<class Operator, class Operand>
 	std::unordered_map<char, int> ska::expression_stack<Operator, Operand>::PRIORITY_MAP = BuildPriorityMap();
+
 }
