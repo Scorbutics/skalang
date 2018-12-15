@@ -1,10 +1,10 @@
 #include <iostream>
 
 #include <doctest.h>
-#include "Parser.h"
-#include "ReservedKeywordsPool.h"
-#include "SymbolTable.h"
-#include "TypeBuilderVariableDeclaration.h"
+#include "Service/Parser.h"
+#include "Service/ReservedKeywordsPool.h"
+#include "Service/SymbolTable.h"
+#include "TypeBuilder/TypeBuilderVariableDeclaration.h"
 #include "TypeBuilderTestCommon.h"
 
 TEST_CASE("[TypeBuilderVariableDeclaration]") {

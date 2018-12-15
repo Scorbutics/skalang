@@ -1,9 +1,9 @@
 #include <doctest.h>
-#include "LoggerConfigLang.h"
-#include "ExpressionType.h"
-#include "Tokenizer.h"
-#include "SymbolTable.h"
-#include "Parser.h"
+#include "Config/LoggerConfigLang.h"
+#include "NodeValue/ExpressionType.h"
+#include "Service/Tokenizer.h"
+#include "Service/SymbolTable.h"
+#include "Service/Parser.h"
 
 using SymbolTablePtr = std::unique_ptr<ska::SymbolTable>;
 using ParserPtr = std::unique_ptr<ska::Parser>;

@@ -1,8 +1,8 @@
 #include "TypeBuilderTestCommon.h"
-#include "Tokenizer.h"
-#include "ReservedKeywordsPool.h"
-#include "Parser.h"
-#include "SymbolTable.h"
+#include "Service/Tokenizer.h"
+#include "Service/ReservedKeywordsPool.h"
+#include "Service/Parser.h"
+#include "Service/SymbolTable.h"
 	
 std::unique_ptr<ska::ASTNode> TypeBuilderTestCommonBuildAST(const std::string& input, DataTestContainer& data, bool buildType) {
 	const auto reservedKeywords = ska::ReservedKeywordsPool{};

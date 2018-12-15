@@ -1,9 +1,9 @@
 #include <doctest.h>
-#include "LoggerConfigLang.h"
-#include "SymbolTable.h"
-#include "ReservedKeywordsPool.h"
-#include "Tokenizer.h"
-#include "Parser.h"
+#include "Config/LoggerConfigLang.h"
+#include "Service/SymbolTable.h"
+#include "Service/ReservedKeywordsPool.h"
+#include "Service/Tokenizer.h"
+#include "Service/Parser.h"
 #include "DataTestContainer.h"
 
 std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, DataTestContainer& data) {

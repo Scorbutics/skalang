@@ -1,11 +1,11 @@
 #pragma once
 
 #include <memory>
-#include "SymbolTable.h"
-#include "Parser.h"
-#include "SemanticTypeChecker.h"
-#include "TypeBuilder.h"
-#include "SymbolTableTypeUpdater.h"
+#include "Service/SymbolTable.h"
+#include "Service/Parser.h"
+#include "Service/SemanticTypeChecker.h"
+#include "TypeBuilder/TypeBuilder.h"
+#include "Service/SymbolTableTypeUpdater.h"
 
 struct DataTestContainer {
     using SymbolTablePtr = std::unique_ptr<ska::SymbolTable>;

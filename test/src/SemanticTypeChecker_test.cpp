@@ -1,14 +1,14 @@
 #include <iostream>
 
 #include <doctest.h>
-#include "LoggerConfigLang.h"
+#include "Config/LoggerConfigLang.h"
 #include "DataTestContainer.h"
-#include "SymbolTable.h"
-#include "ReservedKeywordsPool.h"
-#include "Tokenizer.h"
-#include "Parser.h"
-#include "SemanticTypeChecker.h"
-#include "TypeBuilder.h"
+#include "Service/SymbolTable.h"
+#include "Service/ReservedKeywordsPool.h"
+#include "Service/Tokenizer.h"
+#include "Service/Parser.h"
+#include "Service/SemanticTypeChecker.h"
+#include "TypeBuilder/TypeBuilder.h"
 
 std::unique_ptr<ska::ASTNode> ASTFromInputSemanticTC(const std::string& input, DataTestContainer& data) {
 	const auto reservedKeywords = ska::ReservedKeywordsPool{};

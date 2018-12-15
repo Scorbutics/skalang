@@ -1,7 +1,7 @@
 #include <doctest.h>
-#include "LoggerConfigLang.h"
-#include "Tokenizer.h"
-#include "ReservedKeywordsPool.h"
+#include "Config/LoggerConfigLang.h"
+#include "Service/Tokenizer.h"
+#include "Service/ReservedKeywordsPool.h"
 
 TEST_CASE("test") {
 	const auto inputStr = std::string("for(var i = 0; i < 5; i++) { lol(\"mdr\", 12); }");

@@ -2,7 +2,7 @@
 
 #include <doctest.h>
 #include "TypeBuilderTestCommon.h"
-#include "TypeBuilderBinary.h"
+#include "TypeBuilder/TypeBuilderBinary.h"
 
 
 TEST_CASE("[TypeBuilderBinary]") {
