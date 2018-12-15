@@ -4,7 +4,7 @@
 #include "Service/Parser.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/SymbolTable.h"
-#include "TypeBuilder/TypeBuilderVariableDeclaration.h"
+#include "Service/TypeBuilder/TypeBuilderVariableDeclaration.h"
 #include "TypeBuilderTestCommon.h"
 
 TEST_CASE("[TypeBuilderVariableDeclaration]") {

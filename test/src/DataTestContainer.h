@@ -4,7 +4,7 @@
 #include "Service/SymbolTable.h"
 #include "Service/Parser.h"
 #include "Service/SemanticTypeChecker.h"
-#include "TypeBuilder/TypeBuilder.h"
+#include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/SymbolTableTypeUpdater.h"
 
 struct DataTestContainer {

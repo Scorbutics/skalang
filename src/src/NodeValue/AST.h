@@ -7,18 +7,18 @@
 #include "OperatorTraits.h"
 #include "Operator.h"
 #include "ExpressionType.h"
-#include "TypeBuilder/TypeBuildUnit.h"
+#include "Service/TypeBuilder/TypeBuildUnit.h"
 
 //Alls except Unary, Binary & Literal
-#include "TypeBuilder/TypeBuilderFieldAccess.h"
-#include "TypeBuilder/TypeBuilderFunctionCall.h"
-#include "TypeBuilder/TypeBuilderFunctionPrototypeDeclaration.h"
-#include "TypeBuilder/TypeBuilderFunctionDeclaration.h"
-#include "TypeBuilder/TypeBuilderParameterDeclaration.h"
-#include "TypeBuilder/TypeBuilderArrayDeclaration.h"
-#include "TypeBuilder/TypeBuilderArrayUse.h"
-#include "TypeBuilder/TypeBuilderVariableAffectation.h"
-#include "TypeBuilder/TypeBuilderVariableDeclaration.h"
+#include "Service/TypeBuilder/TypeBuilderFieldAccess.h"
+#include "Service/TypeBuilder/TypeBuilderFunctionCall.h"
+#include "Service/TypeBuilder/TypeBuilderFunctionPrototypeDeclaration.h"
+#include "Service/TypeBuilder/TypeBuilderFunctionDeclaration.h"
+#include "Service/TypeBuilder/TypeBuilderParameterDeclaration.h"
+#include "Service/TypeBuilder/TypeBuilderArrayDeclaration.h"
+#include "Service/TypeBuilder/TypeBuilderArrayUse.h"
+#include "Service/TypeBuilder/TypeBuilderVariableAffectation.h"
+#include "Service/TypeBuilder/TypeBuilderVariableDeclaration.h"
 
 namespace ska {
 	class Symbol;

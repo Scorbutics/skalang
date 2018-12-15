@@ -6,7 +6,7 @@
 #include "Service/Tokenizer.h"
 #include "Service/Parser.h"
 #include "Service/SemanticTypeChecker.h"
-#include "TypeBuilder/TypeBuilder.h"
+#include "Service/TypeBuilder/TypeBuilder.h"
 
 std::unique_ptr<ska::ASTNode> ASTFromInputSemanticComplexTC(const std::string& input, DataTestContainer& data) {
 	const auto reservedKeywords = ska::ReservedKeywordsPool{};

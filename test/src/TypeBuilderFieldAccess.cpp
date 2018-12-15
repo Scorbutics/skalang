@@ -2,7 +2,7 @@
 
 #include <doctest.h>
 #include "TypeBuilderTestCommon.h"
-#include "TypeBuilder/TypeBuilderBinary.h"
+#include "Service/TypeBuilder/TypeBuilderBinary.h"
 
 
 TEST_CASE("[TypeBuilderFieldAccess]") {
