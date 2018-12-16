@@ -277,7 +277,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                         CHECK(ast.size() == 2);
                         CHECK(ast[1].type() == ska::ExpressionType::INT);
                     } catch(std::exception& e) {
-                        CHECK(std::string("syntax error : invalid operator placement") == e.what());
+                        CHECK(std::string("invalid operator placement") == e.what());
                     }
                 }
 

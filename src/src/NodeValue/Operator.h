@@ -20,7 +20,8 @@ namespace ska {
 		FOR_LOOP,
 		BLOCK,
 		IF,
-		IF_ELSE
+		IF_ELSE,
+		UNUSED_Last_Length
 	};
 
     static constexpr const char* OperatorSTR[] = {

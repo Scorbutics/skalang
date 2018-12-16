@@ -15,7 +15,8 @@ namespace ska {
 		FLOAT,
 		STRING,
 		//??
-		ARRAY
+		ARRAY,
+		UNUSED_Last_Length
 	};
 
 	static constexpr const char* ExpressionTypeSTR[] = {
@@ -28,11 +29,34 @@ namespace ska {
 		"array"
 	};
 
+	template<class T>
+	struct ExpressionTypeFromNative;
+
+	template<>
+	struct ExpressionTypeFromNative<int> {
+		static constexpr auto value = ExpressionType::INT;
+	};
+
+	template<>
+	struct ExpressionTypeFromNative<float> {
+		static constexpr auto value = ExpressionType::FLOAT;
+	};
+
+	template<>
+	struct ExpressionTypeFromNative<double> {
+		static constexpr auto value = ExpressionType::FLOAT;
+	};
+
+	template<>
+	struct ExpressionTypeFromNative<std::string> {
+		static constexpr auto value = ExpressionType::STRING;
+	};
+
 	class ScopedSymbolTable;
 
     static std::unordered_map<std::string, ExpressionType> ExpressionTypeMapBuild() {
         auto result = std::unordered_map<std::string, ExpressionType>{};
-        static constexpr auto ExpressionTypeSize = 7;
+        static constexpr auto ExpressionTypeSize = static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length);
         for(auto index = 0u; index < ExpressionTypeSize; index++) {
             result[ExpressionTypeSTR[index]] = static_cast<ExpressionType>(index);
         }
@@ -42,3 +66,4 @@ namespace ska {
     static const auto ExpressionTypeMap = ExpressionTypeMapBuild();
 
 }
+

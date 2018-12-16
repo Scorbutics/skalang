@@ -36,7 +36,7 @@ namespace ska {
 	};
 
 	struct Token {
-		using Variant = std::variant<std::size_t, double, std::string>;
+		using Variant = std::variant<std::size_t, int, double, std::string>;
 
 		Token() = default;
 		Token(const Token& t) = default;

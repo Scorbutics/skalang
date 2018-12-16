@@ -62,7 +62,11 @@ ska::ASTNodePtr ska::MatcherArray::match(ExpressionStack& operands, char token, 
 			//TODO : handle multi dimensional arrays
 			if (value != "=") {
 				SLOG(ska::LogLevel::Debug) << "\tArray begin use";
-				auto result = matchUse(operands.popOperandIfNoOperator(isDoingOperation));
+				auto arrayNode = operands.popOperandIfNoOperator(isDoingOperation);
+				if (arrayNode == nullptr) {
+					throw std::runtime_error("invalid operator placement");
+				}
+				auto result = matchUse(std::move(arrayNode));
 				SLOG(ska::LogLevel::Debug) << "\tArray end";
 				return result;
 			}

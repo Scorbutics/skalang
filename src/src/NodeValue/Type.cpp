@@ -11,7 +11,7 @@ ska::ExpressionType ska::Type::crossTypes(char op, const Type& type2) const {
 		{ 0, 0, 0, 3, 4, 5, 0 },
 		{ 0, 0, 0, 4, 4, 0, 0 },
 		{ 0, 0, 0, 5, 0, 5, 0 },
-		{ 0, 0, 0, 0, 0, 0, 6 }
+		{ 0, 0, 0, 0, 0, 0, 0 }
 	};
 
 	static int typeMapOperatorMinus[TypeMapSize][TypeMapSize] = {
@@ -73,10 +73,15 @@ ska::ExpressionType ska::Type::crossTypes(char op, const Type& type2) const {
 		selectedTypeMap = typeMapOperatorEqual;
 		break;
 
+	case '(':
+	case ')':
+		return type1;
+
 	default: {
-		/*std::cout << "Unknown operator \"" << op << "\", returning by default first type (of index " <<
-			static_cast<std::size_t>(type1) << ") without checking type map" << std::endl;*/
-		} return type1;
+			auto ss = std::stringstream{};
+			ss << "unknown operator " << op;
+			throw std::runtime_error(ss.str());
+		}
 	}
 
 	const auto typeIdResult = selectedTypeMap[static_cast<std::size_t>(type1)][static_cast<std::size_t>(type2.m_type)];

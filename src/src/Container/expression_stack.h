@@ -50,12 +50,8 @@ namespace ska {
 		}
 		
 		Operand popOperandIfNoOperator(bool isMathOperator) {
-			if(operands.empty()) {
+			if(operands.empty() || isMathOperator) {
 				return nullptr;
-			}
-
-			if(isMathOperator) {
-				throw std::runtime_error("syntax error : invalid operator placement");
 			}
 
 			return popOperand();

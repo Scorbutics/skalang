@@ -55,6 +55,10 @@ namespace ska {
 			*this = t;
 		}
 
+		ExpressionType type() const {
+			return m_type;
+		}
+
 		Type& operator=(const Type& t) {
 			m_type = t.m_type;
 			m_alias = t.m_alias;

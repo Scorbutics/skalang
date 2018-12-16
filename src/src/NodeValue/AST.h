@@ -24,6 +24,17 @@ namespace ska {
 	class Symbol;
     class SymbolTable;
 
+	inline auto PrintValueVisitor = [](auto&& arg) -> std::string {
+		using T = std::decay_t<decltype(arg)>;
+		if constexpr (std::is_same<T, std::string>()) {
+			return arg;
+		} else {
+			auto ss = std::stringstream{};
+			ss << arg;
+			return ss.str();
+		}
+	};
+
 	class ASTNode {
 	public:
 		ASTNode(ASTNode&&) noexcept = default;
@@ -47,6 +58,18 @@ namespace ska {
 
 		TokenType tokenType() const {
 			return token.type();
+		}
+
+		Token::Variant tokenContent() const {
+			return token.content();
+		}
+
+		const auto& value() const {
+			return m_value;
+		}
+
+		std::string valueAsString() const {
+			return std::visit(PrintValueVisitor, m_value);
 		}
 
 		ASTNode& left() {
@@ -88,6 +111,7 @@ namespace ska {
 		}
 
 	    void buildType(const SymbolTable& symbols);
+		void buildValue(Token::Variant value);
 
 		const auto& type() const {
 			return m_type;
@@ -161,6 +185,7 @@ namespace ska {
 		std::unique_ptr<TypeBuildUnit> m_typeBuilder;
 
 		Token token;
+		Token::Variant m_value;
 		std::vector<ASTNodePtr> m_children;
 
 		friend std::ostream& operator<<(std::ostream& stream, const ASTNode& node);

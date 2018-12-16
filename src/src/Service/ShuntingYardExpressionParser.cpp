@@ -70,10 +70,14 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(ExpressionStack& ex
         matchRange(expressions, token, isDoingOperation);
 		break;
 
-	case TokenType::DOT_SYMBOL:
-        //Field access only (digits are DIGIT token type, even real ones)
-		expressions.push(matchObjectFieldAccess(expressions.popOperandIfNoOperator(isDoingOperation)));
-        break;
+	case TokenType::DOT_SYMBOL: {
+		//Field access only (digits are DIGIT token type, even real ones)
+		auto expressionObject = expressions.popOperandIfNoOperator(isDoingOperation);
+		if (expressionObject == nullptr) {
+			throw std::runtime_error("invalid operator placement");
+		}
+		expressions.push(matchObjectFieldAccess(std::move(expressionObject)));
+	} break;
 		
 
 	case TokenType::SYMBOL:
