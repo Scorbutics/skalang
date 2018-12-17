@@ -30,8 +30,9 @@ TEST_CASE("[Interpreter]") {
     
 	SUBCASE("OK") {
 		SUBCASE("") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("(4 * 5) + 2 * (3 + 4 - 1) + 1;", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("(4 * 5) + 2 * (3 + 4 - 1) + 1 + 9;", data);
 			data.interpreter->interpret(*astPtr);
+            CHECK(std::get<int>((*astPtr)[0].value()) == 42);
 		}
 	}
 		
