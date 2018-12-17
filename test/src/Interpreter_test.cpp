@@ -67,6 +67,24 @@ TEST_CASE("[Interpreter]") {
 			CHECK(std::get<std::string>((*astPtr)[0].value()) == "ti");
 			CHECK(std::get<std::string>((*astPtr)[1].value()) == "titi");
 		}
+
+		SUBCASE("Var reaffected string") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = \"ti\" * 2 + \"to\";", data);
+			data.interpreter->interpret(*astPtr);
+			CHECK(std::get<std::string>((*astPtr)[0].value()) == "titito");
+		}
+		
+		SUBCASE("Var reaffected string with number") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 2 + \"ti\";", data);
+			data.interpreter->interpret(*astPtr);
+			CHECK(std::get<std::string>((*astPtr)[0].value()) == "2ti");
+		}
+
+		SUBCASE("Var reaffected string with number * 2") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 2 + \"ti\" * 2;", data);
+			data.interpreter->interpret(*astPtr);
+			CHECK(std::get<std::string>((*astPtr)[0].value()) == "2titi");
+		}
 	}
 		
 }
