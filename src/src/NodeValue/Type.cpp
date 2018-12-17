@@ -73,10 +73,6 @@ ska::ExpressionType ska::Type::crossTypes(char op, const Type& type2) const {
 		selectedTypeMap = typeMapOperatorEqual;
 		break;
 
-	case '(':
-	case ')':
-		return type1;
-
 	default: {
 			auto ss = std::stringstream{};
 			ss << "unknown operator " << op;

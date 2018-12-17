@@ -52,11 +52,12 @@ namespace ska {
 			});
 		}
 
-		default:
-			assert(!"Unhandled math plus operation");
-			return "";
-		}
-	}
+		default: 
+            assert(!"Unhandled math plus operation");
+            return "";
+		    
+	    }
+    }
 
 	Token::Variant InterpretMathematicMinus(Token::Variant firstValue, Token::Variant secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		switch (destinationType.type()) {
@@ -170,7 +171,7 @@ namespace ska {
 		case '/':
 			return InterpretMathematicDivide(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
 		default:
-			assert(!"Unhandled operator");
+			throw std::runtime_error("Unhandled operator " + mathOperator);
 			return "";
 		}
 	}
