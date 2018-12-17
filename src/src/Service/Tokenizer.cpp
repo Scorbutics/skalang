@@ -39,7 +39,7 @@ std::vector<ska::Token> ska::Tokenizer::tokenize() const {
 		auto token = tokenizeNext(currentTokenToRead, startIndex);
 		const auto tokenContent = token.type() == TokenType::RESERVED ? m_reserved.patternString(std::get<std::size_t>(token.content())) : token.name();
 
-		startIndex += tokenContent.size();
+		startIndex += tokenContent.size() + token.offset();
 
 		if (currentTokenToRead.current != ska::TokenType::EMPTY && currentTokenToRead.current != ska::TokenType::SPACE) {	
 			if(currentTokenToRead.current == ska::TokenType::SYMBOL) {
@@ -204,16 +204,27 @@ ska::RequiredToken ska::Tokenizer::initializeCharType(const ska::TokenType charT
 	return required;
 }
 
+ska::Token ska::Tokenizer::postComputing(std::size_t index, const ska::RequiredToken& requiredToken, const std::size_t startIndex) const {
+	switch (requiredToken.current) {
+	case TokenType::IDENTIFIER: {
+		const auto value = m_input.substr(startIndex, index - startIndex);
+		return m_reserved.pool.find(value) != m_reserved.pool.end() ? m_reserved.pool.at(value).token : Token{value, requiredToken.current};
+	}
+	
+	case TokenType::STRING:
+		return Token{ m_input.substr(startIndex + 1, index - startIndex - 2), requiredToken.current };
+	
+	default:
+		return Token(m_input.substr(startIndex, index - startIndex), requiredToken.current);
+	}
+}
+
 ska::Token ska::Tokenizer::finalizeToken(std::size_t index, const ska::RequiredToken& requiredToken, const std::size_t startIndex) const {
-	auto token = ska::Token{};
 	index += (!requiredToken.required ? 1 : 0);
 	if (index != startIndex) {
-		token = ska::Token(m_input.substr(startIndex, index - startIndex), requiredToken.current);
-		if (token.type() == ska::TokenType::IDENTIFIER && m_reserved.pool.find(std::get<std::string>(token.content())) != m_reserved.pool.end()) {
-			token = m_reserved.pool.at(std::get<std::string>(token.content())).token;
-		}
+		return postComputing(index, requiredToken, startIndex);
 	}
-	return token;
+	return {};
 }
 
 ska::TokenType ska::Tokenizer::calculateCharacterTokenType(const char c) const {

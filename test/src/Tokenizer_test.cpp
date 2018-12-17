@@ -27,7 +27,7 @@ TEST_CASE("test") {
 	CHECK(tokens[14] == keywords.pattern<ska::TokenGrammar::BLOCK_BEGIN>());
 	CHECK(tokens[15] == ska::Token { "lol", ska::TokenType::IDENTIFIER});
 	CHECK(tokens[16] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_BEGIN>());
-	CHECK(tokens[17] == ska::Token { "\"mdr\"", ska::TokenType::STRING});
+	CHECK(tokens[17] == ska::Token { "mdr", ska::TokenType::STRING});
 	CHECK(tokens[18] == keywords.pattern<ska::TokenGrammar::ARGUMENT_DELIMITER>());
 	CHECK(tokens[19] == ska::Token { "12", ska::TokenType::DIGIT});
 	CHECK(tokens[20] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_END>());
@@ -215,7 +215,7 @@ TEST_CASE("Symbol by symbol") {
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.size() == 1);
-		CHECK(tokens[0] == ska::Token {"\"tettttt\"", ska::TokenType::STRING});
+		CHECK(tokens[0] == ska::Token {"tettttt", ska::TokenType::STRING});
 	}
 
 	SUBCASE("Full method call 0 args") {
@@ -255,7 +255,7 @@ TEST_CASE("Symbol by symbol") {
 
 		CHECK(tokens.size() == 3);
 		CHECK(tokens[0] == ska::Token { "13.23", ska::TokenType::DIGIT });
-		CHECK(tokens[1] == ska::Token { "\"testString\"", ska::TokenType::STRING});
+		CHECK(tokens[1] == ska::Token { "testString", ska::TokenType::STRING});
 		CHECK(tokens[2] == keywords.pattern<ska::TokenGrammar::VARIABLE>());
 	}
 
@@ -265,7 +265,7 @@ TEST_CASE("Symbol by symbol") {
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.size() == 1);
-		CHECK(tokens[0] == ska::Token { "\"var i = 0; {}\"", ska::TokenType::STRING});
+		CHECK(tokens[0] == ska::Token { "var i = 0; {}", ska::TokenType::STRING});
 	}
 
 	SUBCASE("symbols in queue") {

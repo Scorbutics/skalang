@@ -18,7 +18,7 @@ ska::MemoryTable& ska::MemoryTable::endNested() {
 	return *m_current;
 }
 
-std::string& ska::MemoryTable::put(std::string name, std::string value) {
+ska::Token::Variant& ska::MemoryTable::put(std::string name, Token::Variant value) {
 	
 	if (m_current->m_memory.find(name) == m_current->m_memory.end()) {
 		m_current->m_memory.emplace(name, std::move(value));

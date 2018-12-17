@@ -6,9 +6,9 @@
 namespace ska {
     Token::Variant InterpreterOperatorConvertString(ExpressionType type, const Token::Variant& value) {
         if(type == ExpressionType::INT) {
-            return std::stoi(std::get<std::string>(value));
+            return std::holds_alternative<int>(value) ? value : std::stoi(std::get<std::string>(value));
         } else if(type == ExpressionType::FLOAT) {
-            return std::stof(std::get<std::string>(value));
+            return std::holds_alternative<double>(value) ? value : std::stof(std::get<std::string>(value));
         }
         return std::get<std::string>(value);
     }

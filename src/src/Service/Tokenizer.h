@@ -26,8 +26,9 @@ namespace ska {
 
 		RequiredToken determineCurrentToken(const std::size_t startIndex) const;
 		Token tokenizeNext(const RequiredToken& requiredToken, const std::size_t startIndex = 0) const;
-		RequiredToken initializeCharType(const ska::TokenType charTokenType) const;
+		RequiredToken initializeCharType(const TokenType charTokenType) const;
 		Token finalizeToken(std::size_t index, const RequiredToken& requiredToken, const std::size_t startIndex = 0) const;
+		Token postComputing(std::size_t index, const RequiredToken& requiredToken, const std::size_t startIndex) const;
 		TokenType calculateCharacterTokenType(const char c) const;
 
 		static bool isWordCharacter(const int c) {

@@ -66,7 +66,7 @@ namespace ska {
 			return m_type;
 		}
 
-        const bool isLiteral() const {
+        bool isLiteral() const {
             switch(m_type) {
                 case TokenType::DIGIT:
                 case TokenType::STRING:
@@ -75,6 +75,15 @@ namespace ska {
                     return false;
             }
         }
+
+		std::size_t offset() const {
+			switch (m_type) {
+			case TokenType::STRING:
+				return 2;
+			default:
+				return 0;
+			}
+		}
 
 		std::string name() const {
 			if (m_type == TokenType::RESERVED) {

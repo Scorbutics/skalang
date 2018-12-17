@@ -29,10 +29,43 @@ TEST_CASE("[Interpreter]") {
     DataTestContainer data;
     
 	SUBCASE("OK") {
-		SUBCASE("") {
+		SUBCASE("Basic Maths") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("(4 * 5) + 2 * (3 + 4 - 1) + 1 + 9;", data);
 			data.interpreter->interpret(*astPtr);
             CHECK(std::get<int>((*astPtr)[0].value()) == 42);
+		}
+		SUBCASE("Basic Maths with var") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 4; (toto * 5) + 2 * (3 + 4 - 1) + 1 + 9;", data);
+			data.interpreter->interpret(*astPtr);
+			CHECK(std::get<int>((*astPtr)[0].value()) == 4);
+			CHECK(std::get<int>((*astPtr)[1].value()) == 42);
+		}
+
+		SUBCASE("Var declared") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 14;", data);
+			data.interpreter->interpret(*astPtr);
+			CHECK(std::get<int>((*astPtr)[0].value()) == 14);
+		}
+
+		SUBCASE("Var reaffected") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 4; toto = 25;", data);
+			data.interpreter->interpret(*astPtr);
+			CHECK(std::get<int>((*astPtr)[0].value()) == 4);
+			CHECK(std::get<int>((*astPtr)[1].value()) == 25);
+		}
+
+		SUBCASE("Var reaffected using the same var") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 4; toto = toto * 2;", data);
+			data.interpreter->interpret(*astPtr);
+			CHECK(std::get<int>((*astPtr)[0].value()) == 4);
+			CHECK(std::get<int>((*astPtr)[1].value()) == 8);
+		}
+
+		SUBCASE("Var reaffected using the same var") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = \"ti\"; toto = toto * 2;", data);
+			data.interpreter->interpret(*astPtr);
+			CHECK(std::get<std::string>((*astPtr)[0].value()) == "ti");
+			CHECK(std::get<std::string>((*astPtr)[1].value()) == "titi");
 		}
 	}
 		
