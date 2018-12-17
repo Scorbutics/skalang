@@ -10,15 +10,18 @@
 #include "InterpreterOperatorUnary.h"
 #include "InterpreterOperator.h"
 
+#include "InterpreterDeclarer.h"
+
 std::vector<std::unique_ptr<ska::InterpreterOperatorUnit>> ska::Interpreter::build() {
 	auto result = std::vector<std::unique_ptr<ska::InterpreterOperatorUnit>> {};
 	static constexpr auto maxOperatorEnumIndex = static_cast<std::size_t>(ska::Operator::UNUSED_Last_Length);
 	result.resize(maxOperatorEnumIndex);
 
-	result[static_cast<std::size_t>(ska::Operator::BLOCK)] = (std::make_unique<ska::InterpreterOperator<ska::Operator::BLOCK>>(*this));
-	result[static_cast<std::size_t>(ska::Operator::BINARY)] = (std::make_unique<ska::InterpreterOperator<ska::Operator::BINARY>>(*this));
-	result[static_cast<std::size_t>(ska::Operator::LITERAL)] = (std::make_unique<ska::InterpreterOperator<ska::Operator::LITERAL>>(*this));
-	result[static_cast<std::size_t>(ska::Operator::UNARY)] = (std::make_unique<ska::InterpreterOperator<ska::Operator::UNARY>>(*this));
+	//InterpreterOperatorDeclare<ska::Operator::VARIABLE_DECLARATION>(*this, result);
+    InterpreterOperatorDeclare<ska::Operator::BLOCK>(*this, result);
+    InterpreterOperatorDeclare<ska::Operator::BINARY>(*this, result);
+    InterpreterOperatorDeclare<ska::Operator::LITERAL>(*this, result);
+    InterpreterOperatorDeclare<ska::Operator::UNARY>(*this, result);
 	return result;
 }
 

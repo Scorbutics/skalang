@@ -2,6 +2,7 @@
 #include <memory>
 #include <vector>
 #include "InterpreterOperatorUnit.h"
+#include "NodeValue/Operator.h"
 #include "NodeValue/ASTNodePtr.h"
 #include "MemoryTable.h"
 
@@ -11,7 +12,7 @@ namespace ska {
 	public:
 		Interpreter(SymbolTable& symbols);
 		~Interpreter() = default;
-		
+
 		OperatorInterpreter build();
 		void interpret(ASTNodePtr root);
 		const Token::Variant& interpret(ASTNode& node);
