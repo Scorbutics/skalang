@@ -21,6 +21,6 @@ namespace ska {
 	template <Operator O>
 	class InterpreterOperator : public InterpreterOperatorUnit {
 	public:
-		Token::Variant interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) override {}
+		Token::Variant interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) override { return ""; }
 	};
 }
