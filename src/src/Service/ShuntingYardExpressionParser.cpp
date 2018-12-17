@@ -98,10 +98,15 @@ void ska::ShuntingYardExpressionParser::matchRange(ExpressionStack& expressions,
     case ')': {
 		expressions.push(Token{ m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) });
 		
-		auto groupParenthesisRange = [](const Token& t) {
-			const auto& strValue = t.name();
+        auto endGrouping = false;
+		auto groupParenthesisRange = [&endGrouping](const Token& t) {
+            if(endGrouping) {
+                return Group::FlowControl::STOP;
+            }
+            const auto& strValue = t.name();
 			if (t.type() == TokenType::RANGE) {
-				return (strValue.empty() || strValue[0] == '(') ? Group::FlowControl::STOP : Group::FlowControl::IGNORE_AND_CONTINUE;
+                endGrouping = strValue == "(";
+				return Group::FlowControl::IGNORE_AND_CONTINUE;
 			}
 			return Group::FlowControl::GROUP;
 		};
