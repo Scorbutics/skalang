@@ -274,9 +274,9 @@ TEST_CASE("Expression and priorities") {
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
 		CHECK(ast.has(ska::Token { "+", ska::TokenType::SYMBOL }));
-		CHECK(ast[1].has(ska::Token { "5", ska::TokenType::DIGIT }));
-		CHECK(ast[0].op() == ska::Operator::BINARY);
-		const auto& innerOp = ast[0];
+		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT }));
+		CHECK(ast[1].op() == ska::Operator::BINARY);
+		const auto& innerOp = ast[1];
 		CHECK(innerOp[0].has(ska::Token { "2", ska::TokenType::DIGIT }));
 		CHECK(innerOp[1].has(ska::Token { "4", ska::TokenType::DIGIT }));	
 		CHECK(innerOp.has(ska::Token { "*", ska::TokenType::SYMBOL }));

@@ -34,8 +34,6 @@ namespace ska {
 		static std::unordered_map<char, int> BuildPriorityMap();
 		static std::unordered_map<char, int> PRIORITY_MAP;		
 	public:
-		
-
 		void push(Operator&& op) {
 			operators.push(std::forward<Operator>(op));
 		}
@@ -61,13 +59,13 @@ namespace ska {
 		Operand groupAndPop(Group::FlowPredicate<Operator> predicate) {
 			auto groupNode = Operand{};
 
-            //No operator but only an operand : grouping is not necessary
+            //Verify that maybe grouping is not necessary
 			if (emptyOperator() && !emptyOperands()) {
 				return popOperand();
 			}
 
 			while (true) {
-                //Nothing to group
+                //Nothing more to group, we stop
 				if (emptyOperator() || emptyOperands()) {
 					break;
 				}
@@ -76,31 +74,15 @@ namespace ska {
                 const auto analyzeToken = predicate(currentOperator);
                 if (analyzeToken == Group::FlowControl::STOP) {
                     break;
-                } else if (analyzeToken != Group::FlowControl::IGNORE_AND_CONTINUE) {
-                    groupNode = group <NodeMaker>(currentOperator, std::move(groupNode));
-                }
-                popOperator();
-			}
+                } else if (analyzeToken == Group::FlowControl::IGNORE_AND_CONTINUE) {
+                    popOperator();
+                } else {
+                    groupNode = makeGroup<NodeMaker>(std::move(groupNode));
+			    }
+            }
 
 			return groupNode;
 		}
-
-        template <class NodeMaker>
-        Operand group(Operator currentOperator, Operand groupNode) {
-            auto currentOperand = popOperand();
-
-            auto currentNode = Operand{};
-            if (groupNode != nullptr) {
-                //Group already exists
-                return NodeMaker::MakeLogicalNode(currentOperator, std::move(groupNode), std::move(currentOperand));
-            } else if (!emptyOperands()) {
-                //No group created, we make the first one
-                return NodeMaker::MakeLogicalNode(currentOperator, popOperand(), std::move(currentOperand));
-            }
-
-            //TODO handle unary operator ?
-            return NodeMaker::MakeLogicalNode(currentOperator, /*ASTNode::MakeLogicalNode(Token { "0", TokenType::DIGIT }),*/ std::move(currentOperand));
-        }
 
 		bool checkLessPriorityOperator(const char tokenOperatorChar) const {
 			const auto& topOperatorContent = (emptyOperator() || topOperator().name().empty()) ? '\0' : topOperator().name()[0];
@@ -115,6 +97,32 @@ namespace ska {
 		}
 
 	private:
+        template <class NodeMaker>
+        Operand addGroup(Operand groupNode) {
+            return NodeMaker::MakeLogicalNode(popOperator(), popOperand(), std::move(groupNode));
+        }
+
+        template <class NodeMaker>
+        Operand createGroup(bool binary) {
+            if (!binary) {
+                return NodeMaker::MakeLogicalNode(popOperator(), popOperand());
+            }
+
+            auto rightOperand = popOperand();
+            auto leftOperand = popOperand();
+            return NodeMaker::MakeLogicalNode(popOperator(), std::move(leftOperand), std::move(rightOperand));
+        }
+
+        template <class NodeMaker>
+        Operand makeGroup(Operand groupNode) {
+            if (groupNode != nullptr) {
+                return addGroup <NodeMaker>(std::move(groupNode));
+            }
+            
+            return createGroup <NodeMaker>(operands.size() >= 2);
+        }
+
+
 		[[nodiscard]]
 		bool emptyOperator() const {
 			return operators.empty();
