@@ -59,47 +59,48 @@ namespace ska {
 		
 		template <class NodeMaker>
 		Operand groupAndPop(Group::FlowPredicate<Operator> predicate) {
-			auto currentNode = Operand{};
-			auto nextNode = Operand{};
+			auto groupNode = Operand{};
 
+            //No operator but only an operand : grouping is not necessary
 			if (emptyOperator() && !emptyOperands()) {
 				return popOperand();
 			}
 
 			while (true) {
+                //Nothing to group
 				if (emptyOperator() || emptyOperands()) {
 					break;
 				}
-
-				const auto op = topOperator();
-				const auto analyzeToken = predicate(op);
-				//Flow control loop predicate by token
-				if (analyzeToken == Group::FlowControl::STOP) {
-					break;
-				} else if (analyzeToken == Group::FlowControl::IGNORE_AND_CONTINUE) {
-					popOperator();
-					continue;
-				}
-				popOperator();
-
-				auto rightOperand = popOperand();
-
-				currentNode = Operand{};
-				if (nextNode != nullptr) {
-					currentNode = NodeMaker::MakeLogicalNode(op, std::move(nextNode), std::move(rightOperand));
-				} else if (!emptyOperands()) {
-					currentNode = NodeMaker::MakeLogicalNode(op, popOperand(), std::move(rightOperand));
-				} else {
-					//TODO handle unary operator ?
-					//assert(false && "Unsupported for now");
-					currentNode = NodeMaker::MakeLogicalNode(op, /*ASTNode::MakeLogicalNode(Token { "0", TokenType::DIGIT }),*/ std::move(rightOperand));
-				}
-
-				nextNode = std::move(currentNode);
+                
+                const auto currentOperator = topOperator();
+                const auto analyzeToken = predicate(currentOperator);
+                if (analyzeToken == Group::FlowControl::STOP) {
+                    break;
+                } else if (analyzeToken != Group::FlowControl::IGNORE_AND_CONTINUE) {
+                    groupNode = group <NodeMaker>(currentOperator, std::move(groupNode));
+                }
+                popOperator();
 			}
 
-			return (currentNode == nullptr  && nextNode == nullptr) ? nullptr : std::move(nextNode);
+			return groupNode;
 		}
+
+        template <class NodeMaker>
+        Operand group(Operator currentOperator, Operand groupNode) {
+            auto currentOperand = popOperand();
+
+            auto currentNode = Operand{};
+            if (groupNode != nullptr) {
+                //Group already exists
+                return NodeMaker::MakeLogicalNode(currentOperator, std::move(groupNode), std::move(currentOperand));
+            } else if (!emptyOperands()) {
+                //No group created, we make the first one
+                return NodeMaker::MakeLogicalNode(currentOperator, popOperand(), std::move(currentOperand));
+            }
+
+            //TODO handle unary operator ?
+            return NodeMaker::MakeLogicalNode(currentOperator, /*ASTNode::MakeLogicalNode(Token { "0", TokenType::DIGIT }),*/ std::move(currentOperand));
+        }
 
 		bool checkLessPriorityOperator(const char tokenOperatorChar) const {
 			const auto& topOperatorContent = (emptyOperator() || topOperator().name().empty()) ? '\0' : topOperator().name()[0];
