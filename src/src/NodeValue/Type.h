@@ -1,4 +1,5 @@
 #pragma once
+#include <unordered_map>
 #include <vector>
 #include <sstream>
 #include "Config/LoggerConfigLang.h"
@@ -19,7 +20,11 @@ namespace ska {
 			return isNamed(type.m_type);
 		}
 
-		explicit Type(ExpressionType t) : m_type(std::move(t)) {
+        static constexpr auto TypeMapSize = static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length);
+        static const std::unordered_map<std::string, int(*)[TypeMapSize][TypeMapSize]>& GetMap(const std::string& op);
+		
+        explicit Type(ExpressionType t) : 
+            m_type(std::move(t)) {
 			//assert(!isNamed(m_type));
 		}
 
@@ -29,7 +34,10 @@ namespace ska {
 			assert(isNamed(m_type));
 		}
 
-		Type(std::string name, ExpressionType t, const ScopedSymbolTable& sym) : m_type(t), m_usedDefinedSymbolTable(&sym), m_alias(std::move(name)) {
+		Type(std::string name, ExpressionType t, const ScopedSymbolTable& sym) : 
+            m_type(t), 
+            m_usedDefinedSymbolTable(&sym), 
+            m_alias(std::move(name)) {
 			assert(isNamed(m_type));
 		}
 
@@ -111,7 +119,7 @@ namespace ska {
 			return !(*this == t);
 		}
 
-		ExpressionType crossTypes(char op, const Type& type2) const;
+		ExpressionType crossTypes(std::string op, const Type& type2) const;
 		
 		const ScopedSymbolTable* userDefinedSymbolTable() const {
 			return m_usedDefinedSymbolTable;

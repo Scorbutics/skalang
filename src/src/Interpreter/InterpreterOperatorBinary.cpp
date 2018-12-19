@@ -161,7 +161,8 @@ namespace ska {
 
 	Token::Variant InterpretMathematicBinaryExpression(std::string mathOperator, Token::Variant firstValue, Token::Variant secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		assert(!mathOperator.empty());
-		switch (mathOperator[0]) {
+		
+        switch (mathOperator) {
 		case '+' :
 			return InterpretMathematicPlus(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
 		case '-':

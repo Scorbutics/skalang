@@ -116,7 +116,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 				const auto calculatedType = param.type().value();
 				const auto requiredType = (type.value().compound())[index - 1];
 
-                if(requiredType.crossTypes('=', calculatedType) == ExpressionType::VOID) {
+                if(requiredType.crossTypes("=", calculatedType) == ExpressionType::VOID) {
                     auto ss = std::stringstream {};
                     ss << "Type  \"" << calculatedType << "\" is encountered while a type convertible to \"" << requiredType << "\" is required";
                     throw std::runtime_error(ss.str());
@@ -143,7 +143,7 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 	SLOG(ska::LogLevel::Debug) << variable << " = " << value << ";\tsymbol = " << tokenNodeExpressionType;
 
     if(variable.type() == VarTokenEventType::AFFECTATION) {
-        const auto newTokenType = type.crossTypes('=', tokenNodeExpressionType);
+        const auto newTokenType = type.crossTypes("=", tokenNodeExpressionType);
         if(newTokenType == ExpressionType::VOID) {
             const auto expressionTypeIndex = tokenNodeExpressionType;
 			auto ss = std::stringstream{};

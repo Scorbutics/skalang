@@ -11,11 +11,12 @@ namespace ska {
 		VOID,
 		OBJECT,
 		FUNCTION,
-		INT,
+        INT,
 		FLOAT,
 		STRING,
 		//??
 		ARRAY,
+		BOOLEAN,
 		UNUSED_Last_Length
 	};
 
@@ -23,10 +24,11 @@ namespace ska {
 		"void",
 		"var",
 		"function",
-		"int",
+        "int",
 		"float",
 		"string",
-		"array"
+		"array",
+		"bool"
 	};
 
 	template<class T>
@@ -35,6 +37,11 @@ namespace ska {
 	template<>
 	struct ExpressionTypeFromNative<int> {
 		static constexpr auto value = ExpressionType::INT;
+	};
+    
+    template<>
+	struct ExpressionTypeFromNative<bool> {
+		static constexpr auto value = ExpressionType::BOOLEAN;
 	};
 
 	template<>

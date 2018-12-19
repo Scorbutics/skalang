@@ -4,7 +4,7 @@
 #include "SymbolTable.h"
 #include "SymbolTableTypeUpdater.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SymbolTableTypeUpdater)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTableTypeUpdater)
 
 ska::SymbolTableTypeUpdater::SymbolTableTypeUpdater(Parser& parser, SymbolTable& symbolTable): 
 	m_symbols(symbolTable),

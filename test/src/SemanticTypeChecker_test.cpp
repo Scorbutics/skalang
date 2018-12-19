@@ -28,6 +28,13 @@ TEST_CASE("[SemanticTypeChecker]") {
     DataTestContainer data;
     
 	SUBCASE("OK") {
+        SUBCASE("boolean") {
+            auto astPtr = ASTFromInputSemanticTC("var titi = 3 == 3;", data);
+            auto& ast = (*astPtr);
+            CHECK(ast.size() == 1);
+            CHECK(ast[0].type() == ska::ExpressionType::BOOLEAN);
+        }
+
 		SUBCASE("Cross type") {
 			SUBCASE("float x float") {
 				auto astPtr = ASTFromInputSemanticTC("var titi = 2.0; var toto = 5.2; titi * toto;", data);
@@ -119,6 +126,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(ast.size() == 2);
 				CHECK(ast[1].type() == ska::ExpressionType::FLOAT);
 			}
+
 		}
 
 		SUBCASE("Parameters") {

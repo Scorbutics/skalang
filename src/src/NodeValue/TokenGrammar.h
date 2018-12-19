@@ -9,7 +9,8 @@ namespace ska {
 		VARIABLE,
 		FUNCTION,
 		RETURN,
-		INT,
+		BOOLEAN,
+        INT,
 		FLOAT,
 		STRING,
 		//Reserved symbols
@@ -37,6 +38,7 @@ namespace ska {
 		"var",
 		"function",
 		"return",
+        "bool",
 		"int",
 		"float",
 		"string",
