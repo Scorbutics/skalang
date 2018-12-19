@@ -7,7 +7,7 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::MatcherArray)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherArray)
 
 ska::ASTNodePtr ska::MatcherArray::matchDeclaration() {
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());

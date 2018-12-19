@@ -6,6 +6,7 @@
 #include "NodeValue/AST.h"
 
 #include "InterpreterOperatorBinary.h"
+#include "InterpreterOperatorIfElse.h"
 #include "InterpreterOperatorVariableDeclaration.h"
 #include "InterpreterOperatorVariableAffectation.h"
 #include "InterpreterOperatorBlock.h"
@@ -19,6 +20,8 @@ std::vector<std::unique_ptr<ska::InterpreterOperatorUnit>> ska::Interpreter::bui
 	static constexpr auto maxOperatorEnumIndex = static_cast<std::size_t>(ska::Operator::UNUSED_Last_Length);
 	result.resize(maxOperatorEnumIndex);
 
+    InterpreterOperatorDeclare<ska::Operator::IF>(*this, result);
+    InterpreterOperatorDeclare<ska::Operator::IF_ELSE>(*this, result);
 	InterpreterOperatorDeclare<ska::Operator::VARIABLE_DECLARATION>(*this, result);
 	InterpreterOperatorDeclare<ska::Operator::VARIABLE_AFFECTATION>(*this, result);
     InterpreterOperatorDeclare<ska::Operator::BLOCK>(*this, result);

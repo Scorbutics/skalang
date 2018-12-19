@@ -7,7 +7,7 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::MatcherBlock)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherBlock)
 
 ska::ASTNodePtr ska::MatcherBlock::match(const std::string& content) {
 	if (content == m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>().name()) {

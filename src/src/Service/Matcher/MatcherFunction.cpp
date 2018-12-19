@@ -6,9 +6,7 @@
 #include "Service/TokenReader.h"
 #include "Service/ReservedKeywordsPool.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::MatcherFunction)
-
-
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherFunction)
 
 ska::ASTNodePtr ska::MatcherFunction::matchDeclaration() {
 	SLOG(ska::LogLevel::Debug) << "function declaration";

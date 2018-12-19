@@ -7,7 +7,7 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::MatcherIfElse)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherIfElse)
 
 ska::ASTNodePtr ska::MatcherIfElse::match() {
     auto ifNode = ASTNodePtr{};

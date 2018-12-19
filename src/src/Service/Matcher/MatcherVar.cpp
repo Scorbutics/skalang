@@ -7,7 +7,7 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::MatcherVar)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherVar)
 
 ska::ASTNodePtr ska::MatcherVar::matchDeclaration() {
 	SLOG(ska::LogLevel::Info) << "variable declaration";
