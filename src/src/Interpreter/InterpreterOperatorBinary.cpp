@@ -1,4 +1,5 @@
 #include "NodeValue/AST.h"
+#include "NodeValue/LogicalOperator.h"
 #include "Interpreter.h"
 #include "InterpreterOperatorBinary.h"
 
@@ -159,23 +160,31 @@ namespace ska {
 		}
 	}
 
+    Token::Variant InterpretLogicCondition(Token::Variant firstValue, Token::Variant secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
+		assert(destinationType.type() == ExpressionType::BOOLEAN);
+        return firstValue == secondValue;
+    }
+
 	Token::Variant InterpretMathematicBinaryExpression(std::string mathOperator, Token::Variant firstValue, Token::Variant secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		assert(!mathOperator.empty());
-		
-        switch (mathOperator) {
-		case '+' :
-			return InterpretMathematicPlus(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
-		case '-':
-			return InterpretMathematicMinus(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
-		case '*':
-			return InterpretMathematicMultiply(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
-		case '/':
-			return InterpretMathematicDivide(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
-		default:
-			throw std::runtime_error("Unhandled operator " + mathOperator);
-			return "";
-		}
-	}
+		auto operatorIt = LogicalOperatorMap.find(mathOperator);
+        if(operatorIt != LogicalOperatorMap.end()) {
+            switch (*operatorIt) {
+            case LogicalOperator::ADDITION :
+                return InterpretMathematicPlus(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
+            case LogicalOperator::SUBSTRACT:
+                return InterpretMathematicMinus(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
+            case LogicalOperator::MULTIPLY:
+                return InterpretMathematicMultiply(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
+            case LogicalOperator::DIVIDE:
+                return InterpretMathematicDivide(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
+            case LogicalOperator::CONDITION:
+                return InterpretLogicCondition(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
+            default:
+                throw std::runtime_error("Unhandled operator " + mathOperator);
+                return "";
+            }
+	    }
 }
 
 ska::Token::Variant ska::InterpreterOperator<ska::Operator::BINARY>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
