@@ -86,12 +86,29 @@ TEST_CASE("[Interpreter]") {
 			CHECK(std::get<std::string>((*astPtr)[0].value()) == "2titi");
 		}
 
-        SUBCASE("If block") {
+        SUBCASE("If block true") {
             auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 1; if(toto + 1 == 2) { toto = 123; } toto;", data);
             data.interpreter->interpret(*astPtr);
             CHECK(std::get<int>((*astPtr)[2].value()) == 123);
         }
 
+		SUBCASE("If block false") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 1; if(toto + 1 == 12) { toto = 123; } toto;", data);
+			data.interpreter->interpret(*astPtr);
+			CHECK(std::get<int>((*astPtr)[2].value()) == 1);
+		}
+
+		SUBCASE("If Else block if false") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 1; if(toto + 1 == 12) { toto = 123; } else { toto = 24; } toto;", data);
+			data.interpreter->interpret(*astPtr);
+			CHECK(std::get<int>((*astPtr)[2].value()) == 24);
+		}
+
+		SUBCASE("If Else block if true") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 1; if(toto + 1 == 2) { toto = 123; } else { toto = 24; } toto;", data);
+			data.interpreter->interpret(*astPtr);
+			CHECK(std::get<int>((*astPtr)[2].value()) == 123);
+		}
 	}
 		
 }
