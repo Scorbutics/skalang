@@ -45,7 +45,7 @@ const ska::Token::Variant& ska::Interpreter::interpret(ASTNode& node) {
 	assert(builder != nullptr);
 	node.buildValue(builder->interpret(m_symbols, m_memory, node));
 
-	std::cout << node.valueAsString() << std::endl;
+	std::cout << node.name() << " " << node.valueAsString() << std::endl;
 
 	return node.value();
 }

@@ -162,14 +162,14 @@ namespace ska {
 
     Token::Variant InterpretLogicCondition(Token::Variant firstValue, Token::Variant secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		assert(destinationType.type() == ExpressionType::BOOLEAN);
-        return firstValue == secondValue;
+        return firstType == secondType && firstValue == secondValue;
     }
 
 	Token::Variant InterpretMathematicBinaryExpression(std::string mathOperator, Token::Variant firstValue, Token::Variant secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		assert(!mathOperator.empty());
 		auto operatorIt = LogicalOperatorMap.find(mathOperator);
         if(operatorIt != LogicalOperatorMap.end()) {
-            switch (*operatorIt) {
+            switch (operatorIt->second) {
             case LogicalOperator::ADDITION :
                 return InterpretMathematicPlus(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
             case LogicalOperator::SUBSTRACT:
@@ -185,8 +185,8 @@ namespace ska {
                 return "";
             }
 	    }
+    }
 }
-
 ska::Token::Variant ska::InterpreterOperator<ska::Operator::BINARY>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
 	auto firstValue = m_interpreter.interpret(node[0]);
 	auto secondValue = m_interpreter.interpret(node[1]);
@@ -199,3 +199,4 @@ ska::Token::Variant ska::InterpreterOperator<ska::Operator::BINARY>::interpret(c
 			node[1].type().value(),
 			node.type().value());
 }
+

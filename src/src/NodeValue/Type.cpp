@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "Type.h"
 
 const std::unordered_map<std::string, int(*)[ska::Type::TypeMapSize][ska::Type::TypeMapSize]>& ska::Type::GetMap(const std::string& op) {
@@ -93,6 +94,8 @@ ska::ExpressionType ska::Type::crossTypes(std::string op, const Type& type2) con
 		ss << "Unable to use operator \"" << op << "\" on types " << ExpressionTypeSTR[static_cast<std::size_t>(type1)] << " and " << ExpressionTypeSTR[static_cast<std::size_t>(type2.m_type)];
 		throw std::runtime_error(ss.str());
 	}
+
+    SLOG(LogLevel::Info) << op << " has cross-type " << ExpressionTypeSTR[static_cast<std::size_t>(typeIdResult)];
 
 	return static_cast<ExpressionType>(typeIdResult);		
 }
