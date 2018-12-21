@@ -11,7 +11,8 @@ ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser, const SymbolTable&
     SubObserver<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser),
     SubObserver<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser),
 	SubObserver<ArrayTokenEvent>(std::bind(&SemanticTypeChecker::matchArray, this, std::placeholders::_1), parser),
-    SubObserver<ReturnTokenEvent>(std::bind(&SemanticTypeChecker::matchReturn, this, std::placeholders::_1), parser), 
+    SubObserver<ReturnTokenEvent>(std::bind(&SemanticTypeChecker::matchReturn, this, std::placeholders::_1), parser),
+	SubObserver<IfElseTokenEvent>(std::bind(&SemanticTypeChecker::matchIfElse, this, std::placeholders::_1), parser),
     m_symbols(symbols) {
 }
 
@@ -44,6 +45,16 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 		} break;
     }
     return true;
+}
+
+bool ska::SemanticTypeChecker::matchIfElse(const IfElseTokenEvent& token) {
+	const auto& nodeType = token.rootNode()[0].type().value_or(Type{});
+	if (nodeType != ExpressionType::BOOLEAN) {
+		auto ss = std::stringstream{};
+		ss << "expression is not a boolean (it's a " << nodeType << ")";
+		throw std::runtime_error(ss.str());
+	}
+	return true;
 }
 
 bool ska::SemanticTypeChecker::matchArray(const ArrayTokenEvent& token) {

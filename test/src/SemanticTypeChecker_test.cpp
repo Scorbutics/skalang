@@ -182,6 +182,24 @@ TEST_CASE("[SemanticTypeChecker]") {
 				ASTFromInputSemanticTC("var testReturn148 = function() : int { return 2543; var test = 2; };", data);
 			}
         }
+		
+		SUBCASE("Conditions") {
+			SUBCASE("bad type : not a bool") {
+				try {
+					ASTFromInputSemanticTC("var testIf188 = 3; if(testIf188) {}", data);
+					CHECK(false);
+				} catch (std::exception& e) {
+					CHECK(e.what() == std::string("expression is not a boolean (it's a  int)"));
+				}
+			}
+
+			SUBCASE("type OK : bool") {
+				auto astPtr = ASTFromInputSemanticTC("var testIf188 = 3 == 3; if(testIf188) {}", data);
+				auto& ast = (*astPtr);
+				CHECK(ast.size() == 2);
+				CHECK(ast[1][0].type() == ska::ExpressionType::BOOLEAN);
+			}
+		}
 
 		SUBCASE("Array") {
 
