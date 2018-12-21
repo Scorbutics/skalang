@@ -19,12 +19,13 @@ ska::MemoryTable& ska::MemoryTable::endNested() {
 }
 
 ska::Token::Variant& ska::MemoryTable::put(std::string name, Token::Variant value) {
-	
-	if (m_current->m_memory.find(name) == m_current->m_memory.end()) {
-		m_current->m_memory.emplace(name, std::move(value));
+	auto* memValue = operator[](name);
+	if (memValue != nullptr) {
+		*memValue = std::move(value);
 	} else {
-		m_current->m_memory.at(name) = std::move(value);
+		m_current->m_memory.emplace(name, std::move(value));
+		memValue = &m_current->m_memory.at(name);
 	}
 
-	return m_current->m_memory.at(name);
+	return *memValue;
 }

@@ -4,7 +4,7 @@
 
 ska::Token::Variant ska::InterpreterOperator<ska::Operator::IF>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
 	auto conditionValue = m_interpreter.interpret(node[0]);
-	if(std::get<int>(conditionValue) != 0) {
+	if(std::get<bool>(conditionValue)) {
         m_interpreter.interpret(node[1]);
     }
 	
@@ -13,7 +13,7 @@ ska::Token::Variant ska::InterpreterOperator<ska::Operator::IF>::interpret(const
 
 ska::Token::Variant ska::InterpreterOperator<ska::Operator::IF_ELSE>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
 	auto conditionValue = m_interpreter.interpret(node[0]);
-	if(std::get<int>(conditionValue) != 0) {
+	if(std::get<bool>(conditionValue)) {
         m_interpreter.interpret(node[1]);
     } else {
         m_interpreter.interpret(node[2]);
