@@ -329,16 +329,14 @@ TEST_CASE("[SemanticTypeChecker]") {
 
     SUBCASE("Fail") {
 		
-		/*
 		SUBCASE("Because of undeclared symbol in expression") {
 			try {
 				ASTFromInputSemanticTC("tti;", data);
 				CHECK(false);
 			} catch (std::exception& e) {
-				CHECK(std::string(e.what()) == "Symbol already exists : i");
+				CHECK(std::string(e.what()) == "Symbol not found : tti");
 			}
 		}
-		*/
 
         SUBCASE("Because of non-matching type (variable then function)") {
             try {

@@ -55,12 +55,19 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(ExpressionStack& ex
 		}
 	}
 	case TokenType::BOOLEAN:
-	case TokenType::IDENTIFIER:
 	case TokenType::STRING:
 	case TokenType::DIGIT:
 		SLOG(ska::LogLevel::Debug) << "\tPushing operand " << token;
 		expressions.push(ASTNode::MakeLogicalNode(m_input.match(token.type())));
 		break;
+
+	case TokenType::IDENTIFIER: {
+		SLOG(ska::LogLevel::Debug) << "\tPushing var operand " << token;
+		auto varNode = ASTNode::MakeLogicalNode(m_input.match(token.type()));
+		auto event = VarTokenEvent::MakeUse(*varNode);
+		m_parser.Observable<VarTokenEvent>::notifyObservers(event);
+		expressions.push(std::move(varNode));
+	} break;
 
 	case TokenType::ARRAY: {
 		const auto& value = std::get<std::string>(token.content());

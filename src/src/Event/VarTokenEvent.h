@@ -21,6 +21,10 @@ namespace ska {
 			return VarTokenEvent { node, typeNode, VarTokenEventType::PARAMETER_DECLARATION };
 		}
 
+		static VarTokenEvent MakeUse(ASTNode& node) {
+			return VarTokenEvent{ node, VarTokenEventType::USE };
+		}
+
 		template <VarTokenEventType type>
 		static VarTokenEvent Make(ASTNode& node) {
 			static_assert(type != VarTokenEventType::PARAMETER_DECLARATION && type != VarTokenEventType::FUNCTION_DECLARATION);
