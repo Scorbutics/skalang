@@ -75,16 +75,7 @@ namespace ska {
                     return false;
             }
         }
-
-		std::size_t offset() const {
-			switch (m_type) {
-			case TokenType::STRING:
-				return 2;
-			default:
-				return 0;
-			}
-		}
-
+		
 		std::string name() const {
 			if (m_type == TokenType::RESERVED) {
 				return TokenGrammarSTR[std::get<std::size_t>(m_content)];

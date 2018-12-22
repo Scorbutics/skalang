@@ -3,7 +3,8 @@
 #include "Config/LoggerConfigLang.h"
 #include "Tokenizer.h"
 
-//#define SKALANG_LOG_TOKENIZER
+
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Tokenizer)
 
 const std::unordered_set<std::string> ska::Tokenizer::ALLOWED_MULTIPLE_CHAR_TOKEN_SYMBOLS = BuildAllowedMultipleCharTokenSymbolsSet();
 
@@ -29,55 +30,72 @@ ska::Tokenizer::Tokenizer(const ReservedKeywordsPool& reserved, std::string inpu
 	m_input(std::move(input)) {
 }
 
+std::pair<ska::Token, ska::Token> ska::Tokenizer::stackToken(TokenType currentType, Token token, std::vector<Token>& stackSymbol) {
+	if (currentType == ska::TokenType::SYMBOL) {
+		const auto charToken = token.name()[0];
+		switch (isFinalizedSymbol(charToken, stackSymbol)) {
+		case SymbolFinalizeTokenState::READY:
+			stackSymbol.push_back(std::move(token));
+			return {};
+		case SymbolFinalizeTokenState::FINALIZED_NO_NEXT_SYMBOL: {
+			auto result = std::make_pair(group(stackSymbol), Token{});
+			stackSymbol.push_back(std::move(token));
+			return result;
+		}
+		case SymbolFinalizeTokenState::FINALIZED_WITH_NEXT_SYMBOL:
+			stackSymbol.push_back(std::move(token));
+			return std::make_pair(group(stackSymbol), Token{});			
+		default:
+			assert(!"Unhandled token finalization state");
+			return {};
+		} 
+	}
+
+	return std::make_pair(group(stackSymbol), std::move(token));
+}
+
 std::vector<ska::Token> ska::Tokenizer::tokenize() const {
 	auto currentTokenToRead = determineCurrentToken(0);
 
 	auto stackSymbol = std::vector<Token> {};
 	auto result = std::vector<Token>{};
 	auto startIndex = 0u;
+	auto token = Token{};
 	do {
-		auto token = tokenizeNext(currentTokenToRead, startIndex);
-		const auto tokenContent = token.type() == TokenType::RESERVED ? m_reserved.patternString(std::get<std::size_t>(token.content())) : token.name();
+		std::tie(startIndex, token) = tokenizeNext(currentTokenToRead, startIndex);
 
-		startIndex += tokenContent.size() + token.offset();
-
-		if (currentTokenToRead.current != ska::TokenType::EMPTY && currentTokenToRead.current != ska::TokenType::SPACE) {	
-			if(currentTokenToRead.current == ska::TokenType::SYMBOL) {
-				const auto charToken = token.name()[0];
-				stackSymbol.push_back(std::move(token));
-				if(isFinalizedSymbol(charToken, stackSymbol)) {
-					push(Token{}, stackSymbol, result);	
-				}
-			} else {
-				push(std::move(token), stackSymbol, result);
-			}
+		if (ignoreBlankToken(currentTokenToRead.current)) {	
+			auto group = stackToken(currentTokenToRead.current, std::move(token), stackSymbol);
+			push(std::move(group.first), result);
+			push(std::move(group.second), result);			
 		}
 
 		currentTokenToRead = determineCurrentToken(startIndex);
 	} while (currentTokenToRead.current != ska::TokenType::EMPTY);
 	
-	push(Token{}, stackSymbol, result);
+	push(group(stackSymbol), result);
 	
 	return result;
 }
 
-void ska::Tokenizer::push(Token t, std::vector<Token>& symbolStack, std::vector<Token>& output) {
-	if(!symbolStack.empty()) {
-		auto ss = std::stringstream {}; 
-		for(const auto& s : symbolStack) {
-			ss << s;
-		}
-#ifdef SKALANG_LOG_TOKENIZER
-		std::cout << "Pushing compound symbol : " <<  ss.str() << std::endl;
-#endif
-		auto symbolToken = ska::Token { ss.str(), TokenType::SYMBOL };
-		output.push_back(std::move(symbolToken));
-		symbolStack.clear();
+ska::Token ska::Tokenizer::group(std::vector<Token>& symbolStack) {
+	if (symbolStack.empty()) {
+		return {};
 	}
-	if(!t.empty()) {
-#ifdef SKALANG_LOG_TOKENIZER
-		std::cout << "Pushing symbol : " << t.asString() << std::endl;
-#endif
+
+	auto ss = std::stringstream {}; 
+	for(const auto& s : symbolStack) {
+		ss << s;
+	}
+	SLOG_STATIC(LogLevel::Debug, Tokenizer) << "Pushing compound symbol : " <<  ss.str();
+	auto symbolToken = ska::Token { ss.str(), TokenType::SYMBOL };
+	symbolStack.clear();
+	return symbolToken;
+	
+}
+
+void ska::Tokenizer::push(Token t, std::vector<Token>& output) {
+	if (!t.empty()) {
 		output.push_back(std::move(t));
 	}
 }
@@ -92,36 +110,32 @@ ska::RequiredToken ska::Tokenizer::determineCurrentToken(const std::size_t start
 }
 
 //Handles "++", "--", "/=", "-=", "*=", ... has an unique token of symbol type instead of 2
-bool ska::Tokenizer::isFinalizedSymbol(char nextSymbol, const std::vector<Token>& symbolStack) {
+ska::SymbolFinalizeTokenState ska::Tokenizer::isFinalizedSymbol(char nextSymbol, const std::vector<Token>& symbolStack) {
 	if(symbolStack.size() >= 2) {
-		return true;
+		return SymbolFinalizeTokenState::FINALIZED_WITH_NEXT_SYMBOL;
 	}
 	
 	if(symbolStack.empty()) {
-		return false;
+		return SymbolFinalizeTokenState::READY;
 	}
 
 	const auto topStackSymbol = symbolStack[0].name()[0];
 	if(stopSymbolCharAggregation(topStackSymbol) < 0) {
-		return true;
+		return SymbolFinalizeTokenState::FINALIZED_NO_NEXT_SYMBOL;
 	}
 
 	if(stopSymbolCharAggregation(nextSymbol) < 1) {
-		return true;
+		return SymbolFinalizeTokenState::FINALIZED_NO_NEXT_SYMBOL;
 	}
 
 	auto symbol = std::string{};
 	symbol.resize(2);
 	symbol[0] = topStackSymbol;
 	symbol[1] = nextSymbol;
-#ifdef SKALANG_LOG_TOKENIZER
-	std::cout << "Stack symbol : " << symbol;
-#endif
-	const auto result = ALLOWED_MULTIPLE_CHAR_TOKEN_SYMBOLS.find(symbol) == ALLOWED_MULTIPLE_CHAR_TOKEN_SYMBOLS.end();
-#ifdef SKALANG_LOG_TOKENIZER
-	std::cout << " which is " << (!result ? "correct" : "incorrect") << std::endl;
-#endif
-	return result;
+	SLOG_STATIC(LogLevel::Debug, Tokenizer) << "Stack symbol : " << symbol;
+	const auto result = ALLOWED_MULTIPLE_CHAR_TOKEN_SYMBOLS.find(symbol) != ALLOWED_MULTIPLE_CHAR_TOKEN_SYMBOLS.end();
+	SLOG_STATIC(LogLevel::Debug, Tokenizer) << " which is " << (result ? "correct" : "incorrect");
+	return result ? SymbolFinalizeTokenState::FINALIZED_WITH_NEXT_SYMBOL : SymbolFinalizeTokenState::FINALIZED_NO_NEXT_SYMBOL;
 }
 
 int ska::Tokenizer::stopSymbolCharAggregation(char symbol) {
@@ -143,8 +157,8 @@ int ska::Tokenizer::stopSymbolCharAggregation(char symbol) {
 	}
 }
 
-ska::Token ska::Tokenizer::tokenizeNext(const ska::RequiredToken& requiredToken, const std::size_t startIndex) const {
-	auto index = startIndex == 0 ? 0 : startIndex + 1;
+std::pair<std::size_t, ska::Token> ska::Tokenizer::tokenizeNext(const ska::RequiredToken& requiredToken, const std::size_t startIndex) const {
+	auto index = startIndex == 0 ? 0u : startIndex + 1;
 	if (index < m_input.size()) {
 		auto charTokenType = requiredToken.current;
 		for (; index < m_input.size(); index++) {
@@ -159,7 +173,7 @@ ska::Token ska::Tokenizer::tokenizeNext(const ska::RequiredToken& requiredToken,
 	} else {
 		index = m_input.size();
 	}
-	return finalizeToken(index, requiredToken, startIndex);
+	return std::make_pair((requiredToken.required ? 0 : 1 ) + index, finalizeToken(index, requiredToken, startIndex));
 }
 
 ska::RequiredToken ska::Tokenizer::initializeCharType(const ska::TokenType charTokenType) const {
