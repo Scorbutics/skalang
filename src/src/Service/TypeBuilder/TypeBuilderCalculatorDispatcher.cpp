@@ -27,6 +27,9 @@ namespace ska {
                 const auto symbol = symbols[node.name()];
 				return symbol == nullptr ? Type{ ExpressionType::VOID } : symbol->getType();
             }
+			case TokenType::BOOLEAN:
+				return Type{ ExpressionType::BOOLEAN };
+
             case TokenType::RESERVED: {
 				auto type = Type{};
                 //TODO map
@@ -49,8 +52,11 @@ namespace ska {
 				  }
 				  return type;
             }
+			case TokenType::ARRAY:
+				return Type{ ExpressionType::ARRAY };
 
             default:
+				assert(!"Unhandled type for this node");
                 break;
         }
 

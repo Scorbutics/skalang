@@ -26,6 +26,9 @@ namespace ska {
 		STATEMENT_END,
 		ARGUMENT_DELIMITER,
 		TYPE_DELIMITER,
+		//Reserved values
+		TRUE,
+		FALSE,
 		//The last one for enum length
 		UNUSED_Last_Length
 	};
@@ -53,6 +56,8 @@ namespace ska {
 		"\"",
 		";",
 		",",
-		":"
+		":",
+		"true",
+		"false"
 	};
 }

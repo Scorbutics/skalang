@@ -194,6 +194,14 @@ TEST_CASE("[SemanticTypeChecker]") {
 			}
 
 			SUBCASE("type OK : bool") {
+				auto astPtr = ASTFromInputSemanticTC("var testIf188 = true; if(testIf188) {}", data);
+				auto& ast = (*astPtr);
+				CHECK(ast.size() == 2);
+				CHECK(ast[0][0].type() == ska::ExpressionType::BOOLEAN);
+				CHECK(ast[1][0].type() == ska::ExpressionType::BOOLEAN);
+			}
+
+			SUBCASE("type OK : bool indirect") {
 				auto astPtr = ASTFromInputSemanticTC("var testIf188 = 3 == 3; if(testIf188) {}", data);
 				auto& ast = (*astPtr);
 				CHECK(ast.size() == 2);
@@ -320,6 +328,18 @@ TEST_CASE("[SemanticTypeChecker]") {
 	}
 
     SUBCASE("Fail") {
+		
+		/*
+		SUBCASE("Because of undeclared symbol in expression") {
+			try {
+				ASTFromInputSemanticTC("tti;", data);
+				CHECK(false);
+			} catch (std::exception& e) {
+				CHECK(std::string(e.what()) == "Symbol already exists : i");
+			}
+		}
+		*/
+
         SUBCASE("Because of non-matching type (variable then function)") {
             try {
                 ASTFromInputSemanticTC("var i = 120; i = function() {};", data);

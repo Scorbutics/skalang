@@ -105,6 +105,23 @@ TEST_CASE("for") {
 	}
 }
 
+TEST_CASE("booleans") {
+	const auto keywords = ska::ReservedKeywordsPool{};
+	SUBCASE("true") {
+		const auto astPtr = ASTFromInput("true;", keywords);
+		auto& ast = (*astPtr)[0];
+		CHECK(ast.op() == ska::Operator::LITERAL);
+		CHECK(ast.has(ska::Token{ "true", ska::TokenType::BOOLEAN }));
+	}
+
+	SUBCASE("false") {
+		const auto astPtr = ASTFromInput("false;", keywords);
+		auto& ast = (*astPtr)[0];
+		CHECK(ast.op() == ska::Operator::LITERAL);
+		CHECK(ast.has(ska::Token{ "false", ska::TokenType::BOOLEAN }));
+	}
+}
+
 TEST_CASE("If keyword pattern") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	SUBCASE("If only with cond and block statement") {

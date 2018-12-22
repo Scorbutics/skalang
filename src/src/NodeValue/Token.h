@@ -8,17 +8,18 @@
 
 namespace ska {
 	constexpr const char* TokenTypeSTR[] = {
-	"RESERVED",
-	"IDENTIFIER",
-	"DIGIT",
-	"DOT_SYMBOL",
-	"SPACE",
-	"STRING",
-	"RANGE",
-	"ARRAY",
-	"SYMBOL",
-	"EMPTY",
-	"UNUSED_LAST_Length"
+		"RESERVED",
+		"IDENTIFIER",
+		"DIGIT",
+		"DOT_SYMBOL",
+		"SPACE",
+		"STRING",
+		"RANGE",
+		"ARRAY",
+		"SYMBOL",
+		"BOOLEAN",
+		"EMPTY",
+		"UNUSED_LAST_Length"
 	};
 
 	enum class TokenType {
@@ -31,6 +32,7 @@ namespace ska {
 		RANGE,
 		ARRAY,
 		SYMBOL,
+		BOOLEAN,
 		EMPTY,
 		UNUSED_LAST_Length
 	};
@@ -68,6 +70,7 @@ namespace ska {
 
         bool isLiteral() const {
             switch(m_type) {
+				case TokenType::BOOLEAN:
                 case TokenType::DIGIT:
                 case TokenType::STRING:
                     return true;

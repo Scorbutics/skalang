@@ -29,7 +29,8 @@ std::unordered_map<std::string, ska::ReservedKeywordsPool::TokenInfo> ska::Reser
 	emplacer(static_cast<std::size_t>(TokenGrammar::STATEMENT_END), TokenType::SYMBOL);
 	emplacer(static_cast<std::size_t>(TokenGrammar::ARGUMENT_DELIMITER), TokenType::SYMBOL);
 	emplacer(static_cast<std::size_t>(TokenGrammar::TYPE_DELIMITER), TokenType::SYMBOL);
-	
+	emplacer(static_cast<std::size_t>(TokenGrammar::TRUE), TokenType::BOOLEAN);
+	emplacer(static_cast<std::size_t>(TokenGrammar::FALSE), TokenType::BOOLEAN);
 	return pool;
 	
 }

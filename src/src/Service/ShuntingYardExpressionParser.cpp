@@ -54,6 +54,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(ExpressionStack& ex
 			break;
 		}
 	}
+	case TokenType::BOOLEAN:
 	case TokenType::IDENTIFIER:
 	case TokenType::STRING:
 	case TokenType::DIGIT:
