@@ -121,6 +121,12 @@ TEST_CASE("[Interpreter]") {
 			data.interpreter->interpret(*astPtr);
 			CHECK(ska::nodeval<std::string>((*astPtr)[0].value()) == "2ti");
 		}
+
+		SUBCASE("Array of int") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = [14, 25, 13, 2]; toto[1];", data);
+			data.interpreter->interpret(*astPtr);
+			CHECK(ska::nodeval<int>((*astPtr)[1].value()) == 25);
+		}
 	}
 		
 }

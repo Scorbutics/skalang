@@ -7,6 +7,8 @@
 
 #include "InterpreterOperatorBinary.h"
 #include "InterpreterOperatorIfElse.h"
+#include "InterpreterOperatorArrayDeclaration.h"
+#include "InterpreterOperatorArrayUse.h"
 #include "InterpreterOperatorVariableDeclaration.h"
 #include "InterpreterOperatorVariableAffectation.h"
 #include "InterpreterOperatorBlock.h"
@@ -20,7 +22,9 @@ std::vector<std::unique_ptr<ska::InterpreterOperatorUnit>> ska::Interpreter::bui
 	static constexpr auto maxOperatorEnumIndex = static_cast<std::size_t>(ska::Operator::UNUSED_Last_Length);
 	result.resize(maxOperatorEnumIndex);
 
-    InterpreterOperatorDeclare<ska::Operator::IF>(*this, result);
+	InterpreterOperatorDeclare<ska::Operator::ARRAY_USE>(*this, result);
+	InterpreterOperatorDeclare<ska::Operator::ARRAY_DECLARATION>(*this, result);
+	InterpreterOperatorDeclare<ska::Operator::IF>(*this, result);
     InterpreterOperatorDeclare<ska::Operator::IF_ELSE>(*this, result);
 	InterpreterOperatorDeclare<ska::Operator::VARIABLE_DECLARATION>(*this, result);
 	InterpreterOperatorDeclare<ska::Operator::VARIABLE_AFFECTATION>(*this, result);
