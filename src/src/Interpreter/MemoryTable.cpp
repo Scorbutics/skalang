@@ -18,7 +18,7 @@ ska::MemoryTable& ska::MemoryTable::endNested() {
 	return *m_current;
 }
 
-ska::Token::Variant& ska::MemoryTable::put(std::string name, Token::Variant value) {
+ska::NodeValue& ska::MemoryTable::put(std::string name, NodeValue value) {
 	auto* memValue = operator[](name);
 	if (memValue != nullptr) {
 		*memValue = std::move(value);

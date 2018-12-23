@@ -4,7 +4,7 @@
 #include "InterpreterOperatorUnary.h"
 
 namespace ska {
-    Token::Variant InterpreterOperatorConvertString(ExpressionType type, const Token::Variant& value) {
+	NodeValue InterpreterOperatorConvertString(ExpressionType type, const Token::Variant& value) {
         switch(type) {
 		case ExpressionType::INT:
             return std::holds_alternative<int>(value) ? value : std::stoi(std::get<std::string>(value));
@@ -18,16 +18,16 @@ namespace ska {
     }
 }
 
-ska::Token::Variant ska::InterpreterOperator<ska::Operator::UNARY>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
+ska::NodeValue ska::InterpreterOperator<ska::Operator::UNARY>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
 	assert(!node.name().empty());
 	auto nodeValue = memory[node.name()];
     if(nodeValue == nullptr) {
         return "";
     }
 
-    return InterpreterOperatorConvertString(node.type().value().type(), *nodeValue);
+    return InterpreterOperatorConvertString(node.type().value().type(), std::get<Token::Variant>(*nodeValue));
 }
 
-ska::Token::Variant ska::InterpreterOperator<ska::Operator::LITERAL>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
+ska::NodeValue ska::InterpreterOperator<ska::Operator::LITERAL>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
 	return InterpreterOperatorConvertString(node.type().value().type(), node.tokenContent());
 }

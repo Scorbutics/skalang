@@ -7,6 +7,8 @@
 #include "OperatorTraits.h"
 #include "Operator.h"
 #include "ExpressionType.h"
+#include "Interpreter/MemoryTable.h"
+#include "Interpreter/NodeValue.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
 
 //Alls except Unary, Binary & Literal
@@ -26,13 +28,14 @@ namespace ska {
 
 	inline auto PrintValueVisitor = [](auto&& arg) -> std::string {
 		using T = std::decay_t<decltype(arg)>;
-		if constexpr (std::is_same<T, std::string>()) {
+		/*if constexpr (std::is_same<T, std::string>()) {
 			return arg;
 		} else {
 			auto ss = std::stringstream{};
 			ss << arg;
 			return ss.str();
-		}
+		}*/
+		return "";
 	};
 
 	class ASTNode {
@@ -111,7 +114,7 @@ namespace ska {
 		}
 
 	    void buildType(const SymbolTable& symbols);
-		void buildValue(Token::Variant value);
+		void buildValue(NodeValue value);
 
 		const auto& type() const {
 			return m_type;
@@ -185,7 +188,7 @@ namespace ska {
 		std::unique_ptr<TypeBuildUnit> m_typeBuilder;
 
 		Token token;
-		Token::Variant m_value;
+		NodeValue m_value;
 		std::vector<ASTNodePtr> m_children;
 
 		friend std::ostream& operator<<(std::ostream& stream, const ASTNode& node);

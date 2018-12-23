@@ -1,6 +1,7 @@
 #pragma once
 
 #include "NodeValue/Token.h"
+#include "NodeValue.h"
 
 namespace ska {
 	class SymbolTable;
@@ -9,6 +10,6 @@ namespace ska {
 
 	class InterpreterOperatorUnit {
 	public:
-        virtual Token::Variant interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) = 0;
+        virtual NodeValue interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) = 0;
     };
 }

@@ -6,9 +6,9 @@
 namespace ska {
 
 	template<class FirstType, class SecondType, class MathComputer, class MathComputer2, class MathComputer3>
-	Token::Variant ComputeTwoTypeOperation(
-		Token::Variant firstValue,
-		Token::Variant secondValue,
+	NodeValue ComputeTwoTypeOperation(
+		NodeValue firstValue,
+		NodeValue secondValue,
 		const Type& firstType,
 		const Type& secondType,
 		MathComputer computer,
@@ -16,17 +16,17 @@ namespace ska {
 		MathComputer3 computer3) {
 		auto firstIsTypeOne = firstType == ExpressionTypeFromNative<FirstType>::value;
 		if (firstIsTypeOne) {
-			return computer(std::get<FirstType>(firstValue), std::get<SecondType>(secondValue));
+			return computer(nodeval<FirstType>(firstValue), nodeval<SecondType>(secondValue));
 		}
 
 		auto secondIsTypeOne = secondType == ExpressionTypeFromNative<FirstType>::value;
 		if (secondIsTypeOne) {
-			return computer2(std::get<SecondType>(firstValue), std::get<FirstType>(secondValue));
+			return computer2(nodeval<SecondType>(firstValue), nodeval<FirstType>(secondValue));
 		}
-		return computer3(std::get<SecondType>(firstValue), std::get<SecondType>(secondValue));
+		return computer3(nodeval<SecondType>(firstValue), nodeval<SecondType>(secondValue));
 	}
 
-	Token::Variant InterpretMathematicPlus(Token::Variant firstValue, Token::Variant secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
+	NodeValue InterpretMathematicPlus(NodeValue firstValue, NodeValue secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		switch (destinationType.type()) {
 		case ExpressionType::STRING: {
 			return ComputeTwoTypeOperation<int, std::string>(firstValue, secondValue, firstType, secondType, 
@@ -40,7 +40,7 @@ namespace ska {
 		}
 
 		case ExpressionType::INT:
-			return std::get<int>(firstValue) + std::get<int>(secondValue);
+			return nodeval<int>(firstValue) + nodeval<int>(secondValue);
 
 		case ExpressionType::FLOAT: {
 			return ComputeTwoTypeOperation<int, double>(firstValue, secondValue, firstType, secondType, 
@@ -60,10 +60,10 @@ namespace ska {
 	    }
     }
 
-	Token::Variant InterpretMathematicMinus(Token::Variant firstValue, Token::Variant secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
+	NodeValue InterpretMathematicMinus(NodeValue firstValue, NodeValue secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		switch (destinationType.type()) {
 		case ExpressionType::INT:
-			return std::get<int>(firstValue) - std::get<int>(secondValue);
+			return nodeval<int>(firstValue) - nodeval<int>(secondValue);
 
 		case ExpressionType::FLOAT: {
 			return ComputeTwoTypeOperation<int, double>(firstValue, secondValue, firstType, secondType,
@@ -82,7 +82,7 @@ namespace ska {
 		}
 	}
 
-	Token::Variant InterpretMathematicMultiply(Token::Variant firstValue, Token::Variant secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
+	NodeValue InterpretMathematicMultiply(NodeValue firstValue, NodeValue secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		switch (destinationType.type()) {
 		case ExpressionType::STRING: {
 			return ComputeTwoTypeOperation<int, std::string>(firstValue, secondValue, firstType, secondType, 
@@ -107,7 +107,7 @@ namespace ska {
 		}
 
 		case ExpressionType::INT:
-			return std::get<int>(firstValue) * std::get<int>(secondValue);
+			return nodeval<int>(firstValue) * nodeval<int>(secondValue);
 
 		case ExpressionType::FLOAT: {
 			return ComputeTwoTypeOperation<int, double>(firstValue, secondValue, firstType, secondType,
@@ -126,13 +126,13 @@ namespace ska {
 		}
 	}
 
-	Token::Variant InterpretMathematicDivide(Token::Variant firstValue, Token::Variant secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
+	NodeValue InterpretMathematicDivide(NodeValue firstValue, NodeValue secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		switch (destinationType.type()) {
 		case ExpressionType::INT:
-			if (std::get<int>(secondValue) == 0) {
+			if (nodeval<int>(secondValue) == 0) {
 				throw std::runtime_error("math error : division by a null value");
 			}
-			return std::get<int>(firstValue) / std::get<int>(secondValue);
+			return nodeval<int>(firstValue) / nodeval<int>(secondValue);
 
 		case ExpressionType::FLOAT: {
 			return ComputeTwoTypeOperation<int, double>(firstValue, secondValue, firstType, secondType,
@@ -160,12 +160,12 @@ namespace ska {
 		}
 	}
 
-    Token::Variant InterpretLogicCondition(Token::Variant firstValue, Token::Variant secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
+	NodeValue InterpretLogicCondition(NodeValue firstValue, NodeValue secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		assert(destinationType.type() == ExpressionType::BOOLEAN);
         return firstType == secondType && firstValue == secondValue;
     }
 
-	Token::Variant InterpretMathematicBinaryExpression(std::string mathOperator, Token::Variant firstValue, Token::Variant secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
+	NodeValue InterpretMathematicBinaryExpression(std::string mathOperator, NodeValue firstValue, NodeValue secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		assert(!mathOperator.empty());
 		auto operatorIt = LogicalOperatorMap.find(mathOperator);
         if(operatorIt != LogicalOperatorMap.end()) {
@@ -187,7 +187,8 @@ namespace ska {
 	    }
     }
 }
-ska::Token::Variant ska::InterpreterOperator<ska::Operator::BINARY>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
+
+ska::NodeValue ska::InterpreterOperator<ska::Operator::BINARY>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
 	auto firstValue = m_interpreter.interpret(node[0]);
 	auto secondValue = m_interpreter.interpret(node[1]);
 	auto mathOperator = node.name();

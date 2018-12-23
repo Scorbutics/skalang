@@ -40,7 +40,7 @@ void ska::Interpreter::interpret(ASTNodePtr root) {
 	interpret(*root);
 }
 
-const ska::Token::Variant& ska::Interpreter::interpret(ASTNode& node) {
+const ska::NodeValue& ska::Interpreter::interpret(ASTNode& node) {
 	auto& builder = m_operatorInterpreter[static_cast<std::size_t>(node.op())];
 	assert(builder != nullptr);
 	node.buildValue(builder->interpret(m_symbols, m_memory, node));

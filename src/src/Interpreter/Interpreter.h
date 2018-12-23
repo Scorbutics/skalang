@@ -15,7 +15,7 @@ namespace ska {
 
 		OperatorInterpreter build();
 		void interpret(ASTNodePtr root);
-		const Token::Variant& interpret(ASTNode& node);
+		const NodeValue& interpret(ASTNode& node);
 
 	private:
 		SymbolTable& m_symbols;
