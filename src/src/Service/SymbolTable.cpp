@@ -104,7 +104,6 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 			}
         } break;
 
-		case VarTokenEventType::AFFECTATION:
 		case VarTokenEventType::USE: {
 			const auto variableName = token.name();
 			SLOG(ska::LogLevel::Info) << "Using variable : " << variableName;
@@ -114,7 +113,8 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 			}       
 		}
 		break;
-
+		case VarTokenEventType::AFFECTATION:
+			break;
 		default:
 			throw std::runtime_error("Unmanaged variable event");
 			break;

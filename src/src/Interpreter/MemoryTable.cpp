@@ -19,6 +19,7 @@ ska::MemoryTable& ska::MemoryTable::endNested() {
 }
 
 ska::NodeValue& ska::MemoryTable::put(std::string name, NodeValue value) {
+	assert(!name.empty());
 	auto* memValue = operator[](name);
 	if (memValue != nullptr) {
 		*memValue = std::move(value);
@@ -28,4 +29,12 @@ ska::NodeValue& ska::MemoryTable::put(std::string name, NodeValue value) {
 	}
 
 	return *memValue;
+}
+
+void ska::MemoryTable::put(std::string name, std::size_t index, NodeValue value) {
+	assert(!name.empty());
+	auto* memValue = operator[](name);
+	assert(memValue != nullptr);
+	auto& arrayPtr = std::get<std::shared_ptr<std::vector<Token::Variant>>>(*memValue);
+	(*arrayPtr)[index] = std::move(std::get<Token::Variant>(value));
 }

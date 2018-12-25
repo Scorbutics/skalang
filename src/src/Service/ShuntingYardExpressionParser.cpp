@@ -89,7 +89,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(ExpressionStack& ex
 		
 
 	case TokenType::SYMBOL:
-        return matchSymbol(expressions, token);
+        return matchSymbol(expressions, token, isDoingOperation);
 
 	default:
 		error("Expected a symbol, a literal, an identifier or a reserved keyword, but got the token : " + token.name());
@@ -131,12 +131,11 @@ void ska::ShuntingYardExpressionParser::matchRange(ExpressionStack& expressions,
     }
 }
 
-bool ska::ShuntingYardExpressionParser::matchSymbol(ExpressionStack& expressions, const Token& token) {
+bool ska::ShuntingYardExpressionParser::matchSymbol(ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
     const auto& value = std::get<std::string>(token.content());
     if(value == "=") {
-		//We must check that the token before the '=' is an lvalue.
-		//Pops the variable name token (mentioned before the '=')
-		expressions.replaceTopOperand(m_matcherVar.matchAffectation());
+		//We must check that the token before the '=' is an lvalue : done in the semantic check pass.
+		expressions.push(m_matcherVar.matchAffectation(expressions.popOperandIfNoOperator(isDoingOperation)));
         return false;
     } 
 

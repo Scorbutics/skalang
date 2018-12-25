@@ -19,7 +19,7 @@ namespace ska {
 			m_input(input), m_reservedKeywordsPool(pool), m_parser(parser) {}
 	
 		ASTNodePtr matchDeclaration();
-		ASTNodePtr matchAffectation();
+		ASTNodePtr matchAffectation(ASTNodePtr varAffectedNode);
 	
 	private:
 		TokenReader& m_input;

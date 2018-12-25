@@ -30,8 +30,18 @@ namespace ska {
 			return *this;
 		}
 
+		/*const auto& cell() const {
+			return m_valueCell;
+		}
+
+		NodeValue& setCell(MemoryTable& cell) {
+			m_valueCell = &cell;
+			return *this;
+		}*/
+
 	private:
 		NodeValue(const NodeValue&) = default;
+		//MemoryTable* m_valueCell = nullptr;
 
 	};
 

@@ -154,7 +154,13 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 	SLOG(ska::LogLevel::Debug) << variable << " = " << value << ";\tsymbol = " << tokenNodeExpressionType;
 
     if(variable.type() == VarTokenEventType::AFFECTATION) {
-        const auto newTokenType = type.crossTypes("=", tokenNodeExpressionType);
+		if (!OperatorTraits::isLvalueCompatible(variable.rootNode()[0].op())) {
+			auto ss = std::stringstream{};
+			ss << "The symbol \"" << name << "\" is not an lvalue, therefore cannot be assigned";
+			throw std::runtime_error(ss.str());
+		}
+
+		const auto newTokenType = type.crossTypes("=", tokenNodeExpressionType);
         if(newTokenType == ExpressionType::VOID) {
             const auto expressionTypeIndex = tokenNodeExpressionType;
 			auto ss = std::stringstream{};
@@ -163,7 +169,16 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 				expressionTypeIndex;
 			throw std::runtime_error(ss.str());		
         }
+
+		if (OperatorTraits::isNamed(variable.rootNode()[0].op()) && name.empty()) {
+			throw std::runtime_error("invalid symbol affectation");
+		}
     }
+
+	if (variable.type() == VarTokenEventType::VARIABLE_DECLARATION && 
+		OperatorTraits::isNamed(variable.rootNode().op()) && name.empty()) {
+		throw std::runtime_error("invalid symbol declaration");
+	}
 
     return true;
 }

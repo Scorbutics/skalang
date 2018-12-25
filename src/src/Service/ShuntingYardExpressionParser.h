@@ -32,7 +32,7 @@ namespace ska {
 	private:
 		bool parseTokenExpression(ExpressionStack& expressions, const Token& token, bool isDoingOperation);
         
-        bool matchSymbol(ExpressionStack& expressions, const Token& token);
+        bool matchSymbol(ExpressionStack& expressions, const Token& token, bool isDoingOperation);
 		void matchRange(ExpressionStack& expressions, const Token& token, bool isDoingOperation);
 		void matchParenthesis(ExpressionStack& expressions, bool isDoingOperation);
 

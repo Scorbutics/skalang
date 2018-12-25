@@ -127,6 +127,15 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(ast[1].type() == ska::ExpressionType::FLOAT);
 			}
 
+			SUBCASE("not an lvalue") {
+				try {
+					ASTFromInputSemanticTC("var testIf188 = 3; var lvalFunc = function() : int { return 0; }; lvalFunc() = testIf188;", data);
+					CHECK(false);
+				} catch (std::exception& e) {
+					CHECK(e.what() == std::string("The symbol \"\" is not an lvalue, therefore cannot be assigned"));
+				}
+			}
+
 		}
 
 		SUBCASE("Parameters") {
@@ -207,6 +216,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(ast.size() == 2);
 				CHECK(ast[1][0].type() == ska::ExpressionType::BOOLEAN);
 			}
+
 		}
 
 		SUBCASE("Array") {

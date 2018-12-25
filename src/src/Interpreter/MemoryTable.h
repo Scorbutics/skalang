@@ -23,6 +23,7 @@ namespace ska {
 		MemoryTable& createNested();
 		MemoryTable& endNested();
 		NodeValue& put(std::string name, NodeValue value);
+		void put(std::string name, std::size_t index, NodeValue value);
 
 		NodeValue* operator[](const std::string& key) {
 			auto valueIt = m_current->m_memory.find(key);

@@ -41,11 +41,6 @@ namespace ska {
 		void push(Operand&& op) {
 			operands.push(std::forward<Operand>(op));
 		}
-
-		void replaceTopOperand(Operand&& op) {
-			operands.pop();
-			operands.push(std::forward<Operand>(op));
-		}
 		
 		Operand popOperandIfNoOperator(bool isMathOperator) {
 			if(operands.empty() || isMathOperator) {
