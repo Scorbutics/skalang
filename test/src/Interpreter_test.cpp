@@ -35,55 +35,55 @@ TEST_CASE("[Interpreter]") {
             CHECK(ska::nodeval<int>((*astPtr)[0].value()) == 42);
 		}
 		SUBCASE("Basic Maths with var") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 4; (toto * 5) + 2 * (3 + 4 - 1) + 1 + 9;", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 4; toto; (toto * 5) + 2 * (3 + 4 - 1) + 1 + 9;", data);
 			data.interpreter->interpret(*astPtr);
-			CHECK(ska::nodeval<int>((*astPtr)[0].value()) == 4);
-			CHECK(ska::nodeval<int>((*astPtr)[1].value()) == 42);
+			CHECK(ska::nodeval<int>((*astPtr)[1].value()) == 4);
+			CHECK(ska::nodeval<int>((*astPtr)[2].value()) == 42);
 		}
 
 		SUBCASE("Var declared") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 14;", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 14; toto;", data);
 			data.interpreter->interpret(*astPtr);
-			CHECK(ska::nodeval<int>((*astPtr)[0].value()) == 14);
+			CHECK(ska::nodeval<int>((*astPtr)[1].value()) == 14);
 		}
 
 		SUBCASE("Var reaffected") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 4; toto = 25;", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 4; toto; toto = 25;", data);
 			data.interpreter->interpret(*astPtr);
-			CHECK(ska::nodeval<int>((*astPtr)[0].value()) == 4);
-			CHECK(ska::nodeval<int>((*astPtr)[1].value()) == 25);
+			CHECK(ska::nodeval<int>((*astPtr)[1].value()) == 4);
+			CHECK(ska::nodeval<int>((*astPtr)[2].value()) == 25);
 		}
 
 		SUBCASE("Var reaffected using the same var") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 4; toto = toto * 2;", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 4; toto; toto = toto * 2;", data);
 			data.interpreter->interpret(*astPtr);
-			CHECK(ska::nodeval<int>((*astPtr)[0].value()) == 4);
-			CHECK(ska::nodeval<int>((*astPtr)[1].value()) == 8);
+			CHECK(ska::nodeval<int>((*astPtr)[1].value()) == 4);
+			CHECK(ska::nodeval<int>((*astPtr)[2].value()) == 8);
 		}
 
 		SUBCASE("Var reaffected using the same var") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = \"ti\"; toto = toto * 2;", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = \"ti\"; toto; toto = toto * 2;", data);
 			data.interpreter->interpret(*astPtr);
-			CHECK(ska::nodeval<std::string>((*astPtr)[0].value()) == "ti");
-			CHECK(ska::nodeval<std::string>((*astPtr)[1].value()) == "titi");
+			CHECK(ska::nodeval<std::string>((*astPtr)[1].value()) == "ti");
+			CHECK(ska::nodeval<std::string>((*astPtr)[2].value()) == "titi");
 		}
 
 		SUBCASE("Var reaffected string") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = \"ti\" * 2 + \"to\";", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = \"ti\" * 2 + \"to\"; toto;", data);
 			data.interpreter->interpret(*astPtr);
-			CHECK(ska::nodeval<std::string>((*astPtr)[0].value()) == "titito");
+			CHECK(ska::nodeval<std::string>((*astPtr)[1].value()) == "titito");
 		}
 		
 		SUBCASE("Var reaffected string with number") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 2 + \"ti\";", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 2 + \"ti\"; toto;", data);
 			data.interpreter->interpret(*astPtr);
-			CHECK(ska::nodeval<std::string>((*astPtr)[0].value()) == "2ti");
+			CHECK(ska::nodeval<std::string>((*astPtr)[1].value()) == "2ti");
 		}
 
 		SUBCASE("Var reaffected string with number * 2") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 2 + \"ti\" * 2;", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 2 + \"ti\" * 2; toto;", data);
 			data.interpreter->interpret(*astPtr);
-			CHECK(ska::nodeval<std::string>((*astPtr)[0].value()) == "2titi");
+			CHECK(ska::nodeval<std::string>((*astPtr)[1].value()) == "2titi");
 		}
 
         SUBCASE("If block true") {
@@ -117,9 +117,9 @@ TEST_CASE("[Interpreter]") {
 		}
 
 		SUBCASE("Var reaffected string with number") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 2 + \"ti\";", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 2 + \"ti\"; toto;", data);
 			data.interpreter->interpret(*astPtr);
-			CHECK(ska::nodeval<std::string>((*astPtr)[0].value()) == "2ti");
+			CHECK(ska::nodeval<std::string>((*astPtr)[1].value()) == "2ti");
 		}
 
 		SUBCASE("Array of int") {

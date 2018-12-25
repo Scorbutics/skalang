@@ -8,11 +8,32 @@
 
 namespace ska {
 	class MemoryTable;
-	using NodeValue = std::variant<
-		Token::Variant, 
-		std::vector<MemoryTable*>, 
-		std::unordered_map<std::string, MemoryTable*>
+	
+	using NodeValueVariant_ = std::variant<
+		Token::Variant,
+		std::shared_ptr<std::vector<Token::Variant>>,
+		std::shared_ptr<std::unordered_map<std::string, Token::Variant>>
 	>;
+	class NodeValue : public NodeValueVariant_ {
+	public:
+		using NodeValueVariant_::variant;
+
+		NodeValue() = default;
+
+		NodeValue(NodeValue&&) = default;
+
+		NodeValue& operator=(NodeValue&&) = default;
+		NodeValue& operator=(const NodeValue&) = delete;
+		~NodeValue() = default;
+
+		NodeValue clone() const {
+			return *this;
+		}
+
+	private:
+		NodeValue(const NodeValue&) = default;
+
+	};
 
 	namespace detail {
 		template<typename T, typename VARIANT_T>

@@ -29,7 +29,7 @@ namespace ska {
 	NodeValue InterpretMathematicPlus(NodeValue firstValue, NodeValue secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		switch (destinationType.type()) {
 		case ExpressionType::STRING: {
-			return ComputeTwoTypeOperation<int, std::string>(firstValue, secondValue, firstType, secondType, 
+			return ComputeTwoTypeOperation<int, std::string>(std::move(firstValue), std::move(secondValue), firstType, secondType,
 			[](int t1, const std::string& t2) {
 				return std::to_string(t1) + t2;
 			}, [](const std::string& t1, int t2) {
@@ -43,7 +43,7 @@ namespace ska {
 			return nodeval<int>(firstValue) + nodeval<int>(secondValue);
 
 		case ExpressionType::FLOAT: {
-			return ComputeTwoTypeOperation<int, double>(firstValue, secondValue, firstType, secondType, 
+			return ComputeTwoTypeOperation<int, double>(std::move(firstValue), std::move(secondValue), firstType, secondType,
 			[](int t1, double t2) {
 				return t1 + t2;
 			}, [](double t1, int t2) {
@@ -66,7 +66,7 @@ namespace ska {
 			return nodeval<int>(firstValue) - nodeval<int>(secondValue);
 
 		case ExpressionType::FLOAT: {
-			return ComputeTwoTypeOperation<int, double>(firstValue, secondValue, firstType, secondType,
+			return ComputeTwoTypeOperation<int, double>(std::move(firstValue), std::move(secondValue), firstType, secondType,
 			[](int t1, double t2) {
 				return t1 - t2;
 			}, [](double t1, int t2) {
@@ -85,7 +85,7 @@ namespace ska {
 	NodeValue InterpretMathematicMultiply(NodeValue firstValue, NodeValue secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		switch (destinationType.type()) {
 		case ExpressionType::STRING: {
-			return ComputeTwoTypeOperation<int, std::string>(firstValue, secondValue, firstType, secondType, 
+			return ComputeTwoTypeOperation<int, std::string>(std::move(firstValue), std::move(secondValue), firstType, secondType,
 			[](int t1, const std::string& t2) {
 				assert(t1 > 0);
 				auto ss = std::stringstream{};
@@ -110,7 +110,7 @@ namespace ska {
 			return nodeval<int>(firstValue) * nodeval<int>(secondValue);
 
 		case ExpressionType::FLOAT: {
-			return ComputeTwoTypeOperation<int, double>(firstValue, secondValue, firstType, secondType,
+			return ComputeTwoTypeOperation<int, double>(std::move(firstValue), std::move(secondValue), firstType, secondType,
 			[](int t1, double t2) {
 				return t1 * t2;
 			}, [](double t1, int t2) {
@@ -135,7 +135,7 @@ namespace ska {
 			return nodeval<int>(firstValue) / nodeval<int>(secondValue);
 
 		case ExpressionType::FLOAT: {
-			return ComputeTwoTypeOperation<int, double>(firstValue, secondValue, firstType, secondType,
+			return ComputeTwoTypeOperation<int, double>(std::move(firstValue), std::move(secondValue), firstType, secondType,
 			[](int t1, double t2) {
 				if (t2 == 0) {
 					throw std::runtime_error("math error : division by a null value");

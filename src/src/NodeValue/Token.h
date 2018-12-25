@@ -3,10 +3,13 @@
 #include <variant>
 #include <sstream>
 #include <cassert>
+#include <memory>
 
 #include "TokenGrammar.h"
 
 namespace ska {
+	class MemoryTable;
+
 	constexpr const char* TokenTypeSTR[] = {
 		"RESERVED",
 		"IDENTIFIER",
@@ -38,7 +41,7 @@ namespace ska {
 	};
 
 	struct Token {
-		using Variant = std::variant<std::size_t, bool, int, double, std::string>;
+		using Variant = std::variant<std::size_t, bool, int, double, std::string, std::shared_ptr<MemoryTable>>;
 
 		Token() = default;
 		Token(const Token& t) = default;

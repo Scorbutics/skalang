@@ -44,12 +44,11 @@ void ska::Interpreter::interpret(ASTNodePtr root) {
 	interpret(*root);
 }
 
-const ska::NodeValue& ska::Interpreter::interpret(ASTNode& node) {
+ska::NodeValue ska::Interpreter::interpret(ASTNode& node) {
 	auto& builder = m_operatorInterpreter[static_cast<std::size_t>(node.op())];
 	assert(builder != nullptr);
 	node.buildValue(builder->interpret(m_symbols, m_memory, node));
 
-	std::cout << node.name() << " " << node.valueAsString() << std::endl;
-
-	return node.value();
+	//std::cout << node.name() << " " << node.valueAsString() << std::endl;
+	return node.value().clone();
 }

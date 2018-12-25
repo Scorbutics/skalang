@@ -7,7 +7,7 @@
 
 namespace ska {
 	class MemoryTable {
-		using ChildrenScopedMemoryTable = std::vector<std::unique_ptr<MemoryTable>>;
+		using ChildrenScopedMemoryTable = std::vector<std::shared_ptr<MemoryTable>>;
 
 	public:
 		MemoryTable(MemoryTable& parent) :

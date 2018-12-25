@@ -4,12 +4,9 @@
 #include "InterpreterOperatorArrayDeclaration.h"
 
 ska::NodeValue ska::InterpreterOperator<ska::Operator::ARRAY_DECLARATION>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
-	/*
-	memory.createNested();
+	auto result = std::make_shared<std::vector<Token::Variant>>();
 	for (auto& child : node) {
-		m_interpreter.interpret(*child);
+		result->push_back(std::get<Token::Variant>(m_interpreter.interpret(*child)));
 	}
-	memory.endNested();
-	*/
-	return "";
+	return result;
 }
