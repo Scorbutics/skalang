@@ -5,9 +5,10 @@
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::BLOCK>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
 	memory.createNested();
+	auto output = NodeCell{};
 	for (auto& child : node) {
-		m_interpreter.interpret(*child);
+		output = m_interpreter.interpret(*child);		
 	}
 	memory.endNested();
-	return "";
+	return output;
 }

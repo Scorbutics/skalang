@@ -14,7 +14,6 @@ namespace ska {
 		~Interpreter() = default;
 
 		OperatorInterpreter build();
-		void interpret(ASTNodePtr root);
 		NodeCell interpret(ASTNode& node);
 
 	private:
