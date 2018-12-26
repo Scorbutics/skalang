@@ -9,10 +9,11 @@
 namespace ska {
 	class MemoryTable;
 	
+	class NodeValue;
 	using NodeValueVariant_ = std::variant<
 		Token::Variant,
-		std::shared_ptr<std::vector<Token::Variant>>,
-		std::shared_ptr<std::unordered_map<std::string, Token::Variant>>
+		std::shared_ptr<std::vector<NodeValue>>,
+		std::shared_ptr<std::unordered_map<std::string, NodeValue>>
 	>;
 	class NodeValue : public NodeValueVariant_ {
 	public:
@@ -30,19 +31,22 @@ namespace ska {
 			return *this;
 		}
 
-		/*const auto& cell() const {
-			return m_valueCell;
-		}
-
-		NodeValue& setCell(MemoryTable& cell) {
-			m_valueCell = &cell;
-			return *this;
-		}*/
-
 	private:
 		NodeValue(const NodeValue&) = default;
-		//MemoryTable* m_valueCell = nullptr;
 
+	};
+
+	class NodeCell : public std::variant<NodeValue, NodeValue*> {
+	public:
+		using std::variant<NodeValue, NodeValue*>::variant;
+		NodeValue& asLvalue() {
+			assert(std::holds_alternative<NodeValue*>(*this));
+			return *std::get<NodeValue*>(*this);
+		}
+
+		NodeValue asRvalue() {
+			return std::holds_alternative<NodeValue*>(*this) ? std::move(*std::get<NodeValue*>(*this)) : std::move(std::get<NodeValue>(*this));
+		}
 	};
 
 	namespace detail {

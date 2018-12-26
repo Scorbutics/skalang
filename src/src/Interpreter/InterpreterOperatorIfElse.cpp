@@ -2,8 +2,8 @@
 #include "Interpreter.h"
 #include "InterpreterOperatorIfElse.h"
 
-ska::NodeValue ska::InterpreterOperator<ska::Operator::IF>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
-	auto conditionValue = m_interpreter.interpret(node[0]);
+ska::NodeCell ska::InterpreterOperator<ska::Operator::IF>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
+	auto conditionValue = m_interpreter.interpret(node[0]).asRvalue();
 	if(nodeval<bool>(conditionValue)) {
         m_interpreter.interpret(node[1]);
     }
@@ -11,8 +11,8 @@ ska::NodeValue ska::InterpreterOperator<ska::Operator::IF>::interpret(const Symb
 	return "";
 }
 
-ska::NodeValue ska::InterpreterOperator<ska::Operator::IF_ELSE>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
-	auto conditionValue = m_interpreter.interpret(node[0]);
+ska::NodeCell ska::InterpreterOperator<ska::Operator::IF_ELSE>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
+	auto conditionValue = m_interpreter.interpret(node[0]).asRvalue();
 	if(nodeval<bool>(conditionValue)) {
         m_interpreter.interpret(node[1]);
     } else {

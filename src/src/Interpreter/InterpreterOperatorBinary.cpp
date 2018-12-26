@@ -188,9 +188,9 @@ namespace ska {
     }
 }
 
-ska::NodeValue ska::InterpreterOperator<ska::Operator::BINARY>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
-	auto firstValue = m_interpreter.interpret(node[0]);
-	auto secondValue = m_interpreter.interpret(node[1]);
+ska::NodeCell ska::InterpreterOperator<ska::Operator::BINARY>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
+	auto firstValue = m_interpreter.interpret(node[0]).asRvalue();
+	auto secondValue = m_interpreter.interpret(node[1]).asRvalue();
 	auto mathOperator = node.name();
 	return InterpretMathematicBinaryExpression(
 			std::move(mathOperator), 

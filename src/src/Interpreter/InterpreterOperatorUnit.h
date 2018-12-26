@@ -10,6 +10,6 @@ namespace ska {
 
 	class InterpreterOperatorUnit {
 	public:
-        virtual NodeValue interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) = 0;
+        virtual NodeCell interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) = 0;
     };
 }

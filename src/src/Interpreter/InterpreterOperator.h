@@ -9,7 +9,7 @@
     class InterpreterOperator<OperatorType> : public InterpreterOperatorUnit {\
 	public:\
 		InterpreterOperator(Interpreter& interpreter) : m_interpreter(interpreter) {} \
-        NodeValue interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) override;\
+        NodeCell interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) override;\
 	private:\
 		Interpreter& m_interpreter;\
     };
@@ -21,6 +21,6 @@ namespace ska {
 	template <Operator O>
 	class InterpreterOperator : public InterpreterOperatorUnit {
 	public:
-		NodeValue interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) override { return ""; }
+		NodeCell interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) override { return ""; }
 	};
 }
