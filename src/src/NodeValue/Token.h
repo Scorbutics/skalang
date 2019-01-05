@@ -9,7 +9,7 @@
 
 namespace ska {
 	class MemoryTable;
-
+	class ASTNode;
 	constexpr const char* TokenTypeSTR[] = {
 		"RESERVED",
 		"IDENTIFIER",
@@ -41,7 +41,7 @@ namespace ska {
 	};
 
 	struct Token {
-		using Variant = std::variant<std::size_t, bool, int, double, std::string, std::shared_ptr<MemoryTable>>;
+		using Variant = std::variant<std::size_t, bool, int, double, std::string, std::shared_ptr<MemoryTable>, ASTNode*>;
 
 		Token() = default;
 		Token(const Token& t) = default;

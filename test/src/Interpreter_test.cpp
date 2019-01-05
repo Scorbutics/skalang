@@ -129,6 +129,12 @@ TEST_CASE("[Interpreter]") {
 			auto res = data.interpreter->interpret(*astPtr);
 			CHECK(ska::nodeval<int>(res.asRvalue()) == 226);
 		}
+
+		SUBCASE("Basic function") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var totoFunc = function() { return 3; }; var titi = totoFunc();", data);
+			auto res = data.interpreter->interpret(*astPtr);
+			CHECK(ska::nodeval<int>(res.asRvalue()) == 3);
+		}
 	}
 		
 }
