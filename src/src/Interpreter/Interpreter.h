@@ -18,7 +18,7 @@ namespace ska {
 
 	private:
 		SymbolTable& m_symbols;
-		OperatorInterpreter m_operatorInterpreter;
 		MemoryTable m_memory;
+		OperatorInterpreter m_operatorInterpreter;
 	};
 }

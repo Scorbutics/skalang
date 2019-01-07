@@ -6,13 +6,17 @@ namespace ska {
 	class ASTNode;
 	template<>
     class Operation<Operator::VARIABLE_DECLARATION> {
-	protected:
-		static auto GetVariableName(ASTNode& node) {
+	private:
+		ASTNode& node;
+	public:
+		Operation(ASTNode& node) : node(node) {}
+
+		auto GetVariableName() {
 			assert(!node.name().empty());
 			return node.name();
 		}
 		
-		static auto& GetVariableValueNode(ASTNode& node) {
+		auto& GetVariableValueNode() {
 			return node[0];
 		}
 	};
