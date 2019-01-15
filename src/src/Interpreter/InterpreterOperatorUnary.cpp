@@ -18,8 +18,8 @@ namespace ska {
     }
 }
 
-ska::NodeCell ska::InterpreterOperator<ska::Operator::UNARY>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
-	assert(!node.name().empty());
+ska::NodeCell ska::InterpreterOperator<ska::Operator::UNARY>::interpret(OperateOn node) {
+	assert(!node.GetValue().empty());
 	auto nodeValue = memory[node.name()];
     if(nodeValue == nullptr) {
         return "";
@@ -28,6 +28,6 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::UNARY>::interpret(const Sy
 	return nodeValue; //InterpreterOperatorConvertString(node.type().value().type(), std::get<Token::Variant>(*nodeValue));
 }
 
-ska::NodeCell ska::InterpreterOperator<ska::Operator::LITERAL>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
+ska::NodeCell ska::InterpreterOperator<ska::Operator::LITERAL>::interpret(OperateOn node) {
 	return InterpreterOperatorConvertString(node.type().value().type(), node.tokenContent());
 }
