@@ -11,15 +11,15 @@ namespace ska {
 	public:
 		Operation(ASTNode& node) : node(node) {}
 
-		auto& GetCondition() {
+		inline auto& GetCondition() {
 			return node[0];
 		}
 
-		auto& GetIfStatement() {
+		inline auto& GetIfStatement() {
 			return node[1];
 		}
 
-		auto& GetElseStatement() {
+		inline auto& GetElseStatement() {
 			return node[2];
 		}
 	};
@@ -31,11 +31,11 @@ namespace ska {
 	public:
 		Operation(ASTNode& node) : node(node) {}
 
-		auto& GetCondition() {
+		inline auto& GetCondition() {
 			return node[0];
 		}
 
-		auto& GetIfStatement() {
+		inline auto& GetIfStatement() {
 			return node[1];
 		}		
 	};

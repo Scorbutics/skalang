@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <variant>
 #include <memory>
 #include <optional>
 #include "Token.h"
@@ -26,17 +27,17 @@ namespace ska {
 	class Symbol;
     class SymbolTable;
 
-	inline auto PrintValueVisitor = [](auto&& arg) -> std::string {
+	/*inline auto PrintValueVisitor = [](auto&& arg) -> std::string {
 		using T = std::decay_t<decltype(arg)>;
-		/*if constexpr (std::is_same<T, std::string>()) {
+		if constexpr (std::is_same<T, std::string>()) {
 			return arg;
 		} else {
 			auto ss = std::stringstream{};
 			ss << arg;
 			return ss.str();
-		}*/
+		}
 		return "";
-	};
+	};*/
 
 	class ASTNode {
 	public:
@@ -72,7 +73,8 @@ namespace ska {
 		}
 
 		std::string valueAsString() const {
-			return std::visit(PrintValueVisitor, m_value);
+			//return std::visit(PrintValueVisitor, m_value);
+			return "";
 		}
 
 		ASTNode& left() {

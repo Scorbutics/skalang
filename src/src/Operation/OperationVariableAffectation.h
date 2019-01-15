@@ -11,11 +11,11 @@ namespace ska {
 	public:
 		Operation(ASTNode& node) : node(node) {}
 
-		auto& GetVariableNameNode() {
+		inline auto& GetVariableNameNode() {
 			return node[0];
 		}
 		
-		auto& GetVariableValueNode() {
+		inline auto& GetVariableValueNode() {
 			return node[1];
 		}
 	};

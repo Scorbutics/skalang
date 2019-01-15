@@ -11,7 +11,19 @@ namespace ska {
 	public:
 		Operation(ASTNode& node) : node(node) {}
 
-		auto GetValue() {
+		inline auto GetValue() {
+			return node.name();
+		}
+	};
+	
+	template<>
+	class Operation<Operator::LITERAL> {
+	private:
+		ASTNode& node;
+	public:
+		Operation(ASTNode& node) : node(node) {}
+
+		inline auto GetValue() {
 			return node.name();
 		}
 	};

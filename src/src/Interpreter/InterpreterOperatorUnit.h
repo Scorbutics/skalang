@@ -16,12 +16,12 @@ namespace ska {
 
 	class InterpreterOperatorBase :
 		public InterpreterOperatorUnit {
-	protected:
+	public:
 		InterpreterOperatorBase(Interpreter& interpreter, const SymbolTable& symbols, MemoryTable& memory) :
 			m_interpreter(interpreter),
 			m_symbols(symbols),
 			m_memory(memory) {}
-
+	protected:
 		Interpreter& m_interpreter;
 		const SymbolTable& m_symbols;
 		MemoryTable& m_memory;

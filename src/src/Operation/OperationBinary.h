@@ -5,18 +5,18 @@
 namespace ska {
 	class ASTNode;
 	template<>
-	class Operation<Operator::FUNCTION_DECLARATION> {
+	class Operation<Operator::BINARY> {
 	private:
 		ASTNode& node;
 	public:
 		Operation(ASTNode& node) : node(node) {}
 
-		inline auto GetFunctionName() {
-			return node.name();
-		}
-
-		inline auto& GetFunction() {
+		inline auto& GetFirstValue() {
 			return node[0];
+		}
+		
+		inline auto& GetSecondValue() {
+			return node[1];
 		}
 	};
 }

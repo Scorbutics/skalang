@@ -11,15 +11,23 @@ namespace ska {
 	public:
 		Operation(ASTNode& node) : node(node) {}
 
-		auto GetArrayName() {
+		inline auto GetArrayName() {
 			return node[0].name();
 		}
 
-		auto& begin() {
+		inline auto begin() {
 			return node.begin();
 		}
 		
-		auto& end() {
+		inline auto end() {
+			return node.end();
+		}
+		
+		inline const auto begin() const {
+			return node.begin();
+		}
+		
+		inline const auto end() const {
 			return node.end();
 		}
 	};
