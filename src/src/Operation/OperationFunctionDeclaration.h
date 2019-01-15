@@ -16,7 +16,15 @@ namespace ska {
 		}
 
 		inline auto& GetFunction() {
+			return node;
+		}
+
+		inline auto& GetFunctionPrototype() {
 			return node[0];
+		}
+
+		inline auto& GetFunctionBody() {
+			return node[1];
 		}
 	};
 }

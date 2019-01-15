@@ -7,6 +7,8 @@
 
 #include "InterpreterOperatorBinary.h"
 #include "InterpreterOperatorIfElse.h"
+#include "InterpreterOperatorFunctionCall.h"
+#include "InterpreterOperatorFunctionDeclaration.h"
 #include "InterpreterOperatorArrayDeclaration.h"
 #include "InterpreterOperatorArrayUse.h"
 #include "InterpreterOperatorVariableDeclaration.h"
@@ -26,6 +28,8 @@ std::vector<std::unique_ptr<ska::InterpreterOperatorUnit>> ska::Interpreter::bui
 	InterpreterOperatorDeclare<ska::Operator::ARRAY_DECLARATION>(*this, result, m_symbols, m_memory);
 	InterpreterOperatorDeclare<ska::Operator::IF>(*this, result, m_symbols, m_memory);
     InterpreterOperatorDeclare<ska::Operator::IF_ELSE>(*this, result, m_symbols, m_memory);
+	InterpreterOperatorDeclare<ska::Operator::FUNCTION_DECLARATION>(*this, result, m_symbols, m_memory);
+	InterpreterOperatorDeclare<ska::Operator::FUNCTION_CALL>(*this, result, m_symbols, m_memory);
 	InterpreterOperatorDeclare<ska::Operator::VARIABLE_DECLARATION>(*this, result, m_symbols, m_memory);
 	InterpreterOperatorDeclare<ska::Operator::VARIABLE_AFFECTATION>(*this, result, m_symbols, m_memory);
     InterpreterOperatorDeclare<ska::Operator::BLOCK>(*this, result, m_symbols, m_memory);

@@ -11,8 +11,16 @@ namespace ska {
 	public:
 		Operation(ASTNode& node) : node(node) {}
 
-		inline auto& GetFunctionName() {
-			return node[0];
+		inline auto GetFunctionName() {
+			return node[0].name();
+		}
+
+		auto begin() {
+			return node.begin() + 1;
+		}
+
+		auto end() {
+			return node.end();
 		}
 
 	};
