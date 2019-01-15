@@ -20,7 +20,7 @@ namespace ska {
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::UNARY>::interpret(OperateOn node) {
 	assert(!node.GetValue().empty());
-	auto nodeValue = memory[node.name()];
+	auto nodeValue = m_memory[node.GetValue()];
     if(nodeValue == nullptr) {
         return "";
     }
@@ -29,5 +29,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::UNARY>::interpret(OperateO
 }
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::LITERAL>::interpret(OperateOn node) {
-	return InterpreterOperatorConvertString(node.type().value().type(), node.tokenContent());
+	return InterpreterOperatorConvertString(node.GetType().value().type(), node.GetValue());
 }

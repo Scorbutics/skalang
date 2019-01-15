@@ -26,5 +26,9 @@ namespace ska {
 		inline auto GetValue() {
 			return node.name();
 		}
+
+		inline const auto& GetType() const {
+			return node.type();
+		}
 	};
 }

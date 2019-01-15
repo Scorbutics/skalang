@@ -18,5 +18,13 @@ namespace ska {
 		inline auto& GetSecondValue() {
 			return node[1];
 		}
+		
+		inline auto& GetType() {
+			return node.type();
+		}
+	
+		inline auto GetOperator() {
+			return node.name();
+		}
 	};
 }

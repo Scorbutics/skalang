@@ -61,6 +61,8 @@ namespace ska {
 			}
 		}
 		
+		friend bool operator==(const NodeValue& lhs, const NodeValue& rhs);
+
 	private:
 		NodeValue(const NodeValue&) = default;
 		NodeValueVariant_ m_variant;
@@ -84,9 +86,17 @@ namespace ska {
 		template<class T> auto& as() { return std::get<T>(m_variant); }
 		template<class T> const auto& as() const { return std::get<T>(m_variant); }
 		
+		friend bool operator==(const NodeCell& lhs, const NodeCell& rhs);
 	private:
 		std::variant<NodeValue, NodeValue*> m_variant;
 	};
 
+	inline bool operator==(const ska::NodeValue& lhs, const ska::NodeValue& rhs) {
+		return lhs.m_variant == rhs.m_variant;
+	}
+
+	inline bool operator==(const ska::NodeCell& lhs, const ska::NodeCell& rhs) {
+		return lhs.m_variant == rhs.m_variant;
+	}
 }
 

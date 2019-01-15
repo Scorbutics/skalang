@@ -35,6 +35,6 @@ void ska::MemoryTable::put(std::string name, std::size_t index, NodeValue value)
 	assert(!name.empty());
 	auto* memValue = operator[](name);
 	assert(memValue != nullptr);
-	auto& arrayPtr = std::get<std::shared_ptr<std::vector<NodeValue>>>(*memValue);
-	(*arrayPtr)[index] = std::move(std::get<Token::Variant>(value));
+	auto& arrayPtr = memValue->as<std::shared_ptr<std::vector<NodeValue>>>();
+	(*arrayPtr)[index] = std::move(value.as<Token::Variant>());
 }

@@ -4,8 +4,8 @@
 #include "InterpreterOperatorArrayUse.h"
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::ARRAY_USE>::interpret(OperateOn node) {
-	auto& arrayCell = *std::get<std::shared_ptr<std::vector<NodeValue>>>(*m_memory[node.GetArrayName()]);
-	auto arrayIndex = nodeval<int>(m_interpreter.interpret(node.GetArrayIndexNode()).asRvalue());
+	auto& arrayCell = *m_memory[node.GetArrayName()]->as< std::shared_ptr<std::vector<NodeValue>>>();
+	auto arrayIndex = m_interpreter.interpret(node.GetArrayIndexNode()).asRvalue().nodeval<int>();
 	if (arrayCell.size() <= arrayIndex) {
 		throw std::runtime_error("array index out of bounds");
 	}

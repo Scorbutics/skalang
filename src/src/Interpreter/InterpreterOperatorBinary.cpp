@@ -16,14 +16,14 @@ namespace ska {
 		MathComputer3 computer3) {
 		auto firstIsTypeOne = firstType == ExpressionTypeFromNative<FirstType>::value;
 		if (firstIsTypeOne) {
-			return computer(nodeval<FirstType>(firstValue), nodeval<SecondType>(secondValue));
+			return computer(firstValue.nodeval<FirstType>(), secondValue.nodeval<SecondType>());
 		}
 
 		auto secondIsTypeOne = secondType == ExpressionTypeFromNative<FirstType>::value;
 		if (secondIsTypeOne) {
-			return computer2(nodeval<SecondType>(firstValue), nodeval<FirstType>(secondValue));
+			return computer2(firstValue.nodeval<SecondType>(), secondValue.nodeval<FirstType>());
 		}
-		return computer3(nodeval<SecondType>(firstValue), nodeval<SecondType>(secondValue));
+		return computer3(firstValue.nodeval<SecondType>(), secondValue.nodeval<SecondType>());
 	}
 
 	NodeValue InterpretMathematicPlus(NodeValue firstValue, NodeValue secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
@@ -40,7 +40,7 @@ namespace ska {
 		}
 
 		case ExpressionType::INT:
-			return nodeval<int>(firstValue) + nodeval<int>(secondValue);
+			return firstValue.nodeval<int>() + secondValue.nodeval<int>();
 
 		case ExpressionType::FLOAT: {
 			return ComputeTwoTypeOperation<int, double>(std::move(firstValue), std::move(secondValue), firstType, secondType,
@@ -63,7 +63,7 @@ namespace ska {
 	NodeValue InterpretMathematicMinus(NodeValue firstValue, NodeValue secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		switch (destinationType.type()) {
 		case ExpressionType::INT:
-			return nodeval<int>(firstValue) - nodeval<int>(secondValue);
+			return firstValue.nodeval<int>() - secondValue.nodeval<int>();
 
 		case ExpressionType::FLOAT: {
 			return ComputeTwoTypeOperation<int, double>(std::move(firstValue), std::move(secondValue), firstType, secondType,
@@ -107,7 +107,7 @@ namespace ska {
 		}
 
 		case ExpressionType::INT:
-			return nodeval<int>(firstValue) * nodeval<int>(secondValue);
+			return firstValue.nodeval<int>() * secondValue.nodeval<int>();
 
 		case ExpressionType::FLOAT: {
 			return ComputeTwoTypeOperation<int, double>(std::move(firstValue), std::move(secondValue), firstType, secondType,
@@ -129,10 +129,10 @@ namespace ska {
 	NodeValue InterpretMathematicDivide(NodeValue firstValue, NodeValue secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		switch (destinationType.type()) {
 		case ExpressionType::INT:
-			if (nodeval<int>(secondValue) == 0) {
+			if (secondValue.nodeval<int>() == 0) {
 				throw std::runtime_error("math error : division by a null value");
 			}
-			return nodeval<int>(firstValue) / nodeval<int>(secondValue);
+			return firstValue.nodeval<int>() / secondValue.nodeval<int>();
 
 		case ExpressionType::FLOAT: {
 			return ComputeTwoTypeOperation<int, double>(std::move(firstValue), std::move(secondValue), firstType, secondType,
@@ -185,19 +185,20 @@ namespace ska {
                 return "";
             }
 	    }
+		throw std::runtime_error("Unhandled operator " + mathOperator);
     }
 }
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::BINARY>::interpret(OperateOn node) {
 	auto firstValue = m_interpreter.interpret(node.GetFirstValue()).asRvalue();
 	auto secondValue = m_interpreter.interpret(node.GetSecondValue()).asRvalue();
-	auto mathOperator = node.name();
+	auto mathOperator = node.GetOperator();
 	return InterpretMathematicBinaryExpression(
 			std::move(mathOperator), 
 			std::move(firstValue), 
 			std::move(secondValue), 
-			node[0].type().value(), 
-			node[1].type().value(),
-			node.type().value());
+			node.GetFirstValue().type().value(), 
+			node.GetSecondValue().type().value(),
+			node.GetType().value());
 }
 
