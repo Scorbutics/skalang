@@ -1,6 +1,6 @@
 #include "MemoryTable.h"
 
-ska::MemoryTable& ska::MemoryTable::parent() {
+ska::MemoryTable* ska::MemoryTable::parent() {
 	return m_current->m_parent;
 }
 
@@ -13,9 +13,17 @@ ska::MemoryTable & ska::MemoryTable::createNested() {
 	return lastChild;
 }
 
-ska::MemoryTable& ska::MemoryTable::endNested() {
-	m_current = &m_current->parent();
-	return *m_current;
+ska::MemoryTable* ska::MemoryTable::endNested() {
+	m_current = m_current->parent();
+	return m_current;
+}
+
+ska::MemoryTable* ska::MemoryTable::popNested() {
+	m_current = m_current->parent();
+	if (m_current != nullptr) {
+		m_current->m_children.pop_back();
+	}
+	return m_current;
 }
 
 ska::NodeValue& ska::MemoryTable::put(std::string name, NodeValue value) {
