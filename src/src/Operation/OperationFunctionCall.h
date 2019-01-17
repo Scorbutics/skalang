@@ -23,5 +23,13 @@ namespace ska {
 			return node.end();
 		}
 
+		inline auto& GetFunctionParameterValue(std::size_t index) {
+			return node[index + 1];
+		}
+
+		inline bool HasFunctionParameter(std::size_t index) const {
+			return (node.size() - 1) > index;
+		}
+
 	};
 }
