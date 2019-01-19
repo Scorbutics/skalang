@@ -3,7 +3,7 @@
 #include "NodeValue/AST.h"
 #include "Service/SymbolTable.h"
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::VARIABLE_AFFECTATION>::build(const SymbolTable& symbols, const ASTNode& node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::VARIABLE_AFFECTATION>::build(Parser& parser, const SymbolTable& symbols, const ASTNode& node) {
     assert(node.size() > 0 && node[0].type().has_value());
     return node[0].type().value();
 }

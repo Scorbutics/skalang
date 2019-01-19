@@ -5,9 +5,10 @@
 namespace ska {
 	class SymbolTable;
 	class ASTNode;
+	class Parser;
 
     class TypeBuildUnit {
     public:
-        virtual Type build(const SymbolTable&, const ASTNode&) = 0;
+        virtual Type build(Parser& parser, const SymbolTable&, const ASTNode&) = 0;
     };
 }

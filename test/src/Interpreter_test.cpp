@@ -159,6 +159,17 @@ TEST_CASE("[Interpreter]") {
 			auto res = data.interpreter->interpret(*astPtr);
 			CHECK(res.asRvalue().nodeval<int>() == 3);
 		}
+
+		SUBCASE("Outside script from file (import)") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var Character = import \"../test/src/resources/character\";", data);
+			auto res = data.interpreter->interpret(*astPtr);
+		}
+
+		SUBCASE("Outside script from file (import)") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var Character = import \"../test/src/resources/character\";var player = Character.build(\"Player\");var enemy = Character.default; enemy.age", data);
+			auto res = data.interpreter->interpret(*astPtr);
+			CHECK(res.asRvalue().nodeval<int>() == 10);
+		}
 	}
 		
 }

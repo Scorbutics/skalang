@@ -32,6 +32,7 @@ namespace ska {
 			bool matchArray(ArrayTokenEvent& event) const;
 
             const SymbolTable& m_symbols;
+			Parser& m_parser;
 
     };
     

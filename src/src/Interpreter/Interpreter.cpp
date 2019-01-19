@@ -18,6 +18,8 @@
 #include "InterpreterOperatorBlock.h"
 #include "InterpreterOperatorUnary.h"
 #include "InterpreterOperator.h"
+#include "InterpreterOperatorImport.h"
+#include "InterpreterOperatorExport.h"
 
 #include "InterpreterDeclarer.h"
 
@@ -40,6 +42,8 @@ std::vector<std::unique_ptr<ska::InterpreterOperatorUnit>> ska::Interpreter::bui
     InterpreterOperatorDeclare<ska::Operator::BINARY>(*this, result, m_symbols, m_memory);
     InterpreterOperatorDeclare<ska::Operator::LITERAL>(*this, result, m_symbols, m_memory);
     InterpreterOperatorDeclare<ska::Operator::UNARY>(*this, result, m_symbols, m_memory);
+	InterpreterOperatorDeclare<ska::Operator::IMPORT>(*this, result, m_symbols, m_memory);
+	InterpreterOperatorDeclare<ska::Operator::EXPORT>(*this, result, m_symbols, m_memory);
 	return result;
 }
 

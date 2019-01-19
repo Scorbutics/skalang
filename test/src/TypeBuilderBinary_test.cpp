@@ -14,10 +14,10 @@ TEST_CASE("[TypeBuilderBinary]") {
 	auto value2Node = ska::ASTNode::MakeLogicalNode(ska::Token{"1", ska::TokenType::STRING});
 	auto node = ska::ASTNode::MakeLogicalNode(ska::Token{"+", ska::TokenType::SYMBOL}, std::move(value1Node), std::move(value2Node));
 	
-	(*node)[0].buildType(*data.symbols);
-	(*node)[1].buildType(*data.symbols);
+	(*node)[0].buildType(*data.parser, *data.symbols);
+	(*node)[1].buildType(*data.parser, *data.symbols);
 	
 	//This one makes a "crossType"
-	auto type = typeBuilder.build(*data.symbols, *node);
+	auto type = typeBuilder.build(*data.parser, *data.symbols, *node);
 	CHECK(type == ska::ExpressionType::STRING);
 }

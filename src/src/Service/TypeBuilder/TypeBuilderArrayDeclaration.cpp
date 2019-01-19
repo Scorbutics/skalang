@@ -4,7 +4,7 @@
 #include "Service/SymbolTable.h"
 #include "TypeBuilderCalculatorDispatcher.h"
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::ARRAY_DECLARATION>::build(const SymbolTable& symbols, const ASTNode& node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::ARRAY_DECLARATION>::build(Parser& parser, const SymbolTable& symbols, const ASTNode& node) {
 	auto type = Type{ ExpressionType::ARRAY };
 	if (node.size() == 0) {
 		return type;

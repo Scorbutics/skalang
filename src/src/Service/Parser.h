@@ -48,6 +48,8 @@ namespace ska {
 
 		ASTNodePtr expr();
 		ASTNodePtr optexpr(const Token& mustNotBe = Token{});
+
+		ASTNodePtr subParse(std::ifstream& file);
 	
 	private:
 		static void error(const std::string& message);
@@ -61,5 +63,6 @@ namespace ska {
 		MatcherVar m_matcherVar;
 		MatcherIfElse m_matcherIfElse;
 		MatcherReturn m_matcherReturn;
+		MatcherImport m_matcherImport;
 	};
 }

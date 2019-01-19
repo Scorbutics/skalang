@@ -6,7 +6,7 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_DECLARATION>)
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_DECLARATION>::build(const SymbolTable& symbols, const ASTNode& node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_DECLARATION>::build(Parser& parser, const SymbolTable& symbols, const ASTNode& node) {
 	auto functionName = node.name();
 	assert(!symbols.nested().empty());
 	const auto& symbolTableNested = *symbols.nested().back();

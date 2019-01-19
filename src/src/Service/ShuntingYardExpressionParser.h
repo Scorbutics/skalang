@@ -14,6 +14,7 @@
 #include "Matcher/MatcherArray.h"
 #include "Matcher/MatcherFunction.h"
 #include "Matcher/MatcherVar.h"
+#include "Matcher/MatcherImport.h"
 
 namespace ska {
 	class ASTNode;
@@ -52,6 +53,7 @@ namespace ska {
 		MatcherArray m_matcherArray;
 		MatcherFunction m_matcherFunction;
 		MatcherVar m_matcherVar;
+		MatcherImport m_matcherImport;
 	};
 
 }

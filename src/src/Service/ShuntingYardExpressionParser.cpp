@@ -35,7 +35,8 @@ ska::ShuntingYardExpressionParser::ShuntingYardExpressionParser(const ReservedKe
 	m_input(input),
 	m_matcherArray(m_input, m_reservedKeywordsPool, m_parser),
 	m_matcherFunction(m_input, m_reservedKeywordsPool, m_parser),
-	m_matcherVar(m_input, m_reservedKeywordsPool, m_parser) {
+	m_matcherVar(m_input, m_reservedKeywordsPool, m_parser),
+	m_matcherImport(m_input, m_reservedKeywordsPool, m_parser) {
 }
 
 ska::ASTNodePtr ska::ShuntingYardExpressionParser::parse() {
@@ -224,7 +225,8 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchReserved() {
 	switch(std::get<std::size_t>(result.content())) {
 		case static_cast<std::size_t>(TokenGrammar::FUNCTION):
 			return m_matcherFunction.matchDeclaration();
-
+		case static_cast<std::size_t>(TokenGrammar::IMPORT) :
+			return m_matcherImport.matchImport();
 		default:
 			return nullptr;
 	}

@@ -8,7 +8,7 @@
 #define SKALANG_BUILDER_TYPE_OPERATOR_DEFINE(OperatorType)\
     template<>\
     struct TypeBuilderOperator<OperatorType> : public TypeBuildUnit {\
-        Type build(const SymbolTable& symbols, const ASTNode& node) override;\
+        Type build(Parser& parser, const SymbolTable& symbols, const ASTNode& node) override;\
     };
 
 namespace ska {
@@ -17,7 +17,7 @@ namespace ska {
 
     template <Operator O>
     struct TypeBuilderOperator : public TypeBuildUnit {
-        Type build(const SymbolTable& symbols, const ASTNode& node) override {
+        Type build(Parser& parser, const SymbolTable& symbols, const ASTNode& node) override {
 			return Type{ ExpressionType::VOID };
         }
     };

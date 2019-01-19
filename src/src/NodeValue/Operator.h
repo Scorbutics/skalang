@@ -18,6 +18,8 @@ namespace ska {
 		FUNCTION_DECLARATION,
 		FIELD_ACCESS,
 		FOR_LOOP,
+		IMPORT,
+		EXPORT,
 		BLOCK,
 		IF,
 		IF_ELSE,
@@ -39,6 +41,8 @@ namespace ska {
 		"FUNCTION_DECLARATION",
 		"FIELD_ACCESS",
 		"FOR_LOOP",
+		"IMPORT",
+		"EXPORT",
 		"BLOCK",
 		"IF",
 		"IF_ELSE"

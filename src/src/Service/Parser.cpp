@@ -1,10 +1,18 @@
-#include <iostream>
+#include <iterator>
+#include <fstream>
 #include "Matcher/MatcherBlock.h"
 #include "Config/LoggerConfigLang.h"
 #include "NodeValue/AST.h"
 #include "NodeValue/Operator.h"
 #include "Service/Parser.h"
 #include "ReservedKeywordsPool.h"
+
+#include "Service/Tokenizer.h"
+#include "Service/TokenReader.h"
+#include "Service/SymbolTable.h"
+#include "Service/SemanticTypeChecker.h"
+#include "Service/SymbolTableTypeUpdater.h"
+#include "Service/TypeBuilder/TypeBuilder.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Parser)
 
@@ -16,7 +24,8 @@ ska::Parser::Parser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReade
 	m_matcherFor(m_input, m_reservedKeywordsPool, *this),
 	m_matcherIfElse(m_input, m_reservedKeywordsPool, *this),
 	m_matcherVar(m_input, m_reservedKeywordsPool, *this),
-	m_matcherReturn(m_input, m_reservedKeywordsPool, *this) {
+	m_matcherReturn(m_input, m_reservedKeywordsPool, *this),
+	m_matcherImport(m_input, m_reservedKeywordsPool, *this) {
 }
 
 ska::Parser::ASTNodePtr ska::Parser::parse() {
@@ -82,6 +91,9 @@ ska::Parser::ASTNodePtr ska::Parser::matchReservedKeyword(const std::size_t keyw
 
     case static_cast<std::size_t>(TokenGrammar::RETURN):
         return m_matcherReturn.match();
+	
+	case static_cast<std::size_t>(TokenGrammar::EXPORT) :
+		return m_matcherImport.matchExport();
 
 	default: {
 			std::stringstream ss;
@@ -106,6 +118,23 @@ ska::Parser::ASTNodePtr ska::Parser::optexpr(const Token& mustNotBe) {
 		node = expr();
 	}
 	return node != nullptr ? std::move(node) : ASTNode::MakeEmptyNode();
+}
+
+ska::ASTNodePtr ska::Parser::subParse(std::ifstream& file) {
+	auto content = std::string (
+		(std::istreambuf_iterator<char>(file)),
+		(std::istreambuf_iterator<char>()) 
+	);
+
+	auto tokenizer = Tokenizer{ m_reservedKeywordsPool, std::move(content)};
+	auto tokens = tokenizer.tokenize();
+	auto tokenReader = TokenReader{ tokens };
+	auto parser = Parser{ m_reservedKeywordsPool, tokenReader };
+	auto symbols = ska::SymbolTable{ parser };
+	auto typeBuilder = ska::TypeBuilder{ parser, symbols };
+	auto symbolsTypeUpdater = ska::SymbolTableTypeUpdater{ parser, symbols };
+	auto typeChecker = ska::SemanticTypeChecker { parser, symbols };
+	return parser.parse();
 }
 
 ska::Parser::ASTNodePtr ska::Parser::optstatement(const Token& mustNotBe) {
