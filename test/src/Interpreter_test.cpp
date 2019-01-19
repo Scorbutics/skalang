@@ -153,6 +153,12 @@ TEST_CASE("[Interpreter]") {
 			auto res = data.interpreter->interpret(*astPtr);
 			CHECK(res.asRvalue().nodeval<int>() == 30);
 		}
+
+		SUBCASE("Function 0 parameter creating custom object") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var totoFunc = function() : var { return { num: 3, test: \"test\" }; }; var titi = totoFunc(); titi.num;", data);
+			auto res = data.interpreter->interpret(*astPtr);
+			CHECK(res.asRvalue().nodeval<int>() == 3);
+		}
 	}
 		
 }
