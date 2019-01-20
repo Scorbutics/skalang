@@ -7,6 +7,8 @@
 #include "Event/BlockTokenEvent.h"
 #include "Event/FunctionTokenEvent.h"
 #include "Event/ReturnTokenEvent.h"
+#include "Event/ImportTokenEvent.h"
+
 #include "ScopedSymbolTable.h"
 
 namespace ska {
@@ -17,7 +19,8 @@ namespace ska {
         public SubObserver<VarTokenEvent>,
        	public SubObserver<BlockTokenEvent>,
         public SubObserver<FunctionTokenEvent>,
-        public SubObserver<ReturnTokenEvent> {
+        public SubObserver<ReturnTokenEvent>, 
+		public SubObserver<ImportTokenEvent> {
 
         using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 
@@ -58,6 +61,11 @@ namespace ska {
 		bool nestedTable(const BlockTokenEvent&);
 		bool matchFunction(const FunctionTokenEvent&);
 		bool matchReturn(const ReturnTokenEvent&);
+		bool matchImport(const ImportTokenEvent&);
+
+		bool erase(const std::string& name) {
+			return m_currentTable->erase(name);
+		}
 
         std::unique_ptr<ScopedSymbolTable> m_rootTable;
 		ScopedSymbolTable* m_currentTable = nullptr;

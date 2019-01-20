@@ -42,7 +42,9 @@ ska::ASTNodePtr ska::MatcherBlock::match(const std::string& content) {
 	} else if (content == m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>().name()) {
 		throw std::runtime_error("syntax error : Block end token encountered when not expected");
 	} else {
-		return m_parser.matchExpressionStatement();
+		auto expression = m_parser.expr();
+		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+		return expression;
 	}
 
 	m_parser.optexpr(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());

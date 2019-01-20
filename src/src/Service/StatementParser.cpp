@@ -122,17 +122,12 @@ ska::ASTNodePtr ska::StatementParser::subParse(std::ifstream& file) {
 		(std::istreambuf_iterator<char>()) 
 	);
 
-	/*
-	auto lastInput = &m_input;
-
 	auto tokenizer = Tokenizer{ m_reservedKeywordsPool, std::move(content)};
 	auto tokens = tokenizer.tokenize();
-	auto tokenReader = TokenReader{ tokens };
-	m_input = &tokenReader;
-	
-	return parser.parse();
-	*/
-	return nullptr;
+	const auto& [lastSource, lastIndex] = m_input.setSource(tokens);
+	auto result = parse();
+	m_input.setSource(*lastSource, lastIndex);
+	return result;
 }
 
 ska::StatementParser::ASTNodePtr ska::StatementParser::optstatement(const Token& mustNotBe) {

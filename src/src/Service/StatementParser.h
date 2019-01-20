@@ -13,6 +13,7 @@
 #include "Event/ExpressionTokenEvent.h"
 #include "Event/ReturnTokenEvent.h"
 #include "Event/ArrayTokenEvent.h"
+#include "Event/ImportTokenEvent.h"
 
 #include "Matcher/MatcherBlock.h"
 #include "Matcher/MatcherFor.h"
@@ -32,7 +33,8 @@ namespace ska {
             BlockTokenEvent,
 		    ExpressionTokenEvent,
             ReturnTokenEvent,
-			ArrayTokenEvent
+			ArrayTokenEvent,
+			ImportTokenEvent
 	    > {
 
 		using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
@@ -43,15 +45,14 @@ namespace ska {
 		ASTNodePtr statement();
         ASTNodePtr optstatement(const Token& mustNotBe = Token{});
 
-		ASTNodePtr matchReservedKeyword(const std::size_t keywordIndex);
-        ASTNodePtr matchExpressionStatement();
-
 		ASTNodePtr expr();
 		ASTNodePtr optexpr(const Token& mustNotBe = Token{});
 
 		ASTNodePtr subParse(std::ifstream& file);
 	
 	private:
+		ASTNodePtr matchExpressionStatement();
+		ASTNodePtr matchReservedKeyword(const std::size_t keywordIndex);
 		static void error(const std::string& message);
 
 		TokenReader& m_input;

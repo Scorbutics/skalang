@@ -8,7 +8,8 @@ ska::SymbolTable::SymbolTable(StatementParser& parser) :
 	SubObserver<VarTokenEvent>(std::bind(&ska::SymbolTable::match, this, std::placeholders::_1), parser),
 	SubObserver<BlockTokenEvent>(std::bind(&ska::SymbolTable::nestedTable, this, std::placeholders::_1), parser),
 	SubObserver<FunctionTokenEvent>(std::bind(&ska::SymbolTable::matchFunction, this, std::placeholders::_1), parser),
-    SubObserver<ReturnTokenEvent>(std::bind(&ska::SymbolTable::matchReturn, this, std::placeholders::_1), parser) {
+    SubObserver<ReturnTokenEvent>(std::bind(&ska::SymbolTable::matchReturn, this, std::placeholders::_1), parser),
+	SubObserver<ImportTokenEvent>(std::bind(&ska::SymbolTable::matchImport, this, std::placeholders::_1), parser) {
 		m_rootTable = std::make_unique<ScopedSymbolTable>();
 		m_currentTable = m_rootTable.get();
 }
@@ -122,5 +123,12 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 	return true;
 }
 
-
+bool ska::SymbolTable::matchImport(const ImportTokenEvent& token) {
+	assert(token.rootNode().size() == 3);
+	auto& hiddenFields = token.rootNode()[2];
+	for (auto& hiddenField : hiddenFields) {
+		erase(hiddenField->name());
+	}
+	return true;
+}
 
