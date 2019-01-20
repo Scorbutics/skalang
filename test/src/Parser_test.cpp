@@ -3,7 +3,7 @@
 #include <doctest.h>
 #include "Config/LoggerConfigLang.h"
 #include "NodeValue/AST.h"
-#include "Service/Parser.h"
+#include "Service/StatementParser.h"
 #include "Service/TokenReader.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
@@ -15,7 +15,7 @@ TEST_CASE("test") {
 	auto t = ska::Tokenizer {keywords, inputStr};
 	auto tokens = t.tokenize();
 	auto reader = ska::TokenReader { tokens };
-	auto p = ska::Parser { keywords, reader };
+	auto p = ska::StatementParser{ keywords, reader };
 	auto ast = p.parse();
 	
 	CHECK(ast->size() == 1);
@@ -51,7 +51,7 @@ std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, const ska::
 	auto t = ska::Tokenizer {keywords, input};
 	auto tokens = t.tokenize();
 	auto reader = ska::TokenReader { tokens };
-	auto p = ska::Parser { keywords, reader };
+	auto p = ska::StatementParser{ keywords, reader };
 	return p.parse();
 }
 

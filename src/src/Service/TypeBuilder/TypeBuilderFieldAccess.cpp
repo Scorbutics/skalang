@@ -5,7 +5,7 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>)
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(Parser& parser, const SymbolTable& symbols, const ASTNode& node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(StatementParser& parser, const SymbolTable& symbols, const ASTNode& node) {
 	assert(node[0].type() == ExpressionType::OBJECT && node.size() == 2);
 	auto symbolObjectType = node[0].type().value();
     if (symbolObjectType.getName().empty() || symbolObjectType.userDefinedSymbolTable() == nullptr) {

@@ -7,7 +7,7 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>);
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>::build(Parser& parser, const SymbolTable& symbols, const ASTNode& node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>::build(StatementParser& parser, const SymbolTable& symbols, const ASTNode& node) {
     const auto& functionIdentifier = node[0];
     const auto& type = node[0].type().value();
     const auto functionName = functionIdentifier.name();

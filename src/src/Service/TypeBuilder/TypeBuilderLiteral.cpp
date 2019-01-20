@@ -6,10 +6,10 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::LITERAL>);
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::UNARY>);
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::LITERAL>::build(Parser& parser, const SymbolTable& symbols, const ASTNode& node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::LITERAL>::build(StatementParser& parser, const SymbolTable& symbols, const ASTNode& node) {
 	return TypeBuilderBuildFromTokenType(symbols, node);
 }
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::UNARY>::build(Parser& parser, const SymbolTable& symbols, const ASTNode& node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::UNARY>::build(StatementParser& parser, const SymbolTable& symbols, const ASTNode& node) {
 	return TypeBuilderBuildFromTokenType(symbols, node);
 }

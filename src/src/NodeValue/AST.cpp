@@ -44,7 +44,7 @@ ska::ASTNode::ASTNode(Operator o, Token identifierToken) :
     token(std::move(identifierToken)) {
 }
 
-void ska::ASTNode::buildType(Parser& parser, const SymbolTable& symbols) {
+void ska::ASTNode::buildType(StatementParser& parser, const SymbolTable& symbols) {
 	if (m_type.has_value()) {
 		return;
 	}

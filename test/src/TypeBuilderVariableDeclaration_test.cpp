@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <doctest.h>
-#include "Service/Parser.h"
+#include "Service/StatementParser.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/SymbolTable.h"
 #include "Service/TypeBuilder/TypeBuilderVariableDeclaration.h"

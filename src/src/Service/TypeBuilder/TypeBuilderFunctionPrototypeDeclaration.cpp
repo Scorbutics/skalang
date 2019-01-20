@@ -6,7 +6,7 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::build(Parser& parser, const SymbolTable& symbols, const ASTNode& node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::build(StatementParser& parser, const SymbolTable& symbols, const ASTNode& node) {
 	auto functionName = node.name();
 	auto functionType = Type{ functionName, ExpressionType::FUNCTION, *symbols.current() };
     for (auto& paramNode : node) {

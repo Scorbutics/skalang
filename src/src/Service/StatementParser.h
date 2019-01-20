@@ -3,7 +3,7 @@
 #include <Data/Events/EventDispatcher.h>
 
 #include "NodeValue/Token.h"
-#include "Service/ShuntingYardExpressionParser.h"
+#include "Service/ExpressionParser.h"
 
 #include "Event/ForTokenEvent.h"
 #include "Event/IfElseTokenEvent.h"
@@ -23,7 +23,7 @@
 namespace ska {
 	struct ReservedKeywordsPool;
 
-	class Parser :
+	class StatementParser :
 	    public EventDispatcher<
             ForTokenEvent,
             IfElseTokenEvent,
@@ -37,7 +37,7 @@ namespace ska {
 
 		using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 	public:
-		Parser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReader& input);
+		StatementParser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReader& input);
 		ASTNodePtr parse();
 
 		ASTNodePtr statement();
@@ -56,7 +56,7 @@ namespace ska {
 
 		TokenReader& m_input;
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
-		ShuntingYardExpressionParser m_shuntingYardParser;
+		ExpressionParser m_expressionParser;
 		
 		MatcherBlock m_matcherBlock;
 		MatcherFor m_matcherFor;

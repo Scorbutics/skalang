@@ -4,7 +4,7 @@
 #include "Service/SymbolTable.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
-#include "Service/Parser.h"
+#include "Service/StatementParser.h"
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 
@@ -14,7 +14,7 @@ std::unique_ptr<ska::ASTNode> ASTFromInputSemanticComplexTC(const std::string& i
 	const auto tokens = tokenizer.tokenize();
 	auto reader = ska::TokenReader { tokens };
 
-	data.parser = std::make_unique<ska::Parser> ( reservedKeywords, reader );
+	data.parser = std::make_unique<ska::StatementParser> ( reservedKeywords, reader );
     data.symbols = std::make_unique<ska::SymbolTable> (*data.parser);
     data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, *data.symbols);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, *data.symbols);

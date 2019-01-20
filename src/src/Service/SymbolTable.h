@@ -11,7 +11,7 @@
 
 namespace ska {
    
-    class Parser;
+    class StatementParser;
 
 	class SymbolTable :
         public SubObserver<VarTokenEvent>,
@@ -22,7 +22,7 @@ namespace ska {
         using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 
     public:
-		SymbolTable(Parser& parser);
+		SymbolTable(StatementParser& parser);
 		~SymbolTable() = default;
 		
 		auto* operator[](const std::string& key) {

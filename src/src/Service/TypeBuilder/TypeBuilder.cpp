@@ -3,11 +3,11 @@
 #include "TypeBuilderOperator.h"
 #include "NodeValue/AST.h"
 
-#include "Service/Parser.h"
+#include "Service/StatementParser.h"
 
 SKA_LOGC_CONFIG(LogLevel::Debug, TypeBuilder)
 
-ska::TypeBuilder::TypeBuilder(Parser& parser, const SymbolTable& symbolTable) : 
+ska::TypeBuilder::TypeBuilder(StatementParser& parser, const SymbolTable& symbolTable) :
     m_symbols(symbolTable),
 	m_parser(parser),
     SubObserver<ExpressionTokenEvent>(std::bind(&TypeBuilder::matchExpression, this, std::placeholders::_1), parser),

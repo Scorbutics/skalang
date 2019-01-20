@@ -28,7 +28,7 @@
 namespace ska {
 	class Symbol;
     class SymbolTable;
-	class Parser;
+	class StatementParser;
 
 	/*inline auto PrintValueVisitor = [](auto&& arg) -> std::string {
 		using T = std::decay_t<decltype(arg)>;
@@ -122,7 +122,7 @@ namespace ska {
 			return m_op;
 		}
 
-	    void buildType(Parser& parser, const SymbolTable& symbols);
+	    void buildType(StatementParser& parser, const SymbolTable& symbols);
 		void buildValue(NodeValue value);
 
 		const auto& type() const {

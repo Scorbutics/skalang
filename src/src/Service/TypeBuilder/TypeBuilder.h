@@ -12,7 +12,7 @@
 namespace ska {
     class ASTNode;
     class SymbolTable;
-    class Parser;
+    class StatementParser;
 
     class TypeBuilder : 
 	    public SubObserver<ExpressionTokenEvent>,
@@ -21,7 +21,7 @@ namespace ska {
 		public SubObserver<ReturnTokenEvent>,
 		public SubObserver<ArrayTokenEvent> {
         public:
-            TypeBuilder(Parser& parser, const SymbolTable& symbolTable);
+            TypeBuilder(StatementParser& parser, const SymbolTable& symbolTable);
             ~TypeBuilder() = default;
             
         private:
@@ -32,7 +32,7 @@ namespace ska {
 			bool matchArray(ArrayTokenEvent& event) const;
 
             const SymbolTable& m_symbols;
-			Parser& m_parser;
+			StatementParser& m_parser;
 
     };
     
