@@ -14,9 +14,13 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherImport)
 
 ska::ASTNodePtr ska::MatcherImport::matchImport() {
 	SLOG(ska::LogLevel::Info) << "import expression";
+	
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::IMPORT>());
-	auto importNodeClass = m_input.match(TokenType::STRING);
 
+	//With this grammar, no other way than reading previously to retrieve the function name.
+	auto importedVarName = m_input.readPrevious(3);
+
+	auto importNodeClass = m_input.match(TokenType::STRING);
 	//TODO : cache
 
 	auto importClassName = importNodeClass.name() + ".minisk";
@@ -41,6 +45,7 @@ ska::ASTNodePtr ska::MatcherImport::matchImport() {
 	}
 	
 	auto importNode = ASTNode::MakeNode<Operator::IMPORT>(
+			ASTNode::MakeLogicalNode(importedVarName),
 			std::move(importNameNode), 
 			ASTNode::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(exportFields)), 
 			ASTNode::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(hiddenFields)));

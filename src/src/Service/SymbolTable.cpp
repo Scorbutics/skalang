@@ -124,8 +124,8 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 }
 
 bool ska::SymbolTable::matchImport(const ImportTokenEvent& token) {
-	assert(token.rootNode().size() == 3);
-	auto& hiddenFields = token.rootNode()[2];
+	assert(token.rootNode().size() == 4);
+	auto& hiddenFields = token.rootNode()[3];
 	for (auto& hiddenField : hiddenFields) {
 		erase(hiddenField->name());
 	}
