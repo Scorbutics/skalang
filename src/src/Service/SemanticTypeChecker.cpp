@@ -4,6 +4,7 @@
 #include "SemanticTypeChecker.h"
 #include "SymbolTable.h"
 #include "NodeValue/AST.h"
+#include "NodeValue/OperatorTraits.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SemanticTypeChecker)
 

@@ -3,5 +3,5 @@
 
 namespace ska {
 	template<Operator Op>
-	class Operation {};
+	class OperationType {};
 }

@@ -1,5 +1,5 @@
+#include "TypeBuilderFunctionPrototypeDeclaration.h"
 #include "Config/LoggerConfigLang.h"
-#include "TypeBuilderFunctionDeclaration.h"
 #include "TypeBuilderCalculatorDispatcher.h"
 #include "Service/SymbolTable.h"
 #include "NodeValue/AST.h"

@@ -5,7 +5,6 @@
 namespace ska {
 	class SymbolTable;
 	class ASTNode;
-	class StatementParser;
 
     class TypeBuildUnit {
     public:

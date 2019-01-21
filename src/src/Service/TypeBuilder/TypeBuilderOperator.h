@@ -4,14 +4,14 @@
 #include "NodeValue/Type.h"
 #include "TypeBuildUnit.h"
 #include "TypeBuilderCalculatorDispatcher.h"
-#include "Operation/Operation.h"
+#include "Operation/OperationType.h"
 
 #define SKALANG_BUILDER_TYPE_OPERATOR_DEFINE(OperatorType)\
     template<>\
     struct TypeBuilderOperator<OperatorType> : \
 		public TypeBuildUnit {\
 	private:\
-		using OperateOn = Operation<OperatorType>;\
+		using OperateOn = OperationType<OperatorType>;\
 	public:\
         Type build(const SymbolTable& symbols, const ASTNode& node) override final {\
 			return build(symbols, OperateOn{node});\

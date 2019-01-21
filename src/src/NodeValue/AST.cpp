@@ -44,16 +44,16 @@ ska::ASTNode::ASTNode(Operator o, Token identifierToken) :
     token(std::move(identifierToken)) {
 }
 
-void ska::ASTNode::buildType(StatementParser& parser, const SymbolTable& symbols) {
+void ska::ASTNode::buildType(const SymbolTable& symbols) {
 	if (m_type.has_value()) {
 		return;
 	}
 
 	for(auto& child : m_children) {
-        child->buildType(parser, symbols);
+        child->buildType(symbols);
     }
 	assert(m_typeBuilder != nullptr && "Cannot calculate the node type (it might be an empty node)");
-    m_type = m_typeBuilder->build(parser, symbols, *this);
+    m_type = m_typeBuilder->build(symbols, *this);
 }
 
 void ska::ASTNode::buildValue(NodeValue value) {

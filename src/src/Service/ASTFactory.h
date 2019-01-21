@@ -22,6 +22,7 @@
 
 namespace ska {
 	class ASTFactory {
+	public:
 		template<Operator o>
 		static void CheckTokenAssociatedWithOperator(const Token& token) {
 			static_assert(o != Operator::BINARY && o != Operator::LITERAL, "Wrong constructor used for a logical ASTNode. Use MakeLogicalNode instead.");

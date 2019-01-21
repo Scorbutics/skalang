@@ -1,8 +1,8 @@
-#include "OperationFunctionCall.h"
+#include "OperationTypeFunctionCall.h"
 #include "Service/SymbolTable.h"
 
-ska::Symbol* ska::Operation<Operator::FUNCTION_CALL>::GetFunctionReturnSymbol(const SymbolTable& symbols) {
-	auto* symbol = symbols[functionName];
+const ska::Symbol* ska::OperationType<ska::Operator::FUNCTION_CALL>::GetFunctionReturnSymbol(const SymbolTable& symbols) {
+	const Symbol* symbol = symbols[GetFunctionName()];
 	auto* n = &node[0];
 	auto* currentSymbolTable = symbols.current();
 	while (n != nullptr && n->size() > 0 && !currentSymbolTable->children().empty()) {

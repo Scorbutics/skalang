@@ -9,6 +9,7 @@
 
 #include "Service/Tokenizer.h"
 #include "Service/TokenReader.h"
+#include "Service/ASTFactory.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::StatementParser)
 
@@ -38,7 +39,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::parse() {
 			break;
 		}
 	}
-	return ASTNode::MakeNode<Operator::BLOCK>(std::move(blockNodeStatements));
+	return ASTFactory::MakeNode<Operator::BLOCK>(std::move(blockNodeStatements));
 }
 
 ska::StatementParser::ASTNodePtr ska::StatementParser::statement() {
@@ -113,7 +114,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::optexpr(const Token& must
 	if (!m_input.expect(mustNotBe)) {
 		node = expr();
 	}
-	return node != nullptr ? std::move(node) : ASTNode::MakeEmptyNode();
+	return node != nullptr ? std::move(node) : ASTFactory::MakeEmptyNode();
 }
 
 ska::ASTNodePtr ska::StatementParser::subParse(std::ifstream& file) {
@@ -136,6 +137,6 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::optstatement(const Token&
 		node = statement();
 	}
 
-	return node != nullptr ? std::move(node) : ASTNode::MakeEmptyNode();
+	return node != nullptr ? std::move(node) : ASTFactory::MakeEmptyNode();
 }
 

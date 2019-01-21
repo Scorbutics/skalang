@@ -1,7 +1,7 @@
 #include "Service/SymbolTable.h"
-#include "OperationFieldAccess.h"
+#include "OperationTypeFieldAccess.h"
 
-ska::Type ska::Operation<Operator::FIELD_ACCESS>::GetObjectType(const SymbolTable& symbols) {
+ska::Type ska::OperationType<ska::Operator::FIELD_ACCESS>::GetObjectType(const SymbolTable& symbols) {
 	assert(GetObject().type() == ExpressionType::OBJECT && node.size() == 2);
 	auto objectType = GetObject().type().value();
 	const auto& typeName = GetObjectTypeName();
@@ -17,7 +17,7 @@ ska::Type ska::Operation<Operator::FIELD_ACCESS>::GetObjectType(const SymbolTabl
 	return objectType;
 }
 
-ska::Symbol* ska::Operation<Operator::FIELD_ACCESS>::GetFieldSymbolFromObjectSymbolTable(const Type& objectType) {
+ska::Symbol* ska::OperationType<ska::Operator::FIELD_ACCESS>::GetFieldSymbolFromObjectSymbolTable(const Type& objectType) {
 	const auto fieldAccessed = GetFieldName();
 	assert(!fieldAccessed.empty());
 	

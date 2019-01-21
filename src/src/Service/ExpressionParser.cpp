@@ -4,6 +4,7 @@
 #include "Service/StatementParser.h"
 #include "NodeValue/AST.h"
 #include "ReservedKeywordsPool.h"
+#include "Service/ASTFactory.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ExpressionParser)
 
@@ -59,12 +60,12 @@ bool ska::ExpressionParser::parseTokenExpression(ExpressionStack& expressions, c
 	case TokenType::STRING:
 	case TokenType::DIGIT:
 		SLOG(ska::LogLevel::Debug) << "\tPushing operand " << token;
-		expressions.push(ASTNode::MakeLogicalNode(m_input.match(token.type())));
+		expressions.push(ASTFactory::MakeLogicalNode(m_input.match(token.type())));
 		break;
 
 	case TokenType::IDENTIFIER: {
 		SLOG(ska::LogLevel::Debug) << "\tPushing var operand " << token;
-		auto varNode = ASTNode::MakeLogicalNode(m_input.match(token.type()));
+		auto varNode = ASTFactory::MakeLogicalNode(m_input.match(token.type()));
 		auto event = VarTokenEvent::MakeUse(*varNode);
 		m_parser.Observable<VarTokenEvent>::notifyObservers(event);
 		expressions.push(std::move(varNode));
@@ -120,7 +121,7 @@ void ska::ExpressionParser::matchRange(ExpressionStack& expressions, const Token
 			return Group::FlowControl::GROUP;
 		};
 
-		auto result = expressions.groupAndPop<ASTNode>(std::move(groupParenthesisRange));
+		auto result = expressions.groupAndPop<ASTFactory>(std::move(groupParenthesisRange));
 		if (result != nullptr) {
 			expressions.push(std::move(result));
 		}
@@ -147,7 +148,7 @@ bool ska::ExpressionParser::matchSymbol(ExpressionStack& expressions, const Toke
         SLOG(ska::LogLevel::Debug) << "\tLess precedence, poping first (top) operator before adding " << value;
 
 		auto poped = false;
-		auto expressionGroup = expressions.groupAndPop<ASTNode>(Group::FirstOnly<Token>(poped));
+		auto expressionGroup = expressions.groupAndPop<ASTFactory>(Group::FirstOnly<Token>(poped));
 		if (expressionGroup == nullptr) {
 			error("void expression on affectation");
 		}
@@ -182,7 +183,7 @@ ska::ASTNodePtr ska::ExpressionParser::matchObjectFieldAccess(ASTNodePtr objectA
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::METHOD_CALL_OPERATOR>());
     auto fieldAccessedIdentifier = m_input.match(TokenType::IDENTIFIER);
 
-    return ASTNode::MakeNode<Operator::FIELD_ACCESS>(std::move(objectAccessed), ASTNode::MakeLogicalNode(fieldAccessedIdentifier));
+    return ASTFactory::MakeNode<Operator::FIELD_ACCESS>(std::move(objectAccessed), ASTFactory::MakeLogicalNode(fieldAccessedIdentifier));
 }
 
 bool ska::ExpressionParser::isAtEndOfExpression() const {
@@ -209,7 +210,7 @@ ska::ASTNodePtr ska::ExpressionParser::expression(ExpressionStack& expressions) 
 	}
 	SLOG(ska::LogLevel::Debug) << "\tPoping everything";
 
-	auto expressionGroup = expressions.template groupAndPop <ASTNode>(Group::All<Token>);
+	auto expressionGroup = expressions.template groupAndPop <ASTFactory>(Group::All<Token>);
 	if (expressionGroup != nullptr) {
 		auto event = ExpressionTokenEvent { *expressionGroup };
 		m_parser.Observable<ExpressionTokenEvent>::notifyObservers(event);

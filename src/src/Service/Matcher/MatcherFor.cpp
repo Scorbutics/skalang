@@ -6,6 +6,7 @@
 #include "Service/TokenReader.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
+#include "Service/ASTFactory.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherFor)
 
@@ -30,7 +31,7 @@ ska::ASTNodePtr ska::MatcherFor::match() {
     auto forNodeStatement = m_parser.statement();
 	SLOG(ska::LogLevel::Info) << "end for loop statement";
 
-    auto forNode = ASTNode::MakeNode<Operator::FOR_LOOP>(std::move(forNodeFirstExpression), std::move(forNodeMidExpression), std::move(forNodeLastExpression), std::move(forNodeStatement));
+    auto forNode = ASTFactory::MakeNode<Operator::FOR_LOOP>(std::move(forNodeFirstExpression), std::move(forNodeMidExpression), std::move(forNodeLastExpression), std::move(forNodeStatement));
     
     auto event = ForTokenEvent {*forNode};
 	m_parser.Observable<ForTokenEvent>::notifyObservers(event);

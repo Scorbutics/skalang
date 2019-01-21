@@ -98,7 +98,7 @@ namespace ska {
 			return m_op;
 		}
 
-	    void buildType(StatementParser& parser, const SymbolTable& symbols);
+	    void buildType(const SymbolTable& symbols);
 		void buildValue(NodeValue value);
 
 		const auto& type() const {

@@ -1,31 +1,31 @@
 #pragma once
 
-#include "Operation.h"
+#include "OperationType.h"
 #include "NodeValue/AST.h"
 
 namespace ska {
 	template<>
-	class Operation<Operator::UNARY> {
+	class OperationType<Operator::UNARY> {
 	private:
-		ASTNode& node;
+		const ASTNode& node;
 	public:
-		Operation(ASTNode& node) : node(node) {}
+		OperationType(const ASTNode& node) : node(node) {}
 
 		inline auto GetValue() {
 			return node.name();
 		}
 		
-		inline auto& asNode() {
+		inline const auto& asNode() {
 			return node;
 		}
 	};
 	
 	template<>
-	class Operation<Operator::LITERAL> {
+	class OperationType<Operator::LITERAL> {
 	private:
-		ASTNode& node;
+		const ASTNode& node;
 	public:
-		Operation(ASTNode& node) : node(node) {}
+		OperationType(const ASTNode& node) : node(node) {}
 
 		inline auto GetValue() {
 			return node.name();
@@ -35,7 +35,7 @@ namespace ska {
 			return node.type();
 		}
 		
-		inline auto& asNode() {
+		inline const auto& asNode() {
 			return node;
 		}
 	};

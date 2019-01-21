@@ -4,8 +4,6 @@
 
 namespace ska {
 	class ASTNode;
-	class SymbolTable;
-	class Symbol;
 	
 	template<>
 	class Operation<Operator::FUNCTION_CALL> {
@@ -33,7 +31,5 @@ namespace ska {
 		inline bool HasFunctionParameter(std::size_t index) const {
 			return (node.size() - 1) > index;
 		}
-
-		Symbol* GetFunctionReturnSymbol(const SymbolTable& symbols);
 	};
 }

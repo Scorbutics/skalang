@@ -11,7 +11,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator:
 ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>::build(const SymbolTable& symbols, OperateOn node) {
     auto* symbol = node.GetFunctionReturnSymbol(symbols);
 
-	SLOG(LogLevel::INFO) << "function call with type : " << ((symbol != nullptr) ? symbol->getType().asString() : "");    
+	SLOG(LogLevel::Info) << "function call with type : " << ((symbol != nullptr) ? symbol->getType() : Type{});
 
     if(symbol == nullptr) {
 		return Type{ ExpressionType::VOID };
