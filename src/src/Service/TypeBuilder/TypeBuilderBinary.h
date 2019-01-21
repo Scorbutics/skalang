@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Operation/OperationBinary.h"
 #include "TypeBuilderOperator.h"
 
 namespace ska {

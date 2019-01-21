@@ -1,5 +1,6 @@
 #pragma once
 #include <cassert>
+
 #include "Operation.h"
 
 namespace ska {
@@ -18,6 +19,10 @@ namespace ska {
 		
 		inline auto& GetVariableValueNode() {
 			return node[0];
+		}
+		
+		inline auto GetImportVariableName() {
+			return node[0].name();
 		}
 	};
 }

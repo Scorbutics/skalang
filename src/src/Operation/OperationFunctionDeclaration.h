@@ -4,6 +4,7 @@
 
 namespace ska {
 	class ASTNode;
+	
 	template<>
 	class Operation<Operator::FUNCTION_DECLARATION> {
 	private:
@@ -26,5 +27,30 @@ namespace ska {
 		inline auto& GetFunctionBody() {
 			return node[1];
 		}
+	};
+	
+	template<>
+	class Operation<Operator::FUNCTION_PROTOTYPE_DECLARATION> {
+	private:
+		ASTNode& node;
+	public:
+		Operation(ASTNode& node) : node(node) {}
+
+		inline auto GetFunctionName() {
+			return node.name();
+		}
+
+		inline auto& GetFunction() {
+			return node;
+		}
+
+		auto begin() {
+			return node.begin();
+		}
+		
+		auto end() {
+			return node.end();
+		}
+
 	};
 }

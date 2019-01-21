@@ -9,28 +9,27 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator:
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>::build(const SymbolTable& symbols, OperateOn node) {
-    assert(node.size() == 1);
-    const auto typeStr = node[0].name();
+    
+    const auto typeStr = node.GetVariableValueNode().name();
 
 	auto type = Type{};
     if (ExpressionTypeMap.find(typeStr) == ExpressionTypeMap.end()) {
 		//Object case
         const auto symbolType = symbols[typeStr];
         if (symbolType == nullptr) {
-            throw std::runtime_error("unknown type detected as function parameter : " + node[0].name());
+            throw std::runtime_error("unknown type detected as function parameter : " + node.GetVariableValueNode().name());
         }
-        SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node << "\" = \"" << symbolType->getType() << "\"";
+        SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node.GetVariableName() << "\" = \"" << symbolType->getType() << "\"";
 		type = Type{ typeStr, ExpressionType::OBJECT, *symbolType->symbolTable() };
-
    } else { 
 	   //Built-in case
-       SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type calculating for node \"" << node << " with type-node " << typeStr;
-	   type = ExpressionTypeMap.at(node[0].name());
-       SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node << "\" = \"" << type << "\""; 
+       SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type calculating for node \"" << node.GetVariableName() << " with type-node " << typeStr;
+	   type = ExpressionTypeMap.at(node.GetVariableValueNode().name());
+       SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node.GetVariableName() << "\" = \"" << type << "\""; 
    }
 
 	//handles arrays
-	if (node[0].size() == 1) {
+	if (node.GetVariableValueNode().size() == 1) {
 		type = Type{ ExpressionType::ARRAY }.add(type);
 	}
 

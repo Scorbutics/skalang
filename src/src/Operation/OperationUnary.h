@@ -14,6 +14,10 @@ namespace ska {
 		inline auto GetValue() {
 			return node.name();
 		}
+		
+		inline auto& asNode() {
+			return node;
+		}
 	};
 	
 	template<>
@@ -29,6 +33,10 @@ namespace ska {
 
 		inline const auto& GetType() const {
 			return node.type();
+		}
+		
+		inline auto& asNode() {
+			return node;
 		}
 	};
 }
