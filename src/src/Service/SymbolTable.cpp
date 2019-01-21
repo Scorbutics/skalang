@@ -90,7 +90,6 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 	assert(m_currentTable != nullptr);
 	
 	switch(token.type()) {
-		case VarTokenEventType::FUNCTION_DECLARATION:
 		case VarTokenEventType::VARIABLE_DECLARATION:
 		case VarTokenEventType::PARAMETER_DECLARATION: {
 			const auto variableName = token.name();
@@ -114,7 +113,8 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 			}       
 		}
 		break;
-		case VarTokenEventType::AFFECTATION:
+			case VarTokenEventType::AFFECTATION:
+			case VarTokenEventType::FUNCTION_DECLARATION:
 			break;
 		default:
 			throw std::runtime_error("Unmanaged variable event");
