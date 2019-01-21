@@ -14,19 +14,20 @@
 #include "Matcher/MatcherArray.h"
 #include "Matcher/MatcherFunction.h"
 #include "Matcher/MatcherVar.h"
+#include "Matcher/MatcherImport.h"
 
 namespace ska {
 	class ASTNode;
-	class Parser;
+	class StatementParser;
 	struct ReservedKeywordsPool;
 
-	class ShuntingYardExpressionParser {
+	class ExpressionParser {
 
 		using PopPredicate = std::function<int(const Token&)>;
 		using ExpressionStack = expression_stack<Token, ASTNodePtr>;
 
 	public:
-		ShuntingYardExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, Parser& parser, TokenReader& input);
+		ExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, StatementParser& parser, TokenReader& input);
 		ASTNodePtr parse();
 
 	private:
@@ -46,12 +47,13 @@ namespace ska {
 		static void error(const std::string& message);
 
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
-		Parser& m_parser;
+		StatementParser& m_parser;
 		TokenReader& m_input;
 
 		MatcherArray m_matcherArray;
 		MatcherFunction m_matcherFunction;
 		MatcherVar m_matcherVar;
+		MatcherImport m_matcherImport;
 	};
 
 }

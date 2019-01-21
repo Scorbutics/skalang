@@ -1,13 +1,13 @@
 #include <iostream>
 #include "Config/LoggerConfigLang.h"
-#include "Service/Parser.h"
+#include "Service/StatementParser.h"
 #include "SemanticTypeChecker.h"
 #include "SymbolTable.h"
 #include "NodeValue/AST.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SemanticTypeChecker)
 
-ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser, const SymbolTable& symbols) :
+ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser, const SymbolTable& symbols) :
     SubObserver<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser),
     SubObserver<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser),
 	SubObserver<ArrayTokenEvent>(std::bind(&SemanticTypeChecker::matchArray, this, std::placeholders::_1), parser),

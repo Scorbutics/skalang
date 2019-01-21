@@ -22,10 +22,13 @@
 #include "Service/TypeBuilder/TypeBuilderArrayUse.h"
 #include "Service/TypeBuilder/TypeBuilderVariableAffectation.h"
 #include "Service/TypeBuilder/TypeBuilderVariableDeclaration.h"
+#include "Service/TypeBuilder/TypeBuilderImport.h"
+#include "Service/TypeBuilder/TypeBuilderExport.h"
 
 namespace ska {
 	class Symbol;
     class SymbolTable;
+	class StatementParser;
 
 	/*inline auto PrintValueVisitor = [](auto&& arg) -> std::string {
 		using T = std::decay_t<decltype(arg)>;
@@ -105,6 +108,10 @@ namespace ska {
 		    return *m_children[index];
 		}
 
+		ASTNodePtr stealChild(const std::size_t index) {
+			return std::move(m_children[index]);
+		}
+
 		auto begin() { return std::begin(m_children); }
 		auto end() { return std::end(m_children); }
 
@@ -115,7 +122,7 @@ namespace ska {
 			return m_op;
 		}
 
-	    void buildType(const SymbolTable& symbols);
+	    void buildType(StatementParser& parser, const SymbolTable& symbols);
 		void buildValue(NodeValue value);
 
 		const auto& type() const {

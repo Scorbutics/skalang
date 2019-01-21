@@ -4,12 +4,12 @@
 #include "Service/SymbolTable.h"
 #include "TypeBuilderCalculatorDispatcher.h"
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::ARRAY_DECLARATION>::build(const SymbolTable& symbols, const ASTNode& node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::ARRAY_DECLARATION>::build(const SymbolTable& symbols, OperateOn node) {
 	auto type = Type{ ExpressionType::ARRAY };
 	if (node.size() == 0) {
 		return type;
 	}
-	const auto& subType = node[0].type().value();
+	const auto& subType = node.GetArraySubType();
 	type.add(subType);
 	return type;
 }

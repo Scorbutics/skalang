@@ -1,11 +1,11 @@
 #include <iostream>
 #include "Config/LoggerConfigLang.h"
-#include "ShuntingYardExpressionParser.h"
-#include "Service/Parser.h"
+#include "ExpressionParser.h"
+#include "Service/StatementParser.h"
 #include "NodeValue/AST.h"
 #include "ReservedKeywordsPool.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ShuntingYardExpressionParser)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ExpressionParser)
 
 //#define SKA_LOG_SHUNTING_YARD_DETAILS
 
@@ -29,21 +29,22 @@ void PrintPtr(const Container& c, const std::string& name = " ") {
 	std::cout << std::endl;
 }
 
-ska::ShuntingYardExpressionParser::ShuntingYardExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, Parser& parser, TokenReader& input) :
+ska::ExpressionParser::ExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, StatementParser& parser, TokenReader& input) :
 	m_reservedKeywordsPool(reservedKeywordsPool),
 	m_parser(parser),
 	m_input(input),
 	m_matcherArray(m_input, m_reservedKeywordsPool, m_parser),
 	m_matcherFunction(m_input, m_reservedKeywordsPool, m_parser),
-	m_matcherVar(m_input, m_reservedKeywordsPool, m_parser) {
+	m_matcherVar(m_input, m_reservedKeywordsPool, m_parser),
+	m_matcherImport(m_input, m_reservedKeywordsPool, m_parser) {
 }
 
-ska::ASTNodePtr ska::ShuntingYardExpressionParser::parse() {
+ska::ASTNodePtr ska::ExpressionParser::parse() {
 	auto data = expression_stack<Token, ASTNodePtr>{};
 	return expression(data);
 }
 
-bool ska::ShuntingYardExpressionParser::parseTokenExpression(ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
+bool ska::ExpressionParser::parseTokenExpression(ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
 
 	switch (token.type()) {
 	case TokenType::RESERVED: {
@@ -97,7 +98,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(ExpressionStack& ex
     return false;
 }
 
-void ska::ShuntingYardExpressionParser::matchRange(ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
+void ska::ExpressionParser::matchRange(ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
     const auto& value = std::get<std::string>(token.content());
     switch (value[0]) {
 	case '(':
@@ -131,7 +132,7 @@ void ska::ShuntingYardExpressionParser::matchRange(ExpressionStack& expressions,
     }
 }
 
-bool ska::ShuntingYardExpressionParser::matchSymbol(ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
+bool ska::ExpressionParser::matchSymbol(ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
     const auto& value = std::get<std::string>(token.content());
     if(value == "=") {
 		//We must check that the token before the '=' is an lvalue : done in the semantic check pass.
@@ -158,7 +159,7 @@ bool ska::ShuntingYardExpressionParser::matchSymbol(ExpressionStack& expressions
     
 }
 
-void ska::ShuntingYardExpressionParser::matchParenthesis(ExpressionStack& expressions, bool isDoingOperation) {
+void ska::ExpressionParser::matchParenthesis(ExpressionStack& expressions, bool isDoingOperation) {
 	auto functionNameOperand = expressions.popOperandIfNoOperator(isDoingOperation);
 	if (functionNameOperand != nullptr) {
 		auto event = ExpressionTokenEvent{ *functionNameOperand };
@@ -177,21 +178,21 @@ void ska::ShuntingYardExpressionParser::matchParenthesis(ExpressionStack& expres
 	expressions.push(Token{ m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()) });
 }
 
-ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchObjectFieldAccess(ASTNodePtr objectAccessed) {
+ska::ASTNodePtr ska::ExpressionParser::matchObjectFieldAccess(ASTNodePtr objectAccessed) {
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::METHOD_CALL_OPERATOR>());
     auto fieldAccessedIdentifier = m_input.match(TokenType::IDENTIFIER);
 
     return ASTNode::MakeNode<Operator::FIELD_ACCESS>(std::move(objectAccessed), ASTNode::MakeLogicalNode(fieldAccessedIdentifier));
 }
 
-bool ska::ShuntingYardExpressionParser::isAtEndOfExpression() const {
+bool ska::ExpressionParser::isAtEndOfExpression() const {
     return m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()) || 
             m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>()) ||
             m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()) ||
             m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>()); 
 }
 
-ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(ExpressionStack& expressions) {
+ska::ASTNodePtr ska::ExpressionParser::expression(ExpressionStack& expressions) {
 	auto rangeCounter = 0;
     auto isDoingOperation = false;
     while (!isAtEndOfExpression() && rangeCounter >= 0) {
@@ -218,19 +219,20 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(ExpressionStack& e
 
 }
 
-ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchReserved() {
+ska::ASTNodePtr ska::ExpressionParser::matchReserved() {
 	const auto& result = m_input.actual();
 
 	switch(std::get<std::size_t>(result.content())) {
 		case static_cast<std::size_t>(TokenGrammar::FUNCTION):
 			return m_matcherFunction.matchDeclaration();
-
+		case static_cast<std::size_t>(TokenGrammar::IMPORT) :
+			return m_matcherImport.matchImport();
 		default:
 			return nullptr;
 	}
 }
 
-void ska::ShuntingYardExpressionParser::error(const std::string& message) {
+void ska::ExpressionParser::error(const std::string& message) {
 	throw std::runtime_error("syntax error : " + message);
 }
 

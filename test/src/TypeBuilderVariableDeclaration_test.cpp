@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include <doctest.h>
-#include "Service/Parser.h"
+#include "Service/StatementParser.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/SymbolTable.h"
 #include "Service/TypeBuilder/TypeBuilderVariableDeclaration.h"
@@ -17,10 +17,10 @@ TEST_CASE("[TypeBuilderVariableDeclaration]") {
 	auto valueToken = ska::Token{ "1", ska::TokenType::DIGIT };
 	
 	auto valueNode = ska::ASTNode::MakeLogicalNode(valueToken);
-	valueNode->buildType(symbols);
+	valueNode->buildType(*data.parser, symbols);
 	auto children = std::vector<ska::ASTNodePtr>{ };
 	children.push_back(std::move(valueNode));
 	auto node = ska::ASTNode::MakeNode<ska::Operator::VARIABLE_DECLARATION>(std::move(nameToken), std::move(children));
-	auto type = typeBuilder.build(symbols, *node);
+	auto type = typeBuilder.build(*data.parser, symbols, *node);
 	CHECK(type == ska::ExpressionType::INT);
 }

@@ -8,7 +8,7 @@
 namespace ska {
 	struct ReservedKeywordsPool;
 	class TokenReader;
-	class Parser;
+	class StatementParser;
 
 	class ASTNode;
 	using ASTNodePtr = std::unique_ptr<ASTNode>;
@@ -17,7 +17,7 @@ namespace ska {
 		using ExpressionStack = expression_stack<Token, ASTNodePtr>;
 	public:
 		~MatcherArray() = default;
-		MatcherArray(TokenReader& input, const ReservedKeywordsPool& pool, Parser& parser) :
+		MatcherArray(TokenReader& input, const ReservedKeywordsPool& pool, StatementParser& parser) :
 			m_input(input), m_reservedKeywordsPool(pool), m_parser(parser) {}
 		
 		[[nodiscard]]
@@ -29,6 +29,6 @@ namespace ska {
 
 		TokenReader& m_input;
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
-		Parser& m_parser;
+		StatementParser& m_parser;
 	};
 }

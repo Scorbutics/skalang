@@ -13,6 +13,6 @@ TEST_CASE("[TypeBuilderFieldAccess]") {
 	const auto& node = (*ast)[2];
 
 	auto typeBuilder = ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>{};
-	auto type = typeBuilder.build(symbols, node);
+	auto type = typeBuilder.build(*data.parser, symbols, node);
 	CHECK(type == ska::ExpressionType::INT);
 }

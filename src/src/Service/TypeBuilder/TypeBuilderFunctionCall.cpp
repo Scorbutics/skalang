@@ -7,7 +7,7 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>);
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>::build(const SymbolTable& symbols, const ASTNode& node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>::build(const SymbolTable& symbols, OperateOn node) {
     const auto& functionIdentifier = node[0];
     const auto& type = node[0].type().value();
     const auto functionName = functionIdentifier.name();
@@ -29,9 +29,17 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>::build(const Sy
         std::cout << "function call with type : " << symbol->getType().asString() << std::endl;
     }
 #endif
-    if(symbol == nullptr || symbol->empty() || (*symbol)[0] == ExpressionType::VOID) {
+    if(symbol == nullptr) {
 		return Type{ ExpressionType::VOID };
-    }
+	} else if (symbol->getType() == ExpressionType::OBJECT) {
+		auto* symbolComplexType = symbols[symbol->getName()];
+		if (symbolComplexType == nullptr) {
+			return Type{ ExpressionType::VOID };
+		}
+		return symbolComplexType->getType();
+	} else if (symbol->empty() || (*symbol)[0] == ExpressionType::VOID) {
+		return Type{ ExpressionType::VOID };
+	}
 
     SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>) << "returning type : " << symbol->getType().compound().back() << " of " << symbol->getType();
     return symbol->getType().compound().back();

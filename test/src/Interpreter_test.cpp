@@ -6,7 +6,7 @@
 #include "Service/SymbolTable.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
-#include "Service/Parser.h"
+#include "Service/StatementParser.h"
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 
@@ -16,7 +16,7 @@ std::unique_ptr<ska::ASTNode> ASTFromInputSemanticTCInterpreter(const std::strin
 	const auto tokens = tokenizer.tokenize();
 	auto reader = ska::TokenReader { tokens };
 
-	data.parser = std::make_unique<ska::Parser> ( reservedKeywords, reader );
+	data.parser = std::make_unique<ska::StatementParser> ( reservedKeywords, reader );
     data.symbols = std::make_unique<ska::SymbolTable> (*data.parser);
     data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, *data.symbols);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, *data.symbols);
@@ -152,6 +152,23 @@ TEST_CASE("[Interpreter]") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var test = 20; var totoFunc = function(value: int) : int { return test + value + 3; }; var titi = totoFunc(7); titi;", data);
 			auto res = data.interpreter->interpret(*astPtr);
 			CHECK(res.asRvalue().nodeval<int>() == 30);
+		}
+
+		SUBCASE("Function 0 parameter creating custom object") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var totoFunc = function() : var { return { num: 3, test: \"test\" }; }; var titi = totoFunc(); titi.num;", data);
+			auto res = data.interpreter->interpret(*astPtr);
+			CHECK(res.asRvalue().nodeval<int>() == 3);
+		}
+
+		SUBCASE("Outside script from file (import)") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var Character = import \"../test/src/resources/character\";", data);
+			auto res = data.interpreter->interpret(*astPtr);
+		}
+
+		SUBCASE("Outside script from file (import)") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var Character = import \"../test/src/resources/character\";var player = Character.build(\"Player\");var enemy = Character.default; enemy.age;", data);
+			auto res = data.interpreter->interpret(*astPtr);
+			CHECK(res.asRvalue().nodeval<int>() == 10);
 		}
 	}
 		

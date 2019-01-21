@@ -6,12 +6,12 @@
 namespace ska {
 	class ASTNode;
 	class SymbolTable;
-	class Parser;
+	class StatementParser;
 
 	class SymbolTableTypeUpdater :
 		public SubObserver<VarTokenEvent>{
 	public:
-		SymbolTableTypeUpdater(Parser& parser, SymbolTable& symbolTable);
+		SymbolTableTypeUpdater(StatementParser& parser, SymbolTable& symbolTable);
 		~SymbolTableTypeUpdater() = default;
 
 	private:
