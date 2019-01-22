@@ -28,7 +28,7 @@ namespace ska {
 
     static constexpr const char* OperatorSTR[] = {
 		"BINARY",
-        "UNARY,"
+        "UNARY",
 		"LITERAL",
 		"VARIABLE_DECLARATION",
 		"VARIABLE_AFFECTATION",

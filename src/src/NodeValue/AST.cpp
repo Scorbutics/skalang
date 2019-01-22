@@ -1,6 +1,5 @@
 #include "AST.h"
-#include "Service/TypeBuilder/TypeBuilderBinary.h"
-#include "Service/TypeBuilder/TypeBuilderLiteral.h"
+#include "Service/ASTFactory.h"
 
 ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
     m_op(l != nullptr && r != nullptr ? Operator::BINARY : Operator::UNARY),

@@ -5,13 +5,17 @@ ska::Type ska::OperationType<ska::Operator::FIELD_ACCESS>::GetObjectType(const S
 	assert(GetObject().type() == ExpressionType::OBJECT && node.size() == 2);
 	auto objectType = GetObject().type().value();
 	const auto& typeName = GetObjectTypeName();
-	if (typeName.empty() || objectType.userDefinedSymbolTable() == nullptr) {
+	if (typeName.empty()) {
 		return Type { ExpressionType::VOID };
 	}
 	
 	auto symbolObject = symbols[typeName];
 	if (symbolObject != nullptr) {
 		objectType = symbolObject->getType();
+	}
+	
+	if(objectType.userDefinedSymbolTable() == nullptr) {
+		return Type { ExpressionType::VOID};
 	}
 	
 	return objectType;

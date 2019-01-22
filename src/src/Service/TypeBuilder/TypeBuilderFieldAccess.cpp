@@ -3,7 +3,7 @@
 #include "NodeValue/AST.h"
 #include "Service/SymbolTable.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>)
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const SymbolTable& symbols, OperateOn node) {
 	auto objectType = node.GetObjectType(symbols);

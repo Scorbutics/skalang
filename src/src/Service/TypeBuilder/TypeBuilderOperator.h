@@ -1,9 +1,7 @@
 #pragma once
 
-#include "NodeValue/Operator.h"
 #include "NodeValue/Type.h"
 #include "TypeBuildUnit.h"
-#include "TypeBuilderCalculatorDispatcher.h"
 #include "Operation/OperationType.h"
 
 #define SKALANG_BUILDER_TYPE_OPERATOR_DEFINE(OperatorType)\
@@ -32,3 +30,17 @@ namespace ska {
 
 
 }
+
+#include "Service/TypeBuilder/TypeBuilderFunctionCall.h"
+#include "Service/TypeBuilder/TypeBuilderFunctionPrototypeDeclaration.h"
+#include "Service/TypeBuilder/TypeBuilderFunctionDeclaration.h"
+#include "Service/TypeBuilder/TypeBuilderParameterDeclaration.h"
+#include "Service/TypeBuilder/TypeBuilderArrayDeclaration.h"
+#include "Service/TypeBuilder/TypeBuilderArrayUse.h"
+#include "Service/TypeBuilder/TypeBuilderVariableAffectation.h"
+#include "Service/TypeBuilder/TypeBuilderVariableDeclaration.h"
+#include "Service/TypeBuilder/TypeBuilderImport.h"
+#include "Service/TypeBuilder/TypeBuilderExport.h"
+#include "Service/TypeBuilder/TypeBuilderBinary.h"
+#include "Service/TypeBuilder/TypeBuilderLiteral.h"
+#include "Service/TypeBuilder/TypeBuilderFieldAccess.h"

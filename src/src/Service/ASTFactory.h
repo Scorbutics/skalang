@@ -1,28 +1,18 @@
+#pragma once
+#include <iostream>
 #include <vector>
 #include <variant>
 #include <memory>
 
-#include "Service/TypeBuilder/TypeBuildUnit.h"
-
-//Alls except Unary, Binary & Literal
-#include "Service/TypeBuilder/TypeBuilderFieldAccess.h"
-#include "Service/TypeBuilder/TypeBuilderFunctionCall.h"
-#include "Service/TypeBuilder/TypeBuilderFunctionPrototypeDeclaration.h"
-#include "Service/TypeBuilder/TypeBuilderFunctionDeclaration.h"
-#include "Service/TypeBuilder/TypeBuilderParameterDeclaration.h"
-#include "Service/TypeBuilder/TypeBuilderArrayDeclaration.h"
-#include "Service/TypeBuilder/TypeBuilderArrayUse.h"
-#include "Service/TypeBuilder/TypeBuilderVariableAffectation.h"
-#include "Service/TypeBuilder/TypeBuilderVariableDeclaration.h"
-#include "Service/TypeBuilder/TypeBuilderImport.h"
-#include "Service/TypeBuilder/TypeBuilderExport.h"
+#include "Service/TypeBuilder/TypeBuilderOperator.h"
 
 #include "NodeValue/AST.h"
 #include "NodeValue/OperatorTraits.h"
+#include "NodeValue/Operator.h"
 
 namespace ska {
 	class ASTFactory {
-	public:
+	
 		template<Operator o>
 		static void CheckTokenAssociatedWithOperator(const Token& token) {
 			static_assert(o != Operator::BINARY && o != Operator::LITERAL, "Wrong constructor used for a logical ASTNode. Use MakeLogicalNode instead.");
@@ -47,6 +37,7 @@ namespace ska {
 			return result;
 		}
 		
+		public:
 		template<Operator o, class ... Node>
 		static ASTNodePtr MakeNode(std::unique_ptr<Node>&& ... children) {
 			return ASTFactory::template MakeNode<o>(Token{}, ASTFactory::template BuildVectorFromNodePack(std::move(children)...));
@@ -66,6 +57,7 @@ namespace ska {
 		static ASTNodePtr MakeNode(Token token, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{}) {
 			ASTFactory::template CheckTokenAssociatedWithOperator<o>(token);
 			auto node = std::unique_ptr<ASTNode>(new ASTNode(o, std::move(token), std::move(children)));
+			std::cout << "Operator " << o << " builder" << std::endl;
 			node->m_typeBuilder = std::make_unique<TypeBuilderOperator<o>>();
 			return node;
 		}
