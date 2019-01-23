@@ -4,7 +4,7 @@
 #include "Service/SymbolTable.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
-#include "Service/Parser.h"
+#include "Service/StatementParser.h"
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 
@@ -14,7 +14,7 @@ std::unique_ptr<ska::ASTNode> ASTFromInputSemanticComplexTC(const std::string& i
 	const auto tokens = tokenizer.tokenize();
 	auto reader = ska::TokenReader { tokens };
 
-	data.parser = std::make_unique<ska::Parser> ( reservedKeywords, reader );
+	data.parser = std::make_unique<ska::StatementParser> ( reservedKeywords, reader );
     data.symbols = std::make_unique<ska::SymbolTable> (*data.parser);
     data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, *data.symbols);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, *data.symbols);
@@ -132,32 +132,19 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			, data);
 	}
 
-	//TODO : complexe à réaliser mais serait bien.
-	SUBCASE("constructor complex with contained function USING the current type...") {
+	SUBCASE("after field access, not an lvalue") {
 		try {
 			ASTFromInputSemanticComplexTC(
-				"var Joueur = function(nom:string) : var { "
-				"var puissance = 10;"
-
-				"var attaquer = function(cible:Joueur) {"
-				"cible.pv = cible.pv - puissance;"
-				"};"
-
-				"return {"
-				"nom: nom,"
-				"puissance : puissance,"
-				"pv : 100,"
-				"attaquer : attaquer"
-				"};"
-				"};"
-				"var joueur1 = Joueur(\"joueur1\");"
-				"var joueur2 = Joueur(\"joueur2\");"
-				"joueur1.attaquer(joueur2);"
-				, data);
+				"var lvalFunc137 = function() : var {" 
+					"var test137_ = function() : int { return 0; };" 
+					"return { test : test137_};" 
+				"};" 
+				"var object = lvalFunc137();"
+				"object.test() = 1234;", data);
 			CHECK(false);
 		} catch (std::exception& e) {
-			CHECK(std::string(e.what()) == 
-			"trying to access to an undeclared field : pv of cible of type Joueur (function -  string - Joueur var)");
+			CHECK(e.what() == std::string("The symbol \"\" is not an lvalue, therefore cannot be assigned"));
 		}
 	}
+
 }

@@ -1,11 +1,12 @@
 #include <iostream>
 #include "Config/LoggerConfigLang.h"
-#include "ShuntingYardExpressionParser.h"
-#include "Service/Parser.h"
+#include "ExpressionParser.h"
+#include "Service/StatementParser.h"
 #include "NodeValue/AST.h"
 #include "ReservedKeywordsPool.h"
+#include "Service/ASTFactory.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ShuntingYardExpressionParser)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ExpressionParser)
 
 //#define SKA_LOG_SHUNTING_YARD_DETAILS
 
@@ -29,21 +30,22 @@ void PrintPtr(const Container& c, const std::string& name = " ") {
 	std::cout << std::endl;
 }
 
-ska::ShuntingYardExpressionParser::ShuntingYardExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, Parser& parser, TokenReader& input) :
+ska::ExpressionParser::ExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, StatementParser& parser, TokenReader& input) :
 	m_reservedKeywordsPool(reservedKeywordsPool),
 	m_parser(parser),
 	m_input(input),
 	m_matcherArray(m_input, m_reservedKeywordsPool, m_parser),
 	m_matcherFunction(m_input, m_reservedKeywordsPool, m_parser),
-	m_matcherVar(m_input, m_reservedKeywordsPool, m_parser) {
+	m_matcherVar(m_input, m_reservedKeywordsPool, m_parser),
+	m_matcherImport(m_input, m_reservedKeywordsPool, m_parser) {
 }
 
-ska::ASTNodePtr ska::ShuntingYardExpressionParser::parse() {
+ska::ASTNodePtr ska::ExpressionParser::parse() {
 	auto data = expression_stack<Token, ASTNodePtr>{};
 	return expression(data);
 }
 
-bool ska::ShuntingYardExpressionParser::parseTokenExpression(ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
+bool ska::ExpressionParser::parseTokenExpression(ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
 
 	switch (token.type()) {
 	case TokenType::RESERVED: {
@@ -58,12 +60,12 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(ExpressionStack& ex
 	case TokenType::STRING:
 	case TokenType::DIGIT:
 		SLOG(ska::LogLevel::Debug) << "\tPushing operand " << token;
-		expressions.push(ASTNode::MakeLogicalNode(m_input.match(token.type())));
+		expressions.push(ASTFactory::MakeLogicalNode(m_input.match(token.type())));
 		break;
 
 	case TokenType::IDENTIFIER: {
 		SLOG(ska::LogLevel::Debug) << "\tPushing var operand " << token;
-		auto varNode = ASTNode::MakeLogicalNode(m_input.match(token.type()));
+		auto varNode = ASTFactory::MakeLogicalNode(m_input.match(token.type()));
 		auto event = VarTokenEvent::MakeUse(*varNode);
 		m_parser.Observable<VarTokenEvent>::notifyObservers(event);
 		expressions.push(std::move(varNode));
@@ -89,7 +91,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(ExpressionStack& ex
 		
 
 	case TokenType::SYMBOL:
-        return matchSymbol(expressions, token);
+        return matchSymbol(expressions, token, isDoingOperation);
 
 	default:
 		error("Expected a symbol, a literal, an identifier or a reserved keyword, but got the token : " + token.name());
@@ -97,7 +99,7 @@ bool ska::ShuntingYardExpressionParser::parseTokenExpression(ExpressionStack& ex
     return false;
 }
 
-void ska::ShuntingYardExpressionParser::matchRange(ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
+void ska::ExpressionParser::matchRange(ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
     const auto& value = std::get<std::string>(token.content());
     switch (value[0]) {
 	case '(':
@@ -119,7 +121,7 @@ void ska::ShuntingYardExpressionParser::matchRange(ExpressionStack& expressions,
 			return Group::FlowControl::GROUP;
 		};
 
-		auto result = expressions.groupAndPop<ASTNode>(std::move(groupParenthesisRange));
+		auto result = expressions.groupAndPop<ASTFactory>(std::move(groupParenthesisRange));
 		if (result != nullptr) {
 			expressions.push(std::move(result));
 		}
@@ -131,12 +133,11 @@ void ska::ShuntingYardExpressionParser::matchRange(ExpressionStack& expressions,
     }
 }
 
-bool ska::ShuntingYardExpressionParser::matchSymbol(ExpressionStack& expressions, const Token& token) {
+bool ska::ExpressionParser::matchSymbol(ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
     const auto& value = std::get<std::string>(token.content());
     if(value == "=") {
-		//We must check that the token before the '=' is an lvalue.
-		//Pops the variable name token (mentioned before the '=')
-		expressions.replaceTopOperand(m_matcherVar.matchAffectation());
+		//We must check that the token before the '=' is an lvalue : done in the semantic check pass.
+		expressions.push(m_matcherVar.matchAffectation(expressions.popOperandIfNoOperator(isDoingOperation)));
         return false;
     } 
 
@@ -147,7 +148,7 @@ bool ska::ShuntingYardExpressionParser::matchSymbol(ExpressionStack& expressions
         SLOG(ska::LogLevel::Debug) << "\tLess precedence, poping first (top) operator before adding " << value;
 
 		auto poped = false;
-		auto expressionGroup = expressions.groupAndPop<ASTNode>(Group::FirstOnly<Token>(poped));
+		auto expressionGroup = expressions.groupAndPop<ASTFactory>(Group::FirstOnly<Token>(poped));
 		if (expressionGroup == nullptr) {
 			error("void expression on affectation");
 		}
@@ -159,7 +160,7 @@ bool ska::ShuntingYardExpressionParser::matchSymbol(ExpressionStack& expressions
     
 }
 
-void ska::ShuntingYardExpressionParser::matchParenthesis(ExpressionStack& expressions, bool isDoingOperation) {
+void ska::ExpressionParser::matchParenthesis(ExpressionStack& expressions, bool isDoingOperation) {
 	auto functionNameOperand = expressions.popOperandIfNoOperator(isDoingOperation);
 	if (functionNameOperand != nullptr) {
 		auto event = ExpressionTokenEvent{ *functionNameOperand };
@@ -178,21 +179,21 @@ void ska::ShuntingYardExpressionParser::matchParenthesis(ExpressionStack& expres
 	expressions.push(Token{ m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()) });
 }
 
-ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchObjectFieldAccess(ASTNodePtr objectAccessed) {
+ska::ASTNodePtr ska::ExpressionParser::matchObjectFieldAccess(ASTNodePtr objectAccessed) {
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::METHOD_CALL_OPERATOR>());
     auto fieldAccessedIdentifier = m_input.match(TokenType::IDENTIFIER);
 
-    return ASTNode::MakeNode<Operator::FIELD_ACCESS>(std::move(objectAccessed), ASTNode::MakeLogicalNode(fieldAccessedIdentifier));
+    return ASTFactory::MakeNode<Operator::FIELD_ACCESS>(std::move(objectAccessed), ASTFactory::MakeLogicalNode(fieldAccessedIdentifier));
 }
 
-bool ska::ShuntingYardExpressionParser::isAtEndOfExpression() const {
+bool ska::ExpressionParser::isAtEndOfExpression() const {
     return m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()) || 
             m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>()) ||
             m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()) ||
             m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>()); 
 }
 
-ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(ExpressionStack& expressions) {
+ska::ASTNodePtr ska::ExpressionParser::expression(ExpressionStack& expressions) {
 	auto rangeCounter = 0;
     auto isDoingOperation = false;
     while (!isAtEndOfExpression() && rangeCounter >= 0) {
@@ -209,7 +210,7 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(ExpressionStack& e
 	}
 	SLOG(ska::LogLevel::Debug) << "\tPoping everything";
 
-	auto expressionGroup = expressions.template groupAndPop <ASTNode>(Group::All<Token>);
+	auto expressionGroup = expressions.template groupAndPop <ASTFactory>(Group::All<Token>);
 	if (expressionGroup != nullptr) {
 		auto event = ExpressionTokenEvent { *expressionGroup };
 		m_parser.Observable<ExpressionTokenEvent>::notifyObservers(event);
@@ -219,19 +220,20 @@ ska::ASTNodePtr ska::ShuntingYardExpressionParser::expression(ExpressionStack& e
 
 }
 
-ska::ASTNodePtr ska::ShuntingYardExpressionParser::matchReserved() {
+ska::ASTNodePtr ska::ExpressionParser::matchReserved() {
 	const auto& result = m_input.actual();
 
 	switch(std::get<std::size_t>(result.content())) {
 		case static_cast<std::size_t>(TokenGrammar::FUNCTION):
 			return m_matcherFunction.matchDeclaration();
-
+		case static_cast<std::size_t>(TokenGrammar::IMPORT) :
+			return m_matcherImport.matchImport();
 		default:
 			return nullptr;
 	}
 }
 
-void ska::ShuntingYardExpressionParser::error(const std::string& message) {
+void ska::ExpressionParser::error(const std::string& message) {
 	throw std::runtime_error("syntax error : " + message);
 }
 

@@ -3,7 +3,7 @@
 #include <Data/Events/EventDispatcher.h>
 
 #include "NodeValue/Token.h"
-#include "Service/ShuntingYardExpressionParser.h"
+#include "Service/ExpressionParser.h"
 
 #include "Event/ForTokenEvent.h"
 #include "Event/IfElseTokenEvent.h"
@@ -13,6 +13,7 @@
 #include "Event/ExpressionTokenEvent.h"
 #include "Event/ReturnTokenEvent.h"
 #include "Event/ArrayTokenEvent.h"
+#include "Event/ImportTokenEvent.h"
 
 #include "Matcher/MatcherBlock.h"
 #include "Matcher/MatcherFor.h"
@@ -23,7 +24,7 @@
 namespace ska {
 	struct ReservedKeywordsPool;
 
-	class Parser :
+	class StatementParser :
 	    public EventDispatcher<
             ForTokenEvent,
             IfElseTokenEvent,
@@ -32,34 +33,37 @@ namespace ska {
             BlockTokenEvent,
 		    ExpressionTokenEvent,
             ReturnTokenEvent,
-			ArrayTokenEvent
+			ArrayTokenEvent,
+			ImportTokenEvent
 	    > {
 
 		using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 	public:
-		Parser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReader& input);
+		StatementParser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReader& input);
 		ASTNodePtr parse();
 
 		ASTNodePtr statement();
         ASTNodePtr optstatement(const Token& mustNotBe = Token{});
 
-		ASTNodePtr matchReservedKeyword(const std::size_t keywordIndex);
-        ASTNodePtr matchExpressionStatement();
-
 		ASTNodePtr expr();
 		ASTNodePtr optexpr(const Token& mustNotBe = Token{});
+
+		ASTNodePtr subParse(std::ifstream& file);
 	
 	private:
+		ASTNodePtr matchExpressionStatement();
+		ASTNodePtr matchReservedKeyword(const std::size_t keywordIndex);
 		static void error(const std::string& message);
 
 		TokenReader& m_input;
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
-		ShuntingYardExpressionParser m_shuntingYardParser;
+		ExpressionParser m_expressionParser;
 		
 		MatcherBlock m_matcherBlock;
 		MatcherFor m_matcherFor;
 		MatcherVar m_matcherVar;
 		MatcherIfElse m_matcherIfElse;
 		MatcherReturn m_matcherReturn;
+		MatcherImport m_matcherImport;
 	};
 }

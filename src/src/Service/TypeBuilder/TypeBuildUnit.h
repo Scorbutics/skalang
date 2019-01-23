@@ -1,6 +1,6 @@
 #pragma once
 
-#include "NodeValue/ExpressionType.h"
+#include "NodeValue/Type.h"
 
 namespace ska {
 	class SymbolTable;

@@ -2,10 +2,11 @@
 #include "MatcherArray.h"
 
 #include "NodeValue/AST.h"
-#include "Service/Parser.h"
+#include "Service/StatementParser.h"
 #include "Service/TokenReader.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
+#include "Service/ASTFactory.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherArray)
 
@@ -28,7 +29,7 @@ ska::ASTNodePtr ska::MatcherArray::matchDeclaration() {
 	}
 
     m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
-	auto declarationNode = ASTNode::MakeNode<ska::Operator::ARRAY_DECLARATION>(std::move(arrayNode));
+	auto declarationNode = ASTFactory::MakeNode<ska::Operator::ARRAY_DECLARATION>(std::move(arrayNode));
 	auto event = ArrayTokenEvent{ *declarationNode, ArrayTokenEventType::USE };
 	m_parser.Observable<ArrayTokenEvent>::notifyObservers(event);
 	return declarationNode;
@@ -45,7 +46,7 @@ ska::ASTNodePtr ska::MatcherArray::matchUse(ASTNodePtr identifierArrayAffected) 
 	auto indexNode = m_parser.expr();
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 
-	auto declarationNode = ASTNode::MakeNode<ska::Operator::ARRAY_USE>(std::move(identifierArrayAffected), std::move(indexNode));
+	auto declarationNode = ASTFactory::MakeNode<ska::Operator::ARRAY_USE>(std::move(identifierArrayAffected), std::move(indexNode));
 	
     //Notifies the outside that we use the array
     auto event = ArrayTokenEvent{ *declarationNode, ArrayTokenEventType::USE };

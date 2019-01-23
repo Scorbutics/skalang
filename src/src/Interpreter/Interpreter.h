@@ -14,12 +14,11 @@ namespace ska {
 		~Interpreter() = default;
 
 		OperatorInterpreter build();
-		void interpret(ASTNodePtr root);
-		const Token::Variant& interpret(ASTNode& node);
+		NodeCell interpret(ASTNode& node);
 
 	private:
 		SymbolTable& m_symbols;
-		OperatorInterpreter m_operatorInterpreter;
 		MemoryTable m_memory;
+		OperatorInterpreter m_operatorInterpreter;
 	};
 }

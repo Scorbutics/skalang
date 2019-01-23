@@ -10,7 +10,7 @@
 
 namespace ska {
 	class SymbolTable;
-    class Parser;
+    class StatementParser;
 
     class SemanticTypeChecker :
     public SubObserver<VarTokenEvent>,
@@ -19,7 +19,7 @@ namespace ska {
     public SubObserver<ReturnTokenEvent>,
 	public SubObserver<IfElseTokenEvent> {
     public:
-        SemanticTypeChecker(Parser& parser, const SymbolTable& symbols);
+        SemanticTypeChecker(StatementParser& parser, const SymbolTable& symbols);
         ~SemanticTypeChecker() = default;
     private:
         bool matchArray(const ArrayTokenEvent& token);

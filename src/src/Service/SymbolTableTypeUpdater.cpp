@@ -1,12 +1,12 @@
 #include "Config/LoggerConfigLang.h"
-#include "Service/Parser.h"
+#include "Service/StatementParser.h"
 #include "NodeValue/OperatorTraits.h"
 #include "SymbolTable.h"
 #include "SymbolTableTypeUpdater.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTableTypeUpdater)
 
-ska::SymbolTableTypeUpdater::SymbolTableTypeUpdater(Parser& parser, SymbolTable& symbolTable): 
+ska::SymbolTableTypeUpdater::SymbolTableTypeUpdater(StatementParser& parser, SymbolTable& symbolTable):
 	m_symbols(symbolTable),
 	SubObserver<VarTokenEvent>(std::bind(&SymbolTableTypeUpdater::matchVariable, this, std::placeholders::_1), parser) {
 }

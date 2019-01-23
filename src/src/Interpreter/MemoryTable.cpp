@@ -1,24 +1,33 @@
 #include "MemoryTable.h"
 
-ska::MemoryTable& ska::MemoryTable::parent() {
+ska::MemoryTable* ska::MemoryTable::parent() {
 	return m_current->m_parent;
 }
 
 ska::MemoryTable & ska::MemoryTable::createNested() {
-	m_current->m_children.push_back(std::make_unique<MemoryTable>(*m_current));
+	m_current->m_children.push_back(std::make_shared<MemoryTable>(*m_current));
 	auto& lastChild = *m_current->m_children.back();
-	//No bad memory access possible when unique_ptr are moved, that's why it's safe to return the address of contained item
+	//No bad memory access possible when smart ptr are moved, that's why it's safe to return the address of contained item
 	//even if we move the vector or if the vector moves its content automatically 
 	m_current = &lastChild;
 	return lastChild;
 }
 
-ska::MemoryTable& ska::MemoryTable::endNested() {
-	m_current = &m_current->parent();
-	return *m_current;
+ska::MemoryTable* ska::MemoryTable::endNested() {
+	m_current = m_current->parent();
+	return m_current;
 }
 
-ska::Token::Variant& ska::MemoryTable::put(std::string name, Token::Variant value) {
+ska::MemoryTable* ska::MemoryTable::popNested() {
+	m_current = m_current->parent();
+	if (m_current != nullptr) {
+		m_current->m_children.pop_back();
+	}
+	return m_current;
+}
+
+ska::NodeValue& ska::MemoryTable::put(std::string name, NodeValue value) {
+	assert(!name.empty());
 	auto* memValue = operator[](name);
 	if (memValue != nullptr) {
 		*memValue = std::move(value);
@@ -28,4 +37,12 @@ ska::Token::Variant& ska::MemoryTable::put(std::string name, Token::Variant valu
 	}
 
 	return *memValue;
+}
+
+void ska::MemoryTable::put(std::string name, std::size_t index, NodeValue value) {
+	assert(!name.empty());
+	auto* memValue = operator[](name);
+	assert(memValue != nullptr);
+	auto& arrayPtr = memValue->as<std::shared_ptr<std::vector<NodeValue>>>();
+	(*arrayPtr)[index] = std::move(value.as<Token::Variant>());
 }

@@ -1,6 +1,5 @@
 #include "AST.h"
-#include "Service/TypeBuilder/TypeBuilderBinary.h"
-#include "Service/TypeBuilder/TypeBuilderLiteral.h"
+#include "Service/ASTFactory.h"
 
 ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
     m_op(l != nullptr && r != nullptr ? Operator::BINARY : Operator::UNARY),
@@ -56,6 +55,6 @@ void ska::ASTNode::buildType(const SymbolTable& symbols) {
     m_type = m_typeBuilder->build(symbols, *this);
 }
 
-void ska::ASTNode::buildValue(Token::Variant value) {
+void ska::ASTNode::buildValue(NodeValue value) {
 	m_value = std::move(value);
 }

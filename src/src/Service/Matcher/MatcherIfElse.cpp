@@ -2,10 +2,11 @@
 #include "MatcherIfElse.h"
 
 #include "NodeValue/AST.h"
-#include "Service/Parser.h"
+#include "Service/StatementParser.h"
 #include "Service/TokenReader.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
+#include "Service/ASTFactory.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherIfElse)
 
@@ -25,9 +26,9 @@ ska::ASTNodePtr ska::MatcherIfElse::match() {
         if (m_input.expect(elseToken)) {
             m_input.match(elseToken);
             auto elseBlockStatement = m_parser.statement();
-            ifNode = ASTNode::MakeNode<Operator::IF_ELSE>(std::move(conditionExpression), std::move(conditionStatement), std::move(elseBlockStatement));
+            ifNode = ASTFactory::MakeNode<Operator::IF_ELSE>(std::move(conditionExpression), std::move(conditionStatement), std::move(elseBlockStatement));
         } else {
-            ifNode = ASTNode::MakeNode<Operator::IF>(std::move(conditionExpression), std::move(conditionStatement));
+            ifNode = ASTFactory::MakeNode<Operator::IF>(std::move(conditionExpression), std::move(conditionStatement));
         }
     }
 

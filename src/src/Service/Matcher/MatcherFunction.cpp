@@ -2,9 +2,10 @@
 #include "MatcherFunction.h"
 
 #include "NodeValue/AST.h"
-#include "Service/Parser.h"
+#include "Service/StatementParser.h"
 #include "Service/TokenReader.h"
 #include "Service/ReservedKeywordsPool.h"
+#include "Service/ASTFactory.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherFunction)
 
@@ -15,14 +16,14 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclaration() {
     //With this grammar, no other way than reading previously to retrieve the function name.
     const auto functionName = m_input.readPrevious(3); 
 
-	auto emptyNode = ASTNode::MakeEmptyNode();
+	auto emptyNode = ASTFactory::MakeEmptyNode();
 	auto startEvent = FunctionTokenEvent{ *emptyNode, FunctionTokenEventType::DECLARATION_NAME, functionName.name() };
 	m_parser.Observable<FunctionTokenEvent>::notifyObservers(startEvent);
 
 	auto declNode = fillDeclarationParameters();
 	declNode.push_back(matchDeclarationReturnType());
 
-	auto prototypeNode = ASTNode::MakeNode<Operator::FUNCTION_PROTOTYPE_DECLARATION>(functionName, std::move(declNode));
+	auto prototypeNode = ASTFactory::MakeNode<Operator::FUNCTION_PROTOTYPE_DECLARATION>(functionName, std::move(declNode));
 
 	auto functionEvent = VarTokenEvent::MakeFunction(*prototypeNode);
 	m_parser.Observable<VarTokenEvent>::notifyObservers(functionEvent);
@@ -31,7 +32,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclaration() {
 	auto functionBodyNode = matchDeclarationBody();
 	SLOG(ska::LogLevel::Debug) << "function read.";
 	
-	auto functionDeclarationNode = ASTNode::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(prototypeNode), std::move(functionBodyNode));
+	auto functionDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(prototypeNode), std::move(functionBodyNode));
 	
 	auto statementEvent = FunctionTokenEvent {*functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, functionName.name() };
 	m_parser.Observable<FunctionTokenEvent>::notifyObservers(statementEvent);
@@ -64,7 +65,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchCall(ASTNodePtr identifierFunctionNam
 	}
 	m_input.match(endParametersToken);
 
-	auto functionCallNode = ASTNode::MakeNode<Operator::FUNCTION_CALL>(std::move(functionCallNodeContent));
+	auto functionCallNode = ASTFactory::MakeNode<Operator::FUNCTION_CALL>(std::move(functionCallNodeContent));
 	auto event = FunctionTokenEvent { *functionCallNode, FunctionTokenEventType::CALL };
 	m_parser.Observable<FunctionTokenEvent>::notifyObservers(event);
 	return functionCallNode;
@@ -96,12 +97,12 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationParameter() {
 			throw std::runtime_error("syntax error : only brackets [] are supported in a parameter declaration type");
 		}
 
-		typeNode = ASTNode::MakeLogicalNode(typeToken, ASTNode::MakeLogicalNode(Token{"", TokenType::ARRAY }));
+		typeNode = ASTFactory::MakeLogicalNode(typeToken, ASTFactory::MakeLogicalNode(Token{"", TokenType::ARRAY }));
 	} else {
-		typeNode = ASTNode::MakeLogicalNode(typeToken);
+		typeNode = ASTFactory::MakeLogicalNode(typeToken);
 	}
 
-	auto node = ASTNode::MakeNode<Operator::PARAMETER_DECLARATION>(id, std::move(typeNode));
+	auto node = ASTFactory::MakeNode<Operator::PARAMETER_DECLARATION>(id, std::move(typeNode));
 	auto event = VarTokenEvent::MakeParameter(*node, (*node)[0]);
 	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
 	return node;
@@ -136,12 +137,12 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationReturnType() {
 		const auto type = m_input.match(TokenType::RESERVED);
 		SLOG(ska::LogLevel::Debug) << "function type detected : " << type;
 		//if(type.asString() != "var") {
-		return ASTNode::MakeLogicalNode(type);
+		return ASTFactory::MakeLogicalNode(type);
 		//}
 	} 
 
 	SLOG(ska::LogLevel::Debug) << "void function detected";
-	return ASTNode::MakeLogicalNode(ska::Token{ "", ska::TokenType::IDENTIFIER });
+	return ASTFactory::MakeLogicalNode(ska::Token{ "", ska::TokenType::IDENTIFIER });
 }
 
 ska::ASTNodePtr ska::MatcherFunction::matchDeclarationBody() {
@@ -158,6 +159,6 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationBody() {
 	}
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
 
-	auto blockNode = ASTNode::MakeNode<Operator::BLOCK>(std::move(statements));
+	auto blockNode = ASTFactory::MakeNode<Operator::BLOCK>(std::move(statements));
 	return blockNode;
 }

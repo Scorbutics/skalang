@@ -2,21 +2,21 @@
 #include "Interpreter.h"
 #include "InterpreterOperatorIfElse.h"
 
-ska::Token::Variant ska::InterpreterOperator<ska::Operator::IF>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
-	auto conditionValue = m_interpreter.interpret(node[0]);
-	if(std::get<bool>(conditionValue)) {
-        m_interpreter.interpret(node[1]);
+ska::NodeCell ska::InterpreterOperator<ska::Operator::IF>::interpret(OperateOn node) {
+	auto conditionValue = m_interpreter.interpret(node.GetCondition()).asRvalue();
+	if(conditionValue.nodeval<bool>()) {
+        m_interpreter.interpret(node.GetIfStatement());
     }
 	
 	return "";
 }
 
-ska::Token::Variant ska::InterpreterOperator<ska::Operator::IF_ELSE>::interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) {
-	auto conditionValue = m_interpreter.interpret(node[0]);
-	if(std::get<bool>(conditionValue)) {
-        m_interpreter.interpret(node[1]);
+ska::NodeCell ska::InterpreterOperator<ska::Operator::IF_ELSE>::interpret(OperateOn node) {
+	auto conditionValue = m_interpreter.interpret(node.GetCondition()).asRvalue();
+	if(conditionValue.nodeval<bool>()) {
+        m_interpreter.interpret(node.GetIfStatement());
     } else {
-        m_interpreter.interpret(node[2]);
+        m_interpreter.interpret(node.GetElseStatement());
     }
 	
 	return "";

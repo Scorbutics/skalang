@@ -2,10 +2,11 @@
 #include "MatcherReturn.h"
 
 #include "NodeValue/AST.h"
-#include "Service/Parser.h"
+#include "Service/StatementParser.h"
 #include "Service/TokenReader.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
+#include "Service/ASTFactory.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherReturn)
 
@@ -28,7 +29,7 @@ ska::ASTNodePtr ska::MatcherReturn::match() {
 
             SLOG(ska::LogLevel::Info) << "Constructor " << name << " with field \"" << field << "\" and field value \"" << (*fieldValue) << "\"";
 
-            auto fieldNode = ASTNode::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(field), std::move(fieldValue));		
+            auto fieldNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(field), std::move(fieldValue));
 
             auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_DECLARATION> (*fieldNode);
 			m_parser.Observable<VarTokenEvent>::notifyObservers(event);
@@ -42,7 +43,7 @@ ska::ASTNodePtr ska::MatcherReturn::match() {
         
         m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
     
-        returnNode = ASTNode::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(returnFieldNodes)); 
+        returnNode = ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(returnFieldNodes));
         auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT> (*returnNode);
 		m_parser.Observable<ReturnTokenEvent>::notifyObservers(returnEndEvent);
     } else {

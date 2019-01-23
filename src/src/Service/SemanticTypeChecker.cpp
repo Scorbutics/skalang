@@ -1,13 +1,14 @@
 #include <iostream>
 #include "Config/LoggerConfigLang.h"
-#include "Service/Parser.h"
+#include "Service/StatementParser.h"
 #include "SemanticTypeChecker.h"
 #include "SymbolTable.h"
 #include "NodeValue/AST.h"
+#include "NodeValue/OperatorTraits.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SemanticTypeChecker)
 
-ska::SemanticTypeChecker::SemanticTypeChecker(Parser& parser, const SymbolTable& symbols) :
+ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser, const SymbolTable& symbols) :
     SubObserver<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser),
     SubObserver<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser),
 	SubObserver<ArrayTokenEvent>(std::bind(&SemanticTypeChecker::matchArray, this, std::placeholders::_1), parser),
@@ -154,7 +155,13 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 	SLOG(ska::LogLevel::Debug) << variable << " = " << value << ";\tsymbol = " << tokenNodeExpressionType;
 
     if(variable.type() == VarTokenEventType::AFFECTATION) {
-        const auto newTokenType = type.crossTypes("=", tokenNodeExpressionType);
+		if (!OperatorTraits::isLvalueCompatible(variable.rootNode()[0].op())) {
+			auto ss = std::stringstream{};
+			ss << "The symbol \"" << name << "\" is not an lvalue, therefore cannot be assigned";
+			throw std::runtime_error(ss.str());
+		}
+
+		const auto newTokenType = type.crossTypes("=", tokenNodeExpressionType);
         if(newTokenType == ExpressionType::VOID) {
             const auto expressionTypeIndex = tokenNodeExpressionType;
 			auto ss = std::stringstream{};
@@ -163,7 +170,16 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 				expressionTypeIndex;
 			throw std::runtime_error(ss.str());		
         }
+
+		if (OperatorTraits::isNamed(variable.rootNode()[0].op()) && name.empty()) {
+			throw std::runtime_error("invalid symbol affectation");
+		}
     }
+
+	if (variable.type() == VarTokenEventType::VARIABLE_DECLARATION && 
+		OperatorTraits::isNamed(variable.rootNode().op()) && name.empty()) {
+		throw std::runtime_error("invalid symbol declaration");
+	}
 
     return true;
 }

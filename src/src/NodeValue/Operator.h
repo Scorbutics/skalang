@@ -18,6 +18,8 @@ namespace ska {
 		FUNCTION_DECLARATION,
 		FIELD_ACCESS,
 		FOR_LOOP,
+		IMPORT,
+		EXPORT,
 		BLOCK,
 		IF,
 		IF_ELSE,
@@ -26,7 +28,7 @@ namespace ska {
 
     static constexpr const char* OperatorSTR[] = {
 		"BINARY",
-        "UNARY,"
+        "UNARY",
 		"LITERAL",
 		"VARIABLE_DECLARATION",
 		"VARIABLE_AFFECTATION",
@@ -39,6 +41,8 @@ namespace ska {
 		"FUNCTION_DECLARATION",
 		"FIELD_ACCESS",
 		"FOR_LOOP",
+		"IMPORT",
+		"EXPORT",
 		"BLOCK",
 		"IF",
 		"IF_ELSE"

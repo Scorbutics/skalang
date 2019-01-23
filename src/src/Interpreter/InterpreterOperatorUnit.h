@@ -1,14 +1,30 @@
 #pragma once
 
 #include "NodeValue/Token.h"
+#include "NodeValue.h"
 
 namespace ska {
-	class SymbolTable;
 	class ASTNode;
 	class MemoryTable;
+	class SymbolTable;
+	class Interpreter;
 
 	class InterpreterOperatorUnit {
 	public:
-        virtual Token::Variant interpret(const SymbolTable& symbols, MemoryTable& memory, ASTNode& node) = 0;
-    };
+		virtual NodeCell interpret(ASTNode& node) = 0;
+	};
+
+	class InterpreterOperatorBase :
+		public InterpreterOperatorUnit {
+	public:
+		InterpreterOperatorBase(Interpreter& interpreter, const SymbolTable& symbols, MemoryTable& memory) :
+			m_interpreter(interpreter),
+			m_symbols(symbols),
+			m_memory(memory) {}
+	protected:
+		Interpreter& m_interpreter;
+		const SymbolTable& m_symbols;
+		MemoryTable& m_memory;
+	};
+
 }

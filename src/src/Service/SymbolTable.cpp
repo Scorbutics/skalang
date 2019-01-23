@@ -1,14 +1,15 @@
 #include "Config/LoggerConfigLang.h"
 #include "SymbolTable.h"
-#include "Service/Parser.h"
+#include "Service/StatementParser.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTable)
 
-ska::SymbolTable::SymbolTable(Parser& parser) :
+ska::SymbolTable::SymbolTable(StatementParser& parser) :
 	SubObserver<VarTokenEvent>(std::bind(&ska::SymbolTable::match, this, std::placeholders::_1), parser),
 	SubObserver<BlockTokenEvent>(std::bind(&ska::SymbolTable::nestedTable, this, std::placeholders::_1), parser),
 	SubObserver<FunctionTokenEvent>(std::bind(&ska::SymbolTable::matchFunction, this, std::placeholders::_1), parser),
-    SubObserver<ReturnTokenEvent>(std::bind(&ska::SymbolTable::matchReturn, this, std::placeholders::_1), parser) {
+    SubObserver<ReturnTokenEvent>(std::bind(&ska::SymbolTable::matchReturn, this, std::placeholders::_1), parser),
+	SubObserver<ImportTokenEvent>(std::bind(&ska::SymbolTable::matchImport, this, std::placeholders::_1), parser) {
 		m_rootTable = std::make_unique<ScopedSymbolTable>();
 		m_currentTable = m_rootTable.get();
 }
@@ -89,7 +90,6 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 	assert(m_currentTable != nullptr);
 	
 	switch(token.type()) {
-		case VarTokenEventType::FUNCTION_DECLARATION:
 		case VarTokenEventType::VARIABLE_DECLARATION:
 		case VarTokenEventType::PARAMETER_DECLARATION: {
 			const auto variableName = token.name();
@@ -104,7 +104,6 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 			}
         } break;
 
-		case VarTokenEventType::AFFECTATION:
 		case VarTokenEventType::USE: {
 			const auto variableName = token.name();
 			SLOG(ska::LogLevel::Info) << "Using variable : " << variableName;
@@ -114,7 +113,9 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 			}       
 		}
 		break;
-
+			case VarTokenEventType::AFFECTATION:
+			case VarTokenEventType::FUNCTION_DECLARATION:
+			break;
 		default:
 			throw std::runtime_error("Unmanaged variable event");
 			break;
@@ -122,5 +123,12 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 	return true;
 }
 
-
+bool ska::SymbolTable::matchImport(const ImportTokenEvent& token) {
+	assert(token.rootNode().size() == 4);
+	auto& hiddenFields = token.rootNode()[3];
+	for (auto& hiddenField : hiddenFields) {
+		erase(hiddenField->name());
+	}
+	return true;
+}
 
