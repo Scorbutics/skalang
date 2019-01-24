@@ -28,15 +28,8 @@ namespace ska {
 			//assert(!isNamed(m_type));
 		}
 
-		Type(Type t, const ScopedSymbolTable& sym) {
-			*this = t;
-			m_usedDefinedSymbolTable = &sym;
-			assert(isNamed(m_type));
-		}
-
-		Type(std::string name, ExpressionType t, const ScopedSymbolTable& sym) : 
+		Type(std::string name, ExpressionType t) : 
             m_type(t), 
-            m_usedDefinedSymbolTable(&sym), 
             m_alias(std::move(name)) {
 			assert(isNamed(m_type));
 		}
@@ -50,8 +43,6 @@ namespace ska {
             m_type = std::move(t.m_type);
             m_alias = std::move(t.m_alias);
             m_compound = std::move(t.m_compound);
-			m_usedDefinedSymbolTable = std::move(t.m_usedDefinedSymbolTable);
-			t.m_usedDefinedSymbolTable = nullptr;
             t.m_moved = true;
 			SLOG(ska::LogLevel::Debug) << " moved  to " << *this;
             return *this;
@@ -71,7 +62,6 @@ namespace ska {
 			m_type = t.m_type;
 			m_alias = t.m_alias;
 			m_compound = t.m_compound;
-			m_usedDefinedSymbolTable = t.m_usedDefinedSymbolTable;
 			m_moved = t.m_moved;
 			SLOG(ska::LogLevel::Debug) << "   Copy, Type " << t << " copied to " << *this;
 			return *this;
@@ -121,10 +111,6 @@ namespace ska {
 
 		ExpressionType crossTypes(std::string op, const Type& type2) const;
 		
-		const ScopedSymbolTable* userDefinedSymbolTable() const {
-			return m_usedDefinedSymbolTable;
-		}
-
 		std::size_t size() const {
 			return m_compound.size();
 		}
@@ -133,7 +119,6 @@ namespace ska {
 		ExpressionType m_type = ExpressionType::VOID;
 		std::string m_alias;
 		std::vector<Type> m_compound;
-		const ScopedSymbolTable* m_usedDefinedSymbolTable = nullptr;
 	    bool m_moved = false;
 
 		friend std::ostream& operator<<(std::ostream& stream, const Type& type);

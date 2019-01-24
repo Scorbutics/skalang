@@ -6,24 +6,21 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>)
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const SymbolTable& symbols, OperateOn node) {
-	auto objectType = node.GetObjectType(symbols);
-	SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Symbol type : " << objectType;
-	if (objectType.userDefinedSymbolTable() == nullptr) {
+	const auto* symbolObject = symbols[node.GetObjectTypeName()];
+	if (symbolObject == nullptr) {
 		if(node.GetObjectTypeName().empty()) {
 			throw std::runtime_error("trying to dereference an unknown symbol : " + node.GetObjectName());
 		}
 		throw std::runtime_error("the class symbol table " + node.GetFieldName() + " is not registered. Maybe you're trying to use the type you're defining in its definition...");
 	}
-	
-	const auto symbolField = node.GetFieldSymbolFromObjectSymbolTable(objectType);	
+
+	const auto* symbolField = (*symbolObject)[node.GetFieldName()];
     if (symbolField == nullptr) {
 		auto ss = std::stringstream{};
-		ss << "trying to access to an undeclared field : " << node.GetFieldName() << " of " << node.GetObjectName() << " of type " << objectType;
+		ss << "trying to access to an undeclared field : " << node.GetFieldName() << " of " << node.GetObjectName() << " (type " << symbolObject->getType() << ")";
         throw std::runtime_error(ss.str());
     }
 
     SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Field accessed " << node.GetFieldName() << " of type " << symbolField->getType();
-
-	return Type::isNamed(symbolField->getType()) ? Type{ symbolField->getType(), *symbolField->symbolTable() } : symbolField->getType();
-
+	return symbolField->getType();
 }

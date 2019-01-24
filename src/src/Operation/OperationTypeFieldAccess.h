@@ -16,6 +16,10 @@ namespace ska {
 			return node[0];
 		}
 		
+		inline auto& GetField() {
+			return node[0];
+		}
+
 	public:
 		OperationType(const ASTNode& node) : node(node) {}
 		
@@ -32,9 +36,9 @@ namespace ska {
 			return objectType.getName();
 		}
 		
-		Type GetObjectType(const SymbolTable& symbols);
-		
-		Symbol* GetFieldSymbolFromObjectSymbolTable(const Type& objectType);
-		
+		inline std::string GetFieldTypeName() {
+			const auto objectType = GetField().type().value();
+			return objectType.getName();
+		}
 	};
 }

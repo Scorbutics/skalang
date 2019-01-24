@@ -66,20 +66,20 @@ namespace ska {
 				m_category = t;//Type { t.getName(), t, *m_scopedTable };
 			}
 
-			ScopedSymbolTable* symbolTable() {
+			/*ScopedSymbolTable* symbolTable() {
 				return m_scopedTable;
 			}
 			
 			const ScopedSymbolTable* symbolTable() const {
 				return m_scopedTable;
-			}
+			}*/
 
             bool empty() const {
                 return m_category.compound().empty();
             }
 
-            const Symbol* operator[](const std::string& symbol) const;
-            Symbol* operator[](const std::string& symbol);
+            const Symbol* operator[](const std::string& fieldSymbolName) const;
+            Symbol* operator[](const std::string& fieldSymbolName);
 
             std::size_t size() const;
 

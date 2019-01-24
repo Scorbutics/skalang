@@ -9,9 +9,9 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator:
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::build(const SymbolTable& symbols, OperateOn node) {
 	auto functionName = node.GetFunctionName();
-	auto functionType = Type{ functionName, ExpressionType::FUNCTION, *symbols.current() };
+	auto functionType = Type{ functionName, ExpressionType::FUNCTION };
     for (auto& paramNode : node) {
-		auto type = paramNode->type().value() == ExpressionType::OBJECT ? Type{ functionName, ExpressionType::OBJECT, *functionType.userDefinedSymbolTable() } : paramNode->type().value();
+		auto type = paramNode->type().value() == ExpressionType::OBJECT ? Type{ functionName, ExpressionType::OBJECT} : paramNode->type().value();
         functionType.add(type);
     }
 	

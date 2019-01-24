@@ -73,6 +73,14 @@ namespace ska {
 			return true;
 		}
 
+		auto begin() {
+			return m_symbols.begin();
+		}
+
+		auto end() {
+			return m_symbols.end();
+		}
+
 	private:
         std::unordered_map<std::string, Symbol> m_symbols;
 		ChildrenScopedSymbolTable m_children;

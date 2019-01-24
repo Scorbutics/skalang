@@ -27,7 +27,7 @@ TEST_CASE("[ExpressionType]") {
 	auto& nested = table.createNested();
 
     SUBCASE("Type is set") {
-        auto type = ska::Type {"toto", ska::ExpressionType::FUNCTION, nested };
+        auto type = ska::Type {"toto", ska::ExpressionType::FUNCTION };
         CHECK(type == ska::ExpressionType::FUNCTION);
 
 		auto type2 = ska::Type{ska::ExpressionType::FLOAT };
@@ -35,7 +35,7 @@ TEST_CASE("[ExpressionType]") {
     }
 
     SUBCASE("Type Copy") {
-        auto type = ska::Type { "toto", ska::ExpressionType::OBJECT, nested };
+        auto type = ska::Type { "toto", ska::ExpressionType::OBJECT };
 		type.add(ska::Type{ ska::ExpressionType::INT });
         auto typeCopied = type;
         CHECK(typeCopied.getName() == "toto");
@@ -46,7 +46,7 @@ TEST_CASE("[ExpressionType]") {
     }
 
     SUBCASE("Type Move") {
-        auto type = ska::Type {"toto", ska::ExpressionType::OBJECT, nested };
+        auto type = ska::Type {"toto", ska::ExpressionType::OBJECT };
 		type.add(ska::Type{ ska::ExpressionType::INT });
         auto typeMoved = std::move(type);
         CHECK(typeMoved.getName() == "toto");

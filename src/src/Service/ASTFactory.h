@@ -56,8 +56,7 @@ namespace ska {
 		template <Operator o>
 		static ASTNodePtr MakeNode(Token token, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{}) {
 			ASTFactory::template CheckTokenAssociatedWithOperator<o>(token);
-			auto node = std::unique_ptr<ASTNode>(new ASTNode(o, std::move(token), std::move(children)));
-			std::cout << "Operator " << o << " builder" << std::endl;
+			auto node = std::unique_ptr<ASTNode>(new ASTNode(o, std::move(token), std::move(children)));	
 			node->m_typeBuilder = std::make_unique<TypeBuilderOperator<o>>();
 			return node;
 		}
