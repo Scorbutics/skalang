@@ -6,17 +6,16 @@ const ska::Symbol* ska::Symbol::operator[](const std::string& fieldSymbolName) c
 	assert(m_scopedTable != nullptr);
 	
 	if (!m_scopedTable->children().empty()) {
-		const auto& innerSymbolTable = m_scopedTable->children().back();
-		if(!innerSymbolTable->children().empty()) {
-			for(auto& s: innerSymbolTable->children()) {
-				for(auto& ss : (*s)) {
-					SLOG(ska::LogLevel::Error) << "field " << ss->getName();
-				}
-			}
-			const auto& st = *innerSymbolTable->children()[innerSymbolTable->children().size() - 1];
-			return st[fieldSymbolName];
-		}
-	}
+		for(const auto& innerSymbolTable : m_scopedTable->children()) {
+		    if(!innerSymbolTable->children().empty()) {
+			    const auto& st = *innerSymbolTable->children().back();
+			    const auto* result = st[fieldSymbolName];
+                if(result != nullptr) {
+                    return result;
+                }
+		    }
+	    }
+    }
 
 	SLOG(ska::LogLevel::Error) << "UNABLE TO FIND " << fieldSymbolName;
 	return nullptr;

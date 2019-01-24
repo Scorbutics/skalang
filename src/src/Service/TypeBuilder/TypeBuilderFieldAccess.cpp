@@ -17,10 +17,10 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const Sym
 	const auto* symbolField = (*symbolObject)[node.GetFieldName()];
     if (symbolField == nullptr) {
 		auto ss = std::stringstream{};
-		ss << "trying to access to an undeclared field : " << node.GetFieldName() << " of " << node.GetObjectName() << " (type " << symbolObject->getType() << ")";
+		ss << "trying to access to an undeclared field : " << node.GetFieldName() << " of " << node.GetObjectName() << " (type " << node.GetFieldTypeName() << ")";
         throw std::runtime_error(ss.str());
     }
 
-    SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Field accessed " << node.GetFieldName() << " of type " << symbolField->getType();
+    SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Field accessed " << node.GetFieldName() << " (type " << symbolField->getType() << ") of " << node.GetObjectName();
 	return symbolField->getType();
 }
