@@ -47,3 +47,4 @@
 **/Makefile
 Makefile
 /.vs/skalang/v16
+/bin
