@@ -5,10 +5,12 @@
 #include "Service/SymbolTable.h"
 #include "Service/StatementParser.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::IMPORT>)
+SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::IMPORT>)
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::IMPORT>::build(const SymbolTable& symbols, OperateOn node) {
 	assert(!symbols.nested().empty());
-	auto importType = Type{ node.GetImportVariableName(), ExpressionType::OBJECT };
+	
+    SLOG(LogLevel::Info) << "Importing script as " << node.GetImportVariableName();
+    auto importType = Type{ node.GetImportVariableName(), ExpressionType::OBJECT };
 	return importType;
 }

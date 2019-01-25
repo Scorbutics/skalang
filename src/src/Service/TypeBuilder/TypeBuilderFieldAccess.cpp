@@ -8,10 +8,14 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::FI
 ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const SymbolTable& symbols, OperateOn node) {
 	const auto* symbolObject = symbols[node.GetObjectTypeName()];
 	if (symbolObject == nullptr) {
-		if(node.GetObjectTypeName().empty()) {
+        if(node.GetObjectTypeName().empty()) {
 			throw std::runtime_error("trying to dereference an unknown symbol : " + node.GetObjectName());
 		}
-		throw std::runtime_error("the class symbol table " + node.GetFieldName() + " is not registered. Maybe you're trying to use the type you're defining in its definition...");
+
+        for(auto& s : node.GetObjectType().compound()) {
+            SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << s;
+        }
+		throw std::runtime_error("the class symbol table " + node.GetObjectName() + " is not registered. Maybe you're trying to use the type you're defining in its definition...");
 	}
 
 	const auto* symbolField = (*symbolObject)[node.GetFieldName()];

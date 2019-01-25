@@ -14,8 +14,8 @@ namespace ska {
 	public:
 		OperationType(const ASTNode& node) : node(node) {}
 
-		inline auto GetFunctionName() {
-			return node[0].name();
+		inline auto GetFunctionType() {
+			return node[0].type().value();
 		}
 		
 		const Symbol* GetFunctionReturnSymbol(const SymbolTable& symbols);

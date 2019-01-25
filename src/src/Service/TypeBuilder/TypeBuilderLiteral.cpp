@@ -12,5 +12,8 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::LITERAL>::build(const SymbolTa
 }
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::UNARY>::build(const SymbolTable& symbols, OperateOn node) {
-	return TypeBuilderBuildFromTokenType(symbols, node.asNode());
+	auto unaryType = TypeBuilderBuildFromTokenType(symbols, node.asNode());
+    if(Type::isNamed(unaryType)) {
+        unaryType.setSymbol(symbols[node.asNode().name()]);
+    }
 }

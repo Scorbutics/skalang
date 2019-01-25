@@ -28,9 +28,9 @@ namespace ska {
 			//assert(!isNamed(m_type));
 		}
 
-		Type(std::string name, ExpressionType t) : 
+		Type(Symbol* symbol, ExpressionType t) : 
             m_type(t), 
-            m_alias(std::move(name)) {
+            m_symbol(symbol) {
 			assert(isNamed(m_type));
 		}
 
@@ -43,6 +43,8 @@ namespace ska {
             m_type = std::move(t.m_type);
             m_alias = std::move(t.m_alias);
             m_compound = std::move(t.m_compound);
+            m_symbol = t.m_symbol;
+            t.m_symbol = nullptr;
             t.m_moved = true;
 			SLOG(ska::LogLevel::Debug) << " moved  to " << *this;
             return *this;
@@ -54,6 +56,10 @@ namespace ska {
 			*this = t;
 		}
 
+        void setSymbol(Symbol* symbol) {
+            m_symbol = symbol;
+        }
+
 		ExpressionType type() const {
 			return m_type;
 		}
@@ -62,7 +68,8 @@ namespace ska {
 			m_type = t.m_type;
 			m_alias = t.m_alias;
 			m_compound = t.m_compound;
-			m_moved = t.m_moved;
+			m_symbol = t.m_symbol;
+            m_moved = t.m_moved;
 			SLOG(ska::LogLevel::Debug) << "   Copy, Type " << t << " copied to " << *this;
 			return *this;
 		}
@@ -79,9 +86,11 @@ namespace ska {
 			return m_type == t.m_type && m_compound == t.m_compound;
 		}
 
+        /*
         const std::string& getName() const {
             return m_alias;
         }
+        */
 
 		bool operator==(const ExpressionType& t) const {
 			return m_type == t;
@@ -115,9 +124,15 @@ namespace ska {
 			return m_compound.size();
 		}
 
+        const Symbol* operator[](const std::string& fieldName) {
+            assert(m_symbol != nullptr);
+            return (*m_symbol)[fieldName];
+        }
+
 	private:
 		ExpressionType m_type = ExpressionType::VOID;
 		std::string m_alias;
+        Symbol* m_symbol = nullptr;
 		std::vector<Type> m_compound;
 	    bool m_moved = false;
 

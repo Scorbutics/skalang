@@ -36,6 +36,10 @@ namespace ska {
 			return objectType.getName();
 		}
 		
+        inline auto GetObjectType() {
+            return GetObject().type().value();
+        }
+
 		inline std::string GetFieldTypeName() {
 			const auto objectType = GetField().type().value();
 			return objectType.getName();
