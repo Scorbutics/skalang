@@ -1,4 +1,0 @@
-var Character = import "character";
-
-var player = Character.build("Player");
-var enemy = Character.default;

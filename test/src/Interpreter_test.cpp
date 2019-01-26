@@ -165,8 +165,14 @@ TEST_CASE("[Interpreter]") {
 			auto res = data.interpreter->interpret(*astPtr);
 		}
 
-		SUBCASE("Outside script from file (import)") {
+		SUBCASE("Outside script from file (import) and use") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var Character = import \"../test/src/resources/character\";var player = Character.build(\"Player\");var enemy = Character.default; enemy.age;", data);
+			auto res = data.interpreter->interpret(*astPtr);
+			CHECK(res.asRvalue().nodeval<int>() == 10);
+		}
+
+		SUBCASE("Outside script from file (import) used by another script, and use") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var CharacterUser = import \"../test/src/resources/character_user\"; CharacterUser.player.age;", data);
 			auto res = data.interpreter->interpret(*astPtr);
 			CHECK(res.asRvalue().nodeval<int>() == 10);
 		}
