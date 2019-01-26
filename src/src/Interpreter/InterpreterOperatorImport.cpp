@@ -4,5 +4,5 @@
 #include "InterpreterOperatorImport.h"
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::IMPORT>::interpret(OperateOn node) {
-	return "";
+	return m_interpreter.interpret(node.GetScriptNode()).asRvalue();
 }

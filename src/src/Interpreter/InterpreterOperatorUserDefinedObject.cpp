@@ -4,7 +4,7 @@
 #include "InterpreterOperatorUserDefinedObject.h"
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::USER_DEFINED_OBJECT>::interpret(OperateOn node) {
-	auto objectMemory = std::make_shared<MemoryTable>();
+	auto objectMemory = std::make_shared<MemoryTable>(m_memory);
 	auto& executionMemoryPoint = m_memory.pointTo(*objectMemory);
 	for(auto& field: node) {
 		m_interpreter.interpret(*field);

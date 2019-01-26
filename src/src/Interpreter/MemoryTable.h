@@ -12,7 +12,7 @@ namespace ska {
 		using MemoryCLValue = std::pair<const NodeValue*, const MemoryTable*>;
 	public:
 		MemoryTable(MemoryTable& parent) :
-			m_parent(&parent) {
+			m_parent(parent.m_current) {
 		}
 
 		MemoryTable() = default;
@@ -24,8 +24,9 @@ namespace ska {
 		MemoryTable& createNested();
 		MemoryTable* endNested();
 		MemoryTable* popNested();
-		MemoryLValue put(std::string name, NodeValue value);
-		void put(std::string name, std::size_t index, NodeValue value);
+		MemoryLValue put(const std::string& name, NodeValue value);
+		MemoryLValue emplace(const std::string& name, NodeValue value);
+		void put(const std::string& name, std::size_t index, NodeValue value);
 
 		MemoryLValue operator[](const std::string& key) {
 			return m_current->inMemoryFind(key);
@@ -37,7 +38,7 @@ namespace ska {
 
 		MemoryTable& pointTo(MemoryTable& memoryTable) {
 			auto& last = *m_current;
-			m_current = &memoryTable;
+			m_current = memoryTable.m_current;
 			return last;
 		}
 

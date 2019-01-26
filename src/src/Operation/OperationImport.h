@@ -11,18 +11,17 @@ namespace ska {
 		ASTNode& node;
 	public:
 		Operation(ASTNode& node) : node(node) {}
-
-		inline auto GetImport() {
-			assert(!node.name().empty());
-			return node.name();
-		}
-		
-		inline auto& GetVariableValueNode() {
+	
+		inline auto& GetVariableNode() {
 			return node[0];
 		}
 		
-		inline auto GetImportVariableName() {
-			return node[0].name();
+		inline auto& GetObjectValueNode() {
+			return node[2];
+		}
+
+		inline auto& GetScriptNode() {
+			return node[4];
 		}
 	};
 }

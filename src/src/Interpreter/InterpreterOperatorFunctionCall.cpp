@@ -5,7 +5,7 @@
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>::interpret(OperateOn node) {
 	auto inMemoryFunctionZone = m_interpreter.interpret(node.GetFunction()).asLvalue();
-	assert(inMemoryFunctionZone.second != nullptr);
+	assert(inMemoryFunctionZone.first != nullptr && inMemoryFunctionZone.second != nullptr);
 
 	auto astFunction = inMemoryFunctionZone.first->nodeval<ASTNode*>();
 	auto operateOnFunction = Operation<Operator::FUNCTION_DECLARATION>(*astFunction);
