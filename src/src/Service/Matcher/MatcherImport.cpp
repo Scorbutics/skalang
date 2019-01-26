@@ -24,7 +24,7 @@ ska::ASTNodePtr ska::MatcherImport::matchImport() {
 	auto importNodeClass = m_input.match(TokenType::STRING);
 	//TODO : cache
 
-	auto importClassName = importNodeClass.name() + ".minisk";
+	auto importClassName = importNodeClass.name() + ".miniska";
 	auto script = std::ifstream{ importClassName };
 	if (script.fail()) {
 		throw std::runtime_error("unable to find script named " + importClassName);
