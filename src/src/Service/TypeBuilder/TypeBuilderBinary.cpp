@@ -7,5 +7,5 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::BINARY>::build(const SymbolTab
     assert(!node.GetOperator().empty());
     const auto& type1 = node.GetFirstType();
     const auto& type2 = node.GetSecondType();
-	return Type{ type1.crossTypes(node.GetOperator(), type2) };
+	return Type::MakeBuiltIn(type1.crossTypes(node.GetOperator(), type2));
 }

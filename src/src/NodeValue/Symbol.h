@@ -45,11 +45,11 @@ namespace ska {
                 return *this;
             }
 
-            const Type& operator[](std::size_t index) const {
+            const Type& operator()(std::size_t index) const {
                 return m_category.compound()[index];
             }
 
-			Type operator[](std::size_t index) {
+			Type operator()(std::size_t index) {
 				return m_category.compound()[index];
 			}
 
@@ -62,17 +62,8 @@ namespace ska {
             }
 
 			void calculateType(Type t) {
-				//assert(m_scopedTable != nullptr);
-				m_category = t;//Type { t.getName(), t, *m_scopedTable };
+				m_category = t;
 			}
-
-			/*ScopedSymbolTable* symbolTable() {
-				return m_scopedTable;
-			}
-			
-			const ScopedSymbolTable* symbolTable() const {
-				return m_scopedTable;
-			}*/
 
             bool empty() const {
                 return m_category.compound().empty();

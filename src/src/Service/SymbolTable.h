@@ -45,7 +45,7 @@ namespace ska {
 		}
 
         const Symbol* enclosingType() const {
-            return m_currentTable->enclosingType();
+            return m_currentTable->owner();
         }
 
 		ScopedSymbolTable* current() {

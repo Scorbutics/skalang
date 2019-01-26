@@ -55,10 +55,5 @@ ska::Interpreter::Interpreter(SymbolTable& symbols) :
 ska::NodeCell ska::Interpreter::interpret(ASTNode& node) {
 	auto& builder = m_operatorInterpreter[static_cast<std::size_t>(node.op())];
 	assert(builder != nullptr);
-	auto res = builder->interpret(node);
-	//auto val = std::move(std::holds_alternative<NodeValue*>(res) ? std::get<NodeValue*>(res)->clone() : std::get<NodeValue>(res).clone());
-	//node.buildValue(val.clone());
-
-	//std::cout << node.name() << " " << node.valueAsString() << std::endl;
-	return res;
+	return builder->interpret(node);
 }

@@ -8,6 +8,7 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::Type)
 
 namespace ska {
+	class Symbol;
 
 	struct Type {
 		Type() = default;
@@ -23,42 +24,27 @@ namespace ska {
         static constexpr auto TypeMapSize = static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length);
         static const std::unordered_map<std::string, int(*)[TypeMapSize][TypeMapSize]>& GetMap(const std::string& op);
 		
-        explicit Type(ExpressionType t) : 
-            m_type(std::move(t)) {
-			//assert(!isNamed(m_type));
-		}
-
-		Type(Symbol* symbol, ExpressionType t) : 
-            m_type(t), 
-            m_symbol(symbol) {
-			assert(isNamed(m_type));
-		}
-
         Type(Type&& t) noexcept {
             *this = std::move(t);
         }
-
-        Type& operator=(Type&& t) noexcept {
-			SLOG(ska::LogLevel::Debug) << "   Move, Type " << t;
-            m_type = std::move(t.m_type);
-            m_alias = std::move(t.m_alias);
-            m_compound = std::move(t.m_compound);
-            m_symbol = t.m_symbol;
-            t.m_symbol = nullptr;
-            t.m_moved = true;
-			SLOG(ska::LogLevel::Debug) << " moved  to " << *this;
-            return *this;
-        }
-
-        ~Type() = default;
-
+	
 		Type(const Type& t) {
 			*this = t;
 		}
 
-        void setSymbol(Symbol* symbol) {
-            m_symbol = symbol;
-        }
+        ~Type() = default;
+
+		Type& operator=(Type&& t) noexcept {
+			SLOG(ska::LogLevel::Debug) << "   Move, Type " << t;
+			m_type = std::move(t.m_type);
+			m_alias = std::move(t.m_alias);
+			m_compound = std::move(t.m_compound);
+			m_symbol = t.m_symbol;
+			t.m_symbol = nullptr;
+			t.m_moved = true;
+			SLOG(ska::LogLevel::Debug) << " moved  to " << *this;
+			return *this;
+		}
 
 		ExpressionType type() const {
 			return m_type;
@@ -86,11 +72,9 @@ namespace ska {
 			return m_type == t.m_type && m_compound == t.m_compound;
 		}
 
-        /*
-        const std::string& getName() const {
-            return m_alias;
-        }
-        */
+		bool hasSymbol() const {
+			return m_symbol != nullptr;
+		}
 
 		bool operator==(const ExpressionType& t) const {
 			return m_type == t;
@@ -124,15 +108,37 @@ namespace ska {
 			return m_compound.size();
 		}
 
-        const Symbol* operator[](const std::string& fieldName) {
-            assert(m_symbol != nullptr);
-            return (*m_symbol)[fieldName];
-        }
+		const Symbol* operator[](const std::string& fieldName) const;
+
+		template<ExpressionType t>
+		static Type MakeBuiltIn() {
+			static_assert(t != ExpressionType::VOID);
+			return Type{ t };
+		}
+
+		static Type MakeBuiltIn(ExpressionType t) {
+			return Type{ t };
+		}
+
+		template<ExpressionType t>
+		static Type MakeCustom(const Symbol* symbol) {
+			static_assert(isNamed(t));
+			return Type{ symbol, t };
+		}
 
 	private:
+		explicit Type(ExpressionType t) :
+			m_type(std::move(t)) {
+		}
+
+		Type(const Symbol* symbol, ExpressionType t) :
+			m_type(t),
+			m_symbol(symbol) {
+		}
+
 		ExpressionType m_type = ExpressionType::VOID;
 		std::string m_alias;
-        Symbol* m_symbol = nullptr;
+        const Symbol* m_symbol = nullptr;
 		std::vector<Type> m_compound;
 	    bool m_moved = false;
 

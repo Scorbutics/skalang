@@ -24,7 +24,7 @@ namespace ska {
     template <Operator O>
     struct TypeBuilderOperator : public TypeBuildUnit {
         Type build(const SymbolTable& symbols, const ASTNode& node) override {
-			return Type{ ExpressionType::VOID };
+			return Type{ };
         }
     };
 

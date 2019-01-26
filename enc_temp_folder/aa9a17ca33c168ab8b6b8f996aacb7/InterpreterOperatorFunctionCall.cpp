@@ -16,9 +16,8 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>::interpret(
 	//Creates function-memory environment scope (including creation of parameters)
 	m_memory.createNested();
 	
-	auto& functionPrototype = operateOnFunction.GetFunctionPrototype();
-	for (auto index = 0u; index < functionPrototype.size() - 1 && node.HasFunctionParameter(index); index++) {
-		auto& functionParameter = functionPrototype[index];
+	for (auto index = 0u; index < operateOnFunction.GetFunctionPrototype().size() - 1 && node.HasFunctionParameter(index); index++) {
+		auto& functionParameter = operateOnFunction.GetFunctionPrototype()[index];
 		
 		auto nodeValue = m_interpreter.interpret(node.GetFunctionParameterValue(index)).asRvalue();
 		m_memory.put(functionParameter.name(), std::move(nodeValue));

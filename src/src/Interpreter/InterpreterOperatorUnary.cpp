@@ -21,7 +21,7 @@ namespace ska {
 ska::NodeCell ska::InterpreterOperator<ska::Operator::UNARY>::interpret(OperateOn node) {
 	assert(!node.GetValue().empty());
 	auto nodeValue = m_memory[node.GetValue()];
-    if(nodeValue == nullptr) {
+    if(nodeValue.first == nullptr) {
         return "";
     }
 

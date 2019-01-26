@@ -18,6 +18,6 @@ namespace ska {
 			return node[0].type().value();
 		}
 		
-		const Symbol* GetFunctionReturnSymbol(const SymbolTable& symbols);
+		const Type GetFunctionReturnSymbol(const SymbolTable& symbols);
 	};
 }

@@ -26,7 +26,7 @@ namespace ska {
             m_parentSymbol = &s;
         }
 
-        const Symbol* enclosingType() const {
+        const Symbol* owner() const {
             return m_parentSymbol;
         }
 

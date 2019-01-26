@@ -19,7 +19,7 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>::build(
             throw std::runtime_error("unknown type detected as function parameter : " + node.GetVariableValueNode().name());
         }
         SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node.GetVariableName() << "\" = \"" << symbolType->getType() << "\"";
-		type = Type{ typeStr, ExpressionType::OBJECT };
+		type = Type::MakeCustom<ExpressionType::OBJECT>(symbolType);
    } else { 
 	   //Built-in case
        SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type calculating for node \"" << node.GetVariableName() << " with type-node " << typeStr;
@@ -29,7 +29,7 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>::build(
 
 	//handles arrays
 	if (node.GetVariableValueNode().size() == 1) {
-		type = Type{ ExpressionType::ARRAY }.add(type);
+		type = Type::MakeBuiltIn<ExpressionType::ARRAY>().add(type);
 	}
 
 	return type;

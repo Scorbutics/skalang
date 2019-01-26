@@ -135,7 +135,7 @@ TEST_CASE("[Interpreter]") {
 			auto res = data.interpreter->interpret(*astPtr);
 			CHECK(res.asRvalue().nodeval<int>() == 3);
 		}
-
+		
 		SUBCASE("Function 1 parameter") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var totoFunc = function(value: int) : int { return value + 3; }; var titi = totoFunc(7); titi;", data);
 			auto res = data.interpreter->interpret(*astPtr);

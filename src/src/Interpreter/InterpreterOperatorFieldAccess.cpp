@@ -4,6 +4,6 @@
 #include "InterpreterOperatorFieldAccess.h"
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::FIELD_ACCESS>::interpret(OperateOn node) {
-	auto& objectMemory = *m_memory[node.GetObjectName()]->nodeval<std::shared_ptr<MemoryTable>>();
+	auto& objectMemory = *m_memory[node.GetObjectName()].first->nodeval<std::shared_ptr<MemoryTable>>();
 	return objectMemory(node.GetFieldName());
 }

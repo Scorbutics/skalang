@@ -389,7 +389,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				ASTFromInputSemanticTC("var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.ttetetetet;", data);
 				CHECK(false);
 			} catch (std::exception& e) {
-				CHECK(std::string(e.what()) == "trying to access to an undeclared field : ttetetetet of joueur1 (type Joueur)");
+				CHECK(std::string(e.what()) == "trying to access to an undeclared field : ttetetetet of joueur1");
 			}
 		}
 

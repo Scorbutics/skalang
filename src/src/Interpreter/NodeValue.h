@@ -71,12 +71,14 @@ namespace ska {
 
 	class NodeCell {
 	public:
-		template <class ... Args>
-		NodeCell(Args&& ... args): m_variant(std::forward<Args>(args)...) {}
-		
-		NodeValue& asLvalue() {
+		NodeCell() = default;
+		NodeCell(MemoryTable& memory, NodeValue* lvalue): m_memory(&memory), m_variant(lvalue) {}
+		NodeCell(NodeValue&& rvalue) : m_variant(std::move(rvalue)) {}
+		NodeCell(std::pair<NodeValue*, MemoryTable*> lvalue) : m_memory(lvalue.second), m_variant(lvalue.first) { assert(m_memory != nullptr); }
+
+		std::pair<NodeValue*, MemoryTable*> asLvalue() {
 			assert(std::holds_alternative<NodeValue*>(m_variant));
-			return *std::get<NodeValue*>(m_variant);
+			return std::make_pair(std::get<NodeValue*>(m_variant), m_memory);
 		}
 
 		NodeValue asRvalue() {
@@ -89,6 +91,7 @@ namespace ska {
 		friend bool operator==(const NodeCell& lhs, const NodeCell& rhs);
 	private:
 		std::variant<NodeValue, NodeValue*> m_variant;
+		MemoryTable* m_memory = nullptr;
 	};
 
 	inline bool operator==(const ska::NodeValue& lhs, const ska::NodeValue& rhs) {

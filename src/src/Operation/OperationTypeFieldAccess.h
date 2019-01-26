@@ -31,18 +31,13 @@ namespace ska {
 			return node[1].name();
 		}
 		
-		inline std::string GetObjectTypeName() {
-			const auto objectType = GetObject().type().value();
-			return objectType.getName();
-		}
-		
         inline auto GetObjectType() {
             return GetObject().type().value();
         }
 
-		inline std::string GetFieldTypeName() {
+		inline auto GetFieldType() {
 			const auto objectType = GetField().type().value();
-			return objectType.getName();
+			return objectType;
 		}
 	};
 }

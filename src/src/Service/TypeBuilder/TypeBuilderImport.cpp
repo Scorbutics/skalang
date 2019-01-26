@@ -11,6 +11,6 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::IMPORT>::build(const SymbolTab
 	assert(!symbols.nested().empty());
 	
     SLOG(LogLevel::Info) << "Importing script as " << node.GetImportVariableName();
-    auto importType = Type{ node.GetImportVariableName(), ExpressionType::OBJECT };
+    auto importType = Type::MakeCustom<ExpressionType::OBJECT>(nullptr);
 	return importType;
 }

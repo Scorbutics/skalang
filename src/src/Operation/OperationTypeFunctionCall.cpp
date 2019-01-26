@@ -1,8 +1,8 @@
 #include "OperationTypeFunctionCall.h"
 #include "Service/SymbolTable.h"
 
-const ska::Symbol* ska::OperationType<ska::Operator::FUNCTION_CALL>::GetFunctionReturnSymbol(const SymbolTable& symbols) {
-	const Symbol* symbol = symbols[GetFunctionType().getName()];
+const ska::Type ska::OperationType<ska::Operator::FUNCTION_CALL>::GetFunctionReturnSymbol(const SymbolTable& symbols) {
+	const auto& type = GetFunctionType();
 	/*
     auto* n = &node[0];
 	auto* currentSymbolTable = symbols.current();
@@ -14,9 +14,5 @@ const ska::Symbol* ska::OperationType<ska::Operator::FUNCTION_CALL>::GetFunction
 	}
     */
 
-    if(symbol == nullptr || symbol->size() == 0) {
-        throw std::runtime_error("Unable to get function return type");
-    }
-
-	return symbol;
+	return type;
  }

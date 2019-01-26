@@ -5,7 +5,7 @@
 #include "TypeBuilderCalculatorDispatcher.h"
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::ARRAY_DECLARATION>::build(const SymbolTable& symbols, OperateOn node) {
-	auto type = Type{ ExpressionType::ARRAY };
+	auto type = Type::MakeBuiltIn<ExpressionType::ARRAY>();
 	if (!node.HasArrayType()) {
 		return type;
 	}

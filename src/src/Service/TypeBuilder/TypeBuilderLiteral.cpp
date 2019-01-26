@@ -1,6 +1,6 @@
 #include "Config/LoggerConfigLang.h"
 #include "TypeBuilderLiteral.h"
-
+#include "Service/SymbolTable.h"
 #include "TypeBuilderCalculatorDispatcher.h"
 #include "Operation/OperationUnary.h"
 
@@ -12,8 +12,5 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::LITERAL>::build(const SymbolTa
 }
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::UNARY>::build(const SymbolTable& symbols, OperateOn node) {
-	auto unaryType = TypeBuilderBuildFromTokenType(symbols, node.asNode());
-    if(Type::isNamed(unaryType)) {
-        unaryType.setSymbol(symbols[node.asNode().name()]);
-    }
+	return TypeBuilderBuildFromTokenType(symbols, node.asNode());
 }
