@@ -42,8 +42,10 @@ ska::ASTNodePtr ska::MatcherImport::matchImport() {
 		if (node->op() == Operator::EXPORT) {
 			exportFields.push_back(ASTFactory::MakeLogicalNode(ska::Token{ (*node)[0].name(), (*node)[0].tokenType() }));
 			allFields.push_back(node->stealChild(0));
-		} else if(OperatorTraits::isNamed(node->op())) {
-			hiddenFields.push_back(ASTFactory::MakeLogicalNode(ska::Token{ (*node).name(), (*node).tokenType() }));
+		} else {
+			if (OperatorTraits::isNamed(node->op())) {
+				hiddenFields.push_back(ASTFactory::MakeLogicalNode(ska::Token{ (*node).name(), (*node).tokenType() }));
+			}
 			allFields.push_back(std::move(node));
 		}
 	}
