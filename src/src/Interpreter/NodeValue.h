@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 #include <variant>
+#include <sstream>
+#include <tuple>
 #include <unordered_map>
 #include <type_traits>
 #include <memory>
@@ -43,6 +45,27 @@ namespace ska {
 		template<class T> auto& as() { return std::get<T>(m_variant); }
 		template<class T> const auto& as() const { return std::get<T>(m_variant); }
 		
+		double convertNumeric() const { 
+			double numeric = 0.0;
+			const auto& valueVariant = std::get<Token::Variant>(m_variant);
+			std::visit([&numeric](auto && arg){
+				using T = std::decay_t<decltype(arg)>;
+
+				if constexpr (std::is_same<T, int>::value) {
+					numeric = static_cast<double>(arg);
+				} else if constexpr (std::is_same<T, double>::value) {
+					numeric = arg;
+				} else if constexpr (std::is_same<T, bool>::value) {
+					numeric = arg ? 1.0 : 0.0;
+				} else if constexpr (std::is_same<T, std::string>::value) {
+					numeric = std::stod(arg);
+				} else {
+					throw std::runtime_error("cannot convert the node value to a numeric format");
+				}
+			}, valueVariant);
+			return numeric;
+		}
+
 		template <class Converted>
 		Converted& nodeval() {
 			if constexpr(detail::isVariantMember<Converted, Token::Variant>::value) {

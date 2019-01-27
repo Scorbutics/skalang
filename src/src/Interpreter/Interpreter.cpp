@@ -13,6 +13,7 @@
 #include "InterpreterOperatorArrayUse.h"
 #include "InterpreterOperatorFieldAccess.h"
 #include "InterpreterOperatorUserDefinedObject.h"
+#include "InterpreterOperatorFor.h"
 #include "InterpreterOperatorVariableDeclaration.h"
 #include "InterpreterOperatorVariableAffectation.h"
 #include "InterpreterOperatorBlock.h"
@@ -34,6 +35,7 @@ std::vector<std::unique_ptr<ska::InterpreterOperatorUnit>> ska::Interpreter::bui
     InterpreterOperatorDeclare<ska::Operator::IF_ELSE>(*this, result, m_symbols, m_memory);
 	InterpreterOperatorDeclare<ska::Operator::FUNCTION_DECLARATION>(*this, result, m_symbols, m_memory);
 	InterpreterOperatorDeclare<ska::Operator::FUNCTION_CALL>(*this, result, m_symbols, m_memory);
+	InterpreterOperatorDeclare<ska::Operator::FOR_LOOP>(*this, result, m_symbols, m_memory);
 	InterpreterOperatorDeclare<ska::Operator::FIELD_ACCESS>(*this, result, m_symbols, m_memory);
 	InterpreterOperatorDeclare<ska::Operator::USER_DEFINED_OBJECT>(*this, result, m_symbols, m_memory);
 	InterpreterOperatorDeclare<ska::Operator::VARIABLE_DECLARATION>(*this, result, m_symbols, m_memory);

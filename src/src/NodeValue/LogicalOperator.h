@@ -8,13 +8,18 @@ namespace ska {
         DIVIDE,
         SUBSTRACT,
         EQUAL,
+		EQUALITY,
         CONDITION,
         NOT_CONDITION,
         NOT,
         ADDITION_EQUAL,
         SUBSTRACT_EQUAL,
         MULTIPLY_EQUAL,
-        DIVIDE_EQUAL
+        DIVIDE_EQUAL,
+		LESSER,
+		LESSER_OR_EQUAL,
+		GREATER_OR_EQUAL,
+		GREATER
     };
 
     static const auto LogicalOperatorMap = std::unordered_map<std::string, LogicalOperator>{
@@ -23,7 +28,11 @@ namespace ska {
         {"/",  LogicalOperator::DIVIDE},
         {"-",  LogicalOperator::SUBSTRACT},
         {"=",  LogicalOperator::EQUAL},
-        {"==", LogicalOperator::CONDITION},
+        {"==", LogicalOperator::EQUALITY},
+		{"<=", LogicalOperator::LESSER_OR_EQUAL},
+		{">=", LogicalOperator::GREATER_OR_EQUAL},
+		{"<", LogicalOperator::LESSER},
+		{">", LogicalOperator::GREATER},
         {"!=", LogicalOperator::NOT_CONDITION},
         {"!",  LogicalOperator::NOT},
         {"+=", LogicalOperator::ADDITION_EQUAL},

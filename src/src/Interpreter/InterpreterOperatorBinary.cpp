@@ -165,6 +165,37 @@ namespace ska {
         return firstType == secondType && firstValue == secondValue;
     }
 
+	template<class Comparer>
+	bool InterpretLogicNumericFromNodeValue(const NodeValue& firstValue, const NodeValue& secondValue, ExpressionType type, Comparer comparison) {
+		assert(Type::isNumeric(type));
+		switch (type) {
+		case ExpressionType::FLOAT:
+			return comparison(firstValue.convertNumeric(), secondValue.convertNumeric());
+		case ExpressionType::INT:
+			return comparison(static_cast<int>(firstValue.convertNumeric()), static_cast<int>(secondValue.convertNumeric()));
+		case ExpressionType::BOOLEAN:
+			return comparison(static_cast<int>(firstValue.convertNumeric()) == 1, static_cast<int>(secondValue.convertNumeric()) == 1);
+		}
+
+		return false;
+	}
+
+	NodeValue InterpretLogicLesser(NodeValue firstValue, NodeValue secondValue, ExpressionType destinationType) {
+		return InterpretLogicNumericFromNodeValue(firstValue, secondValue, destinationType, [](auto v1, auto v2) {return v1 < v2; });
+	}
+
+	NodeValue InterpretLogicLesserOrEqual(NodeValue firstValue, NodeValue secondValue, ExpressionType destinationType) {
+		return InterpretLogicNumericFromNodeValue(firstValue, secondValue, destinationType, [](auto v1, auto v2) {return v1 <= v2; });
+	}
+
+	NodeValue InterpretLogicGreaterOrEqual(NodeValue firstValue, NodeValue secondValue, ExpressionType destinationType) {
+		return InterpretLogicNumericFromNodeValue(firstValue, secondValue, destinationType, [](auto v1, auto v2) {return v1 >= v2; });
+	}
+
+	NodeValue InterpretLogicGreater(NodeValue firstValue, NodeValue secondValue, ExpressionType destinationType) {
+		return InterpretLogicNumericFromNodeValue(firstValue, secondValue, destinationType, [](auto v1, auto v2) {return v1 > v2; });
+	}
+
 	NodeValue InterpretMathematicBinaryExpression(std::string mathOperator, NodeValue firstValue, NodeValue secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		assert(!mathOperator.empty());
 		auto operatorIt = LogicalOperatorMap.find(mathOperator);
@@ -178,8 +209,16 @@ namespace ska {
                 return InterpretMathematicMultiply(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
             case LogicalOperator::DIVIDE:
                 return InterpretMathematicDivide(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
-            case LogicalOperator::CONDITION:
+            case LogicalOperator::EQUALITY:
                 return InterpretLogicCondition(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
+			case LogicalOperator::LESSER_OR_EQUAL:
+				return InterpretLogicLesserOrEqual(std::move(firstValue), std::move(secondValue), firstType.crossTypes("=", secondType));
+			case LogicalOperator::LESSER:
+				return InterpretLogicLesser(std::move(firstValue), std::move(secondValue), firstType.crossTypes("=", secondType));
+			case LogicalOperator::GREATER_OR_EQUAL:
+				return InterpretLogicGreaterOrEqual(std::move(firstValue), std::move(secondValue), firstType.crossTypes("=", secondType));
+			case LogicalOperator::GREATER:
+				return InterpretLogicGreater(std::move(firstValue), std::move(secondValue), firstType.crossTypes("=", secondType));
             default:
                 throw std::runtime_error("Unhandled operator " + mathOperator);
                 return "";

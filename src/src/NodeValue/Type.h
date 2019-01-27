@@ -17,8 +17,16 @@ namespace ska {
 			return type == ExpressionType::FUNCTION || type == ExpressionType::OBJECT;
 		}
 
+		static constexpr bool isNumeric(ExpressionType type) {
+			return type == ExpressionType::INT || type == ExpressionType::FLOAT || type == ExpressionType::BOOLEAN;
+		}
+
 		static bool isNamed(Type type) {
 			return isNamed(type.m_type);
+		}
+
+		static bool isNumeric(Type type) {
+			return isNumeric(type.m_type);
 		}
 
         static constexpr auto TypeMapSize = static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length);

@@ -61,25 +61,31 @@ TEST_CASE("[Interpreter]") {
 		SUBCASE("Var reaffected using the same var") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = \"ti\"; toto; toto = toto * 2;", data);
 			auto res = data.interpreter->interpret(*astPtr);
-			CHECK(res.asRvalue().nodeval < std::string > () == "titi");
+			CHECK(res.asRvalue().nodeval<std::string>() == "titi");
 		}
 
 		SUBCASE("Var reaffected string") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = \"ti\" * 2 + \"to\"; toto;", data);
 			auto res = data.interpreter->interpret(*astPtr);
-			CHECK(res.asRvalue().nodeval < std::string >() == "titito");
+			CHECK(res.asRvalue().nodeval<std::string>() == "titito");
 		}
 		
 		SUBCASE("Var reaffected string with number") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 2 + \"ti\"; toto;", data);
 			auto res = data.interpreter->interpret(*astPtr);
-			CHECK(res.asRvalue().nodeval < std::string >() == "2ti");
+			CHECK(res.asRvalue().nodeval<std::string>() == "2ti");
 		}
 
 		SUBCASE("Var reaffected string with number * 2") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 2 + \"ti\" * 2; toto;", data);
 			auto res = data.interpreter->interpret(*astPtr);
-			CHECK(res.asRvalue().nodeval < std::string >() == "2titi");
+			CHECK(res.asRvalue().nodeval<std::string>() == "2titi");
+		}
+
+		SUBCASE("For loop statement") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var tititi = 2; for(var i = 0; i < 5; i = i + 1) { tititi = tititi + i; } tititi; ", data);
+			auto res = data.interpreter->interpret(*astPtr);
+			CHECK(res.asRvalue().nodeval<int>() == 12);
 		}
 
         SUBCASE("If block true") {
@@ -171,6 +177,12 @@ TEST_CASE("[Interpreter]") {
 			CHECK(res.asRvalue().nodeval<int>() == 10);
 		}
 
+		SUBCASE("Outside script from file (import) used by another script, and use") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var CharacterUser = import \"../test/src/resources/character_user\"; CharacterUser.player.age;", data);
+			auto res = data.interpreter->interpret(*astPtr);
+			CHECK(res.asRvalue().nodeval<int>() == 10);
+		}
+		
 		SUBCASE("Outside script from file (import) used by another script, and use") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var CharacterUser = import \"../test/src/resources/character_user\"; CharacterUser.player.age;", data);
 			auto res = data.interpreter->interpret(*astPtr);
