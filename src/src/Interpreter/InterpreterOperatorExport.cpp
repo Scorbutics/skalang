@@ -4,5 +4,5 @@
 #include "InterpreterOperatorExport.h"
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::EXPORT>::interpret(OperateOn node) {
-	return "";
+	return NodeCell {""};
 }

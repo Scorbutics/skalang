@@ -6,5 +6,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_DECLARATION>::int
 	assert(!node.GetFunctionName().empty());
 	auto* astPtr = &node.GetFunction();
 	m_memory.put(node.GetFunctionName(), astPtr);
-	return astPtr;
+	return NodeCell {astPtr};
 }

@@ -17,7 +17,7 @@ const ska::Symbol* ska::Symbol::operator[](const std::string& fieldSymbolName) c
 	    }
     }
 
-	SLOG(ska::LogLevel::Error) << "UNABLE TO FIND " << fieldSymbolName;
+	SLOG(ska::LogLevel::Debug) << "Unable to find " << fieldSymbolName << " in this symbol";
 	return nullptr;
 }
 

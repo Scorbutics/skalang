@@ -6,7 +6,7 @@
 #include "NodeValue/AST.h"
 #include "Operation/OperationFunctionDeclaration.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>);
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>::build(const SymbolTable& symbols, OperateOn node) {
 	const auto type = node.GetFunctionType();

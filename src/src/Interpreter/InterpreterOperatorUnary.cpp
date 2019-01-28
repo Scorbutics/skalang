@@ -22,7 +22,7 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::UNARY>::interpret(OperateO
 	assert(!node.GetValue().empty());
 	auto nodeValue = m_memory[node.GetValue()];
     if(nodeValue.first == nullptr) {
-        return "";
+        return NodeCell {""};
     }
 
 	return nodeValue; //InterpreterOperatorConvertString(node.type().value().type(), std::get<Token::Variant>(*nodeValue));

@@ -137,7 +137,7 @@ TEST_CASE("If keyword pattern") {
 TEST_CASE("function") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	SUBCASE("with 2 arguments built-in types and no return type") {
-		auto astPtr = ASTFromInput("var f = function(titi:int, toto:string) : var { };", keywords);
+		auto astPtr = ASTFromInput("var f = function(titi:int, toto:string) { };", keywords);
 		auto& ast = (*astPtr)[0];
         CHECK(ast.op() == ska::Operator::VARIABLE_DECLARATION);
         const auto& astFunc133 = ast[0];
@@ -148,6 +148,15 @@ TEST_CASE("function") {
         CHECK(astFunc133[1].size() == 0);
         //CHECK(ast[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
 		
+	}
+	
+	SUBCASE("with 2 return placements (early return support)") {
+		auto astPtr = ASTFromInput("var f_parser154 = function(titi:int) : int { if(titi == 0) { return 1; } return 0; }; var int_parser154 = f_parser154(1);", keywords);
+		auto& ast = (*astPtr)[0];
+        CHECK(ast.op() == ska::Operator::VARIABLE_DECLARATION);
+        const auto& astFunc157 = ast[0];
+        CHECK(astFunc157.op() == ska::Operator::FUNCTION_DECLARATION);
+		CHECK(astFunc157.size() == 2);
 	}
 }
 
@@ -287,7 +296,6 @@ TEST_CASE("Expression and priorities") {
 	SUBCASE("Priorization with mul after add") {
 		auto astPtr = ASTFromInput("5 + 2 * 4;", keywords);
 		auto& ast = (*astPtr)[0];
-        std::cout << ast.op() << std::endl;
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
 		CHECK(ast.has(ska::Token { "+", ska::TokenType::SYMBOL }));

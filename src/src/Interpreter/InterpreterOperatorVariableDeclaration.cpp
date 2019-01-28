@@ -5,5 +5,5 @@
 ska::NodeCell ska::InterpreterOperator<ska::Operator::VARIABLE_DECLARATION>::interpret(OperateOn node) {
 	auto nodeValue = m_interpreter.interpret(node.GetVariableValueNode()).asRvalue();
 	m_memory.emplace(node.GetVariableName(), std::move(nodeValue));
-	return "";
+	return NodeCell {""};
 }

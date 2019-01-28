@@ -5,7 +5,7 @@
 #include "Config/LoggerConfigLang.h"
 #include "ExpressionType.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::Type)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Type)
 
 namespace ska {
 	class Symbol;
@@ -70,7 +70,7 @@ namespace ska {
 	
 		bool operator==(const Type& t) const {
 			if (!m_alias.empty()) {
-				return m_alias == t.m_alias;
+				return m_alias == t.m_alias && m_symbol == t.m_symbol;
 			}
 
 			if (!t.m_alias.empty()) {

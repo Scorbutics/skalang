@@ -1,4 +1,5 @@
 #include "NodeValue/AST.h"
+#include "NodeValue.h"
 #include "Interpreter.h"
 #include "MemoryTable.h"
 #include "InterpreterOperatorArrayDeclaration.h"
@@ -8,5 +9,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::ARRAY_DECLARATION>::interp
 	for (auto& child : node) {
 		result->push_back(std::move(m_interpreter.interpret(*child).as<NodeValue>()));
 	}
-	return result;
+	return NodeCell {result};
 }
