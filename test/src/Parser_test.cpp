@@ -190,7 +190,8 @@ TEST_CASE("User defined object") {
         //Checks the function body
         CHECK(astFunc154[1].size() == 1);
         
-        const auto& userDefinedObjectNode = astFunc154[1][0];
+        const auto& userDefinedObjectNode = astFunc154[1][0][0];
+		CHECK(astFunc154[1][0].op() == ska::Operator::RETURN);
         CHECK(userDefinedObjectNode.op() == ska::Operator::USER_DEFINED_OBJECT);
         CHECK(userDefinedObjectNode.size() == 1);
 

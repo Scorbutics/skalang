@@ -22,6 +22,9 @@ namespace ska {
         SemanticTypeChecker(StatementParser& parser, const SymbolTable& symbols);
         ~SemanticTypeChecker() = default;
     private:
+		static bool childrenHasReturnOnAllControlPath(const ASTNode& node);
+		static bool statementHasReturnOnAllControlPath(const ASTNode& node);
+
         bool matchArray(const ArrayTokenEvent& token);
         bool matchVariable(const VarTokenEvent& token); 		
         bool matchFunction(const FunctionTokenEvent& token);

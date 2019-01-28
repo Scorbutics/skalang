@@ -1,0 +1,11 @@
+var Character = import "../test/src/resources/custom_base";
+
+var player = Character.build("Player");
+var enemy = Character.default;
+
+export var totalAge = 0;
+
+for(var i = 0; i < enemy.age; i = i + 1) {
+	totalAge = totalAge + 1;
+}
+totalAge = totalAge + enemy.age + player.age;

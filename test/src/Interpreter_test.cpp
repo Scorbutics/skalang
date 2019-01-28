@@ -188,6 +188,12 @@ TEST_CASE("[Interpreter]") {
 			auto res = data.interpreter->interpret(*astPtr);
 			CHECK(res.asRvalue().nodeval<int>() == 10);
 		}
+
+		SUBCASE("Custom script starter") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var Custom = import \"../test/src/resources/custom\"; Custom.totalAge;", data);
+			auto res = data.interpreter->interpret(*astPtr);
+			CHECK(res.asRvalue().nodeval<int>() == 30);
+		}
 	}
 		
 }

@@ -1,0 +1,10 @@
+export var build = function (name_: string) : var {
+	var age = 10;
+	return {
+		age : age,
+		name : name_
+	};
+};
+
+var defaultStr = "Default";
+export var default = build(defaultStr);

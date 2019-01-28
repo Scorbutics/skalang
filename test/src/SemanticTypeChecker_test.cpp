@@ -177,16 +177,16 @@ TEST_CASE("[SemanticTypeChecker]") {
                 }
             }
 
-			SUBCASE("bad return placement") {
+			SUBCASE("bad return : missing branch") {
 				try {
-					ASTFromInputSemanticTC("var testReturn148 = function() { if(1) { return 2543; } };", data);
+					ASTFromInputSemanticTC("var testReturn148 = function() : int { if(true) { return 2543; } };", data);
 					CHECK(false);
 				} catch (std::exception& e) {
-					CHECK(e.what() == std::string("bad user-defined return placing : custom return must be set in a named function-constructor"));
+					CHECK(e.what() == std::string("function lacks of return in one of its code path"));
 				}
 			}
 
-			//TODO : forbid the "no effect" ?
+			//TODO : forbid the "no effect" dead code ?
 			SUBCASE("code after return : no effect") {
 				ASTFromInputSemanticTC("var testReturn148 = function() : int { return 2543; var test = 2; };", data);
 			}

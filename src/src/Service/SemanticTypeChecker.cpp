@@ -6,6 +6,9 @@
 #include "NodeValue/AST.h"
 #include "NodeValue/OperatorTraits.h"
 
+#include "Operation/OperationTypeFunctionDeclaration.h"
+#include "Operation/OperationTypeIfElse.h"
+
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SemanticTypeChecker)
 
 ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser, const SymbolTable& symbols) :
@@ -17,6 +20,36 @@ ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser, const Sym
     m_symbols(symbols) {
 }
 
+bool ska::SemanticTypeChecker::statementHasReturnOnAllControlPath(const ASTNode& node) {	
+	switch (node.op()) {
+	case Operator::FUNCTION_DECLARATION:
+	case Operator::FUNCTION_PROTOTYPE_DECLARATION:
+	case Operator::IF:
+		//false, cause even if there was a return inside children nodes, in this case it would not be enough to guaranty the systematic return
+		return false;
+	case Operator::IF_ELSE: {
+		auto ifElseOperation = OperationType<Operator::IF_ELSE>{ node };
+		return statementHasReturnOnAllControlPath(ifElseOperation.GetIfStatement()) && statementHasReturnOnAllControlPath(ifElseOperation.GetElseStatement());
+	}
+	case Operator::RETURN:
+		return true;
+	default:
+		return childrenHasReturnOnAllControlPath(node);
+	}
+}
+
+bool ska::SemanticTypeChecker::childrenHasReturnOnAllControlPath(const ASTNode& node) {
+	auto result = false;
+	for (const auto& statement : node) {
+		result |= statementHasReturnOnAllControlPath(*statement);
+		if (result) {
+			break;
+		}
+	}
+
+	return result;
+}
+
 bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
     switch(token.type()) {
         case ReturnTokenEventType::START:
@@ -25,12 +58,13 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
         case ReturnTokenEventType::BUILTIN:
 		case ReturnTokenEventType::OBJECT: {
 			const auto symbol = m_symbols.enclosingType();
-			if (symbol == nullptr || symbol->getName().empty() || m_symbols[symbol->getName()] == nullptr) {
-				throw std::runtime_error("return must be place directly in the function block (not in the nested ones)");
+			auto* finalSymbol = m_symbols[symbol->getName()];
+			if (symbol == nullptr || symbol->getName().empty() || finalSymbol == nullptr) {
+				throw std::runtime_error("return must be place in a function block or a nested one");
 			}
-			
-			const auto type = m_symbols[symbol->getName()]->getType();
-			const auto& node = token.rootNode();
+
+			const auto type = finalSymbol->getType();
+			const auto& node = token.rootNode()[0];
 			if (type.compound().empty() || !node.type().has_value()) {
 				throw std::runtime_error(symbol->getName() + " is not a function");
 			}
@@ -137,7 +171,12 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
             }
         } break;
 
-		case FunctionTokenEventType::DECLARATION_STATEMENT:
+		case FunctionTokenEventType::DECLARATION_STATEMENT: {
+			auto operation = OperationType<Operator::FUNCTION_DECLARATION>{ token.rootNode() };
+			if (operation.GetFunction()[0].type().value().compound().back() != ExpressionType::VOID && !childrenHasReturnOnAllControlPath(operation.GetFunctionBody())) {
+				throw std::runtime_error("function lacks of return in one of its code path");
+			}
+		} break;
 		default:
 			break;
     }
@@ -183,3 +222,5 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 
     return true;
 }
+
+//TODO check that "import" is located at script root (has no parent node except the root one)

@@ -43,11 +43,11 @@ ska::ASTNodePtr ska::MatcherReturn::match() {
         
         m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
     
-        returnNode = ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(returnFieldNodes));
+        returnNode = ASTFactory::MakeNode<Operator::RETURN>(ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(returnFieldNodes)));
         auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT> (*returnNode);
 		m_parser.Observable<ReturnTokenEvent>::notifyObservers(returnEndEvent);
     } else {
-        returnNode = m_parser.expr();
+        returnNode = ASTFactory::MakeNode<Operator::RETURN>(m_parser.expr());
         auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::BUILTIN> (*returnNode);
 		m_parser.Observable<ReturnTokenEvent>::notifyObservers(returnEndEvent);
     }

@@ -23,6 +23,7 @@ namespace ska {
 		BLOCK,
 		IF,
 		IF_ELSE,
+		RETURN,
 		UNUSED_Last_Length
 	};
 
@@ -46,6 +47,7 @@ namespace ska {
 		"BLOCK",
 		"IF",
 		"IF_ELSE"
+		"RETURN"
 	};
 
     static inline const char* OperatorPrint(Operator op) {

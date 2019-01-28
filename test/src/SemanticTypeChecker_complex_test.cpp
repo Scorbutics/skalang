@@ -148,7 +148,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	}
 	
 	SUBCASE("function with 2 return placements (early return support)") {
-		auto astPtr = ASTFromInputSemanticComplexTC("var f_semantic151 = function(titi:int) : int { if(titi == 0) { return 1; } return 0; }; var int_semantic151 = f_semantic151(1);", data);
+		ASTFromInputSemanticComplexTC("var f_semantic151 = function(titi:int) : int { if(titi == 0) { return 1; } return 0; }; var int_semantic151 = f_semantic151(1);", data);
 	}
 
 }

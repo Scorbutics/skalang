@@ -27,7 +27,7 @@ namespace ska {
         }
 
         const Symbol* owner() const {
-            return m_parentSymbol;
+            return m_parentSymbol == nullptr && &m_parent != this ? m_parent.owner() : m_parentSymbol;
         }
 
 		Symbol* operator[](const std::string& key) {
