@@ -1,6 +1,0 @@
-[17:36:37:779][Info ](TypeBuilderImport l.0013) Importing script as Character
-[17:36:37:785][Info ](TypeBuilderImport l.0013) Importing script as Character
-[17:36:37:789][Info ](TypeBuilderImport l.0013) Importing script as Character
-[17:36:37:791][Info ](TypeBuilderImport l.0013) Importing script as CharacterUser
-[17:36:37:795][Info ](TypeBuilderImport l.0013) Importing script as Character
-[17:36:37:796][Info ](TypeBuilderImport l.0013) Importing script as CharacterUser

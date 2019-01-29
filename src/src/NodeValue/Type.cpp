@@ -60,7 +60,7 @@ const std::unordered_map<std::string, int(*)[ska::Type::TypeMapSize][ska::Type::
 	};
 
     static int typeMapOperatorEquality[TypeMapSize][TypeMapSize] = {
-		{ 7, 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 0, 0, 0, 0, 0, 0 },
 		{ 0, 7, 0, 0, 0, 0, 0, 0 },
 		{ 0, 0, 7, 0, 0, 0, 0, 0 },
 		{ 0, 0, 0, 7, 0, 0, 0, 0 },
@@ -81,6 +81,17 @@ const std::unordered_map<std::string, int(*)[ska::Type::TypeMapSize][ska::Type::
 		{ 0, 0, 0, 0, 0, 0, 0, 7 }
 	};
 
+	static int typeMapOperatorLogicalBool[TypeMapSize][TypeMapSize] = {
+		{ 0, 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 0, 0, 0, 0, 0, 7 }
+	};
+
     static auto typeMap = std::unordered_map<std::string, int(*)[TypeMapSize][TypeMapSize]> {};
     typeMap.emplace("+", &typeMapOperatorPlus);
     typeMap.emplace("-", &typeMapOperatorMinus);
@@ -89,6 +100,8 @@ const std::unordered_map<std::string, int(*)[ska::Type::TypeMapSize][ska::Type::
     typeMap.emplace("=", &typeMapOperatorEqual);
     typeMap.emplace("==", &typeMapOperatorEquality);
 	typeMap.emplace("!=", &typeMapOperatorEquality);
+	typeMap.emplace("&&", &typeMapOperatorLogicalBool);
+	typeMap.emplace("||", &typeMapOperatorLogicalBool);
 	typeMap.emplace("<", &typeMapOperatorLogical);
 	typeMap.emplace("<=", &typeMapOperatorLogical);
 	typeMap.emplace(">", &typeMapOperatorLogical);

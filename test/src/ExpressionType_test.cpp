@@ -51,8 +51,5 @@ TEST_CASE("[ExpressionType]") {
         CHECK(typeMoved == ska::ExpressionType::OBJECT);
         CHECK(!typeMoved.compound().empty());
         CHECK(typeMoved.compound()[0] == ska::ExpressionType::INT);
-		auto ss = std::stringstream{};
-		ss << type;
-		CHECK(ss.str() == "INVALID_MOVED");
     }
 }

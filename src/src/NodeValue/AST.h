@@ -48,14 +48,6 @@ namespace ska {
 			return token.content();
 		}
 
-		const auto& value() const {
-			return m_value;
-		}
-
-		std::string valueAsString() const {
-			return "";
-		}
-
 		ASTNode& left() {
 			assert(m_op == Operator::BINARY && !m_children.empty());
 			return *m_children[0].get();
@@ -99,7 +91,6 @@ namespace ska {
 		}
 
 	    void buildType(const SymbolTable& symbols);
-		void buildValue(NodeValue value);
 
 		const auto& type() const {
 			return m_type;
@@ -118,7 +109,6 @@ namespace ska {
 		std::unique_ptr<TypeBuildUnit> m_typeBuilder;
 
 		Token token;
-		NodeValue m_value;
 		std::vector<ASTNodePtr> m_children;
 
 		friend std::ostream& operator<<(std::ostream& stream, const ASTNode& node);

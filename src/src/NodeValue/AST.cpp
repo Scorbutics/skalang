@@ -54,7 +54,3 @@ void ska::ASTNode::buildType(const SymbolTable& symbols) {
 	assert(m_typeBuilder != nullptr && "Cannot calculate the node type (it might be an empty node)");
     m_type = m_typeBuilder->build(symbols, *this);
 }
-
-void ska::ASTNode::buildValue(NodeValue value) {
-	m_value = std::move(value);
-}

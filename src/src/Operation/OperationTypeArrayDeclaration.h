@@ -11,12 +11,21 @@ namespace ska {
 	public:
 		OperationType(const ASTNode& node) : node(node) {}
 		
+		inline auto HasArrayType() {
+			return node.size() > 0;
+		}
+
         inline auto GetArraySubType() {
+			assert(HasArrayType());
             return node[0].type().value();
         }
 		
-		inline auto HasArrayType() {
-			return node.size() > 0;
+		auto begin() const {
+			return node.begin();
+		}
+
+		auto end() const  {
+			return node.end();
 		}
 	};
 }

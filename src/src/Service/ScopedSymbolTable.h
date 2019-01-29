@@ -19,6 +19,8 @@ namespace ska {
 		~ScopedSymbolTable() = default;
 
 		ScopedSymbolTable& parent();
+		const ScopedSymbolTable& parent() const;
+
 		ScopedSymbolTable& createNested();
 		Symbol& emplace(std::string name);
 		

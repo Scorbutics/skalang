@@ -8,6 +8,7 @@ namespace ska {
 	struct TypeBuilderBuildFromTokenTypeTag;
 
     Type TypeBuilderBuildFromTokenType(const SymbolTable& symbols, const ASTNode& node) {
+
         switch(node.tokenType()) {
             case TokenType::SYMBOL:
             case TokenType::SPACE:
@@ -28,10 +29,8 @@ namespace ska {
 				if (symbol != nullptr) {
 					if (symbol->getType().hasSymbol()) {
 						return symbol->getType();
-					}
-					const auto* symbol = symbols[node.name()];
-					const auto* finalSymbol = symbol == nullptr ? nullptr : (*symbol)[node.name()];
-
+					}			
+					const auto* finalSymbol = (*symbol)[node.name()];
 					switch (symbol->getType().type()) {
 					case ExpressionType::OBJECT:
 						return Type::MakeCustom<ExpressionType::OBJECT>(finalSymbol);
@@ -48,28 +47,41 @@ namespace ska {
 
             case TokenType::RESERVED: {
 				auto type = Type{};
-                //TODO map
-                  if(node.name() == std::string(ExpressionTypeSTR[static_cast<std::size_t>(ExpressionType::INT)])) {
-					  type = Type::MakeBuiltIn<ExpressionType::INT>();
-                  } else if (node.name() == std::string(ExpressionTypeSTR[static_cast<std::size_t>(ExpressionType::FLOAT)])) {
-					  type = Type::MakeBuiltIn<ExpressionType::FLOAT>();
-                  } else if (node.name() == std::string(ExpressionTypeSTR[static_cast<std::size_t>(ExpressionType::STRING)])) {
-					  type = Type::MakeBuiltIn<ExpressionType::STRING>();
-                  } else if (node.name() == std::string(ExpressionTypeSTR[static_cast<std::size_t>(ExpressionType::BOOLEAN)])) {
-					  type = Type::MakeBuiltIn<ExpressionType::FLOAT>();
-                  } else if(node.name() == std::string(ExpressionTypeSTR[static_cast<std::size_t>(ExpressionType::OBJECT)])) {
-					  type = Type::MakeCustom<ExpressionType::OBJECT>(nullptr);
-                  } else if (node.name() == std::string(ExpressionTypeSTR[static_cast<std::size_t>(ExpressionType::FUNCTION)])) {					  
-					  type = Type::MakeCustom<ExpressionType::FUNCTION>(nullptr);
-				  } else if (node.name() == "true" || node.name() == "false") {
-                      type = Type::MakeBuiltIn<ExpressionType::BOOLEAN>();
-                  }
-				  //handles arrays
-				  if (node.size() == 1 && node[0].tokenType() == TokenType::ARRAY) {
-					  type = Type::MakeBuiltIn<ExpressionType::ARRAY>().add(type);
-				  }
-				  return type;
+				if(ExpressionTypeMap.find(node.name()) != ExpressionTypeMap.end()) {
+					switch(ExpressionTypeMap.at(node.name())) {
+						case ExpressionType::INT:
+						type = Type::MakeBuiltIn<ExpressionType::INT>();
+						break;
+						case ExpressionType::FLOAT:
+						type = Type::MakeBuiltIn<ExpressionType::FLOAT>();
+						break;
+						case ExpressionType::STRING:
+						type = Type::MakeBuiltIn<ExpressionType::STRING>();
+						break;
+						case ExpressionType::BOOLEAN:
+						type = Type::MakeBuiltIn<ExpressionType::BOOLEAN>();
+						break;
+						case ExpressionType::OBJECT:
+						type = Type::MakeCustom<ExpressionType::OBJECT>(nullptr);
+						break;
+                  		case ExpressionType::FUNCTION:
+					  	type = Type::MakeCustom<ExpressionType::FUNCTION>(nullptr);
+						break;
+						default:
+						if(node.name() == "true" || node.name() == "false") {
+							type = Type::MakeBuiltIn<ExpressionType::BOOLEAN>();
+						}
+						break;
+					}
+				}
+				//handles arrays
+				if (node.size() == 1 && node[0].tokenType() == TokenType::ARRAY) {
+					type = Type::MakeBuiltIn<ExpressionType::ARRAY>().add(type);
+				}
+
+				return type;
             }
+			
 			case TokenType::ARRAY:
 				return Type::MakeBuiltIn<ExpressionType::ARRAY>();
 

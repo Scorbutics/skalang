@@ -17,7 +17,18 @@ namespace ska {
 		inline auto GetFunctionType() {
 			return node[0].type().value();
 		}
+
+		auto begin() {
+			return node.begin() + 1;
+		}
 		
-		const Type GetFunctionReturnSymbol(const SymbolTable& symbols);
+		auto end() {
+			return node.end();
+		}
+
+		inline std::size_t GetFunctionParameterSize() const {
+			return node.size() - 1;
+		}
+
 	};
 }

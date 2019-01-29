@@ -7,7 +7,10 @@
 #include "NodeValue/OperatorTraits.h"
 
 #include "Operation/OperationTypeFunctionDeclaration.h"
+#include "Operation/OperationTypeFunctionCall.h"
 #include "Operation/OperationTypeIfElse.h"
+#include "Operation/OperationTypeArrayDeclaration.h"
+#include "Operation/OperationTypeReturn.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SemanticTypeChecker)
 
@@ -17,6 +20,7 @@ ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser, const Sym
 	SubObserver<ArrayTokenEvent>(std::bind(&SemanticTypeChecker::matchArray, this, std::placeholders::_1), parser),
     SubObserver<ReturnTokenEvent>(std::bind(&SemanticTypeChecker::matchReturn, this, std::placeholders::_1), parser),
 	SubObserver<IfElseTokenEvent>(std::bind(&SemanticTypeChecker::matchIfElse, this, std::placeholders::_1), parser),
+	SubObserver<ImportTokenEvent>(std::bind(&SemanticTypeChecker::matchImport, this, std::placeholders::_1), parser),
     m_symbols(symbols) {
 }
 
@@ -64,16 +68,17 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 			}
 
 			const auto type = finalSymbol->getType();
-			const auto& node = token.rootNode()[0];
-			if (type.compound().empty() || !node.type().has_value()) {
+			auto operationReturn = OperationType<Operator::RETURN>{token.rootNode()};
+			const auto& returnedValue = operationReturn.GetValue();
+			if (type.compound().empty() || !returnedValue.type().has_value()) {
 				throw std::runtime_error(symbol->getName() + " is not a function");
 			}
 
 			const auto expectedReturnType = type.compound().back();
-			if ((node.op() == Operator::USER_DEFINED_OBJECT && expectedReturnType != ExpressionType::OBJECT) || 
-				node.op() != Operator::USER_DEFINED_OBJECT && expectedReturnType != node.type()) {
+			if ((returnedValue.op() == Operator::USER_DEFINED_OBJECT && expectedReturnType != ExpressionType::OBJECT) || 
+				returnedValue.op() != Operator::USER_DEFINED_OBJECT && expectedReturnType != returnedValue.type()) {
 				auto ss = std::stringstream{};
-				ss << "bad return type : expected " << expectedReturnType << " on function but got " << node.type().value() << " on return";
+				ss << "bad return type : expected " << expectedReturnType << " on function but got " << returnedValue.type().value() << " on return";
 				throw std::runtime_error(ss.str());
 			}
 
@@ -83,10 +88,11 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 }
 
 bool ska::SemanticTypeChecker::matchIfElse(const IfElseTokenEvent& token) {
-	const auto& nodeType = token.rootNode()[0].type().value_or(Type{});
-	if (nodeType != ExpressionType::BOOLEAN) {
+	const auto& ifElseOperation = OperationType<Operator::IF_ELSE>{token.rootNode()};
+	const auto& conditionType = ifElseOperation.GetCondition().type().value_or(Type{});
+	if (conditionType != ExpressionType::BOOLEAN) {
 		auto ss = std::stringstream{};
-		ss << "expression is not a boolean (it's a " << nodeType << ")";
+		ss << "expression condition is not a boolean (it's a " << conditionType << ")";
 		throw std::runtime_error(ss.str());
 	}
 	return true;
@@ -96,18 +102,12 @@ bool ska::SemanticTypeChecker::matchArray(const ArrayTokenEvent& token) {
 
 	switch (token.type()) {
 	case ArrayTokenEventType::DECLARATION: {
-			const auto& node = token.rootNode();
-			assert(node.type() == ExpressionType::ARRAY);
-			if (node.size() == 0) {
-				assert(node.type().value().compound().empty());
-				return true;
-			}
-			const auto type = node[0].type().value();
-			for (const auto& arrayElementNode : node) {
-				if (type != arrayElementNode->type()) {
-					assert(arrayElementNode->type().has_value());
+			auto arrayDeclarationOperation = OperationType<Operator::ARRAY_DECLARATION>{token.rootNode()};
+			const auto arraySubType = arrayDeclarationOperation.GetArraySubType();
+			for (const auto& arrayElementNode : arrayDeclarationOperation) {
+				if (arraySubType != arrayElementNode->type()) {
 					auto ss = std::stringstream{};
-					ss << "array has not uniform types in it : " << type << " and " << arrayElementNode->type().value();
+					ss << "array has not uniform types in it : " << arraySubType << " and " << arrayElementNode->type().value();
 					throw std::runtime_error(ss.str());
 				}
 			}
@@ -136,35 +136,35 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
     switch(token.type()) {
         
         case FunctionTokenEventType::CALL: {
-			assert(token.rootNode().size() > 0);
-			const auto& functionNode = token.rootNode()[0];
+			auto functionCallOperation = OperationType<Operator::FUNCTION_CALL>{ token.rootNode() };
 			
-            const auto type = functionNode.type();
-            if(!type.has_value() || type != ExpressionType::FUNCTION) {
+            const auto functionFullRequiredType = functionCallOperation.GetFunctionType();
+            if(functionFullRequiredType != ExpressionType::FUNCTION) {
 				auto ss = std::stringstream{};
-				ss << "function " << functionNode << " is called before being declared (or has a bad declaration)";
+				ss << "function " << functionFullRequiredType << " is called before being declared (or has a bad declaration)";
 				throw std::runtime_error(ss.str());
             }
 
-			const auto typeSize = type.value().size();
-			assert(typeSize != 0 && "Function declaration type must have at least a return type (even if it's void)");
-			const auto callNodeParameterSize = token.rootNode().size();
-            if(typeSize != callNodeParameterSize) {
+			const auto functionRequiredTypeParameterSize = functionFullRequiredType.size() - 1;
+			const auto callNodeParameterSize = functionCallOperation.GetFunctionParameterSize();
+            if(functionRequiredTypeParameterSize != callNodeParameterSize) {
                 auto ss = std::stringstream {};
-                ss << "bad function call : the function " << functionNode << " needs " << (typeSize - 1) << " parameters but is being called with " << (callNodeParameterSize - 1) << " parameters (function type is " << type.value() << ")";
+                ss << "bad function call : the function " << functionFullRequiredType << " needs " 
+				<< functionRequiredTypeParameterSize << " parameters but is being called with " << callNodeParameterSize 
+				<< " parameters (function type is " << functionFullRequiredType << ")";
                 throw std::runtime_error(ss.str());
             }
 
-			SLOG(ska::LogLevel::Debug) << functionNode << " function has the following arguments types during its call : ";
-			const auto& functionCallNode = token.rootNode();
-			for (auto index = 1u; index < functionCallNode.size(); index++) {
-				auto& param = functionCallNode[index];
-				const auto calculatedType = param.type().value();
-				const auto requiredType = (type.value().compound())[index - 1];
+			SLOG(ska::LogLevel::Debug) << functionFullRequiredType << " function has the following arguments types during its call : ";
+			auto index = 0u;
+			for (auto& arg : functionCallOperation) {		
+				const auto calculatedArgumentType = arg->type().value();
+				const auto requiredParameterType = functionFullRequiredType.compound()[index];
 
-                if(requiredType.crossTypes("=", calculatedType) == ExpressionType::VOID) {
+                if(requiredParameterType.crossTypes("=", calculatedArgumentType) == ExpressionType::VOID) {
                     auto ss = std::stringstream {};
-                    ss << "Type  \"" << calculatedType << "\" is encountered while a type convertible to \"" << requiredType << "\" is required";
+                    ss << "Type  \"" << calculatedArgumentType << "\" is encountered while a type convertible to \"" 
+					<< requiredParameterType << "\" is required";
                     throw std::runtime_error(ss.str());
                 }
 				index++;
@@ -173,7 +173,9 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 
 		case FunctionTokenEventType::DECLARATION_STATEMENT: {
 			auto operation = OperationType<Operator::FUNCTION_DECLARATION>{ token.rootNode() };
-			if (operation.GetFunction()[0].type().value().compound().back() != ExpressionType::VOID && !childrenHasReturnOnAllControlPath(operation.GetFunctionBody())) {
+			auto functionReturnType = operation.GetFunctionPrototype().type().value().compound().back();
+			if (functionReturnType != ExpressionType::VOID && 
+				!childrenHasReturnOnAllControlPath(operation.GetFunctionBody())) {
 				throw std::runtime_error("function lacks of return in one of its code path");
 			}
 		} break;
@@ -223,4 +225,14 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
     return true;
 }
 
-//TODO check that "import" is located at script root (has no parent node except the root one)
+bool ska::SemanticTypeChecker::matchImport(const ImportTokenEvent& token) {
+	assert(m_symbols.current() != nullptr);
+	const auto& parent = m_symbols.current()->parent();
+	/*
+	TODO
+	if(&parent != m_symbols.current()) {
+		throw std::runtime_error("bad import placement : import must not be located in a nested block");
+	}
+	*/
+	return true;
+}

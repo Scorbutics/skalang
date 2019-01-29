@@ -6,6 +6,10 @@ ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
 	return m_parent;
 }
 
+const ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() const {
+	return m_parent;
+}
+
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name) {
     
     {

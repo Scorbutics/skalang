@@ -173,7 +173,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                     ASTFromInputSemanticTC("var testReturn148 = function() { return 2543; }; var value = testReturn148(); value;", data);
                     CHECK(false);
                 } catch (std::exception& e) {
-                    CHECK(e.what() == std::string ("bad return type : expected  void on function but got  int on return"));
+                    CHECK(e.what() == std::string ("bad return type : expected void on function but got int on return"));
                 }
             }
 
@@ -198,7 +198,8 @@ TEST_CASE("[SemanticTypeChecker]") {
 					ASTFromInputSemanticTC("var testIf188 = 3; if(testIf188) {}", data);
 					CHECK(false);
 				} catch (std::exception& e) {
-					CHECK(e.what() == std::string("expression is not a boolean (it's a  int)"));
+					std::cout << e.what() << std::endl;
+					CHECK(e.what() == std::string("expression condition is not a boolean (it's a int)"));
 				}
 			}
 
@@ -310,7 +311,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 						auto astPtr = ASTFromInputSemanticTC("var var187 = 123; var187[0];", data);
 						CHECK(false);
 					} catch (std::exception& e) {
-						CHECK(std::string("expression is not an array (it's a  int)") == e.what());
+						CHECK(std::string("expression is not an array (it's a int)") == e.what());
 					}
 				}
 
