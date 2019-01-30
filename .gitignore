@@ -20,3 +20,5 @@ Makefile
 /bench/external
 TypeBuilderLogError.txt
 **/TypeBuilderLogError.txt
+**/Log.txt
+Log.txt
