@@ -15,6 +15,10 @@ namespace ska {
 		inline auto& GetVariableNode() {
 			return node[0];
 		}
+
+		inline auto& GetValueNode() {
+			return node[1];
+		}
 		
 		inline auto& GetObjectValueNode() {
 			return node[2];
