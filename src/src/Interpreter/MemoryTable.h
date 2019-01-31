@@ -52,6 +52,12 @@ namespace ska {
 			return valueIt == m_current->m_memory.end() ? std::make_pair(nullptr, nullptr) : std::make_pair(&(valueIt->second), this);
 		}
 
+		void clear() {
+			m_children.clear();
+			m_memory.clear();
+			m_current = this;
+		}
+
 	private:
 		MemoryCLValue inMemoryFind(const std::string& key) const {
 			const auto valueIt = m_memory.find(key);

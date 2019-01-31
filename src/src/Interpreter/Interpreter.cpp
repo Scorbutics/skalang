@@ -61,3 +61,9 @@ ska::NodeCell ska::Interpreter::interpret(ASTNode& node) {
 	assert(builder != nullptr);
 	return builder->interpret(node);
 }
+
+ska::NodeValue ska::Interpreter::script(ASTNode& node) {
+	auto value = interpret(node).asRvalue();
+	m_memory.clear();
+	return value;
+}
