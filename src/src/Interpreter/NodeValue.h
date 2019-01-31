@@ -31,8 +31,11 @@ namespace ska {
 	
 	class NodeValue {
 	public:
-		template <class ... Args>
-		NodeValue(Args&& ... args): m_variant(std::forward<Args>(args)...) {}
+		NodeValue() = default;
+		template <class Arg>
+		NodeValue(Arg arg) : m_variant(std::move(arg)) {}
+		NodeValue(std::shared_ptr<std::vector<NodeValue>> arg) : m_variant(std::move(arg)) {}
+		NodeValue(std::shared_ptr<std::unordered_map<std::string, NodeValue>> arg) : m_variant(std::move(arg)) {}
 
 		NodeValue(NodeValue&&) = default;
 
@@ -96,7 +99,7 @@ namespace ska {
 	public:
 		NodeCell() = default;
 		NodeCell(MemoryTable& memory, NodeValue* lvalue): m_memory(&memory), m_variant(lvalue) {}
-		NodeCell(NodeValue rvalue) : m_variant(NodeValue { std::move(rvalue) }) {}
+		NodeCell(NodeValue rvalue) : m_variant(std::move(rvalue)) {}
 		NodeCell(std::pair<NodeValue*, MemoryTable*> lvalue) : m_memory(lvalue.second), m_variant(lvalue.first) { assert(m_memory != nullptr); }
 
 		std::pair<NodeValue*, MemoryTable*> asLvalue() {

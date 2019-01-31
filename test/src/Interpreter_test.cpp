@@ -196,9 +196,9 @@ TEST_CASE("[Interpreter]") {
 		}
 
 		SUBCASE("2 outside scripts from file (import)") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var CharacterUser = import \"../test/src/resources/character_user\"; var CharacterUser2 = import \"../test/src/resources/character_user\"; CharacterUser.player.age;", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var CharacterUser = import \"../test/src/resources/character_user\"; CharacterUser.player.age = 3; var CharacterUser2 = import \"../test/src/resources/character_user\"; CharacterUser2.player.age;", data);
 			auto res = data.interpreter->script(*astPtr);
-			CHECK(res.nodeval<int>() == 10);
+			CHECK(res.nodeval<int>() == 3);
 		}
 	}
 		
