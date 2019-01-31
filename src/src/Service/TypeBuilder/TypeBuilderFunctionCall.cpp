@@ -4,7 +4,6 @@
 #include "TypeBuilderCalculatorDispatcher.h"
 #include "Service/SymbolTable.h"
 #include "NodeValue/AST.h"
-#include "Operation/OperationFunctionDeclaration.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>);
 

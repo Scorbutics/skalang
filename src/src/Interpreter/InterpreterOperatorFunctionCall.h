@@ -1,7 +1,7 @@
 #pragma once
 
 #include "InterpreterOperator.h"
-#include "Operation/OperationFunctionCall.h"
+#include "Operation/Interpreter/OperationFunctionCall.h"
 
 namespace ska {
 	SKALANG_INTERPRETER_OPERATOR_DEFINE(Operator::FUNCTION_CALL);

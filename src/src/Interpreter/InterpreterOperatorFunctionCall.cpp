@@ -1,7 +1,7 @@
 #include "NodeValue/AST.h"
 #include "Interpreter.h"
 #include "InterpreterOperatorFunctionCall.h"
-#include "Operation/OperationFunctionDeclaration.h"
+#include "Operation/Interpreter/OperationFunctionDeclaration.h"
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>::interpret(OperateOn node) {
 	auto inMemoryFunctionZone = m_interpreter.interpret(node.GetFunction()).asLvalue();

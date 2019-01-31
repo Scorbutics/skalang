@@ -2,7 +2,6 @@
 #include "TypeBuilderLiteral.h"
 #include "Service/SymbolTable.h"
 #include "TypeBuilderCalculatorDispatcher.h"
-#include "Operation/OperationUnary.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::LITERAL>);
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::UNARY>);
