@@ -25,7 +25,7 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::UNARY>::interpret(OperateO
         return NodeCell {""};
     }
 
-	return nodeValue; //InterpreterOperatorConvertString(node.type().value().type(), std::get<Token::Variant>(*nodeValue));
+	return nodeValue;
 }
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::LITERAL>::interpret(OperateOn node) {
