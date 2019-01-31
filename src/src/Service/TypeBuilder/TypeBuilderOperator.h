@@ -2,7 +2,7 @@
 
 #include "NodeValue/Type.h"
 #include "TypeBuildUnit.h"
-#include "Operation/OperationType.h"
+#include "Operation/Type/OperationType.h"
 
 #define SKALANG_BUILDER_TYPE_OPERATOR_DEFINE(OperatorType)\
     template<>\

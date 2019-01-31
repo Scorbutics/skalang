@@ -15,7 +15,6 @@ ska::SymbolTable::SymbolTable(StatementParser& parser) :
 }
 
 bool ska::SymbolTable::nestedTable(const BlockTokenEvent& event) {
-	//TODO gsl::not_null<...> pour m_currentTable
 	assert(m_currentTable != nullptr);
 
 	switch(event.type()) {
@@ -37,7 +36,6 @@ bool ska::SymbolTable::nestedTable(const BlockTokenEvent& event) {
 }
 
 bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
-	//TODO gsl::not_null<...> pour m_currentTable
 	assert(m_currentTable != nullptr);
 
     switch(token.type()) {
@@ -61,7 +59,6 @@ bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
 }
 
 bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
-	//TODO gsl::not_null<...> pour m_currentTable
 	assert(m_currentTable != nullptr);
 
 	switch(token.type()) {
@@ -86,7 +83,6 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 }
 
 bool ska::SymbolTable::match(const VarTokenEvent& token) {
-	//TODO gsl::not_null<...> pour m_currentTable
 	assert(m_currentTable != nullptr);
 	
 	switch(token.type()) {

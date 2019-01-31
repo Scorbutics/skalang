@@ -198,7 +198,6 @@ TEST_CASE("[SemanticTypeChecker]") {
 					ASTFromInputSemanticTC("var testIf188 = 3; if(testIf188) {}", data);
 					CHECK(false);
 				} catch (std::exception& e) {
-					std::cout << e.what() << std::endl;
 					CHECK(e.what() == std::string("expression condition is not a boolean (it's a int)"));
 				}
 			}
