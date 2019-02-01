@@ -159,6 +159,5 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationBody() {
 	}
 	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
 
-	auto blockNode = ASTFactory::MakeNode<Operator::BLOCK>(std::move(statements));
-	return blockNode;
+	return ASTFactory::MakeNode<Operator::BLOCK>(std::move(statements));
 }

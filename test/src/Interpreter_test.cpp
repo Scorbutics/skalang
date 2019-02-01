@@ -52,13 +52,13 @@ TEST_CASE("[Interpreter]") {
 			CHECK(res.nodeval<int>() == 25);
 		}
 
-		SUBCASE("Var reaffected using the same var") {
+		SUBCASE("Var reaffected using the same var (int)") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 4; toto; toto = toto * 2;", data);
 			auto res = data.interpreter->script(*astPtr);
 			CHECK(res.nodeval<int>() == 8);
 		}
 
-		SUBCASE("Var reaffected using the same var") {
+		SUBCASE("Var reaffected using the same var (string)") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = \"ti\"; toto; toto = toto * 2;", data);
 			auto res = data.interpreter->script(*astPtr);
 			CHECK(res.nodeval<std::string>() == "titi");
@@ -121,7 +121,7 @@ TEST_CASE("[Interpreter]") {
 		SUBCASE("Var reaffected string with number") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 2 + \"ti\"; toto;", data);
 			auto res = data.interpreter->script(*astPtr);
-			CHECK(res.nodeval < std::string >() == "2ti");
+			CHECK(res.nodeval<std::string>() == "2ti");
 		}
 
 		SUBCASE("Array of int") {
