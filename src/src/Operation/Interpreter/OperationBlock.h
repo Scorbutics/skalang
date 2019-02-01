@@ -19,5 +19,9 @@ namespace ska {
 		auto end() {
 			return node.end();
 		}
+
+		auto size() {
+			return node.size();
+		}
 	};
 }

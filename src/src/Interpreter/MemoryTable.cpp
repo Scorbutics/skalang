@@ -14,6 +14,7 @@ ska::MemoryTable & ska::MemoryTable::createNested() {
 }
 
 ska::MemoryTable* ska::MemoryTable::endNested() {
+	m_current->m_memory.clear();
 	m_current = m_current->parent();
 	return m_current;
 }
