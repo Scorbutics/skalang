@@ -13,9 +13,11 @@ namespace ska {
 	class NodeValue;
 	class NodeCell;
 	class MemoryTable;
+	struct BridgeFunction;
 
 	using NodeValueVariant_ = std::variant<
 		Token::Variant,
+		std::shared_ptr<BridgeFunction>,
 		std::shared_ptr<std::vector<NodeValue>>,
 		std::shared_ptr<std::unordered_map<std::string, NodeValue>>
 	>;

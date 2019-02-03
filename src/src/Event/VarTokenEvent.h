@@ -1,5 +1,7 @@
 #pragma once
 
+#include "NodeValue/Type.h"
+
 namespace ska {
     class ASTNode;
 

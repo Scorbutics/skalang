@@ -1,4 +1,5 @@
 #include <functional>
+#include "Interpreter/Interpreter.h"
 #include "Config/LoggerConfigLang.h"
 #include "Event/BridgeTokenEvent.h"
 #include "Service/SymbolTable.h"
@@ -7,7 +8,12 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Binding)
 
-void ska::Binding::bindFunction(const std::string& functionName, BridgeFunction f, std::vector<std::string> typeNames) {
+ska::Binding::Binding(Interpreter& interpreter, SymbolTable& symbolTable) :
+	m_observer(symbolTable),
+	m_interpreter(interpreter) {
+}
+
+void ska::Binding::bindSymbol(const std::string& functionName, std::vector<std::string> typeNames) {
 	auto functionNameToken = Token{ functionName, TokenType::IDENTIFIER };
 
 	auto parameters = std::vector<ASTNodePtr>{};
@@ -37,6 +43,4 @@ void ska::Binding::bindFunction(const std::string& functionName, BridgeFunction 
 	Observable<FunctionTokenEvent>::notifyObservers(statementEvent);
 
 	m_bridges.push_back(ASTFactory::MakeNode<Operator::BRIDGE>(std::move(functionDeclarationNode)));
-	//TODO
-	//m_memory.emplace(functionNameToken.name(), NodeValue { std::move(f) });
 }

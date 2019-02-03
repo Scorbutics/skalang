@@ -53,7 +53,8 @@ std::vector<std::unique_ptr<ska::InterpreterOperatorUnit>> ska::Interpreter::bui
 
 ska::Interpreter::Interpreter(SymbolTable& symbols) :
 	m_symbols(symbols),
-	m_operatorInterpreter(build()) {
+	m_operatorInterpreter(build()),
+	m_binding(*this, symbols) {
 }
 
 ska::NodeCell ska::Interpreter::interpret(ASTNode& node) {

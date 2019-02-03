@@ -8,53 +8,52 @@
 
 namespace ska {
 	class SymbolTable;
-	using BridgeFunction = std::function<NodeValue(std::vector<NodeValue>)>;
-
+	class Interpreter;
+	
 	//http://coliru.stacked-crooked.com/a/8efdf80ac4082e22
-
 	class Binding :
 		public Observable<VarTokenEvent>,
 		public Observable<FunctionTokenEvent> {
 	public:
-		Binding(SymbolTable& symbolTable, MemoryTable& memory) : 
-			m_observer(symbolTable),
-			m_memory(memory) {}
+		Binding(Interpreter& interpreter, SymbolTable& symbolTable);
 		~Binding() = default;
 
+		template <class ReturnType, class ... ParameterTypes>
+		ska::BridgeFunctionPtr bindFunction(const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
+			auto typeNames = buildTypes<ReturnType, ParameterTypes...>();
+			auto result = makeScriptSideBridge<ReturnType, ParameterTypes...>(std::move(f));
+			bindSymbol(functionName, std::move(typeNames));
+			return result;
+		}
+
+	private:
 		template <class ReturnType, class ... ParameterTypes, std::size_t... Idx>
 		auto callNativeFromScript(std::function<ReturnType(ParameterTypes...)> f, std::vector<NodeValue>& v, std::index_sequence<Idx...>) {
 			return f(convertTypeFromScript<ParameterTypes, Idx>(v)...);
 		}
 
 		template <class ReturnType, class ... ParameterTypes>
-		BridgeFunction makeScriptSideBridge(std::function<ReturnType(ParameterTypes...)> f) {
-			return [&f](std::vector<NodeValue> v) {
+		BridgeFunctionPtr makeScriptSideBridge(std::function<ReturnType(ParameterTypes...)> f) {
+			return std::make_unique<BridgeFunction>(static_cast<decltype(BridgeFunction::function)> ([&f, this](std::vector<NodeValue> v) {
 				return NodeValue{ callNativeFromScript<ReturnType, ParameterTypes...>(std::move(f), v, std::make_index_sequence<sizeof ...(ParameterTypes)>()) };
-			};
+			}) );
 		}
 
-		template <class ReturnType, class ... ParameterTypes>
-		void bindFunction(const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
-			auto typeNames = buildTypes<ReturnType, ParameterTypes...>();
-			bindFunction(functionName, makeScriptSideBridge<ReturnType, ParameterTypes...>(std::move(f)), std::move(typeNames));
-		}
-
-	private:
 		template <class T, std::size_t Id>
 		T convertTypeFromScript(const std::vector<NodeValue>& vect) {
 			const auto& v = vect[Id];
 			if constexpr (std::is_same<T, std::string>()) {
 				return v.convertString();
 			} else if constexpr (std::is_same<T, int>()) {
-				return v.convertNumeric();
+				return static_cast<T>(v.convertNumeric());
 			} else if constexpr (std::is_same<T, std::size_t>()) {
-				return v.convertNumeric();
+				return static_cast<T>(v.convertNumeric());
 			} else if constexpr (std::is_same<T, float>()) {
-				return v.convertNumeric();
+				return static_cast<T>(v.convertNumeric());
 			} else if constexpr (std::is_same<T, bool>()) {
 				return static_cast<int>(v.convertNumeric()) != 0;
 			} else if constexpr (std::is_same<T, double>()) {
-				return v.convertNumeric();
+				return static_cast<T>(v.convertNumeric());
 			} else {
 				static_assert(false, "Invalid type for bridge function");
 			}
@@ -88,9 +87,9 @@ namespace ska {
 			return ss;
 		}
 
-		void bindFunction(const std::string& functionName, BridgeFunction f, std::vector<std::string> typeNames);
+		void bindSymbol(const std::string& functionName, std::vector<std::string> typeNames);
 
-		MemoryTable& m_memory;
+		Interpreter& m_interpreter;
 		Observer<VarTokenEvent>& m_observer;
 		std::vector<ASTNodePtr> m_bridges;
 	};

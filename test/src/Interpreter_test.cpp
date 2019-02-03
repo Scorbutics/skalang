@@ -10,19 +10,23 @@
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 
-std::unique_ptr<ska::ASTNode> ASTFromInputSemanticTCInterpreter(const std::string& input, DataTestContainer& data) {
+void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTestContainer& data) {
 	const auto reservedKeywords = ska::ReservedKeywordsPool{};
-	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
+	auto tokenizer = ska::Tokenizer{ reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
-	auto reader = ska::TokenReader { tokens };
+	auto reader = ska::TokenReader{ tokens };
 
-	data.parser = std::make_unique<ska::StatementParser> ( reservedKeywords, reader );
-    data.symbols = std::make_unique<ska::SymbolTable> (*data.parser);
-    data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, *data.symbols);
+	data.parser = std::make_unique<ska::StatementParser>(reservedKeywords, reader);
+	data.symbols = std::make_unique<ska::SymbolTable>(*data.parser);
+	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, *data.symbols);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, *data.symbols);
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, *data.symbols);
 	data.interpreter = std::make_unique<ska::Interpreter>(*data.symbols);
-    return data.parser->parse();
+}
+
+std::unique_ptr<ska::ASTNode> ASTFromInputSemanticTCInterpreter(const std::string& input, DataTestContainer& data) {
+	ASTFromInputSemanticTCInterpreterNoParse(input, data);
+	return data.parser->parse();
 }
 
 TEST_CASE("[Interpreter]") {
@@ -199,6 +203,21 @@ TEST_CASE("[Interpreter]") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var CharacterUser = import \"../test/src/resources/character_user\"; CharacterUser.player.age = 3; var CharacterUser2 = import \"../test/src/resources/character_user\"; CharacterUser2.player.age;", data);
 			auto res = data.interpreter->script(*astPtr);
 			CHECK(res.nodeval<int>() == 3);
+		}
+
+		SUBCASE("C++ binding") {
+			ASTFromInputSemanticTCInterpreterNoParse("var User = import \"binding\"; User.bind(14, \"titito\");", data);
+			auto test = 0;
+			auto testStr = std::string{ "" };
+			auto function = std::function<int(int, std::string)>([&](int toto, std::string titi) -> int {
+				test = toto;
+				testStr = std::move(titi);
+			});
+			data.interpreter->bindFunction("binding", std::move(function));
+			auto astPtr = data.parser->parse();
+			data.interpreter->script(*astPtr);
+			CHECK(test == 14);
+			CHECK(testStr == "titito");
 		}
 	}
 		
