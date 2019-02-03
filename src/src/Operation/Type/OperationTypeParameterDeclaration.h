@@ -17,9 +17,10 @@ namespace ska {
 			return node.name();
 		}
 		
-		inline const auto& GetVariableValueNode() {
+		inline const auto& GetTypeValueNode() {
 			assert(node.size() == 1);
 			return node[0];
 		}
+
 	};
 }

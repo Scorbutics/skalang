@@ -15,5 +15,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::BLOCK>::interpret(OperateO
 		index++;
 	}
 	m_memory.endNested();
-	return output;
+	return NodeCell{ std::move(output) };
 }

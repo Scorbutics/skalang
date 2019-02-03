@@ -136,9 +136,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationReturnType() {
 		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
 		const auto type = m_input.match(TokenType::RESERVED);
 		SLOG(ska::LogLevel::Debug) << "function type detected : " << type;
-		//if(type.asString() != "var") {
 		return ASTFactory::MakeLogicalNode(type);
-		//}
 	} 
 
 	SLOG(ska::LogLevel::Debug) << "void function detected";

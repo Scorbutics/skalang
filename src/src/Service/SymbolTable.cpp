@@ -1,6 +1,8 @@
 #include "Config/LoggerConfigLang.h"
 #include "SymbolTable.h"
 #include "Service/StatementParser.h"
+#include "Service/ASTFactory.h"
+#include "Operation/Type/OperationTypeBridge.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTable)
 
@@ -127,4 +129,3 @@ bool ska::SymbolTable::matchImport(const ImportTokenEvent& token) {
 	}
 	return true;
 }
-
