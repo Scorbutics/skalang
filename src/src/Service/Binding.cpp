@@ -25,7 +25,8 @@ void ska::Binding::bindSymbol(const std::string& functionName, std::vector<std::
 		auto parameter = ASTFactory::MakeNode<Operator::PARAMETER_DECLARATION>(
 			Token{ ss.str(), TokenType::IDENTIFIER },
 			ASTFactory::MakeLogicalNode(Token{ std::move(t), TokenType::RESERVED }));
-		Observable<VarTokenEvent>::notifyObservers(VarTokenEvent::MakeParameter((*parameter)[0], (*parameter)[1]));
+		auto event = VarTokenEvent::MakeParameter((*parameter)[0], (*parameter)[1]);
+        Observable<VarTokenEvent>::notifyObservers(event);
 			
 		parameters.push_back(std::move(parameter));
 		ss.clear();

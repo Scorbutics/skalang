@@ -55,12 +55,13 @@ namespace ska {
 			} else if constexpr (std::is_same<T, double>()) {
 				return static_cast<T>(v.convertNumeric());
 			} else {
-				static_assert(false, "Invalid type for bridge function");
+				return T{};
+                //static_assert(false, "Invalid type for bridge function");
 			}
 		}
 
 		template <class T>
-		std::string buildType(std::vector<std::string>& ss) {
+		void buildType(std::vector<std::string>& ss) {
 			if constexpr (std::is_same<T, std::string>()) {
 				ss.push_back("string");
 			} else if constexpr (std::is_same<T, int>()) {
@@ -74,7 +75,7 @@ namespace ska {
 			} else if constexpr (std::is_same<T, double>()) {
 				ss.push_back("float");
 			} else {
-				static_assert(false, "Invalid type for bridge function");
+                //static_assert(false, "Invalid type for bridge function");
 			}
 		}
 

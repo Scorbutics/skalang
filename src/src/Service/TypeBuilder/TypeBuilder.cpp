@@ -6,7 +6,7 @@
 
 #include "Service/StatementParser.h"
 
-SKA_LOGC_CONFIG(LogLevel::Disabled, TypeBuilder)
+SKA_LOGC_CONFIG(LogLevel::Debug, TypeBuilder)
 
 ska::TypeBuilder::TypeBuilder(StatementParser& parser, const SymbolTable& symbolTable) :
     m_symbols(symbolTable),

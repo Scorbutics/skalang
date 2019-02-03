@@ -213,8 +213,14 @@ TEST_CASE("[Interpreter]") {
 				test = toto;
 				testStr = std::move(titi);
 			});
+
+            std::cout << "function before bind" << std::endl;
+
 			data.interpreter->bindFunction("binding", std::move(function));
-			auto astPtr = data.parser->parse();
+			
+            std::cout << "function bound" << std::endl;
+
+            auto astPtr = data.parser->parse();
 			data.interpreter->script(*astPtr);
 			CHECK(test == 14);
 			CHECK(testStr == "titito");

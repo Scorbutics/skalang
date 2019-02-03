@@ -5,7 +5,12 @@
 
 namespace ska {
 	struct BridgeFunction {
-		std::function<NodeValue(std::vector<NodeValue>)> function;
+        using Callback = std::function<NodeValue(std::vector<NodeValue>)>;
+        
+        template <class F>
+        BridgeFunction(F&& callback) : function(std::forward<F>(callback)) {}
+
+		Callback function;
 	};
 
 	using BridgeFunctionPtr = std::shared_ptr<BridgeFunction>;

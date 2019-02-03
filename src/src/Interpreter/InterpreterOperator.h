@@ -27,6 +27,6 @@ namespace ska {
 	class InterpreterOperator : 
 		public InterpreterOperatorUnit {
 	public:
-		NodeCell interpret(ASTNode& node) override { return ""; }
+		NodeCell interpret(ASTNode& node) override { return NodeCell {""}; }
 	};
 }
