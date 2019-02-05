@@ -10,13 +10,17 @@
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 
-void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTestContainer& data) {
-	const auto reservedKeywords = ska::ReservedKeywordsPool{};
-	auto tokenizer = ska::Tokenizer{ reservedKeywords, input };
-	const auto tokens = tokenizer.tokenize();
-	auto reader = ska::TokenReader{ tokens };
+const auto reservedKeywords = ska::ReservedKeywordsPool{};
+auto tokenizer = std::unique_ptr<ska::Tokenizer>{};
+std::vector<ska::Token> tokens;
+auto reader = std::unique_ptr<ska::TokenReader>{};
 
-	data.parser = std::make_unique<ska::StatementParser>(reservedKeywords, reader);
+void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTestContainer& data) {
+    tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);
+    auto tokens = tokenizer->tokenize();
+    reader = std::make_unique<ska::TokenReader>(tokens);
+    
+    data.parser = std::make_unique<ska::StatementParser>(reservedKeywords, *reader);
 	data.symbols = std::make_unique<ska::SymbolTable>(*data.parser);
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, *data.symbols);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, *data.symbols);
@@ -205,7 +209,8 @@ TEST_CASE("[Interpreter]") {
 			CHECK(res.nodeval<int>() == 3);
 		}
 
-		SUBCASE("C++ binding") {
+		
+         SUBCASE("C++ binding") {
 			ASTFromInputSemanticTCInterpreterNoParse("var User = import \"binding\"; User.bind(14, \"titito\");", data);
 			auto test = 0;
 			auto testStr = std::string{ "" };

@@ -52,7 +52,7 @@ namespace ska {
 
 		Token(std::string c, TokenType t) :
 			m_type(std::move(t)) {
-			init(std::move(c), m_type);
+			init(c, m_type);
 		}
 
 		Token(std::size_t c, TokenType t) :
