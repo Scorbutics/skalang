@@ -17,7 +17,7 @@ auto reader = std::unique_ptr<ska::TokenReader>{};
 
 void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTestContainer& data) {
     tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);
-    auto tokens = tokenizer->tokenize();
+    tokens = tokenizer->tokenize();
     reader = std::make_unique<ska::TokenReader>(tokens);
     
     data.parser = std::make_unique<ska::StatementParser>(reservedKeywords, *reader);
