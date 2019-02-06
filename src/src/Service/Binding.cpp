@@ -1,4 +1,5 @@
 #include <functional>
+#include "Service/ReservedKeywordsPool.h"
 #include "Interpreter/Interpreter.h"
 #include "Config/LoggerConfigLang.h"
 #include "Event/BridgeTokenEvent.h"
@@ -8,9 +9,10 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Binding)
 
-ska::Binding::Binding(Interpreter& interpreter, SymbolTable& symbolTable) :
+ska::Binding::Binding(Interpreter& interpreter, SymbolTable& symbolTable, const ReservedKeywordsPool& reserved) :
 	m_observer(symbolTable),
-	m_interpreter(interpreter) {
+	m_interpreter(interpreter),
+    m_reserved(reserved) {
 }
 
 void ska::Binding::bindSymbol(const std::string& functionName, std::vector<std::string> typeNames) {
@@ -24,7 +26,7 @@ void ska::Binding::bindSymbol(const std::string& functionName, std::vector<std::
 		
 		auto parameter = ASTFactory::MakeNode<Operator::PARAMETER_DECLARATION>(
 			Token{ ss.str(), TokenType::IDENTIFIER },
-			ASTFactory::MakeLogicalNode(Token{ std::move(t), TokenType::RESERVED }));
+			ASTFactory::MakeLogicalNode(m_reserved.pool.at(t).token));
 		auto event = VarTokenEvent::MakeParameter((*parameter)[0], (*parameter)[1]);
         Observable<VarTokenEvent>::notifyObservers(event);
 			

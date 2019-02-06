@@ -8,10 +8,11 @@
 #include "Service/Binding.h"
 
 namespace ska {
+    class ReservedKeywordsPool;
 	class Interpreter {
 		using OperatorInterpreter = std::vector<std::unique_ptr<InterpreterOperatorUnit>>;
 	public:
-		Interpreter(SymbolTable& symbols);
+		Interpreter(SymbolTable& symbols, const ReservedKeywordsPool& reserved);
 		~Interpreter() = default;
 
 		OperatorInterpreter build();

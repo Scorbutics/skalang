@@ -9,13 +9,14 @@
 namespace ska {
 	class SymbolTable;
 	class Interpreter;
-	
+	class ReservedKeywordsPool;
+
 	//http://coliru.stacked-crooked.com/a/8efdf80ac4082e22
 	class Binding :
 		public Observable<VarTokenEvent>,
 		public Observable<FunctionTokenEvent> {
 	public:
-		Binding(Interpreter& interpreter, SymbolTable& symbolTable);
+		Binding(Interpreter& interpreter, SymbolTable& symbolTable, const ReservedKeywordsPool& reserved);
 		~Binding() = default;
 
 		template <class ReturnType, class ... ParameterTypes>
@@ -34,7 +35,7 @@ namespace ska {
 
 		template <class ReturnType, class ... ParameterTypes>
 		BridgeFunctionPtr makeScriptSideBridge(std::function<ReturnType(ParameterTypes...)> f) {
-			return std::make_unique<BridgeFunction>(static_cast<decltype(BridgeFunction::function)> ([&f, this](std::vector<NodeValue> v) {
+			return std::make_unique<BridgeFunction>(static_cast<decltype(BridgeFunction::function)> ([f, this](std::vector<NodeValue> v) {
 				return NodeValue{ callNativeFromScript<ReturnType, ParameterTypes...>(std::move(f), v, std::make_index_sequence<sizeof ...(ParameterTypes)>()) };
 			}) );
 		}
@@ -92,6 +93,7 @@ namespace ska {
 
 		Interpreter& m_interpreter;
 		Observer<VarTokenEvent>& m_observer;
+        const ReservedKeywordsPool& m_reserved;
 		std::vector<ASTNodePtr> m_bridges;
 	};
 }
