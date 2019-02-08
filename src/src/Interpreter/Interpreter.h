@@ -8,7 +8,7 @@
 #include "Service/Binding.h"
 
 namespace ska {
-    class ReservedKeywordsPool;
+    struct ReservedKeywordsPool;
 	class Interpreter {
 		using OperatorInterpreter = std::vector<std::unique_ptr<InterpreterOperatorUnit>>;
 	public:

@@ -217,6 +217,7 @@ TEST_CASE("[Interpreter]") {
 			auto function = std::function<int(int, std::string)>([&](int toto, std::string titi) -> int {
 				test = toto;
 				testStr = std::move(titi);
+				return 0;
 			});
 
             std::cout << "function before bind" << std::endl;

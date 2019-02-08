@@ -9,7 +9,7 @@
 namespace ska {
 	class SymbolTable;
 	class Interpreter;
-	class ReservedKeywordsPool;
+	struct ReservedKeywordsPool;
 
 	//http://coliru.stacked-crooked.com/a/8efdf80ac4082e22
 	class Binding :
