@@ -53,8 +53,8 @@ std::vector<std::unique_ptr<ska::InterpreterOperatorUnit>> ska::Interpreter::bui
 
 ska::Interpreter::Interpreter(SymbolTable& symbols, const ReservedKeywordsPool& reserved) :
 	m_symbols(symbols),
-	m_operatorInterpreter(build()),
-	m_binding(*this, symbols, reserved) {
+	m_operatorInterpreter(build()) /*,
+	m_binding(*this, symbols, reserved) */ {
 }
 
 ska::NodeCell ska::Interpreter::interpret(ASTNode& node) {

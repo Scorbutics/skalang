@@ -1,23 +1,30 @@
 #pragma once
 #include <functional>
+#include <unordered_map>
+#include <Data/Events/EventDispatcher.h>
 #include "Interpreter/BridgeFunction.h"
 #include "Utils/Observable.h"
 #include "Utils/TupleUtils.h"
 #include "Event/VarTokenEvent.h"
 #include "Event/FunctionTokenEvent.h"
+#include "Event/BlockTokenEvent.h"
 
 namespace ska {
 	class SymbolTable;
 	class Interpreter;
+	class TypeBuilder;
 	struct ReservedKeywordsPool;
 
 	//http://coliru.stacked-crooked.com/a/8efdf80ac4082e22
 	class Binding :
-		public Observable<VarTokenEvent>,
-		public Observable<FunctionTokenEvent> {
+		public EventDispatcher<
+			VarTokenEvent,
+			FunctionTokenEvent,
+			BlockTokenEvent
+		> {
 	public:
-		Binding(Interpreter& interpreter, SymbolTable& symbolTable, const ReservedKeywordsPool& reserved);
-		~Binding() = default;
+		Binding(Interpreter& interpreter, SymbolTable& symbolTable, TypeBuilder& typeBuilder, const ReservedKeywordsPool& reserved);
+		virtual ~Binding();
 
 		template <class ReturnType, class ... ParameterTypes>
 		ska::BridgeFunctionPtr bindFunction(const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
@@ -28,6 +35,8 @@ namespace ska {
 		}
 
 	private:
+		//ASTNode& bindToScript(const std::string& scriptName);
+
 		template <class ReturnType, class ... ParameterTypes, std::size_t... Idx>
 		auto callNativeFromScript(std::function<ReturnType(ParameterTypes...)> f, std::vector<NodeValue>& v, std::index_sequence<Idx...>) {
 			return f(convertTypeFromScript<ParameterTypes, Idx>(v)...);
@@ -92,7 +101,8 @@ namespace ska {
 		void bindSymbol(const std::string& functionName, std::vector<std::string> typeNames);
 
 		Interpreter& m_interpreter;
-		Observer<VarTokenEvent>& m_observer;
+		SymbolTable& m_observer;
+		TypeBuilder& m_typeBuilder;
         const ReservedKeywordsPool& m_reserved;
 		std::vector<ASTNodePtr> m_bridges;
 	};

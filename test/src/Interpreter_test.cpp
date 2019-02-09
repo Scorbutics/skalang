@@ -222,7 +222,8 @@ TEST_CASE("[Interpreter]") {
 
             std::cout << "function before bind" << std::endl;
 
-			data.interpreter->bindFunction("binding", std::move(function));
+			auto binding = ska::Binding{ *data.interpreter, *data.symbols, *data.typeBuilder, reservedKeywords };
+			auto bridge = binding.bindFunction("binding", std::move(function));
 			
             std::cout << "function bound" << std::endl;
 
