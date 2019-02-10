@@ -21,6 +21,7 @@
 #include "InterpreterOperator.h"
 #include "InterpreterOperatorImport.h"
 #include "InterpreterOperatorExport.h"
+#include "InterpreterOperatorBridge.h"
 #include "InterpreterOperatorReturn.h"
 
 #include "InterpreterDeclarer.h"
@@ -33,6 +34,7 @@ std::vector<std::unique_ptr<ska::InterpreterOperatorUnit>> ska::Interpreter::bui
 	InterpreterOperatorDeclare<ska::Operator::ARRAY_USE>(*this, result, m_symbols, m_memory);
 	InterpreterOperatorDeclare<ska::Operator::ARRAY_DECLARATION>(*this, result, m_symbols, m_memory);
 	InterpreterOperatorDeclare<ska::Operator::IF>(*this, result, m_symbols, m_memory);
+	InterpreterOperatorDeclare<ska::Operator::BRIDGE>(*this, result, m_symbols, m_memory);
     InterpreterOperatorDeclare<ska::Operator::IF_ELSE>(*this, result, m_symbols, m_memory);
 	InterpreterOperatorDeclare<ska::Operator::FUNCTION_DECLARATION>(*this, result, m_symbols, m_memory);
 	InterpreterOperatorDeclare<ska::Operator::FUNCTION_CALL>(*this, result, m_symbols, m_memory);

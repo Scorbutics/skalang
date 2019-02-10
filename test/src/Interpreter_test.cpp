@@ -211,7 +211,7 @@ TEST_CASE("[Interpreter]") {
 
 		
          SUBCASE("C++ binding") {
-			ASTFromInputSemanticTCInterpreterNoParse("var User = import \"binding\"; User.bind(14, \"titito\");", data);
+			ASTFromInputSemanticTCInterpreterNoParse("var User = import \"binding\"; User.funcTest(14, \"titito\");", data);
 			auto test = 0;
 			auto testStr = std::string{ "" };
 			auto function = std::function<int(int, std::string)>([&](int toto, std::string titi) -> int {
@@ -222,8 +222,8 @@ TEST_CASE("[Interpreter]") {
 
             std::cout << "function before bind" << std::endl;
 
-			auto binding = ska::Binding{ *data.interpreter, *data.symbols, *data.typeBuilder, reservedKeywords };
-			auto bridge = binding.bindFunction("binding", std::move(function));
+			auto binding = ska::Binding{ *data.interpreter, *data.symbols, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
+			auto bridge = binding.bindFunction("funcTest", std::move(function));
 			
             std::cout << "function bound" << std::endl;
 

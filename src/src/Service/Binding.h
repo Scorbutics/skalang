@@ -8,11 +8,13 @@
 #include "Event/VarTokenEvent.h"
 #include "Event/FunctionTokenEvent.h"
 #include "Event/BlockTokenEvent.h"
+#include "Event/BridgeTokenEvent.h"
 
 namespace ska {
 	class SymbolTable;
 	class Interpreter;
 	class TypeBuilder;
+	class SymbolTableTypeUpdater;
 	struct ReservedKeywordsPool;
 
 	//http://coliru.stacked-crooked.com/a/8efdf80ac4082e22
@@ -20,16 +22,17 @@ namespace ska {
 		public EventDispatcher<
 			VarTokenEvent,
 			FunctionTokenEvent,
-			BlockTokenEvent
+			BlockTokenEvent,
+			BridgeTokenEvent
 		> {
 	public:
-		Binding(Interpreter& interpreter, SymbolTable& symbolTable, TypeBuilder& typeBuilder, const ReservedKeywordsPool& reserved);
+		Binding(Interpreter& interpreter, SymbolTable& symbolTable, TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
 		virtual ~Binding();
 
 		template <class ReturnType, class ... ParameterTypes>
 		ska::BridgeFunctionPtr bindFunction(const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
-			auto typeNames = buildTypes<ReturnType, ParameterTypes...>();
-			auto result = makeScriptSideBridge<ReturnType, ParameterTypes...>(std::move(f));
+			auto typeNames = buildTypes<ParameterTypes..., ReturnType>();
+			auto result = makeScriptSideBridge(std::move(f));
 			bindSymbol(functionName, std::move(typeNames));
 			return result;
 		}
@@ -45,7 +48,7 @@ namespace ska {
 		template <class ReturnType, class ... ParameterTypes>
 		BridgeFunctionPtr makeScriptSideBridge(std::function<ReturnType(ParameterTypes...)> f) {
 			return std::make_unique<BridgeFunction>(static_cast<decltype(BridgeFunction::function)> ([f, this](std::vector<NodeValue> v) {
-				return NodeValue{ callNativeFromScript<ReturnType, ParameterTypes...>(std::move(f), v, std::make_index_sequence<sizeof ...(ParameterTypes)>()) };
+				return NodeValue{ callNativeFromScript(std::move(f), v, std::make_index_sequence<sizeof ...(ParameterTypes)>()) };
 			}) );
 		}
 
@@ -103,6 +106,7 @@ namespace ska {
 		Interpreter& m_interpreter;
 		SymbolTable& m_observer;
 		TypeBuilder& m_typeBuilder;
+		SymbolTableTypeUpdater& m_symbolTypeUpdater;
         const ReservedKeywordsPool& m_reserved;
 		std::vector<ASTNodePtr> m_bridges;
 	};

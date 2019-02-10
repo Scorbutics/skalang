@@ -12,12 +12,8 @@ namespace ska {
 	public:
 		Operation(ASTNode& node) : node(node) {}
 
-		auto begin() {
-			return node.begin();
-		}
-
-		auto end() {
-			return node.end();
+		inline auto& GetObject() {
+			return node[0];
 		}
 	};
 }

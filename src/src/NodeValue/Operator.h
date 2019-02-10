@@ -47,7 +47,7 @@ namespace ska {
 		"EXPORT",
 		"BLOCK",
 		"IF",
-		"IF_ELSE"
+		"IF_ELSE",
 		"RETURN",
 		"BRIDGE"
 	};

@@ -98,7 +98,7 @@ namespace ska {
 
 	private:
 		friend class ASTFactory;
-		ASTNode() = default;
+		ASTNode();
         
         explicit ASTNode(Token t, ASTNodePtr l = nullptr, ASTNodePtr r = nullptr);
         ASTNode(Operator o, Token identifierToken = Token{}, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{});

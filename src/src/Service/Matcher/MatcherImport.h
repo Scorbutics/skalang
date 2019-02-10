@@ -8,6 +8,7 @@ namespace ska {
 	struct ReservedKeywordsPool;
 	class TokenReader;
 	class StatementParser;
+	struct Token;
 
 	class ASTNode;
 	using ASTNodePtr = std::unique_ptr<ASTNode>;
@@ -20,6 +21,7 @@ namespace ska {
 	
 		ASTNodePtr matchImport();
 		ASTNodePtr matchExport();
+		ASTNodePtr matchNewImport(const Token& importVarName, const Token& importNodeClass);
 	
 	private:
 		TokenReader& m_input;

@@ -14,6 +14,7 @@
 #include "Event/ReturnTokenEvent.h"
 #include "Event/ArrayTokenEvent.h"
 #include "Event/ImportTokenEvent.h"
+#include "Event/BridgeTokenEvent.h"
 
 #include "Matcher/MatcherBlock.h"
 #include "Matcher/MatcherFor.h"
@@ -34,7 +35,8 @@ namespace ska {
 		    ExpressionTokenEvent,
             ReturnTokenEvent,
 			ArrayTokenEvent,
-			ImportTokenEvent
+			ImportTokenEvent,
+			BridgeTokenEvent
 	    > {
 
 		using ASTNodePtr = std::unique_ptr<ska::ASTNode>;

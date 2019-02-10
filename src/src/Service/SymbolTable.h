@@ -7,6 +7,7 @@
 #include "Event/BlockTokenEvent.h"
 #include "Event/FunctionTokenEvent.h"
 #include "Event/ReturnTokenEvent.h"
+#include "Event/BridgeTokenEvent.h"
 #include "Event/ImportTokenEvent.h"
 
 #include "ScopedSymbolTable.h"
@@ -20,7 +21,8 @@ namespace ska {
        	public SubObserver<BlockTokenEvent>,
         public SubObserver<FunctionTokenEvent>,
         public SubObserver<ReturnTokenEvent>, 
-		public SubObserver<ImportTokenEvent> {
+		public SubObserver<ImportTokenEvent>,
+		public SubObserver<BridgeTokenEvent> {
 
         using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 
@@ -62,6 +64,7 @@ namespace ska {
 		bool matchFunction(const FunctionTokenEvent&);
 		bool matchReturn(const ReturnTokenEvent&);
 		bool matchImport(const ImportTokenEvent&);
+		bool matchBridge(const BridgeTokenEvent&);
 
 		bool erase(const std::string& name) {
 			return m_currentTable->erase(name);

@@ -1,6 +1,11 @@
 #include "AST.h"
 #include "Service/ASTFactory.h"
 
+ska::ASTNode::ASTNode(): 
+	m_type(Type::MakeBuiltIn(ExpressionType::VOID)) {
+
+}
+
 ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
     m_op(l != nullptr && r != nullptr ? Operator::BINARY : Operator::UNARY),
     token(std::move(t)) {

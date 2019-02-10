@@ -15,7 +15,8 @@ ska::TypeBuilder::TypeBuilder(StatementParser& parser, const SymbolTable& symbol
 	SubObserver<FunctionTokenEvent>(std::bind(&TypeBuilder::matchFunction, this, std::placeholders::_1), parser),
 	SubObserver<VarTokenEvent>(std::bind(&TypeBuilder::matchVariable, this, std::placeholders::_1), parser),
 	SubObserver<ReturnTokenEvent>(std::bind(&TypeBuilder::matchReturn, this, std::placeholders::_1), parser),
-	SubObserver<ArrayTokenEvent>(std::bind(&TypeBuilder::matchArray, this, std::placeholders::_1), parser) {
+	SubObserver<ArrayTokenEvent>(std::bind(&TypeBuilder::matchArray, this, std::placeholders::_1), parser),
+	SubObserver<BridgeTokenEvent>(std::bind(&TypeBuilder::matchBridge, this, std::placeholders::_1), parser) {
 }
 
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
@@ -35,6 +36,12 @@ bool ska::TypeBuilder::matchReturn(ReturnTokenEvent& event) const {
 bool ska::TypeBuilder::matchArray(ArrayTokenEvent & event) const {
 	event.rootNode().buildType(m_symbols);
 	SLOG(LogLevel::Debug) << "Type built for array = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
+	return true;
+}
+
+bool ska::TypeBuilder::matchBridge(BridgeTokenEvent& event) const {
+	event.rootNode().buildType(m_symbols);
+	SLOG(LogLevel::Debug) << "Type built for bridge \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
 	return true;
 }
 
