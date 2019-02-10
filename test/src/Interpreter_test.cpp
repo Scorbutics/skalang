@@ -224,7 +224,7 @@ TEST_CASE("[Interpreter]") {
 
 			auto binding = ska::Binding{ *data.interpreter, *data.symbols, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
 			auto bridge = binding.bindFunction("funcTest", std::move(function));
-			
+			data.interpreter->bind("binding.miniska", std::move(bridge));
             std::cout << "function bound" << std::endl;
 
             auto astPtr = data.parser->parse();

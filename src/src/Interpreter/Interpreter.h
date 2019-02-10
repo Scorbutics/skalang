@@ -19,6 +19,10 @@ namespace ska {
 		NodeCell interpret(ASTNode& node);
 		NodeValue script(ASTNode& node);
 
+		void bind(const std::string& functionName, BridgeFunctionPtr bridge) {
+			m_memory.emplace(functionName, NodeValue{ std::move(bridge) });
+		}
+
 		template <class ReturnType, class ... ParameterTypes>
 		void bindFunction(const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
 //			auto bridge = m_binding.bindFunction<ReturnType, ParameterTypes...>(functionName, std::move(f));

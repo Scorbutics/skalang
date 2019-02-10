@@ -16,5 +16,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::BRIDGE>::interpret(Operate
 	auto scriptValue = m_interpreter.interpret(node.GetScriptNode());
 	return m_memory.emplace("import " + scriptPath, scriptValue.asRvalue()).first->clone();
 	*/
-	return m_interpreter.interpret(node.GetObject());
+	return m_memory[node.GetObject().name()];
 }
