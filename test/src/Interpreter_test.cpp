@@ -20,7 +20,7 @@ void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTest
     tokens = tokenizer->tokenize();
     reader = std::make_unique<ska::TokenReader>(tokens);
     
-    data.parser = std::make_unique<ska::StatementParser>(reservedKeywords, *reader);
+    data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
 	data.symbols = std::make_unique<ska::SymbolTable>(*data.parser);
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, *data.symbols);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, *data.symbols);
@@ -30,7 +30,7 @@ void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTest
 
 std::unique_ptr<ska::ASTNode> ASTFromInputSemanticTCInterpreter(const std::string& input, DataTestContainer& data) {
 	ASTFromInputSemanticTCInterpreterNoParse(input, data);
-	return data.parser->parse();
+	return data.parser->parse(*reader);
 }
 
 TEST_CASE("[Interpreter]") {
@@ -227,7 +227,7 @@ TEST_CASE("[Interpreter]") {
 			data.interpreter->bind("binding.miniska", std::move(bridge));
             std::cout << "function bound" << std::endl;
 
-            auto astPtr = data.parser->parse();
+            auto astPtr = data.parser->parse(*reader);
 			data.interpreter->script(*astPtr);
 			CHECK(test == 14);
 			CHECK(testStr == "titito");

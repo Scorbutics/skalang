@@ -10,22 +10,22 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherIfElse)
 
-ska::ASTNodePtr ska::MatcherIfElse::match() {
+ska::ASTNodePtr ska::MatcherIfElse::match(TokenReader& input) {
     auto ifNode = ASTNodePtr{};
 
-    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::IF>());
-    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
+    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::IF>());
+    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
     
     {
-        auto conditionExpression = m_parser.expr();
-        m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
+        auto conditionExpression = m_parser.expr(input);
+        input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 
-        auto conditionStatement = m_parser.statement();
+        auto conditionStatement = m_parser.statement(input);
 
         const auto elseToken = m_reservedKeywordsPool.pattern<TokenGrammar::ELSE>();
-        if (m_input.expect(elseToken)) {
-            m_input.match(elseToken);
-            auto elseBlockStatement = m_parser.statement();
+        if (input.expect(elseToken)) {
+            input.match(elseToken);
+            auto elseBlockStatement = m_parser.statement(input);
             ifNode = ASTFactory::MakeNode<Operator::IF_ELSE>(std::move(conditionExpression), std::move(conditionStatement), std::move(elseBlockStatement));
         } else {
             ifNode = ASTFactory::MakeNode<Operator::IF>(std::move(conditionExpression), std::move(conditionStatement));

@@ -10,20 +10,20 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherBlock)
 
-ska::ASTNodePtr ska::MatcherBlock::match(const std::string& content) {
+ska::ASTNodePtr ska::MatcherBlock::match(TokenReader& input, const std::string& content) {
 	if (content == m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>().name()) {
 
 		SLOG(ska::LogLevel::Info) << "block start detected";
 
-		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
+		input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
 		
 		auto blockNode = ASTFactory::MakeNode<Operator::BLOCK>();
 		auto startEvent = BlockTokenEvent { *blockNode, BlockTokenEventType::START };
 		m_parser.Observable<BlockTokenEvent>::notifyObservers(startEvent);
 
         auto blockNodeStatements = std::vector<ASTNodePtr>{};
-		while (!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
-			auto optionalStatement = m_parser.optstatement();
+		while (!input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
+			auto optionalStatement = m_parser.optstatement(input);
 			if (!optionalStatement->logicalEmpty()) {
 				blockNodeStatements.push_back(std::move(optionalStatement));
 			} else {
@@ -33,7 +33,7 @@ ska::ASTNodePtr ska::MatcherBlock::match(const std::string& content) {
 
 		blockNode = ASTFactory::MakeNode<Operator::BLOCK>(std::move(blockNodeStatements));
 
-		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
+		input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
 
 		SLOG(ska::LogLevel::Info) << "block end";
 
@@ -43,11 +43,11 @@ ska::ASTNodePtr ska::MatcherBlock::match(const std::string& content) {
 	} else if (content == m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>().name()) {
 		throw std::runtime_error("syntax error : Block end token encountered when not expected");
 	} else {
-		auto expression = m_parser.expr();
-		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+		auto expression = m_parser.expr(input);
+		input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
 		return expression;
 	}
 
-	m_parser.optexpr(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+	m_parser.optexpr(input, m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
 	return nullptr;
 }

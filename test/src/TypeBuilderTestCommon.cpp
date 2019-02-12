@@ -10,11 +10,11 @@ std::unique_ptr<ska::ASTNode> TypeBuilderTestCommonBuildAST(const std::string& i
 	const auto tokens = tokenizer.tokenize();
 	auto reader = ska::TokenReader{ tokens };
 
-	data.parser = std::make_unique<ska::StatementParser>(reservedKeywords, reader);
+	data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
 	data.symbols = std::make_unique<ska::SymbolTable>(*data.parser);
 	if (buildType) {
 		data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, *data.symbols);
 		data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, *data.symbols);
 	}
-	return data.parser->parse();
+	return data.parser->parse(reader);
 }

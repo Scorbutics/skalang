@@ -15,8 +15,8 @@ TEST_CASE("test") {
 	auto t = ska::Tokenizer {keywords, inputStr};
 	auto tokens = t.tokenize();
 	auto reader = ska::TokenReader { tokens };
-	auto p = ska::StatementParser{ keywords, reader };
-	auto ast = p.parse();
+	auto p = ska::StatementParser{ keywords };
+	auto ast = p.parse(reader);
 	
 	CHECK(ast->size() == 1);
 
@@ -51,8 +51,8 @@ std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, const ska::
 	auto t = ska::Tokenizer {keywords, input};
 	auto tokens = t.tokenize();
 	auto reader = ska::TokenReader { tokens };
-	auto p = ska::StatementParser{ keywords, reader };
-	return p.parse();
+	auto p = ska::StatementParser{ keywords };
+	return p.parse(reader);
 }
 
 TEST_CASE("Block") {

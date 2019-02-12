@@ -13,26 +13,25 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::StatementParser)
 
-ska::StatementParser::StatementParser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReader& input) :
-	m_input(input),
+ska::StatementParser::StatementParser(const ReservedKeywordsPool& reservedKeywordsPool) :
 	m_reservedKeywordsPool(reservedKeywordsPool),
-	m_expressionParser(reservedKeywordsPool, *this, m_input),
-	m_matcherBlock(m_input, m_reservedKeywordsPool, *this),
-	m_matcherFor(m_input, m_reservedKeywordsPool, *this),
-	m_matcherIfElse(m_input, m_reservedKeywordsPool, *this),
-	m_matcherVar(m_input, m_reservedKeywordsPool, *this),
-	m_matcherReturn(m_input, m_reservedKeywordsPool, *this),
-	m_matcherImport(m_input, m_reservedKeywordsPool, *this) {
+	m_expressionParser(reservedKeywordsPool, *this),
+	m_matcherBlock(m_reservedKeywordsPool, *this),
+	m_matcherFor(m_reservedKeywordsPool, *this),
+	m_matcherIfElse(m_reservedKeywordsPool, *this),
+	m_matcherVar(m_reservedKeywordsPool, *this),
+	m_matcherReturn(m_reservedKeywordsPool, *this),
+	m_matcherImport(m_reservedKeywordsPool, *this) {
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::parse() {
-    if(m_input.empty()) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::parse(TokenReader& input) {
+    if(input.empty()) {
 		return nullptr;
 	}
 
 	auto blockNodeStatements = std::vector<ASTNodePtr>{};
-    while (!m_input.empty()) {
-		auto optionalStatement = optstatement();
+    while (!input.empty()) {
+		auto optionalStatement = optstatement(input);
 		if (optionalStatement != nullptr && !optionalStatement->logicalEmpty()) {
 			blockNodeStatements.push_back(std::move(optionalStatement));
 		} else {
@@ -42,55 +41,55 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::parse() {
 	return ASTFactory::MakeNode<Operator::BLOCK>(std::move(blockNodeStatements));
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::statement() {
-	if (m_input.empty()) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::statement(TokenReader& input) {
+	if (input.empty()) {
 		return nullptr;
 	}
 
-	const auto token = m_input.actual();
+	const auto token = input.actual();
 	switch (token.type()) {
 	case TokenType::RESERVED:
-		return matchReservedKeyword(std::get<std::size_t>(token.content()));
+		return matchReservedKeyword(input, std::get<std::size_t>(token.content()));
 
 	case TokenType::RANGE:
-		return m_matcherBlock.match(std::get<std::string>(token.content()));
+		return m_matcherBlock.match(input, std::get<std::string>(token.content()));
 
 	default:
-        return matchExpressionStatement();
+        return matchExpressionStatement(input);
 	}
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::matchExpressionStatement() {
+ska::StatementParser::ASTNodePtr ska::StatementParser::matchExpressionStatement(TokenReader& input) {
 	SLOG(ska::LogLevel::Info) << "Expression-statement found";
 
-    auto expressionResult = expr();
-    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+    auto expressionResult = expr(input);
+    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
     if(expressionResult == nullptr) {
-		SLOG(ska::LogLevel::Info) << "NOP statement";
-		return nullptr;
+			SLOG(ska::LogLevel::Info) << "NOP statement";
+			return nullptr;
     }
     return expressionResult;
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::matchReservedKeyword(const std::size_t keywordIndex) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::matchReservedKeyword(TokenReader& input, const std::size_t keywordIndex) {
 	switch (keywordIndex) {
 	case static_cast<std::size_t>(TokenGrammar::FOR):
-		return m_matcherFor.match();
+		return m_matcherFor.match(input);
 
 	case static_cast<std::size_t>(TokenGrammar::IF):
-		return m_matcherIfElse.match();
+		return m_matcherIfElse.match(input);
 
 	case static_cast<std::size_t>(TokenGrammar::VARIABLE):
-		return m_matcherVar.matchDeclaration();
+		return m_matcherVar.matchDeclaration(input);
 
 	case static_cast<std::size_t>(TokenGrammar::FUNCTION):
-		return expr();
+		return expr(input);
 
     case static_cast<std::size_t>(TokenGrammar::RETURN):
-        return m_matcherReturn.match();
+        return m_matcherReturn.match(input);
 	
 	case static_cast<std::size_t>(TokenGrammar::EXPORT) :
-		return m_matcherImport.matchExport();
+		return m_matcherImport.matchExport(input);
 
 	default: {
 			std::stringstream ss;
@@ -101,23 +100,23 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::matchReservedKeyword(cons
 	}
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::expr() {
-	return m_expressionParser.parse();
+ska::StatementParser::ASTNodePtr ska::StatementParser::expr(TokenReader& input) {
+	return m_expressionParser.parse(input);
 }
 
 void ska::StatementParser::error(const std::string& message) {
 	throw std::runtime_error("syntax error : " + message);
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::optexpr(const Token& mustNotBe) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::optexpr(TokenReader& input, const Token& mustNotBe) {
 	auto node = ASTNodePtr {};
-	if (!m_input.expect(mustNotBe)) {
-		node = expr();
+	if (!input.expect(mustNotBe)) {
+		node = expr(input);
 	}
 	return node != nullptr ? std::move(node) : ASTFactory::MakeEmptyNode();
 }
 
-ska::ASTNodePtr ska::StatementParser::subParse(std::ifstream& file) {
+ska::ASTNodePtr ska::StatementParser::subParse(TokenReader& input, std::ifstream& file) {
 	auto content = std::string (
 		(std::istreambuf_iterator<char>(file)),
 		(std::istreambuf_iterator<char>()) 
@@ -125,16 +124,16 @@ ska::ASTNodePtr ska::StatementParser::subParse(std::ifstream& file) {
 
 	auto tokenizer = Tokenizer{ m_reservedKeywordsPool, std::move(content)};
 	auto tokens = tokenizer.tokenize();
-	const auto& [lastSource, lastIndex] = m_input.setSource(tokens);
-	auto result = parse();
-	m_input.setSource(*lastSource, lastIndex);
+	const auto& [lastSource, lastIndex] = input.setSource(tokens);
+	auto result = parse(input);
+	input.setSource(*lastSource, lastIndex);
 	return result;
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::optstatement(const Token& mustNotBe) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::optstatement(TokenReader& input, const Token& mustNotBe) {
 	auto node = ASTNodePtr {};
-	if (!m_input.expect(mustNotBe)) {
-		node = statement();
+	if (!input.expect(mustNotBe)) {
+		node = statement(input);
 	}
 
 	return node != nullptr ? std::move(node) : ASTFactory::MakeEmptyNode();

@@ -10,20 +10,20 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherReturn)
 
-ska::ASTNodePtr ska::MatcherReturn::match() {
-    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::RETURN>());
+ska::ASTNodePtr ska::MatcherReturn::match(TokenReader& input) {
+    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::RETURN>());
 
     auto returnNode = ASTNodePtr {};
     auto returnStartEvent = ReturnTokenEvent {};
     m_parser.Observable<ReturnTokenEvent>::notifyObservers(returnStartEvent);
 
-    if(m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>())) {
+    if(input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>())) {
         auto returnFieldNodes = std::vector<ASTNodePtr>{};
-        m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
-        while(!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
-            auto field = m_input.match(TokenType::IDENTIFIER);
-            m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
-            auto fieldValue = m_parser.expr();
+        input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
+        while(!input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
+            auto field = input.match(TokenType::IDENTIFIER);
+            input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
+            auto fieldValue = m_parser.expr(input);
 
             const std::string name = "???";
 
@@ -36,22 +36,22 @@ ska::ASTNodePtr ska::MatcherReturn::match() {
 
             returnFieldNodes.push_back(std::move(fieldNode));
             
-            if (m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>())) {
-                m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
+            if (input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>())) {
+                input.match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
             }
         }
         
-        m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
+        input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
     
         returnNode = ASTFactory::MakeNode<Operator::RETURN>(ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(returnFieldNodes)));
         auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT> (*returnNode);
 		m_parser.Observable<ReturnTokenEvent>::notifyObservers(returnEndEvent);
     } else {
-        returnNode = ASTFactory::MakeNode<Operator::RETURN>(m_parser.expr());
+        returnNode = ASTFactory::MakeNode<Operator::RETURN>(m_parser.expr(input));
         auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::BUILTIN> (*returnNode);
 		m_parser.Observable<ReturnTokenEvent>::notifyObservers(returnEndEvent);
     }
-    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
     
     return returnNode;
 }

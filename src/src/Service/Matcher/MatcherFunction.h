@@ -13,19 +13,18 @@ namespace ska {
 	class MatcherFunction {
 	public:
 		~MatcherFunction() = default;
-		MatcherFunction(TokenReader& input, const ReservedKeywordsPool& pool, StatementParser& parser) :
-			m_input(input), m_reservedKeywordsPool(pool), m_parser(parser) {}
+		MatcherFunction(const ReservedKeywordsPool& pool, StatementParser& parser) :
+			m_reservedKeywordsPool(pool), m_parser(parser) {}
 	
-		ASTNodePtr matchCall(ASTNodePtr identifierFunctionName);
-		ASTNodePtr matchDeclaration();
+		ASTNodePtr matchCall(TokenReader& input, ASTNodePtr identifierFunctionName);
+		ASTNodePtr matchDeclaration(TokenReader& input);
 	
 	private:
-		ASTNodePtr matchDeclarationBody();
-		std::vector<ASTNodePtr> fillDeclarationParameters();
-		ASTNodePtr matchDeclarationReturnType();
-		ASTNodePtr matchDeclarationParameter();
+		ASTNodePtr matchDeclarationBody(TokenReader& input);
+		std::vector<ASTNodePtr> fillDeclarationParameters(TokenReader& input);
+		ASTNodePtr matchDeclarationReturnType(TokenReader& input);
+		ASTNodePtr matchDeclarationParameter(TokenReader& input);
 
-		TokenReader& m_input;
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		StatementParser& m_parser;
 	};

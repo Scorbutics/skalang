@@ -27,28 +27,27 @@ namespace ska {
 		using ExpressionStack = expression_stack<Token, ASTNodePtr>;
 
 	public:
-		ExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, StatementParser& parser, TokenReader& input);
-		ASTNodePtr parse();
+		ExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, StatementParser& parser);
+		ASTNodePtr parse(TokenReader& input);
 
 	private:
-		bool parseTokenExpression(ExpressionStack& expressions, const Token& token, bool isDoingOperation);
+		bool parseTokenExpression(TokenReader& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
         
-        bool matchSymbol(ExpressionStack& expressions, const Token& token, bool isDoingOperation);
-		void matchRange(ExpressionStack& expressions, const Token& token, bool isDoingOperation);
-		void matchParenthesis(ExpressionStack& expressions, bool isDoingOperation);
+        bool matchSymbol(TokenReader& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
+		void matchRange(TokenReader& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
+		void matchParenthesis(TokenReader& input, ExpressionStack& expressions, bool isDoingOperation);
 
-        ASTNodePtr matchReserved();
-		ASTNodePtr matchObjectFieldAccess(ASTNodePtr objectAccessed);      
+        ASTNodePtr matchReserved(TokenReader& input);
+		ASTNodePtr matchObjectFieldAccess(TokenReader& input, ASTNodePtr objectAccessed);      
 
-        bool isAtEndOfExpression() const;
+        bool isAtEndOfExpression(TokenReader& input) const;
 		
-		ASTNodePtr expression(ExpressionStack& expressions);
+		ASTNodePtr expression(TokenReader& input, ExpressionStack& expressions);
 
 		static void error(const std::string& message);
 
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		StatementParser& m_parser;
-		TokenReader& m_input;
 
 		MatcherArray m_matcherArray;
 		MatcherFunction m_matcherFunction;

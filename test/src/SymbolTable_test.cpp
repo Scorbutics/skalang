@@ -11,10 +11,10 @@ std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, DataTestCon
 	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
 	auto reader = ska::TokenReader { tokens };
-	data.parser = std::make_unique<ska::StatementParser> ( reservedKeywords, reader );
+	data.parser = std::make_unique<ska::StatementParser> ( reservedKeywords );
 	data.symbols = std::make_unique<ska::SymbolTable>(*data.parser);
 
-    return data.parser->parse();
+    return data.parser->parse(reader);
 }
 
 TEST_CASE("test") {

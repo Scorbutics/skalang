@@ -9,19 +9,19 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherFunction)
 
-ska::ASTNodePtr ska::MatcherFunction::matchDeclaration() {
+ska::ASTNodePtr ska::MatcherFunction::matchDeclaration(TokenReader& input) {
 	SLOG(ska::LogLevel::Debug) << "function declaration";
-	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::FUNCTION>());
+	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::FUNCTION>());
 
     //With this grammar, no other way than reading previously to retrieve the function name.
-    const auto functionName = m_input.readPrevious(3); 
+    const auto functionName = input.readPrevious(3); 
 
 	auto emptyNode = ASTFactory::MakeEmptyNode();
 	auto startEvent = FunctionTokenEvent{ *emptyNode, FunctionTokenEventType::DECLARATION_NAME, functionName.name() };
 	m_parser.Observable<FunctionTokenEvent>::notifyObservers(startEvent);
 
-	auto declNode = fillDeclarationParameters();
-	declNode.push_back(matchDeclarationReturnType());
+	auto declNode = fillDeclarationParameters(input);
+	declNode.push_back(matchDeclarationReturnType(input));
 
 	auto prototypeNode = ASTFactory::MakeNode<Operator::FUNCTION_PROTOTYPE_DECLARATION>(functionName, std::move(declNode));
 
@@ -29,7 +29,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclaration() {
 	m_parser.Observable<VarTokenEvent>::notifyObservers(functionEvent);
 
     SLOG(ska::LogLevel::Debug) << "reading function body";
-	auto functionBodyNode = matchDeclarationBody();
+	auto functionBodyNode = matchDeclarationBody(input);
 	SLOG(ska::LogLevel::Debug) << "function read.";
 	
 	auto functionDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(prototypeNode), std::move(functionBodyNode));
@@ -40,17 +40,17 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclaration() {
 	return functionDeclarationNode;
 }
 
-ska::ASTNodePtr ska::MatcherFunction::matchCall(ASTNodePtr identifierFunctionName) {
-	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
+ska::ASTNodePtr ska::MatcherFunction::matchCall(TokenReader& input, ASTNodePtr identifierFunctionName) {
+	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
 	auto functionCallNodeContent = std::vector<ASTNodePtr>{};
 
 	functionCallNodeContent.push_back(std::move(identifierFunctionName));
 	
 	const auto endParametersToken = m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>();
-	while (!m_input.expect(endParametersToken)) {
+	while (!input.expect(endParametersToken)) {
 
-		auto expressionOpt = m_parser.expr();
+		auto expressionOpt = m_parser.expr(input);
 		if (expressionOpt != nullptr) {
 			SLOG(ska::LogLevel::Debug) << "Expression not null";
 			functionCallNodeContent.push_back(std::move(expressionOpt));
@@ -59,11 +59,11 @@ ska::ASTNodePtr ska::MatcherFunction::matchCall(ASTNodePtr identifierFunctionNam
 		}
 
         const auto commaToken = m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>();
-		if(m_input.expect(commaToken)) {
-			m_input.match(commaToken);
+		if(input.expect(commaToken)) {
+			input.match(commaToken);
 		}
 	}
-	m_input.match(endParametersToken);
+	input.match(endParametersToken);
 
 	auto functionCallNode = ASTFactory::MakeNode<Operator::FUNCTION_CALL>(std::move(functionCallNodeContent));
 	auto event = FunctionTokenEvent { *functionCallNode, FunctionTokenEventType::CALL };
@@ -71,27 +71,27 @@ ska::ASTNodePtr ska::MatcherFunction::matchCall(ASTNodePtr identifierFunctionNam
 	return functionCallNode;
 }
 
-ska::ASTNodePtr ska::MatcherFunction::matchDeclarationParameter() {
-	const auto isRightParenthesis = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
+ska::ASTNodePtr ska::MatcherFunction::matchDeclarationParameter(TokenReader& input) {
+	const auto isRightParenthesis = input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 	if(isRightParenthesis) {
 		return nullptr;
 	}
-	const auto& id = m_input.match(TokenType::IDENTIFIER);
+	const auto& id = input.match(TokenType::IDENTIFIER);
 	SLOG(ska::LogLevel::Debug) << id.name();
 	
-    m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
+    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
     const auto typeToken = 
-		m_input.expect(TokenType::RESERVED) ?
-		m_input.match(TokenType::RESERVED) : m_input.match(TokenType::IDENTIFIER);
+		input.expect(TokenType::RESERVED) ?
+		input.match(TokenType::RESERVED) : input.match(TokenType::IDENTIFIER);
 	const auto typeStr = typeToken.name();
 
 	SLOG(ska::LogLevel::Debug) << "type is : " << typeStr;
 	
 	//handle arrays
-	auto typeNode = ASTNodePtr{};;
-	if (m_input.expect(TokenType::ARRAY)) {
-		auto arrayStartToken = m_input.match(TokenType::ARRAY);
-		auto arrayEndToken = m_input.match(TokenType::ARRAY);
+	auto typeNode = ASTNodePtr{};
+	if (input.expect(TokenType::ARRAY)) {
+		auto arrayStartToken = input.match(TokenType::ARRAY);
+		auto arrayEndToken = input.match(TokenType::ARRAY);
 		if (std::get<std::string>(arrayStartToken.content()) != "[" ||
 			std::get<std::string>(arrayEndToken.content()) != "]") {
 			throw std::runtime_error("syntax error : only brackets [] are supported in a parameter declaration type");
@@ -108,33 +108,33 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationParameter() {
 	return node;
 }
 
-std::vector<ska::ASTNodePtr> ska::MatcherFunction::fillDeclarationParameters() {
-	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
+std::vector<ska::ASTNodePtr> ska::MatcherFunction::fillDeclarationParameters(TokenReader& input) {
+	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
 	auto parameters = std::vector<ASTNodePtr>{};
-	auto isRightParenthesis = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
+	auto isRightParenthesis = input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 	auto isComma = true;
 	while (!isRightParenthesis && isComma) {
-		if (!m_input.expect(TokenType::SYMBOL)) {
+		if (!input.expect(TokenType::SYMBOL)) {
 			SLOG(ska::LogLevel::Debug) << "parameter detected, reading identifier : ";
-			auto parameterNode = matchDeclarationParameter();
+			auto parameterNode = matchDeclarationParameter(input);
 			parameters.push_back(std::move(parameterNode));
-			isComma = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
+			isComma = input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
 			if (isComma) {
-				m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
+				input.match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
 			}
 		}
-		isRightParenthesis = m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
+		isRightParenthesis = input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 	}
-	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
+	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 	
 	return parameters;
 }
 
-ska::ASTNodePtr ska::MatcherFunction::matchDeclarationReturnType() {
-	if (m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>())) {
-		m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
-		const auto type = m_input.match(TokenType::RESERVED);
+ska::ASTNodePtr ska::MatcherFunction::matchDeclarationReturnType(TokenReader& input) {
+	if (input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>())) {
+		input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
+		const auto type = input.match(TokenType::RESERVED);
 		SLOG(ska::LogLevel::Debug) << "function type detected : " << type;
 		return ASTFactory::MakeLogicalNode(type);
 	} 
@@ -143,19 +143,19 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationReturnType() {
 	return ASTFactory::MakeLogicalNode(ska::Token{ "", ska::TokenType::IDENTIFIER });
 }
 
-ska::ASTNodePtr ska::MatcherFunction::matchDeclarationBody() {
-	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
+ska::ASTNodePtr ska::MatcherFunction::matchDeclarationBody(TokenReader& input) {
+	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
 
 	auto statements = std::vector<ASTNodePtr>{};
-	while (!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
-		auto optionalStatement = m_parser.statement();
+	while (!input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
+		auto optionalStatement = m_parser.statement(input);
 		if (!optionalStatement->logicalEmpty()) {
 			statements.push_back(std::move(optionalStatement));
 		} else {
 			break;
 		}
 	}
-	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
+	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
 
 	return ASTFactory::MakeNode<Operator::BLOCK>(std::move(statements));
 }

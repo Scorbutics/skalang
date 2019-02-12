@@ -14,15 +14,15 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherImport)
 
-ska::ASTNodePtr ska::MatcherImport::matchImport() {
+ska::ASTNodePtr ska::MatcherImport::matchImport(TokenReader& input) {
 	SLOG(ska::LogLevel::Info) << "import expression";
 	
-	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::IMPORT>());
+	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::IMPORT>());
 
 	//With this grammar, no other way than reading previously to retrieve the function name.
-	auto importedVarName = m_input.readPrevious(3);
+	auto importedVarName = input.readPrevious(3);
 
-	auto importNodeClass = m_input.match(TokenType::STRING);
+	auto importNodeClass = input.match(TokenType::STRING);
 	//TODO : cache
 	auto importClassName = importNodeClass.name() + ".miniska";
 
@@ -31,18 +31,18 @@ ska::ASTNodePtr ska::MatcherImport::matchImport() {
 	m_parser.Observable<BridgeTokenEvent>::notifyObservers(bridgeEvent);
 
 
-	return bridgeNode->type() != ExpressionType::VOID ? std::move(bridgeNode) : matchNewImport(importedVarName, importNodeClass);
+	return bridgeNode->type() != ExpressionType::VOID ? std::move(bridgeNode) : matchNewImport(input, importedVarName, importNodeClass);
 }
 
-ska::ASTNodePtr ska::MatcherImport::matchExport() {
-	m_input.match(m_reservedKeywordsPool.pattern<TokenGrammar::EXPORT>());
-	if (!m_input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>())) {
+ska::ASTNodePtr ska::MatcherImport::matchExport(TokenReader& input) {
+	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::EXPORT>());
+	if (!input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>())) {
 		throw std::runtime_error("only a variable can be exported");
 	}
-	return ASTFactory::MakeNode<Operator::EXPORT>(m_parser.statement());
+	return ASTFactory::MakeNode<Operator::EXPORT>(m_parser.statement(input));
 }
 
-ska::ASTNodePtr ska::MatcherImport::matchNewImport(const Token& importedVarName, const Token& importNodeClass) {
+ska::ASTNodePtr ska::MatcherImport::matchNewImport(TokenReader& input, const Token& importedVarName, const Token& importNodeClass) {
 	auto importClassName = importNodeClass.name() + ".miniska";
 	auto script = std::ifstream{ importClassName };
 	if (script.fail()) {
@@ -54,7 +54,7 @@ ska::ASTNodePtr ska::MatcherImport::matchNewImport(const Token& importedVarName,
 	auto startEvent = BlockTokenEvent{ *nodeBlock, BlockTokenEventType::START };
 	m_parser.Observable<BlockTokenEvent>::notifyObservers(startEvent);
 
-	auto scriptNodeContent = m_parser.subParse(script);
+	auto scriptNodeContent = m_parser.subParse(input, script);
 	auto exportFields = std::vector<ASTNodePtr>{};
 	auto hiddenFields = std::vector<ASTNodePtr>{};
 	auto allFields = std::vector<ASTNodePtr>{};

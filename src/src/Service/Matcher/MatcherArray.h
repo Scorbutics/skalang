@@ -17,17 +17,16 @@ namespace ska {
 		using ExpressionStack = expression_stack<Token, ASTNodePtr>;
 	public:
 		~MatcherArray() = default;
-		MatcherArray(TokenReader& input, const ReservedKeywordsPool& pool, StatementParser& parser) :
-			m_input(input), m_reservedKeywordsPool(pool), m_parser(parser) {}
+		MatcherArray(const ReservedKeywordsPool& pool, StatementParser& parser) :
+			m_reservedKeywordsPool(pool), m_parser(parser) {}
 		
 		[[nodiscard]]
-		ASTNodePtr match(ExpressionStack& operands, char token, bool isDoingOperation);
+		ASTNodePtr match(TokenReader& input, ExpressionStack& operands, char token, bool isDoingOperation);
 	
 	private:
-		ASTNodePtr matchUse(ASTNodePtr identifierArrayAffected);
-		ASTNodePtr matchDeclaration();
+		ASTNodePtr matchUse(TokenReader& input, ASTNodePtr identifierArrayAffected);
+		ASTNodePtr matchDeclaration(TokenReader& input);
 
-		TokenReader& m_input;
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		StatementParser& m_parser;
 	};

@@ -41,23 +41,22 @@ namespace ska {
 
 		using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 	public:
-		StatementParser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReader& input);
-		ASTNodePtr parse();
+		StatementParser(const ReservedKeywordsPool& reservedKeywordsPool);
+		ASTNodePtr parse(TokenReader& input);
 
-		ASTNodePtr statement();
-        ASTNodePtr optstatement(const Token& mustNotBe = Token{});
+		ASTNodePtr statement(TokenReader& input);
+        ASTNodePtr optstatement(TokenReader& input, const Token& mustNotBe = Token{});
 
-		ASTNodePtr expr();
-		ASTNodePtr optexpr(const Token& mustNotBe = Token{});
+		ASTNodePtr expr(TokenReader& input);
+		ASTNodePtr optexpr(TokenReader& input, const Token& mustNotBe = Token{});
 
-		ASTNodePtr subParse(std::ifstream& file);
+		ASTNodePtr subParse(TokenReader& input, std::ifstream& file);
 	
 	private:
-		ASTNodePtr matchExpressionStatement();
-		ASTNodePtr matchReservedKeyword(const std::size_t keywordIndex);
+		ASTNodePtr matchExpressionStatement(TokenReader& input);
+		ASTNodePtr matchReservedKeyword(TokenReader& input, const std::size_t keywordIndex);
 		static void error(const std::string& message);
 
-		TokenReader& m_input;
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		ExpressionParser m_expressionParser;
 		

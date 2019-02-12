@@ -13,13 +13,12 @@ namespace ska {
 	class MatcherIfElse {
 	public:
 		~MatcherIfElse() = default;
-		MatcherIfElse(TokenReader& input, const ReservedKeywordsPool& pool, StatementParser& parser) :
-			m_input(input), m_reservedKeywordsPool(pool), m_parser(parser) {}
+		MatcherIfElse(const ReservedKeywordsPool& pool, StatementParser& parser) :
+			m_reservedKeywordsPool(pool), m_parser(parser) {}
 	
-		ASTNodePtr match();
+		ASTNodePtr match(TokenReader& input);
 	
 	private:
-		TokenReader& m_input;
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		StatementParser& m_parser;
 	};
