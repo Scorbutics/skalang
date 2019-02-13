@@ -10,6 +10,7 @@
 #include "Service/Tokenizer.h"
 #include "Service/TokenReader.h"
 #include "Service/ASTFactory.h"
+#include "Service/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::StatementParser)
 
@@ -24,8 +25,8 @@ ska::StatementParser::StatementParser(const ReservedKeywordsPool& reservedKeywor
 	m_matcherImport(m_reservedKeywordsPool, *this) {
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::parse(TokenReader& input) {
-    if(input.empty()) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::parse(Script& input) {
+  if(input.empty()) {
 		return nullptr;
 	}
 
@@ -41,7 +42,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::parse(TokenReader& input)
 	return ASTFactory::MakeNode<Operator::BLOCK>(std::move(blockNodeStatements));
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::statement(TokenReader& input) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::statement(Script& input) {
 	if (input.empty()) {
 		return nullptr;
 	}
@@ -59,7 +60,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::statement(TokenReader& in
 	}
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::matchExpressionStatement(TokenReader& input) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::matchExpressionStatement(Script& input) {
 	SLOG(ska::LogLevel::Info) << "Expression-statement found";
 
     auto expressionResult = expr(input);
@@ -71,7 +72,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::matchExpressionStatement(
     return expressionResult;
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::matchReservedKeyword(TokenReader& input, const std::size_t keywordIndex) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::matchReservedKeyword(Script& input, const std::size_t keywordIndex) {
 	switch (keywordIndex) {
 	case static_cast<std::size_t>(TokenGrammar::FOR):
 		return m_matcherFor.match(input);
@@ -100,7 +101,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::matchReservedKeyword(Toke
 	}
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::expr(TokenReader& input) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::expr(Script& input) {
 	return m_expressionParser.parse(input);
 }
 
@@ -108,7 +109,7 @@ void ska::StatementParser::error(const std::string& message) {
 	throw std::runtime_error("syntax error : " + message);
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::optexpr(TokenReader& input, const Token& mustNotBe) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::optexpr(Script& input, const Token& mustNotBe) {
 	auto node = ASTNodePtr {};
 	if (!input.expect(mustNotBe)) {
 		node = expr(input);
@@ -116,7 +117,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::optexpr(TokenReader& inpu
 	return node != nullptr ? std::move(node) : ASTFactory::MakeEmptyNode();
 }
 
-ska::ASTNodePtr ska::StatementParser::subParse(TokenReader& input, std::ifstream& file) {
+ska::ASTNodePtr ska::StatementParser::subParse(std::ifstream& file) {
 	auto content = std::string (
 		(std::istreambuf_iterator<char>(file)),
 		(std::istreambuf_iterator<char>()) 
@@ -124,13 +125,14 @@ ska::ASTNodePtr ska::StatementParser::subParse(TokenReader& input, std::ifstream
 
 	auto tokenizer = Tokenizer{ m_reservedKeywordsPool, std::move(content)};
 	auto tokens = tokenizer.tokenize();
-	const auto& [lastSource, lastIndex] = input.setSource(tokens);
+	auto input = TokenReader { tokens };
+  //const auto& [lastSource, lastIndex] = input.setSource(tokens);
 	auto result = parse(input);
-	input.setSource(*lastSource, lastIndex);
+	//input.setSource(*lastSource, lastIndex);
 	return result;
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::optstatement(TokenReader& input, const Token& mustNotBe) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::optstatement(Script& input, const Token& mustNotBe) {
 	auto node = ASTNodePtr {};
 	if (!input.expect(mustNotBe)) {
 		node = statement(input);

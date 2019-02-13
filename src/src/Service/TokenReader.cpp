@@ -8,6 +8,7 @@ const ska::Token& ska::TokenReader::match(Token t) {
 	throw std::runtime_error("unexpected error");
 }
 
+/*
 std::pair<const std::vector<ska::Token>*, std::size_t> ska::TokenReader::setSource(const std::vector<ska::Token>& input, std::size_t lookAheadIndex) {
 	const auto& lastInput = *m_input;
 	const auto lastLookAheadIndex = m_lookAheadIndex;
@@ -16,6 +17,7 @@ std::pair<const std::vector<ska::Token>*, std::size_t> ska::TokenReader::setSour
 	m_lookAhead = &(*m_input)[m_lookAheadIndex];
 	return std::make_pair(&lastInput, lastLookAheadIndex);
 }
+*/
 
 const ska::Token& ska::TokenReader::match(const TokenType type) {
     if (m_lookAhead != nullptr && m_lookAhead->type() == type) {

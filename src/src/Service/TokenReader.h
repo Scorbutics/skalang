@@ -13,7 +13,7 @@ namespace ska {
 			}
         }
 
-		std::pair<const std::vector<ska::Token>*, std::size_t> setSource(const std::vector<ska::Token>& input, std::size_t lookAheadIndex = 0);
+		//std::pair<const std::vector<ska::Token>*, std::size_t> setSource(const std::vector<ska::Token>& input, std::size_t lookAheadIndex = 0);
 
 		const Token& match(Token t);
 		const Token& match(const TokenType type);

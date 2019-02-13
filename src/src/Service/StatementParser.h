@@ -24,7 +24,8 @@
 
 namespace ska {
 	struct ReservedKeywordsPool;
-
+	class Script;
+	
 	class StatementParser :
 	    public EventDispatcher<
             ForTokenEvent,
@@ -42,19 +43,19 @@ namespace ska {
 		using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 	public:
 		StatementParser(const ReservedKeywordsPool& reservedKeywordsPool);
-		ASTNodePtr parse(TokenReader& input);
+		ASTNodePtr parse(Script& input);
 
-		ASTNodePtr statement(TokenReader& input);
-        ASTNodePtr optstatement(TokenReader& input, const Token& mustNotBe = Token{});
+		ASTNodePtr statement(Script& input);
+        ASTNodePtr optstatement(Script& input, const Token& mustNotBe = Token{});
 
-		ASTNodePtr expr(TokenReader& input);
-		ASTNodePtr optexpr(TokenReader& input, const Token& mustNotBe = Token{});
+		ASTNodePtr expr(Script& input);
+		ASTNodePtr optexpr(Script& input, const Token& mustNotBe = Token{});
 
-		ASTNodePtr subParse(TokenReader& input, std::ifstream& file);
+		ASTNodePtr subParse(std::ifstream& file);
 	
 	private:
-		ASTNodePtr matchExpressionStatement(TokenReader& input);
-		ASTNodePtr matchReservedKeyword(TokenReader& input, const std::size_t keywordIndex);
+		ASTNodePtr matchExpressionStatement(Script& input);
+		ASTNodePtr matchReservedKeyword(Script& input, const std::size_t keywordIndex);
 		static void error(const std::string& message);
 
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
