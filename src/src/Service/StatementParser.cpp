@@ -125,11 +125,8 @@ ska::ASTNodePtr ska::StatementParser::subParse(std::ifstream& file) {
 
 	auto tokenizer = Tokenizer{ m_reservedKeywordsPool, std::move(content)};
 	auto tokens = tokenizer.tokenize();
-	auto input = TokenReader { tokens };
-  //const auto& [lastSource, lastIndex] = input.setSource(tokens);
-	auto result = parse(input);
-	//input.setSource(*lastSource, lastIndex);
-	return result;
+	auto script = Script { tokens };
+	return parse(script);
 }
 
 ska::StatementParser::ASTNodePtr ska::StatementParser::optstatement(Script& input, const Token& mustNotBe) {

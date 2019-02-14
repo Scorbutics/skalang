@@ -5,6 +5,7 @@
 #include "NodeValue/AST.h"
 #include "ReservedKeywordsPool.h"
 #include "Service/ASTFactory.h"
+#include "Service/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ExpressionParser)
 
@@ -39,12 +40,12 @@ ska::ExpressionParser::ExpressionParser(const ReservedKeywordsPool& reservedKeyw
 	m_matcherImport(m_reservedKeywordsPool, m_parser) {
 }
 
-ska::ASTNodePtr ska::ExpressionParser::parse(TokenReader& input) {
+ska::ASTNodePtr ska::ExpressionParser::parse(Script& input) {
 	auto data = expression_stack<Token, ASTNodePtr>{};
 	return expression(input, data);
 }
 
-bool ska::ExpressionParser::parseTokenExpression(TokenReader& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
+bool ska::ExpressionParser::parseTokenExpression(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
 
 	switch (token.type()) {
 	case TokenType::RESERVED: {
@@ -98,7 +99,7 @@ bool ska::ExpressionParser::parseTokenExpression(TokenReader& input, ExpressionS
     return false;
 }
 
-void ska::ExpressionParser::matchRange(TokenReader& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
+void ska::ExpressionParser::matchRange(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
     const auto& value = std::get<std::string>(token.content());
     switch (value[0]) {
 	case '(':
@@ -132,7 +133,7 @@ void ska::ExpressionParser::matchRange(TokenReader& input, ExpressionStack& expr
     }
 }
 
-bool ska::ExpressionParser::matchSymbol(TokenReader& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
+bool ska::ExpressionParser::matchSymbol(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
     const auto& value = std::get<std::string>(token.content());
     if(value == "=") {
 		//We must check that the token before the '=' is an lvalue : done in the semantic check pass.
@@ -159,7 +160,7 @@ bool ska::ExpressionParser::matchSymbol(TokenReader& input, ExpressionStack& exp
     
 }
 
-void ska::ExpressionParser::matchParenthesis(TokenReader& input, ExpressionStack& expressions, bool isDoingOperation) {
+void ska::ExpressionParser::matchParenthesis(Script& input, ExpressionStack& expressions, bool isDoingOperation) {
 	auto functionNameOperand = expressions.popOperandIfNoOperator(isDoingOperation);
 	if (functionNameOperand != nullptr) {
 		auto event = ExpressionTokenEvent{ *functionNameOperand };
@@ -178,21 +179,21 @@ void ska::ExpressionParser::matchParenthesis(TokenReader& input, ExpressionStack
 	expressions.push(Token{ input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()) });
 }
 
-ska::ASTNodePtr ska::ExpressionParser::matchObjectFieldAccess(TokenReader& input, ASTNodePtr objectAccessed) {
+ska::ASTNodePtr ska::ExpressionParser::matchObjectFieldAccess(Script& input, ASTNodePtr objectAccessed) {
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::METHOD_CALL_OPERATOR>());
     auto fieldAccessedIdentifier = input.match(TokenType::IDENTIFIER);
 
     return ASTFactory::MakeNode<Operator::FIELD_ACCESS>(std::move(objectAccessed), ASTFactory::MakeLogicalNode(fieldAccessedIdentifier));
 }
 
-bool ska::ExpressionParser::isAtEndOfExpression(TokenReader& input) const {
+bool ska::ExpressionParser::isAtEndOfExpression(Script& input) const {
     return input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()) || 
             input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>()) ||
             input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()) ||
             input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>()); 
 }
 
-ska::ASTNodePtr ska::ExpressionParser::expression(TokenReader& input, ExpressionStack& expressions) {
+ska::ASTNodePtr ska::ExpressionParser::expression(Script& input, ExpressionStack& expressions) {
 	auto rangeCounter = 0;
     auto isDoingOperation = false;
     while (!isAtEndOfExpression(input) && rangeCounter >= 0) {
@@ -219,7 +220,7 @@ ska::ASTNodePtr ska::ExpressionParser::expression(TokenReader& input, Expression
 
 }
 
-ska::ASTNodePtr ska::ExpressionParser::matchReserved(TokenReader& input) {
+ska::ASTNodePtr ska::ExpressionParser::matchReserved(Script& input) {
 	const auto& result = input.actual();
 
 	switch(std::get<std::size_t>(result.content())) {

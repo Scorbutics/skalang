@@ -9,16 +9,17 @@
 #include "Service/StatementParser.h"
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
+#include "Service/Script.h"
 
 const auto reservedKeywords = ska::ReservedKeywordsPool{};
 auto tokenizer = std::unique_ptr<ska::Tokenizer>{};
 std::vector<ska::Token> tokens;
-auto reader = std::unique_ptr<ska::TokenReader>{};
+auto reader = std::unique_ptr<ska::Script>{};
 
 void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTestContainer& data) {
     tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);
     tokens = tokenizer->tokenize();
-    reader = std::make_unique<ska::TokenReader>(tokens);
+    reader = std::make_unique<ska::Script>(tokens);
     
     data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
 	data.symbols = std::make_unique<ska::SymbolTable>(*data.parser);

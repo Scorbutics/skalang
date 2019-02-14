@@ -8,13 +8,14 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
 #include "NodeValue/Operator.h"
+#include "Service/Script.h"
 
 TEST_CASE("test") {
 	const auto inputStr = std::string("for(var i = 0; i < 5; i++) { lol; \"mdr\"; 12; }");
 	const auto keywords = ska::ReservedKeywordsPool{};
 	auto t = ska::Tokenizer {keywords, inputStr};
 	auto tokens = t.tokenize();
-	auto reader = ska::TokenReader { tokens };
+	auto reader = ska::Script { tokens };
 	auto p = ska::StatementParser{ keywords };
 	auto ast = p.parse(reader);
 	
@@ -50,7 +51,7 @@ TEST_CASE("test") {
 std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, const ska::ReservedKeywordsPool& keywords) {
 	auto t = ska::Tokenizer {keywords, input};
 	auto tokens = t.tokenize();
-	auto reader = ska::TokenReader { tokens };
+	auto reader = ska::Script { tokens };
 	auto p = ska::StatementParser{ keywords };
 	return p.parse(reader);
 }

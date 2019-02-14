@@ -28,21 +28,21 @@ namespace ska {
 
 	public:
 		ExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, StatementParser& parser);
-		ASTNodePtr parse(TokenReader& input);
+		ASTNodePtr parse(Script& input);
 
 	private:
-		bool parseTokenExpression(TokenReader& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
+		bool parseTokenExpression(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
         
-        bool matchSymbol(TokenReader& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
-		void matchRange(TokenReader& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
-		void matchParenthesis(TokenReader& input, ExpressionStack& expressions, bool isDoingOperation);
+        bool matchSymbol(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
+		void matchRange(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
+		void matchParenthesis(Script& input, ExpressionStack& expressions, bool isDoingOperation);
 
-        ASTNodePtr matchReserved(TokenReader& input);
-		ASTNodePtr matchObjectFieldAccess(TokenReader& input, ASTNodePtr objectAccessed);      
+        ASTNodePtr matchReserved(Script& input);
+		ASTNodePtr matchObjectFieldAccess(Script& input, ASTNodePtr objectAccessed);      
 
-        bool isAtEndOfExpression(TokenReader& input) const;
+        bool isAtEndOfExpression(Script& input) const;
 		
-		ASTNodePtr expression(TokenReader& input, ExpressionStack& expressions);
+		ASTNodePtr expression(Script& input, ExpressionStack& expressions);
 
 		static void error(const std::string& message);
 

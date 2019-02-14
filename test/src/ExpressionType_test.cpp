@@ -4,6 +4,7 @@
 #include "Service/Tokenizer.h"
 #include "Service/SymbolTable.h"
 #include "Service/StatementParser.h"
+#include "Service/Script.h"
 
 using SymbolTablePtr = std::unique_ptr<ska::SymbolTable>;
 using ParserPtr = std::unique_ptr<ska::StatementParser>;
@@ -12,7 +13,7 @@ std::unique_ptr<ska::ASTNode> ASTFromInputSemanticExpressionType(const std::stri
 	const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
-	auto reader = ska::TokenReader { tokens };
+	auto reader = ska::Script { tokens };
 	parser_test = std::make_unique<ska::StatementParser> ( reservedKeywords );
     table_test = std::make_unique<ska::SymbolTable> (*parser_test);
     return parser_test->parse(reader);

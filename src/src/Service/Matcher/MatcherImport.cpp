@@ -7,6 +7,7 @@
 #include "Service/TokenReader.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/ASTFactory.h"
+#include "Service/Script.h"
 
 #include "Event/BlockTokenEvent.h"
 #include "Event/ImportTokenEvent.h"
@@ -14,7 +15,7 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherImport)
 
-ska::ASTNodePtr ska::MatcherImport::matchImport(TokenReader& input) {
+ska::ASTNodePtr ska::MatcherImport::matchImport(Script& input) {
 	SLOG(ska::LogLevel::Info) << "import expression";
 	
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::IMPORT>());
@@ -34,7 +35,7 @@ ska::ASTNodePtr ska::MatcherImport::matchImport(TokenReader& input) {
 	return bridgeNode->type() != ExpressionType::VOID ? std::move(bridgeNode) : matchNewImport(input, importedVarName, importNodeClass);
 }
 
-ska::ASTNodePtr ska::MatcherImport::matchExport(TokenReader& input) {
+ska::ASTNodePtr ska::MatcherImport::matchExport(Script& input) {
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::EXPORT>());
 	if (!input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>())) {
 		throw std::runtime_error("only a variable can be exported");
@@ -42,7 +43,7 @@ ska::ASTNodePtr ska::MatcherImport::matchExport(TokenReader& input) {
 	return ASTFactory::MakeNode<Operator::EXPORT>(m_parser.statement(input));
 }
 
-ska::ASTNodePtr ska::MatcherImport::matchNewImport(TokenReader& input, const Token& importedVarName, const Token& importNodeClass) {
+ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& importedVarName, const Token& importNodeClass) {
 	auto importClassName = importNodeClass.name() + ".miniska";
 	auto script = std::ifstream{ importClassName };
 	if (script.fail()) {
