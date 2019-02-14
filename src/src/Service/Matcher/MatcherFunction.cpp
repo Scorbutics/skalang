@@ -51,7 +51,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchCall(Script& input, ASTNodePtr identi
 	const auto endParametersToken = m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>();
 	while (!input.expect(endParametersToken)) {
 
-		auto expressionOpt = m_parser.expr(input);
+		auto expressionOpt = input.expr(m_parser);
 		if (expressionOpt != nullptr) {
 			SLOG(ska::LogLevel::Debug) << "Expression not null";
 			functionCallNodeContent.push_back(std::move(expressionOpt));
@@ -149,7 +149,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationBody(Script& input) {
 
 	auto statements = std::vector<ASTNodePtr>{};
 	while (!input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
-		auto optionalStatement = m_parser.statement(input);
+		auto optionalStatement = input.statement(m_parser);
 		if (!optionalStatement->logicalEmpty()) {
 			statements.push_back(std::move(optionalStatement));
 		} else {

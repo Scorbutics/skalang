@@ -16,7 +16,7 @@ std::unique_ptr<ska::ASTNode> ASTFromInputSemanticExpressionType(const std::stri
 	auto reader = ska::Script { tokens };
 	parser_test = std::make_unique<ska::StatementParser> ( reservedKeywords );
     table_test = std::make_unique<ska::SymbolTable> (*parser_test);
-    return parser_test->parse(reader);
+    return reader.parse(*parser_test);
 }
 
 TEST_CASE("[ExpressionType]") {

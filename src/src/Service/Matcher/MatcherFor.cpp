@@ -17,19 +17,19 @@ ska::ASTNodePtr ska::MatcherFor::match(Script& input) {
 
 	SLOG(ska::LogLevel::Info) << "1st for loop expression (= statement)";
 
-    auto forNodeFirstExpression = m_parser.optstatement(input);
+    auto forNodeFirstExpression = input.optstatement(m_parser);
 
 	SLOG(ska::LogLevel::Info) << "2nd for loop expression";
 
-    auto forNodeMidExpression = m_parser.optexpr(input, m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+    auto forNodeMidExpression = input.optexpr(m_parser, m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
 
 	SLOG(ska::LogLevel::Info) << "3rd for loop expression";
 
-    auto forNodeLastExpression = m_parser.optexpr(input, m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
+    auto forNodeLastExpression = input.optexpr(m_parser, m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 
-    auto forNodeStatement = m_parser.statement(input);
+    auto forNodeStatement = input.statement(m_parser);
 	SLOG(ska::LogLevel::Info) << "end for loop statement";
 
     auto forNode = ASTFactory::MakeNode<Operator::FOR_LOOP>(std::move(forNodeFirstExpression), std::move(forNodeMidExpression), std::move(forNodeLastExpression), std::move(forNodeStatement));

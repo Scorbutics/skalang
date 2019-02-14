@@ -20,7 +20,7 @@ ska::ASTNodePtr ska::MatcherVar::matchDeclaration(Script& input) {
 
 	SLOG(ska::LogLevel::Info) << "equal sign matched, reading expression";
 
-    auto varNodeExpression = m_parser.expr(input);
+    auto varNodeExpression = input.expr(m_parser);
 
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
 
@@ -36,7 +36,7 @@ ska::ASTNodePtr ska::MatcherVar::matchDeclaration(Script& input) {
 
 ska::ASTNodePtr ska::MatcherVar::matchAffectation(Script& input, ASTNodePtr varAffectedNode) {
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
-	auto expressionNode = m_parser.expr(input);
+	auto expressionNode = input.expr(m_parser);
 	if (expressionNode == nullptr) {
 		throw std::runtime_error("syntax error : Affectation incomplete : no expression");
 	}

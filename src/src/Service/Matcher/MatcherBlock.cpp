@@ -24,7 +24,7 @@ ska::ASTNodePtr ska::MatcherBlock::match(Script& input, const std::string& conte
 
         auto blockNodeStatements = std::vector<ASTNodePtr>{};
 		while (!input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
-			auto optionalStatement = m_parser.optstatement(input);
+			auto optionalStatement = input.optstatement(m_parser);
 			if (!optionalStatement->logicalEmpty()) {
 				blockNodeStatements.push_back(std::move(optionalStatement));
 			} else {
@@ -44,11 +44,11 @@ ska::ASTNodePtr ska::MatcherBlock::match(Script& input, const std::string& conte
 	} else if (content == m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>().name()) {
 		throw std::runtime_error("syntax error : Block end token encountered when not expected");
 	} else {
-		auto expression = m_parser.expr(input);
+		auto expression = input.expr(m_parser);
 		input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
 		return expression;
 	}
 
-	m_parser.optexpr(input, m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+	input.optexpr(m_parser, m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
 	return nullptr;
 }

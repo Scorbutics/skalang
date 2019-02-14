@@ -24,7 +24,7 @@ ska::ASTNodePtr ska::MatcherReturn::match(Script& input) {
         while(!input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
             auto field = input.match(TokenType::IDENTIFIER);
             input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
-            auto fieldValue = m_parser.expr(input);
+            auto fieldValue = input.expr(m_parser);
 
             const std::string name = "???";
 
@@ -48,7 +48,7 @@ ska::ASTNodePtr ska::MatcherReturn::match(Script& input) {
         auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT> (*returnNode);
 		m_parser.Observable<ReturnTokenEvent>::notifyObservers(returnEndEvent);
     } else {
-        returnNode = ASTFactory::MakeNode<Operator::RETURN>(m_parser.expr(input));
+        returnNode = ASTFactory::MakeNode<Operator::RETURN>(input.expr(m_parser));
         auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::BUILTIN> (*returnNode);
 		m_parser.Observable<ReturnTokenEvent>::notifyObservers(returnEndEvent);
     }

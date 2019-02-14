@@ -20,7 +20,7 @@ ska::ASTNodePtr ska::MatcherArray::matchDeclaration(Script& input) {
 		if (!input.expect(TokenType::SYMBOL)) {
 			SLOG(ska::LogLevel::Debug) << "array entry detected, reading expression : ";
 			
-			auto expression = m_parser.expr(input);
+			auto expression = input.expr(m_parser);
 			arrayNode.push_back(std::move(expression));
 			isComma = input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
 			if (isComma) {
@@ -44,7 +44,7 @@ ska::ASTNodePtr ska::MatcherArray::matchUse(Script& input, ASTNodePtr identifier
 
     //Gets the index part with bracket syntax
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());
-	auto indexNode = m_parser.expr(input);
+	auto indexNode = input.expr(m_parser);
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 
 	auto declarationNode = ASTFactory::MakeNode<ska::Operator::ARRAY_USE>(std::move(identifierArrayAffected), std::move(indexNode));

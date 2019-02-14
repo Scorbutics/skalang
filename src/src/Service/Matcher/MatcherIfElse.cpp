@@ -18,15 +18,15 @@ ska::ASTNodePtr ska::MatcherIfElse::match(Script& input) {
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
     
     {
-        auto conditionExpression = m_parser.expr(input);
+        auto conditionExpression = input.expr(m_parser);
         input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 
-        auto conditionStatement = m_parser.statement(input);
+        auto conditionStatement = input.statement(m_parser);
 
         const auto elseToken = m_reservedKeywordsPool.pattern<TokenGrammar::ELSE>();
         if (input.expect(elseToken)) {
             input.match(elseToken);
-            auto elseBlockStatement = m_parser.statement(input);
+            auto elseBlockStatement = input.statement(m_parser);
             ifNode = ASTFactory::MakeNode<Operator::IF_ELSE>(std::move(conditionExpression), std::move(conditionStatement), std::move(elseBlockStatement));
         } else {
             ifNode = ASTFactory::MakeNode<Operator::IF>(std::move(conditionExpression), std::move(conditionStatement));

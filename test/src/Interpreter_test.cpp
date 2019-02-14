@@ -31,7 +31,7 @@ void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTest
 
 std::unique_ptr<ska::ASTNode> ASTFromInputSemanticTCInterpreter(const std::string& input, DataTestContainer& data) {
 	ASTFromInputSemanticTCInterpreterNoParse(input, data);
-	return data.parser->parse(*reader);
+	return reader->parse(*data.parser);
 }
 
 TEST_CASE("[Interpreter]") {
@@ -228,7 +228,7 @@ TEST_CASE("[Interpreter]") {
 			data.interpreter->bind("binding.miniska", std::move(bridge));
             std::cout << "function bound" << std::endl;
 
-            auto astPtr = data.parser->parse(*reader);
+            auto astPtr = reader->parse(*data.parser);
 			data.interpreter->script(*astPtr);
 			CHECK(test == 14);
 			CHECK(testStr == "titito");

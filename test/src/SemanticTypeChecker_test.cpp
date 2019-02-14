@@ -22,7 +22,7 @@ std::unique_ptr<ska::ASTNode> ASTFromInputSemanticTC(const std::string& input, D
     data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, *data.symbols);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, *data.symbols);
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, *data.symbols);
-    return data.parser->parse(reader);
+    return reader.parse(*data.parser);
 }
 
 TEST_CASE("[SemanticTypeChecker]") {

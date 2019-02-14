@@ -25,6 +25,7 @@
 namespace ska {
 	struct ReservedKeywordsPool;
 	class Script;
+	class ExpressionParser;
 	
 	class StatementParser :
 	    public EventDispatcher<
@@ -41,8 +42,12 @@ namespace ska {
 	    > {
 
 		using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
+		friend class Script;
 	public:
 		StatementParser(const ReservedKeywordsPool& reservedKeywordsPool);
+		ASTNodePtr subParse(std::ifstream& file);
+
+	private:
 		ASTNodePtr parse(Script& input);
 
 		ASTNodePtr statement(Script& input);
@@ -51,9 +56,6 @@ namespace ska {
 		ASTNodePtr expr(Script& input);
 		ASTNodePtr optexpr(Script& input, const Token& mustNotBe = Token{});
 
-		ASTNodePtr subParse(std::ifstream& file);
-	
-	private:
 		ASTNodePtr matchExpressionStatement(Script& input);
 		ASTNodePtr matchReservedKeyword(Script& input, const std::size_t keywordIndex);
 		static void error(const std::string& message);

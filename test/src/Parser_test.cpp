@@ -10,14 +10,14 @@
 #include "NodeValue/Operator.h"
 #include "Service/Script.h"
 
-TEST_CASE("test") {
+TEST_CASE("[Parser]") {
 	const auto inputStr = std::string("for(var i = 0; i < 5; i++) { lol; \"mdr\"; 12; }");
 	const auto keywords = ska::ReservedKeywordsPool{};
 	auto t = ska::Tokenizer {keywords, inputStr};
 	auto tokens = t.tokenize();
 	auto reader = ska::Script { tokens };
 	auto p = ska::StatementParser{ keywords };
-	auto ast = p.parse(reader);
+	auto ast = reader.parse(p, false);
 	
 	CHECK(ast->size() == 1);
 
@@ -53,7 +53,7 @@ std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, const ska::
 	auto tokens = t.tokenize();
 	auto reader = ska::Script { tokens };
 	auto p = ska::StatementParser{ keywords };
-	return p.parse(reader);
+	return reader.parse(p, false);
 }
 
 TEST_CASE("Block") {

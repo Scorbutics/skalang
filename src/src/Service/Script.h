@@ -14,9 +14,7 @@ namespace ska {
 			m_input(input, startIndex) {
 		}
 		virtual ~Script() = default;
-		
-		void parse(StatementParser& parser);
-
+	
         const Token& readPrevious(std::size_t offset) const;
 		bool canReadPrevious(std::size_t offset) const;
 		bool empty() const;
@@ -25,6 +23,16 @@ namespace ska {
 		const Token& match(const TokenType& t);
         bool expect(const Token& t);
 		bool expect(const TokenType& type) const;
+
+		ASTNodePtr parse(StatementParser& parser, bool listen = true);
+
+		ASTNodePtr statement(StatementParser& parser);
+        ASTNodePtr optstatement(StatementParser& parser, const Token& mustNotBe = Token{});
+
+		ASTNodePtr expr(StatementParser& parser);
+		ASTNodePtr optexpr(StatementParser& parser, const Token& mustNotBe = Token{});
+
+		ASTNodePtr subParse(StatementParser& parser, std::ifstream& file);
 
 	private:
 		TokenReader m_input;
