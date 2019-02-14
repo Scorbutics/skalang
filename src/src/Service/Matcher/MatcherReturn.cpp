@@ -7,10 +7,11 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
 #include "Service/ASTFactory.h"
+#include "Service/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherReturn)
 
-ska::ASTNodePtr ska::MatcherReturn::match(TokenReader& input) {
+ska::ASTNodePtr ska::MatcherReturn::match(Script& input) {
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::RETURN>());
 
     auto returnNode = ASTNodePtr {};

@@ -6,10 +6,11 @@
 #include "Service/TokenReader.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/ASTFactory.h"
+#include "Service/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherFunction)
 
-ska::ASTNodePtr ska::MatcherFunction::matchDeclaration(TokenReader& input) {
+ska::ASTNodePtr ska::MatcherFunction::matchDeclaration(Script& input) {
 	SLOG(ska::LogLevel::Debug) << "function declaration";
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::FUNCTION>());
 
@@ -40,7 +41,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclaration(TokenReader& input) {
 	return functionDeclarationNode;
 }
 
-ska::ASTNodePtr ska::MatcherFunction::matchCall(TokenReader& input, ASTNodePtr identifierFunctionName) {
+ska::ASTNodePtr ska::MatcherFunction::matchCall(Script& input, ASTNodePtr identifierFunctionName) {
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
 	auto functionCallNodeContent = std::vector<ASTNodePtr>{};
@@ -71,7 +72,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchCall(TokenReader& input, ASTNodePtr i
 	return functionCallNode;
 }
 
-ska::ASTNodePtr ska::MatcherFunction::matchDeclarationParameter(TokenReader& input) {
+ska::ASTNodePtr ska::MatcherFunction::matchDeclarationParameter(Script& input) {
 	const auto isRightParenthesis = input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 	if(isRightParenthesis) {
 		return nullptr;
@@ -108,7 +109,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationParameter(TokenReader& inp
 	return node;
 }
 
-std::vector<ska::ASTNodePtr> ska::MatcherFunction::fillDeclarationParameters(TokenReader& input) {
+std::vector<ska::ASTNodePtr> ska::MatcherFunction::fillDeclarationParameters(Script& input) {
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
 	auto parameters = std::vector<ASTNodePtr>{};
@@ -131,7 +132,7 @@ std::vector<ska::ASTNodePtr> ska::MatcherFunction::fillDeclarationParameters(Tok
 	return parameters;
 }
 
-ska::ASTNodePtr ska::MatcherFunction::matchDeclarationReturnType(TokenReader& input) {
+ska::ASTNodePtr ska::MatcherFunction::matchDeclarationReturnType(Script& input) {
 	if (input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>())) {
 		input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
 		const auto type = input.match(TokenType::RESERVED);
@@ -143,7 +144,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationReturnType(TokenReader& in
 	return ASTFactory::MakeLogicalNode(ska::Token{ "", ska::TokenType::IDENTIFIER });
 }
 
-ska::ASTNodePtr ska::MatcherFunction::matchDeclarationBody(TokenReader& input) {
+ska::ASTNodePtr ska::MatcherFunction::matchDeclarationBody(Script& input) {
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
 
 	auto statements = std::vector<ASTNodePtr>{};

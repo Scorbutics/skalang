@@ -7,10 +7,11 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
 #include "Service/ASTFactory.h"
+#include "Service/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherArray)
 
-ska::ASTNodePtr ska::MatcherArray::matchDeclaration(TokenReader& input) {
+ska::ASTNodePtr ska::MatcherArray::matchDeclaration(Script& input) {
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());
 
 	auto arrayNode = std::vector<ASTNodePtr>{};
@@ -35,7 +36,7 @@ ska::ASTNodePtr ska::MatcherArray::matchDeclaration(TokenReader& input) {
 	return declarationNode;
 }
 
-ska::ASTNodePtr ska::MatcherArray::matchUse(TokenReader& input, ASTNodePtr identifierArrayAffected) {
+ska::ASTNodePtr ska::MatcherArray::matchUse(Script& input, ASTNodePtr identifierArrayAffected) {
 	//Ensures array expression before the index access
     SLOG(ska::LogLevel::Debug) << "expression-array : " << *identifierArrayAffected;
     auto expressionEvent = ArrayTokenEvent{ *identifierArrayAffected, ArrayTokenEventType::EXPRESSION };
@@ -54,7 +55,7 @@ ska::ASTNodePtr ska::MatcherArray::matchUse(TokenReader& input, ASTNodePtr ident
 	return declarationNode;
 }
 
-ska::ASTNodePtr ska::MatcherArray::match(TokenReader& input, ExpressionStack& operands, char token, bool isDoingOperation) {
+ska::ASTNodePtr ska::MatcherArray::match(Script& input, ExpressionStack& operands, char token, bool isDoingOperation) {
 	switch (token) {
 	case '[': {
 		if (input.canReadPrevious(1)) {

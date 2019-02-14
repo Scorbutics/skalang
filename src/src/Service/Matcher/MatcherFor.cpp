@@ -7,10 +7,11 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
 #include "Service/ASTFactory.h"
+#include "Service/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherFor)
 
-ska::ASTNodePtr ska::MatcherFor::match(TokenReader& input) {
+ska::ASTNodePtr ska::MatcherFor::match(Script& input) {
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::FOR>());
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 

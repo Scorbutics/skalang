@@ -7,10 +7,11 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
 #include "Service/ASTFactory.h"
+#include "Service/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherVar)
 
-ska::ASTNodePtr ska::MatcherVar::matchDeclaration(TokenReader& input) {
+ska::ASTNodePtr ska::MatcherVar::matchDeclaration(Script& input) {
 	SLOG(ska::LogLevel::Info) << "variable declaration";
 
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>());
@@ -33,7 +34,7 @@ ska::ASTNodePtr ska::MatcherVar::matchDeclaration(TokenReader& input) {
     return varNode;
 }
 
-ska::ASTNodePtr ska::MatcherVar::matchAffectation(TokenReader& input, ASTNodePtr varAffectedNode) {
+ska::ASTNodePtr ska::MatcherVar::matchAffectation(Script& input, ASTNodePtr varAffectedNode) {
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
 	auto expressionNode = m_parser.expr(input);
 	if (expressionNode == nullptr) {

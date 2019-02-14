@@ -7,10 +7,11 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
 #include "Service/ASTFactory.h"
+#include "Service/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherBlock)
 
-ska::ASTNodePtr ska::MatcherBlock::match(TokenReader& input, const std::string& content) {
+ska::ASTNodePtr ska::MatcherBlock::match(Script& input, const std::string& content) {
 	if (content == m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>().name()) {
 
 		SLOG(ska::LogLevel::Info) << "block start detected";

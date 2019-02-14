@@ -7,10 +7,11 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
 #include "Service/ASTFactory.h"
+#include "Service/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherIfElse)
 
-ska::ASTNodePtr ska::MatcherIfElse::match(TokenReader& input) {
+ska::ASTNodePtr ska::MatcherIfElse::match(Script& input) {
     auto ifNode = ASTNodePtr{};
 
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::IF>());
