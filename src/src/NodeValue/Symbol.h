@@ -11,7 +11,8 @@ namespace ska {
 	class ScopedSymbolTable;
  	
     class Symbol {
-        public:
+        friend class ScopedSymbolTable;
+        private:
 			Symbol(){}
 
 			Symbol(std::string name, ScopedSymbolTable& symbolTable, Type type = Type {}) :
@@ -20,7 +21,7 @@ namespace ska {
 				m_scopedTable(&symbolTable) {
 				SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" with type " << m_category;
             }
-
+        public:
             Symbol(const Symbol& s) {
                 *this = s;
             }
@@ -61,7 +62,7 @@ namespace ska {
                 return m_category;
             }
 
-			void calculateType(Type t) {
+			void forceType(Type t) {
 				m_category = t;
 			}
 

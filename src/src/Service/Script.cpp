@@ -61,6 +61,6 @@ ska::ASTNodePtr ska::Script::optexpr(StatementParser& parser, const Token& mustN
 	return parser.optexpr(*this, mustNotBe);
 }
 
-ska::ASTNodePtr ska::Script::subParse(StatementParser& parser, std::ifstream& file) {
+/*ska::ASTNodePtr ska::Script::subParse(StatementParser& parser, std::ifstream& file) {
 	return parser.subParse(file);
-}
+}*/

@@ -32,7 +32,7 @@ namespace ska {
 		ASTNodePtr expr(StatementParser& parser);
 		ASTNodePtr optexpr(StatementParser& parser, const Token& mustNotBe = Token{});
 
-		ASTNodePtr subParse(StatementParser& parser, std::ifstream& file);
+		//ASTNodePtr subParse(StatementParser& parser, std::ifstream& file);
 
 	private:
 		TokenReader m_input;

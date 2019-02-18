@@ -37,7 +37,7 @@ void ska::SymbolTableTypeUpdater::updateType(const ASTNode& node) {
 	auto* symbol = m_symbols[node.name()];	
 	if (symbol != nullptr) {
 		if (symbol->getType() != type.value()) {
-			symbol->calculateType(type.value());
+			symbol->forceType(type.value());
 			SLOG(LogLevel::Info) << "Type updated for symbol \"" << node.name() << "\" = \"" << node.type().value() << "\"";
 		} else {
 			SLOG(LogLevel::Error) << "No type detected for symbol \"" << node.name() << "\" with operator \"" << node.op() << "\"";
