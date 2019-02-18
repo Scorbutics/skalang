@@ -34,6 +34,10 @@ namespace ska {
 
 		//ASTNodePtr subParse(StatementParser& parser, std::ifstream& file);
 
+		SymbolTable& symbols() {
+			return m_symbols;
+		}
+
 	private:
 		TokenReader m_input;
 		SymbolTable m_symbols;

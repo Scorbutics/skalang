@@ -24,5 +24,9 @@ namespace ska {
 		inline auto GetImportVariableName() {
 			return node[0].name();
 		}
+
+		inline auto GetScriptPath() {
+			return node[5].name();
+		}
 	};
 }

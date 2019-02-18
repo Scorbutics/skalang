@@ -176,36 +176,36 @@ TEST_CASE("[Interpreter]") {
 		}
 
 		SUBCASE("Outside script from file (import)") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var Character = import \"../test/src/resources/character\";", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var Character179 = import \"../test/src/resources/character\";", data);
 			auto res = data.interpreter->script(*astPtr);
 		}
 
 		SUBCASE("Outside script from file (import) and use") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var Character = import \"../test/src/resources/character\";var player = Character.build(\"Player\");var enemy = Character.default; enemy.age;", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var Character184 = import \"../test/src/resources/character\";var player = Character184.build(\"Player\");var enemy = Character184.default; enemy.age;", data);
 			auto res = data.interpreter->script(*astPtr);
 			CHECK(res.nodeval<int>() == 10);
 		}
 
 		SUBCASE("Outside script from file (import) used by another script, and use") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var CharacterUser = import \"../test/src/resources/character_user\"; CharacterUser.player.age;", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var CharacterUser190 = import \"../test/src/resources/character_user\"; CharacterUser190.player.age;", data);
 			auto res = data.interpreter->script(*astPtr);
 			CHECK(res.nodeval<int>() == 10);
 		}
 		
 		SUBCASE("Outside script from file (import) used by another script, and use") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var CharacterUser = import \"../test/src/resources/character_user\"; CharacterUser.player.age;", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var CharacterUser196 = import \"../test/src/resources/character_user\"; CharacterUser196.player.age;", data);
 			auto res = data.interpreter->script(*astPtr);
 			CHECK(res.nodeval<int>() == 10);
 		}
 
 		SUBCASE("Custom script starter") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var Custom = import \"../test/src/resources/custom\"; Custom.totalAge;", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var Custom202 = import \"../test/src/resources/custom\"; Custom202.totalAge;", data);
 			auto res = data.interpreter->script(*astPtr);
 			CHECK(res.nodeval<int>() == 30);
 		}
 
 		SUBCASE("2 outside scripts from file (import)") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var CharacterUser = import \"../test/src/resources/character_user\"; CharacterUser.player.age = 3; var CharacterUser2 = import \"../test/src/resources/character_user\"; CharacterUser2.player.age;", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var CharacterUser208 = import \"../test/src/resources/character_user\"; CharacterUser208.player.age = 3; var CharacterUser2 = import \"../test/src/resources/character_user\"; CharacterUser2.player.age;", data);
 			auto res = data.interpreter->script(*astPtr);
 			CHECK(res.nodeval<int>() == 3);
 		}

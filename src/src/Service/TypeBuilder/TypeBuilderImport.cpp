@@ -9,5 +9,6 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator:
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::IMPORT>::build(const SymbolTable& symbols, OperateOn node) {
     SLOG(LogLevel::Info) << "Importing script as " << node.GetImportVariableName();
-    return Type::MakeCustom<ExpressionType::OBJECT>(nullptr);
+    const auto* symbol = symbols[node.GetScriptPath()];	
+	return symbol == nullptr ? Type::MakeBuiltIn(ExpressionType::VOID) : Type::MakeCustom<ExpressionType::OBJECT>(symbol);
 }

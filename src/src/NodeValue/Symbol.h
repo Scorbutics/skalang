@@ -1,4 +1,5 @@
 #pragma once
+#include <variant>
 #include "Type.h"
 
 namespace ska {
@@ -9,17 +10,23 @@ SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::Symbol)
 
 namespace ska {
 	class ScopedSymbolTable;
- 	
+ 	class Script;
+
     class Symbol {
         friend class ScopedSymbolTable;
         private:
 			Symbol(){}
 
-			Symbol(std::string name, ScopedSymbolTable& symbolTable, Type type = Type {}) :
+			Symbol(std::string name, ScopedSymbolTable& symbolTable) :
 				m_name(std::move(name)), 
-				m_category(std::move(type)),
-				m_scopedTable(&symbolTable) {
-				SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" with type " << m_category;
+				m_data(&symbolTable) {
+				SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" from table";
+            }
+
+            Symbol(std::string name, Script& script) :
+				m_name(std::move(name)), 
+				m_data(&script) {
+				SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" from script";
             }
         public:
             Symbol(const Symbol& s) {
@@ -31,7 +38,7 @@ namespace ska {
             }
 
             Symbol& operator=(const Symbol& s) {
-                m_scopedTable = s.m_scopedTable;
+                m_data = s.m_data;
                 m_name = s.m_name;
                 m_category = s.m_category;
 				SLOG(ska::LogLevel::Debug) << "   Copy, Symbol " << s.getName() << " " << s.m_category << " copied to " << m_name << " " << m_category;
@@ -39,7 +46,7 @@ namespace ska {
             }
 
             Symbol& operator=(Symbol&& s) noexcept {
-                m_scopedTable = std::move(s.m_scopedTable);
+                m_data = std::move(s.m_data);
                 m_name = std::move(s.m_name);
                 m_category = std::move(s.m_category);
 				SLOG(ska::LogLevel::Debug) << "   Move, Symbol " << s.getName() << " " << s.m_category << " moved to " << m_name << " " << m_category;
@@ -76,7 +83,7 @@ namespace ska {
             std::size_t size() const;
 
         private:
-			ScopedSymbolTable* m_scopedTable = nullptr;
+			std::variant<ScopedSymbolTable*, Script*> m_data = static_cast<ScopedSymbolTable*>(nullptr);
             std::string m_name;
             Type m_category;
     };

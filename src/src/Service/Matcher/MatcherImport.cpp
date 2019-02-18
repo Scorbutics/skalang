@@ -63,8 +63,7 @@ ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& i
 		if (node->op() == Operator::EXPORT) {
 			exportFields.push_back(ASTFactory::MakeLogicalNode(ska::Token{ (*node)[0].name(), (*node)[0].tokenType() }));
 			allFields.push_back(node->stealChild(0));
-		}
-		else {
+		} else {
 			if (OperatorTraits::isNamed(node->op())) {
 				hiddenFields.push_back(ASTFactory::MakeLogicalNode(ska::Token{ (*node).name(), (*node).tokenType() }));
 			}
@@ -77,7 +76,8 @@ ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& i
 		std::move(ASTFactory::MakeLogicalNode(std::move(importNodeClass))),
 		ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(exportFields)),
 		ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(hiddenFields)),
-		ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(allFields)));
+		ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(allFields)),
+		ASTFactory::MakeLogicalNode(Token {importClassName, TokenType::STRING}));
 
 	auto importEvent = ImportTokenEvent{ *importNode };
 	m_parser.Observable<ImportTokenEvent>::notifyObservers(importEvent);

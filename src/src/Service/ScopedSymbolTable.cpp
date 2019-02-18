@@ -1,4 +1,5 @@
 #include "ScopedSymbolTable.h"
+#include "Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScopedSymbolTable)
 
@@ -11,20 +12,25 @@ const ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() const {
 }
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name) {
-    
-    {
-		auto symbol = Symbol{ name, *this, ska::Type{} };
-		SLOG(ska::LogLevel::Debug) << "\tSymbol \"" << name << "\" \"" <<  symbol.getType() << "\"";
-        if(m_symbols.find(name) == m_symbols.end()) {
-            m_symbols.emplace(name, std::move(symbol));
-        } else {
-			throw std::runtime_error("Symbol already exists : " + name);
-        }
-    }
+    return emplace(Symbol{ name, *this });
+}
+
+ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
+	auto name = symbol.getName();
+	SLOG(ska::LogLevel::Debug) << "\tSymbol \"" << name << "\" \"" <<  symbol.getType() << "\"";
+	if(m_symbols.find(name) == m_symbols.end()) {
+		m_symbols.emplace(name, std::move(std::move(symbol)));
+	} else {
+		throw std::runtime_error("Symbol already exists : " + name);
+	}
 
     auto& s = m_symbols.at(name);
 	SLOG(ska::LogLevel::Debug) << "\tSymbol Inserted \"" << name << "\" \"" << s.getType() << "\"";
     return s;
+}
+
+ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, Script& script) {
+	return emplace(Symbol{ name, script });
 }
 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested() {
