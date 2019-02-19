@@ -1,5 +1,5 @@
 #pragma once
-
+#include <memory>
 #include "NodeValue/ASTNodePtr.h"
 #include "Service/SymbolTable.h"
 #include "Service/TokenReader.h"
@@ -7,11 +7,23 @@
 
 namespace ska {
 	class StatementParser;
-	
-	class Script {
+	struct ScriptHandle {
+        TokenReader m_input;
+        SymbolTable m_symbols;
+        ASTNodePtr m_ast;
+    };
+
+    using ScriptPtr = std::unique_ptr<ScriptHandle>;
+
+    class Script {
 	public:
-		Script(const std::vector<ska::Token>& input, std::size_t startIndex = 0) :
-			m_input(input, startIndex) {
+        template<class TokenContainer>
+		Script(const std::string& name, TokenContainer&& input, std::size_t startIndex = 0) {
+            auto handle = std::make_unique<ScriptHandle>(std::forward<TokenContainer>(input), startIndex);
+            if(map.find(name) == map.end()) {
+                map.emplace(name, std::move(handle));
+            }
+            m_handle = map.at(name);
 		}
 		virtual ~Script() = default;
 	
@@ -32,15 +44,12 @@ namespace ska {
 		ASTNodePtr expr(StatementParser& parser);
 		ASTNodePtr optexpr(StatementParser& parser, const Token& mustNotBe = Token{});
 
-		//ASTNodePtr subParse(StatementParser& parser, std::ifstream& file);
-
 		SymbolTable& symbols() {
-			return m_symbols;
+			return m_handle->m_symbols;
 		}
 
 	private:
-		TokenReader m_input;
-		SymbolTable m_symbols;
-		ASTNodePtr m_ast;
+        ScriptHandle* m_handle = nullptr;
+        static std::unordered_map<std::string, ScriptHandlePtr> map;
 	};
 }
