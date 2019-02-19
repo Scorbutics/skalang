@@ -45,7 +45,7 @@ namespace ska {
 		friend class Script;
 	public:
 		StatementParser(const ReservedKeywordsPool& reservedKeywordsPool);
-		ASTNodePtr subParse(std::ifstream& file);
+		ASTNodePtr subParse(const std::string& name, std::ifstream& file);
 
 	private:
 		ASTNodePtr parse(Script& input);

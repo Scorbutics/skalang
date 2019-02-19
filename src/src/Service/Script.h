@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <unordered_map>
 #include "NodeValue/ASTNodePtr.h"
 #include "Service/SymbolTable.h"
 #include "Service/TokenReader.h"
@@ -8,12 +9,16 @@
 namespace ska {
 	class StatementParser;
 	struct ScriptHandle {
+        template <class TokenContainer>
+            ScriptHandle(TokenContainer&& input, std::size_t startIndex = 0) : 
+                m_input(std::forward<TokenContainer>(input), startIndex) {}
+
         TokenReader m_input;
         SymbolTable m_symbols;
         ASTNodePtr m_ast;
     };
 
-    using ScriptPtr = std::unique_ptr<ScriptHandle>;
+    using ScriptHandlePtr = std::unique_ptr<ScriptHandle>;
 
     class Script {
 	public:
@@ -23,7 +28,7 @@ namespace ska {
             if(map.find(name) == map.end()) {
                 map.emplace(name, std::move(handle));
             }
-            m_handle = map.at(name);
+            m_handle = map.at(name).get();
 		}
 		virtual ~Script() = default;
 	

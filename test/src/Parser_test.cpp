@@ -15,7 +15,7 @@ TEST_CASE("[Parser]") {
 	const auto keywords = ska::ReservedKeywordsPool{};
 	auto t = ska::Tokenizer {keywords, inputStr};
 	auto tokens = t.tokenize();
-	auto reader = ska::Script { tokens };
+	auto reader = ska::Script { "main", tokens };
 	auto p = ska::StatementParser{ keywords };
 	auto ast = reader.parse(p, false);
 	
@@ -51,7 +51,7 @@ TEST_CASE("[Parser]") {
 std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, const ska::ReservedKeywordsPool& keywords) {
 	auto t = ska::Tokenizer {keywords, input};
 	auto tokens = t.tokenize();
-	auto reader = ska::Script { tokens };
+	auto reader = ska::Script { "main", tokens };
 	auto p = ska::StatementParser{ keywords };
 	return reader.parse(p, false);
 }

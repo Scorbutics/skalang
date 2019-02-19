@@ -55,7 +55,7 @@ ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& i
 	auto startEvent = BlockTokenEvent{ *nodeBlock, BlockTokenEventType::START };
 	m_parser.Observable<BlockTokenEvent>::notifyObservers(startEvent);
 
-	auto scriptNodeContent = m_parser.subParse(script);
+	auto scriptNodeContent = m_parser.subParse(importClassName, script);
 	auto exportFields = std::vector<ASTNodePtr>{};
 	auto hiddenFields = std::vector<ASTNodePtr>{};
 	auto allFields = std::vector<ASTNodePtr>{};

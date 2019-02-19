@@ -117,7 +117,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::optexpr(Script& input, co
 	return node != nullptr ? std::move(node) : ASTFactory::MakeEmptyNode();
 }
 
-ska::ASTNodePtr ska::StatementParser::subParse(std::ifstream& file) {
+ska::ASTNodePtr ska::StatementParser::subParse(const std::string& name, std::ifstream& file) {
 	auto content = std::string (
 		(std::istreambuf_iterator<char>(file)),
 		(std::istreambuf_iterator<char>()) 
@@ -125,7 +125,7 @@ ska::ASTNodePtr ska::StatementParser::subParse(std::ifstream& file) {
 
 	auto tokenizer = Tokenizer{ m_reservedKeywordsPool, std::move(content)};
 	auto tokens = tokenizer.tokenize();
-	auto script = Script { tokens };
+	auto script = Script { name, tokens };
 	return parse(script);
 }
 
