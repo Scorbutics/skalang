@@ -10,13 +10,16 @@ using SymbolTablePtr = std::unique_ptr<ska::SymbolTable>;
 using ParserPtr = std::unique_ptr<ska::StatementParser>;
 
 std::unique_ptr<ska::ASTNode> ASTFromInputSemanticExpressionType(const std::string& input, ParserPtr& parser_test, SymbolTablePtr& table_test) {
-	const auto reservedKeywords = ska::ReservedKeywordsPool{};
+	static auto refCounter = 0;
+    const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
 	auto reader = ska::Script { "main", tokens };
 	parser_test = std::make_unique<ska::StatementParser> ( reservedKeywords );
     table_test = std::make_unique<ska::SymbolTable> (*parser_test);
-    return reader.parse(*parser_test);
+    auto result = reader.parse(*parser_test);
+    ska::Script::clearCache();
+    return result;
 }
 
 TEST_CASE("[ExpressionType]") {

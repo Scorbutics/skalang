@@ -22,9 +22,8 @@ namespace ska {
 
     class Script {
 	public:
-        template<class TokenContainer>
-		Script(const std::string& name, TokenContainer&& input, std::size_t startIndex = 0) {
-            auto handle = std::make_unique<ScriptHandle>(std::forward<TokenContainer>(input), startIndex);
+		Script(const std::string& name, std::vector<Token> input, std::size_t startIndex = 0) {
+            auto handle = std::make_unique<ScriptHandle>(std::move(input), startIndex);
             if(map.find(name) == map.end()) {
                 map.emplace(name, std::move(handle));
             }
@@ -52,6 +51,10 @@ namespace ska {
 		SymbolTable& symbols() {
 			return m_handle->m_symbols;
 		}
+
+        static void clearCache() {
+            map.clear();
+        }
 
 	private:
         ScriptHandle* m_handle = nullptr;

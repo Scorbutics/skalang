@@ -14,8 +14,9 @@ std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, DataTestCon
 	auto reader = ska::Script { "main", tokens };
 	data.parser = std::make_unique<ska::StatementParser> ( reservedKeywords );
 	data.symbols = std::make_unique<ska::SymbolTable>(*data.parser);
-
-    return reader.parse(*data.parser);
+    auto result = reader.parse(*data.parser);
+    ska::Script::clearCache();
+    return result;
 }
 
 TEST_CASE("test") {

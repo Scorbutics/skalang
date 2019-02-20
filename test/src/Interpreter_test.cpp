@@ -31,7 +31,9 @@ void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTest
 
 std::unique_ptr<ska::ASTNode> ASTFromInputSemanticTCInterpreter(const std::string& input, DataTestContainer& data) {
 	ASTFromInputSemanticTCInterpreterNoParse(input, data);
-	return reader->parse(*data.parser);
+	auto result = reader->parse(*data.parser);
+    ska::Script::clearCache();
+    return result;
 }
 
 TEST_CASE("[Interpreter]") {
@@ -232,6 +234,7 @@ TEST_CASE("[Interpreter]") {
 			data.interpreter->script(*astPtr);
 			CHECK(test == 14);
 			CHECK(testStr == "titito");
+            ska::Script::clearCache();
 		}
 	}
 		

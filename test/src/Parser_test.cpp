@@ -53,7 +53,9 @@ std::unique_ptr<ska::ASTNode> ASTFromInput(const std::string& input, const ska::
 	auto tokens = t.tokenize();
 	auto reader = ska::Script { "main", tokens };
 	auto p = ska::StatementParser{ keywords };
-	return reader.parse(p, false);
+	auto result = reader.parse(p, false);
+    ska::Script::clearCache();
+    return result;
 }
 
 TEST_CASE("Block") {
