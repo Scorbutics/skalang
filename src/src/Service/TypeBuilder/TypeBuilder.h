@@ -24,7 +24,7 @@ namespace ska {
 		public SubObserver<BridgeTokenEvent> {
         public:
             TypeBuilder(StatementParser& parser, const SymbolTable& symbolTable);
-            ~TypeBuilder() = default;
+            virtual ~TypeBuilder() = default;
             
         private:
             bool matchVariable(VarTokenEvent& token) const;
