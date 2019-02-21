@@ -1,6 +1,6 @@
 #include "TokenReader.h"
 
-const ska::Token& ska::TokenReader::match(Token t) {
+const ska::Token& ska::TokenReader::match(const Token& t) {
     if (m_lookAhead != nullptr && *m_lookAhead == t) {
         return match(t.type());
     }
@@ -54,7 +54,7 @@ const ska::Token& ska::TokenReader::readPrevious(std::size_t offset) const {
     return m_input[m_lookAheadIndex - offset];
 }
 
-void ska::TokenReader::error(Token* token) {
+void ska::TokenReader::error(const Token* token) {
     throw std::runtime_error("syntax error : bad token matching : expected " + (token == nullptr ? "UNKNOWN_TOKEN" : token->name()) + " but got \"" + (m_lookAhead == nullptr ? "EMPTY_TOKEN (no more lookahead)" : m_lookAhead->name()) + "\"");
 }
 

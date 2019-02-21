@@ -10,9 +10,9 @@ using SymbolTablePtr = std::unique_ptr<ska::SymbolTable>;
 using ParserPtr = std::unique_ptr<ska::StatementParser>;
 
 const auto reservedKeywords = ska::ReservedKeywordsPool{};
-auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
 
-ska::Script ASTFromInputSemanticExpressionType(const std::string& input, ParserPtr& parser_test) {
+
+ska::Script ASTFromInputSemanticExpressionType(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, ParserPtr& parser_test) {
 	static auto refCounter = 0;
     
 	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
@@ -23,9 +23,9 @@ ska::Script ASTFromInputSemanticExpressionType(const std::string& input, ParserP
 }
 
 TEST_CASE("[ExpressionType]") {
-    
     ParserPtr parser_test;
-    auto script = ASTFromInputSemanticExpressionType("{var toto = 2;}", parser_test);
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+    auto script = ASTFromInputSemanticExpressionType(scriptCache, "{var toto = 2;}", parser_test);
 	auto astPtr = script.parse(*parser_test);
 	auto* symbol_test = &script.symbols();
 	auto& table = *script.symbols().nested()[0];

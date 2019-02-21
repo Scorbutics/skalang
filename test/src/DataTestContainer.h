@@ -6,6 +6,7 @@
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/SymbolTableTypeUpdater.h"
+#include "Service/ReservedKeywordsPool.h"
 #include "Interpreter/Interpreter.h"
 
 struct DataTestContainer {
@@ -15,6 +16,7 @@ struct DataTestContainer {
 	using SymbolTableTypeUpdaterPtr = std::unique_ptr<ska::SymbolTableTypeUpdater>;
 	using InterpreterPtr = std::unique_ptr<ska::Interpreter>;
 
+	ska::ReservedKeywordsPool reservedKeywords;
 	InterpreterPtr interpreter;
     ParserPtr parser;
     SemanticTypeCheckerPtr typeChecker;

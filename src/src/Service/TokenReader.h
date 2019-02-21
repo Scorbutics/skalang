@@ -13,7 +13,7 @@ namespace ska {
 			}
         }
 
-		const Token& match(Token t);
+		const Token& match(const Token& t);
 		const Token& match(const TokenType type);
 		bool expect(const Token& token) const;
 		bool expect(const TokenType& type) const;
@@ -24,7 +24,7 @@ namespace ska {
 
     private:
         void nextToken();
-        void error(Token* token = nullptr);
+        void error(const Token* token = nullptr);
 
         const std::vector<ska::Token> m_input;
         std::size_t m_lookAheadIndex {};

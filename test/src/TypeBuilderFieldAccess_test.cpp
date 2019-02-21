@@ -6,8 +6,8 @@
 #include "Service/Script.h"
 
 TEST_CASE("[TypeBuilderFieldAccess]") {
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
 	DataTestContainer data;
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
 	auto script = TypeBuilderTestCommonBuildAST(scriptCache, "var Factory = function() : var { var pdv = 0; return { pdv : pdv }; }; var obj = Factory(); obj.pdv;", data);
 	auto ast = script.parse(*data.parser);
 	auto& symbols = script.symbols();
