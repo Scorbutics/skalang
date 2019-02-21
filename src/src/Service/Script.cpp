@@ -1,8 +1,6 @@
 #include "Script.h"	
 #include "StatementParser.h"
 
-std::unordered_map<std::string, ska::ScriptHandlePtr> ska::Script::map;
-
 const ska::Token& ska::Script::readPrevious(std::size_t offset) const {
 	return m_handle->m_input.readPrevious(offset);
 }
@@ -35,6 +33,9 @@ bool ska::Script::expect(const TokenType& type) const {
 	return m_handle->m_input.expect(type);
 }
 
+ska::ASTNodePtr ska::Script::subParse(StatementParser& parser, const std::string& name, std::ifstream& file) {
+	return parser.subParse(m_cache, name, file);
+}
 
 ska::ASTNodePtr ska::Script::parse(StatementParser& parser, bool listen) {
 	if(!listen) {

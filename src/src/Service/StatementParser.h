@@ -26,7 +26,8 @@ namespace ska {
 	struct ReservedKeywordsPool;
 	class Script;
 	class ExpressionParser;
-	
+	struct ScriptHandle;
+
 	class StatementParser :
 	    public EventDispatcher<
             ForTokenEvent,
@@ -43,9 +44,11 @@ namespace ska {
 
 		using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 		friend class Script;
+		
+		using ScriptHandlePtr = std::unique_ptr<ScriptHandle>;
 	public:
 		StatementParser(const ReservedKeywordsPool& reservedKeywordsPool);
-		ASTNodePtr subParse(const std::string& name, std::ifstream& file);
+		ASTNodePtr subParse(std::unordered_map<std::string, ScriptHandlePtr>& scriptCache, const std::string& name, std::ifstream& file);
 
 	private:
 		ASTNodePtr parse(Script& input);

@@ -9,25 +9,26 @@
 using SymbolTablePtr = std::unique_ptr<ska::SymbolTable>;
 using ParserPtr = std::unique_ptr<ska::StatementParser>;
 
-std::unique_ptr<ska::ASTNode> ASTFromInputSemanticExpressionType(const std::string& input, ParserPtr& parser_test, SymbolTablePtr& table_test) {
+const auto reservedKeywords = ska::ReservedKeywordsPool{};
+auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+
+ska::Script ASTFromInputSemanticExpressionType(const std::string& input, ParserPtr& parser_test) {
 	static auto refCounter = 0;
-    const auto reservedKeywords = ska::ReservedKeywordsPool{};
+    
 	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
-	auto reader = ska::Script { "main", tokens };
+	auto reader = ska::Script { scriptCache, "main", std::move(tokens) };
 	parser_test = std::make_unique<ska::StatementParser> ( reservedKeywords );
-    table_test = std::make_unique<ska::SymbolTable> (*parser_test);
-    auto result = reader.parse(*parser_test);
-    ska::Script::clearCache();
-    return result;
+    return reader;
 }
 
 TEST_CASE("[ExpressionType]") {
     
     ParserPtr parser_test;
-    SymbolTablePtr symbol_test;
-    auto astPtr = ASTFromInputSemanticExpressionType("{var toto = 2;}", parser_test, symbol_test);
-    auto& table = *symbol_test->nested()[0];
+    auto script = ASTFromInputSemanticExpressionType("{var toto = 2;}", parser_test);
+	auto astPtr = script.parse(*parser_test);
+	auto* symbol_test = &script.symbols();
+	auto& table = *script.symbols().nested()[0];
 	auto& nested = table.createNested();
 
 	SUBCASE("Type is set") {

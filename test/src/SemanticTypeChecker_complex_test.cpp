@@ -9,26 +9,27 @@
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/Script.h"
 
-std::unique_ptr<ska::ASTNode> ASTFromInputSemanticComplexTC(const std::string& input, DataTestContainer& data) {
+std::unique_ptr<ska::ASTNode> ASTFromInputSemanticComplexTC(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, DataTestContainer& data) {
 	const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
-	auto reader = ska::Script {"main", tokens };
+	auto reader = ska::Script {scriptCache, "main", tokens };
 	
     data.parser = std::make_unique<ska::StatementParser> ( reservedKeywords );
-    data.symbols = std::make_unique<ska::SymbolTable> (*data.parser);
-    data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, *data.symbols);
-	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, *data.symbols);
-	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, *data.symbols);
+    //data.symbols = std::make_unique<ska::SymbolTable> (*data.parser);
+    data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, reader.symbols());
+	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, reader.symbols());
+	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, reader.symbols());
     auto result = reader.parse(*data.parser);
-    ska::Script::clearCache();
     return result;
 }
 
 TEST_CASE("[SemanticTypeChecker Complex]") {
 	DataTestContainer data;
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+
 	SUBCASE("constructor with function field accessed through variable") {
-		ASTFromInputSemanticComplexTC(
+		ASTFromInputSemanticComplexTC(scriptCache,
 			"var JoueurClass = function(nom:string) : var { "
 				"var attaquer = function(degats:int) {"
 				"};"
@@ -44,7 +45,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 
 
     SUBCASE("constructor with integer field accessed through function call and used in expression") {
-		ASTFromInputSemanticComplexTC(
+		ASTFromInputSemanticComplexTC(scriptCache,
 			"var JoueurClass = function(nom:string) : var { "
 				"var test74 = 123;"
 
@@ -57,7 +58,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	}
 
 	SUBCASE("constructor complex with contained function NOT USING the current type BUT mentioning it...") {
-		ASTFromInputSemanticComplexTC(
+		ASTFromInputSemanticComplexTC(scriptCache,
 		"var JoueurClass = function(nom:string) : var { "
 			"var puissance = 10;"
 
@@ -78,7 +79,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	}
 
 	SUBCASE("class with internal data used in public function") {
-		ASTFromInputSemanticComplexTC(
+		ASTFromInputSemanticComplexTC(scriptCache,
 			"var Stats = function() : var {"
 			"var pointsDeVie = 100;"
 			"var blesser = function(degats:int) {"
@@ -107,7 +108,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	}
 
 	SUBCASE("class with internal data used in public function 2") {
-		ASTFromInputSemanticComplexTC(
+		ASTFromInputSemanticComplexTC(scriptCache,
 			"var Stats = function() : var {"
 			"var pointsDeVie = 100;"
 			"var blesser = function(degats:int) {"
@@ -137,7 +138,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 
 	SUBCASE("after field access, not an lvalue") {
 		try {
-			ASTFromInputSemanticComplexTC(
+			ASTFromInputSemanticComplexTC(scriptCache,
 				"var lvalFunc137 = function() : var {" 
 					"var test137_ = function() : int { return 0; };" 
 					"return { test : test137_};" 
@@ -151,7 +152,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	}
 	
 	SUBCASE("function with 2 return placements (early return support)") {
-		ASTFromInputSemanticComplexTC("var f_semantic151 = function(titi:int) : int { if(titi == 0) { return 1; } return 0; }; var int_semantic151 = f_semantic151(1);", data);
+		ASTFromInputSemanticComplexTC(scriptCache, "var f_semantic151 = function(titi:int) : int { if(titi == 0) { return 1; } return 0; }; var int_semantic151 = f_semantic151(1);", data);
 	}
 
 }

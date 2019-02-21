@@ -9,7 +9,6 @@
 #include "Interpreter/Interpreter.h"
 
 struct DataTestContainer {
-    using SymbolTablePtr = std::unique_ptr<ska::SymbolTable>;
     using ParserPtr = std::unique_ptr<ska::StatementParser>;
     using SemanticTypeCheckerPtr = std::unique_ptr<ska::SemanticTypeChecker>;
     using TypeBuilderPtr = std::unique_ptr<ska::TypeBuilder>;
@@ -19,7 +18,6 @@ struct DataTestContainer {
 	InterpreterPtr interpreter;
     ParserPtr parser;
     SemanticTypeCheckerPtr typeChecker;
-    SymbolTablePtr symbols;
     TypeBuilderPtr typeBuilder;
 	SymbolTableTypeUpdaterPtr symbolsTypeUpdater;
 };

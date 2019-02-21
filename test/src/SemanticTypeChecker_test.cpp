@@ -11,19 +11,22 @@
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/Script.h"
 
+auto readerSTC = std::unique_ptr<ska::Script>{};
+auto scriptCacheSTC = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+
 std::unique_ptr<ska::ASTNode> ASTFromInputSemanticTC(const std::string& input, DataTestContainer& data) {
+	
 	const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
-	auto reader = ska::Script {"main", tokens };
-
+	
+	readerSTC = std::make_unique<ska::Script>(scriptCacheSTC, "main", tokens );
 	data.parser = std::make_unique<ska::StatementParser> ( reservedKeywords );
-    data.symbols = std::make_unique<ska::SymbolTable> (*data.parser);
-    data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, *data.symbols);
-	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, *data.symbols);
-	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, *data.symbols);
-    auto result = reader.parse(*data.parser);
-    ska::Script::clearCache();
+    //data.symbols = std::make_unique<ska::SymbolTable> (*data.parser);
+    data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, readerSTC->symbols());
+	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, readerSTC->symbols());
+	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, readerSTC->symbols());
+    auto result = readerSTC->parse(*data.parser);
     return result;
 }
 

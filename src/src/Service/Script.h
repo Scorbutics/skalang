@@ -9,9 +9,8 @@
 namespace ska {
 	class StatementParser;
 	struct ScriptHandle {
-        template <class TokenContainer>
-            ScriptHandle(TokenContainer&& input, std::size_t startIndex = 0) : 
-                m_input(std::forward<TokenContainer>(input), startIndex) {}
+            ScriptHandle(std::vector<Token> input, std::size_t startIndex = 0) : 
+                m_input(std::move(input), startIndex) {}
 
         TokenReader m_input;
         SymbolTable m_symbols;
@@ -22,12 +21,13 @@ namespace ska {
 
     class Script {
 	public:
-		Script(const std::string& name, std::vector<Token> input, std::size_t startIndex = 0) {
+		Script(std::unordered_map<std::string, ScriptHandlePtr>& scriptCache, const std::string& name, std::vector<Token> input, std::size_t startIndex = 0) :
+			m_cache(scriptCache) {
             auto handle = std::make_unique<ScriptHandle>(std::move(input), startIndex);
-            if(map.find(name) == map.end()) {
-                map.emplace(name, std::move(handle));
+            if(m_cache.find(name) == m_cache.end()) {
+				m_cache.emplace(name, std::move(handle));
             }
-            m_handle = map.at(name).get();
+            m_handle = m_cache.at(name).get();
 		}
 		virtual ~Script() = default;
 	
@@ -48,16 +48,14 @@ namespace ska {
 		ASTNodePtr expr(StatementParser& parser);
 		ASTNodePtr optexpr(StatementParser& parser, const Token& mustNotBe = Token{});
 
+		ASTNodePtr subParse(StatementParser& parser, const std::string& name, std::ifstream& file);
+
 		SymbolTable& symbols() {
 			return m_handle->m_symbols;
 		}
 
-        static void clearCache() {
-            map.clear();
-        }
-
 	private:
         ScriptHandle* m_handle = nullptr;
-        static std::unordered_map<std::string, ScriptHandlePtr> map;
+        std::unordered_map<std::string, ScriptHandlePtr>& m_cache;
 	};
 }

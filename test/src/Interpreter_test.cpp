@@ -14,25 +14,26 @@
 const auto reservedKeywords = ska::ReservedKeywordsPool{};
 auto tokenizer = std::unique_ptr<ska::Tokenizer>{};
 std::vector<ska::Token> tokens;
-auto reader = std::unique_ptr<ska::Script>{};
+auto readerI = std::unique_ptr<ska::Script>{};
+auto scriptCacheI = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
 
 void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTestContainer& data) {
     tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);
     tokens = tokenizer->tokenize();
-    reader = std::make_unique<ska::Script>("main", tokens);
+	scriptCacheI.clear();
+	readerI = std::make_unique<ska::Script>(scriptCacheI, "main", tokens);
     
     data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
-	data.symbols = std::make_unique<ska::SymbolTable>(*data.parser);
-	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, *data.symbols);
-	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, *data.symbols);
-	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, *data.symbols);
-	data.interpreter = std::make_unique<ska::Interpreter>(*data.symbols, reservedKeywords);
+	//data.symbols = std::make_unique<ska::SymbolTable>(*data.parser);
+	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, readerI->symbols());
+	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, readerI->symbols());
+	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, readerI->symbols());
+	data.interpreter = std::make_unique<ska::Interpreter>(readerI->symbols(), reservedKeywords);
 }
 
 std::unique_ptr<ska::ASTNode> ASTFromInputSemanticTCInterpreter(const std::string& input, DataTestContainer& data) {
 	ASTFromInputSemanticTCInterpreterNoParse(input, data);
-	auto result = reader->parse(*data.parser);
-    ska::Script::clearCache();
+	auto result = readerI->parse(*data.parser);
     return result;
 }
 
@@ -225,16 +226,15 @@ TEST_CASE("[Interpreter]") {
 
             std::cout << "function before bind" << std::endl;
 
-			auto binding = ska::Binding{ *data.interpreter, *data.symbols, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
+			auto binding = ska::Binding{ *data.interpreter, readerI->symbols(), *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
 			auto bridge = binding.bindFunction("funcTest", std::move(function));
 			data.interpreter->bind("binding.miniska", std::move(bridge));
             std::cout << "function bound" << std::endl;
 
-            auto astPtr = reader->parse(*data.parser);
+            auto astPtr = readerI->parse(*data.parser);
 			data.interpreter->script(*astPtr);
 			CHECK(test == 14);
 			CHECK(testStr == "titito");
-            ska::Script::clearCache();
 		}
 	}
 		
