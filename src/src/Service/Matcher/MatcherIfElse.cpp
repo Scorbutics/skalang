@@ -34,6 +34,6 @@ ska::ASTNodePtr ska::MatcherIfElse::match(Script& input) {
     }
 
     auto event = IfElseTokenEvent {*ifNode};
-	m_parser.Observable<IfElseTokenEvent>::notifyObservers(event);
+	m_parser.observable_priority_queue<IfElseTokenEvent>::notifyObservers(event);
     return ifNode;
 }

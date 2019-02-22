@@ -29,7 +29,7 @@ ska::ASTNodePtr ska::MatcherImport::matchImport(Script& input) {
 
 	auto bridgeNode = ASTFactory::MakeNode<Operator::BRIDGE>(ASTFactory::MakeLogicalNode(Token{ importClassName, TokenType::STRING }, ASTFactory::MakeEmptyNode()));
 	auto bridgeEvent = BridgeTokenEvent{ *bridgeNode };
-	m_parser.Observable<BridgeTokenEvent>::notifyObservers(bridgeEvent);
+	m_parser.observable_priority_queue<BridgeTokenEvent>::notifyObservers(bridgeEvent);
 
 
 	return bridgeNode->type() != ExpressionType::VOID ? std::move(bridgeNode) : matchNewImport(input, importedVarName, importNodeClass);
@@ -53,7 +53,7 @@ ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& i
 
 	auto nodeBlock = ASTFactory::MakeNode<Operator::BLOCK>();
 	auto startEvent = BlockTokenEvent{ *nodeBlock, BlockTokenEventType::START };
-	m_parser.Observable<BlockTokenEvent>::notifyObservers(startEvent);
+	m_parser.observable_priority_queue<BlockTokenEvent>::notifyObservers(startEvent);
 
 	auto scriptNodeContent = input.subParse(m_parser, importClassName, script);
 	auto exportFields = std::vector<ASTNodePtr>{};
@@ -80,9 +80,9 @@ ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& i
 		ASTFactory::MakeLogicalNode(Token {importClassName, TokenType::STRING}));
 
 	auto importEvent = ImportTokenEvent{ *importNode };
-	m_parser.Observable<ImportTokenEvent>::notifyObservers(importEvent);
+	m_parser.observable_priority_queue<ImportTokenEvent>::notifyObservers(importEvent);
 
 	auto endEvent = BlockTokenEvent{ *importNode, BlockTokenEventType::END };
-	m_parser.Observable<BlockTokenEvent>::notifyObservers(endEvent);
+	m_parser.observable_priority_queue<BlockTokenEvent>::notifyObservers(endEvent);
 	return importNode;
 }

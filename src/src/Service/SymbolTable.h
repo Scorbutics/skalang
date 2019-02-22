@@ -1,5 +1,5 @@
 #pragma once
-#include <Utils/Observer.h>
+#include "Container/sorted_observable.h"
 
 #include "NodeValue/AST.h"
 #include "Event/VarTokenEvent.h"
@@ -16,12 +16,12 @@ namespace ska {
     class StatementParser;
 
 	class SymbolTable :
-        public Observer<VarTokenEvent>,
-       	public Observer<BlockTokenEvent>,
-        public Observer<FunctionTokenEvent>,
-        public Observer<ReturnTokenEvent>, 
-		public Observer<ImportTokenEvent>,
-		public Observer<BridgeTokenEvent> {
+        public PriorityObserver<VarTokenEvent>,
+       	public PriorityObserver<BlockTokenEvent>,
+        public PriorityObserver<FunctionTokenEvent>,
+        public PriorityObserver<ReturnTokenEvent>, 
+		public PriorityObserver<ImportTokenEvent>,
+		public PriorityObserver<BridgeTokenEvent> {
 
         using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 

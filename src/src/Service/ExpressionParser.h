@@ -3,7 +3,6 @@
 #include <memory>
 #include <unordered_map>
 #include <functional>
-#include <Data/Events/EventDispatcher.h>
 
 #include "Container/expression_stack.h"
 #include "NodeValue/ASTNodePtr.h"

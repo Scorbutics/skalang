@@ -35,6 +35,6 @@ ska::ASTNodePtr ska::MatcherFor::match(Script& input) {
     auto forNode = ASTFactory::MakeNode<Operator::FOR_LOOP>(std::move(forNodeFirstExpression), std::move(forNodeMidExpression), std::move(forNodeLastExpression), std::move(forNodeStatement));
     
     auto event = ForTokenEvent {*forNode};
-	m_parser.Observable<ForTokenEvent>::notifyObservers(event);
+	m_parser.observable_priority_queue<ForTokenEvent>::notifyObservers(event);
 	return forNode;
 }

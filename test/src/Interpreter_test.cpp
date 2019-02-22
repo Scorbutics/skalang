@@ -215,7 +215,7 @@ TEST_CASE("[Interpreter]") {
 
 		
          SUBCASE("C++ binding") {
-			ASTFromInputSemanticTCInterpreterNoParse("var User = import \"binding\"; User.funcTest(14, \"titito\");", data);
+			ASTFromInputSemanticTCInterpreterNoParse("var User218 = import \"binding\"; User218.funcTest(14, \"titito\");", data);
 			auto test = 0;
 			auto testStr = std::string{ "" };
 			auto function = std::function<int(int, std::string)>([&](int toto, std::string titi) -> int {

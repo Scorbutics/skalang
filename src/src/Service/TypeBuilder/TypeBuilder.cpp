@@ -11,12 +11,12 @@ SKA_LOGC_CONFIG(LogLevel::Debug, TypeBuilder)
 ska::TypeBuilder::TypeBuilder(StatementParser& parser, const SymbolTable& symbolTable) :
     m_symbols(symbolTable),
 	m_parser(parser),
-    SubObserver<ExpressionTokenEvent>(std::bind(&TypeBuilder::matchExpression, this, std::placeholders::_1), parser),
-	SubObserver<FunctionTokenEvent>(std::bind(&TypeBuilder::matchFunction, this, std::placeholders::_1), parser),
-	SubObserver<VarTokenEvent>(std::bind(&TypeBuilder::matchVariable, this, std::placeholders::_1), parser),
-	SubObserver<ReturnTokenEvent>(std::bind(&TypeBuilder::matchReturn, this, std::placeholders::_1), parser),
-	SubObserver<ArrayTokenEvent>(std::bind(&TypeBuilder::matchArray, this, std::placeholders::_1), parser),
-	SubObserver<BridgeTokenEvent>(std::bind(&TypeBuilder::matchBridge, this, std::placeholders::_1), parser) {
+    subobserver_priority_queue<ExpressionTokenEvent>(std::bind(&TypeBuilder::matchExpression, this, std::placeholders::_1), parser, 60),
+	subobserver_priority_queue<FunctionTokenEvent>(std::bind(&TypeBuilder::matchFunction, this, std::placeholders::_1), parser, 60),
+	subobserver_priority_queue<VarTokenEvent>(std::bind(&TypeBuilder::matchVariable, this, std::placeholders::_1), parser, 60),
+	subobserver_priority_queue<ReturnTokenEvent>(std::bind(&TypeBuilder::matchReturn, this, std::placeholders::_1), parser, 60),
+	subobserver_priority_queue<ArrayTokenEvent>(std::bind(&TypeBuilder::matchArray, this, std::placeholders::_1), parser, 60),
+	subobserver_priority_queue<BridgeTokenEvent>(std::bind(&TypeBuilder::matchBridge, this, std::placeholders::_1), parser, 60) {
 }
 
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {

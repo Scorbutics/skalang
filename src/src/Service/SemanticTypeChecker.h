@@ -1,5 +1,5 @@
 #pragma once
-#include <Utils/SubObserver.h>
+#include "Container/sorted_observable.h"
 
 #include "Event/ExpressionTokenEvent.h"
 #include "NodeValue/ExpressionType.h"
@@ -14,12 +14,12 @@ namespace ska {
     class StatementParser;
 
     class SemanticTypeChecker :
-    public SubObserver<VarTokenEvent>,
-    public SubObserver<FunctionTokenEvent>,
-	public SubObserver<ArrayTokenEvent>,
-    public SubObserver<ReturnTokenEvent>,
-	public SubObserver<IfElseTokenEvent>,
-    public SubObserver<ImportTokenEvent> {
+    public subobserver_priority_queue<VarTokenEvent>,
+    public subobserver_priority_queue<FunctionTokenEvent>,
+	public subobserver_priority_queue<ArrayTokenEvent>,
+    public subobserver_priority_queue<ReturnTokenEvent>,
+	public subobserver_priority_queue<IfElseTokenEvent>,
+    public subobserver_priority_queue<ImportTokenEvent> {
     public:
         SemanticTypeChecker(StatementParser& parser, const SymbolTable& symbols);
         ~SemanticTypeChecker() = default;

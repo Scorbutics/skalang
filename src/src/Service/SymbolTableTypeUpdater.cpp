@@ -8,7 +8,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTableTypeUpdater)
 
 ska::SymbolTableTypeUpdater::SymbolTableTypeUpdater(StatementParser& parser, SymbolTable& symbolTable):
 	m_symbols(symbolTable),
-	SubObserver<VarTokenEvent>(std::bind(&SymbolTableTypeUpdater::matchVariable, this, std::placeholders::_1), parser) {
+	subobserver_priority_queue<VarTokenEvent>(std::bind(&SymbolTableTypeUpdater::matchVariable, this, std::placeholders::_1), parser, 70) {
 }
 
 bool ska::SymbolTableTypeUpdater::matchVariable(const VarTokenEvent& event) {

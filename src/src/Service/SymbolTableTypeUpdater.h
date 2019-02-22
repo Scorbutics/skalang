@@ -1,5 +1,5 @@
 #pragma once
-#include <Utils/SubObserver.h>
+#include "Container/sorted_observable.h"
 
 #include "Event/VarTokenEvent.h"
 
@@ -9,7 +9,7 @@ namespace ska {
 	class StatementParser;
 
 	class SymbolTableTypeUpdater :
-		public SubObserver<VarTokenEvent>{
+		public subobserver_priority_queue<VarTokenEvent> {
 	public:
 		SymbolTableTypeUpdater(StatementParser& parser, SymbolTable& symbolTable);
 		~SymbolTableTypeUpdater() = default;

@@ -20,7 +20,7 @@ ska::ASTNodePtr ska::MatcherBlock::match(Script& input, const std::string& conte
 		
 		auto blockNode = ASTFactory::MakeNode<Operator::BLOCK>();
 		auto startEvent = BlockTokenEvent { *blockNode, BlockTokenEventType::START };
-		m_parser.Observable<BlockTokenEvent>::notifyObservers(startEvent);
+		m_parser.observable_priority_queue<BlockTokenEvent>::notifyObservers(startEvent);
 
         auto blockNodeStatements = std::vector<ASTNodePtr>{};
 		while (!input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
@@ -39,7 +39,7 @@ ska::ASTNodePtr ska::MatcherBlock::match(Script& input, const std::string& conte
 		SLOG(ska::LogLevel::Info) << "block end";
 
 		auto endEvent = BlockTokenEvent { *blockNode, BlockTokenEventType::END };
-		m_parser.Observable<BlockTokenEvent>::notifyObservers(endEvent);
+		m_parser.observable_priority_queue<BlockTokenEvent>::notifyObservers(endEvent);
 		return blockNode;
 	} else if (content == m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>().name()) {
 		throw std::runtime_error("syntax error : Block end token encountered when not expected");

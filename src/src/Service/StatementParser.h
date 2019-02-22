@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
-#include <Data/Events/EventDispatcher.h>
+
+#include "Container/sorted_observable.h"
 
 #include "NodeValue/Token.h"
 #include "Service/ExpressionParser.h"
@@ -29,18 +30,16 @@ namespace ska {
 	struct ScriptHandle;
 
 	class StatementParser :
-	    public EventDispatcher<
-            ForTokenEvent,
-            IfElseTokenEvent,
-            VarTokenEvent,
-	    	FunctionTokenEvent,
-            BlockTokenEvent,
-		    ExpressionTokenEvent,
-            ReturnTokenEvent,
-			ArrayTokenEvent,
-			ImportTokenEvent,
-			BridgeTokenEvent
-	    > {
+	    public observable_priority_queue<ForTokenEvent>,
+        public observable_priority_queue<IfElseTokenEvent>,
+		public observable_priority_queue<VarTokenEvent>,
+		public observable_priority_queue<FunctionTokenEvent>,
+		public observable_priority_queue<BlockTokenEvent>,
+		public observable_priority_queue<ExpressionTokenEvent>,
+		public observable_priority_queue<ReturnTokenEvent>,
+		public observable_priority_queue<ArrayTokenEvent>,
+		public observable_priority_queue<ImportTokenEvent>,
+		public observable_priority_queue<BridgeTokenEvent> {
 
 		using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 		friend class Script;

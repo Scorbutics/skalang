@@ -29,7 +29,7 @@ ska::ASTNodePtr ska::MatcherVar::matchDeclaration(Script& input) {
     auto varNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(varNodeIdentifier), std::move(varNodeExpression));
     
     auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_DECLARATION> (*varNode);
-	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
+	m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 
     return varNode;
 }
@@ -43,6 +43,6 @@ ska::ASTNodePtr ska::MatcherVar::matchAffectation(Script& input, ASTNodePtr varA
 
 	auto affectationNode = ASTFactory::MakeNode<Operator::VARIABLE_AFFECTATION>(std::move(varAffectedNode), std::move(expressionNode));
 	auto event = VarTokenEvent::template Make<VarTokenEventType::AFFECTATION>(*affectationNode);
-	m_parser.Observable<VarTokenEvent>::notifyObservers(event);
+	m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 	return affectationNode;
 }

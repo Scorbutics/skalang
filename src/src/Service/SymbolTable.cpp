@@ -12,9 +12,9 @@ namespace ska::detail::symbol {
 	template <bool remove, class Event>
 	void manageObs(ska::StatementParser& parser, ska::SymbolTable& symbol) {
 		if constexpr (remove) {
-			parser.ska::Observable<Event>::removeObserver(symbol);
+			parser.ska::observable_priority_queue<Event>::removeObserver(symbol);
 		} else {
-			parser.ska::Observable<Event>::addObserver(symbol);
+			parser.ska::observable_priority_queue<Event>::addObserver(symbol);
 		}
 	}
 	
@@ -40,12 +40,12 @@ ska::SymbolTable::SymbolTable(StatementParser& parser) :
 }
 
 ska::SymbolTable::SymbolTable() :
-	Observer<VarTokenEvent>(std::bind(&ska::SymbolTable::match, this, std::placeholders::_1)),
-	Observer<BlockTokenEvent>(std::bind(&ska::SymbolTable::nestedTable, this, std::placeholders::_1)),
-	Observer<FunctionTokenEvent>(std::bind(&ska::SymbolTable::matchFunction, this, std::placeholders::_1)),
-    Observer<ReturnTokenEvent>(std::bind(&ska::SymbolTable::matchReturn, this, std::placeholders::_1)),
-	Observer<ImportTokenEvent>(std::bind(&ska::SymbolTable::matchImport, this, std::placeholders::_1)),
-	Observer<BridgeTokenEvent>(std::bind(&ska::SymbolTable::matchBridge, this, std::placeholders::_1)) {
+	PriorityObserver<VarTokenEvent>(50, std::bind(&ska::SymbolTable::match, this, std::placeholders::_1)),
+	PriorityObserver<BlockTokenEvent>(50, std::bind(&ska::SymbolTable::nestedTable, this, std::placeholders::_1)),
+	PriorityObserver<FunctionTokenEvent>(50, std::bind(&ska::SymbolTable::matchFunction, this, std::placeholders::_1)),
+    PriorityObserver<ReturnTokenEvent>(50, std::bind(&ska::SymbolTable::matchReturn, this, std::placeholders::_1)),
+	PriorityObserver<ImportTokenEvent>(50, std::bind(&ska::SymbolTable::matchImport, this, std::placeholders::_1)),
+	PriorityObserver<BridgeTokenEvent>(50, std::bind(&ska::SymbolTable::matchBridge, this, std::placeholders::_1)) {
 	m_rootTable = std::make_unique<ScopedSymbolTable>();
 	m_currentTable = m_rootTable.get();
 }

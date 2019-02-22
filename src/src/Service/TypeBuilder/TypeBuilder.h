@@ -1,5 +1,6 @@
 #pragma once
-#include <Utils/SubObserver.h>
+#include "Container/sorted_observable.h"
+
 #include "NodeValue/Operator.h"
 #include "NodeValue/ExpressionType.h"
 
@@ -16,12 +17,12 @@ namespace ska {
     class StatementParser;
 
     class TypeBuilder : 
-	    public SubObserver<ExpressionTokenEvent>,
-		public SubObserver<FunctionTokenEvent>,
-		public SubObserver<VarTokenEvent>,
-		public SubObserver<ReturnTokenEvent>,
-		public SubObserver<ArrayTokenEvent>,
-		public SubObserver<BridgeTokenEvent> {
+	    public subobserver_priority_queue<ExpressionTokenEvent>,
+		public subobserver_priority_queue<FunctionTokenEvent>,
+		public subobserver_priority_queue<VarTokenEvent>,
+		public subobserver_priority_queue<ReturnTokenEvent>,
+		public subobserver_priority_queue<ArrayTokenEvent>,
+		public subobserver_priority_queue<BridgeTokenEvent> {
         public:
             TypeBuilder(StatementParser& parser, const SymbolTable& symbolTable);
             virtual ~TypeBuilder() = default;

@@ -16,7 +16,7 @@ ska::ASTNodePtr ska::MatcherReturn::match(Script& input) {
 
     auto returnNode = ASTNodePtr {};
     auto returnStartEvent = ReturnTokenEvent {};
-    m_parser.Observable<ReturnTokenEvent>::notifyObservers(returnStartEvent);
+    m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnStartEvent);
 
     if(input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>())) {
         auto returnFieldNodes = std::vector<ASTNodePtr>{};
@@ -33,7 +33,7 @@ ska::ASTNodePtr ska::MatcherReturn::match(Script& input) {
             auto fieldNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(field), std::move(fieldValue));
 
             auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_DECLARATION> (*fieldNode);
-			m_parser.Observable<VarTokenEvent>::notifyObservers(event);
+			m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 
             returnFieldNodes.push_back(std::move(fieldNode));
             
@@ -46,11 +46,11 @@ ska::ASTNodePtr ska::MatcherReturn::match(Script& input) {
     
         returnNode = ASTFactory::MakeNode<Operator::RETURN>(ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(returnFieldNodes)));
         auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT> (*returnNode);
-		m_parser.Observable<ReturnTokenEvent>::notifyObservers(returnEndEvent);
+		m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnEndEvent);
     } else {
         returnNode = ASTFactory::MakeNode<Operator::RETURN>(input.expr(m_parser));
         auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::BUILTIN> (*returnNode);
-		m_parser.Observable<ReturnTokenEvent>::notifyObservers(returnEndEvent);
+		m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnEndEvent);
     }
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
     
