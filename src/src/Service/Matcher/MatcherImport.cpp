@@ -59,6 +59,9 @@ ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& i
 	auto exportFields = std::vector<ASTNodePtr>{};
 	auto hiddenFields = std::vector<ASTNodePtr>{};
 	auto allFields = std::vector<ASTNodePtr>{};
+	if (scriptNodeContent == nullptr) {
+		throw std::runtime_error("unable to parse script named " + importClassName);
+	}
 	for (auto& node : (*scriptNodeContent)) {
 		if (node->op() == Operator::EXPORT) {
 			exportFields.push_back(ASTFactory::MakeLogicalNode(ska::Token{ (*node)[0].name(), (*node)[0].tokenType() }));
