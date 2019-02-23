@@ -5,12 +5,14 @@
 #include <memory>
 
 #include "Service/TypeBuilder/TypeBuilderOperator.h"
+#include "Service/Script.h"
 
 #include "NodeValue/AST.h"
 #include "NodeValue/OperatorTraits.h"
 #include "NodeValue/Operator.h"
 
 namespace ska {
+	
 	class ASTFactory {
 	
 		template<Operator o>
@@ -51,6 +53,12 @@ namespace ska {
 		template<Operator o>
 		static ASTNodePtr MakeNode(std::vector<ASTNodePtr> children) {
 			return ASTFactory::template MakeNode<o>(Token {}, std::move(children));
+		}
+
+		static ASTNodePtr MakeImportNode(Script s) {
+			auto node = std::unique_ptr<ASTNode>(new ASTNode(std::move(s)));
+			node->m_typeBuilder = std::make_unique<TypeBuilderOperator<Operator::IMPORT>>();
+			return node;
 		}
 
 		template <Operator o>

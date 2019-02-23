@@ -45,8 +45,8 @@ ska::ASTNodePtr ska::MatcherImport::matchExport(Script& input) {
 
 ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& importedVarName, const Token& importNodeClass) {
 	auto importClassName = importNodeClass.name() + ".miniska";
-	auto script = std::ifstream{ importClassName };
-	if (script.fail()) {
+	auto scriptFile = std::ifstream{ importClassName };
+	if (scriptFile.fail()) {
 		//TODO handle bridging
 		throw std::runtime_error("unable to find script named " + importClassName);
 	}
@@ -55,7 +55,8 @@ ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& i
 	auto startEvent = BlockTokenEvent{ *nodeBlock, BlockTokenEventType::START };
 	m_parser.observable_priority_queue<BlockTokenEvent>::notifyObservers(startEvent);
 
-	auto scriptNodeContent = input.subParse(m_parser, importClassName, script);
+	auto script = input.subParse(m_parser, importClassName, scriptFile);
+	auto scriptNodeContent = m_parser.parse(script);
 	auto exportFields = std::vector<ASTNodePtr>{};
 	auto hiddenFields = std::vector<ASTNodePtr>{};
 	auto allFields = std::vector<ASTNodePtr>{};

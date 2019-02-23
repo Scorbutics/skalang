@@ -48,7 +48,7 @@ namespace ska {
 		ASTNodePtr expr(StatementParser& parser);
 		ASTNodePtr optexpr(StatementParser& parser, const Token& mustNotBe = Token{});
 
-		ASTNodePtr subParse(StatementParser& parser, const std::string& name, std::ifstream& file);
+		Script subParse(StatementParser& parser, const std::string& name, std::ifstream& file);
 
 		SymbolTable& symbols() {
 			return m_handle->m_symbols;

@@ -1,10 +1,16 @@
 #include "AST.h"
 #include "Service/ASTFactory.h"
-
+#include "Service/Script.h"
 ska::ASTNode::ASTNode(): 
 	m_type(Type::MakeBuiltIn(ExpressionType::VOID)) {
 
 }
+ska::ASTNode::ASTNode(Script s) :
+	m_op(Operator::IMPORT),
+	m_linkedScript(std::make_unique<Script>(s)) {
+}
+
+ska::ASTNode::ScriptPtr::~ScriptPtr() {}
 
 ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
     m_op(l != nullptr && r != nullptr ? Operator::BINARY : Operator::UNARY),

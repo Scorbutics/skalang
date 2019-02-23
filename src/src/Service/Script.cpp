@@ -33,7 +33,7 @@ bool ska::Script::expect(const TokenType& type) const {
 	return m_handle->m_input.expect(type);
 }
 
-ska::ASTNodePtr ska::Script::subParse(StatementParser& parser, const std::string& name, std::ifstream& file) {
+ska::Script ska::Script::subParse(StatementParser& parser, const std::string& name, std::ifstream& file) {
 	return parser.subParse(m_cache, name, file);
 }
 
