@@ -8,13 +8,13 @@
 #include "Service/Script.h"
 
 auto reader = std::unique_ptr<ska::Script>{};
-std::unique_ptr<ska::ASTNode> ASTFromInput(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, DataTestContainer& data) {
+ska::Script ASTFromInput(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, DataTestContainer& data) {
 	auto tokenizer = ska::Tokenizer { data.reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
 	reader = std::make_unique<ska::Script>(scriptCache, "main", tokens);
 	data.parser = std::make_unique<ska::StatementParser> ( data.reservedKeywords );
-    auto result = reader->parse(*data.parser);
-    return result;
+    reader->parse(*data.parser);
+    return *reader;
 }
 
 TEST_CASE("test") {

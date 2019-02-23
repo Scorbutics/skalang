@@ -29,7 +29,7 @@ ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
     return s;
 }
 
-ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, Script& script) {
+ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, const Script& script) {
 	return emplace(Symbol{ name, script });
 }
 

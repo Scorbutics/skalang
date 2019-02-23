@@ -37,15 +37,17 @@ ska::Script ska::Script::subParse(StatementParser& parser, const std::string& na
 	return parser.subParse(m_cache, name, file);
 }
 
-ska::ASTNodePtr ska::Script::parse(StatementParser& parser, bool listen) {
+void ska::Script::parse(StatementParser& parser, bool listen) {
 	if(!listen) {
-		return parser.parse(*this);
+		m_handle->m_ast = parser.parse(*this);
+		return;
 	}
 
 	m_handle->m_symbols.listenParser(parser);
 	auto result = parser.parse(*this);
 	m_handle->m_symbols.unlistenParser();
-	return result;
+	m_handle->m_ast = std::move(result);
+	return;
 }
 
 ska::ASTNodePtr ska::Script::statement(StatementParser& parser) {

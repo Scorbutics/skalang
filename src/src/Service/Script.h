@@ -40,7 +40,7 @@ namespace ska {
         bool expect(const Token& t);
 		bool expect(const TokenType& type) const;
 
-		ASTNodePtr parse(StatementParser& parser, bool listen = true);
+		void parse(StatementParser& parser, bool listen = true);
 
 		ASTNodePtr statement(StatementParser& parser);
         ASTNodePtr optstatement(StatementParser& parser, const Token& mustNotBe = Token{});
@@ -50,8 +50,11 @@ namespace ska {
 
 		Script subParse(StatementParser& parser, const std::string& name, std::ifstream& file);
 
-		SymbolTable& symbols() {
-			return m_handle->m_symbols;
+		SymbolTable& symbols() { return m_handle->m_symbols; }
+		const SymbolTable& symbols() const { return m_handle->m_symbols; }
+
+		auto& rootNode() {
+			return *m_handle->m_ast;
 		}
 
 	private:

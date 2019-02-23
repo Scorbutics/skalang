@@ -20,12 +20,9 @@ namespace ska {
 			return node[1];
 		}
 		
-		inline auto& GetObjectValueNode() {
+		inline auto& GetScriptNode() {
 			return node[2];
 		}
 
-		inline auto& GetScriptNode() {
-			return node[4];
-		}
 	};
 }

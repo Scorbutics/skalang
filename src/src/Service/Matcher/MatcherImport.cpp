@@ -28,7 +28,7 @@ ska::ASTNodePtr ska::MatcherImport::matchImport(Script& input) {
 	auto importClassName = importNodeClass.name() + ".miniska";
 
 	auto bridgeNode = ASTFactory::MakeNode<Operator::BRIDGE>(ASTFactory::MakeLogicalNode(Token{ importClassName, TokenType::STRING }, ASTFactory::MakeEmptyNode()));
-	auto bridgeEvent = BridgeTokenEvent{ *bridgeNode };
+	auto bridgeEvent = BridgeTokenEvent{ *bridgeNode, input.symbols() };
 	m_parser.observable_priority_queue<BridgeTokenEvent>::notifyObservers(bridgeEvent);
 
 
@@ -44,19 +44,20 @@ ska::ASTNodePtr ska::MatcherImport::matchExport(Script& input) {
 }
 
 ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& importedVarName, const Token& importNodeClass) {
-	auto importClassName = importNodeClass.name() + ".miniska";
-	auto scriptFile = std::ifstream{ importClassName };
+	auto importClassNameFile = importNodeClass.name() + ".miniska";
+	auto scriptFile = std::ifstream{ importClassNameFile };
 	if (scriptFile.fail()) {
 		//TODO handle bridging
-		throw std::runtime_error("unable to find script named " + importClassName);
+		throw std::runtime_error("unable to find script named " + importClassNameFile);
 	}
 
 	auto nodeBlock = ASTFactory::MakeNode<Operator::BLOCK>();
 	auto startEvent = BlockTokenEvent{ *nodeBlock, BlockTokenEventType::START };
 	m_parser.observable_priority_queue<BlockTokenEvent>::notifyObservers(startEvent);
 
-	auto script = input.subParse(m_parser, importClassName, scriptFile);
-	auto scriptNodeContent = m_parser.parse(script);
+	auto script = input.subParse(m_parser, importClassNameFile, scriptFile);
+	//script.parse(m_parser);
+	/*
 	auto exportFields = std::vector<ASTNodePtr>{};
 	auto hiddenFields = std::vector<ASTNodePtr>{};
 	auto allFields = std::vector<ASTNodePtr>{};
@@ -82,7 +83,13 @@ ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& i
 		ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(hiddenFields)),
 		ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(allFields)),
 		ASTFactory::MakeLogicalNode(Token {importClassName, TokenType::STRING}));
+	*/
 
+	auto importNode = ASTFactory::MakeImportNode(
+		script, 
+		ASTFactory::MakeLogicalNode(importedVarName),
+		ASTFactory::MakeLogicalNode(std::move(importNodeClass)),
+		ASTFactory::MakeLogicalNode(Token{ importClassNameFile, TokenType::STRING }));
 	auto importEvent = ImportTokenEvent{ *importNode };
 	m_parser.observable_priority_queue<ImportTokenEvent>::notifyObservers(importEvent);
 

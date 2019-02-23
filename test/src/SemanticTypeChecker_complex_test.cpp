@@ -9,7 +9,7 @@
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/Script.h"
 
-std::unique_ptr<ska::ASTNode> ASTFromInputSemanticComplexTC(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, DataTestContainer& data) {
+ska::Script ASTFromInputSemanticComplexTC(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, DataTestContainer& data) {
 	const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
@@ -17,11 +17,11 @@ std::unique_ptr<ska::ASTNode> ASTFromInputSemanticComplexTC(std::unordered_map<s
 	
     data.parser = std::make_unique<ska::StatementParser> ( reservedKeywords );
     //data.symbols = std::make_unique<ska::SymbolTable> (*data.parser);
-    data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, reader.symbols());
+    data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, reader.symbols());
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, reader.symbols());
-    auto result = reader.parse(*data.parser);
-    return result;
+    reader.parse(*data.parser);
+    return reader;
 }
 
 TEST_CASE("[SemanticTypeChecker Complex]") {

@@ -23,7 +23,7 @@ namespace ska {
 				SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" from table";
             }
 
-            Symbol(std::string name, Script& script) :
+            Symbol(std::string name, const Script& script) :
 				m_name(std::move(name)), 
 				m_data(&script) {
 				SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" from script";
@@ -83,7 +83,7 @@ namespace ska {
             std::size_t size() const;
 
         private:
-			std::variant<ScopedSymbolTable*, Script*> m_data = static_cast<ScopedSymbolTable*>(nullptr);
+			std::variant<ScopedSymbolTable*, const Script*> m_data = static_cast<ScopedSymbolTable*>(nullptr);
             std::string m_name;
             Type m_category;
     };

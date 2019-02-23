@@ -24,7 +24,7 @@ namespace ska {
 		public subobserver_priority_queue<ArrayTokenEvent>,
 		public subobserver_priority_queue<BridgeTokenEvent> {
         public:
-            TypeBuilder(StatementParser& parser, const SymbolTable& symbolTable);
+            TypeBuilder(StatementParser& parser);
             virtual ~TypeBuilder() = default;
             
         private:
@@ -35,7 +35,6 @@ namespace ska {
 			bool matchArray(ArrayTokenEvent& event) const;
 			bool matchBridge(BridgeTokenEvent& event) const;
 
-            const SymbolTable& m_symbols;
 			StatementParser& m_parser;
 
     };

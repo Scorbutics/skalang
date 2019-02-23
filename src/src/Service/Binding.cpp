@@ -55,7 +55,7 @@ void ska::Binding::bindSymbol(const std::string& functionName, std::vector<std::
 	Observable<BlockTokenEvent>::notifyObservers(startEvent);
 
 	auto functionNameNode = ASTFactory::MakeLogicalNode(functionNameToken);
-	auto declarationEvent = FunctionTokenEvent{ *functionNameNode, FunctionTokenEventType::DECLARATION_NAME, functionNameToken.name() };
+	auto declarationEvent = FunctionTokenEvent{ *functionNameNode, FunctionTokenEventType::DECLARATION_NAME, m_observer, functionNameToken.name() };
 	Observable<FunctionTokenEvent>::notifyObservers(declarationEvent);
 
 	auto parameters = std::vector<ASTNodePtr>{};
@@ -70,7 +70,7 @@ void ska::Binding::bindSymbol(const std::string& functionName, std::vector<std::
 			auto parameter = ASTFactory::MakeNode<Operator::PARAMETER_DECLARATION>(
 				Token{ ss.str(), TokenType::IDENTIFIER },
 				ASTFactory::MakeLogicalNode(std::move(t)));
-			auto event = VarTokenEvent::MakeParameter(*parameter, (*parameter)[0]);
+			auto event = VarTokenEvent::MakeParameter(*parameter, (*parameter)[0], m_observer);
 			Observable<VarTokenEvent>::notifyObservers(event);
 			parameters.push_back(std::move(parameter));
 		}
@@ -79,12 +79,12 @@ void ska::Binding::bindSymbol(const std::string& functionName, std::vector<std::
 
 	auto bridgeFunction = ASTFactory::MakeNode<Operator::FUNCTION_PROTOTYPE_DECLARATION>(functionNameToken, std::move(parameters));
 
-	auto functionEvent = VarTokenEvent::MakeFunction(*bridgeFunction);
+	auto functionEvent = VarTokenEvent::MakeFunction(*bridgeFunction, m_observer);
 	Observable<VarTokenEvent>::notifyObservers(functionEvent);
 
 	auto functionDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionNameToken, std::move(bridgeFunction), ASTFactory::MakeNode<Operator::BLOCK>());
 
-	auto statementEvent = FunctionTokenEvent{ *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, functionNameToken.name() };
+	auto statementEvent = FunctionTokenEvent{ *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, m_observer, functionNameToken.name() };
 	Observable<FunctionTokenEvent>::notifyObservers(statementEvent);
 	
 	auto endEvent = BlockTokenEvent{ *functionDeclarationNode, BlockTokenEventType::END };
@@ -118,7 +118,7 @@ void ska::Binding::bindSymbol(const std::string& functionName, std::vector<std::
 
 	auto varNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(Token{ "binding.miniska", TokenType::IDENTIFIER }), std::move(bridgeNode));
 	
-	auto event = VarTokenEvent::Make<VarTokenEventType::VARIABLE_DECLARATION>(*varNode);
+	auto event = VarTokenEvent::Make<VarTokenEventType::VARIABLE_DECLARATION>(*varNode, m_observer);
 	Observable<VarTokenEvent>::notifyObservers(event);
 	
 	m_bridges.push_back(std::move(varNode));

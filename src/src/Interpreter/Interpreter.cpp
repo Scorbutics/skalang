@@ -4,6 +4,7 @@
 
 #include "NodeValue/Operator.h"
 #include "NodeValue/AST.h"
+#include "Service/Script.h"
 
 #include "InterpreterOperatorBinary.h"
 #include "InterpreterOperatorIfElse.h"
@@ -65,8 +66,8 @@ ska::NodeCell ska::Interpreter::interpret(ASTNode& node) {
 	return builder->interpret(node);
 }
 
-ska::NodeValue ska::Interpreter::script(ASTNode& node) {
-	auto value = interpret(node).asRvalue();
+ska::NodeValue ska::Interpreter::script(Script& script) {
+	auto value = interpret(script.rootNode()).asRvalue();
 	m_memory.clear();
 	return value;
 }

@@ -24,7 +24,7 @@ namespace ska {
 
 		ScopedSymbolTable& createNested();
 		Symbol& emplace(std::string name);
-		Symbol& emplace(std::string name, Script& script);
+		Symbol& emplace(std::string name, const Script& script);
 
         void link(Symbol& s) {
             m_parentSymbol = &s;

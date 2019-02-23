@@ -15,7 +15,7 @@ ska::ASTNodePtr ska::MatcherReturn::match(Script& input) {
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::RETURN>());
 
     auto returnNode = ASTNodePtr {};
-    auto returnStartEvent = ReturnTokenEvent {};
+    auto returnStartEvent = ReturnTokenEvent { input.symbols() };
     m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnStartEvent);
 
     if(input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>())) {
@@ -32,7 +32,7 @@ ska::ASTNodePtr ska::MatcherReturn::match(Script& input) {
 
             auto fieldNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(field), std::move(fieldValue));
 
-            auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_DECLARATION> (*fieldNode);
+            auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_DECLARATION> (*fieldNode, input.symbols());
 			m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 
             returnFieldNodes.push_back(std::move(fieldNode));
@@ -45,11 +45,11 @@ ska::ASTNodePtr ska::MatcherReturn::match(Script& input) {
         input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
     
         returnNode = ASTFactory::MakeNode<Operator::RETURN>(ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(returnFieldNodes)));
-        auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT> (*returnNode);
+        auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT> (*returnNode, input.symbols());
 		m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnEndEvent);
     } else {
         returnNode = ASTFactory::MakeNode<Operator::RETURN>(input.expr(m_parser));
-        auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::BUILTIN> (*returnNode);
+        auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::BUILTIN> (*returnNode, input.symbols());
 		m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnEndEvent);
     }
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());

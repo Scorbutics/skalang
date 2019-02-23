@@ -55,8 +55,9 @@ namespace ska {
 			return ASTFactory::template MakeNode<o>(Token {}, std::move(children));
 		}
 
-		static ASTNodePtr MakeImportNode(Script s) {
-			auto node = std::unique_ptr<ASTNode>(new ASTNode(std::move(s)));
+		template<class ... Node>
+		static ASTNodePtr MakeImportNode(Script s, std::unique_ptr<Node>&& ... children) {
+			auto node = std::unique_ptr<ASTNode>(new ASTNode(std::move(s), ASTFactory::template BuildVectorFromNodePack(std::move(children)...)));
 			node->m_typeBuilder = std::make_unique<TypeBuilderOperator<Operator::IMPORT>>();
 			return node;
 		}

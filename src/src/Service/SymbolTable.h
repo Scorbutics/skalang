@@ -69,10 +69,6 @@ namespace ska {
 		bool matchImport(const ImportTokenEvent&);
 		bool matchBridge(const BridgeTokenEvent&);
 
-		bool erase(const std::string& name) {
-			return m_currentTable->erase(name);
-		}
-
 		StatementParser* m_parser = nullptr;
         std::unique_ptr<ScopedSymbolTable> m_rootTable;
 		ScopedSymbolTable* m_currentTable = nullptr;

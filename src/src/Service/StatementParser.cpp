@@ -126,6 +126,7 @@ ska::Script ska::StatementParser::subParse(std::unordered_map<std::string, ska::
 	auto tokenizer = Tokenizer{ m_reservedKeywordsPool, std::move(content)};
 	auto tokens = tokenizer.tokenize();
 	auto script = Script { scriptCache, name, tokens };
+	script.parse(*this);
 	return script;
 }
 

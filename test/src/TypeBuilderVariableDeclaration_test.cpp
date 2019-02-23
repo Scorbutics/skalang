@@ -13,7 +13,7 @@ TEST_CASE("[TypeBuilderVariableDeclaration]") {
 	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr> {};
 	DataTestContainer data;
 	auto script = TypeBuilderTestCommonBuildAST(scriptCache, "", data, false);
-	auto ast = script.parse(*data.parser);
+	script.parse(*data.parser);
 	auto& symbols = script.symbols();
 	auto typeBuilder = ska::TypeBuilderOperator<ska::Operator::VARIABLE_DECLARATION>{};
 	

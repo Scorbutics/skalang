@@ -4,9 +4,10 @@
 
 namespace ska {
 	class ASTNode;
+	class SymbolTable;
 	class BridgeTokenEvent {
 	public:
-		BridgeTokenEvent(ASTNode& node) : m_node(node) { assert(m_node.op() == Operator::BRIDGE); }
+		BridgeTokenEvent(ASTNode& node, SymbolTable& s) : m_node(node), m_symbolTable(s) { assert(m_node.op() == Operator::BRIDGE); }
 
 		auto& rootNode() {
 			return m_node;
@@ -16,7 +17,12 @@ namespace ska {
 			return m_node;
 		}
 
+		SymbolTable& symbolTable() {
+			return m_symbolTable;
+		}
+
 	private:
 		ASTNode& m_node;
+		SymbolTable& m_symbolTable;
 	};
 }

@@ -26,7 +26,7 @@ TEST_CASE("[ExpressionType]") {
     ParserPtr parser_test;
 	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
     auto script = ASTFromInputSemanticExpressionType(scriptCache, "{var toto = 2;}", parser_test);
-	auto astPtr = script.parse(*parser_test);
+	script.parse(*parser_test);
 	auto* symbol_test = &script.symbols();
 	auto& table = *script.symbols().nested()[0];
 	auto& nested = table.createNested();

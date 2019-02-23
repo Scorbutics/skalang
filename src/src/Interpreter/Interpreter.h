@@ -9,6 +9,8 @@
 
 namespace ska {
     struct ReservedKeywordsPool;
+	class Script;
+
 	class Interpreter {
 		using OperatorInterpreter = std::vector<std::unique_ptr<InterpreterOperatorUnit>>;
 	public:
@@ -17,7 +19,7 @@ namespace ska {
 
 		OperatorInterpreter build();
 		NodeCell interpret(ASTNode& node);
-		NodeValue script(ASTNode& node);
+		NodeValue script(Script& script);
 
 		void bind(const std::string& functionName, BridgeFunctionPtr bridge) {
 			m_memory.emplace(functionName, NodeValue{ std::move(bridge) });

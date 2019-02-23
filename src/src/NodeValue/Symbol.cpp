@@ -23,7 +23,7 @@ const ska::Symbol* ska::Symbol::operator[](const std::string& fieldSymbolName) c
 		return nullptr;
 	}
 
-	auto* script = std::get<Script*>(m_data);
+	auto* script = std::get<const Script*>(m_data);
 	assert(script != nullptr);
 	const auto* result = script->symbols()[fieldSymbolName];
 	if(result != nullptr) {

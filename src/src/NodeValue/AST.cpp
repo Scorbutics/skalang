@@ -5,9 +5,17 @@ ska::ASTNode::ASTNode():
 	m_type(Type::MakeBuiltIn(ExpressionType::VOID)) {
 
 }
-ska::ASTNode::ASTNode(Script s) :
+ska::ASTNode::ASTNode(Script s, std::vector<ASTNodePtr> children) :
 	m_op(Operator::IMPORT),
 	m_linkedScript(std::make_unique<Script>(s)) {
+	if (!children.empty()) {
+		m_children.reserve(children.size());
+		for (auto& child : children) {
+			if (child != nullptr) {
+				m_children.push_back(std::move(child));
+			}
+		}
+	}
 }
 
 ska::ASTNode::ScriptPtr::~ScriptPtr() {}

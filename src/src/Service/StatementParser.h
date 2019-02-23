@@ -48,9 +48,10 @@ namespace ska {
 	public:
 		StatementParser(const ReservedKeywordsPool& reservedKeywordsPool);
 		Script subParse(std::unordered_map<std::string, ScriptHandlePtr>& scriptCache, const std::string& name, std::ifstream& file);
-		ASTNodePtr parse(Script& input);
 
 	private:
+		ASTNodePtr parse(Script& input);
+
 		ASTNodePtr statement(Script& input);
         ASTNodePtr optstatement(Script& input, const Token& mustNotBe = Token{});
 

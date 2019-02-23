@@ -78,15 +78,15 @@ namespace ska {
 			return m_type;
 		}
 
-		auto& script() { return m_linkedScript; }
-		const auto& script() const { return m_linkedScript;	}
+		auto& script() { assert(m_linkedScript != nullptr);  return *m_linkedScript; }
+		const auto& script() const { assert(m_linkedScript != nullptr); return *m_linkedScript;	}
 
 	private:
 		friend class ASTFactory;
 		ASTNode();
         
         explicit ASTNode(Token t, ASTNodePtr l = nullptr, ASTNodePtr r = nullptr);
-		explicit ASTNode(Script s);
+		explicit ASTNode(Script s, std::vector<ASTNodePtr> children);
 
         ASTNode(Operator o, Token identifierToken = Token{}, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{});
         ASTNode(Operator o, Token identifierToken = Token{});

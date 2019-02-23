@@ -10,7 +10,7 @@ TEST_CASE("[TypeBuilderBinary]") {
 	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
 	DataTestContainer data;
 	auto script = TypeBuilderTestCommonBuildAST(scriptCache, "", data, false);
-	auto ast = script.parse(*data.parser);
+	script.parse(*data.parser);
 	auto typeBuilder = ska::TypeBuilderOperator<ska::Operator::BINARY>{};
 	
 	auto value1Node = ska::ASTFactory::MakeLogicalNode(ska::Token{"1", ska::TokenType::DIGIT});
