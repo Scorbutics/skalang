@@ -25,8 +25,8 @@ void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTest
     
     data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser);
-	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, readerI->symbols());
-	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, readerI->symbols());
+	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser);
+	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser);
 	data.interpreter = std::make_unique<ska::Interpreter>(readerI->symbols(), reservedKeywords);
 }
 

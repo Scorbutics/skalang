@@ -90,7 +90,7 @@ ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& i
 		ASTFactory::MakeLogicalNode(importedVarName),
 		ASTFactory::MakeLogicalNode(std::move(importNodeClass)),
 		ASTFactory::MakeLogicalNode(Token{ importClassNameFile, TokenType::STRING }));
-	auto importEvent = ImportTokenEvent{ *importNode };
+	auto importEvent = ImportTokenEvent{ *importNode, input.symbols() };
 	m_parser.observable_priority_queue<ImportTokenEvent>::notifyObservers(importEvent);
 
 	auto endEvent = BlockTokenEvent{ *importNode, BlockTokenEventType::END };

@@ -11,14 +11,12 @@ namespace ska {
 	class SymbolTableTypeUpdater :
 		public subobserver_priority_queue<VarTokenEvent> {
 	public:
-		SymbolTableTypeUpdater(StatementParser& parser, SymbolTable& symbolTable);
+		SymbolTableTypeUpdater(StatementParser& parser);
 		~SymbolTableTypeUpdater() = default;
 
 	private:
-		bool matchVariable(const VarTokenEvent& token);
+		bool matchVariable(VarTokenEvent& token);
 
-		void updateType(const ASTNode& node);
-		
-        SymbolTable& m_symbols;
+		void updateType(const ASTNode& node, SymbolTable& s);
 	};
 }

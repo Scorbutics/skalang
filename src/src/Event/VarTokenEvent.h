@@ -60,6 +60,10 @@ namespace ska {
 			return m_symbolTable;
 		}
 
+		const SymbolTable& symbolTable() const {
+			return m_symbolTable;
+		}
+
 		const std::optional<Type>& varType() const;
 		std::string value() const;
 		std::string name() const;

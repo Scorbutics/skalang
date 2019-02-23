@@ -21,10 +21,9 @@ ska::Script ASTFromInputSemanticTC(std::unordered_map<std::string, ska::ScriptHa
 	
 	readerSTC = std::make_unique<ska::Script>(scriptCache, "main", tokens );
 	data.parser = std::make_unique<ska::StatementParser> ( data.reservedKeywords );
-    //data.symbols = std::make_unique<ska::SymbolTable> (*data.parser);
     data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser);
-	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser, readerSTC->symbols());
-	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, readerSTC->symbols());
+	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser);
+	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser);
     readerSTC->parse(*data.parser);
     return *readerSTC;
 }

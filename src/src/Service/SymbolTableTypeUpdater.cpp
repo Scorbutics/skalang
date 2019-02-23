@@ -6,12 +6,11 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTableTypeUpdater)
 
-ska::SymbolTableTypeUpdater::SymbolTableTypeUpdater(StatementParser& parser, SymbolTable& symbolTable):
-	m_symbols(symbolTable),
+ska::SymbolTableTypeUpdater::SymbolTableTypeUpdater(StatementParser& parser):
 	subobserver_priority_queue<VarTokenEvent>(std::bind(&SymbolTableTypeUpdater::matchVariable, this, std::placeholders::_1), parser, 70) {
 }
 
-bool ska::SymbolTableTypeUpdater::matchVariable(const VarTokenEvent& event) {
+bool ska::SymbolTableTypeUpdater::matchVariable(VarTokenEvent& event) {
 	switch (event.type()) {
 		case VarTokenEventType::AFFECTATION:
 		case VarTokenEventType::USE:
@@ -19,7 +18,7 @@ bool ska::SymbolTableTypeUpdater::matchVariable(const VarTokenEvent& event) {
 		case VarTokenEventType::FUNCTION_DECLARATION:
 		case VarTokenEventType::PARAMETER_DECLARATION:
 		case VarTokenEventType::VARIABLE_DECLARATION:
-			updateType(event.rootNode());
+			updateType(event.rootNode(), event.symbolTable());
 		break;
 		
 		default:
@@ -29,12 +28,12 @@ bool ska::SymbolTableTypeUpdater::matchVariable(const VarTokenEvent& event) {
 	return true;
 }
 
-void ska::SymbolTableTypeUpdater::updateType(const ASTNode& node) {
+void ska::SymbolTableTypeUpdater::updateType(const ASTNode& node, SymbolTable& symbols) {
 	assert(OperatorTraits::isNamed(node.op()));
 		
 	const auto& type = node.type();
 	assert(type.has_value() && !node.name().empty());
-	auto* symbol = m_symbols[node.name()];	
+	auto* symbol = symbols[node.name()];	
 	if (symbol != nullptr) {
 		if (symbol->getType() != type.value()) {
 			symbol->forceType(type.value());

@@ -21,7 +21,7 @@ namespace ska {
 	public subobserver_priority_queue<IfElseTokenEvent>,
     public subobserver_priority_queue<ImportTokenEvent> {
     public:
-        SemanticTypeChecker(StatementParser& parser, const SymbolTable& symbols);
+        SemanticTypeChecker(StatementParser& parser);
         ~SemanticTypeChecker() = default;
     private:
 		static bool childrenHasReturnOnAllControlPath(const ASTNode& node);
@@ -33,8 +33,6 @@ namespace ska {
         bool matchReturn(const ReturnTokenEvent& token);
 		bool matchIfElse(const IfElseTokenEvent& token);
         bool matchImport(const ImportTokenEvent& token);
-        
-        const SymbolTable& m_symbols;
     };
 
 }
