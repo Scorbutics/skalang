@@ -7,6 +7,7 @@
 #include "ASTNodePtr.h"
 #include "Operator.h"
 #include "ExpressionType.h"
+#include "Service/ScriptPtr.h"
 #include "Interpreter/MemoryTable.h"
 #include "Interpreter/NodeValue.h"
 
@@ -18,7 +19,6 @@ namespace ska {
     class SymbolTable;
 	class StatementParser;
 	class ASTFactory;
-	class Script;
 
 	class ASTNode {
 	public:
@@ -86,7 +86,7 @@ namespace ska {
 		ASTNode();
         
         explicit ASTNode(Token t, ASTNodePtr l = nullptr, ASTNodePtr r = nullptr);
-		explicit ASTNode(Script s, std::vector<ASTNodePtr> children);
+		explicit ASTNode(ScriptPtr s, std::vector<ASTNodePtr> children);
 
         ASTNode(Operator o, Token identifierToken = Token{}, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{});
         ASTNode(Operator o, Token identifierToken = Token{});
@@ -101,10 +101,7 @@ namespace ska {
 		Token token;
 		std::vector<ASTNodePtr> m_children;
 
-		struct ScriptPtr : std::unique_ptr<Script> {
-			using std::unique_ptr<Script>::unique_ptr;
-			~ScriptPtr(); // Implement (empty body) elsewhere
-		} m_linkedScript;
+		ScriptPtr m_linkedScript;
 
 		friend std::ostream& operator<<(std::ostream& stream, const ASTNode& node);
 	};

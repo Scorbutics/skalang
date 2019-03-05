@@ -117,7 +117,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::optexpr(Script& input, co
 	return node != nullptr ? std::move(node) : ASTFactory::MakeEmptyNode();
 }
 
-ska::Script ska::StatementParser::subParse(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& name, std::ifstream& file) {
+ska::ScriptPtr ska::StatementParser::subParse(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& name, std::ifstream& file) {
 	auto content = std::string (
 		(std::istreambuf_iterator<char>(file)),
 		(std::istreambuf_iterator<char>()) 
@@ -125,8 +125,8 @@ ska::Script ska::StatementParser::subParse(std::unordered_map<std::string, ska::
 
 	auto tokenizer = Tokenizer{ m_reservedKeywordsPool, std::move(content)};
 	auto tokens = tokenizer.tokenize();
-	auto script = Script { scriptCache, name, tokens };
-	script.parse(*this);
+	auto script = ScriptPtr{std::make_unique<Script>( scriptCache, name, tokens )};
+	script->parse(*this);
 	return script;
 }
 

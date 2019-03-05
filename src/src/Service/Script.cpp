@@ -1,4 +1,4 @@
-#include "Script.h"	
+#include "Script.h"
 #include "StatementParser.h"
 
 const ska::Token& ska::Script::readPrevious(std::size_t offset) const {
@@ -33,7 +33,7 @@ bool ska::Script::expect(const TokenType& type) const {
 	return m_handle->m_input.expect(type);
 }
 
-ska::Script ska::Script::subParse(StatementParser& parser, const std::string& name, std::ifstream& file) {
+ska::ScriptPtr ska::Script::subParse(StatementParser& parser, const std::string& name, std::ifstream& file) {
 	return parser.subParse(m_cache, name, file);
 }
 

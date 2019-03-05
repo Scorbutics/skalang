@@ -23,6 +23,8 @@
 #include "Matcher/MatcherVar.h"
 #include "Matcher/MatcherReturn.h"
 
+#include "ScriptPtr.h"
+
 namespace ska {
 	struct ReservedKeywordsPool;
 	class Script;
@@ -47,7 +49,7 @@ namespace ska {
 		using ScriptHandlePtr = std::unique_ptr<ScriptHandle>;
 	public:
 		StatementParser(const ReservedKeywordsPool& reservedKeywordsPool);
-		Script subParse(std::unordered_map<std::string, ScriptHandlePtr>& scriptCache, const std::string& name, std::ifstream& file);
+		ScriptPtr subParse(std::unordered_map<std::string, ScriptHandlePtr>& scriptCache, const std::string& name, std::ifstream& file);
 
 	private:
 		ASTNodePtr parse(Script& input);

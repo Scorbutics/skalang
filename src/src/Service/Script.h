@@ -1,6 +1,7 @@
 #pragma once
 #include <memory>
 #include <unordered_map>
+#include "ScriptPtr.h"
 #include "NodeValue/ASTNodePtr.h"
 #include "Service/SymbolTable.h"
 #include "Service/TokenReader.h"
@@ -48,7 +49,7 @@ namespace ska {
 		ASTNodePtr expr(StatementParser& parser);
 		ASTNodePtr optexpr(StatementParser& parser, const Token& mustNotBe = Token{});
 
-		Script subParse(StatementParser& parser, const std::string& name, std::ifstream& file);
+		ScriptPtr subParse(StatementParser& parser, const std::string& name, std::ifstream& file);
 
 		SymbolTable& symbols() { return m_handle->m_symbols; }
 		const SymbolTable& symbols() const { return m_handle->m_symbols; }
@@ -60,5 +61,7 @@ namespace ska {
 	private:
         ScriptHandle* m_handle = nullptr;
         std::unordered_map<std::string, ScriptHandlePtr>& m_cache;
+
 	};
+
 }

@@ -5,9 +5,9 @@ ska::ASTNode::ASTNode():
 	m_type(Type::MakeBuiltIn(ExpressionType::VOID)) {
 
 }
-ska::ASTNode::ASTNode(Script s, std::vector<ASTNodePtr> children) :
+ska::ASTNode::ASTNode(ScriptPtr s, std::vector<ASTNodePtr> children) :
 	m_op(Operator::IMPORT),
-	m_linkedScript(std::make_unique<Script>(s)) {
+	m_linkedScript(std::move(s)) {
 	if (!children.empty()) {
 		m_children.reserve(children.size());
 		for (auto& child : children) {
@@ -17,8 +17,6 @@ ska::ASTNode::ASTNode(Script s, std::vector<ASTNodePtr> children) :
 		}
 	}
 }
-
-ska::ASTNode::ScriptPtr::~ScriptPtr() {}
 
 ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
     m_op(l != nullptr && r != nullptr ? Operator::BINARY : Operator::UNARY),

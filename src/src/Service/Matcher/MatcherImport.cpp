@@ -86,7 +86,7 @@ ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& i
 	*/
 
 	auto importNode = ASTFactory::MakeImportNode(
-		script, 
+		std::move(script), 
 		ASTFactory::MakeLogicalNode(importedVarName),
 		ASTFactory::MakeLogicalNode(std::move(importNodeClass)),
 		ASTFactory::MakeLogicalNode(Token{ importClassNameFile, TokenType::STRING }));
