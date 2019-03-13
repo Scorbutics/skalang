@@ -17,7 +17,9 @@ namespace ska {
     template <class T>
     class PriorityObserver : public Observer<T> {
         friend struct ObserverComparatorPriorityLess;
-
+        template <class T, std::size_t ArraySize, class Compare>
+        friend class unique_buffered_priority_indexed_fixed_queue;
+        
     protected:
         template <class ...Args>
         PriorityObserver(int p, Args&& ... args) : Observer<T>::Observer(std::forward<Args>(args)...), priority(p) {}
