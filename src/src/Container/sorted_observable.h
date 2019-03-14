@@ -1,24 +1,20 @@
 #pragma once
 #include <Utils/Observable.h>
 #include <Utils/SubObserver.h>
-#include "iterable_priority_queue.h"
+#include "unique_buffered_priority_indexed_fixed_queue.h"
 
 namespace ska {
-    struct ObserverComparatorPriorityLess {
-        template<class Observer>
-        bool operator()(const Observer& left, const Observer& right) const {
-            if(left->priority == right->priority) {
-                return 0;
-            }
-            return left->priority < right->priority;
-        }
-    };
+
+	struct PriorityObserverGetter {
+		template<class T>
+		std::size_t operator()(const T& value) const {
+			return value->priority;
+		}
+	};
 
     template <class T>
     class PriorityObserver : public Observer<T> {
-        friend struct ObserverComparatorPriorityLess;
-        template <class T, std::size_t ArraySize, class Compare>
-        friend class unique_buffered_priority_indexed_fixed_queue;
+		friend struct PriorityObserverGetter;
         
     protected:
         template <class ...Args>
@@ -29,7 +25,7 @@ namespace ska {
     };
 
     template <class T>
-    using priority_queue_for_observer = iterable_priority_queue<T, std::vector<T>, ObserverComparatorPriorityLess>;
+    using priority_queue_for_observer = unique_buffered_priority_indexed_fixed_queue<T, 10, PriorityObserverGetter>;
 
     template <class T>
     using observable_priority_queue = Observable<T, priority_queue_for_observer, PriorityObserver>;

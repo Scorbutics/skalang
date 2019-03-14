@@ -44,3 +44,15 @@ TEST_CASE("[unique_buffered_priority_indexed_fixed_queue]") {
 	container.remove({ 123, 0 });
 	AssertContainValues<Queue, 10, -1>(container);
 }
+
+TEST_CASE("[unique_buffered_priority_indexed_fixed_queue] not starting in index 0") {
+	using Queue = ska::unique_buffered_priority_indexed_fixed_queue<PriorityValue<int>, 3>;
+	auto container = Queue{};
+
+	container.push({ -1, 2 });
+	AssertContainValues<Queue, -1>(container);
+
+	container.push({ 7, 1 });
+	AssertContainValues<Queue,  7, -1>(container);
+
+}

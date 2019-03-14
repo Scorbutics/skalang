@@ -8,32 +8,32 @@
 namespace ska {
 	template <typename T, std::size_t ArraySize, class Container = std::array<std::optional<T>, ArraySize>>
 	class unique_buffered_priority_indexed_fixed_queue_iterator {
-		Container& buf;
+		Container* buf {};
 		std::size_t off;
 
 		void safe_next_element() {
-			while (off < ArraySize && !buf[off].has_value()) { ++off; }
+			while (off < ArraySize && !(*buf)[off].has_value()) { ++off; }
 			keep_safe();
 		}
 
 		void safe_previous_element() {
-			while (off > 0 && !buf[off].has_value()) { --off; }
+			while (off > 0 && !(*buf)[off].has_value()) { --off; }
 			keep_safe();
 		}
 
 		void keep_safe() {
-			if ( off < 0 || off >= ArraySize || !buf[off].has_value()) {
+			if ( off < 0 || off >= ArraySize || !(*buf)[off].has_value()) {
 				off = ArraySize;
 			}
 		}
 
 	public:
 		unique_buffered_priority_indexed_fixed_queue_iterator(Container& buf, std::size_t offset)
-			: buf(buf), off(offset) {
-			keep_safe();
+			: buf(&buf), off(offset) {
+			safe_next_element();
 		}
 		bool operator==(const unique_buffered_priority_indexed_fixed_queue_iterator& i) {
-			return &i.buf == &buf && i.off == off;
+			return i.buf == buf && i.off == off;
 		}
 		bool operator!=(const unique_buffered_priority_indexed_fixed_queue_iterator& i) {
 			return !(*this == i);
@@ -46,17 +46,24 @@ namespace ska {
 		bool operator<=(unique_buffered_priority_indexed_fixed_queue_iterator const& sibling) const { return off <= sibling.off; }
 		bool operator>(unique_buffered_priority_indexed_fixed_queue_iterator const& sibling) const { return off > sibling.off; }
 		bool operator>=(unique_buffered_priority_indexed_fixed_queue_iterator const& sibling) const { return off >= sibling.off; }
-		auto& operator*() const { return buf[off].value(); }
+		auto& operator*() const { return (*buf)[off].value(); }
 	};
 
-	template <class T, std::size_t ArraySize, class Compare = std::less<T> >
+	struct PropertyPriorityGetter {
+		template<class T>
+		std::size_t operator()(const T& value) const {
+			return value.priority;
+		}
+	};
+
+	template <class T, std::size_t ArraySize, class PriorityGetter = PropertyPriorityGetter>
 	class unique_buffered_priority_indexed_fixed_queue {
 		using BufferArrayContainer = std::array<std::vector<T>, ArraySize>;
 		using ArrayContainer = std::array<std::optional<T>, ArraySize>;
 	protected:
 		ArrayContainer front_container;
 		BufferArrayContainer buffer;
-		Compare comp;
+		PriorityGetter priorityGetter;
 		std::size_t counter = 0;
 	public:
 		using iterator = unique_buffered_priority_indexed_fixed_queue_iterator<T, ArraySize>;
@@ -71,14 +78,14 @@ namespace ska {
 		const T& top()     const { assert(counter > 0); return front_container[counter - 1].value(); }
 
 		void push(T x) {
-			assert(x.priority < ArraySize && x.priority >= 0);
-			auto & cell = front_container[x.priority];
+			const auto priority = priorityGetter(x);
+			assert(priority < ArraySize && priority >= 0);
+			auto & cell = front_container[priority];
 			if (cell.has_value()) {
 				auto newValue = std::move(cell.value());
 				cell = std::move(x);
-				buffer[x.priority].push_back(std::move(newValue));
-			}
-			else {
+				buffer[priority].push_back(std::move(newValue));
+			} else {
 				cell = std::move(x);
 				counter++;
 			}
@@ -91,15 +98,15 @@ namespace ska {
 		}
 
 		void remove(const T& x) {
-			if (x.priority == counter - 1) {
+			const auto priority = priorityGetter(x);
+			if (priority == counter - 1) {
 				pop();
-			}
-			else {
-				remove_from_index(x.priority);
+			} else {
+				remove_from_index(priority);
 			}
 		}
 
-		void erase(const decltype(front_container.begin())& it) {
+		void erase(iterator it) {
 			remove(*it);
 		}
 

@@ -15,12 +15,12 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SemanticTypeChecker)
 
 ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser) :
-    subobserver_priority_queue<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser, 100),
-    subobserver_priority_queue<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser, 100),
-	subobserver_priority_queue<ArrayTokenEvent>(std::bind(&SemanticTypeChecker::matchArray, this, std::placeholders::_1), parser, 100),
-    subobserver_priority_queue<ReturnTokenEvent>(std::bind(&SemanticTypeChecker::matchReturn, this, std::placeholders::_1), parser, 100),
-	subobserver_priority_queue<IfElseTokenEvent>(std::bind(&SemanticTypeChecker::matchIfElse, this, std::placeholders::_1), parser, 100),
-	subobserver_priority_queue<ImportTokenEvent>(std::bind(&SemanticTypeChecker::matchImport, this, std::placeholders::_1), parser, 100) {
+    subobserver_priority_queue<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser, 9),
+    subobserver_priority_queue<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser, 9),
+	subobserver_priority_queue<ArrayTokenEvent>(std::bind(&SemanticTypeChecker::matchArray, this, std::placeholders::_1), parser, 9),
+    subobserver_priority_queue<ReturnTokenEvent>(std::bind(&SemanticTypeChecker::matchReturn, this, std::placeholders::_1), parser, 9),
+	subobserver_priority_queue<IfElseTokenEvent>(std::bind(&SemanticTypeChecker::matchIfElse, this, std::placeholders::_1), parser, 9),
+	subobserver_priority_queue<ImportTokenEvent>(std::bind(&SemanticTypeChecker::matchImport, this, std::placeholders::_1), parser, 9) {
 }
 
 bool ska::SemanticTypeChecker::statementHasReturnOnAllControlPath(const ASTNode& node) {	
