@@ -27,7 +27,7 @@ void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTest
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser);
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser);
-	data.interpreter = std::make_unique<ska::Interpreter>(readerI->symbols(), reservedKeywords);
+	data.interpreter = std::make_unique<ska::Interpreter>(reservedKeywords);
 }
 
 ska::Script ASTFromInputSemanticTCInterpreter(const std::string& input, DataTestContainer& data) {
@@ -227,7 +227,7 @@ TEST_CASE("[Interpreter]") {
 
 			auto binding = ska::Binding{ *data.interpreter, readerI->symbols(), *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
 			auto bridge = binding.bindFunction("funcTest", std::move(function));
-			data.interpreter->bind("binding.miniska", std::move(bridge));
+			data.interpreter->bind(*readerI, "binding.miniska", std::move(bridge));
             std::cout << "function bound" << std::endl;
 
             readerI->parse(*data.parser);

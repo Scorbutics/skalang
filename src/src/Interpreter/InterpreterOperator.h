@@ -3,6 +3,7 @@
 #include "NodeValue/Operator.h"
 #include "Interpreter.h"
 #include "InterpreterOperatorUnit.h"
+#include "ExecutionContext.h"
 
 #define SKALANG_INTERPRETER_OPERATOR_DEFINE(OperatorType)\
     template<>\
@@ -12,7 +13,7 @@
 		using OperateOn = Operation<OperatorType>;\
 	public:\
 		using InterpreterOperatorBase::InterpreterOperatorBase;\
-        NodeCell interpret(ASTNode& node) override final {\
+        NodeCell interpret(ExecutionContext& node) override final {\
 			return interpret(OperateOn{node});\
 		}\
 		NodeCell interpret(OperateOn node);\
@@ -27,6 +28,6 @@ namespace ska {
 	class InterpreterOperator : 
 		public InterpreterOperatorUnit {
 	public:
-		NodeCell interpret(ASTNode& node) override { return NodeCell {""}; }
+		NodeCell interpret(ExecutionContext node) override { return NodeCell {""}; }
 	};
 }

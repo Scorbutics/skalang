@@ -4,8 +4,11 @@
 #include "InterpreterOperatorUnit.h"
 #include "NodeValue/Operator.h"
 #include "NodeValue/ASTNodePtr.h"
-#include "MemoryTable.h"
+
 #include "Service/Binding.h"
+
+#include "MemoryTable.h"
+#include "ExecutionContext.h"
 
 namespace ska {
     struct ReservedKeywordsPool;
@@ -14,16 +17,14 @@ namespace ska {
 	class Interpreter {
 		using OperatorInterpreter = std::vector<std::unique_ptr<InterpreterOperatorUnit>>;
 	public:
-		Interpreter(SymbolTable& symbols, const ReservedKeywordsPool& reserved);
+		Interpreter(const ReservedKeywordsPool& reserved);
 		~Interpreter() = default;
 
 		OperatorInterpreter build();
-		NodeCell interpret(ASTNode& node);
+		NodeCell interpret(ExecutionContext node);
 		NodeValue script(Script& script);
 
-		void bind(const std::string& functionName, BridgeFunctionPtr bridge) {
-			m_memory.emplace(functionName, NodeValue{ std::move(bridge) });
-		}
+		void bind(Script& script, const std::string& functionName, BridgeFunctionPtr bridge);
 
 		template <class ReturnType, class ... ParameterTypes>
 		void bindFunction(const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
@@ -33,8 +34,8 @@ namespace ska {
 
 	private:
 		//Binding m_binding;
-		SymbolTable& m_symbols;
-		MemoryTable m_memory;
+		//SymbolTable& m_symbols;
+		//MemoryTable m_memory;
 		OperatorInterpreter m_operatorInterpreter;
 	};
 }

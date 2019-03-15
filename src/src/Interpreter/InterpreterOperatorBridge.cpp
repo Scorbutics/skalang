@@ -2,6 +2,7 @@
 #include "Interpreter.h"
 #include "MemoryTable.h"
 #include "InterpreterOperatorBridge.h"
+#include "Service/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::InterpreterOperator<ska::Operator::BRIDGE>);
 
@@ -16,5 +17,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::BRIDGE>::interpret(Operate
 	auto scriptValue = m_interpreter.interpret(node.GetScriptNode());
 	return m_memory.emplace("import " + scriptPath, scriptValue.asRvalue()).first->clone();
 	*/
-	return m_memory[node.GetObject().name()];
+	return node.parent.memory()[node.GetObject().name()];
 }

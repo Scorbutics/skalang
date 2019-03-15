@@ -2,13 +2,14 @@
 #include "Interpreter.h"
 #include "MemoryTable.h"
 #include "InterpreterOperatorUserDefinedObject.h"
+#include "Service/Script.h"
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::USER_DEFINED_OBJECT>::interpret(OperateOn node) {
-	auto objectMemory = std::make_shared<MemoryTable>(m_memory);
-	auto& executionMemoryPoint = m_memory.pointTo(*objectMemory);
+	auto objectMemory = std::make_shared<MemoryTable>(node.parent.memory());
+	auto& executionMemoryPoint = node.parent.memory().pointTo(*objectMemory);
 	for(auto& field: node) {
-		m_interpreter.interpret(*field);
+		m_interpreter.interpret({ node.parent, *field });
 	}
-	m_memory.pointTo(executionMemoryPoint);
+	node.parent.memory().pointTo(executionMemoryPoint);
 	return NodeCell {objectMemory};
 }

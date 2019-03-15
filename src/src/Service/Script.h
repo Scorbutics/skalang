@@ -15,6 +15,7 @@ namespace ska {
 
         TokenReader m_input;
         SymbolTable m_symbols;
+		MemoryTable m_memory;
         ASTNodePtr m_ast;
     };
 
@@ -53,6 +54,9 @@ namespace ska {
 
 		SymbolTable& symbols() { return m_handle->m_symbols; }
 		const SymbolTable& symbols() const { return m_handle->m_symbols; }
+
+		MemoryTable& memory() { return m_handle->m_memory; }
+		const MemoryTable& memory() const { return m_handle->m_memory; }
 
 		auto& rootNode() {
 			return *m_handle->m_ast;
