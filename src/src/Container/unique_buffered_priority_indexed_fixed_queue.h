@@ -28,9 +28,13 @@ namespace ska {
 		}
 
 	public:
-		unique_buffered_priority_indexed_fixed_queue_iterator(Container& buf, std::size_t offset)
+		unique_buffered_priority_indexed_fixed_queue_iterator(Container& buf, std::size_t offset, bool next = true)
 			: buf(&buf), off(offset) {
-			safe_next_element();
+			if(next) {
+				safe_next_element();
+			} else {
+				safe_previous_element();
+			}
 		}
 		bool operator==(const unique_buffered_priority_indexed_fixed_queue_iterator& i) {
 			return i.buf == buf && i.off == off;
@@ -42,6 +46,13 @@ namespace ska {
 		unique_buffered_priority_indexed_fixed_queue_iterator operator++(int) { auto t = *this; off++; safe_next_element(); return t; }
 		unique_buffered_priority_indexed_fixed_queue_iterator& operator--() { off--; safe_previous_element(); return *this; }
 		unique_buffered_priority_indexed_fixed_queue_iterator operator--(int) { auto t = *this; off--; safe_previous_element(); return t; }
+		
+		unique_buffered_priority_indexed_fixed_queue_iterator operator-(int i) { return {*buf, off - i, false}; }
+		unique_buffered_priority_indexed_fixed_queue_iterator operator+(int i) { return {*buf, off + i}; }
+
+		std::size_t operator-(unique_buffered_priority_indexed_fixed_queue_iterator i) { return off - i.off; }
+		std::size_t operator+(unique_buffered_priority_indexed_fixed_queue_iterator i) { return off + i.off; }
+
 		bool operator<(unique_buffered_priority_indexed_fixed_queue_iterator const& sibling) const { return off < sibling.off; }
 		bool operator<=(unique_buffered_priority_indexed_fixed_queue_iterator const& sibling) const { return off <= sibling.off; }
 		bool operator>(unique_buffered_priority_indexed_fixed_queue_iterator const& sibling) const { return off > sibling.off; }
