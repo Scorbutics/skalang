@@ -21,6 +21,13 @@ const ska::Token& ska::TokenReader::match(const TokenType type) {
 	throw std::runtime_error("unexpected error");
 }
 
+void ska::TokenReader::rewind() {
+	if (!m_input.empty()) {
+		m_lookAheadIndex = 0;
+		m_lookAhead = &m_input[m_lookAheadIndex];
+	}
+}
+
 ska::Token ska::TokenReader::actual() const {
     if (m_lookAhead != nullptr) {
         return *m_lookAhead;

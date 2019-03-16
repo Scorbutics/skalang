@@ -21,6 +21,7 @@ namespace ska {
 		Token actual() const;
         const Token& readPrevious(std::size_t offset) const;
 		bool canReadPrevious(std::size_t offset) const;
+		void rewind();
 
     private:
         void nextToken();

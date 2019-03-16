@@ -3,6 +3,6 @@
 #include "OperationImport.h"
 
 
-ska::ASTNode* ska::Operation<ska::Operator::IMPORT>::GetScriptNode() {
-	return &node.script().rootNode();
+ska::Script& ska::Operation<ska::Operator::IMPORT>::GetScript() {
+	return node.script();
 }

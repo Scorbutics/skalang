@@ -8,9 +8,9 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>::interpret(
 	auto inMemoryFunctionZone = m_interpreter.interpret({ node.parent, node.GetFunction() }).asLvalue();
 	assert(inMemoryFunctionZone.first != nullptr && inMemoryFunctionZone.second != nullptr);
 
-	auto astFunction = inMemoryFunctionZone.first->nodeval<ASTNode*>();
-	auto executionContext = ExecutionContext{ node.parent, *astFunction };
-	auto operateOnFunction = Operation<Operator::FUNCTION_DECLARATION>(executionContext);
+	auto functionExecutionContext = inMemoryFunctionZone.first->nodeval<ExecutionContext>();
+	//auto executionContext = ExecutionContext{ node.parent, *astFunction };
+	auto operateOnFunction = Operation<Operator::FUNCTION_DECLARATION>(functionExecutionContext);
 
 	//Centers memory on the current function scope
 	auto& currentExecutionMemoryZone = node.parent.memory().pointTo(*inMemoryFunctionZone.second);

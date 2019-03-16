@@ -23,7 +23,7 @@ namespace ska {
 			return node[1];
 		}
 		
-		ASTNode* GetScriptNode();
+		Script& GetScript();
 
 		/*
 		inline auto& GetScriptNode() {

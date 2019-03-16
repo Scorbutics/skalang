@@ -33,6 +33,14 @@ namespace ska {
 		}
 		virtual ~Script() = default;
 	
+		bool existsInCache(const std::string& name) const {
+			return m_cache.find(name) != m_cache.end();
+		}
+
+		void rewind() {
+			return m_handle->m_input.rewind();
+		}
+
         const Token& readPrevious(std::size_t offset) const;
 		bool canReadPrevious(std::size_t offset) const;
 		bool empty() const;

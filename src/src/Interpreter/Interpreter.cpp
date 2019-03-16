@@ -69,5 +69,5 @@ ska::NodeCell ska::Interpreter::interpret(ExecutionContext node) {
 }
 
 ska::NodeValue ska::Interpreter::script(Script& script) {
-	return interpret(script).asRvalue();
+	return interpret(ExecutionContext{ script }).asRvalue();
 }

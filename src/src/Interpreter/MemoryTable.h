@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #include <vector>
 #include <memory>
 #include <unordered_map>
@@ -20,6 +21,11 @@ namespace ska {
 
 		[[nodiscard]]
 		MemoryTable* parent();
+		MemoryTable& down() {
+			assert(!m_current->m_children.empty());
+			return *m_current->m_children[0].get();
+		}
+
 
 		MemoryTable& createNested();
 		MemoryTable* endNested();

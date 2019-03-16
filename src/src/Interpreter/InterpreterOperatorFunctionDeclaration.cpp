@@ -5,7 +5,6 @@
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_DECLARATION>::interpret(OperateOn node) {
 	assert(!node.GetFunctionName().empty());
-	auto* astPtr = &node.GetFunction();
-	auto functionLValue = node.parent.memory().put(node.GetFunctionName(), astPtr);
+	auto functionLValue = node.parent.memory().put(node.GetFunctionName(), ExecutionContext{ node.parent, node.GetFunction() });
 	return NodeCell{ functionLValue };
 }
