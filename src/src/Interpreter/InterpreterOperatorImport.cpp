@@ -16,5 +16,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::IMPORT>::interpret(Operate
 		node.parent.rewind();
 		SLOG_STATIC(ska::LogLevel::Info, ska::InterpreterOperator<ska::Operator::IMPORT>) << "Script " << " found in cache, loading from memory";
 	}*/
-	return scriptExecutionContext;
+	return NodeCell {scriptExecutionContext};
 }
