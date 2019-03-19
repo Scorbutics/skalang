@@ -28,7 +28,9 @@ namespace ska {
             auto handle = std::make_unique<ScriptHandle>(std::move(input), startIndex);
             if(m_cache.find(name) == m_cache.end()) {
 				m_cache.emplace(name, std::move(handle));
-            }
+            } else {
+				m_inCache = true;
+			}
             m_handle = m_cache.at(name).get();
 		}
 		virtual ~Script() = default;
@@ -73,6 +75,7 @@ namespace ska {
 	private:
         ScriptHandle* m_handle = nullptr;
         std::unordered_map<std::string, ScriptHandlePtr>& m_cache;
+		bool m_inCache = false;
 
 	};
 

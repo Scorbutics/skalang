@@ -123,7 +123,7 @@ namespace ska {
 
 	inline std::ostream& operator<<(std::ostream& stream, const Token& token) {
 		if (token.m_type == TokenType::EMPTY) {
-			stream << "EMPTY_TOKEN";
+			return stream;
 		}
 
 		if (token.m_type == TokenType::RESERVED) {				

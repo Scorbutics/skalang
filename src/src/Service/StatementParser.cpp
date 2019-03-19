@@ -12,7 +12,7 @@
 #include "Service/ASTFactory.h"
 #include "Service/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::StatementParser)
+SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::StatementParser)
 
 ska::StatementParser::StatementParser(const ReservedKeywordsPool& reservedKeywordsPool) :
 	m_reservedKeywordsPool(reservedKeywordsPool),
@@ -125,8 +125,11 @@ ska::ScriptPtr ska::StatementParser::subParse(std::unordered_map<std::string, sk
 
 	auto tokenizer = Tokenizer{ m_reservedKeywordsPool, std::move(content)};
 	auto tokens = tokenizer.tokenize();
+
+	const auto scriptAlreadyExists = scriptCache.find(name) != scriptCache.end();
+	SLOG(ska::LogLevel::Info) << "SubParsing script " << name << " : " << (scriptAlreadyExists ? "not " : "") << "in cache";
 	auto script = ScriptPtr{std::make_unique<Script>( scriptCache, name, tokens )};
-	script->parse(*this);
+	script->parse(*this);	
 	return script;
 }
 

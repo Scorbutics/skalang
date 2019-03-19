@@ -38,6 +38,11 @@ ska::ScriptPtr ska::Script::subParse(StatementParser& parser, const std::string&
 }
 
 void ska::Script::parse(StatementParser& parser, bool listen) {
+	if(m_inCache) {
+		//No more parsing if script is already in-cache.
+		return;
+	}
+
 	if(!listen) {
 		m_handle->m_ast = parser.parse(*this);
 		return;
