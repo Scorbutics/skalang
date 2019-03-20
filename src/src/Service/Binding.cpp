@@ -37,14 +37,6 @@ ska::Binding::~Binding() {
 	Observable<VarTokenEvent>::removeObserver(m_observer);
 }
 
-/*
-ska::ASTNode& ska::Binding::bindToScript(const std::string& scriptName) {
-	auto importNameNode = ASTFactory::MakeLogicalNode(Token{ scriptName, TokenType::IDENTIFIER });
-	auto startEvent = BlockTokenEvent{ *importNameNode, BlockTokenEventType::START };
-	Observable<BlockTokenEvent>::notifyObservers(startEvent);
-}
-*/
-
 void ska::Binding::bindSymbol(const std::string& functionName, std::vector<std::string> typeNames) {
 	
 	//Build the function
@@ -90,31 +82,9 @@ void ska::Binding::bindSymbol(const std::string& functionName, std::vector<std::
 	auto endEvent = BlockTokenEvent{ *functionDeclarationNode, BlockTokenEventType::END };
 	Observable<BlockTokenEvent>::notifyObservers(endEvent);
 
-	auto importNameNode = ASTFactory::MakeLogicalNode(Token{ "binding.miniska", TokenType::IDENTIFIER });
-
-	//nodeBlock = ASTFactory::MakeNode<Operator::BLOCK>(std::move(functionDeclarationNode));
-
-	//Fill the script with the function
-	
-	/*auto exportFields = std::vector<ASTNodePtr>{};
-	auto allFields = std::vector<ASTNodePtr>{};
-	exportFields.push_back(ASTFactory::MakeLogicalNode(ska::Token{ (*functionDeclarationNode)[0].name(), (*functionDeclarationNode)[0].tokenType() }));
-	allFields.push_back(std::move(functionDeclarationNode));
-
-	auto importNode = ASTFactory::MakeNode<Operator::IMPORT>(
-		ASTFactory::MakeEmptyNode(),
-		std::move(importNameNode),
-		ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(exportFields)),
-		ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(),
-		ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(allFields)));
-	*/
-
 	auto bridgeNode = ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(functionDeclarationNode));
 
-	/*auto event = BridgeTokenEvent{ *bridgeNode };
-	Observable<BridgeTokenEvent>::notifyObservers(event);*/
-
-
+	//TODO split here for several functions in a script ?
 
 	auto varNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(Token{ "binding.miniska", TokenType::IDENTIFIER }), std::move(bridgeNode));
 	

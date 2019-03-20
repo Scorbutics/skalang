@@ -223,12 +223,9 @@ TEST_CASE("[Interpreter]") {
 				return 0;
 			});
 
-            std::cout << "function before bind" << std::endl;
-
 			auto binding = ska::Binding{ *data.interpreter, readerI->symbols(), *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
 			auto bridge = binding.bindFunction("funcTest", std::move(function));
 			data.interpreter->bind(*readerI, "binding.miniska", std::move(bridge));
-            std::cout << "function bound" << std::endl;
 
             readerI->parse(*data.parser);
 			data.interpreter->script(*readerI);
