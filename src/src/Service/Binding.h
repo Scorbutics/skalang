@@ -38,8 +38,6 @@ namespace ska {
 		}
 
 	private:
-		//ASTNode& bindToScript(const std::string& scriptName);
-
 		template <class ReturnType, class ... ParameterTypes, std::size_t... Idx>
 		auto callNativeFromScript(std::function<ReturnType(ParameterTypes...)> f, std::vector<NodeValue>& v, std::index_sequence<Idx...>) {
 			return f(convertTypeFromScript<ParameterTypes, Idx>(v)...);
@@ -54,6 +52,7 @@ namespace ska {
 
 		template <class T, std::size_t Id>
 		T convertTypeFromScript(const std::vector<NodeValue>& vect) {
+			assert(Id < vect.size());
 			const auto& v = vect[Id];
 			if constexpr (std::is_same<T, std::string>()) {
 				return v.convertString();
@@ -68,8 +67,9 @@ namespace ska {
 			} else if constexpr (std::is_same<T, double>()) {
 				return static_cast<T>(v.convertNumeric());
 			} else {
+				assert(!"Invalid type for bridge function");
 				return T{};
-                //static_assert(false, "Invalid type for bridge function");
+                
 			}
 		}
 
@@ -88,7 +88,7 @@ namespace ska {
 			} else if constexpr (std::is_same<T, double>()) {
 				ss.push_back("float");
 			} else {
-                //static_assert(false, "Invalid type for bridge function");
+				assert(!"Invalid type for bridge function");
 			}
 		}
 

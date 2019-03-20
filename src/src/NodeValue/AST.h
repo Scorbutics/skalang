@@ -7,6 +7,7 @@
 #include "ASTNodePtr.h"
 #include "Operator.h"
 #include "ExpressionType.h"
+#include "Service/ScriptPtr.h"
 #include "Interpreter/MemoryTable.h"
 #include "Interpreter/NodeValue.h"
 
@@ -23,6 +24,7 @@ namespace ska {
 	public:
 		ASTNode(ASTNode&&) noexcept = default;
 		ASTNode(const ASTNode&) = delete;
+		~ASTNode() = default;
 
 		bool has(const Token& t) const {
 			return token == t;
@@ -46,26 +48,6 @@ namespace ska {
 
 		Token::Variant tokenContent() const {
 			return token.content();
-		}
-
-		ASTNode& left() {
-			assert(m_op == Operator::BINARY && !m_children.empty());
-			return *m_children[0].get();
-		}
-
-		ASTNode& right() {
-			assert(m_op == Operator::BINARY && m_children.size() >= 2);
-			return *m_children[1].get();
-		}
-
-		const ASTNode& left() const {
-			assert(m_op == Operator::BINARY && !m_children.empty());
-			return *m_children[0].get();
-		}
-
-		const ASTNode& right() const {
-			assert(m_op == Operator::BINARY && m_children.size() >= 2);
-			return *m_children[1].get();
 		}
 
 		auto& operator[](const std::size_t index) {
@@ -96,20 +78,30 @@ namespace ska {
 			return m_type;
 		}
 
+		auto& script() { assert(m_linkedScript != nullptr);  return *m_linkedScript; }
+		const auto& script() const { assert(m_linkedScript != nullptr); return *m_linkedScript;	}
+
 	private:
 		friend class ASTFactory;
 		ASTNode();
         
         explicit ASTNode(Token t, ASTNodePtr l = nullptr, ASTNodePtr r = nullptr);
+		explicit ASTNode(ScriptPtr s, std::vector<ASTNodePtr> children);
+
         ASTNode(Operator o, Token identifierToken = Token{}, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{});
         ASTNode(Operator o, Token identifierToken = Token{});
 
+
 		Operator m_op = Operator::UNARY;
 		std::optional<Type> m_type;
+
+		//TODO a externaliser
 		std::unique_ptr<TypeBuildUnit> m_typeBuilder;
 
 		Token token;
 		std::vector<ASTNodePtr> m_children;
+
+		ScriptPtr m_linkedScript;
 
 		friend std::ostream& operator<<(std::ostream& stream, const ASTNode& node);
 	};

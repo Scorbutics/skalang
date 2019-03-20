@@ -3,10 +3,11 @@
 
 namespace ska {
     class ASTNode;
-
+    class SymbolTable;
+    
     class ImportTokenEvent {
 	public:
-		ImportTokenEvent(ASTNode& node) : m_node(node) {
+		ImportTokenEvent(ASTNode& node, SymbolTable& s) : m_node(node), m_symbolTable(s) {
         }
 		
         auto& rootNode() {
@@ -17,7 +18,11 @@ namespace ska {
             return m_node;
 		}
 
+		const SymbolTable& symbolTable() const {
+			return m_symbolTable;
+		}
 	private:
 		ASTNode& m_node;
+        SymbolTable& m_symbolTable;
     };
 }

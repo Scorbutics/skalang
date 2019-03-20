@@ -229,8 +229,8 @@ namespace ska {
 }
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::BINARY>::interpret(OperateOn node) {
-	auto firstValue = m_interpreter.interpret(node.GetFirstValue()).asRvalue();
-	auto secondValue = m_interpreter.interpret(node.GetSecondValue()).asRvalue();
+	auto firstValue = m_interpreter.interpret({ node.parent , node.GetFirstValue() }).asRvalue();
+	auto secondValue = m_interpreter.interpret({ node.parent , node.GetSecondValue() }).asRvalue();
 	auto mathOperator = node.GetOperator();
 	return InterpretMathematicBinaryExpression(
 			std::move(mathOperator), 

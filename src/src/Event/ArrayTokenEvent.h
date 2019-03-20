@@ -11,7 +11,7 @@ namespace ska {
 
 	class ArrayTokenEvent {
 	public:
-		ArrayTokenEvent(ASTNode& node, ArrayTokenEventType type) : m_node(node), m_type(type) {}
+		ArrayTokenEvent(ASTNode& node, SymbolTable& s, ArrayTokenEventType type) : m_node(node), m_type(type), m_symbolTable(s) {}
 
 		auto& rootNode() {
 			return m_node;
@@ -24,9 +24,14 @@ namespace ska {
 		const auto& type() const {
 			return m_type;
 		}
+		
+		SymbolTable& symbolTable() {
+			return m_symbolTable;
+		}
 
 	private:
 		ArrayTokenEventType m_type;
 		ASTNode& m_node;
+		SymbolTable& m_symbolTable;
 	};
 }

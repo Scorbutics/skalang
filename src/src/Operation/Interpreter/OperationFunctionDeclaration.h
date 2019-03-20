@@ -10,7 +10,8 @@ namespace ska {
 	private:
 		ASTNode& node;
 	public:
-		Operation(ASTNode& node) : node(node) {}
+		Script& parent;
+		Operation(ExecutionContext& context) : node(context.pointer()), parent(context.program()) {}
 
 		inline auto GetFunctionName() {
 			return node.name();
@@ -34,7 +35,7 @@ namespace ska {
 	private:
 		ASTNode& node;
 	public:
-		Operation(ASTNode& node) : node(node) {}
+		Script& parent;
 
 		inline auto GetFunctionName() {
 			return node.name();

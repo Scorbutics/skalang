@@ -16,13 +16,13 @@ namespace ska {
 			assert(!node.name().empty());
 			return node.name();
 		}
-		
-		inline auto& GetVariableValueNode() {
-			return node[0];
-		}
-		
+				
 		inline auto GetImportVariableName() {
 			return node[0].name();
+		}
+
+		inline auto GetScriptPath() {
+			return node[2].name();
 		}
 	};
 }

@@ -4,7 +4,8 @@
 
 namespace ska {
     class ASTNode;
-	
+	class SymbolTable;
+
 	enum class FunctionTokenEventType {
 		DECLARATION_NAME,		
         DECLARATION_STATEMENT,
@@ -14,10 +15,11 @@ namespace ska {
     class FunctionTokenEvent {
 	public:
 
-		FunctionTokenEvent(ASTNode& content, FunctionTokenEventType type, std::string name = "") :
+		FunctionTokenEvent(ASTNode& content, FunctionTokenEventType type, SymbolTable& s, std::string name = "") :
 			m_contentNode(content),
 			m_name(std::move(name)),
-			m_type(type) {
+			m_type(type),
+			m_symbolTable(s) {
 		}
 
 		auto begin() { return m_contentNode.begin(); }
@@ -42,9 +44,14 @@ namespace ska {
 			return m_contentNode;
 		}
 
+		SymbolTable& symbolTable() {
+			return m_symbolTable;
+		}
+
 	private:
 		std::string m_name;
         ASTNode& m_contentNode;
 	    FunctionTokenEventType m_type;
+		SymbolTable& m_symbolTable;
     };
 }

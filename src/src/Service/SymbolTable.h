@@ -1,6 +1,5 @@
 #pragma once
-#include <Utils/SubObserver.h>
-#include <Utils/Observable.h>
+#include "Container/sorted_observable.h"
 
 #include "NodeValue/AST.h"
 #include "Event/VarTokenEvent.h"
@@ -17,19 +16,23 @@ namespace ska {
     class StatementParser;
 
 	class SymbolTable :
-        public SubObserver<VarTokenEvent>,
-       	public SubObserver<BlockTokenEvent>,
-        public SubObserver<FunctionTokenEvent>,
-        public SubObserver<ReturnTokenEvent>, 
-		public SubObserver<ImportTokenEvent>,
-		public SubObserver<BridgeTokenEvent> {
+        public PriorityObserver<VarTokenEvent>,
+       	public PriorityObserver<BlockTokenEvent>,
+        public PriorityObserver<FunctionTokenEvent>,
+        public PriorityObserver<ReturnTokenEvent>, 
+		public PriorityObserver<ImportTokenEvent>,
+		public PriorityObserver<BridgeTokenEvent> {
 
         using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 
     public:
+		SymbolTable();
 		SymbolTable(StatementParser& parser);
-		~SymbolTable() = default;
+		virtual ~SymbolTable();
 		
+		void listenParser(StatementParser& parser);
+		void unlistenParser();
+
 		auto* operator[](const std::string& key) {
             return (*m_currentTable)[key];
         }
@@ -66,10 +69,7 @@ namespace ska {
 		bool matchImport(const ImportTokenEvent&);
 		bool matchBridge(const BridgeTokenEvent&);
 
-		bool erase(const std::string& name) {
-			return m_currentTable->erase(name);
-		}
-
+		StatementParser* m_parser = nullptr;
         std::unique_ptr<ScopedSymbolTable> m_rootTable;
 		ScopedSymbolTable* m_currentTable = nullptr;
     };

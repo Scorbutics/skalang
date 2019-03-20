@@ -3,7 +3,6 @@
 #include <memory>
 #include <unordered_map>
 #include <functional>
-#include <Data/Events/EventDispatcher.h>
 
 #include "Container/expression_stack.h"
 #include "NodeValue/ASTNodePtr.h"
@@ -27,28 +26,27 @@ namespace ska {
 		using ExpressionStack = expression_stack<Token, ASTNodePtr>;
 
 	public:
-		ExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, StatementParser& parser, TokenReader& input);
-		ASTNodePtr parse();
+		ExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, StatementParser& parser);
+		ASTNodePtr parse(Script& input);
 
 	private:
-		bool parseTokenExpression(ExpressionStack& expressions, const Token& token, bool isDoingOperation);
+		bool parseTokenExpression(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
         
-        bool matchSymbol(ExpressionStack& expressions, const Token& token, bool isDoingOperation);
-		void matchRange(ExpressionStack& expressions, const Token& token, bool isDoingOperation);
-		void matchParenthesis(ExpressionStack& expressions, bool isDoingOperation);
+        bool matchSymbol(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
+		void matchRange(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
+		void matchParenthesis(Script& input, ExpressionStack& expressions, bool isDoingOperation);
 
-        ASTNodePtr matchReserved();
-		ASTNodePtr matchObjectFieldAccess(ASTNodePtr objectAccessed);      
+        ASTNodePtr matchReserved(Script& input);
+		ASTNodePtr matchObjectFieldAccess(Script& input, ASTNodePtr objectAccessed);      
 
-        bool isAtEndOfExpression() const;
+        bool isAtEndOfExpression(Script& input) const;
 		
-		ASTNodePtr expression(ExpressionStack& expressions);
+		ASTNodePtr expression(Script& input, ExpressionStack& expressions);
 
 		static void error(const std::string& message);
 
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		StatementParser& m_parser;
-		TokenReader& m_input;
 
 		MatcherArray m_matcherArray;
 		MatcherFunction m_matcherFunction;

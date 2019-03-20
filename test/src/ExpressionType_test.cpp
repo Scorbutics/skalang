@@ -4,26 +4,31 @@
 #include "Service/Tokenizer.h"
 #include "Service/SymbolTable.h"
 #include "Service/StatementParser.h"
+#include "Service/Script.h"
 
 using SymbolTablePtr = std::unique_ptr<ska::SymbolTable>;
 using ParserPtr = std::unique_ptr<ska::StatementParser>;
 
-std::unique_ptr<ska::ASTNode> ASTFromInputSemanticExpressionType(const std::string& input, ParserPtr& parser_test, SymbolTablePtr& table_test) {
-	const auto reservedKeywords = ska::ReservedKeywordsPool{};
+const auto reservedKeywords = ska::ReservedKeywordsPool{};
+
+
+ska::Script ASTFromInputSemanticExpressionType(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, ParserPtr& parser_test) {
+	static auto refCounter = 0;
+    
 	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
-	auto reader = ska::TokenReader { tokens };
-	parser_test = std::make_unique<ska::StatementParser> ( reservedKeywords, reader );
-    table_test = std::make_unique<ska::SymbolTable> (*parser_test);
-    return parser_test->parse();
+	auto reader = ska::Script { scriptCache, "main", std::move(tokens) };
+	parser_test = std::make_unique<ska::StatementParser> ( reservedKeywords );
+    return reader;
 }
 
 TEST_CASE("[ExpressionType]") {
-    
     ParserPtr parser_test;
-    SymbolTablePtr symbol_test;
-    auto astPtr = ASTFromInputSemanticExpressionType("{var toto = 2;}", parser_test, symbol_test);
-    auto& table = *symbol_test->nested()[0];
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+    auto script = ASTFromInputSemanticExpressionType(scriptCache, "{var toto = 2;}", parser_test);
+	script.parse(*parser_test);
+	auto* symbol_test = &script.symbols();
+	auto& table = *script.symbols().nested()[0];
 	auto& nested = table.createNested();
 
 	SUBCASE("Type is set") {

@@ -8,8 +8,11 @@ namespace ska {
 	class Operation<Operator::ARRAY_DECLARATION> {
 	private:
 		ASTNode& node;
+		
 	public:
-		Operation(ASTNode& node) : node(node) {}
+		Script& parent;
+
+		Operation(ExecutionContext& context) : node(context.pointer()), parent(context.program()) {}
 
 		inline auto GetArrayName() {
 			return node[0].name();

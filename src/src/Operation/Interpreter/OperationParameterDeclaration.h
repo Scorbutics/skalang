@@ -1,15 +1,19 @@
 #pragma once
 #include <cassert>
 #include "Operation.h"
+#include "Interpreter/ExecutionContext.h"
 
 namespace ska {
 	class ASTNode;
+	class Script;
+
 	template<>
     class Operation<Operator::PARAMETER_DECLARATION> {
 	private:
 		ASTNode& node;
 	public:
-		Operation(ASTNode& node) : node(node) {}
+		Script& parent;
+		Operation(ExecutionContext& context) : node(context.pointer()), parent(context.program()) {}
 
 		inline auto GetVariableName() {
 			assert(!node.name().empty());

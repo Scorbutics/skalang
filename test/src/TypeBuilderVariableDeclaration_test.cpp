@@ -7,11 +7,14 @@
 #include "Service/TypeBuilder/TypeBuilderVariableDeclaration.h"
 #include "TypeBuilderTestCommon.h"
 #include "Service/ASTFactory.h"
+#include "Service/Script.h"
 
 TEST_CASE("[TypeBuilderVariableDeclaration]") {
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr> {};
 	DataTestContainer data;
-	auto ast = TypeBuilderTestCommonBuildAST("", data, false);
-	auto& symbols = *data.symbols;
+	auto script = TypeBuilderTestCommonBuildAST(scriptCache, "", data, false);
+	script.parse(*data.parser);
+	auto& symbols = script.symbols();
 	auto typeBuilder = ska::TypeBuilderOperator<ska::Operator::VARIABLE_DECLARATION>{};
 	
 	auto nameToken = ska::Token{"toto", ska::TokenType::IDENTIFIER };

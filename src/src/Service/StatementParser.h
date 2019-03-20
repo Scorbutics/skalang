@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
-#include <Data/Events/EventDispatcher.h>
+
+#include "Container/sorted_observable.h"
 
 #include "NodeValue/Token.h"
 #include "Service/ExpressionParser.h"
@@ -22,42 +23,47 @@
 #include "Matcher/MatcherVar.h"
 #include "Matcher/MatcherReturn.h"
 
+#include "ScriptPtr.h"
+
 namespace ska {
 	struct ReservedKeywordsPool;
+	class Script;
+	class ExpressionParser;
+	struct ScriptHandle;
 
 	class StatementParser :
-	    public EventDispatcher<
-            ForTokenEvent,
-            IfElseTokenEvent,
-            VarTokenEvent,
-	    	FunctionTokenEvent,
-            BlockTokenEvent,
-		    ExpressionTokenEvent,
-            ReturnTokenEvent,
-			ArrayTokenEvent,
-			ImportTokenEvent,
-			BridgeTokenEvent
-	    > {
+	    public observable_priority_queue<ForTokenEvent>,
+        public observable_priority_queue<IfElseTokenEvent>,
+		public observable_priority_queue<VarTokenEvent>,
+		public observable_priority_queue<FunctionTokenEvent>,
+		public observable_priority_queue<BlockTokenEvent>,
+		public observable_priority_queue<ExpressionTokenEvent>,
+		public observable_priority_queue<ReturnTokenEvent>,
+		public observable_priority_queue<ArrayTokenEvent>,
+		public observable_priority_queue<ImportTokenEvent>,
+		public observable_priority_queue<BridgeTokenEvent> {
 
 		using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
+		friend class Script;
+		
+		using ScriptHandlePtr = std::unique_ptr<ScriptHandle>;
 	public:
-		StatementParser(const ReservedKeywordsPool& reservedKeywordsPool, TokenReader& input);
-		ASTNodePtr parse();
+		StatementParser(const ReservedKeywordsPool& reservedKeywordsPool);
+		ScriptPtr subParse(std::unordered_map<std::string, ScriptHandlePtr>& scriptCache, const std::string& name, std::ifstream& file);
 
-		ASTNodePtr statement();
-        ASTNodePtr optstatement(const Token& mustNotBe = Token{});
-
-		ASTNodePtr expr();
-		ASTNodePtr optexpr(const Token& mustNotBe = Token{});
-
-		ASTNodePtr subParse(std::ifstream& file);
-	
 	private:
-		ASTNodePtr matchExpressionStatement();
-		ASTNodePtr matchReservedKeyword(const std::size_t keywordIndex);
+		ASTNodePtr parse(Script& input);
+
+		ASTNodePtr statement(Script& input);
+        ASTNodePtr optstatement(Script& input, const Token& mustNotBe = Token{});
+
+		ASTNodePtr expr(Script& input);
+		ASTNodePtr optexpr(Script& input, const Token& mustNotBe = Token{});
+
+		ASTNodePtr matchExpressionStatement(Script& input);
+		ASTNodePtr matchReservedKeyword(Script& input, const std::size_t keywordIndex);
 		static void error(const std::string& message);
 
-		TokenReader& m_input;
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		ExpressionParser m_expressionParser;
 		

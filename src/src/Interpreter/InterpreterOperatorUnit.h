@@ -5,26 +5,21 @@
 
 namespace ska {
 	class ASTNode;
-	class MemoryTable;
-	class SymbolTable;
 	class Interpreter;
+	class ExecutionContext;
 
 	class InterpreterOperatorUnit {
 	public:
-		virtual NodeCell interpret(ASTNode& node) = 0;
+		virtual NodeCell interpret(ExecutionContext& node) = 0;
 	};
 
 	class InterpreterOperatorBase :
 		public InterpreterOperatorUnit {
 	public:
-		InterpreterOperatorBase(Interpreter& interpreter, const SymbolTable& symbols, MemoryTable& memory) :
-			m_interpreter(interpreter),
-			m_symbols(symbols),
-			m_memory(memory) {}
+		InterpreterOperatorBase(Interpreter& interpreter) :
+			m_interpreter(interpreter) {}
 	protected:
 		Interpreter& m_interpreter;
-		const SymbolTable& m_symbols;
-		MemoryTable& m_memory;
 	};
 
 }

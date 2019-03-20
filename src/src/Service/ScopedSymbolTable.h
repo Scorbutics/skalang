@@ -5,7 +5,8 @@
 
 namespace ska {
 	class SymbolTable;
-
+	class Script;
+	
 	class ScopedSymbolTable {
 	using ChildrenScopedSymbolTable = std::vector<std::unique_ptr<ScopedSymbolTable>>;
 	
@@ -23,7 +24,8 @@ namespace ska {
 
 		ScopedSymbolTable& createNested();
 		Symbol& emplace(std::string name);
-		
+		Symbol& emplace(std::string name, const Script& script);
+
         void link(Symbol& s) {
             m_parentSymbol = &s;
         }
@@ -84,6 +86,8 @@ namespace ska {
 		}
 
 	private:
+		Symbol& emplace(Symbol symbol);
+
         std::unordered_map<std::string, Symbol> m_symbols;
 		ChildrenScopedSymbolTable m_children;
 		ScopedSymbolTable& m_parent = *this;

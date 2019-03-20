@@ -6,7 +6,7 @@
 
 namespace ska {
 	struct ReservedKeywordsPool;
-	class TokenReader;
+	class Script;
 	class StatementParser;
 	struct Token;
 
@@ -16,15 +16,14 @@ namespace ska {
 	class MatcherImport {
 	public:
 		~MatcherImport() = default;
-		MatcherImport(TokenReader& input, const ReservedKeywordsPool& pool, StatementParser& parser) :
-			m_input(input), m_reservedKeywordsPool(pool), m_parser(parser) {}
+		MatcherImport(const ReservedKeywordsPool& pool, StatementParser& parser) :
+			m_reservedKeywordsPool(pool), m_parser(parser) {}
 	
-		ASTNodePtr matchImport();
-		ASTNodePtr matchExport();
-		ASTNodePtr matchNewImport(const Token& importVarName, const Token& importNodeClass);
+		ASTNodePtr matchImport(Script& input);
+		ASTNodePtr matchExport(Script& input);
+		ASTNodePtr matchNewImport(Script& input, const Token& importVarName, const Token& importNodeClass);
 	
 	private:
-		TokenReader& m_input;
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		StatementParser& m_parser;
 	};

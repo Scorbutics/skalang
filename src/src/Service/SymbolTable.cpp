@@ -1,4 +1,6 @@
+#include <Utils/Observable.h>
 #include "Config/LoggerConfigLang.h"
+
 #include "SymbolTable.h"
 #include "Service/StatementParser.h"
 #include "Service/ASTFactory.h"
@@ -6,15 +8,77 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTable)
 
-ska::SymbolTable::SymbolTable(StatementParser& parser) :
-	SubObserver<VarTokenEvent>(std::bind(&ska::SymbolTable::match, this, std::placeholders::_1), parser),
-	SubObserver<BlockTokenEvent>(std::bind(&ska::SymbolTable::nestedTable, this, std::placeholders::_1), parser),
-	SubObserver<FunctionTokenEvent>(std::bind(&ska::SymbolTable::matchFunction, this, std::placeholders::_1), parser),
-    SubObserver<ReturnTokenEvent>(std::bind(&ska::SymbolTable::matchReturn, this, std::placeholders::_1), parser),
-	SubObserver<ImportTokenEvent>(std::bind(&ska::SymbolTable::matchImport, this, std::placeholders::_1), parser),
-	SubObserver<BridgeTokenEvent>(std::bind(&ska::SymbolTable::matchBridge, this, std::placeholders::_1), parser) {
-		m_rootTable = std::make_unique<ScopedSymbolTable>();
-		m_currentTable = m_rootTable.get();
+namespace ska::detail::symbol {
+	template <bool remove, class Event>
+	void manageObs(ska::StatementParser& parser, ska::SymbolTable& symbol) {
+		if constexpr (remove) {
+			parser.ska::observable_priority_queue<Event>::removeObserver(symbol);
+		} else {
+			parser.ska::observable_priority_queue<Event>::addObserver(symbol);
+		}
+	}
+	
+	template <class ... Events>
+	inline void addAsObserver(ska::StatementParser& parser, ska::SymbolTable& symbol) {
+		int _[] = { 0, (manageObs<false, Events>(parser, symbol), 0)... };
+		static_cast<void>(_);
+	}
+	
+
+	template <class ... Events>
+	inline void removeAsObserver(ska::StatementParser& parser, ska::SymbolTable& symbol) {
+		int _[] = { 0, (manageObs<true, Events>(parser, symbol), 0)... };
+		static_cast<void>(_);
+	}
+}
+
+ska::SymbolTable::SymbolTable(StatementParser& parser) : 
+	SymbolTable() {
+	m_rootTable = std::make_unique<ScopedSymbolTable>();
+	m_currentTable = m_rootTable.get();
+	listenParser(parser);
+}
+
+ska::SymbolTable::SymbolTable() :
+	PriorityObserver<VarTokenEvent>(5, std::bind(&ska::SymbolTable::match, this, std::placeholders::_1)),
+	PriorityObserver<BlockTokenEvent>(5, std::bind(&ska::SymbolTable::nestedTable, this, std::placeholders::_1)),
+	PriorityObserver<FunctionTokenEvent>(5, std::bind(&ska::SymbolTable::matchFunction, this, std::placeholders::_1)),
+    PriorityObserver<ReturnTokenEvent>(5, std::bind(&ska::SymbolTable::matchReturn, this, std::placeholders::_1)),
+	PriorityObserver<ImportTokenEvent>(5, std::bind(&ska::SymbolTable::matchImport, this, std::placeholders::_1)),
+	PriorityObserver<BridgeTokenEvent>(5, std::bind(&ska::SymbolTable::matchBridge, this, std::placeholders::_1)) {
+	m_rootTable = std::make_unique<ScopedSymbolTable>();
+	m_currentTable = m_rootTable.get();
+}
+
+ska::SymbolTable::~SymbolTable() {
+	unlistenParser();
+}
+
+void ska::SymbolTable::listenParser(StatementParser& parser) {
+	unlistenParser();
+	m_parser = &parser;
+	detail::symbol::addAsObserver<
+		VarTokenEvent, 
+		BlockTokenEvent, 
+		FunctionTokenEvent, 
+		ReturnTokenEvent, 
+		ImportTokenEvent, 
+		BridgeTokenEvent
+	> (*m_parser, *this);
+}
+
+void ska::SymbolTable::unlistenParser() {
+	if(m_parser != nullptr) {
+		detail::symbol::removeAsObserver<
+			VarTokenEvent, 
+			BlockTokenEvent, 
+			FunctionTokenEvent, 
+			ReturnTokenEvent, 
+			ImportTokenEvent, 
+			BridgeTokenEvent
+		> (*m_parser, *this);
+		m_parser = nullptr;
+	}
 }
 
 bool ska::SymbolTable::nestedTable(const BlockTokenEvent& event) {
@@ -123,11 +187,8 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 }
 
 bool ska::SymbolTable::matchImport(const ImportTokenEvent& token) {
-	assert(token.rootNode().size() == 5);
-	auto& hiddenFields = token.rootNode()[3];
-	for (auto& hiddenField : hiddenFields) {
-		erase(hiddenField->name());
-	}
+	assert(token.rootNode().size() == 3);
+	m_currentTable->emplace(token.rootNode()[2].name(), token.rootNode().script());
 	return true;
 }
 

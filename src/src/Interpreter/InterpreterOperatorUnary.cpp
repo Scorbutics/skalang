@@ -2,6 +2,7 @@
 #include "NodeValue/AST.h"
 #include "MemoryTable.h"
 #include "InterpreterOperatorUnary.h"
+#include "Service/Script.h"
 
 namespace ska {
 	NodeValue InterpreterOperatorConvertString(ExpressionType type, const Token::Variant& value) {
@@ -20,7 +21,7 @@ namespace ska {
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::UNARY>::interpret(OperateOn node) {
 	assert(!node.GetValue().empty());
-	auto nodeValue = m_memory[node.GetValue()];
+	auto nodeValue = node.parent.memory()[node.GetValue()];
     if(nodeValue.first == nullptr) {
         return NodeCell {""};
     }

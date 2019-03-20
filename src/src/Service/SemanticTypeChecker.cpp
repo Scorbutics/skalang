@@ -14,14 +14,13 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SemanticTypeChecker)
 
-ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser, const SymbolTable& symbols) :
-    SubObserver<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser),
-    SubObserver<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser),
-	SubObserver<ArrayTokenEvent>(std::bind(&SemanticTypeChecker::matchArray, this, std::placeholders::_1), parser),
-    SubObserver<ReturnTokenEvent>(std::bind(&SemanticTypeChecker::matchReturn, this, std::placeholders::_1), parser),
-	SubObserver<IfElseTokenEvent>(std::bind(&SemanticTypeChecker::matchIfElse, this, std::placeholders::_1), parser),
-	SubObserver<ImportTokenEvent>(std::bind(&SemanticTypeChecker::matchImport, this, std::placeholders::_1), parser),
-    m_symbols(symbols) {
+ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser) :
+    subobserver_priority_queue<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser, 9),
+    subobserver_priority_queue<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser, 9),
+	subobserver_priority_queue<ArrayTokenEvent>(std::bind(&SemanticTypeChecker::matchArray, this, std::placeholders::_1), parser, 9),
+    subobserver_priority_queue<ReturnTokenEvent>(std::bind(&SemanticTypeChecker::matchReturn, this, std::placeholders::_1), parser, 9),
+	subobserver_priority_queue<IfElseTokenEvent>(std::bind(&SemanticTypeChecker::matchIfElse, this, std::placeholders::_1), parser, 9),
+	subobserver_priority_queue<ImportTokenEvent>(std::bind(&SemanticTypeChecker::matchImport, this, std::placeholders::_1), parser, 9) {
 }
 
 bool ska::SemanticTypeChecker::statementHasReturnOnAllControlPath(const ASTNode& node) {	
@@ -61,8 +60,8 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 
         case ReturnTokenEventType::BUILTIN:
 		case ReturnTokenEventType::OBJECT: {
-			const auto symbol = m_symbols.enclosingType();
-			auto* finalSymbol = m_symbols[symbol->getName()];
+			const auto symbol = token.symbolTable().enclosingType();
+			auto* finalSymbol = token.symbolTable()[symbol->getName()];
 			if (symbol == nullptr || symbol->getName().empty() || finalSymbol == nullptr) {
 				throw std::runtime_error("return must be place in a function block or a nested one");
 			}
@@ -226,8 +225,8 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 }
 
 bool ska::SemanticTypeChecker::matchImport(const ImportTokenEvent& token) {
-	assert(m_symbols.current() != nullptr);
-	const auto& parent = m_symbols.current()->parent();
+	assert(token.symbolTable().current() != nullptr);
+	const auto& parent = token.symbolTable().current()->parent();
 	/*
 	TODO
 	if(&parent != m_symbols.current()) {

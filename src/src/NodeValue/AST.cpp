@@ -1,9 +1,21 @@
 #include "AST.h"
 #include "Service/ASTFactory.h"
-
+#include "Service/Script.h"
 ska::ASTNode::ASTNode(): 
 	m_type(Type::MakeBuiltIn(ExpressionType::VOID)) {
 
+}
+ska::ASTNode::ASTNode(ScriptPtr s, std::vector<ASTNodePtr> children) :
+	m_op(Operator::IMPORT),
+	m_linkedScript(std::move(s)) {
+	if (!children.empty()) {
+		m_children.reserve(children.size());
+		for (auto& child : children) {
+			if (child != nullptr) {
+				m_children.push_back(std::move(child));
+			}
+		}
+	}
 }
 
 ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
