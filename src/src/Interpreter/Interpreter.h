@@ -5,7 +5,7 @@
 #include "NodeValue/Operator.h"
 #include "NodeValue/ASTNodePtr.h"
 
-#include "Service/Binding.h"
+#include "Service/BindingFactory.h"
 
 #include "MemoryTable.h"
 #include "ExecutionContext.h"

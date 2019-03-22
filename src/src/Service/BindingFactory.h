@@ -1,7 +1,10 @@
 #pragma once
 #include <functional>
+#include <cassert>
 #include <unordered_map>
 #include <Data/Events/EventDispatcher.h>
+
+#include "NodeValue/ASTNodePtr.h"
 #include "Interpreter/BridgeFunction.h"
 #include "Utils/Observable.h"
 #include "Utils/TupleUtils.h"
@@ -18,7 +21,7 @@ namespace ska {
 	struct ReservedKeywordsPool;
 
 	//http://coliru.stacked-crooked.com/a/8efdf80ac4082e22
-	class Binding :
+	class BindingFactory :
 		public EventDispatcher<
 			VarTokenEvent,
 			FunctionTokenEvent,
@@ -26,18 +29,21 @@ namespace ska {
 			BridgeTokenEvent
 		> {
 	public:
-		Binding(Interpreter& interpreter, SymbolTable& symbolTable, TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
-		virtual ~Binding();
+		BindingFactory(Interpreter& interpreter, TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
+		virtual ~BindingFactory();
 
 		template <class ReturnType, class ... ParameterTypes>
-		ska::BridgeFunctionPtr bindFunction(const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
+		BridgeFunctionPtr bindFunction(Script& script, const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
 			auto typeNames = buildTypes<ParameterTypes..., ReturnType>();
 			auto result = makeScriptSideBridge(std::move(f));
-			bindSymbol(functionName, std::move(typeNames));
+			result->node = bindSymbol(script, functionName, std::move(typeNames));
 			return result;
 		}
 
 	private:
+		void unlisten(SymbolTable& symbolTable);
+		void listen(SymbolTable& symbolTable);
+
 		template <class ReturnType, class ... ParameterTypes, std::size_t... Idx>
 		auto callNativeFromScript(std::function<ReturnType(ParameterTypes...)> f, std::vector<NodeValue>& v, std::index_sequence<Idx...>) {
 			return f(convertTypeFromScript<ParameterTypes, Idx>(v)...);
@@ -101,13 +107,11 @@ namespace ska {
 			return ss;
 		}
 
-		void bindSymbol(const std::string& functionName, std::vector<std::string> typeNames);
+		ASTNodePtr bindSymbol(Script& script, const std::string& functionName, std::vector<std::string> typeNames);
 
 		Interpreter& m_interpreter;
-		SymbolTable& m_observer;
 		TypeBuilder& m_typeBuilder;
 		SymbolTableTypeUpdater& m_symbolTypeUpdater;
         const ReservedKeywordsPool& m_reserved;
-		std::vector<ASTNodePtr> m_bridges;
 	};
 }

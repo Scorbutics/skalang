@@ -2,6 +2,7 @@
 #include <functional>
 #include <memory>
 #include "NodeValue.h"
+#include "NodeValue/ASTNodePtr.h"
 
 namespace ska {
 	struct BridgeFunction {
@@ -11,6 +12,7 @@ namespace ska {
         BridgeFunction(F&& callback) : function(std::forward<F>(callback)) {}
 
 		Callback function;
+		ASTNodePtr node;
 	};
 
 	using BridgeFunctionPtr = std::shared_ptr<BridgeFunction>;

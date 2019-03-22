@@ -212,8 +212,7 @@ TEST_CASE("[Interpreter]") {
 			CHECK(res.nodeval<int>() == 3);
 		}
 
-		
-         SUBCASE("C++ binding") {
+        SUBCASE("C++ 1 script-function binding") {
 			ASTFromInputSemanticTCInterpreterNoParse("var User218 = import \"binding\"; User218.funcTest(14, \"titito\");", data);
 			auto test = 0;
 			auto testStr = std::string{ "" };
@@ -223,15 +222,39 @@ TEST_CASE("[Interpreter]") {
 				return 0;
 			});
 
-			auto binding = ska::Binding{ *data.interpreter, readerI->symbols(), *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
-			auto bridge = binding.bindFunction("funcTest", std::move(function));
-			data.interpreter->bind(*readerI, "binding.miniska", std::move(bridge));
+			auto binding = ska::BindingFactory{ *data.interpreter, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
+			auto bridge = binding.bindFunction(*readerI, "funcTest", std::move(function));
+			//data.interpreter->bind(*readerI, "binding.miniska", std::move(bridge));
 
             readerI->parse(*data.parser);
 			data.interpreter->script(*readerI);
 			CHECK(test == 14);
 			CHECK(testStr == "titito");
 		}
+
+        SUBCASE("C++ several script-function binding") {
+			ASTFromInputSemanticTCInterpreterNoParse("var User218 = import \"binding\"; User218.funcTest(14); User218.funcTest2(\"titito\");", data);
+			auto test = 0;
+			auto testStr = std::string{ "" };
+
+			auto factory = ska::BindingFactory{ *data.interpreter, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
+			auto function1 = factory.bindFunction(*readerI, "funcTest", std::function<int(int)>([&](int toto) -> int {
+				test = toto;
+				return 0;
+			}));
+			auto function2 = factory.bindFunction(*readerI, "funcTest2", std::function<int(std::string)>([&](std::string titi) -> int {
+				testStr = std::move(titi);
+				return 0;
+			}));
+
+			//data.interpreter->bind(*readerI, "binding.miniska", std::move(bridge));
+
+            readerI->parse(*data.parser);
+			data.interpreter->script(*readerI);
+			CHECK(test == 14);
+			CHECK(testStr == "titito");
+		}
+
 	}
 		
 }
