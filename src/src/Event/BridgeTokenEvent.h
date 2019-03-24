@@ -1,28 +1,31 @@
 #pragma once
 #include <cassert>
 #include "NodeValue/Operator.h"
+#include "Service/ScriptPtr.h"
 
 namespace ska {
-	class ASTNode;
 	class SymbolTable;
+	class Script;
+	class ASTNode;
+
 	class BridgeTokenEvent {
 	public:
-		BridgeTokenEvent(ASTNode& node, SymbolTable& s) : m_node(node), m_symbolTable(s) { assert(m_node.op() == Operator::BRIDGE); }
+		BridgeTokenEvent(ASTNode& node, std::string scriptName, Script& parentScript);
 
-		auto& rootNode() {
-			return m_node;
-		}
+		Script* script();
+		const Script* script() const;
 
-		const auto& rootNode() const {
-			return m_node;
-		}
+		ASTNode& rootNode();
+		const ASTNode& rootNode() const;
 
-		SymbolTable& symbolTable() {
-			return m_symbolTable;
-		}
+		const std::string& name() const { return m_name; }
+
+		SymbolTable& symbolTable();
 
 	private:
 		ASTNode& m_node;
+		ScriptPtr m_script;
+		std::string m_name;
 		SymbolTable& m_symbolTable;
 	};
 }

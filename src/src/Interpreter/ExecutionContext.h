@@ -2,26 +2,25 @@
 #include <cassert>
 
 namespace ska {
-	class Script;
+	
 	class ASTNode;
 	class NodeValue;
 	class MemoryTable;
+	struct ScriptHandle;
+	class Script;
 
 	class ExecutionContext {
 		friend bool operator!=(const ska::ExecutionContext& lhs, const ska::ExecutionContext& rhs);
 	public:
 		ExecutionContext() = default;
 		explicit ExecutionContext(Script& program);
-		ExecutionContext(Script& program, ASTNode& node) :
-			m_program(&program),
-			m_pointer(&node){
-		}
+		ExecutionContext(Script& program, ASTNode& node);
 
 		ASTNode& pointer() { assert(m_pointer != nullptr); return *m_pointer; }
-		Script& program() { assert(m_program != nullptr); return *m_program; }
+		ScriptHandle& program() { assert(m_program != nullptr); return *m_program; }
 
 	private:
-		Script* m_program{};
+		ScriptHandle* m_program {};
 		ASTNode* m_pointer{};
 	};
 

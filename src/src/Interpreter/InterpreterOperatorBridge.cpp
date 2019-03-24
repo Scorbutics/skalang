@@ -7,5 +7,12 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::InterpreterOperator<ska::Operator::BRIDGE>);
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::BRIDGE>::interpret(OperateOn node) {
-	return node.parent.memory()[node.GetObject().name()];
+	auto bridgeCellData = node.parent.symbols()[node.GetObject().name()];
+
+	if (bridgeCellData == nullptr) {
+		throw std::runtime_error("unable to find the bridged script \"" + node.GetObject().name() + "\" in the current memory");
+	}
+	auto script = node.parent.subScript(bridgeCellData->getName());
+	auto ec = ExecutionContext{ *script };
+	return ska::NodeCell{ ec };
 }

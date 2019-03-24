@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Operation.h"
+#include "Service/Script.h"
 
 namespace ska {
 	class ASTNode;
@@ -10,7 +11,7 @@ namespace ska {
 	private:
 		ASTNode& node;
 	public:
-		Script& parent;
+		Script parent;
 		Operation(ExecutionContext& context) : node(context.pointer()), parent(context.program()) {}
 
 		inline auto GetFunctionName() {
@@ -30,28 +31,4 @@ namespace ska {
 		}
 	};
 	
-	template<>
-	class Operation<Operator::FUNCTION_PROTOTYPE_DECLARATION> {
-	private:
-		ASTNode& node;
-	public:
-		Script& parent;
-
-		inline auto GetFunctionName() {
-			return node.name();
-		}
-
-		inline auto& GetFunction() {
-			return node;
-		}
-
-		auto begin() {
-			return node.begin();
-		}
-		
-		auto end() {
-			return node.end();
-		}
-
-	};
 }

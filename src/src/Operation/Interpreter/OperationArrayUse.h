@@ -2,6 +2,7 @@
 
 #include <cassert>
 #include "Operation.h"
+#include "Service/Script.h"
 
 namespace ska {
 	class ASTNode;
@@ -10,7 +11,7 @@ namespace ska {
 	private:
 		ASTNode& node;
 	public:
-		Script& parent;
+		Script parent;
 		Operation(ExecutionContext& context) : node(context.pointer()), parent(context.program()) {}
 
 		inline auto GetArrayName() {

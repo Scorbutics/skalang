@@ -30,7 +30,7 @@ ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
 }
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, const Script& script) {
-	return emplace(Symbol{ name, script });
+	return emplace(Symbol{ name, script.handle() });
 }
 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested() {

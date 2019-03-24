@@ -2,7 +2,6 @@
 #include <functional>
 #include <cassert>
 #include <unordered_map>
-#include <Data/Events/EventDispatcher.h>
 
 #include "NodeValue/ASTNodePtr.h"
 #include "Interpreter/BridgeFunction.h"
@@ -12,6 +11,7 @@
 #include "Event/FunctionTokenEvent.h"
 #include "Event/BlockTokenEvent.h"
 #include "Event/BridgeTokenEvent.h"
+#include "Container/sorted_observable.h"
 
 namespace ska {
 	class SymbolTable;
@@ -22,12 +22,10 @@ namespace ska {
 
 	//http://coliru.stacked-crooked.com/a/8efdf80ac4082e22
 	class BindingFactory :
-		public EventDispatcher<
-			VarTokenEvent,
-			FunctionTokenEvent,
-			BlockTokenEvent,
-			BridgeTokenEvent
-		> {
+		public observable_priority_queue<VarTokenEvent>,
+		public observable_priority_queue<FunctionTokenEvent>,
+		public observable_priority_queue<BlockTokenEvent>,
+		public observable_priority_queue<BridgeTokenEvent> {
 	public:
 		BindingFactory(Interpreter& interpreter, TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
 		virtual ~BindingFactory();

@@ -5,6 +5,8 @@
 #include "Service/StatementParser.h"
 #include "Service/ASTFactory.h"
 #include "Operation/Type/OperationTypeBridge.h"
+#include "Event/BridgeTokenEvent.h"
+#include "Service/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTable)
 
@@ -193,10 +195,9 @@ bool ska::SymbolTable::matchImport(const ImportTokenEvent& token) {
 }
 
 bool ska::SymbolTable::matchBridge(const BridgeTokenEvent& token) {
-	/*const auto& scriptName = token.rootNode()[0].name();
-	const auto symbol = (*this)[scriptName];
-	if (symbol == nullptr) {
-		return true;
-	}*/
+	if (token.script() != nullptr && token.script()->isBridged()) {
+		//Binds the current memory table to the bridge-script, only if it's bridged
+		m_currentTable->emplace(token.name(), *token.script());
+	}	
 	return true;
 }

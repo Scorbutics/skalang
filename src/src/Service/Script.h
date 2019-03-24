@@ -2,30 +2,23 @@
 #include <memory>
 #include <unordered_map>
 #include "ScriptPtr.h"
-#include "NodeValue/ASTNodePtr.h"
-#include "Service/SymbolTable.h"
-#include "Service/TokenReader.h"
-#include "NodeValue/Token.h"
+#include "ScriptHandle.h"
+#include "ScriptCache.h"
+#include "Interpreter/BridgeFunction.h"
 
 namespace ska {
 	class StatementParser;
-	struct ScriptHandle {
-            ScriptHandle(std::vector<Token> input, std::size_t startIndex = 0) : 
-                m_input(std::move(input), startIndex) {}
-
-        TokenReader m_input;
-        SymbolTable m_symbols;
-		MemoryTable m_memory;
-        ASTNodePtr m_ast;
-    };
-
-    using ScriptHandlePtr = std::unique_ptr<ScriptHandle>;
 
     class Script {
 	public:
-		Script(std::unordered_map<std::string, ScriptHandlePtr>& scriptCache, const std::string& name, std::vector<Token> input, std::size_t startIndex = 0) :
+		Script(ScriptHandle& handle) :
+			m_cache(handle.m_cache) {
+			m_handle = &handle;
+		}
+
+		Script(ScriptCache& scriptCache, const std::string& name, std::vector<Token> input, std::size_t startIndex = 0) :
 			m_cache(scriptCache) {
-            auto handle = std::make_unique<ScriptHandle>(std::move(input), startIndex);
+            auto handle = std::make_unique<ScriptHandle>(m_cache, std::move(input), startIndex);
             if(m_cache.find(name) == m_cache.end()) {
 				m_cache.emplace(name, std::move(handle));
             } else {
@@ -61,6 +54,11 @@ namespace ska {
 		ASTNodePtr optexpr(StatementParser& parser, const Token& mustNotBe = Token{});
 
 		ScriptPtr subParse(StatementParser& parser, const std::string& name, std::ifstream& file);
+		ScriptPtr subScript(const std::string& name);
+
+		ASTNode& fromBridge(std::vector<BridgeFunctionPtr> bindings);
+
+		const auto& handle() const { return m_handle; }
 
 		SymbolTable& symbols() { return m_handle->m_symbols; }
 		const SymbolTable& symbols() const { return m_handle->m_symbols; }
@@ -72,9 +70,15 @@ namespace ska {
 			return *m_handle->m_ast;
 		}
 
+		const auto& rootNode() const {
+			return *m_handle->m_ast;
+		}
+
+		bool isBridged() const { return m_handle->m_bridged; }
+
 	private:
         ScriptHandle* m_handle = nullptr;
-        std::unordered_map<std::string, ScriptHandlePtr>& m_cache;
+		ScriptCache& m_cache;
 		bool m_inCache = false;
 
 	};

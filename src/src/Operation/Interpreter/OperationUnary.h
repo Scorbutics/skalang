@@ -2,6 +2,7 @@
 
 #include "Operation.h"
 #include "NodeValue/AST.h"
+#include "Service/Script.h"
 
 namespace ska {
 	template<>
@@ -9,7 +10,7 @@ namespace ska {
 	private:
 		ASTNode& node;
 	public:
-		Script& parent;
+		Script parent;
 		Operation(ExecutionContext& context) : node(context.pointer()), parent(context.program()) {}
 
 		inline auto GetValue() {
@@ -26,7 +27,7 @@ namespace ska {
 	private:
 		ASTNode& node;
 	public:
-		Script& parent;
+		Script parent;
 		Operation(ExecutionContext& context) : node(context.pointer()), parent(context.program()) {}
 
 		inline auto GetValue() {

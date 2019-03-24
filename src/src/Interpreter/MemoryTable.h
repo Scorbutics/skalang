@@ -21,6 +21,7 @@ namespace ska {
 
 		[[nodiscard]]
 		MemoryTable* parent();
+		[[nodiscard]]
 		MemoryTable& down() {
 			assert(!m_current->m_children.empty());
 			return *m_current->m_children[0].get();

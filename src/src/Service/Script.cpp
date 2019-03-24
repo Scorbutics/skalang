@@ -1,8 +1,32 @@
+#include <memory>
 #include "Script.h"
 #include "StatementParser.h"
+#include "Service/ASTFactory.h"
 
 const ska::Token& ska::Script::readPrevious(std::size_t offset) const {
 	return m_handle->m_input.readPrevious(offset);
+}
+
+ska::ScriptPtr ska::Script::subScript(const std::string& name) {
+	return existsInCache(name) ? std::make_unique<Script>(m_cache, name, std::vector<Token>{}) : nullptr;
+}
+
+ska::ASTNode& ska::Script::fromBridge(std::vector<BridgeFunctionPtr> bindings) {
+	assert(m_handle->m_ast == nullptr && "Script built from a bridge must be empty");
+
+	memory().createNested();
+	auto functionListNodes = bindings.empty() ? std::vector<ASTNodePtr>() : std::vector<ASTNodePtr>(bindings.size());
+	for (auto& bridgeFunction : bindings) {
+		auto functionName = bridgeFunction->node->name();
+		auto functionVarDeclarationNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(Token{ functionName, TokenType::IDENTIFIER }), std::move(bridgeFunction->node));
+		functionListNodes.push_back(std::move(functionVarDeclarationNode));
+		memory().emplace(functionName, NodeValue{ std::move(bridgeFunction) });
+	}
+	memory().endNested();
+
+	m_handle->m_ast = ASTFactory::MakeNode<Operator::BLOCK>(std::move(functionListNodes));
+	m_handle->m_bridged = true;
+	return *m_handle->m_ast;
 }
 
 bool ska::Script::canReadPrevious(std::size_t offset) const {

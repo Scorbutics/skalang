@@ -4,6 +4,7 @@
 #include "NodeValue/AST.h"
 #include "Service/ASTFactory.h"
 
+#include "Service/Script.h"
 #include "Service/StatementParser.h"
 
 SKA_LOGC_CONFIG(LogLevel::Debug, TypeBuilder)

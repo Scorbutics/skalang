@@ -10,7 +10,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::Symbol)
 
 namespace ska {
 	class ScopedSymbolTable;
- 	class Script;
+	struct ScriptHandle;
 
     class Symbol {
         friend class ScopedSymbolTable;
@@ -23,9 +23,9 @@ namespace ska {
 				SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" from table";
             }
 
-            Symbol(std::string name, const Script& script) :
+            Symbol(std::string name, const ScriptHandle* script) :
 				m_name(std::move(name)), 
-				m_data(&script) {
+				m_data(script) {
 				SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" from script";
             }
         public:
@@ -83,7 +83,7 @@ namespace ska {
             std::size_t size() const;
 
         private:
-			std::variant<ScopedSymbolTable*, const Script*> m_data = static_cast<ScopedSymbolTable*>(nullptr);
+			std::variant<ScopedSymbolTable*, const ScriptHandle* > m_data = static_cast<ScopedSymbolTable*>(nullptr);
             std::string m_name;
             Type m_category;
     };

@@ -20,5 +20,12 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const Sym
     }
 
     SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Field accessed " << node.GetFieldName() << " (type " << symbolField->getType() << ") of " << node.GetObjectName();
+	
+	if (symbolField->getType() == ExpressionType::VOID) {
+		auto ss = std::stringstream{};
+		ss << "field \"" << node.GetFieldName() << "\" of \"" << node.GetObjectName() << "\" has a void type, which is invalid";
+		throw std::runtime_error(ss.str());
+	}
+
 	return symbolField->getType();
 }

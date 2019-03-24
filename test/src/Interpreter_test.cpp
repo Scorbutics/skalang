@@ -9,13 +9,15 @@
 #include "Service/StatementParser.h"
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
+#include "Service/ScriptBinding.h"
 #include "Service/Script.h"
+#include "Service/ScriptCache.h"
 
 const auto reservedKeywords = ska::ReservedKeywordsPool{};
 auto tokenizer = std::unique_ptr<ska::Tokenizer>{};
 std::vector<ska::Token> tokens;
 auto readerI = std::unique_ptr<ska::Script>{};
-auto scriptCacheI = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+auto scriptCacheI = ska::ScriptCache{};
 
 void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTestContainer& data) {
     tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);
@@ -222,9 +224,10 @@ TEST_CASE("[Interpreter]") {
 				return 0;
 			});
 
-			auto binding = ska::BindingFactory{ *data.interpreter, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
-			auto bridge = binding.bindFunction(*readerI, "funcTest", std::move(function));
-			//data.interpreter->bind(*readerI, "binding.miniska", std::move(bridge));
+			
+			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding", *data.interpreter, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
+			scriptBinding.bindFunction("funcTest", std::move(function));
+			scriptBinding.build();
 
             readerI->parse(*data.parser);
 			data.interpreter->script(*readerI);
@@ -233,21 +236,23 @@ TEST_CASE("[Interpreter]") {
 		}
 
         SUBCASE("C++ several script-function binding") {
-			ASTFromInputSemanticTCInterpreterNoParse("var User218 = import \"binding\"; User218.funcTest(14); User218.funcTest2(\"titito\");", data);
+			ASTFromInputSemanticTCInterpreterNoParse("var User239 = import \"binding\"; User239.funcTest(14); User239.funcTest2(\"titito\");", data);
 			auto test = 0;
 			auto testStr = std::string{ "" };
 
-			auto factory = ska::BindingFactory{ *data.interpreter, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
-			auto function1 = factory.bindFunction(*readerI, "funcTest", std::function<int(int)>([&](int toto) -> int {
+			auto function1 = std::function<int(int)>([&](int toto) -> int {
 				test = toto;
 				return 0;
-			}));
-			auto function2 = factory.bindFunction(*readerI, "funcTest2", std::function<int(std::string)>([&](std::string titi) -> int {
+			});
+			auto function2 = std::function<int(std::string)>([&](std::string titi) -> int {
 				testStr = std::move(titi);
 				return 0;
-			}));
+			});
 
-			//data.interpreter->bind(*readerI, "binding.miniska", std::move(bridge));
+			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding", *data.interpreter, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
+			scriptBinding.bindFunction("funcTest", std::move(function1));
+			scriptBinding.bindFunction("funcTest2", std::move(function2));
+			scriptBinding.build();
 
             readerI->parse(*data.parser);
 			data.interpreter->script(*readerI);
