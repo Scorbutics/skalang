@@ -236,7 +236,7 @@ TEST_CASE("[Interpreter]") {
 		}
 
         SUBCASE("C++ several script-function binding") {
-			ASTFromInputSemanticTCInterpreterNoParse("var User239 = import \"binding\"; User239.funcTest(14); User239.funcTest2(\"titito\");", data);
+			ASTFromInputSemanticTCInterpreterNoParse("var User239 = import \"binding239\"; User239.funcTest(14); User239.funcTest2(\"titito\");", data);
 			auto test = 0;
 			auto testStr = std::string{ "" };
 
@@ -249,7 +249,7 @@ TEST_CASE("[Interpreter]") {
 				return 0;
 			});
 
-			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding", *data.interpreter, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
+			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding239", *data.interpreter, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
 			scriptBinding.bindFunction("funcTest", std::move(function1));
 			scriptBinding.bindFunction("funcTest2", std::move(function2));
 			scriptBinding.build();

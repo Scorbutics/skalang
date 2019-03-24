@@ -58,10 +58,6 @@ ska::Interpreter::Interpreter(const ReservedKeywordsPool& reserved) :
 	m_operatorInterpreter(build()) {
 }
 
-void ska::Interpreter::bind(Script& script, const std::string& functionName, BridgeFunctionPtr bridge) {
-	script.memory().emplace(functionName, NodeValue{ std::move(bridge) });
-}
-
 ska::NodeCell ska::Interpreter::interpret(ExecutionContext node) {
 	auto& builder = m_operatorInterpreter[static_cast<std::size_t>(node.pointer().op())];
 	assert(builder != nullptr);
