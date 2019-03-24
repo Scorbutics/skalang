@@ -225,7 +225,7 @@ TEST_CASE("[Interpreter]") {
 			});
 
 			
-			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding", *data.interpreter, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
+			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
 			scriptBinding.bindFunction("funcTest", std::move(function));
 			scriptBinding.build();
 
@@ -249,7 +249,7 @@ TEST_CASE("[Interpreter]") {
 				return 0;
 			});
 
-			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding239", *data.interpreter, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
+			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding239", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
 			scriptBinding.bindFunction("funcTest", std::move(function1));
 			scriptBinding.bindFunction("funcTest2", std::move(function2));
 			scriptBinding.build();

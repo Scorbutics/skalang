@@ -1,7 +1,6 @@
 #include <functional>
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Script.h"
-#include "Interpreter/Interpreter.h"
 #include "Config/LoggerConfigLang.h"
 #include "Service/SymbolTable.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
@@ -11,8 +10,7 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::BindingFactory)
 
-ska::BindingFactory::BindingFactory(Interpreter& interpreter, TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved) :
-	m_interpreter(interpreter),
+ska::BindingFactory::BindingFactory(TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved) :
     m_reserved(reserved),
 	m_typeBuilder(typeBuilder),
 	m_symbolTypeUpdater(symbolTypeUpdater) {

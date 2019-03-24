@@ -15,7 +15,6 @@
 
 namespace ska {
 	class SymbolTable;
-	class Interpreter;
 	class TypeBuilder;
 	class SymbolTableTypeUpdater;
 	struct ReservedKeywordsPool;
@@ -27,7 +26,7 @@ namespace ska {
 		public observable_priority_queue<BlockTokenEvent>,
 		public observable_priority_queue<BridgeTokenEvent> {
 	public:
-		BindingFactory(Interpreter& interpreter, TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
+		BindingFactory(TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
 		virtual ~BindingFactory();
 
 		template <class ReturnType, class ... ParameterTypes>
@@ -107,7 +106,6 @@ namespace ska {
 
 		ASTNodePtr bindSymbol(Script& script, const std::string& functionName, std::vector<std::string> typeNames);
 
-		Interpreter& m_interpreter;
 		TypeBuilder& m_typeBuilder;
 		SymbolTableTypeUpdater& m_symbolTypeUpdater;
         const ReservedKeywordsPool& m_reserved;

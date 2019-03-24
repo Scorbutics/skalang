@@ -10,13 +10,12 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptBridge);
 ska::ScriptBridge::ScriptBridge(
 	ScriptCache& cache,
 	std::string scriptName,
-	Interpreter& interpreter,
 	TypeBuilder& typeBuilder,
 	SymbolTableTypeUpdater& symbolTypeUpdater,
 	const ReservedKeywordsPool& reserved) :
 	m_typeBuilder(typeBuilder),
 	m_symbolTypeUpdater(symbolTypeUpdater),
-	m_functionBinder(interpreter, typeBuilder, symbolTypeUpdater, reserved),
+	m_functionBinder(typeBuilder, symbolTypeUpdater, reserved),
 	m_name(std::move(scriptName)),
 	m_script(cache, m_name + ".miniska", std::vector<Token>{}) {
 	observable_priority_queue<VarTokenEvent>::addObserver(m_typeBuilder);

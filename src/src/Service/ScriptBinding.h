@@ -21,7 +21,6 @@ namespace ska {
 		ScriptBridge(
 			ScriptCache& cache,
 			std::string scriptName,
-			Interpreter& interpreter,
 			TypeBuilder& typeBuilder,
 			SymbolTableTypeUpdater& symbolTypeUpdater,
 			const ReservedKeywordsPool& reserved);
