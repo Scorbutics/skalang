@@ -291,6 +291,28 @@ TEST_CASE("[Interpreter]") {
 			CHECK(test == 10);
 		}
 
+		SUBCASE("C++ script-function binding generic form, complex object") {
+			ASTFromInputSemanticTCInterpreterNoParse("var User279 = import \"binding279\"; var DataClass = function(name: string) : var { return { id : 1234, name : name }; }; var data = DataClass(\"JeanMi\"); User279.funcTest(data);", data);
+			auto test = 0;
+			std::string name;
+
+			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding279", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
+			scriptBinding.bindGenericFunction("funcTest", { "var", "void" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+				auto mem = params[0].nodeval<std::shared_ptr<ska::MemoryTable>>();
+				auto* idMap = (*mem)("id").first;
+				auto* nameMap = (*mem)("name").first;
+				test = idMap->nodeval<int>();
+				name = nameMap->nodeval<std::string>();
+				return ska::NodeValue{};
+			}));
+			scriptBinding.build();
+
+			readerI->parse(*data.parser);
+			data.interpreter->script(*readerI);
+			CHECK(test == 1234);
+			CHECK(name == "JeanMi");
+		}
+
 	}
 		
 }
