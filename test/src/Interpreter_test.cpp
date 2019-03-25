@@ -292,11 +292,11 @@ TEST_CASE("[Interpreter]") {
 		}
 
 		SUBCASE("C++ script-function binding generic form, complex object") {
-			ASTFromInputSemanticTCInterpreterNoParse("var User279 = import \"binding279\"; var DataClass = function(name: string) : var { return { id : 1234, name : name }; }; var data = DataClass(\"JeanMi\"); User279.funcTest(data);", data);
+			ASTFromInputSemanticTCInterpreterNoParse("var User295 = import \"binding295\"; var DataClass = function(name: string) : var { return { id : 1234, name : name }; }; var data = DataClass(\"JeanMi\"); User295.funcTest(data);", data);
 			auto test = 0;
 			std::string name;
 
-			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding279", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
+			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding295", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
 			scriptBinding.bindGenericFunction("funcTest", { "var", "void" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 				auto mem = params[0].nodeval<std::shared_ptr<ska::MemoryTable>>();
 				auto* idMap = (*mem)("id").first;
