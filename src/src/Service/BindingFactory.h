@@ -37,6 +37,12 @@ namespace ska {
 			return result;
 		}
 
+		BridgeFunctionPtr bindGenericFunction(Script& script, const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
+			auto result = std::make_unique<BridgeFunction>(std::move(f));
+			result->node = bindSymbol(script, functionName, std::move(typeNames));
+			return result;
+		}
+
 	private:
 		void unlisten(SymbolTable& symbolTable);
 		void listen(SymbolTable& symbolTable);

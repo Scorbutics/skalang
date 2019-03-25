@@ -35,6 +35,11 @@ namespace ska {
 			m_bindings.push_back(m_functionBinder.bindFunction<ReturnType, ParameterTypes...>(m_script, functionName, std::move(f)));
 		}
 
+		void bindGenericFunction(const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
+			assert(m_scriptMemoryNode == nullptr);
+			m_bindings.push_back(m_functionBinder.bindGenericFunction(m_script, functionName, std::move(typeNames), std::move(f)));
+		}
+
 	
 	private:
 		TypeBuilder& m_typeBuilder;

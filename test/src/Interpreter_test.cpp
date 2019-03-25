@@ -261,20 +261,34 @@ TEST_CASE("[Interpreter]") {
 		}
 
         SUBCASE("C++ script-function binding with void return") {
-			ASTFromInputSemanticTCInterpreterNoParse("var User264 = import \"binding264\"; var titito = User264.funcTest(14);", data);
+			ASTFromInputSemanticTCInterpreterNoParse("var User264 = import \"binding264\"; User264.funcTest(14);", data);
 			auto test = 0;
-
-			auto function = std::function<void(int)>([&](int toto) {
-				test = toto;
-			});
 			
 			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding264", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
-			scriptBinding.bindFunction("funcTest", std::move(function));
+			scriptBinding.bindFunction("funcTest", std::function<void(int)>([&](int toto) {
+				test = toto;
+			}));
 			scriptBinding.build();
 
             readerI->parse(*data.parser);
 			data.interpreter->script(*readerI);
 			CHECK(test == 14);
+		}
+
+		SUBCASE("C++ script-function binding generic form") {
+			ASTFromInputSemanticTCInterpreterNoParse("var User279 = import \"binding279\"; User279.funcTest(10);", data);
+			auto test = 0;
+
+			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding279", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
+			scriptBinding.bindGenericFunction("funcTest", {"int", "void"}, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+				test = params[0].nodeval<int>();
+				return ska::NodeValue{};
+			}));
+			scriptBinding.build();
+
+			readerI->parse(*data.parser);
+			data.interpreter->script(*readerI);
+			CHECK(test == 10);
 		}
 
 	}
