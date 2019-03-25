@@ -260,6 +260,23 @@ TEST_CASE("[Interpreter]") {
 			CHECK(testStr == "titito");
 		}
 
+        SUBCASE("C++ script-function binding with void return") {
+			ASTFromInputSemanticTCInterpreterNoParse("var User264 = import \"binding264\"; User264.funcTest(14);", data);
+			auto test = 0;
+
+			auto function = std::function<void(int)>([&](int toto) {
+				test = toto;
+			});
+			
+			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding264", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
+			scriptBinding.bindFunction("funcTest", std::move(function));
+			scriptBinding.build();
+
+            readerI->parse(*data.parser);
+			data.interpreter->script(*readerI);
+			CHECK(test == 14);
+		}
+
 	}
 		
 }

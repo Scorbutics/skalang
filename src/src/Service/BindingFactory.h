@@ -42,15 +42,22 @@ namespace ska {
 		void listen(SymbolTable& symbolTable);
 
 		template <class ReturnType, class ... ParameterTypes, std::size_t... Idx>
-		auto callNativeFromScript(std::function<ReturnType(ParameterTypes...)> f, std::vector<NodeValue>& v, std::index_sequence<Idx...>) {
+		auto callNativeFromScript(std::function<ReturnType(ParameterTypes...)> f, const std::vector<NodeValue>& v, std::index_sequence<Idx...>) {
 			return f(convertTypeFromScript<ParameterTypes, Idx>(v)...);
 		}
 
 		template <class ReturnType, class ... ParameterTypes>
 		BridgeFunctionPtr makeScriptSideBridge(std::function<ReturnType(ParameterTypes...)> f) {
-			return std::make_unique<BridgeFunction>(static_cast<decltype(BridgeFunction::function)> ([f, this](std::vector<NodeValue> v) {
-				return NodeValue{ callNativeFromScript(std::move(f), v, std::make_index_sequence<sizeof ...(ParameterTypes)>()) };
-			}) );
+			auto lambdaWrapped = [f, this](std::vector<NodeValue> v) {
+				if constexpr(std::is_same_v<ReturnType, void>) {
+					callNativeFromScript(std::move(f), v, std::make_index_sequence<sizeof ...(ParameterTypes)>());
+					return NodeValue{};
+				} else {
+					return NodeValue(callNativeFromScript(std::move(f), v, std::make_index_sequence<sizeof ...(ParameterTypes)>()));
+				}
+			};
+
+			return std::make_unique<BridgeFunction>(static_cast<decltype(BridgeFunction::function)> (std::move(lambdaWrapped)));
 		}
 
 		template <class T, std::size_t Id>
@@ -72,7 +79,6 @@ namespace ska {
 			} else {
 				assert(!"Invalid type for bridge function");
 				return T{};
-                
 			}
 		}
 
@@ -90,6 +96,8 @@ namespace ska {
 				ss.push_back("bool");
 			} else if constexpr (std::is_same<T, double>()) {
 				ss.push_back("float");
+			} else if constexpr (std::is_same<T, void>()) {
+				ss.push_back("void");
 			} else {
 				assert(!"Invalid type for bridge function");
 			}
@@ -97,7 +105,6 @@ namespace ska {
 
 		template<class ... Types>
 		std::vector<std::string> buildTypes() {
-			auto types = std::tuple<Types...>{};
 			auto ss = std::vector<std::string>{};
 			int _[] = {0, (buildType<Types>(ss), 0)...};
 			(void)_;
