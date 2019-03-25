@@ -261,7 +261,7 @@ TEST_CASE("[Interpreter]") {
 		}
 
         SUBCASE("C++ script-function binding with void return") {
-			ASTFromInputSemanticTCInterpreterNoParse("var User264 = import \"binding264\"; User264.funcTest(14);", data);
+			ASTFromInputSemanticTCInterpreterNoParse("var User264 = import \"binding264\"; var titito = User264.funcTest(14);", data);
 			auto test = 0;
 
 			auto function = std::function<void(int)>([&](int toto) {

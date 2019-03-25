@@ -15,6 +15,7 @@ namespace ska {
         INT,
 		FLOAT,
 		STRING,
+		VOID,
 		//Reserved symbols
 		METHOD_CALL_OPERATOR,
 		AFFECTATION,
@@ -49,6 +50,7 @@ namespace ska {
 		"int",
 		"float",
 		"string",
+		"void",
 		".",
 		"=",
 		"{",
