@@ -314,6 +314,42 @@ TEST_CASE("[Interpreter]") {
 			CHECK(name == "JeanMi");
 		}
 
+		SUBCASE("2 outside scripts from file, with C++ bridging") {
+			ASTFromInputSemanticTCInterpreterNoParse("var BridgeScript = import \"../test/src/resources/bridge_user\"; var BridgeScript2 = import \"../test/src/resources/bridge_user2\";", data);
+			auto test = 0;
+			auto count = 0;
+
+			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding322", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
+			scriptBinding.bindFunction("funcTest", std::function<void(int)>([&](int toto) {
+				test += toto;
+				count++;
+			}));
+			scriptBinding.build();
+
+			readerI->parse(*data.parser);
+			data.interpreter->script(*readerI);
+			CHECK(test == 3);
+			CHECK(count == 2);
+		}
+
+		SUBCASE("2 outside scripts from file, with C++ bridging, common script in cache") {
+			ASTFromInputSemanticTCInterpreterNoParse("var BridgeScript2 = import \"../test/src/resources/bridge_user2\"; var BridgeScript3 = import \"../test/src/resources/bridge_user3\";", data);
+			auto test = 0;
+			auto count = 0;
+
+			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding322", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
+			scriptBinding.bindFunction("funcTest", std::function<void(int)>([&](int toto) {
+				test += toto;
+				count++;
+			}));
+			scriptBinding.build();
+
+			readerI->parse(*data.parser);
+			data.interpreter->script(*readerI);
+			CHECK(test == 4);
+			CHECK(count == 3);
+		}
+
 	}
 		
 }

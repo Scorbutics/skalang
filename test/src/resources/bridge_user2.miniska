@@ -1,0 +1,2 @@
+var Bridge = import "binding322";
+Bridge.funcTest(2);
