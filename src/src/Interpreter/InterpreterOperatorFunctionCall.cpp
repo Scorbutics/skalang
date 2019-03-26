@@ -69,7 +69,7 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>::interpret(
 		auto operateOnFunction = Operation<Operator::FUNCTION_DECLARATION>(functionExecutionContext);
 		return InterpreterOperationFunctionCallScript(m_interpreter, *inMemoryFunctionZone.second, operateOnFunction, node);
 	} else {
-		auto bridgeCall = inMemoryFunctionZone.first->nodeval<std::shared_ptr<BridgeFunction>>();
+		auto bridgeCall = inMemoryFunctionZone.first->nodeval<BridgeMemory>();
 		auto operateOnFunction = Operation<Operator::FUNCTION_DECLARATION>(executionContext);
 		return InterpreterOperationFunctionCallBridge(m_interpreter, *bridgeCall, operateOnFunction, node);
 	}

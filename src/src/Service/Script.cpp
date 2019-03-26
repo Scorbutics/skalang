@@ -11,7 +11,7 @@ ska::ScriptPtr ska::Script::subScript(const std::string& name) {
 	return existsInCache(name) ? std::make_unique<Script>(m_cache, name, std::vector<Token>{}) : nullptr;
 }
 
-ska::ASTNode& ska::Script::fromBridge(std::vector<BridgeFunctionPtr> bindings) {
+ska::ASTNode& ska::Script::fromBridge(std::vector<BridgeMemory> bindings) {
 	assert(m_handle->m_ast == nullptr && "Script built from a bridge must be empty");
 
 	memory().createNested();

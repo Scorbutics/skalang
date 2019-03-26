@@ -56,7 +56,7 @@ namespace ska {
 		ScriptPtr subParse(StatementParser& parser, const std::string& name, std::ifstream& file);
 		ScriptPtr subScript(const std::string& name);
 
-		ASTNode& fromBridge(std::vector<BridgeFunctionPtr> bindings);
+		ASTNode& fromBridge(std::vector<BridgeMemory> bindings);
 
 		const auto& handle() const { return m_handle; }
 

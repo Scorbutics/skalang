@@ -14,6 +14,4 @@ namespace ska {
 		Callback function;
 		ASTNodePtr node;
 	};
-
-	using BridgeFunctionPtr = std::shared_ptr<BridgeFunction>;
 }

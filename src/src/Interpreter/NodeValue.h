@@ -8,6 +8,8 @@
 #include <memory>
 
 #include "NodeValue/Token.h"
+#include "NodeValue/NodeValueArray.h"
+#include "NodeValue/NodeValueMap.h"
 
 namespace ska {
 	class NodeValue;
@@ -16,8 +18,8 @@ namespace ska {
 
 	using NodeValueVariant_ = std::variant<
 		Token::Variant,
-		std::shared_ptr<std::vector<NodeValue>>,
-		std::shared_ptr<std::unordered_map<std::string, NodeValue>>
+		NodeValueArray,
+		NodeValueMap
 	>;
 	
 	namespace detail {
@@ -34,8 +36,8 @@ namespace ska {
 		NodeValue() = default;
 		template <class Arg>
 		NodeValue(Arg arg) : m_variant(std::move(arg)) {}
-		NodeValue(std::shared_ptr<std::vector<NodeValue>> arg) : m_variant(arg) {}
-		NodeValue(std::shared_ptr<std::unordered_map<std::string, NodeValue>> arg) : m_variant(arg) {}
+		NodeValue(NodeValueArray arg) : m_variant(arg) {}
+		NodeValue(NodeValueMap arg) : m_variant(arg) {}
 
 		NodeValue(NodeValue&&) = default;
 

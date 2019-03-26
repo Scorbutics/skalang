@@ -45,7 +45,7 @@ namespace ska {
 		TypeBuilder& m_typeBuilder;
 		SymbolTableTypeUpdater& m_symbolTypeUpdater;
 		BindingFactory m_functionBinder;
-		std::vector<BridgeFunctionPtr> m_bindings;
+		std::vector<BridgeMemory> m_bindings;
 		std::string m_name;
 		Script m_script;
 		ASTNodePtr m_scriptMemoryNode;

@@ -14,7 +14,7 @@ ska::MemoryTable & ska::MemoryTable::createNested() {
 }
 
 ska::MemoryTable* ska::MemoryTable::endNested() {
-	//TODO : à remettre, pour le moment bloque le système d'import de script
+	//TODO : ï¿½ remettre, pour le moment bloque le systï¿½me d'import de script
 	//m_current->m_memory.clear();
 	m_current = m_current->parent();
 	return m_current;
@@ -47,7 +47,7 @@ void ska::MemoryTable::put(const std::string& name, std::size_t index, NodeValue
 	auto memValueZone = operator[](name);
 	auto memValue = memValueZone.first;
 	assert(memValue != nullptr);
-	auto& arrayPtr = memValue->as<std::shared_ptr<std::vector<NodeValue>>>();
+	auto& arrayPtr = memValue->as<NodeValueArray>();
 	(*arrayPtr)[index] = std::move(value.as<Token::Variant>());
 }
 

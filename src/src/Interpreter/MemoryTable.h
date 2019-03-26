@@ -8,7 +8,8 @@
 
 namespace ska {
 	class MemoryTable {
-		using ChildrenScopedMemoryTable = std::vector<std::shared_ptr<MemoryTable>>;
+		using DynamicMemoryTable = std::shared_ptr<MemoryTable>;
+		using ChildrenScopedMemoryTable = std::vector<DynamicMemoryTable>;
 		using MemoryLValue = std::pair<NodeValue*, MemoryTable*>;
 		using MemoryCLValue = std::pair<const NodeValue*, const MemoryTable*>;
 	public:

@@ -30,14 +30,14 @@ namespace ska {
 		virtual ~BindingFactory();
 
 		template <class ReturnType, class ... ParameterTypes>
-		BridgeFunctionPtr bindFunction(Script& script, const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
+		BridgeMemory bindFunction(Script& script, const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
 			auto typeNames = buildTypes<ParameterTypes..., ReturnType>();
 			auto result = makeScriptSideBridge(std::move(f));
 			result->node = bindSymbol(script, functionName, std::move(typeNames));
 			return result;
 		}
 
-		BridgeFunctionPtr bindGenericFunction(Script& script, const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
+		BridgeMemory bindGenericFunction(Script& script, const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
 			auto result = std::make_unique<BridgeFunction>(std::move(f));
 			result->node = bindSymbol(script, functionName, std::move(typeNames));
 			return result;
@@ -53,7 +53,7 @@ namespace ska {
 		}
 
 		template <class ReturnType, class ... ParameterTypes>
-		BridgeFunctionPtr makeScriptSideBridge(std::function<ReturnType(ParameterTypes...)> f) {
+		BridgeMemory makeScriptSideBridge(std::function<ReturnType(ParameterTypes...)> f) {
 			auto lambdaWrapped = [f, this](std::vector<NodeValue> v) {
 				if constexpr(std::is_same_v<ReturnType, void>) {
 					callNativeFromScript(std::move(f), v, std::make_index_sequence<sizeof ...(ParameterTypes)>());

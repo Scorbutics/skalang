@@ -12,6 +12,7 @@
 #include "Service/ScriptBinding.h"
 #include "Service/Script.h"
 #include "Service/ScriptCache.h"
+#include "NodeValue/ObjectMemory.h"
 
 const auto reservedKeywords = ska::ReservedKeywordsPool{};
 auto tokenizer = std::unique_ptr<ska::Tokenizer>{};
@@ -298,7 +299,7 @@ TEST_CASE("[Interpreter]") {
 
 			auto scriptBinding = ska::ScriptBridge{ scriptCacheI, "binding295", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords };
 			scriptBinding.bindGenericFunction("funcTest", { "var", "void" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
-				auto mem = params[0].nodeval<std::shared_ptr<ska::MemoryTable>>();
+				auto mem = params[0].nodeval<ska::ObjectMemory>();
 				auto* idMap = (*mem)("id").first;
 				auto* nameMap = (*mem)("name").first;
 				test = idMap->nodeval<int>();
