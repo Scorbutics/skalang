@@ -54,7 +54,7 @@ ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::strin
 	observable_priority_queue<BlockTokenEvent>::notifyObservers(startEvent);
 
 	auto functionNameNode = ASTFactory::MakeLogicalNode(functionNameToken);
-	auto declarationEvent = FunctionTokenEvent{ *functionNameNode, FunctionTokenEventType::DECLARATION_NAME, script.symbols(), functionNameToken.name() };
+	auto declarationEvent = FunctionTokenEvent{ *functionNameNode, FunctionTokenEventType::DECLARATION_NAME, script, functionNameToken.name() };
 	observable_priority_queue<FunctionTokenEvent>::notifyObservers(declarationEvent);
 
 	auto parameters = std::vector<ASTNodePtr>{};
@@ -69,7 +69,7 @@ ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::strin
 			auto parameter = ASTFactory::MakeNode<Operator::PARAMETER_DECLARATION>(
 				Token{ ss.str(), TokenType::IDENTIFIER },
 				ASTFactory::MakeLogicalNode(std::move(t)));
-			auto event = VarTokenEvent::MakeParameter(*parameter, (*parameter)[0], script.symbols());
+			auto event = VarTokenEvent::MakeParameter(*parameter, (*parameter)[0], script);
 			observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 			parameters.push_back(std::move(parameter));
 		}
@@ -78,12 +78,12 @@ ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::strin
 
 	auto bridgeFunction = ASTFactory::MakeNode<Operator::FUNCTION_PROTOTYPE_DECLARATION>(functionNameToken, std::move(parameters));
 
-	auto functionEvent = VarTokenEvent::MakeFunction(*bridgeFunction, script.symbols());
+	auto functionEvent = VarTokenEvent::MakeFunction(*bridgeFunction, script);
 	observable_priority_queue<VarTokenEvent>::notifyObservers(functionEvent);
 
 	auto functionDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionNameToken, std::move(bridgeFunction), ASTFactory::MakeNode<Operator::BLOCK>());
 
-	auto statementEvent = FunctionTokenEvent{ *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, script.symbols(), functionNameToken.name() };
+	auto statementEvent = FunctionTokenEvent{ *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, script, functionNameToken.name() };
 	observable_priority_queue<FunctionTokenEvent>::notifyObservers(statementEvent);
 	
 	auto endEvent = BlockTokenEvent{ *functionDeclarationNode, BlockTokenEventType::END };

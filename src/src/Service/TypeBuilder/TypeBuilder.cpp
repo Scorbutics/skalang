@@ -20,39 +20,39 @@ ska::TypeBuilder::TypeBuilder(StatementParser& parser) :
 }
 
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
-    event.rootNode().buildType(event.symbolTable());
+    event.rootNode().buildType(event.script());
 	SLOG(LogLevel::Debug) << "Type built for variable \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
     return true;
 }
 
 bool ska::TypeBuilder::matchReturn(ReturnTokenEvent& event) const {
 	if(event.type() != ReturnTokenEventType::START) {
-        event.rootNode().buildType(event.symbolTable());
+        event.rootNode().buildType(event.script());
     }   
 	return true;
 }
 
 bool ska::TypeBuilder::matchArray(ArrayTokenEvent & event) const {
-	event.rootNode().buildType(event.symbolTable());
+	event.rootNode().buildType(event.script());
 	SLOG(LogLevel::Debug) << "Type built for array = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
 	return true;
 }
 
 bool ska::TypeBuilder::matchScriptLink(ScriptLinkTokenEvent& event) const {
-	event.rootNode().buildType(event.symbolTable());
+	event.rootNode().buildType(event.script());
 	SLOG(LogLevel::Debug) << "Type built for script link \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
 	return true;
 }
 
 bool ska::TypeBuilder::matchExpression(ExpressionTokenEvent& event) const {
-	event.rootNode().buildType(event.symbolTable());
+	event.rootNode().buildType(event.script());
 	SLOG(LogLevel::Debug) << "Type built for expression \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
     return true;
 }
 
 bool ska::TypeBuilder::matchFunction(FunctionTokenEvent& event) const {	
 	if (event.type() != FunctionTokenEventType::DECLARATION_NAME) {
-		event.rootNode().buildType(event.symbolTable());
+		event.rootNode().buildType(event.script());
 		SLOG(LogLevel::Debug) << "Type built for function parameter declaration / call \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
 	}
     return true;

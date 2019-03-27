@@ -11,19 +11,19 @@
 	private:\
 		using OperateOn = OperationType<OperatorType>;\
 	public:\
-        Type build(const SymbolTable& symbols, const ASTNode& node) override final {\
-			return build(symbols, OperateOn{node});\
+        Type build(const Script& script, const ASTNode& node) override final {\
+			return build(script, OperateOn{node});\
 		}\
-		Type build(const SymbolTable& symbols, OperateOn node);\
+		Type build(const Script& script, OperateOn node);\
     };
 
 namespace ska {
     class ASTNode;
-    class SymbolTable;
+    class Script;
 
     template <Operator O>
     struct TypeBuilderOperator : public TypeBuildUnit {
-        Type build(const SymbolTable& symbols, const ASTNode& node) override {
+        Type build(const Script& script, const ASTNode& node) override {
 			return Type{ };
         }
     };

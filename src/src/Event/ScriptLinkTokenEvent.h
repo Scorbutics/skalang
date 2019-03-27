@@ -10,10 +10,13 @@ namespace ska {
 
 	class ScriptLinkTokenEvent {
 	public:
-		ScriptLinkTokenEvent(ASTNode& node, std::string scriptName, Script& parentScript);
+		ScriptLinkTokenEvent(ASTNode& node, std::string scriptName, Script& scriptCaller);
 
-		Script* script();
-		const Script* script() const;
+		Script& script();
+		const Script& script() const;
+
+		Script* bound() { return m_script.get(); }
+		const Script* bound() const { return m_script.get(); }
 
 		ASTNode& rootNode();
 		const ASTNode& rootNode() const;
@@ -24,8 +27,8 @@ namespace ska {
 
 	private:
 		ASTNode& m_node;
-		ScriptPtr m_script;
 		std::string m_name;
-		SymbolTable& m_symbolTable;
+		Script& m_scriptCaller;
+		ScriptPtr m_script;		
 	};
 }

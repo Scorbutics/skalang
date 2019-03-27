@@ -5,6 +5,7 @@
 #include "SymbolTable.h"
 #include "NodeValue/AST.h"
 #include "NodeValue/OperatorTraits.h"
+#include "Service/Script.h"
 
 #include "Operation/Type/OperationTypeFunctionDeclaration.h"
 #include "Operation/Type/OperationTypeFunctionCall.h"
@@ -59,8 +60,8 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 
         case ReturnTokenEventType::BUILTIN:
 		case ReturnTokenEventType::OBJECT: {
-			const auto symbol = token.symbolTable().enclosingType();
-			auto* finalSymbol = token.symbolTable()[symbol->getName()];
+			const auto symbol = token.script().symbols().enclosingType();
+			auto* finalSymbol = token.script().symbols()[symbol->getName()];
 			if (symbol == nullptr || symbol->getName().empty() || finalSymbol == nullptr) {
 				throw std::runtime_error("return must be place in a function block or a nested one");
 			}

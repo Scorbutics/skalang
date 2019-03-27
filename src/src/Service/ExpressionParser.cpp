@@ -66,7 +66,7 @@ bool ska::ExpressionParser::parseTokenExpression(Script& input, ExpressionStack&
 	case TokenType::IDENTIFIER: {
 		SLOG(ska::LogLevel::Debug) << "\tPushing var operand " << token;
 		auto varNode = ASTFactory::MakeLogicalNode(input.match(token.type()));
-		auto event = VarTokenEvent::MakeUse(*varNode, input.symbols());
+		auto event = VarTokenEvent::MakeUse(*varNode, input);
 		m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 		expressions.push(std::move(varNode));
 	} break;
@@ -163,7 +163,7 @@ bool ska::ExpressionParser::matchSymbol(Script& input, ExpressionStack& expressi
 void ska::ExpressionParser::matchParenthesis(Script& input, ExpressionStack& expressions, bool isDoingOperation) {
 	auto functionNameOperand = expressions.popOperandIfNoOperator(isDoingOperation);
 	if (functionNameOperand != nullptr) {
-		auto event = ExpressionTokenEvent{ *functionNameOperand, input.symbols() };
+		auto event = ExpressionTokenEvent{ *functionNameOperand, input };
 		m_parser.observable_priority_queue<ExpressionTokenEvent>::notifyObservers(event);
 
 		if (functionNameOperand->type() == ExpressionType::FUNCTION) {
@@ -212,7 +212,7 @@ ska::ASTNodePtr ska::ExpressionParser::expression(Script& input, ExpressionStack
 
 	auto expressionGroup = expressions.template groupAndPop <ASTFactory>(Group::All<Token>);
 	if (expressionGroup != nullptr) {
-		auto event = ExpressionTokenEvent { *expressionGroup, input.symbols() };
+		auto event = ExpressionTokenEvent { *expressionGroup, input };
 		m_parser.observable_priority_queue<ExpressionTokenEvent>::notifyObservers(event);
 	}
 

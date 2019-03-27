@@ -74,7 +74,7 @@ namespace ska {
 			return *m_handle->m_ast;
 		}
 
-		bool isBridged() const { return m_handle->m_bridged; }
+		bool isBridged() const { return m_handle != nullptr && m_handle->m_bridged; }
 
 	private:
         ScriptHandle* m_handle = nullptr;

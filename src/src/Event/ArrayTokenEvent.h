@@ -2,6 +2,7 @@
 
 namespace ska {
 	class ASTNode;
+	class Script;
 
 	enum class ArrayTokenEventType {
         DECLARATION,
@@ -11,7 +12,7 @@ namespace ska {
 
 	class ArrayTokenEvent {
 	public:
-		ArrayTokenEvent(ASTNode& node, SymbolTable& s, ArrayTokenEventType type) : m_node(node), m_type(type), m_symbolTable(s) {}
+		ArrayTokenEvent(ASTNode& node, Script& s, ArrayTokenEventType type) : m_node(node), m_type(type), m_script(s) {}
 
 		auto& rootNode() {
 			return m_node;
@@ -25,13 +26,13 @@ namespace ska {
 			return m_type;
 		}
 		
-		SymbolTable& symbolTable() {
-			return m_symbolTable;
+		Script& script() {
+			return m_script;
 		}
 
 	private:
 		ArrayTokenEventType m_type;
 		ASTNode& m_node;
-		SymbolTable& m_symbolTable;
+		Script& m_script;
 	};
 }

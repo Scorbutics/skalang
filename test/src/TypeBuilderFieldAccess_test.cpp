@@ -10,11 +10,10 @@ TEST_CASE("[TypeBuilderFieldAccess]") {
 	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
 	auto script = TypeBuilderTestCommonBuildAST(scriptCache, "var Factory = function() : var { var pdv = 0; return { pdv : pdv }; }; var obj = Factory(); obj.pdv;", data);
 	script.parse(*data.parser);
-	auto& symbols = script.symbols();
 
 	const auto& node = (script.rootNode())[2];
 
 	auto typeBuilder = ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>{};
-	auto type = typeBuilder.build(symbols, node);
+	auto type = typeBuilder.build(script, node);
 	CHECK(type == ska::ExpressionType::INT);
 }

@@ -18,7 +18,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclaration(Script& input) {
     const auto functionName = input.readPrevious(3); 
 
 	auto emptyNode = ASTFactory::MakeEmptyNode();
-	auto startEvent = FunctionTokenEvent{ *emptyNode, FunctionTokenEventType::DECLARATION_NAME, input.symbols(), functionName.name() };
+	auto startEvent = FunctionTokenEvent{ *emptyNode, FunctionTokenEventType::DECLARATION_NAME, input, functionName.name() };
 	m_parser.observable_priority_queue<FunctionTokenEvent>::notifyObservers(startEvent);
 
 	auto declNode = fillDeclarationParameters(input);
@@ -26,7 +26,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclaration(Script& input) {
 
 	auto prototypeNode = ASTFactory::MakeNode<Operator::FUNCTION_PROTOTYPE_DECLARATION>(functionName, std::move(declNode));
 
-	auto functionEvent = VarTokenEvent::MakeFunction(*prototypeNode, input.symbols());
+	auto functionEvent = VarTokenEvent::MakeFunction(*prototypeNode, input);
 	m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(functionEvent);
 
     SLOG(ska::LogLevel::Debug) << "reading function body";
@@ -35,7 +35,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclaration(Script& input) {
 	
 	auto functionDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(prototypeNode), std::move(functionBodyNode));
 	
-	auto statementEvent = FunctionTokenEvent {*functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, input.symbols(), functionName.name() };
+	auto statementEvent = FunctionTokenEvent {*functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, input, functionName.name() };
 	m_parser.observable_priority_queue<FunctionTokenEvent>::notifyObservers(statementEvent);
 
 	return functionDeclarationNode;
@@ -67,7 +67,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchCall(Script& input, ASTNodePtr identi
 	input.match(endParametersToken);
 
 	auto functionCallNode = ASTFactory::MakeNode<Operator::FUNCTION_CALL>(std::move(functionCallNodeContent));
-	auto event = FunctionTokenEvent { *functionCallNode, FunctionTokenEventType::CALL, input.symbols() };
+	auto event = FunctionTokenEvent { *functionCallNode, FunctionTokenEventType::CALL, input };
 	m_parser.observable_priority_queue<FunctionTokenEvent>::notifyObservers(event);
 	return functionCallNode;
 }
@@ -104,7 +104,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationParameter(Script& input) {
 	}
 
 	auto node = ASTFactory::MakeNode<Operator::PARAMETER_DECLARATION>(id, std::move(typeNode));
-	auto event = VarTokenEvent::MakeParameter(*node, (*node)[0], input.symbols());
+	auto event = VarTokenEvent::MakeParameter(*node, (*node)[0], input);
 	m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 	return node;
 }

@@ -34,7 +34,7 @@ void ska::ScriptBridge::build() {
 	auto& scriptAst = m_script.fromBridge( std::move(m_bindings));
 	
 	for (auto& functionVarDeclaration : scriptAst) {
-		auto event = VarTokenEvent::Make<VarTokenEventType::VARIABLE_DECLARATION>(*functionVarDeclaration, m_script.symbols());
+		auto event = VarTokenEvent::Make<VarTokenEventType::VARIABLE_DECLARATION>(*functionVarDeclaration, m_script);
 		observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 	}
 

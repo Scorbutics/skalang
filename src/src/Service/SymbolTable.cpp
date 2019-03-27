@@ -195,9 +195,9 @@ bool ska::SymbolTable::matchImport(const ImportTokenEvent& token) {
 }
 
 bool ska::SymbolTable::matchScriptLink(const ScriptLinkTokenEvent& token) {
-	if (token.script() != nullptr && token.script()->isBridged()) {
-		//Binds the current memory table to the bridge-script, only if it's bridged
-		m_currentTable->emplace(token.name(), *token.script());
+	if (token.bound() != nullptr && token.bound()->isBridged()) {
+		//Binds the current memory table script to the bridge-script (only if it's a bridged script)
+		m_currentTable->emplace(token.name(), *token.bound());
 	}	
 	return true;
 }

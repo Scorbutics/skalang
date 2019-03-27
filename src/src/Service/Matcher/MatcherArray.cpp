@@ -31,7 +31,7 @@ ska::ASTNodePtr ska::MatcherArray::matchDeclaration(Script& input) {
 
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 	auto declarationNode = ASTFactory::MakeNode<ska::Operator::ARRAY_DECLARATION>(std::move(arrayNode));
-	auto event = ArrayTokenEvent{ *declarationNode, input.symbols(), ArrayTokenEventType::USE };
+	auto event = ArrayTokenEvent{ *declarationNode, input, ArrayTokenEventType::USE };
 	m_parser.observable_priority_queue<ArrayTokenEvent>::notifyObservers(event);
 	return declarationNode;
 }
@@ -39,7 +39,7 @@ ska::ASTNodePtr ska::MatcherArray::matchDeclaration(Script& input) {
 ska::ASTNodePtr ska::MatcherArray::matchUse(Script& input, ASTNodePtr identifierArrayAffected) {
 	//Ensures array expression before the index access
     SLOG(ska::LogLevel::Debug) << "expression-array : " << *identifierArrayAffected;
-    auto expressionEvent = ArrayTokenEvent{ *identifierArrayAffected, input.symbols(), ArrayTokenEventType::EXPRESSION };
+    auto expressionEvent = ArrayTokenEvent{ *identifierArrayAffected, input, ArrayTokenEventType::EXPRESSION };
 	m_parser.observable_priority_queue<ArrayTokenEvent>::notifyObservers(expressionEvent);
 
     //Gets the index part with bracket syntax
@@ -50,7 +50,7 @@ ska::ASTNodePtr ska::MatcherArray::matchUse(Script& input, ASTNodePtr identifier
 	auto declarationNode = ASTFactory::MakeNode<ska::Operator::ARRAY_USE>(std::move(identifierArrayAffected), std::move(indexNode));
 	
     //Notifies the outside that we use the array
-    auto event = ArrayTokenEvent{ *declarationNode, input.symbols(), ArrayTokenEventType::USE };
+    auto event = ArrayTokenEvent{ *declarationNode, input, ArrayTokenEventType::USE };
 	m_parser.observable_priority_queue<ArrayTokenEvent>::notifyObservers(event);
 	return declarationNode;
 }

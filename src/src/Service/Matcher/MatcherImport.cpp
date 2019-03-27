@@ -21,7 +21,6 @@ ska::ASTNodePtr ska::MatcherImport::matchImport(Script& input) {
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::IMPORT>());
 
 	auto importNodeClass = input.match(TokenType::STRING);
-
 	auto importClassName = importNodeClass.name() + ".miniska";
 
 	auto scriptLinkNode = ASTFactory::MakeNode<Operator::SCRIPT_LINK>(ASTFactory::MakeLogicalNode(Token{ importClassName, TokenType::STRING }, ASTFactory::MakeEmptyNode()));
@@ -55,7 +54,7 @@ ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& i
 	auto importNode = ASTFactory::MakeImportNode(
 		std::move(script), 
 		ASTFactory::MakeLogicalNode(std::move(importNodeClass)));
-	auto importEvent = ImportTokenEvent{ *importNode, input.symbols() };
+	auto importEvent = ImportTokenEvent{ *importNode, input };
 	m_parser.observable_priority_queue<ImportTokenEvent>::notifyObservers(importEvent);
 
 	auto endEvent = BlockTokenEvent{ *importNode, BlockTokenEventType::END };

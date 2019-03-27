@@ -3,6 +3,7 @@
 #include "NodeValue/OperatorTraits.h"
 #include "SymbolTable.h"
 #include "SymbolTableTypeUpdater.h"
+#include "Service/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTableTypeUpdater)
 
@@ -18,7 +19,7 @@ bool ska::SymbolTableTypeUpdater::matchVariable(VarTokenEvent& event) {
 		case VarTokenEventType::FUNCTION_DECLARATION:
 		case VarTokenEventType::PARAMETER_DECLARATION:
 		case VarTokenEventType::VARIABLE_DECLARATION:
-			updateType(event.rootNode(), event.symbolTable());
+			updateType(event.rootNode(), event.script().symbols());
 		break;
 		
 		default:

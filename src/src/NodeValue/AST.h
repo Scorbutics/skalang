@@ -16,7 +16,7 @@
 
 namespace ska {
 	class Symbol;
-    class SymbolTable;
+    class Script;
 	class StatementParser;
 	class ASTFactory;
 
@@ -72,7 +72,7 @@ namespace ska {
 			return m_op;
 		}
 
-	    void buildType(const SymbolTable& symbols);
+	    void buildType(const Script& script);
 
 		const auto& type() const {
 			return m_type;
