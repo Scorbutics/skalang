@@ -6,7 +6,7 @@
 #include "Event/BlockTokenEvent.h"
 #include "Event/FunctionTokenEvent.h"
 #include "Event/ReturnTokenEvent.h"
-#include "Event/BridgeTokenEvent.h"
+#include "Event/ScriptLinkTokenEvent.h"
 #include "Event/ImportTokenEvent.h"
 
 #include "ScopedSymbolTable.h"
@@ -21,7 +21,7 @@ namespace ska {
         public PriorityObserver<FunctionTokenEvent>,
         public PriorityObserver<ReturnTokenEvent>, 
 		public PriorityObserver<ImportTokenEvent>,
-		public PriorityObserver<BridgeTokenEvent> {
+		public PriorityObserver<ScriptLinkTokenEvent> {
 
         using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 
@@ -67,7 +67,7 @@ namespace ska {
 		bool matchFunction(const FunctionTokenEvent&);
 		bool matchReturn(const ReturnTokenEvent&);
 		bool matchImport(const ImportTokenEvent&);
-		bool matchBridge(const BridgeTokenEvent&);
+		bool matchScriptLink(const ScriptLinkTokenEvent&);
 
 		StatementParser* m_parser = nullptr;
         std::unique_ptr<ScopedSymbolTable> m_rootTable;

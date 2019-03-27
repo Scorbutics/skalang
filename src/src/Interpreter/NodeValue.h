@@ -123,7 +123,9 @@ namespace ska {
 		NodeCell() = default;
 		NodeCell(MemoryTable& memory, NodeValue* lvalue): m_memory(&memory), m_variant(lvalue) {}
 		NodeCell(NodeValue rvalue) : m_variant(std::move(rvalue)) {}
-		NodeCell(std::pair<NodeValue*, MemoryTable*> lvalue) : m_memory(lvalue.second), m_variant(lvalue.first) { assert(m_memory != nullptr); }
+		NodeCell(std::pair<NodeValue*, MemoryTable*> lvalue) : m_memory(lvalue.second), m_variant(lvalue.first) { 
+			assert(m_memory != nullptr && "lvalue not provided (null)"); 
+		}
 
 		std::pair<NodeValue*, MemoryTable*> asLvalue() {
 			assert(std::holds_alternative<NodeValue*>(m_variant) && "Must be an lvalue");

@@ -9,7 +9,7 @@
 #include "Event/ExpressionTokenEvent.h"
 #include "Event/ReturnTokenEvent.h"
 #include "Event/ArrayTokenEvent.h"
-#include "Event/BridgeTokenEvent.h"
+#include "Event/ScriptLinkTokenEvent.h"
 
 namespace ska {
     class ASTNode;
@@ -22,7 +22,7 @@ namespace ska {
 		public subobserver_priority_queue<VarTokenEvent>,
 		public subobserver_priority_queue<ReturnTokenEvent>,
 		public subobserver_priority_queue<ArrayTokenEvent>,
-		public subobserver_priority_queue<BridgeTokenEvent> {
+		public subobserver_priority_queue<ScriptLinkTokenEvent> {
         public:
             TypeBuilder(StatementParser& parser);
             virtual ~TypeBuilder() = default;
@@ -33,7 +33,7 @@ namespace ska {
             bool matchExpression(ExpressionTokenEvent& event) const;
 			bool matchReturn(ReturnTokenEvent& event) const;
 			bool matchArray(ArrayTokenEvent& event) const;
-			bool matchBridge(BridgeTokenEvent& event) const;
+			bool matchScriptLink(ScriptLinkTokenEvent& event) const;
 
 			StatementParser& m_parser;
 

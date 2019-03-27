@@ -12,17 +12,8 @@ namespace ska {
 	public:
 		OperationType(const ASTNode& node) : node(node) {}
 
-		inline auto GetImport() {
-			assert(!node.name().empty());
-			return node.name();
-		}
-				
-		inline auto GetImportVariableName() {
-			return node[0].name();
-		}
-
 		inline auto GetScriptPath() {
-			return node[2].name();
+			return node[0].name();
 		}
 	};
 }

@@ -19,8 +19,7 @@ ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser) :
     subobserver_priority_queue<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser, 9),
 	subobserver_priority_queue<ArrayTokenEvent>(std::bind(&SemanticTypeChecker::matchArray, this, std::placeholders::_1), parser, 9),
     subobserver_priority_queue<ReturnTokenEvent>(std::bind(&SemanticTypeChecker::matchReturn, this, std::placeholders::_1), parser, 9),
-	subobserver_priority_queue<IfElseTokenEvent>(std::bind(&SemanticTypeChecker::matchIfElse, this, std::placeholders::_1), parser, 9),
-	subobserver_priority_queue<ImportTokenEvent>(std::bind(&SemanticTypeChecker::matchImport, this, std::placeholders::_1), parser, 9) {
+	subobserver_priority_queue<IfElseTokenEvent>(std::bind(&SemanticTypeChecker::matchIfElse, this, std::placeholders::_1), parser, 9) {
 }
 
 bool ska::SemanticTypeChecker::statementHasReturnOnAllControlPath(const ASTNode& node) {	
@@ -222,16 +221,4 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 	}
 
     return true;
-}
-
-bool ska::SemanticTypeChecker::matchImport(const ImportTokenEvent& token) {
-	assert(token.symbolTable().current() != nullptr);
-	const auto& parent = token.symbolTable().current()->parent();
-	/*
-	TODO
-	if(&parent != m_symbols.current()) {
-		throw std::runtime_error("bad import placement : import must not be located in a nested block");
-	}
-	*/
-	return true;
 }

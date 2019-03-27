@@ -7,7 +7,6 @@
 #include "Event/FunctionTokenEvent.h"
 #include "Event/ReturnTokenEvent.h"
 #include "Event/IfElseTokenEvent.h"
-#include "Event/ImportTokenEvent.h"
 
 namespace ska {
 	class SymbolTable;
@@ -18,8 +17,7 @@ namespace ska {
     public subobserver_priority_queue<FunctionTokenEvent>,
 	public subobserver_priority_queue<ArrayTokenEvent>,
     public subobserver_priority_queue<ReturnTokenEvent>,
-	public subobserver_priority_queue<IfElseTokenEvent>,
-    public subobserver_priority_queue<ImportTokenEvent> {
+	public subobserver_priority_queue<IfElseTokenEvent> {
     public:
         SemanticTypeChecker(StatementParser& parser);
         ~SemanticTypeChecker() = default;
@@ -32,7 +30,6 @@ namespace ska {
         bool matchFunction(const FunctionTokenEvent& token);
         bool matchReturn(const ReturnTokenEvent& token);
 		bool matchIfElse(const IfElseTokenEvent& token);
-        bool matchImport(const ImportTokenEvent& token);
     };
 
 }

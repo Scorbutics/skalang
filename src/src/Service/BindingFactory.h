@@ -10,7 +10,7 @@
 #include "Event/VarTokenEvent.h"
 #include "Event/FunctionTokenEvent.h"
 #include "Event/BlockTokenEvent.h"
-#include "Event/BridgeTokenEvent.h"
+#include "Event/ScriptLinkTokenEvent.h"
 #include "Container/sorted_observable.h"
 
 namespace ska {
@@ -24,7 +24,7 @@ namespace ska {
 		public observable_priority_queue<VarTokenEvent>,
 		public observable_priority_queue<FunctionTokenEvent>,
 		public observable_priority_queue<BlockTokenEvent>,
-		public observable_priority_queue<BridgeTokenEvent> {
+		public observable_priority_queue<ScriptLinkTokenEvent> {
 	public:
 		BindingFactory(TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
 		virtual ~BindingFactory();

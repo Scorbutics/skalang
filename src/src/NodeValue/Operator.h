@@ -24,7 +24,7 @@ namespace ska {
 		IF,
 		IF_ELSE,
 		RETURN,
-		BRIDGE,
+		SCRIPT_LINK,
 		UNUSED_Last_Length
 	};
 
@@ -49,7 +49,7 @@ namespace ska {
 		"IF",
 		"IF_ELSE",
 		"RETURN",
-		"BRIDGE"
+		"SCRIPT_LINK"
 	};
 
     static inline const char* OperatorPrint(Operator op) {

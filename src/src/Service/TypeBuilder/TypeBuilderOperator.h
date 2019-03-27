@@ -42,6 +42,6 @@ namespace ska {
 #include "Service/TypeBuilder/TypeBuilderImport.h"
 #include "Service/TypeBuilder/TypeBuilderExport.h"
 #include "Service/TypeBuilder/TypeBuilderBinary.h"
-#include "Service/TypeBuilder/TypeBuilderBridge.h"
+#include "Service/TypeBuilder/TypeBuilderScriptLink.h"
 #include "Service/TypeBuilder/TypeBuilderLiteral.h"
 #include "Service/TypeBuilder/TypeBuilderFieldAccess.h"

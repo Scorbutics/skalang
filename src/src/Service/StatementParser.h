@@ -15,7 +15,7 @@
 #include "Event/ReturnTokenEvent.h"
 #include "Event/ArrayTokenEvent.h"
 #include "Event/ImportTokenEvent.h"
-#include "Event/BridgeTokenEvent.h"
+#include "Event/ScriptLinkTokenEvent.h"
 
 #include "Matcher/MatcherBlock.h"
 #include "Matcher/MatcherFor.h"
@@ -41,7 +41,7 @@ namespace ska {
 		public observable_priority_queue<ReturnTokenEvent>,
 		public observable_priority_queue<ArrayTokenEvent>,
 		public observable_priority_queue<ImportTokenEvent>,
-		public observable_priority_queue<BridgeTokenEvent> {
+		public observable_priority_queue<ScriptLinkTokenEvent> {
 
 		using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 		friend class Script;

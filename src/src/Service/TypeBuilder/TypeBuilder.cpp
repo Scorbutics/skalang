@@ -16,7 +16,7 @@ ska::TypeBuilder::TypeBuilder(StatementParser& parser) :
 	subobserver_priority_queue<VarTokenEvent>(std::bind(&TypeBuilder::matchVariable, this, std::placeholders::_1), parser, 6),
 	subobserver_priority_queue<ReturnTokenEvent>(std::bind(&TypeBuilder::matchReturn, this, std::placeholders::_1), parser, 6),
 	subobserver_priority_queue<ArrayTokenEvent>(std::bind(&TypeBuilder::matchArray, this, std::placeholders::_1), parser, 6),
-	subobserver_priority_queue<BridgeTokenEvent>(std::bind(&TypeBuilder::matchBridge, this, std::placeholders::_1), parser, 6) {
+	subobserver_priority_queue<ScriptLinkTokenEvent>(std::bind(&TypeBuilder::matchScriptLink, this, std::placeholders::_1), parser, 6) {
 }
 
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
@@ -30,7 +30,6 @@ bool ska::TypeBuilder::matchReturn(ReturnTokenEvent& event) const {
         event.rootNode().buildType(event.symbolTable());
     }   
 	return true;
-
 }
 
 bool ska::TypeBuilder::matchArray(ArrayTokenEvent & event) const {
@@ -39,9 +38,9 @@ bool ska::TypeBuilder::matchArray(ArrayTokenEvent & event) const {
 	return true;
 }
 
-bool ska::TypeBuilder::matchBridge(BridgeTokenEvent& event) const {
+bool ska::TypeBuilder::matchScriptLink(ScriptLinkTokenEvent& event) const {
 	event.rootNode().buildType(event.symbolTable());
-	SLOG(LogLevel::Debug) << "Type built for bridge \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
+	SLOG(LogLevel::Debug) << "Type built for script link \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
 	return true;
 }
 

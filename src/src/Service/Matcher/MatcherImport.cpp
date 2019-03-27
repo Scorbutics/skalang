@@ -11,7 +11,7 @@
 
 #include "Event/BlockTokenEvent.h"
 #include "Event/ImportTokenEvent.h"
-#include "Event/BridgeTokenEvent.h"
+#include "Event/ScriptLinkTokenEvent.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherImport)
 
@@ -20,19 +20,15 @@ ska::ASTNodePtr ska::MatcherImport::matchImport(Script& input) {
 	
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::IMPORT>());
 
-	//With this grammar, no other way than reading previously to retrieve the function name.
-	auto importedVarName = input.readPrevious(3);
-
 	auto importNodeClass = input.match(TokenType::STRING);
 
 	auto importClassName = importNodeClass.name() + ".miniska";
 
-	auto bridgeNode = ASTFactory::MakeNode<Operator::BRIDGE>(ASTFactory::MakeLogicalNode(Token{ importClassName, TokenType::STRING }, ASTFactory::MakeEmptyNode()));
-	auto bridgeEvent = BridgeTokenEvent{ *bridgeNode, importClassName, input };
-	m_parser.observable_priority_queue<BridgeTokenEvent>::notifyObservers(bridgeEvent);
+	auto scriptLinkNode = ASTFactory::MakeNode<Operator::SCRIPT_LINK>(ASTFactory::MakeLogicalNode(Token{ importClassName, TokenType::STRING }, ASTFactory::MakeEmptyNode()));
+	auto scriptLinkEvent = ScriptLinkTokenEvent{ *scriptLinkNode, importClassName, input };
+	m_parser.observable_priority_queue<ScriptLinkTokenEvent>::notifyObservers(scriptLinkEvent);
 
-
-	return bridgeNode->type() != ExpressionType::VOID ? std::move(bridgeNode) : matchNewImport(input, importedVarName, importNodeClass);
+	return scriptLinkNode->type() != ExpressionType::VOID ? std::move(scriptLinkNode) : matchNewImport(input, importNodeClass);
 }
 
 ska::ASTNodePtr ska::MatcherImport::matchExport(Script& input) {
@@ -43,7 +39,7 @@ ska::ASTNodePtr ska::MatcherImport::matchExport(Script& input) {
 	return ASTFactory::MakeNode<Operator::EXPORT>(input.statement(m_parser));
 }
 
-ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& importedVarName, const Token& importNodeClass) {
+ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& importNodeClass) {
 	auto importClassNameFile = importNodeClass.name() + ".miniska";
 	auto scriptFile = std::ifstream{ importClassNameFile };
 	if (scriptFile.fail()) {
@@ -58,9 +54,7 @@ ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& i
 
 	auto importNode = ASTFactory::MakeImportNode(
 		std::move(script), 
-		ASTFactory::MakeLogicalNode(importedVarName),
-		ASTFactory::MakeLogicalNode(std::move(importNodeClass)),
-		ASTFactory::MakeLogicalNode(Token{ importClassNameFile, TokenType::STRING }));
+		ASTFactory::MakeLogicalNode(std::move(importNodeClass)));
 	auto importEvent = ImportTokenEvent{ *importNode, input.symbols() };
 	m_parser.observable_priority_queue<ImportTokenEvent>::notifyObservers(importEvent);
 

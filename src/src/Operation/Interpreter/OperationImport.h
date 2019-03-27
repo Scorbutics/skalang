@@ -16,21 +16,6 @@ namespace ska {
 		Script parent;
 		Operation(ExecutionContext& context) : node(context.pointer()), parent(context.program()) {}
 
-		inline auto& GetVariableNode() {
-			return node[0];
-		}
-
-		inline auto& GetValueNode() {
-			return node[1];
-		}
-		
 		Script& GetScript();
-
-		/*
-		inline auto& GetScriptNode() {
-			return node[2];
-		}
-		*/
-
 	};
 }

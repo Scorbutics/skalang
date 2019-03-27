@@ -6,7 +6,7 @@
 namespace ska {
 	class ASTNode;
 	template<>
-	class OperationType<Operator::BRIDGE> {
+	class OperationType<Operator::SCRIPT_LINK> {
 	private:
 		const ASTNode& node;
 	public:

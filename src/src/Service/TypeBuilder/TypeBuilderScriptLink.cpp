@@ -1,10 +1,10 @@
-#include "TypeBuilderBridge.h"
+#include "TypeBuilderScriptLink.h"
 #include "NodeValue/AST.h"
 #include "Service/SymbolTable.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::BRIDGE>)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::SCRIPT_LINK>)
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::BRIDGE>::build(const SymbolTable& symbols, OperateOn node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::SCRIPT_LINK>::build(const SymbolTable& symbols, OperateOn node) {
 	const auto* symbol = symbols[node.GetValue().name()];
     SLOG(LogLevel::Info) << "Looking for script cache \"" << node.GetValue().name() << "\" with symbol " << (symbol == nullptr ? "" : symbol->getName());
 	return symbol == nullptr ? Type::MakeBuiltIn(ExpressionType::VOID) : Type::MakeCustom<ExpressionType::OBJECT>(symbol);

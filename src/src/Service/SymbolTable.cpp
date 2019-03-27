@@ -4,8 +4,8 @@
 #include "SymbolTable.h"
 #include "Service/StatementParser.h"
 #include "Service/ASTFactory.h"
-#include "Operation/Type/OperationTypeBridge.h"
-#include "Event/BridgeTokenEvent.h"
+#include "Operation/Type/OperationTypeScriptLink.h"
+#include "Event/ScriptLinkTokenEvent.h"
 #include "Service/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTable)
@@ -47,7 +47,7 @@ ska::SymbolTable::SymbolTable() :
 	PriorityObserver<FunctionTokenEvent>(5, std::bind(&ska::SymbolTable::matchFunction, this, std::placeholders::_1)),
     PriorityObserver<ReturnTokenEvent>(5, std::bind(&ska::SymbolTable::matchReturn, this, std::placeholders::_1)),
 	PriorityObserver<ImportTokenEvent>(5, std::bind(&ska::SymbolTable::matchImport, this, std::placeholders::_1)),
-	PriorityObserver<BridgeTokenEvent>(5, std::bind(&ska::SymbolTable::matchBridge, this, std::placeholders::_1)) {
+	PriorityObserver<ScriptLinkTokenEvent>(5, std::bind(&ska::SymbolTable::matchScriptLink, this, std::placeholders::_1)) {
 	m_rootTable = std::make_unique<ScopedSymbolTable>();
 	m_currentTable = m_rootTable.get();
 }
@@ -65,7 +65,7 @@ void ska::SymbolTable::listenParser(StatementParser& parser) {
 		FunctionTokenEvent, 
 		ReturnTokenEvent, 
 		ImportTokenEvent, 
-		BridgeTokenEvent
+		ScriptLinkTokenEvent
 	> (*m_parser, *this);
 }
 
@@ -77,7 +77,7 @@ void ska::SymbolTable::unlistenParser() {
 			FunctionTokenEvent, 
 			ReturnTokenEvent, 
 			ImportTokenEvent, 
-			BridgeTokenEvent
+			ScriptLinkTokenEvent
 		> (*m_parser, *this);
 		m_parser = nullptr;
 	}
@@ -189,12 +189,12 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 }
 
 bool ska::SymbolTable::matchImport(const ImportTokenEvent& token) {
-	assert(token.rootNode().size() == 3);
-	m_currentTable->emplace(token.rootNode()[2].name(), token.rootNode().script());
+	assert(token.rootNode().size() == 1);
+	m_currentTable->emplace(token.rootNode()[0].name(), token.rootNode().script());
 	return true;
 }
 
-bool ska::SymbolTable::matchBridge(const BridgeTokenEvent& token) {
+bool ska::SymbolTable::matchScriptLink(const ScriptLinkTokenEvent& token) {
 	if (token.script() != nullptr && token.script()->isBridged()) {
 		//Binds the current memory table to the bridge-script, only if it's bridged
 		m_currentTable->emplace(token.name(), *token.script());

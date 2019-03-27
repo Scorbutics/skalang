@@ -8,9 +8,9 @@ namespace ska {
 	class Script;
 	class ASTNode;
 
-	class BridgeTokenEvent {
+	class ScriptLinkTokenEvent {
 	public:
-		BridgeTokenEvent(ASTNode& node, std::string scriptName, Script& parentScript);
+		ScriptLinkTokenEvent(ASTNode& node, std::string scriptName, Script& parentScript);
 
 		Script* script();
 		const Script* script() const;
