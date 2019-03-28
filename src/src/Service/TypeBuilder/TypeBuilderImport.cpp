@@ -12,6 +12,6 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::IMPORT>::build(const Script& s
     SLOG(LogLevel::Info) << "Importing script " << node.GetScriptPath();
 	auto& symbols = script.symbols();
 	auto& s = *symbols.current()->children().back();
-	const auto* symbol = s[node.GetScriptPath()];	
+	const auto* symbol = s[node.GetScriptPath()];
 	return Type::MakeCustom<ExpressionType::OBJECT>(symbol);
 }

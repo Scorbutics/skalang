@@ -16,6 +16,6 @@ namespace ska {
 		Script parent;
 		Operation(ExecutionContext& context) : node(context.pointer()), parent(context.program()) {}
 
-		Script& GetScript();
+		ScriptPtr GetScript();
 	};
 }

@@ -21,9 +21,10 @@ namespace ska {
 	
 		ASTNodePtr matchImport(Script& input);
 		ASTNodePtr matchExport(Script& input);
-		ASTNodePtr matchNewImport(Script& input, const Token& importNodeClass);
 	
 	private:
+		ASTNodePtr matchNewImport(Script& input, const Token& importNodeClass);
+
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		StatementParser& m_parser;
 	};

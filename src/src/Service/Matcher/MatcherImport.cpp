@@ -51,9 +51,7 @@ ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& i
 
 	auto script = input.subParse(m_parser, importClassNameFile, scriptFile);
 
-	auto importNode = ASTFactory::MakeImportNode(
-		std::move(script), 
-		ASTFactory::MakeLogicalNode(std::move(importNodeClass)));
+	auto importNode = ASTFactory::MakeNode<Operator::IMPORT>(ASTFactory::MakeLogicalNode(std::move(importNodeClass)));
 	auto importEvent = ImportTokenEvent{ *importNode, input };
 	m_parser.observable_priority_queue<ImportTokenEvent>::notifyObservers(importEvent);
 

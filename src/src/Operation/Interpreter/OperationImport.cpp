@@ -1,7 +1,6 @@
 #include "NodeValue/AST.h"
-#include "Service/Script.h"
 #include "OperationImport.h"
 
-ska::Script& ska::Operation<ska::Operator::IMPORT>::GetScript() {
-	return node.script();
+ska::ScriptPtr ska::Operation<ska::Operator::IMPORT>::GetScript() {
+	return parent.subScript(node[0].name() + ".miniska");
 }

@@ -16,7 +16,6 @@
 
 namespace ska {
 	class Symbol;
-    class Script;
 	class StatementParser;
 	class ASTFactory;
 
@@ -78,15 +77,11 @@ namespace ska {
 			return m_type;
 		}
 
-		auto& script() { assert(m_linkedScript != nullptr);  return *m_linkedScript; }
-		const auto& script() const { assert(m_linkedScript != nullptr); return *m_linkedScript;	}
-
 	private:
 		friend class ASTFactory;
 		ASTNode();
         
         explicit ASTNode(Token t, ASTNodePtr l = nullptr, ASTNodePtr r = nullptr);
-		explicit ASTNode(ScriptPtr s, std::vector<ASTNodePtr> children);
 
         ASTNode(Operator o, Token identifierToken = Token{}, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{});
         ASTNode(Operator o, Token identifierToken = Token{});
@@ -100,8 +95,6 @@ namespace ska {
 
 		Token token;
 		std::vector<ASTNodePtr> m_children;
-
-		ScriptPtr m_linkedScript;
 
 		friend std::ostream& operator<<(std::ostream& stream, const ASTNode& node);
 	};

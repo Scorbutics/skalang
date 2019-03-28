@@ -190,7 +190,7 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 
 bool ska::SymbolTable::matchImport(const ImportTokenEvent& token) {
 	assert(token.rootNode().size() == 1);
-	m_currentTable->emplace(token.rootNode()[0].name(), token.rootNode().script());
+	m_currentTable->emplace(token.rootNode()[0].name(), token.bound());
 	return true;
 }
 

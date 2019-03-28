@@ -13,6 +13,7 @@ namespace ska {
 		friend bool operator!=(const ska::ExecutionContext& lhs, const ska::ExecutionContext& rhs);
 	public:
 		ExecutionContext() = default;
+		explicit ExecutionContext(ScriptHandle& program);
 		explicit ExecutionContext(Script& program);
 		ExecutionContext(Script& program, ASTNode& node);
 

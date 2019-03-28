@@ -1,6 +1,11 @@
 #include "ExecutionContext.h"
 #include "Service/Script.h"
 
+ska::ExecutionContext::ExecutionContext(ScriptHandle& program) : 
+	m_program(&program),
+	m_pointer(&m_program->rootNode()){
+}
+
 ska::ExecutionContext::ExecutionContext(Script& program) :
 	m_program(program.handle()),
 	m_pointer(&m_program->rootNode()){
