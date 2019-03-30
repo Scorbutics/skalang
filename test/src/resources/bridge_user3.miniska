@@ -1,2 +1,1 @@
-var User = import "../test/src/resources/bridge_user";
-User.Bridge.funcTest(1);
+(import "../test/src/resources/bridge_user").Bridge.funcTest(1);

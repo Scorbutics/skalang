@@ -127,8 +127,12 @@ namespace ska {
 			assert(m_memory != nullptr && "lvalue not provided (null)"); 
 		}
 
+		bool isLvalue() const {
+			return std::holds_alternative<NodeValue*>(m_variant);
+		}
+
 		std::pair<NodeValue*, MemoryTable*> asLvalue() {
-			assert(std::holds_alternative<NodeValue*>(m_variant) && "Must be an lvalue");
+			assert(isLvalue() && "Must be an lvalue");
 			return std::make_pair(std::get<NodeValue*>(m_variant), m_memory);
 		}
 
