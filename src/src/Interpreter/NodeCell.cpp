@@ -3,6 +3,13 @@
 #include "Service/ScriptHandle.h"
 #include "MemoryTable.h"
 
+ska::NodeCell ska::NodeCell::build(MemoryLValue& memoryField) {
+	if (isLvalue()) {
+		return NodeLValue{ memoryField.first, memoryField.second };
+	}
+	return NodeRValue{ std::move(*memoryField.first), std::move(memoryField.second) };
+}
+
 ska::NodeCell ska::NodeCell::operator()(const std::string& key) {
 	auto& val = isLvalue() ? *std::get<NodeValue*>(m_variant) : std::get<NodeValue>(m_variant);
 	auto& variant = val.as<TokenVariant>();
@@ -11,32 +18,28 @@ ska::NodeCell ska::NodeCell::operator()(const std::string& key) {
 		auto memoryObject = std::get<ObjectMemory>(variant);
 		assert(memoryObject != nullptr && "disallowed null memory object");
 		auto memoryField = (*memoryObject)(key);
-		return isLvalue() ? NodeCell{ NodeLValue{ memoryField.first, memoryField.second } } :
-			NodeCell{ NodeRValue{ std::move(*memoryField.first), memoryField.second } };
+		return build(memoryField);
 	}
 	
 	auto& scriptZone = std::get<ExecutionContext>(variant);
 	auto& memoryScript = scriptZone.program().currentMemory().down();
 	auto memoryField = (memoryScript)(key);
-	return isLvalue() ? NodeCell{ NodeLValue{ memoryField.first, memoryField.second } } :
-		NodeCell{ NodeRValue{ std::move(*memoryField.first), memoryField.second } };
+	return build(memoryField);
+}
+
+ska::NodeCell::NodeCell() : 
+	NodeCell(NodeRValue{ "", nullptr }) {
 }
 
 ska::NodeCell::NodeCell(NodeRValue rvalue) :
-	m_memory(rvalue.memory),
+	m_memory(std::move(rvalue.memory)),
 	m_variant(std::move(rvalue.object)) {
-
 }
 
 ska::NodeCell::NodeCell(NodeLValue lvalue) :
-	m_memory(lvalue.memory),
-	m_variant(lvalue.object) {
+	m_memory(std::move(lvalue.memory)),
+	m_variant(std::move(lvalue.object)) {
 	assert(m_memory != nullptr && "lvalue not provided (null)");
-}
-
-ska::NodeCell::NodeCell(NodeValue rvalue, MemoryTablePtr rvalueMemory) :
-	m_variant(std::move(rvalue)),
-	m_memory(rvalueMemory) {
 }
 
 ska::NodeLValue ska::NodeCell::asLvalue() {
@@ -46,12 +49,12 @@ ska::NodeLValue ska::NodeCell::asLvalue() {
 
 ska::NodeRValue ska::NodeCell::asRvalue() {
 	if (isLvalue()) {
+		//Keeps a copy of the value stored in the nodecell when it's an lvalue to allow later reuse
 		auto newValue = std::get<NodeValue*>(m_variant)->clone();
 		return NodeRValue{
 			std::move(newValue),
 			m_memory
 		};
-
 	}
 	return NodeRValue {
 		std::move(std::get<NodeValue>(m_variant)),

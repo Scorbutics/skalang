@@ -15,5 +15,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::FOR_LOOP>::interpret(Opera
 		node.parent.endNestedMemory();
 	}	
 	node.parent.endNestedMemory();
-	return NodeCell {"", nullptr };
+	return {};
 }

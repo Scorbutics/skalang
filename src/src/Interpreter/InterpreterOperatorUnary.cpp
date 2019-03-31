@@ -23,12 +23,12 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::UNARY>::interpret(OperateO
 	assert(!node.GetValue().empty());
 	auto nodeValue = node.parent.findInMemoryTree(node.GetValue());
     if(nodeValue.first == nullptr) {
-        return NodeCell {"", nullptr };
+        return { };
     }
 
-	return NodeLValue{ nodeValue.first, nodeValue.second };
+	return NodeLValue{ std::move(nodeValue.first), std::move(nodeValue.second) };
 }
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::LITERAL>::interpret(OperateOn node) {
-	return NodeCell{ InterpreterOperatorConvertString(node.GetType().value().type(), node.GetValue()), nullptr };
+	return NodeRValue{ InterpreterOperatorConvertString(node.GetType().value().type(), node.GetValue()), nullptr };
 }

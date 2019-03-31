@@ -22,7 +22,7 @@ ska::MemoryTable* ska::MemoryTable::popNested() {
 	return this;
 }
 
-ska::MemoryTable::MemoryLValue ska::MemoryTable::put(const std::string& name, NodeValue value) {
+ska::MemoryLValue ska::MemoryTable::put(const std::string& name, NodeValue value) {
 	assert(!name.empty());
 	auto memValueZone = operator[](name);
 	auto* memValue = memValueZone.first;
@@ -46,7 +46,7 @@ void ska::MemoryTable::put(const std::string& name, std::size_t index, NodeValue
 	(*arrayPtr)[index] = std::move(rvalue.first);
 }
 
-ska::MemoryTable::MemoryLValue ska::MemoryTable::emplace(const std::string& name, NodeValue value) {
+ska::MemoryLValue ska::MemoryTable::emplace(const std::string& name, NodeValue value) {
 	assert(!name.empty());
 	auto memValueZone = operator()(name);
 	auto* memValue = memValueZone.first;

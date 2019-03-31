@@ -11,5 +11,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::ARRAY_USE>::interpret(Oper
 	if (arrayCell.size() <= arrayIndex) {
 		throw std::runtime_error("array index out of bounds");
 	}
-	return NodeCell{ NodeLValue{&arrayCell[arrayIndex], inMemoryArrayZone.second} };
+	return NodeLValue{&arrayCell[arrayIndex], inMemoryArrayZone.second};
 }

@@ -8,7 +8,7 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::IF>::interpret(OperateOn n
 		m_interpreter.interpret({ node.parent, node.GetIfStatement() });
     }
 	
-	return NodeCell {"", nullptr };
+	return NodeCell {};
 }
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::IF_ELSE>::interpret(OperateOn node) {
@@ -19,5 +19,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::IF_ELSE>::interpret(Operat
 		m_interpreter.interpret({ node.parent, node.GetElseStatement() });
     }
 	
-	return NodeCell {"", nullptr };
+	return NodeCell {};
 }

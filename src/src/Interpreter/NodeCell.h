@@ -4,20 +4,14 @@
 namespace ska {
 	class NodeCell {
 	public:
-		NodeCell() = default;
-		NodeCell(MemoryTable& memory, NodeValue* lvalue): m_memory(&memory), m_variant(lvalue) {}
-		NodeCell(NodeValue rvalue, MemoryTablePtr rvalueMemory);
+		NodeCell();
 		NodeCell(NodeLValue lvalue);
 		NodeCell(NodeRValue rvalue);
 
-		bool isLvalue() const {
-			return std::holds_alternative<NodeValue*>(m_variant);
-		}
-
+		bool isLvalue() const { return std::holds_alternative<NodeValue*>(m_variant); }
 		NodeLValue asLvalue();
-
 		NodeRValue asRvalue();
-		
+
 		NodeCell operator()(const std::string& key);
 
 		NodeCell(NodeCell&&) noexcept = default;
@@ -30,7 +24,10 @@ namespace ska {
 		template<class T> const auto& as() const { return std::get<T>(m_variant); }
 		
 		friend bool operator==(const NodeCell& lhs, const NodeCell& rhs);
+	
 	private:
+		NodeCell build(MemoryLValue& memoryField);
+
 		std::variant<NodeValue, NodeValue*> m_variant;
 		MemoryTablePtr m_memory;
 	};

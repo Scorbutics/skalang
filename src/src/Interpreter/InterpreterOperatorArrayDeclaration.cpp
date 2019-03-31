@@ -9,5 +9,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::ARRAY_DECLARATION>::interp
 	for (auto& child : node) {
 		result->push_back(std::move(m_interpreter.interpret({ node.parent, *child }).asRvalue().object));
 	}
-	return NodeCell{ std::move(result), nullptr };
+	return NodeRValue{ std::move(result), nullptr };
 }

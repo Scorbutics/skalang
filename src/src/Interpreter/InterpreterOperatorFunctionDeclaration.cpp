@@ -6,5 +6,5 @@
 ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_DECLARATION>::interpret(OperateOn node) {
 	assert(!node.GetFunctionName().empty());
 	auto functionLValue = node.parent.putMemory(node.GetFunctionName(), ExecutionContext{ node.parent, node.GetFunction() });
-	return NodeCell{ NodeLValue{functionLValue.first, functionLValue.second} };
+	return NodeLValue{std::move(functionLValue.first), std::move(functionLValue.second)};
 }

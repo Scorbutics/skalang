@@ -5,5 +5,5 @@
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::EXPORT>::interpret(OperateOn node) {
 	m_interpreter.interpret({ node.parent, node.GetVariable() });
-	return NodeCell{ "", nullptr};
+	return {};
 }

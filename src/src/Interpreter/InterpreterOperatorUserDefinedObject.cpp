@@ -11,5 +11,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::USER_DEFINED_OBJECT>::inte
 		m_interpreter.interpret({ node.parent, *field });
 	}
 	node.parent.pointMemoryTo(executionMemoryPoint);
-	return NodeCell{ objectMemory, objectMemory };
+	return NodeRValue{ objectMemory, objectMemory };
 }

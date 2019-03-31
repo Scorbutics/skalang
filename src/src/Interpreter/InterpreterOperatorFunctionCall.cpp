@@ -53,7 +53,7 @@ namespace ska {
 		ska::Operation<ska::Operator::FUNCTION_DECLARATION>& operateOnFunctionDeclaration,
 		ska::Operation<ska::Operator::FUNCTION_CALL>& operateOnFunctionCall) {
 		auto parametersValues = InterpreterOperationFunctionCallExecuteFunctionFromCallParameters(interpreter, operateOnFunctionDeclaration, operateOnFunctionCall);
-		return NodeCell{ NodeRValue{(bridgeCall.function)(parametersValues.empty() ? std::vector<NodeValue>() : std::move(parametersValues)), nullptr } };
+		return NodeRValue{(bridgeCall.function)(std::move(parametersValues)), nullptr };
 	}
 
 }
@@ -61,10 +61,10 @@ namespace ska {
 ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>::interpret(OperateOn node) {
 	auto executionContext = ExecutionContext{ node.parent, node.GetFunction() };
 	auto inMemoryFunctionZone = m_interpreter.interpret(executionContext).asRvalue();
-	assert(inMemoryFunctionZone.memory != nullptr);
 
 	auto& functionValue = inMemoryFunctionZone.object.as<TokenVariant>();
 	if (std::holds_alternative<ExecutionContext>(functionValue)) {
+		assert(inMemoryFunctionZone.memory != nullptr);
 		auto functionExecutionContext = inMemoryFunctionZone.object.nodeval<ExecutionContext>();
 		auto operateOnFunction = Operation<Operator::FUNCTION_DECLARATION>(functionExecutionContext);
 		return InterpreterOperationFunctionCallScript(m_interpreter, inMemoryFunctionZone.memory, operateOnFunction, node);

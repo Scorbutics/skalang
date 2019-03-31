@@ -11,9 +11,6 @@
 namespace ska {
 
 	class MemoryTable : public  std::enable_shared_from_this<MemoryTable> {
-		using MemoryLValue = std::pair<NodeValue*, MemoryTablePtr>;
-		using MemoryCLValue = std::pair<const NodeValue*, MemoryTableCPtr>;
-
 	public:
 		MemoryTable(const MemoryTable&) = delete;
 		MemoryTable& operator=(const MemoryTable&) = delete;
