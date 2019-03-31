@@ -10,4 +10,5 @@ namespace ska {
     public:
         virtual Type build(const Script&, const ASTNode&) = 0;
     };
+
 }

@@ -20,7 +20,12 @@ TEST_CASE("[TypeBuilderVariableDeclaration]") {
 	auto valueToken = ska::Token{ "1", ska::TokenType::DIGIT };
 	
 	auto valueNode = ska::ASTFactory::MakeLogicalNode(valueToken);
-	valueNode->buildType(script);
+	auto result = std::array<ska::TypeBuildUnitPtr, static_cast<std::size_t>(ska::Operator::UNUSED_Last_Length)>{};
+	result[static_cast<std::size_t>(ska::Operator::BINARY)] = std::make_unique<ska::TypeBuilderOperator<ska::Operator::BINARY>>();
+	result[static_cast<std::size_t>(ska::Operator::UNARY)] = std::make_unique<ska::TypeBuilderOperator<ska::Operator::UNARY>>();
+	result[static_cast<std::size_t>(ska::Operator::LITERAL)] = std::make_unique<ska::TypeBuilderOperator<ska::Operator::LITERAL>>();
+
+	valueNode->buildType(result, script);
 	auto children = std::vector<ska::ASTNodePtr>{ };
 	children.push_back(std::move(valueNode));
 	auto node = ska::ASTFactory::MakeNode<ska::Operator::VARIABLE_DECLARATION>(std::move(nameToken), std::move(children));

@@ -17,8 +17,13 @@ TEST_CASE("[TypeBuilderBinary]") {
 	auto value2Node = ska::ASTFactory::MakeLogicalNode(ska::Token{"1", ska::TokenType::STRING});
 	auto node = ska::ASTFactory::MakeLogicalNode(ska::Token{"+", ska::TokenType::SYMBOL}, std::move(value1Node), std::move(value2Node));
 	
-	(*node)[0].buildType(script);
-	(*node)[1].buildType(script);
+	auto result = std::array<ska::TypeBuildUnitPtr, static_cast<std::size_t>(ska::Operator::UNUSED_Last_Length)>{};
+	result[static_cast<std::size_t>(ska::Operator::BINARY)] = std::make_unique<ska::TypeBuilderOperator<ska::Operator::BINARY>>();
+	result[static_cast<std::size_t>(ska::Operator::UNARY)] = std::make_unique<ska::TypeBuilderOperator<ska::Operator::UNARY>>();
+	result[static_cast<std::size_t>(ska::Operator::LITERAL)] = std::make_unique<ska::TypeBuilderOperator<ska::Operator::LITERAL>>();
+
+	(*node)[0].buildType(result, script);
+	(*node)[1].buildType(result, script);
 	
 	//This one makes a "crossType"
 	auto type = typeBuilder.build(script, *node);

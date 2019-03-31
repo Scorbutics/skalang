@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include "Container/sorted_observable.h"
 
 #include "NodeValue/Operator.h"
@@ -10,10 +11,9 @@
 #include "Event/ReturnTokenEvent.h"
 #include "Event/ArrayTokenEvent.h"
 #include "Event/ScriptLinkTokenEvent.h"
+#include "TypeBuildersContainer.h"
 
 namespace ska {
-    class ASTNode;
-    class SymbolTable;
     class StatementParser;
 
     class TypeBuilder : 
@@ -35,8 +35,7 @@ namespace ska {
 			bool matchArray(ArrayTokenEvent& event) const;
 			bool matchScriptLink(ScriptLinkTokenEvent& event) const;
 
-			StatementParser& m_parser;
-
+			TypeBuildersContainer m_typeBuilder;
     };
     
 }

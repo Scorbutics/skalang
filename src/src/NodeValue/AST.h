@@ -11,7 +11,7 @@
 #include "Interpreter/MemoryTable.h"
 #include "Interpreter/NodeValue.h"
 
-#include "Service/TypeBuilder/TypeBuildUnit.h"
+#include "Service/TypeBuilder/TypeBuildersContainer.h"
 #include "Type.h"
 
 namespace ska {
@@ -67,7 +67,7 @@ namespace ska {
 			return m_op;
 		}
 
-	    void buildType(const Script& script);
+	    void buildType(const TypeBuildersContainer& typeBuilder, const Script& script);
 
 		const auto& type() const {
 			return m_type;
@@ -85,9 +85,6 @@ namespace ska {
 
 		Operator m_op = Operator::UNARY;
 		std::optional<Type> m_type;
-
-		//TODO a externaliser
-		std::unique_ptr<TypeBuildUnit> m_typeBuilder;
 
 		Token token;
 		std::vector<ASTNodePtr> m_children;

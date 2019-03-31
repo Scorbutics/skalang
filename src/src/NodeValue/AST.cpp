@@ -1,9 +1,10 @@
 #include "AST.h"
 #include "Service/ASTFactory.h"
 #include "Service/Script.h"
+#include "Service/TypeBuilder/TypeBuildUnit.h"
+
 ska::ASTNode::ASTNode(): 
 	m_type(Type::MakeBuiltIn(ExpressionType::VOID)) {
-
 }
 
 ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
@@ -20,13 +21,6 @@ ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
     if(token.isLiteral()) {
         assert(m_op == Operator::UNARY);
         m_op = Operator::LITERAL;
-		m_typeBuilder = std::make_unique<TypeBuilderOperator<Operator::LITERAL>>();
-	} else {
-		if (m_op == Operator::BINARY) {
-			m_typeBuilder = std::make_unique<TypeBuilderOperator<Operator::BINARY>>();
-		} else {
-			m_typeBuilder = std::make_unique<TypeBuilderOperator<Operator::UNARY>>();
-		}
 	}
 }
 
@@ -48,14 +42,15 @@ ska::ASTNode::ASTNode(Operator o, Token identifierToken) :
     token(std::move(identifierToken)) {
 }
 
-void ska::ASTNode::buildType(const Script& script) {
+void ska::ASTNode::buildType(const TypeBuildersContainer& typeBuilders, const Script& script) {
 	if (m_type.has_value()) {
 		return;
 	}
 
 	for(auto& child : m_children) {
-        child->buildType(script);
+        child->buildType(typeBuilders, script);
     }
-	assert(m_typeBuilder != nullptr && "Cannot calculate the node type (it might be an empty node)");
-    m_type = m_typeBuilder->build(script, *this);
+	auto& typeBuilder = typeBuilders[static_cast<std::size_t>(op())];
+	assert(typeBuilder != nullptr && "Cannot calculate the node type (it might be an empty node)");
+    m_type = typeBuilder->build(script, *this);
 }
