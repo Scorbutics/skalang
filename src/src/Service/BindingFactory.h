@@ -44,6 +44,7 @@ namespace ska {
 		}
 
 	private:
+		Token getTokenFromTypeName(const std::string& typeName);
 		void unlisten(SymbolTable& symbolTable);
 		void listen(SymbolTable& symbolTable);
 

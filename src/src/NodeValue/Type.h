@@ -9,6 +9,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Type)
 
 namespace ska {
 	class Symbol;
+	class SymbolTable;
 
 	struct Type {
 		static constexpr bool isNamed(ExpressionType type) {
@@ -33,12 +34,18 @@ namespace ska {
 			return Type{ t };
 		}
 
-		static Type MakeBuiltIn(ExpressionType t) {
-			return Type{ t };
+		static Type MakeBuiltIn(ExpressionType t, const Symbol* symbol = nullptr) {
+			return Type{ symbol, t };
 		}
 
 		template<ExpressionType t>
 		static Type MakeCustom(const Symbol* symbol) {
+			static_assert(isNamed(t));
+			return Type{ symbol, t };
+		}
+
+		template<ExpressionType t>
+		static Type MakeCustom(const std::string symbol) {
 			static_assert(isNamed(t));
 			return Type{ symbol, t };
 		}
@@ -56,21 +63,13 @@ namespace ska {
 			return m_type;
 		}
 
-		bool operator==(const Type& t) const {
-			if (!m_alias.empty()) {
-				return m_alias == t.m_alias && m_symbol == t.m_symbol;
-			}
-
-			if (!t.m_alias.empty()) {
-				return false;
-			}
-
-			return m_type == t.m_type && m_compound == t.m_compound;
-		}
+		bool operator==(const Type& t) const;
 
 		bool hasSymbol() const {
 			return m_symbol != nullptr;
 		}
+
+		Type updateSymbol(const SymbolTable& symbols) const;
 
 		bool operator==(const ExpressionType& t) const {
 			return m_type == t;
@@ -114,31 +113,22 @@ namespace ska {
 			m_type(std::move(t)) {
 		}
 
-		Type(const Symbol* symbol, ExpressionType t) :
+		Type(const Symbol* symbol, ExpressionType t);
+
+		Type(std::string symbol, ExpressionType t) :
 			m_type(t),
-			m_symbol(symbol) {
+			m_symbolAlias(std::move(symbol)) {
 		}
 
+		bool checkSameObjectTypes(const Type& type2) const;
+
 		ExpressionType m_type = ExpressionType::VOID;
-		std::string m_alias;
         const Symbol* m_symbol = nullptr;
+		std::string m_symbolAlias;
 		std::vector<Type> m_compound;
 
 		friend std::ostream& operator<<(std::ostream& stream, const Type& type);
     };
 	
-	inline std::ostream& operator<<(std::ostream& stream, const Type& type) {
-		const auto mainType = ExpressionTypeSTR[static_cast<std::size_t>(type.m_type)];
-		if (type.m_compound.empty() || !type.m_alias.empty()) {
-			stream << (type.m_alias.empty() ? "" : (type.m_alias + " ")) << mainType;
-		} else {
-			stream << mainType << " (";
-			for (const auto& childType : type.m_compound) {
-				stream << " - " << childType;
-			}
-			stream << ")";
-		}
-		
-		return stream;
-	}
+	std::ostream& operator<<(std::ostream& stream, const Type& type);
 }

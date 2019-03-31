@@ -187,12 +187,11 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 
 bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 	assert(variable.varType().has_value() && "The current variable has no type. Maybe you forgot to add a type builder ?");
-    const auto tokenNodeExpressionType = variable.varType().value();
 	const auto value = variable.value();
     const auto name = variable.name();
 	const auto type = variable.varType().value();
     
-	SLOG(ska::LogLevel::Debug) << variable << " = " << value << ";\tsymbol = " << tokenNodeExpressionType;
+	SLOG(ska::LogLevel::Debug) << variable << " = " << value << ";\tsymbol = " << type;
 
     if(variable.type() == VarTokenEventType::AFFECTATION) {
 		if (!OperatorTraits::isLvalueCompatible(variable.rootNode()[0].op())) {
@@ -201,6 +200,7 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 			throw std::runtime_error(ss.str());
 		}
 
+		const auto tokenNodeExpressionType = variable.valType().value();
 		const auto newTokenType = type.crossTypes("=", tokenNodeExpressionType);
         if(newTokenType == ExpressionType::VOID) {
             const auto expressionTypeIndex = tokenNodeExpressionType;

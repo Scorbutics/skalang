@@ -39,6 +39,10 @@ namespace ska {
 		inline auto GetFunctionName() {
 			return node.name();
 		}
+		
+		inline auto GetParameterSize() {
+			return node.size() - 1;
+		}
 
 		inline auto& GetFunction() {
 			return node;

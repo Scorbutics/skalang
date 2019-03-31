@@ -43,6 +43,13 @@ ska::BindingFactory::~BindingFactory() {
 	observable_priority_queue<VarTokenEvent>::removeObserver(m_typeBuilder);
 }
 
+ska::Token ska::BindingFactory::getTokenFromTypeName(const std::string& typeName) {
+	if (m_reserved.pool.find(typeName) != m_reserved.pool.end()) {
+		return m_reserved.pool.at(typeName).token;
+	}
+	return Token{ typeName, TokenType::IDENTIFIER };
+}
+
 ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::string& functionName, std::vector<std::string> typeNames) {
 	listen(script.symbols());
 
@@ -62,7 +69,7 @@ ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::strin
 	auto ss = std::stringstream{};
 	for (auto index = 0u; index < typeNames.size(); index++) {
 		ss << index;
-		auto t = m_reserved.pool.at(typeNames[index]).token;
+		auto t = getTokenFromTypeName(typeNames[index]);
 		if (index == typeNames.size() - 1) {
 			parameters.push_back(ASTFactory::MakeLogicalNode(std::move(t)));
 		} else {
@@ -72,7 +79,7 @@ ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::strin
 			auto event = VarTokenEvent::MakeParameter(*parameter, (*parameter)[0], script);
 			observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 			parameters.push_back(std::move(parameter));
-		}
+		}		
 		ss.clear();
 	}
 

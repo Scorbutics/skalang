@@ -6,7 +6,7 @@ namespace ska {
 	class Symbol;
 }
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::Symbol)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::Symbol)
 
 namespace ska {
 	class ScopedSymbolTable;

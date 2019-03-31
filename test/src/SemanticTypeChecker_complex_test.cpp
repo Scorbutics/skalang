@@ -154,4 +154,20 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 		ASTFromInputSemanticComplexTC(scriptCache, "var f_semantic151 = function(titi:int) : int { if(titi == 0) { return 1; } return 0; }; var int_semantic151 = f_semantic151(1);", data);
 	}
 
+	SUBCASE("assign 2 differents object types") {
+		try {
+			ASTFromInputSemanticComplexTC(scriptCache,
+				"var lvalFunc160 = function() : var {"
+				"return {};"
+				"};"
+				"var lvalFunc163 = function() : var {"
+				"return {};"
+				"};"
+				"var object = lvalFunc160();"
+				"object = lvalFunc163();", data);
+			CHECK(false);
+		} catch (std::exception & e) {
+			CHECK(e.what() == std::string("The symbol \"object\" has already been declared as var lvalFunc160 but is now wanted to be var lvalFunc163"));
+		}
+	}
 }

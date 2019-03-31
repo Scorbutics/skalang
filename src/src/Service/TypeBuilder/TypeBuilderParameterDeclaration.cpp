@@ -15,17 +15,27 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>::build(
 	auto type = Type{};
     if (ExpressionTypeMap.find(typeStr) == ExpressionTypeMap.end()) {
 		//Object case
-        auto& symbols = script.symbols();
-        const auto symbolType = symbols[typeStr];
-        if (symbolType == nullptr) {
-            throw std::runtime_error("unknown type detected as function parameter : " + node.GetTypeValueNode().name());
-        }
-        SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node.GetVariableName() << "\" = \"" << symbolType->getType() << "\"";
-		type = Type::MakeCustom<ExpressionType::OBJECT>(symbolType);
+        /*if (typeStr != "var") {
+            throw std::runtime_error("unknown type detected as function parameter : " + typeStr);
+        }*/
+		auto& symbols = script.symbols();
+		const auto symbolType = symbols[typeStr];
+		SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node.GetVariableName() << "\" = \"" << (symbolType != nullptr ? symbolType->getType() : Type{}) << "\"";
+		if (symbolType != nullptr) {
+			type = Type::MakeCustom<ExpressionType::OBJECT>(symbolType);
+		} else {
+			type = Type::MakeCustom<ExpressionType::OBJECT>(typeStr);
+		}
    } else { 
 	   //Built-in case
        SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type calculating for node \"" << node.GetVariableName() << " with type-node " << typeStr;
 	   type = ExpressionTypeMap.at(node.GetTypeValueNode().name());
+
+	   auto& symbols = script.symbols();
+	   const auto symbolType = symbols[node.GetVariableName()];
+	   if (symbolType != nullptr) {
+		   type = Type::MakeBuiltIn(type.type(), symbolType);
+	   }
        SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node.GetVariableName() << "\" = \"" << type << "\""; 
    }
 

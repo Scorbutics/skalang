@@ -8,7 +8,6 @@ namespace ska {
 		NodeCell(NodeLValue lvalue);
 		NodeCell(NodeRValue rvalue);
 
-		bool isLvalue() const { return std::holds_alternative<NodeValue*>(m_variant); }
 		NodeLValue asLvalue();
 		NodeRValue asRvalue();
 
@@ -26,6 +25,8 @@ namespace ska {
 		friend bool operator==(const NodeCell& lhs, const NodeCell& rhs);
 	
 	private:
+		bool isLvalue() const { return std::holds_alternative<NodeValue*>(m_variant); }
+
 		NodeCell build(MemoryLValue& memoryField);
 
 		std::variant<NodeValue, NodeValue*> m_variant;

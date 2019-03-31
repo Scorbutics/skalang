@@ -367,7 +367,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                 ASTFromInputSemanticTC(scriptCache, "var titi = function() {}; titi = 9;", data);
                 CHECK(false);
             } catch(std::exception& e) {
-                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types function and function");
+                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types function and int");
             }
         }
         

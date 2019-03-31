@@ -12,9 +12,21 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION
     auto& symbols = script.symbols();
 	const auto* symbolFunction = symbols[functionName];
 	auto functionType = Type::MakeCustom<ExpressionType::FUNCTION>(symbolFunction);
+	std::size_t index = 0;
     for (auto& paramNode : node) {
-		auto type = paramNode->type().value() == ExpressionType::OBJECT ? Type::MakeCustom<ExpressionType::OBJECT>(symbolFunction) : paramNode->type().value();
-        functionType.add(type);
+		if (index == node.GetParameterSize()) {
+			//Handles return value object special case (refers to itself)
+			auto type = paramNode->type().value() == ExpressionType::OBJECT && !paramNode->type()->hasSymbol() ?
+				Type::MakeCustom<ExpressionType::OBJECT>(symbolFunction) :
+				paramNode->type().value();
+			functionType.add(type);
+		} else {
+			auto type = paramNode->type().value() == ExpressionType::OBJECT && !paramNode->type()->hasSymbol() ?
+				paramNode->type().value().updateSymbol(script.symbols()) :
+				paramNode->type().value();
+			functionType.add(type);
+		}
+		index++;
     }
 	
     SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function prototype declaration \""<< node <<"\" with type "<< functionType;

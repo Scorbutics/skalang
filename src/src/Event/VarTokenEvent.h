@@ -65,6 +65,8 @@ namespace ska {
 		}
 
 		const std::optional<Type>& varType() const;
+		std::optional<Type> valType() const;
+
 		std::string value() const;
 		std::string name() const;
 
