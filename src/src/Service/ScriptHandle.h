@@ -14,16 +14,14 @@ namespace ska {
 	using ScriptCache = std::unordered_map<std::string, ScriptHandlePtr>;
 
 	struct ScriptHandle {
-		ScriptHandle(ScriptCache& cache, std::vector<Token> input, std::size_t startIndex = 0) :
-			m_cache(cache),
-			m_input(std::move(input), startIndex) {}
+		ScriptHandle(ScriptCache& cache, std::vector<Token> input, std::size_t startIndex = 0);
 	
 	public:
 		SymbolTable& symbols() { return m_symbols; }
 		const SymbolTable& symbols() const { return m_symbols; }
 		
-		MemoryTable& memory() { return m_memory; }
-		const MemoryTable& memory() const { return m_memory; }
+		MemoryTable& currentMemory() { return *m_currentMemory; }
+		const MemoryTable& currentMemory() const { return *m_currentMemory; }
 
 		ASTNode& rootNode() { assert(m_ast != nullptr);  return *m_ast; }
 		const ASTNode& rootNode() const { assert(m_ast != nullptr);  return *m_ast; }
@@ -34,7 +32,8 @@ namespace ska {
 		ScriptCache& m_cache;
 		TokenReader m_input;
 		SymbolTable m_symbols;
-		MemoryTable m_memory;
+		MemoryTablePtr m_memory;
+		MemoryTablePtr m_currentMemory;
 		ASTNodePtr m_ast;
 		bool m_bridged = false;
 	};

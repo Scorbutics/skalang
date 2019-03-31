@@ -15,35 +15,35 @@ namespace ska {
 		auto& functionPrototype = operateOnFunctionDeclaration.GetFunctionPrototype();
 		for (auto index = 0u; index < functionPrototype.size() - 1 && operateOnFunctionCall.HasFunctionParameter(index); index++) {
 			auto nodeValue = interpreter.interpret({ operateOnFunctionCall.parent, operateOnFunctionCall.GetFunctionParameterValue(index) }).asRvalue();
-			result.push_back(std::move(nodeValue));
+			result.push_back(std::move(nodeValue.object));
 		}
 		return result;
 	}
 
 	ska::NodeCell InterpreterOperationFunctionCallScript(
 		ska::Interpreter& interpreter,
-		ska::MemoryTable& memoryForFunctionExecution,
+		ska::MemoryTablePtr& memoryForFunctionExecution,
 		ska::Operation<ska::Operator::FUNCTION_DECLARATION>& operateOnFunctionDeclaration,
 		ska::Operation<ska::Operator::FUNCTION_CALL>& node) {
 
 		//Centers memory on the current function scope
-		auto& currentExecutionMemoryZone = node.parent.memory().pointTo(memoryForFunctionExecution);
+		auto& currentExecutionMemoryZone = node.parent.pointMemoryTo(memoryForFunctionExecution);
 
 		//Creates function-memory environment scope (including creation of parameters)
-		node.parent.memory().createNested();
+		node.parent.pushNestedMemory();
 
 		auto parametersValues = InterpreterOperationFunctionCallExecuteFunctionFromCallParameters(interpreter, operateOnFunctionDeclaration, node);
 		auto index = 0u;
 		auto& functionPrototype = operateOnFunctionDeclaration.GetFunctionPrototype();
 		for (auto& parameterValue : parametersValues) {
 			auto& functionParameter = functionPrototype[index++];
-			node.parent.memory().put(functionParameter.name(), std::move(parameterValue));
+			node.parent.putMemory(functionParameter.name(), std::move(parameterValue));
 		}
 		auto result = interpreter.interpret({ node.parent, operateOnFunctionDeclaration.GetFunctionBody() });
 
 		//Go back to the current execution scope, while destroying the memory used during function execution
-		node.parent.memory().popNested();
-		node.parent.memory().pointTo(currentExecutionMemoryZone);
+		node.parent.popNestedMemory();
+		node.parent.pointMemoryTo(currentExecutionMemoryZone);
 		return result;
 	}
 
@@ -53,23 +53,24 @@ namespace ska {
 		ska::Operation<ska::Operator::FUNCTION_DECLARATION>& operateOnFunctionDeclaration,
 		ska::Operation<ska::Operator::FUNCTION_CALL>& operateOnFunctionCall) {
 		auto parametersValues = InterpreterOperationFunctionCallExecuteFunctionFromCallParameters(interpreter, operateOnFunctionDeclaration, operateOnFunctionCall);
-		return (bridgeCall.function)(std::move(parametersValues));
+		return NodeCell{ NodeRValue{(bridgeCall.function)(parametersValues.empty() ? std::vector<NodeValue>() : std::move(parametersValues)), nullptr } };
 	}
 
 }
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>::interpret(OperateOn node) {
 	auto executionContext = ExecutionContext{ node.parent, node.GetFunction() };
-	auto inMemoryFunctionZone = m_interpreter.interpret(executionContext).asLvalue();
-	assert(inMemoryFunctionZone.first != nullptr && inMemoryFunctionZone.second != nullptr);
+	auto inMemoryFunctionZone = m_interpreter.interpret(executionContext).asRvalue();
+	assert(inMemoryFunctionZone.memory != nullptr);
 
-	auto& functionValue = inMemoryFunctionZone.first->as<TokenVariant>();
+	auto& functionValue = inMemoryFunctionZone.object.as<TokenVariant>();
 	if (std::holds_alternative<ExecutionContext>(functionValue)) {
-		auto functionExecutionContext = inMemoryFunctionZone.first->nodeval<ExecutionContext>();
+		auto functionExecutionContext = inMemoryFunctionZone.object.nodeval<ExecutionContext>();
 		auto operateOnFunction = Operation<Operator::FUNCTION_DECLARATION>(functionExecutionContext);
-		return InterpreterOperationFunctionCallScript(m_interpreter, *inMemoryFunctionZone.second, operateOnFunction, node);
+		return InterpreterOperationFunctionCallScript(m_interpreter, inMemoryFunctionZone.memory, operateOnFunction, node);
 	} else {
-		auto bridgeCall = inMemoryFunctionZone.first->nodeval<BridgeMemory>();
+		auto bridgeCall = inMemoryFunctionZone.object.nodeval<BridgeMemory>();
+		assert(bridgeCall != nullptr);
 		auto operateOnFunction = Operation<Operator::FUNCTION_DECLARATION>(executionContext);
 		return InterpreterOperationFunctionCallBridge(m_interpreter, *bridgeCall, operateOnFunction, node);
 	}

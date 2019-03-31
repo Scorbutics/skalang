@@ -14,5 +14,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::SCRIPT_LINK>::interpret(Op
 	}
 	auto script = node.parent.subScript(scriptLinkCellData->getName());
 	auto ec = ExecutionContext{ *script };
-	return ska::NodeCell{ ec };
+	return ska::NodeCell{ ec, nullptr };
 }

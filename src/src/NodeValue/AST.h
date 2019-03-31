@@ -45,10 +45,6 @@ namespace ska {
 			return token.type();
 		}
 
-		Token::Variant tokenContent() const {
-			return token.content();
-		}
-
 		auto& operator[](const std::size_t index) {
 		    return *m_children[index];
 		}

@@ -7,17 +7,15 @@
 #include <type_traits>
 #include <memory>
 
-#include "NodeValue/Token.h"
+#include "NodeValue/TokenVariant.h"
 #include "NodeValue/NodeValueArray.h"
 #include "NodeValue/NodeValueMap.h"
+#include "MemoryTablePtr.h"
 
 namespace ska {
-	class NodeValue;
-	class NodeCell;
-	class MemoryTable;
 
 	using NodeValueVariant_ = std::variant<
-		Token::Variant,
+		TokenVariant,
 		NodeValueArray,
 		NodeValueMap
 	>;
@@ -34,14 +32,15 @@ namespace ska {
 	class NodeValue {
 	public:
 		NodeValue() = default;
+		
 		template <class Arg>
-		NodeValue(Arg arg) : m_variant(std::move(arg)) {}
+		NodeValue(Arg&& arg) : m_variant(std::forward<Arg>(arg)) {}
 		NodeValue(NodeValueArray arg) : m_variant(arg) {}
 		NodeValue(NodeValueMap arg) : m_variant(arg) {}
 
-		NodeValue(NodeValue&&) = default;
+		NodeValue(NodeValue&&) noexcept = default;
 
-		NodeValue& operator=(NodeValue&&) = default;
+		NodeValue& operator=(NodeValue&&) noexcept = default;
 		NodeValue& operator=(const NodeValue&) = delete;
 		~NodeValue() = default;
 
@@ -50,52 +49,14 @@ namespace ska {
 		template<class T> auto& as() { return std::get<T>(m_variant); }
 		template<class T> const auto& as() const { return std::get<T>(m_variant); }
 		
-		double convertNumeric() const { 
-			double numeric = 0.0;
-			const auto& valueVariant = std::get<Token::Variant>(m_variant);
-			std::visit([&numeric](auto && arg){
-				using T = std::decay_t<decltype(arg)>;
+		double convertNumeric() const;
 
-				if constexpr (std::is_same<T, int>::value) {
-					numeric = static_cast<double>(arg);
-				} else if constexpr (std::is_same<T, double>::value) {
-					numeric = arg;
-				} else if constexpr (std::is_same<T, bool>::value) {
-					numeric = arg ? 1.0 : 0.0;
-				} else if constexpr (std::is_same<T, std::string>::value) {
-					numeric = std::stod(arg);
-				} else {
-					throw std::runtime_error("cannot convert the node value to a numeric format");
-				}
-			}, valueVariant);
-			return numeric;
-		}
-
-		std::string convertString() const {
-			auto result = std::string{};
-			const auto& valueVariant = std::get<Token::Variant>(m_variant);
-			std::visit([&result](auto && arg) {
-				using T = std::decay_t<decltype(arg)>;
-
-				if constexpr (std::is_same<T, int>::value) {
-					result = std::to_string(arg);
-				} else if constexpr (std::is_same<T, double>::value) {
-					result = std::to_string(arg);
-				} else if constexpr (std::is_same<T, bool>::value) {
-					result = arg ? "true" : "false";
-				} else if constexpr (std::is_same<T, std::string>::value) {
-					result = arg;
-				} else {
-					throw std::runtime_error("cannot convert the node value to a numeric format");
-				}
-			}, valueVariant);
-			return result;
-		}
+		std::string convertString() const;
 
 		template <class Converted>
 		Converted& nodeval() {
-			if constexpr(detail::isVariantMember<Converted, Token::Variant>::value) {
-				return std::get<Converted>(std::get<Token::Variant>(m_variant));
+			if constexpr(detail::isVariantMember<Converted, TokenVariant>::value) {
+				return std::get<Converted>(std::get<TokenVariant>(m_variant));
 			} else {
 				return std::get<Converted>(m_variant);
 			}
@@ -103,8 +64,8 @@ namespace ska {
 
 		template <class Converted>
 		const Converted& nodeval() const {
-			if constexpr(detail::isVariantMember<Converted, Token::Variant>::value) {
-				return std::get<Converted>(std::get<Token::Variant>(m_variant));
+			if constexpr(detail::isVariantMember<Converted, TokenVariant>::value) {
+				return std::get<Converted>(std::get<TokenVariant>(m_variant));
 			} else {
 				return std::get<Converted>(m_variant);
 			}
@@ -117,44 +78,6 @@ namespace ska {
 		NodeValueVariant_ m_variant;
 	};
 
-
-	class NodeCell {
-	public:
-		NodeCell() = default;
-		NodeCell(MemoryTable& memory, NodeValue* lvalue): m_memory(&memory), m_variant(lvalue) {}
-		NodeCell(NodeValue rvalue) : m_variant(std::move(rvalue)) {}
-		NodeCell(std::pair<NodeValue*, MemoryTable*> lvalue) : m_memory(lvalue.second), m_variant(lvalue.first) { 
-			assert(m_memory != nullptr && "lvalue not provided (null)"); 
-		}
-
-		bool isLvalue() const {
-			return std::holds_alternative<NodeValue*>(m_variant);
-		}
-
-		std::pair<NodeValue*, MemoryTable*> asLvalue() {
-			assert(isLvalue() && "Must be an lvalue");
-			return std::make_pair(std::get<NodeValue*>(m_variant), m_memory);
-		}
-
-		NodeValue asRvalue() {
-			return std::holds_alternative<NodeValue*>(m_variant) ? std::move(*std::get<NodeValue*>(m_variant)) : std::move(std::get<NodeValue>(m_variant));
-		}
-		
-		template<class T> auto& as() { return std::get<T>(m_variant); }
-		template<class T> const auto& as() const { return std::get<T>(m_variant); }
-		
-		friend bool operator==(const NodeCell& lhs, const NodeCell& rhs);
-	private:
-		std::variant<NodeValue, NodeValue*> m_variant;
-		MemoryTable* m_memory = nullptr;
-	};
-
-	inline bool operator==(const ska::NodeValue& lhs, const ska::NodeValue& rhs) {
-		return lhs.m_variant == rhs.m_variant;
-	}
-
-	inline bool operator==(const ska::NodeCell& lhs, const ska::NodeCell& rhs) {
-		return lhs.m_variant == rhs.m_variant;
-	}
+	bool operator==(const ska::NodeValue& lhs, const ska::NodeValue& rhs);
 }
 

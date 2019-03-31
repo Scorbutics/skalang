@@ -63,8 +63,49 @@ namespace ska {
 		SymbolTable& symbols() { return m_handle->m_symbols; }
 		const SymbolTable& symbols() const { return m_handle->m_symbols; }
 
-		MemoryTable& memory() { return m_handle->m_memory; }
-		const MemoryTable& memory() const { return m_handle->m_memory; }
+		void pushNestedMemory() {
+			m_handle->m_currentMemory = m_handle->m_currentMemory->pushNested();
+		}
+		
+		void popNestedMemory() {
+			endNestedMemory();
+			if (m_handle->m_currentMemory != nullptr) {
+				m_handle->m_currentMemory->popNested();
+			}
+		}
+
+		template <class T>
+		auto putMemory(const std::string& s, T&& value) {
+			return m_handle->m_currentMemory->put(s, std::forward<T>(value));
+		}
+
+		void endNestedMemory() {
+			m_handle->m_currentMemory->endNested();
+			m_handle->m_currentMemory = m_handle->m_currentMemory->parent().lock();
+		}
+
+		MemoryTablePtr pointMemoryTo(MemoryTablePtr& to) {
+			auto actualMemory = m_handle->m_currentMemory;
+			m_handle->m_currentMemory = to;
+			return actualMemory;
+		}
+
+		MemoryTablePtr createMemory() {
+			return MemoryTable::create(m_handle->m_currentMemory);
+		}
+
+		auto findInMemoryTree(const std::string& key) {
+			return (*m_handle->m_currentMemory)[key];
+		}
+
+		auto findInMemory(const std::string& key) {
+			return (*m_handle->m_currentMemory)(key);
+		}
+
+		template <class T>
+		auto emplaceMemory(const std::string& key, T&& value) {
+			return m_handle->m_currentMemory->emplace(key, std::forward<T>(value));
+		}
 
 		auto& rootNode() {
 			return *m_handle->m_ast;

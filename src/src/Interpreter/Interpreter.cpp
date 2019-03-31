@@ -65,5 +65,6 @@ ska::NodeCell ska::Interpreter::interpret(ExecutionContext node) {
 }
 
 ska::NodeValue ska::Interpreter::script(Script& script) {
-	return interpret(ExecutionContext{ script }).asRvalue();
+	auto result = interpret(ExecutionContext{ script }).asRvalue();
+	return std::move(result.object);
 }

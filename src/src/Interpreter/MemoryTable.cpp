@@ -1,31 +1,25 @@
-#include "MemoryTable.h"
+﻿#include "MemoryTable.h"
 
-ska::MemoryTable* ska::MemoryTable::parent() {
-	return m_current->m_parent;
+std::weak_ptr<ska::MemoryTable> ska::MemoryTable::parent() {
+	return m_parent;
 }
 
-ska::MemoryTable & ska::MemoryTable::createNested() {
-	m_current->m_children.push_back(std::make_shared<MemoryTable>(*m_current));
-	auto& lastChild = *m_current->m_children.back();
+ska::MemoryTablePtr& ska::MemoryTable::pushNested() {
+	m_children.push_back(MemoryTable::create(shared_from_this()));
+	auto& lastChild = m_children.back();
 	//No bad memory access possible when smart ptr are moved, that's why it's safe to return the address of contained item
 	//even if we move the vector or if the vector moves its content automatically 
-	m_current = &lastChild;
 	return lastChild;
 }
 
-ska::MemoryTable* ska::MemoryTable::endNested() {
-	//TODO : � remettre, pour le moment bloque le syst�me d'import de script
+void ska::MemoryTable::endNested() {
+	//TODO : a remettre, pour le moment bloque le systeme d'import de script
 	//m_current->m_memory.clear();
-	m_current = m_current->parent();
-	return m_current;
 }
 
 ska::MemoryTable* ska::MemoryTable::popNested() {
-	m_current = m_current->parent();
-	if (m_current != nullptr) {
-		m_current->m_children.pop_back();
-	}
-	return m_current;
+	m_children.pop_back();
+	return this;
 }
 
 ska::MemoryTable::MemoryLValue ska::MemoryTable::put(const std::string& name, NodeValue value) {
@@ -35,11 +29,11 @@ ska::MemoryTable::MemoryLValue ska::MemoryTable::put(const std::string& name, No
 	if (memValue != nullptr) {
 		*memValue = std::move(value);
 	} else {
-		m_current->m_memory.emplace(name, std::move(value));
-		memValue = &m_current->m_memory.at(name);
+		m_memory.emplace(name, std::move(value));
+		memValue = &m_memory.at(name);
 	}
 
-	return std::make_pair(memValue, m_current);
+	return std::make_pair(memValue, shared_from_this());
 }
 
 void ska::MemoryTable::put(const std::string& name, std::size_t index, NodeValue value) {
@@ -48,7 +42,8 @@ void ska::MemoryTable::put(const std::string& name, std::size_t index, NodeValue
 	auto memValue = memValueZone.first;
 	assert(memValue != nullptr);
 	auto& arrayPtr = memValue->as<NodeValueArray>();
-	(*arrayPtr)[index] = std::move(value.as<Token::Variant>());
+	auto rvalue = std::make_pair(std::move(value), nullptr);
+	(*arrayPtr)[index] = std::move(rvalue.first);
 }
 
 ska::MemoryTable::MemoryLValue ska::MemoryTable::emplace(const std::string& name, NodeValue value) {
@@ -58,9 +53,9 @@ ska::MemoryTable::MemoryLValue ska::MemoryTable::emplace(const std::string& name
 	if (memValue != nullptr) {
 		*memValue = std::move(value);
 	} else {
-		m_current->m_memory.emplace(name, std::move(value));
-		memValue = &m_current->m_memory.at(name);
+		m_memory.emplace(name, std::move(value));
+		memValue = &m_memory.at(name);
 	}
 
-	return std::make_pair(memValue, m_current);
+	return std::make_pair(memValue, shared_from_this());
 }

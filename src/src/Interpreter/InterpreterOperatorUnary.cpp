@@ -5,7 +5,7 @@
 #include "Service/Script.h"
 
 namespace ska {
-	NodeValue InterpreterOperatorConvertString(ExpressionType type, const Token::Variant& value) {
+	NodeValue InterpreterOperatorConvertString(ExpressionType type, const TokenVariant& value) {
         switch(type) {
 		case ExpressionType::INT:
             return std::holds_alternative<int>(value) ? value : std::stoi(std::get<std::string>(value));
@@ -21,14 +21,14 @@ namespace ska {
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::UNARY>::interpret(OperateOn node) {
 	assert(!node.GetValue().empty());
-	auto nodeValue = node.parent.memory()[node.GetValue()];
+	auto nodeValue = node.parent.findInMemoryTree(node.GetValue());
     if(nodeValue.first == nullptr) {
-        return NodeCell {""};
+        return NodeCell {"", nullptr };
     }
 
-	return nodeValue;
+	return NodeLValue{ nodeValue.first, nodeValue.second };
 }
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::LITERAL>::interpret(OperateOn node) {
-	return InterpreterOperatorConvertString(node.GetType().value().type(), node.GetValue());
+	return NodeCell{ InterpreterOperatorConvertString(node.GetType().value().type(), node.GetValue()), nullptr };
 }

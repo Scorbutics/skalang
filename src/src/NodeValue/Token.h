@@ -6,7 +6,6 @@
 #include <memory>
 
 #include "TokenGrammar.h"
-#include "TokenVariant.h"
 
 namespace ska {
 	class MemoryTable;
@@ -42,7 +41,7 @@ namespace ska {
 	};
 
 	struct Token {
-		using Variant = TokenVariant;
+		
 
 		Token() = default;
 		Token(const Token& t) = default;
@@ -64,7 +63,7 @@ namespace ska {
 			}
 		}
 
-		const Variant& content() const {
+		const auto& content() const {
 			return m_content;
 		}
 
@@ -103,6 +102,7 @@ namespace ska {
 		}
 
 	private:
+		using Variant = std::variant<std::size_t, std::string>;
 		void init(std::size_t c, TokenType t) {
 			m_type = t;
 			assert(m_type == TokenType::RESERVED);

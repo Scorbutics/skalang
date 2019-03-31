@@ -232,12 +232,12 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::BINARY>::interpret(Operate
 	auto firstValue = m_interpreter.interpret({ node.parent , node.GetFirstValue() }).asRvalue();
 	auto secondValue = m_interpreter.interpret({ node.parent , node.GetSecondValue() }).asRvalue();
 	auto mathOperator = node.GetOperator();
-	return InterpretMathematicBinaryExpression(
-			std::move(mathOperator), 
-			std::move(firstValue), 
-			std::move(secondValue), 
-			node.GetFirstValue().type().value(), 
+	return NodeRValue{ InterpretMathematicBinaryExpression(
+			std::move(mathOperator),
+			std::move(firstValue.object),
+			std::move(secondValue.object),
+			node.GetFirstValue().type().value(),
 			node.GetSecondValue().type().value(),
-			node.GetType().value());
+			node.GetType().value()) };
 }
 

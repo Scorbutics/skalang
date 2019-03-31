@@ -5,8 +5,9 @@
 #include "Service/Script.h"
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::BLOCK>::interpret(OperateOn node) {
-	node.parent.memory().createNested();
-	auto output = NodeValue{};
+	node.parent.pushNestedMemory();
+	
+	NodeRValue output;
 	auto index = 0u;
 	for (auto& child : node) {
 		auto childCell = m_interpreter.interpret({ node.parent, *child });
@@ -15,6 +16,7 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::BLOCK>::interpret(OperateO
 		}
 		index++;
 	}
-	node.parent.memory().endNested();
+
+	node.parent.endNestedMemory();
 	return NodeCell{ std::move(output) };
 }

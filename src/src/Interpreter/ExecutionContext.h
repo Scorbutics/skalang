@@ -4,11 +4,9 @@
 namespace ska {
 	
 	class ASTNode;
-	class NodeValue;
-	class MemoryTable;
 	struct ScriptHandle;
 	class Script;
-
+	class MemoryTable;
 	class ExecutionContext {
 		friend bool operator!=(const ska::ExecutionContext& lhs, const ska::ExecutionContext& rhs);
 	public:

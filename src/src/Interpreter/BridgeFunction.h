@@ -1,10 +1,10 @@
 #pragma once
 #include <functional>
 #include <memory>
-#include "NodeValue.h"
 #include "NodeValue/ASTNodePtr.h"
 
 namespace ska {
+	class NodeValue;
 	struct BridgeFunction {
         using Callback = std::function<NodeValue(std::vector<NodeValue>)>;
         
