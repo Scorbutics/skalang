@@ -2,7 +2,7 @@
 #include "Interpreter.h"
 #include "MemoryTable.h"
 #include "InterpreterOperatorUserDefinedObject.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::USER_DEFINED_OBJECT>::interpret(OperateOn node) {
 	auto objectMemory = node.parent.createMemory();

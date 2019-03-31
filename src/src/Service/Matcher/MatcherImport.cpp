@@ -7,7 +7,7 @@
 #include "Service/TokenReader.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/ASTFactory.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 #include "Event/BlockTokenEvent.h"
 #include "Event/ImportTokenEvent.h"

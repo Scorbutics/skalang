@@ -1,6 +1,6 @@
 #include <cassert>
 #include "ImportTokenEvent.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 ska::ImportTokenEvent::ImportTokenEvent(ASTNode& node, Script& s) : 
     m_node(node), 

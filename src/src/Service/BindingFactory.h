@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "NodeValue/ASTNodePtr.h"
-#include "Interpreter/BridgeFunction.h"
+#include "Interpreter/Value/BridgeFunction.h"
 #include "Utils/Observable.h"
 #include "Utils/TupleUtils.h"
 #include "Event/VarTokenEvent.h"

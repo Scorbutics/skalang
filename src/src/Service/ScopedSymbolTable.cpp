@@ -1,5 +1,5 @@
 #include "ScopedSymbolTable.h"
-#include "Script.h"
+#include "Interpreter/Value/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScopedSymbolTable)
 

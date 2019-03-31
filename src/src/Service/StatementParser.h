@@ -23,7 +23,7 @@
 #include "Matcher/MatcherVar.h"
 #include "Matcher/MatcherReturn.h"
 
-#include "ScriptPtr.h"
+#include "Interpreter/Value/ScriptPtr.h"
 
 namespace ska {
 	struct ReservedKeywordsPool;

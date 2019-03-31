@@ -10,7 +10,7 @@
 #include "NodeValue/TokenVariant.h"
 #include "NodeValue/NodeValueArray.h"
 #include "NodeValue/NodeValueMap.h"
-#include "MemoryTablePtr.h"
+#include "Interpreter/MemoryTablePtr.h"
 
 namespace ska {
 

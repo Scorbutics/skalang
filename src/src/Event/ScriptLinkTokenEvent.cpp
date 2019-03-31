@@ -1,5 +1,5 @@
 #include "ScriptLinkTokenEvent.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 ska::ScriptLinkTokenEvent::ScriptLinkTokenEvent(ASTNode& node, std::string scriptName, Script& scriptCaller) :
 	m_node(node), 

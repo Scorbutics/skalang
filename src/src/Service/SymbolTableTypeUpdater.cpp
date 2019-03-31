@@ -3,7 +3,7 @@
 #include "NodeValue/OperatorTraits.h"
 #include "SymbolTable.h"
 #include "SymbolTableTypeUpdater.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTableTypeUpdater)
 

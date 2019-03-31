@@ -6,7 +6,7 @@
 #include "Service/ASTFactory.h"
 #include "Operation/Type/OperationTypeScriptLink.h"
 #include "Event/ScriptLinkTokenEvent.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTable)
 

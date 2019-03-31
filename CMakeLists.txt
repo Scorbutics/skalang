@@ -11,3 +11,5 @@ add_subdirectory(external/doctest)
 add_subdirectory(external/skalog/src)
 add_subdirectory(src)
 add_subdirectory(test)
+add_subdirectory(runner)
+

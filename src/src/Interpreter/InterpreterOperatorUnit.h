@@ -1,7 +1,7 @@
 #pragma once
 
 #include "NodeValue/Token.h"
-#include "NodeCell.h"
+#include "Interpreter/Value/NodeCell.h"
 
 namespace ska {
 	class ASTNode;

@@ -3,8 +3,8 @@
 #include <unordered_map>
 #include "ScriptPtr.h"
 #include "ScriptHandle.h"
-#include "ScriptCache.h"
-#include "Interpreter/BridgeFunction.h"
+#include "Interpreter/ScriptCache.h"
+#include "Interpreter/Value/BridgeFunction.h"
 
 namespace ska {
 	class StatementParser;

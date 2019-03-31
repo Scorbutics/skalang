@@ -7,9 +7,9 @@
 #include "ASTNodePtr.h"
 #include "Operator.h"
 #include "ExpressionType.h"
-#include "Service/ScriptPtr.h"
+#include "Interpreter/Value/ScriptPtr.h"
 #include "Interpreter/MemoryTable.h"
-#include "Interpreter/NodeValue.h"
+#include "Interpreter/Value/NodeValue.h"
 
 #include "Service/TypeBuilder/TypeBuildersContainer.h"
 #include "Type.h"

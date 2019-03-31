@@ -2,7 +2,7 @@
 #include "Interpreter.h"
 #include "InterpreterOperatorFunctionCall.h"
 #include "Operation/Interpreter/OperationFunctionDeclaration.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 namespace ska {
 
@@ -69,6 +69,7 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>::interpret(
 		auto operateOnFunction = Operation<Operator::FUNCTION_DECLARATION>(functionExecutionContext);
 		return InterpreterOperationFunctionCallScript(m_interpreter, inMemoryFunctionZone.memory, operateOnFunction, node);
 	} else {
+		assert(std::holds_alternative<BridgeMemory>(functionValue));
 		auto bridgeCall = inMemoryFunctionZone.object.nodeval<BridgeMemory>();
 		assert(bridgeCall != nullptr);
 		auto operateOnFunction = Operation<Operator::FUNCTION_DECLARATION>(executionContext);

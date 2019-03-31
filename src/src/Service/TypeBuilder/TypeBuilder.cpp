@@ -4,10 +4,10 @@
 #include "NodeValue/AST.h"
 #include "Service/ASTFactory.h"
 
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 #include "Service/StatementParser.h"
 
-SKA_LOGC_CONFIG(LogLevel::Debug, TypeBuilder)
+SKA_LOGC_CONFIG(LogLevel::Disabled, TypeBuilder)
 
 ska::TypeBuilder::TypeBuilder(StatementParser& parser) :	
     subobserver_priority_queue<ExpressionTokenEvent>(std::bind(&TypeBuilder::matchExpression, this, std::placeholders::_1), parser, 6),

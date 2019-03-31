@@ -1,6 +1,6 @@
 #include "NodeValue/Symbol.h"
 #include "Service/ScopedSymbolTable.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 const ska::Symbol* ska::Symbol::operator[](const std::string& fieldSymbolName) const {
 	if(std::holds_alternative<ScopedSymbolTable*>(m_data)) {

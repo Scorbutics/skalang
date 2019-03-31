@@ -1,6 +1,6 @@
 #include "AST.h"
 #include "Service/ASTFactory.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
 
 ska::ASTNode::ASTNode(): 

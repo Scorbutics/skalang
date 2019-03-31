@@ -10,9 +10,9 @@
 #include "Service/Tokenizer.h"
 #include "Service/TokenReader.h"
 #include "Service/ASTFactory.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::StatementParser)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::StatementParser)
 
 ska::StatementParser::StatementParser(const ReservedKeywordsPool& reservedKeywordsPool) :
 	m_reservedKeywordsPool(reservedKeywordsPool),

@@ -1,6 +1,6 @@
 #include <memory>
 #include "Script.h"
-#include "StatementParser.h"
+#include "Service/StatementParser.h"
 #include "Service/ASTFactory.h"
 
 const ska::Token& ska::Script::readPrevious(std::size_t offset) const {

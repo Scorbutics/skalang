@@ -5,7 +5,7 @@
 #include <memory>
 
 #include "Service/TypeBuilder/TypeBuilderOperator.h"
-#include "Service/ScriptPtr.h"
+#include "Interpreter/Value/ScriptPtr.h"
 
 #include "NodeValue/AST.h"
 #include "NodeValue/OperatorTraits.h"

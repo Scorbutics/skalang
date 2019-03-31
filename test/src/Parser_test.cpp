@@ -8,7 +8,7 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
 #include "NodeValue/Operator.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 TEST_CASE("[Parser]") {
 	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};

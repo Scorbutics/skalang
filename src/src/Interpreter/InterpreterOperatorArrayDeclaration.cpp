@@ -1,5 +1,5 @@
 #include "NodeValue/AST.h"
-#include "NodeValue.h"
+#include "Interpreter/Value/NodeValue.h"
 #include "Interpreter.h"
 #include "MemoryTable.h"
 #include "InterpreterOperatorArrayDeclaration.h"

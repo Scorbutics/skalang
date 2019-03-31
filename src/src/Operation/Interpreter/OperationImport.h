@@ -2,8 +2,8 @@
 #include <cassert>
 
 #include "Operation.h"
-#include "Interpreter/ExecutionContext.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/ExecutionContext.h"
+#include "Interpreter/Value/Script.h"
 
 namespace ska {
 	class ASTNode;

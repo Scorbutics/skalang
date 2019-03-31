@@ -6,7 +6,7 @@
 #include "Service/TokenReader.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/ASTFactory.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherFunction)
 
@@ -49,6 +49,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchCall(Script& input, ASTNodePtr identi
 	functionCallNodeContent.push_back(std::move(identifierFunctionName));
 	
 	const auto endParametersToken = m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>();
+	const auto endStatementToken = m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>();
 	while (!input.expect(endParametersToken)) {
 
 		auto expressionOpt = input.expr(m_parser);
@@ -57,6 +58,9 @@ ska::ASTNodePtr ska::MatcherFunction::matchCall(Script& input, ASTNodePtr identi
 			functionCallNodeContent.push_back(std::move(expressionOpt));
 		} else {
 			SLOG(ska::LogLevel::Debug) << "Expression null";
+			if (input.expect(endStatementToken)) {
+				break;
+			}
 		}
 
         const auto commaToken = m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>();
@@ -64,7 +68,9 @@ ska::ASTNodePtr ska::MatcherFunction::matchCall(Script& input, ASTNodePtr identi
 			input.match(commaToken);
 		}
 	}
-	input.match(endParametersToken);
+	if (input.expect(endParametersToken)) {
+		input.match(endParametersToken);
+	}
 
 	auto functionCallNode = ASTFactory::MakeNode<Operator::FUNCTION_CALL>(std::move(functionCallNodeContent));
 	auto event = FunctionTokenEvent { *functionCallNode, FunctionTokenEventType::CALL, input };

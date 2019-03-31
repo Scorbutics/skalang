@@ -4,9 +4,9 @@
 #include "NodeValue/AST.h"
 #include "Service/SymbolTable.h"
 #include "Service/StatementParser.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::IMPORT>)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::IMPORT>)
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::IMPORT>::build(const Script& script, OperateOn node) {
     SLOG(LogLevel::Info) << "Importing script " << node.GetScriptPath();

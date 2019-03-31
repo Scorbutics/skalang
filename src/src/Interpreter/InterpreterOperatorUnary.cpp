@@ -2,7 +2,7 @@
 #include "NodeValue/AST.h"
 #include "MemoryTable.h"
 #include "InterpreterOperatorUnary.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 namespace ska {
 	NodeValue InterpreterOperatorConvertString(ExpressionType type, const TokenVariant& value) {

@@ -5,7 +5,7 @@
 #include "SymbolTable.h"
 #include "NodeValue/AST.h"
 #include "NodeValue/OperatorTraits.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 #include "Operation/Type/OperationTypeFunctionDeclaration.h"
 #include "Operation/Type/OperationTypeFunctionCall.h"
@@ -13,7 +13,7 @@
 #include "Operation/Type/OperationTypeArrayDeclaration.h"
 #include "Operation/Type/OperationTypeReturn.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SemanticTypeChecker)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SemanticTypeChecker)
 
 ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser) :
     subobserver_priority_queue<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser, 9),

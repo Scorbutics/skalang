@@ -2,7 +2,7 @@
 #include "Interpreter.h"
 #include "MemoryTable.h"
 #include "InterpreterOperatorFieldAccess.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 #include "NodeValue/ObjectMemory.h"
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::FIELD_ACCESS>::interpret(OperateOn node) {

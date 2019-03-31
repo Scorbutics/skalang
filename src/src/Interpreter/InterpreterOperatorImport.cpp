@@ -2,9 +2,9 @@
 #include "Interpreter.h"
 #include "MemoryTable.h"
 #include "InterpreterOperatorImport.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::InterpreterOperator<ska::Operator::IMPORT>);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::InterpreterOperator<ska::Operator::IMPORT>);
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::IMPORT>::interpret(OperateOn node) {
 	auto boundScript = node.GetScript();

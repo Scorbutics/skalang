@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include "Operation.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 namespace ska {
 	class ASTNode;

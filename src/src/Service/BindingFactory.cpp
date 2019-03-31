@@ -1,6 +1,6 @@
 #include <functional>
 #include "Service/ReservedKeywordsPool.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 #include "Config/LoggerConfigLang.h"
 #include "Service/SymbolTable.h"
 #include "Service/TypeBuilder/TypeBuilder.h"

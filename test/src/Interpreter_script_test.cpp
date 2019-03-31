@@ -9,9 +9,9 @@
 #include "Service/StatementParser.h"
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
-#include "Service/ScriptBinding.h"
-#include "Service/Script.h"
-#include "Service/ScriptCache.h"
+#include "Interpreter/ScriptBinding.h"
+#include "Interpreter/Value/Script.h"
+#include "Interpreter/ScriptCache.h"
 #include "NodeValue/ObjectMemory.h"
 
 const auto reservedKeywordsS = ska::ReservedKeywordsPool{};

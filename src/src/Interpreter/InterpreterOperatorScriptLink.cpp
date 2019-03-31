@@ -2,9 +2,9 @@
 #include "Interpreter.h"
 #include "MemoryTable.h"
 #include "InterpreterOperatorScriptLink.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::InterpreterOperator<ska::Operator::SCRIPT_LINK>);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::InterpreterOperator<ska::Operator::SCRIPT_LINK>);
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::SCRIPT_LINK>::interpret(OperateOn node) {
 	auto scriptLinkCellData = node.parent.symbols()[node.GetObject().name()];

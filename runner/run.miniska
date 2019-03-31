@@ -1,0 +1,3 @@
+var Dummy = function(): var { return { data: 3 }; }; 
+var RunnerT = import "runner_lib";
+RunnerT.print(Dummy());

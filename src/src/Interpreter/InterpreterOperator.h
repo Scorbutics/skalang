@@ -3,7 +3,7 @@
 #include "NodeValue/Operator.h"
 #include "Interpreter.h"
 #include "InterpreterOperatorUnit.h"
-#include "ExecutionContext.h"
+#include "Interpreter/Value/ExecutionContext.h"
 
 #define SKALANG_INTERPRETER_OPERATOR_DEFINE(OperatorType)\
     template<>\

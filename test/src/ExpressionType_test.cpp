@@ -4,7 +4,7 @@
 #include "Service/Tokenizer.h"
 #include "Service/SymbolTable.h"
 #include "Service/StatementParser.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 using SymbolTablePtr = std::unique_ptr<ska::SymbolTable>;
 using ParserPtr = std::unique_ptr<ska::StatementParser>;

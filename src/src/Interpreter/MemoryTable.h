@@ -5,7 +5,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "NodeValue.h"
+#include "Interpreter/Value/NodeValue.h"
 #include "Interpreter/MemoryTablePtr.h"
 
 namespace ska {
@@ -22,8 +22,10 @@ namespace ska {
 
 		[[nodiscard]]
 		MemoryTable& down() {
-			assert(!m_children.empty());
-			return *m_children[0].get();
+			if (!m_children.empty()) {
+				return *m_children[0].get();
+			}
+			return *this;
 		}
 
 		MemoryTablePtr& pushNested();
@@ -72,7 +74,7 @@ namespace ska {
 		MemoryCLValue inMemoryFind(const std::string& key) const {
 			const auto valueIt = m_memory.find(key);
 			if (valueIt == m_memory.end()) {
-				auto& backScope = m_parent.lock();
+				auto& backScope = m_parent;
 				return backScope == nullptr || backScope == this ? std::make_pair(nullptr, nullptr) : backScope->inMemoryFind(key);
 			}
 			return valueIt == m_memory.end() ? std::make_pair(nullptr, nullptr) : std::make_pair(&(valueIt->second), shared_from_this());
@@ -81,7 +83,7 @@ namespace ska {
 		MemoryLValue inMemoryFind(const std::string& key) {
 			const auto valueIt = m_memory.find(key);
 			if (valueIt == m_memory.end()) {
-				auto& backScope = m_parent.lock();
+				auto& backScope = m_parent;
 				return backScope == nullptr || backScope == this ? std::make_pair(nullptr, nullptr) : backScope->inMemoryFind(key);
 			}
 			return valueIt == m_memory.end() ? std::make_pair(nullptr, nullptr) : std::make_pair(&(valueIt->second), shared_from_this());
@@ -92,7 +94,7 @@ namespace ska {
 
 		std::unordered_map<std::string, NodeValue> m_memory;
 		ChildrenScopedMemoryTable m_children;
-		std::weak_ptr<MemoryTable> m_parent;
+		std::shared_ptr<MemoryTable> m_parent;
 	};
 
 

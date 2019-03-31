@@ -9,9 +9,9 @@
 #include "Service/StatementParser.h"
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
-#include "Service/ScriptBinding.h"
-#include "Service/Script.h"
-#include "Service/ScriptCache.h"
+#include "Interpreter/ScriptBinding.h"
+#include "Interpreter/Value/Script.h"
+#include "Interpreter/ScriptCache.h"
 #include "NodeValue/ObjectMemory.h"
 
 const auto reservedKeywords = ska::ReservedKeywordsPool{};
@@ -179,8 +179,12 @@ TEST_CASE("[Interpreter]") {
 			auto res = data.interpreter->script(astPtr);
 			CHECK(res.nodeval<int>() == 3);
 		}
-
-
+			
+		SUBCASE("Function 0 parameter creating custom object with use as parameter of another one") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var Dummy = function(): var { return { data: 3 }; }; var Runner = function(): var { var print = function(i: Dummy): int { return i.data; }; return { print : print }; }; Runner().print(Dummy());", data);
+			auto res = data.interpreter->script(astPtr);
+			CHECK(res.nodeval<int>() == 3);
+		}
 	}
 		
 }

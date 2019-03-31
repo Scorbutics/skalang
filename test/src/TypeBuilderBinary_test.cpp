@@ -4,7 +4,7 @@
 #include "TypeBuilderTestCommon.h"
 #include "Service/TypeBuilder/TypeBuilderBinary.h"
 #include "Service/ASTFactory.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 TEST_CASE("[TypeBuilderBinary]") {
 	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};

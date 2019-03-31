@@ -2,7 +2,7 @@
 #include "Interpreter.h"
 #include "MemoryTable.h"
 #include "InterpreterOperatorArrayUse.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::ARRAY_USE>::interpret(OperateOn node) {
 	auto inMemoryArrayZone = node.parent.findInMemoryTree(node.GetArrayName());

@@ -4,7 +4,7 @@
 
 #include "NodeValue/Operator.h"
 #include "NodeValue/AST.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 #include "InterpreterOperatorBinary.h"
 #include "InterpreterOperatorIfElse.h"

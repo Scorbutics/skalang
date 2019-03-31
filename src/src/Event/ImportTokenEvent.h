@@ -1,7 +1,7 @@
 #pragma once
 #include <cassert>
 #include <string>
-#include "Service/ScriptPtr.h"
+#include "Interpreter/Value/ScriptPtr.h"
 
 namespace ska {
     class ASTNode;

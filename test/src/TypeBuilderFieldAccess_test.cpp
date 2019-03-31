@@ -3,7 +3,7 @@
 #include <doctest.h>
 #include "TypeBuilderTestCommon.h"
 #include "Service/TypeBuilder/TypeBuilderFieldAccess.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 TEST_CASE("[TypeBuilderFieldAccess]") {
 	DataTestContainer data;

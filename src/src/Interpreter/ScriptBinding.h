@@ -6,10 +6,10 @@
 #include <Data/Events/EventDispatcher.h>
 
 #include "Container/sorted_observable.h"
-#include "Interpreter/BridgeFunction.h"
+#include "Interpreter/Value/BridgeFunction.h"
 #include "Service/BindingFactory.h"
 #include "Event/VarTokenEvent.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 #include "ScriptCache.h"
 
 namespace ska {

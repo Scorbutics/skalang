@@ -1,7 +1,7 @@
 #include "ScriptBinding.h"
 #include "Service/ASTFactory.h"
 #include "Service/SymbolTable.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/SymbolTableTypeUpdater.h"
 

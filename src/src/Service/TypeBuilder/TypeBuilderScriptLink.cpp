@@ -1,9 +1,9 @@
 #include "TypeBuilderScriptLink.h"
 #include "NodeValue/AST.h"
 #include "Service/SymbolTable.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::SCRIPT_LINK>)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::SCRIPT_LINK>)
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::SCRIPT_LINK>::build(const Script& script, OperateOn node) {
 	auto& symbols = script.symbols();

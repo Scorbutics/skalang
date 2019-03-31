@@ -1,7 +1,7 @@
 #include "NodeCell.h"
 #include "NodeValue/ObjectMemory.h"
-#include "Service/ScriptHandle.h"
-#include "MemoryTable.h"
+#include "Interpreter/Value/ScriptHandle.h"
+#include "Interpreter/MemoryTable.h"
 
 ska::NodeCell ska::NodeCell::build(MemoryLValue& memoryField) {
 	if (isLvalue()) {

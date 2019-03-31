@@ -2,7 +2,7 @@
 #include "Interpreter.h"
 #include "MemoryTable.h"
 #include "InterpreterOperatorBlock.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::BLOCK>::interpret(OperateOn node) {
 	node.parent.pushNestedMemory();

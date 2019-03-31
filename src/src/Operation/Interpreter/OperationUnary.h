@@ -2,7 +2,7 @@
 
 #include "Operation.h"
 #include "NodeValue/AST.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 namespace ska {
 	template<>

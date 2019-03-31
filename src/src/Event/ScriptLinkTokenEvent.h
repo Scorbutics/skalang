@@ -1,7 +1,7 @@
 #pragma once
 #include <cassert>
 #include "NodeValue/Operator.h"
-#include "Service/ScriptPtr.h"
+#include "Interpreter/Value/ScriptPtr.h"
 
 namespace ska {
 	class SymbolTable;

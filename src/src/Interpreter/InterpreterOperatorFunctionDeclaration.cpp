@@ -1,7 +1,7 @@
 #include "NodeValue/AST.h"
 #include "Interpreter.h"
 #include "InterpreterOperatorFunctionDeclaration.h"
-#include "Service/Script.h"
+#include "Interpreter/Value/Script.h"
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_DECLARATION>::interpret(OperateOn node) {
 	assert(!node.GetFunctionName().empty());
