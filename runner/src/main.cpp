@@ -52,9 +52,12 @@ int main(int argc, char* argv[]) {
 	}));
 	scriptBinding.build();
 
-	reader.parse(parser);
-	interpreter.script(reader);
-	
+	try {
+		reader.parse(parser);
+		interpreter.script(reader);
+	} catch (std::exception& e) {
+		std::cout << e.what() << std::endl;
+	}
 	return 0;
 }
 
