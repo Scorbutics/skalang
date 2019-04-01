@@ -7,13 +7,13 @@
 const std::unordered_map<std::string, int(*)[ska::Type::TypeMapSize][ska::Type::TypeMapSize]>& ska::Type::GetMap(const std::string& op) {
     static int typeMapOperatorPlus[TypeMapSize][TypeMapSize] = {
 		{ 0, 0, 0, 0, 0, 0, 0, 0 },
+		{ 0, 0, 0, 0, 0, 0, 6, 0 },
 		{ 0, 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 3, 4, 5, 0, 0 },
-		{ 0, 0, 0, 4, 4, 0, 0, 0 },
-		{ 0, 0, 0, 5, 0, 5, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 0, 0, 0, 0, 0 }
+		{ 0, 0, 0, 3, 4, 5, 6, 0 },
+		{ 0, 0, 0, 4, 4, 0, 6, 0 },
+		{ 0, 0, 0, 5, 0, 5, 6, 0 },
+		{ 0, 6, 0, 6, 6, 6, 6, 6 },
+        { 0, 0, 0, 0, 0, 0, 6, 0 }
 	};
 
 	static int typeMapOperatorMinus[TypeMapSize][TypeMapSize] = {
@@ -114,7 +114,7 @@ bool ska::Type::checkSameObjectTypes(const Type& type2) const {
 	return *this == type2;
 }
 
-ska::ExpressionType ska::Type::crossTypes(std::string op, const Type& type2) const {
+ska::Type ska::Type::crossTypes(std::string op, const Type& type2) const {
 	const auto& type1 = m_type;
     static const auto& TypeMap = GetMap(op);
 
@@ -127,19 +127,35 @@ ska::ExpressionType ska::Type::crossTypes(std::string op, const Type& type2) con
 	const auto typeIdResult = (*TypeMap.at(op))[static_cast<std::size_t>(type1)][static_cast<std::size_t>(type2.m_type)];
 	if (typeIdResult == 0) {
 		auto ss = std::stringstream{};
-		ss << "Unable to use operator \"" << op << "\" on types " << ExpressionTypeSTR[static_cast<std::size_t>(type1)] << " and " << ExpressionTypeSTR[static_cast<std::size_t>(type2.m_type)];
+		ss << "Unable to use operator \"" << op << "\" on types " << (*this) << " and " << type2;
 		throw std::runtime_error(ss.str());
 	}
 
-	if (op == "=" && (*this) == ExpressionType::OBJECT && type2 == ExpressionType::OBJECT) {
-		if (!checkSameObjectTypes(type2)) {
-			return ExpressionType::VOID;
+	switch (static_cast<ExpressionType>(typeIdResult)) {
+	case ExpressionType::OBJECT:
+		if (op == "=") {
+			if (*this != type2) {
+				return Type{};
+			}
 		}
+		break;
+
+	case ExpressionType::ARRAY: {
+		auto checkArraySubTypeCoherence = (*this == type2) || (type2.size() > 0 ? type2.compound()[0] == *this : (size() > 0 && m_compound[0] == type2));
+		if (!checkArraySubTypeCoherence) {
+			auto ss = std::stringstream{};
+			ss << "Unable to use operator \"" << op << "\" on types " << (*this) << " and " << type2;
+			throw std::runtime_error(ss.str());
+		}
+		return type2.size() > 0 ? type2 : *this;
+		} 
 	}
+
+	
 
     SLOG(LogLevel::Info) << op << " has cross-type " << ExpressionTypeSTR[static_cast<std::size_t>(typeIdResult)];
 
-	return static_cast<ExpressionType>(typeIdResult);		
+	return Type{ static_cast<ExpressionType>(typeIdResult) };
 }
 
 const ska::Symbol* ska::Type::operator[](const std::string& fieldName) const {
@@ -163,7 +179,7 @@ bool ska::Type::operator==(const Type& t) const {
 		return true;
 	}
 
-	if (hasSymbol()) {
+	if (hasSymbol() && t.hasSymbol()) {
 		return m_symbol == t.m_symbol;
 	}
 

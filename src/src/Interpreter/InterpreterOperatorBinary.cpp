@@ -2,6 +2,7 @@
 #include "NodeValue/LogicalOperator.h"
 #include "Interpreter.h"
 #include "InterpreterOperatorBinary.h"
+#include "NodeValue/TypeFromNative.h"
 
 namespace ska {
 
@@ -14,12 +15,12 @@ namespace ska {
 		MathComputer computer,
 		MathComputer2 computer2,
 		MathComputer3 computer3) {
-		auto firstIsTypeOne = firstType == ExpressionTypeFromNative<FirstType>::value;
+		auto firstIsTypeOne = firstType == TypeFromNative<FirstType>::value;
 		if (firstIsTypeOne) {
 			return computer(firstValue.nodeval<FirstType>(), secondValue.nodeval<SecondType>());
 		}
 
-		auto secondIsTypeOne = secondType == ExpressionTypeFromNative<FirstType>::value;
+		auto secondIsTypeOne = secondType == TypeFromNative<FirstType>::value;
 		if (secondIsTypeOne) {
 			return computer2(firstValue.nodeval<SecondType>(), secondValue.nodeval<FirstType>());
 		}
@@ -51,6 +52,47 @@ namespace ska {
 			}, [](double t1, double t2) {
 				return t1 + t2;
 			});
+		}
+		case ExpressionType::ARRAY: {
+			switch (firstType.compound()[0].type()) {
+			case ExpressionType::STRING:
+				return ComputeTwoTypeOperation<std::string, NodeValueArray>(std::move(firstValue), std::move(secondValue), firstType, secondType,
+				[](std::string t1, NodeValueArray t2) {
+					t2->push_back(std::move(t1));
+					return t2;
+				}, [](NodeValueArray t1, std::string t2) {
+					t1->push_back(std::move(t2));
+					return t1;
+				}, [](NodeValueArray t1, NodeValueArray t2) {
+					t1->insert(t1->end(), std::make_move_iterator(t2->begin()), std::make_move_iterator(t2->end()));
+					return t1;
+				});
+			case ExpressionType::INT:
+				return ComputeTwoTypeOperation<int, NodeValueArray>(std::move(firstValue), std::move(secondValue), firstType, secondType,
+					[](int t1, NodeValueArray t2) {
+					t2->push_back(t1);
+					return t2;
+				}, [](NodeValueArray t1, int t2) {
+					t1->push_back(t2);
+					return t1;
+				}, [](NodeValueArray t1, NodeValueArray t2) {
+					t1->insert(t1->end(), std::make_move_iterator(t2->begin()), std::make_move_iterator(t2->end()));
+					return t1;
+				});
+			case ExpressionType::FLOAT:
+				return ComputeTwoTypeOperation<double, NodeValueArray>(std::move(firstValue), std::move(secondValue), firstType, secondType,
+					[](double t1, NodeValueArray t2) {
+					t2->push_back(t1);
+					return t2;
+				}, [](NodeValueArray t1, double t2) {
+					t1->push_back(t2);
+					return t1;
+				}, [](NodeValueArray t1, NodeValueArray t2) {
+					t1->insert(t1->end(), std::make_move_iterator(t2->begin()), std::make_move_iterator(t2->end()));
+					return t1;
+				});
+			}
+			return "";
 		}
 
 		default: 
@@ -166,33 +208,39 @@ namespace ska {
     }
 
 	template<class Comparer>
-	bool InterpretLogicNumericFromNodeValue(const NodeValue& firstValue, const NodeValue& secondValue, ExpressionType type, Comparer comparison) {
+	bool InterpretLogicNumericFromNodeValue(const NodeValue& firstValue, const NodeValue& secondValue, const Type& type, Comparer comparison) {
 		assert(Type::isNumeric(type));
-		switch (type) {
+		switch (type.type()) {
 		case ExpressionType::FLOAT:
 			return comparison(firstValue.convertNumeric(), secondValue.convertNumeric());
 		case ExpressionType::INT:
 			return comparison(static_cast<int>(firstValue.convertNumeric()), static_cast<int>(secondValue.convertNumeric()));
 		case ExpressionType::BOOLEAN:
 			return comparison(static_cast<int>(firstValue.convertNumeric()) == 1, static_cast<int>(secondValue.convertNumeric()) == 1);
+		default:
+			{
+				auto ss = std::stringstream{};
+				ss << "unhandled type " << type << " for comparison";
+				throw std::runtime_error(ss.str());
+			}
 		}
 
 		return false;
 	}
 
-	NodeValue InterpretLogicLesser(NodeValue firstValue, NodeValue secondValue, ExpressionType destinationType) {
+	NodeValue InterpretLogicLesser(NodeValue firstValue, NodeValue secondValue, const Type& destinationType) {
 		return InterpretLogicNumericFromNodeValue(firstValue, secondValue, destinationType, [](auto v1, auto v2) {return v1 < v2; });
 	}
 
-	NodeValue InterpretLogicLesserOrEqual(NodeValue firstValue, NodeValue secondValue, ExpressionType destinationType) {
+	NodeValue InterpretLogicLesserOrEqual(NodeValue firstValue, NodeValue secondValue, const Type& destinationType) {
 		return InterpretLogicNumericFromNodeValue(firstValue, secondValue, destinationType, [](auto v1, auto v2) {return v1 <= v2; });
 	}
 
-	NodeValue InterpretLogicGreaterOrEqual(NodeValue firstValue, NodeValue secondValue, ExpressionType destinationType) {
+	NodeValue InterpretLogicGreaterOrEqual(NodeValue firstValue, NodeValue secondValue, const Type& destinationType) {
 		return InterpretLogicNumericFromNodeValue(firstValue, secondValue, destinationType, [](auto v1, auto v2) {return v1 >= v2; });
 	}
 
-	NodeValue InterpretLogicGreater(NodeValue firstValue, NodeValue secondValue, ExpressionType destinationType) {
+	NodeValue InterpretLogicGreater(NodeValue firstValue, NodeValue secondValue, const Type& destinationType) {
 		return InterpretLogicNumericFromNodeValue(firstValue, secondValue, destinationType, [](auto v1, auto v2) {return v1 > v2; });
 	}
 

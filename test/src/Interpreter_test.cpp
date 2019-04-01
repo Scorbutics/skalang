@@ -144,6 +144,12 @@ TEST_CASE("[Interpreter]") {
 			CHECK(res.nodeval<int>() == 25);
 		}
 
+		SUBCASE("Array of int : add a cell") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = [14, 25]; toto = toto + 4; toto[2];", data);
+			auto res = data.interpreter->script(astPtr);
+			CHECK(res.nodeval<int>() == 4);
+		}
+
 		SUBCASE("Assigning a cell of an array of int") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = [14, 25, 13, 2]; toto[1] = 226; toto[1];", data);
 			auto res = data.interpreter->script(astPtr);

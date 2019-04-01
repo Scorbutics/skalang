@@ -28,6 +28,13 @@ namespace ska {
 			return isNumeric(type.m_type);
 		}
 
+		static Type MakeBuiltInArray(ExpressionType t) {
+			assert(t != ExpressionType::VOID);
+			auto result = Type{ ExpressionType::ARRAY };
+			result.m_compound.push_back(Type{ t });
+			return result;
+		}
+
 		template<ExpressionType t>
 		static Type MakeBuiltIn() {
 			static_assert(t != ExpressionType::VOID);
@@ -97,7 +104,7 @@ namespace ska {
 			return !(*this == t);
 		}
 
-		ExpressionType crossTypes(std::string op, const Type& type2) const;
+		Type crossTypes(std::string op, const Type& type2) const;
 		
 		std::size_t size() const {
 			return m_compound.size();

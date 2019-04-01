@@ -242,6 +242,13 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(ast[1].type() == ska::ExpressionType::STRING);
 			}
 
+			SUBCASE("int : add a cell") {
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var toto = [14, 25]; toto = toto + 4;", data);
+				auto& ast = astPtr.rootNode();
+				CHECK(ast.size() == 2);
+				CHECK(ast[1].type() == ska::Type::MakeBuiltInArray(ska::ExpressionType::INT));
+			}
+
 			SUBCASE("double array string : cell") {
                 /*
                 auto astPtr = ASTFromInputSemanticTC(scriptCache, "var str167 = [[0, 1], [2, 3]]; str167[0]; str167[0][0];", data);
@@ -367,7 +374,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                 ASTFromInputSemanticTC(scriptCache, "var titi = function() {}; titi = 9;", data);
                 CHECK(false);
             } catch(std::exception& e) {
-                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types function and int");
+                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types function titi ( - void) and int");
             }
         }
         
@@ -385,7 +392,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                 ASTFromInputSemanticTC(scriptCache, "var titi = function(test:function) {}; titi(23);", data);
                 CHECK(false);
             } catch(std::exception& e) {
-                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types function and int");
+                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types function test and int");
             }
         }
 
@@ -421,7 +428,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				, data);
 				CHECK(false);
 			} catch (std::exception& e) {
-				CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types var and int");
+				CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types var Joueur and int");
 			}
 		}
     }
