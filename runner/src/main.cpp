@@ -44,6 +44,14 @@ int main(int argc, char* argv[]) {
 	auto reader = ska::Script {scriptCache, "main", std::move(tokens)};
 	
 	auto scriptBinding = ska::ScriptBridge{ scriptCache, "runner_lib", typeBuilder, symbolsTypeUpdater, reservedKeywords };
+	scriptBinding.bindFunction("printInt", std::function<void(int)>([](int value) {
+		std::cout << value << std::endl;
+	}));
+	
+	scriptBinding.bindFunction("printString", std::function<void(std::string)>([](std::string value) {
+		std::cout << value << std::endl;
+	}));
+	
 	scriptBinding.bindGenericFunction("print", { "Dummy", "void" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 		auto& mem = params[0].nodeval<ska::ObjectMemory>();
 		auto& data = (*mem)["data"];

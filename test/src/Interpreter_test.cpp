@@ -185,6 +185,12 @@ TEST_CASE("[Interpreter]") {
 			auto res = data.interpreter->script(astPtr);
 			CHECK(res.nodeval<int>() == 3);
 		}
+
+		SUBCASE("Array use from field access") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var Coldragon = function() : var{ var array = [20, 150, 2]; return { array : array }; }; var target = Coldragon(); var data = target.array[0] - 88; data;", data);
+			auto res = data.interpreter->script(astPtr);
+			CHECK(res.nodeval<int>() == -68);
+		}
 	}
 		
 }
