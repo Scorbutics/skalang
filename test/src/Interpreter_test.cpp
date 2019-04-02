@@ -145,6 +145,12 @@ TEST_CASE("[Interpreter]") {
 			CHECK(res.nodeval<int>() == 25);
 		}
 
+		SUBCASE("Array of int : add a cell") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = [14, 25]; toto = toto + 4; toto[2];", data);
+			auto res = data.interpreter->script(astPtr);
+			CHECK(res.nodeval<int>() == 4);
+		}
+
 		SUBCASE("Assigning a cell of an array of int") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = [14, 25, 13, 2]; toto[1] = 226; toto[1];", data);
 			auto res = data.interpreter->script(astPtr);
@@ -185,6 +191,12 @@ TEST_CASE("[Interpreter]") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var Dummy = function(): var { return { data: 3 }; }; var Runner = function(): var { var print = function(i: Dummy): int { return i.data; }; return { print : print }; }; Runner().print(Dummy());", data);
 			auto res = data.interpreter->script(astPtr);
 			CHECK(res.nodeval<int>() == 3);
+		}
+
+		SUBCASE("Array use from field access") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var Coldragon = function() : var{ var array = [20, 150, 2]; return { array : array }; }; var target = Coldragon(); var data = target.array[0] - 88; data;", data);
+			auto res = data.interpreter->script(astPtr);
+			CHECK(res.nodeval<int>() == -68);
 		}
 	}
 		
