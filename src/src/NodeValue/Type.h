@@ -10,6 +10,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Type)
 namespace ska {
 	class Symbol;
 	class SymbolTable;
+	class TypeCrosser;
 
 	struct Type {
 		static constexpr bool isNamed(ExpressionType type) {
@@ -104,7 +105,7 @@ namespace ska {
 			return !(*this == t);
 		}
 
-		Type crossTypes(std::string op, const Type& type2) const;
+		Type crossTypes(const TypeCrosser& crosser, std::string op, const Type& type2) const;
 		
 		std::size_t size() const {
 			return m_compound.size();
@@ -113,9 +114,7 @@ namespace ska {
 		const Symbol* operator[](const std::string& fieldName) const;
 
 	private:
-	    static constexpr auto TypeMapSize = static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length);
-        static const std::unordered_map<std::string, int(*)[TypeMapSize][TypeMapSize]>& GetMap(const std::string& op);
-
+		friend class TypeCrosser;
 		explicit Type(ExpressionType t) :
 			m_type(std::move(t)) {
 		}
@@ -126,8 +125,6 @@ namespace ska {
 			m_type(t),
 			m_symbolAlias(std::move(symbol)) {
 		}
-
-		bool checkSameObjectTypes(const Type& type2) const;
 
 		ExpressionType m_type = ExpressionType::VOID;
         const Symbol* m_symbol = nullptr;

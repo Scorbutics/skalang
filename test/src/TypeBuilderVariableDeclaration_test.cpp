@@ -8,6 +8,7 @@
 #include "TypeBuilderTestCommon.h"
 #include "Service/ASTFactory.h"
 #include "Interpreter/Value/Script.h"
+#include "Service/TypeCrosser/TypeCrossExpression.h"
 
 TEST_CASE("[TypeBuilderVariableDeclaration]") {
 	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr> {};
@@ -18,10 +19,11 @@ TEST_CASE("[TypeBuilderVariableDeclaration]") {
 	
 	auto nameToken = ska::Token{"toto", ska::TokenType::IDENTIFIER };
 	auto valueToken = ska::Token{ "1", ska::TokenType::DIGIT };
-	
+	auto typeCrosser = ska::TypeCrosser{};
+
 	auto valueNode = ska::ASTFactory::MakeLogicalNode(valueToken);
 	auto result = std::array<ska::TypeBuildUnitPtr, static_cast<std::size_t>(ska::Operator::UNUSED_Last_Length)>{};
-	result[static_cast<std::size_t>(ska::Operator::BINARY)] = std::make_unique<ska::TypeBuilderOperator<ska::Operator::BINARY>>();
+	result[static_cast<std::size_t>(ska::Operator::BINARY)] = std::make_unique<ska::TypeBuilderOperator<ska::Operator::BINARY>>(typeCrosser);
 	result[static_cast<std::size_t>(ska::Operator::UNARY)] = std::make_unique<ska::TypeBuilderOperator<ska::Operator::UNARY>>();
 	result[static_cast<std::size_t>(ska::Operator::LITERAL)] = std::make_unique<ska::TypeBuilderOperator<ska::Operator::LITERAL>>();
 

@@ -9,17 +9,19 @@
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
 #include "Interpreter/Value/Script.h"
+#include "Service/TypeCrosser/TypeCrossExpression.h"
 
 ska::Script ASTFromInputSemanticComplexTC(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, DataTestContainer& data) {
 	const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
 	auto reader = ska::Script {scriptCache, "main", tokens };
-	
+	auto typeCrosser = ska::TypeCrosser{};
+
     data.parser = std::make_unique<ska::StatementParser> ( reservedKeywords );
-    data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser);
+    data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosser);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser);
-	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser);
+	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, typeCrosser);
     reader.parse(*data.parser);
     return reader;
 }

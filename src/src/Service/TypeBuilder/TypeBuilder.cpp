@@ -9,14 +9,14 @@
 
 SKA_LOGC_CONFIG(LogLevel::Disabled, TypeBuilder)
 
-ska::TypeBuilder::TypeBuilder(StatementParser& parser) :	
+ska::TypeBuilder::TypeBuilder(StatementParser& parser, const TypeCrosser& typeCrosser) :	
     subobserver_priority_queue<ExpressionTokenEvent>(std::bind(&TypeBuilder::matchExpression, this, std::placeholders::_1), parser, 6),
 	subobserver_priority_queue<FunctionTokenEvent>(std::bind(&TypeBuilder::matchFunction, this, std::placeholders::_1), parser, 6),
 	subobserver_priority_queue<VarTokenEvent>(std::bind(&TypeBuilder::matchVariable, this, std::placeholders::_1), parser, 6),
 	subobserver_priority_queue<ReturnTokenEvent>(std::bind(&TypeBuilder::matchReturn, this, std::placeholders::_1), parser, 6),
 	subobserver_priority_queue<ArrayTokenEvent>(std::bind(&TypeBuilder::matchArray, this, std::placeholders::_1), parser, 6),
-	subobserver_priority_queue<ScriptLinkTokenEvent>(std::bind(&TypeBuilder::matchScriptLink, this, std::placeholders::_1), parser, 6) {
-	m_typeBuilder = BuildTypeBuildersContainer();
+	subobserver_priority_queue<ScriptLinkTokenEvent>(std::bind(&TypeBuilder::matchScriptLink, this, std::placeholders::_1), parser, 6){
+	m_typeBuilder = BuildTypeBuildersContainer(typeCrosser);
 }
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
 	auto& node = event.rootNode();

@@ -7,5 +7,9 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::BINARY>::build(const Script& s
     assert(!node.GetOperator().empty());
     const auto& type1 = node.GetFirstType();
     const auto& type2 = node.GetSecondType();
-	return type1.crossTypes(node.GetOperator(), type2);
+	return type1.crossTypes(m_typeCrosser, node.GetOperator(), type2);
+}
+
+ska::TypeBuilderOperator<ska::Operator::BINARY>::TypeBuilderOperator(const TypeCrosser& typeCrosser) :
+	m_typeCrosser(typeCrosser) {
 }

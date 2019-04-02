@@ -46,7 +46,7 @@ std::vector<std::unique_ptr<ska::InterpreterOperatorUnit>> ska::Interpreter::bui
 	InterpreterOperatorDeclare<ska::Operator::VARIABLE_DECLARATION>(*this, result );
 	InterpreterOperatorDeclare<ska::Operator::VARIABLE_AFFECTATION>(*this, result );
     InterpreterOperatorDeclare<ska::Operator::BLOCK>(*this, result );
-    InterpreterOperatorDeclare<ska::Operator::BINARY>(*this, result );
+    InterpreterOperatorDeclare<ska::Operator::BINARY>(*this, result, m_typeCrosser );
     InterpreterOperatorDeclare<ska::Operator::LITERAL>(*this, result );
     InterpreterOperatorDeclare<ska::Operator::UNARY>(*this, result );
 	InterpreterOperatorDeclare<ska::Operator::IMPORT>(*this, result );
@@ -54,8 +54,9 @@ std::vector<std::unique_ptr<ska::InterpreterOperatorUnit>> ska::Interpreter::bui
 	return result;
 }
 
-ska::Interpreter::Interpreter(const ReservedKeywordsPool& reserved) :
-	m_operatorInterpreter(build()) {
+ska::Interpreter::Interpreter(const ReservedKeywordsPool& reserved, const TypeCrosser& typeCrosser) :
+	m_operatorInterpreter(build()),
+	m_typeCrosser(typeCrosser) {
 }
 
 ska::NodeCell ska::Interpreter::interpret(ExecutionContext node) {

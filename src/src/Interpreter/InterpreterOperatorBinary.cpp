@@ -244,7 +244,7 @@ namespace ska {
 		return InterpretLogicNumericFromNodeValue(firstValue, secondValue, destinationType, [](auto v1, auto v2) {return v1 > v2; });
 	}
 
-	NodeValue InterpretMathematicBinaryExpression(std::string mathOperator, NodeValue firstValue, NodeValue secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
+	NodeValue InterpretMathematicBinaryExpression(const TypeCrosser& crosser, std::string mathOperator, NodeValue firstValue, NodeValue secondValue, const Type& firstType, const Type& secondType, const Type& destinationType) {
 		assert(!mathOperator.empty());
 		auto operatorIt = LogicalOperatorMap.find(mathOperator);
         if(operatorIt != LogicalOperatorMap.end()) {
@@ -260,13 +260,13 @@ namespace ska {
             case LogicalOperator::EQUALITY:
                 return InterpretLogicCondition(std::move(firstValue), std::move(secondValue), firstType, secondType, destinationType);
 			case LogicalOperator::LESSER_OR_EQUAL:
-				return InterpretLogicLesserOrEqual(std::move(firstValue), std::move(secondValue), firstType.crossTypes("=", secondType));
+				return InterpretLogicLesserOrEqual(std::move(firstValue), std::move(secondValue), firstType.crossTypes(crosser, "=", secondType));
 			case LogicalOperator::LESSER:
-				return InterpretLogicLesser(std::move(firstValue), std::move(secondValue), firstType.crossTypes("=", secondType));
+				return InterpretLogicLesser(std::move(firstValue), std::move(secondValue), firstType.crossTypes(crosser, "=", secondType));
 			case LogicalOperator::GREATER_OR_EQUAL:
-				return InterpretLogicGreaterOrEqual(std::move(firstValue), std::move(secondValue), firstType.crossTypes("=", secondType));
+				return InterpretLogicGreaterOrEqual(std::move(firstValue), std::move(secondValue), firstType.crossTypes(crosser, "=", secondType));
 			case LogicalOperator::GREATER:
-				return InterpretLogicGreater(std::move(firstValue), std::move(secondValue), firstType.crossTypes("=", secondType));
+				return InterpretLogicGreater(std::move(firstValue), std::move(secondValue), firstType.crossTypes(crosser, "=", secondType));
             default:
                 throw std::runtime_error("Unhandled operator " + mathOperator);
                 return "";
@@ -281,6 +281,7 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::BINARY>::interpret(Operate
 	auto secondValue = m_interpreter.interpret({ node.parent , node.GetSecondValue() }).asRvalue();
 	auto mathOperator = node.GetOperator();
 	return NodeRValue{ InterpretMathematicBinaryExpression(
+			m_typeCrosser,
 			std::move(mathOperator),
 			std::move(firstValue.object),
 			std::move(secondValue.object),
@@ -289,3 +290,7 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::BINARY>::interpret(Operate
 			node.GetType().value()) };
 }
 
+ska::InterpreterOperator<ska::Operator::BINARY>::InterpreterOperator(Interpreter& interpreter, const TypeCrosser& typeCrosser) :
+	ska::InterpreterOperatorBase(interpreter),
+	m_typeCrosser(typeCrosser) {
+}

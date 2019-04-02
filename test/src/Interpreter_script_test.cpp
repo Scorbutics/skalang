@@ -14,12 +14,14 @@
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/ScriptCache.h"
 #include "NodeValue/ObjectMemory.h"
+#include "Service/TypeCrosser/TypeCrossExpression.h"
 
 const auto reservedKeywordsS = ska::ReservedKeywordsPool{};
 auto tokenizerS = std::unique_ptr<ska::Tokenizer>{};
 std::vector<ska::Token> tokensS;
 auto readerIS = std::unique_ptr<ska::Script>{};
 auto scriptCacheIS = ska::ScriptCache{};
+auto typeCrosserIS = ska::TypeCrosser{};
 
 void ASTFromInputSemanticTCInterpreterScriptNoParse(const std::string& input, DataTestContainer& data) {
     tokenizerS = std::make_unique<ska::Tokenizer>(reservedKeywordsS, input);
@@ -28,10 +30,10 @@ void ASTFromInputSemanticTCInterpreterScriptNoParse(const std::string& input, Da
 	readerIS = std::make_unique<ska::Script>(scriptCacheIS, "main", tokensS);
     
     data.parser = std::make_unique<ska::StatementParser>(reservedKeywordsS);
-	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser);
+	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosserIS);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser);
-	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser);
-	data.interpreter = std::make_unique<ska::Interpreter>(reservedKeywordsS);
+	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, typeCrosserIS);
+	data.interpreter = std::make_unique<ska::Interpreter>(reservedKeywordsS, typeCrosserIS);
 }
 
 ska::Script ASTFromInputSemanticTCInterpreterScript(const std::string& input, DataTestContainer& data) {

@@ -11,20 +11,20 @@
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
 #include "Interpreter/Value/Script.h"
+#include "Service/TypeCrosser/TypeCrossExpression.h"
 
 auto readerSTC = std::unique_ptr<ska::Script>{};
-
 
 ska::Script ASTFromInputSemanticTC(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, DataTestContainer& data) {
 	
 	auto tokenizer = ska::Tokenizer { data.reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
-	
+	auto typeCrosser = ska::TypeCrosser{};
 	readerSTC = std::make_unique<ska::Script>(scriptCache, "main", tokens );
 	data.parser = std::make_unique<ska::StatementParser> ( data.reservedKeywords );
-    data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser);
+    data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosser);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser);
-	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser);
+	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, typeCrosser);
     readerSTC->parse(*data.parser);
     return *readerSTC;
 }
@@ -375,7 +375,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                 ASTFromInputSemanticTC(scriptCache, "var titi = function() {}; titi = 9;", data);
                 CHECK(false);
             } catch(std::exception& e) {
-                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types function titi ( - void) and int");
+                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types function and int");
             }
         }
         
@@ -393,7 +393,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                 ASTFromInputSemanticTC(scriptCache, "var titi = function(test:function) {}; titi(23);", data);
                 CHECK(false);
             } catch(std::exception& e) {
-                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types function test and int");
+                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types function and int");
             }
         }
 
@@ -429,7 +429,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				, data);
 				CHECK(false);
 			} catch (std::exception& e) {
-				CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types var Joueur and int");
+				CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types var and int");
 			}
 		}
     }

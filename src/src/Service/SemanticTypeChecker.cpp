@@ -15,12 +15,13 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SemanticTypeChecker)
 
-ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser) :
+ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser, const TypeCrosser& typeCrosser) :
     subobserver_priority_queue<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser, 9),
     subobserver_priority_queue<FunctionTokenEvent>(std::bind(&SemanticTypeChecker::matchFunction, this, std::placeholders::_1), parser, 9),
 	subobserver_priority_queue<ArrayTokenEvent>(std::bind(&SemanticTypeChecker::matchArray, this, std::placeholders::_1), parser, 9),
     subobserver_priority_queue<ReturnTokenEvent>(std::bind(&SemanticTypeChecker::matchReturn, this, std::placeholders::_1), parser, 9),
-	subobserver_priority_queue<IfElseTokenEvent>(std::bind(&SemanticTypeChecker::matchIfElse, this, std::placeholders::_1), parser, 9) {
+	subobserver_priority_queue<IfElseTokenEvent>(std::bind(&SemanticTypeChecker::matchIfElse, this, std::placeholders::_1), parser, 9),
+	m_typeCrosser(typeCrosser) {
 }
 
 bool ska::SemanticTypeChecker::statementHasReturnOnAllControlPath(const ASTNode& node) {	
@@ -160,7 +161,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 				const auto calculatedArgumentType = arg->type().value();
 				const auto requiredParameterType = functionFullRequiredType.compound()[index];
 
-                if(requiredParameterType.crossTypes("=", calculatedArgumentType) == ExpressionType::VOID) {
+                if(requiredParameterType.crossTypes(m_typeCrosser, "=", calculatedArgumentType) == ExpressionType::VOID) {
                     auto ss = std::stringstream {};
                     ss << "Type  \"" << calculatedArgumentType << "\" is encountered while a type convertible to \"" 
 					<< requiredParameterType << "\" is required";
@@ -201,7 +202,7 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 		}
 
 		const auto tokenNodeExpressionType = variable.valType().value();
-		const auto newTokenType = type.crossTypes("=", tokenNodeExpressionType);
+		const auto newTokenType = type.crossTypes(m_typeCrosser, "=", tokenNodeExpressionType);
         if(newTokenType == ExpressionType::VOID) {
             const auto expressionTypeIndex = tokenNodeExpressionType;
 			auto ss = std::stringstream{};

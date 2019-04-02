@@ -4,5 +4,19 @@
 #include "Operation/Type/OperationTypeBinary.h"
 
 namespace ska {
-    SKALANG_BUILDER_TYPE_OPERATOR_DEFINE(Operator::BINARY);
+	class TypeCrosser;
+
+    template<>
+    struct TypeBuilderOperator<Operator::BINARY> :
+		public TypeBuildUnit {
+	private:
+		using OperateOn = OperationType<Operator::BINARY>;
+		const TypeCrosser& m_typeCrosser;
+	public:
+		TypeBuilderOperator(const TypeCrosser& typeCrosser);
+        Type build(const Script& script, const ASTNode& node) override final {
+			return build(script, OperateOn{node});
+		}
+		Type build(const Script& script, OperateOn node);
+	};
 }

@@ -10,11 +10,12 @@
 namespace ska {
     struct ReservedKeywordsPool;
 	class Script;
+	class TypeCrosser;
 
 	class Interpreter {
 		using OperatorInterpreter = std::vector<std::unique_ptr<InterpreterOperatorUnit>>;
 	public:
-		Interpreter(const ReservedKeywordsPool& reserved);
+		Interpreter(const ReservedKeywordsPool& reserved, const TypeCrosser& typeCrosser);
 		~Interpreter() = default;
 
 		OperatorInterpreter build();
@@ -23,5 +24,6 @@ namespace ska {
 
 	private:
 		OperatorInterpreter m_operatorInterpreter;
+		const TypeCrosser& m_typeCrosser;
 	};
 }

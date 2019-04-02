@@ -15,6 +15,7 @@
 
 namespace ska {
     class StatementParser;
+	class TypeCrosser;
 
     class TypeBuilder : 
 	    public subobserver_priority_queue<ExpressionTokenEvent>,
@@ -24,7 +25,7 @@ namespace ska {
 		public subobserver_priority_queue<ArrayTokenEvent>,
 		public subobserver_priority_queue<ScriptLinkTokenEvent> {
         public:
-            TypeBuilder(StatementParser& parser);
+            TypeBuilder(StatementParser& parser, const TypeCrosser& typeCrosser);
             virtual ~TypeBuilder() = default;
             
         private:

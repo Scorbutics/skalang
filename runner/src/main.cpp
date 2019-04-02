@@ -14,6 +14,7 @@
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
 #include "Interpreter/Interpreter.h"
+#include "Service/TypeCrosser/TypeCrossExpression.h"
 
 int main(int argc, char* argv[]) {
 	if (argc <= 1) {
@@ -23,12 +24,12 @@ int main(int argc, char* argv[]) {
 	
     const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto scriptCache = ska::ScriptCache{};
-	
+	auto typeCrosser = ska::TypeCrosser{};
 	auto parser = ska::StatementParser {reservedKeywords};
-	auto typeBuilder = ska::TypeBuilder {parser};
+	auto typeBuilder = ska::TypeBuilder {parser, typeCrosser };
 	auto symbolsTypeUpdater = ska::SymbolTableTypeUpdater {parser};
-	auto typeChecker = ska::SemanticTypeChecker {parser};
-	auto interpreter = ska::Interpreter {reservedKeywords};
+	auto typeChecker = ska::SemanticTypeChecker {parser, typeCrosser };
+	auto interpreter = ska::Interpreter {reservedKeywords, typeCrosser };
 
 	auto inputFile = std::ifstream{ argv[1] };
 	if(inputFile.fail()) {

@@ -4,15 +4,15 @@
 #include "TypeBuildersContainer.h"
 
 namespace ska {
-	template<Operator op>
-	inline void TypeBuilderMakeBuilder(TypeBuildersContainer& result) {
-		result[static_cast<std::size_t>(op)] = std::make_unique<TypeBuilderOperator<op>>();
+	template<Operator op, class ... Args >
+	inline void TypeBuilderMakeBuilder(TypeBuildersContainer& result, Args&& ... args) {
+		result[static_cast<std::size_t>(op)] = std::make_unique<TypeBuilderOperator<op>>(std::forward<Args>(args)...);
 	}
 }
 
-ska::TypeBuildersContainer ska::BuildTypeBuildersContainer() {
+ska::TypeBuildersContainer ska::BuildTypeBuildersContainer(const TypeCrosser& typeCrosser) {
 	auto result = TypeBuildersContainer {};
-	TypeBuilderMakeBuilder<Operator::BINARY>(result);
+	TypeBuilderMakeBuilder<Operator::BINARY>(result, typeCrosser);
 	TypeBuilderMakeBuilder<Operator::UNARY>(result);
 	TypeBuilderMakeBuilder<Operator::LITERAL>(result);
 	TypeBuilderMakeBuilder<Operator::VARIABLE_DECLARATION>(result);

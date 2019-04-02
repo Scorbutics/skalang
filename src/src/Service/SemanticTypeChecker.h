@@ -11,6 +11,7 @@
 namespace ska {
 	class SymbolTable;
     class StatementParser;
+	class TypeCrosser;
 
     class SemanticTypeChecker :
     public subobserver_priority_queue<VarTokenEvent>,
@@ -19,7 +20,7 @@ namespace ska {
     public subobserver_priority_queue<ReturnTokenEvent>,
 	public subobserver_priority_queue<IfElseTokenEvent> {
     public:
-        SemanticTypeChecker(StatementParser& parser);
+        SemanticTypeChecker(StatementParser& parser, const TypeCrosser& typeCrosser);
         ~SemanticTypeChecker() = default;
     private:
 		static bool childrenHasReturnOnAllControlPath(const ASTNode& node);
@@ -30,6 +31,8 @@ namespace ska {
         bool matchFunction(const FunctionTokenEvent& token);
         bool matchReturn(const ReturnTokenEvent& token);
 		bool matchIfElse(const IfElseTokenEvent& token);
+
+		const TypeCrosser& m_typeCrosser;
     };
 
 }
