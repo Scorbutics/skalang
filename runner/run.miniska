@@ -1,3 +1,28 @@
-var Dummy = function(): var { return { data: 3 }; }; 
-var RunnerT = import "runner_lib";
-RunnerT.print(Dummy());
+var Coldragon = function(): var { 
+	var array = [20, 150, 2];
+	
+	return { 
+		data: 500,
+		array : array
+	}; 
+};
+
+var Scorbutics = function(): var {
+	var power = 88;
+	var i = 0;
+	return {
+		attack : function(target: Coldragon) {
+			target.data = target.array[i] - power;
+			i = i + 1;
+			if( i >= 3 ) {
+				i = 0;
+			}
+		}
+	};
+}; 
+
+var coldragon = Coldragon();
+Scorbutics().attack(coldragon);
+
+var Runner = import "runner_lib";
+Runner.print(coldragon);

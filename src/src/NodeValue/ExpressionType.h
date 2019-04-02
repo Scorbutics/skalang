@@ -31,33 +31,6 @@ namespace ska {
 		"bool"
 	};
 
-	template<class T>
-	struct ExpressionTypeFromNative;
-
-	template<>
-	struct ExpressionTypeFromNative<int> {
-		static constexpr auto value = ExpressionType::INT;
-	};
-    
-    template<>
-	struct ExpressionTypeFromNative<bool> {
-		static constexpr auto value = ExpressionType::BOOLEAN;
-	};
-
-	template<>
-	struct ExpressionTypeFromNative<float> {
-		static constexpr auto value = ExpressionType::FLOAT;
-	};
-
-	template<>
-	struct ExpressionTypeFromNative<double> {
-		static constexpr auto value = ExpressionType::FLOAT;
-	};
-
-	template<>
-	struct ExpressionTypeFromNative<std::string> {
-		static constexpr auto value = ExpressionType::STRING;
-	};
 
 	class ScopedSymbolTable;
 
