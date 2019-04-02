@@ -7,7 +7,7 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>)
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const Script& script, OperateOn node) {
-	auto& typeObject = node.GetObjectType();
+	auto typeObject = node.GetObjectType();
 	if (typeObject != ExpressionType::OBJECT) {
 		auto error = std::stringstream {};
 		if (typeObject == ExpressionType::VOID) {

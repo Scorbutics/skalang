@@ -27,7 +27,7 @@ namespace ska {
 		ska::Operation<ska::Operator::FUNCTION_CALL>& node) {
 
 		//Centers memory on the current function scope
-		auto& currentExecutionMemoryZone = node.parent.pointMemoryTo(memoryForFunctionExecution);
+		auto currentExecutionMemoryZone = node.parent.pointMemoryTo(memoryForFunctionExecution);
 
 		//Creates function-memory environment scope (including creation of parameters)
 		node.parent.pushNestedMemory();

@@ -5,6 +5,7 @@
 #include "Service/StatementParser.h"
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
+#include "Service/TypeBuilder/TypeBuildUnit.h"
 #include "Service/SymbolTableTypeUpdater.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Interpreter/Interpreter.h"

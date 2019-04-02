@@ -9,6 +9,7 @@
 #include "Service/StatementParser.h"
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
+#include "Service/TypeBuilder/TypeBuildUnit.h"
 #include "Interpreter/Value/Script.h"
 
 auto readerSTC = std::unique_ptr<ska::Script>{};
