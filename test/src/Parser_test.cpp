@@ -160,7 +160,7 @@ TEST_CASE("function") {
         //CHECK(ast[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
 		
 	}
-	
+	//TODO rework : doesn't properly work (doesn't detect a good function returning type)
 	SUBCASE("with 2 return placements (early return support)") {
 		auto astPtr = ASTFromInput(scriptCache, "var f_parser154 = function(titi:int) : int { if(titi == 0) { return 1; } return 0; }; var int_parser154 = f_parser154(1);", keywords);
 		auto& ast = astPtr.rootNode()[0];
