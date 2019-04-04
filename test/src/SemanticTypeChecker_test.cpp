@@ -465,7 +465,15 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(e.what() == std::string{ "Unable to use operator \"-\" on types array ( - float) and array ( - float)" });
 			}
 		}
-
+		
+		SUBCASE("double array string : cell") {
+			try {
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var str167 = [[0, 1], [2.0]]; str167[1]; str167[1][0];", data);
+				CHECK(false);
+			} catch (std::exception& e) {
+				CHECK(e.what() == std::string{ "array has not uniform types in it : array ( - int) and array ( - float)" });
+			}
+		}
 
 		SUBCASE("constructor complex with contained function NOT USING the current type and calling member function with a wrong type...") {
 			try {
