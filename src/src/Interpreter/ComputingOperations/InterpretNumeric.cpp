@@ -25,49 +25,40 @@ ska::NodeValue ska::InterpretMathematicPlus(TypedNodeValue firstValue, TypedNode
 		});
 	}
 	case ExpressionType::ARRAY: {
+		auto lambdas = std::make_tuple([](auto& t1, NodeValueArray& t2) {
+			t2->push_back(std::move(t1));
+			return t2;
+		}, [](NodeValueArray& t1, auto& t2) {
+			t1->push_back(std::move(t2));
+			return t1;
+		}, [](NodeValueArray& t1, NodeValueArray& t2) {
+			t1->insert(t1->end(), std::make_move_iterator(t2->begin()), std::make_move_iterator(t2->end()));
+			return t1;
+		});
+
 		switch (firstValue.type.compound()[0].type()) {
 		case ExpressionType::STRING:
 			return ComputeTwoTypeOperation<std::string, NodeValueArray>(std::move(firstValue), std::move(secondValue),
-			[](std::string& t1, NodeValueArray& t2) {
-				t2->push_back(std::move(t1));
-				return t2;
-			}, [](NodeValueArray& t1, std::string& t2) {
-				t1->push_back(std::move(t2));
-				return t1;
-			}, [](NodeValueArray& t1, NodeValueArray& t2) {
-				t1->insert(t1->end(), std::make_move_iterator(t2->begin()), std::make_move_iterator(t2->end()));
-				return t1;
-			});
+			std::get<0>(lambdas),
+			std::get<1>(lambdas),
+			std::get<2>(lambdas)
+			);
 		case ExpressionType::INT:
 			return ComputeTwoTypeOperation<int, NodeValueArray>(std::move(firstValue), std::move(secondValue),
-				[](int t1, NodeValueArray& t2) {
-				t2->push_back(t1);
-				return t2;
-			}, [](NodeValueArray& t1, int t2) {
-				t1->push_back(t2);
-				return t1;
-			}, [](NodeValueArray& t1, NodeValueArray& t2) {
-				t1->insert(t1->end(), std::make_move_iterator(t2->begin()), std::make_move_iterator(t2->end()));
-				return t1;
-			});
+			std::get<0>(lambdas),
+			std::get<1>(lambdas),
+			std::get<2>(lambdas));
 		case ExpressionType::FLOAT:
 			return ComputeTwoTypeOperation<double, NodeValueArray>(std::move(firstValue), std::move(secondValue),
-				[](double t1, NodeValueArray& t2) {
-				t2->push_back(t1);
-				return t2;
-			}, [](NodeValueArray& t1, double t2) {
-				t1->push_back(t2);
-				return t1;
-			}, [](NodeValueArray& t1, NodeValueArray& t2) {
-				t1->insert(t1->end(), std::make_move_iterator(t2->begin()), std::make_move_iterator(t2->end()));
-				return t1;
-			});
+			std::get<0>(lambdas),
+			std::get<1>(lambdas),
+			std::get<2>(lambdas));
 		}
 		return "";
 	}
 
 	default: 
-		assert(!"Unhandled math plus operation");
+		throw std::runtime_error("Unhandled math plus operation");
 		return "";
 		
 	}
@@ -86,7 +77,7 @@ ska::NodeValue ska::InterpretMathematicMinus(TypedNodeValue firstValue, TypedNod
 	}
 
 	default:
-		assert(!"Unhandled math minus operation");
+		throw std::runtime_error("Unhandled math minus operation");
 		return "";
 	}
 }
