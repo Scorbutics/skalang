@@ -250,6 +250,27 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(ast[1].type() == ska::Type::MakeBuiltInArray(ska::ExpressionType::INT));
 			}
 
+			SUBCASE("int : del a cell") {
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var toto = [14, 25, 3]; toto = toto - 1;", data);
+				auto& ast = astPtr.rootNode();
+				CHECK(ast.size() == 2);
+				CHECK(ast[1].type() == ska::Type::MakeBuiltInArray(ska::ExpressionType::INT));
+			}
+
+			SUBCASE("int : del a cell range") {
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var toto = [14, 25, 3]; var range = [0, 1]; toto = toto - range;", data);
+				auto& ast = astPtr.rootNode();
+				CHECK(ast.size() == 3);
+				CHECK(ast[2].type() == ska::Type::MakeBuiltInArray(ska::ExpressionType::INT));
+			}
+
+			SUBCASE("int : del a cell range, in-place value") {
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var toto = [14, 25, 3]; toto = toto - [0, 1];", data);
+				auto& ast = astPtr.rootNode();
+				CHECK(ast.size() == 3);
+				CHECK(ast[2].type() == ska::Type::MakeBuiltInArray(ska::ExpressionType::INT));
+			}
+
 			SUBCASE("double array string : cell") {
                 /*
                 auto astPtr = ASTFromInputSemanticTC(scriptCache, "var str167 = [[0, 1], [2, 3]]; str167[0]; str167[0][0];", data);
@@ -343,6 +364,28 @@ TEST_CASE("[SemanticTypeChecker]") {
 						CHECK(false);
 					} catch (std::exception& e) {
 						CHECK(true);
+					}
+				}
+
+				SUBCASE("int : bad operation : operator - with string") {
+					try {
+						auto astPtr = ASTFromInputSemanticTC(scriptCache, "var toto = [14, 25, 3]; toto = toto - \"1\";", data);
+						auto& ast = astPtr.rootNode();
+						CHECK(ast.size() == 2);
+						CHECK(ast[1].type() == ska::Type::MakeBuiltInArray(ska::ExpressionType::INT));
+					} catch(std::exception& e) {
+						CHECK(e.what() == std::string{"Unable to use operator \"-\" on types array and string"});
+					}
+				}
+
+				SUBCASE("int : bad operation : operator - with int, reverse ordered") {
+					try {
+						auto astPtr = ASTFromInputSemanticTC(scriptCache, "var toto = [14, 25, 3]; toto = 1 - toto;", data);
+						auto& ast = astPtr.rootNode();
+						CHECK(ast.size() == 2);
+						CHECK(ast[1].type() == ska::Type::MakeBuiltInArray(ska::ExpressionType::INT));
+					} catch(std::exception& e) {
+						CHECK(e.what() == std::string{"Unable to use operator \"-\" on types int and array"});
 					}
 				}
 			}

@@ -26,7 +26,7 @@ ska::NodeValue ska::InterpretMathematicPlus(TypedNodeValue firstValue, TypedNode
 	}
 	case ExpressionType::ARRAY: {
 		auto lambdas = std::make_tuple([](auto& t1, NodeValueArray& t2) {
-			t2->push_back(std::move(t1));
+			t2->push_front(std::move(t1));
 			return t2;
 		}, [](NodeValueArray& t1, auto& t2) {
 			t1->push_back(std::move(t2));
@@ -76,6 +76,52 @@ ska::NodeValue ska::InterpretMathematicMinus(TypedNodeValue firstValue, TypedNod
 		});
 	}
 
+	case ExpressionType::ARRAY: {
+		auto lambdas = std::make_tuple([](int t1, NodeValueArray& t2) {
+			throw std::runtime_error("Unhandled math minus operation");
+			return t2;
+		}, [](NodeValueArray& t1, int t2) {
+			if(t2 < 0) {
+				throw std::runtime_error("Bad vector-based index deletion : negative index(es)");
+			}
+			t1->resize(t1->size() - static_cast<std::size_t>(t2));
+			return t1;
+		}, [](NodeValueArray& t1, NodeValueArray& t2) { 
+			throw std::runtime_error("Unhandled math minus operation"); 
+			return t1; 
+		} );
+
+		switch (secondValue.type.type()) {
+		case ExpressionType::INT:
+			return ComputeTwoTypeOperation<int, NodeValueArray>(std::move(firstValue), std::move(secondValue),
+			std::get<0>(lambdas),
+			std::get<1>(lambdas),
+			std::get<2>(lambdas));
+		case ExpressionType::ARRAY: {
+			auto& t1 = firstValue.value.nodeval<NodeValueArray>();
+			auto& t2 = secondValue.value.nodeval<NodeValueArray>();
+			if(t2->size() != 2) {
+				throw std::runtime_error("Bad vector-based index deletion : size != 2");
+			}
+			if((*t2)[0].nodeval<int>() < 0 || (*t2)[1].nodeval<int>() < 0) {
+				throw std::runtime_error("Bad vector-based index deletion : negative index(es)");
+			}
+			auto start = static_cast<std::size_t>((*t2)[0].nodeval<int>());
+			auto end = static_cast<std::size_t>((*t2)[1].nodeval<int>());
+			if(start > end) {
+				std::swap(start, end);
+			}
+			t1->erase(t1->begin() + start , t1->begin() + end);
+			return t1;
+		}
+		default: {
+			auto ss = std::stringstream {};
+			ss << "unhandled math minus operation between an array and " << secondValue.type;
+			throw std::runtime_error(ss.str());
+		}
+		}
+		return "";
+	}
 	default:
 		throw std::runtime_error("Unhandled math minus operation");
 		return "";

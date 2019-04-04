@@ -14,7 +14,6 @@ namespace ska {
         INT,
 		FLOAT,
 		STRING,
-		//??
 		ARRAY,
 		BOOLEAN,
 		UNUSED_Last_Length

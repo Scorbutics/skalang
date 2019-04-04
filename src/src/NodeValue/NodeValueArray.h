@@ -1,9 +1,9 @@
 #pragma once
 #include <memory>
 #include <tuple>
-#include <vector>
+#include <deque>
 
 namespace ska {
 	class NodeValue;
-    using NodeValueArray = std::shared_ptr<std::vector<NodeValue>>;
+    using NodeValueArray = std::shared_ptr<std::deque<NodeValue>>;
 }
