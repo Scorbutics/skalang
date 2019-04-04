@@ -31,7 +31,7 @@ ska::ASTNodePtr ska::MatcherArray::matchDeclaration(Script& input) {
 
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 	auto declarationNode = ASTFactory::MakeNode<ska::Operator::ARRAY_DECLARATION>(std::move(arrayNode));
-	auto event = ArrayTokenEvent{ *declarationNode, input, ArrayTokenEventType::USE };
+	auto event = ArrayTokenEvent{ *declarationNode, input, ArrayTokenEventType::DECLARATION };
 	m_parser.observable_priority_queue<ArrayTokenEvent>::notifyObservers(event);
 	return declarationNode;
 }
@@ -65,12 +65,6 @@ ska::ASTNodePtr ska::MatcherArray::match(Script& input, ExpressionStack& operand
 			//TODO : handle multi dimensional arrays
 			if (value != "=") {
 				auto arrayNode = operands.popOperandIfNoOperator(isDoingOperation);
-				/*
-				if (arrayNode == nullptr) {
-					arrayNode = ASTFactory::MakeEmptyNode();
-					//throw std::runtime_error("invalid operator placement");
-				}
-				*/
 				if (arrayNode != nullptr) {
 					SLOG(ska::LogLevel::Debug) << "\tArray begin use";
 					auto result = matchUse(input, std::move(arrayNode));

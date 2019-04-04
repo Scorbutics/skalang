@@ -192,7 +192,6 @@ TEST_CASE("[SemanticTypeChecker]") {
 				}
 			}
 
-			//TODO : forbid the "no effect" dead code ?
 			SUBCASE("code after return : no effect") {
 				ASTFromInputSemanticTC(scriptCache, "var testReturn148 = function() : int { return 2543; var test = 2; };", data);
 			}
@@ -272,13 +271,13 @@ TEST_CASE("[SemanticTypeChecker]") {
 			}
 
 			SUBCASE("double array string : cell") {
-                /*
+                
                 auto astPtr = ASTFromInputSemanticTC(scriptCache, "var str167 = [[0, 1], [2, 3]]; str167[0]; str167[0][0];", data);
 				auto& ast = astPtr.rootNode();
 				CHECK(ast.size() == 3);
 				CHECK(ast[1].type() == ska::ExpressionType::ARRAY);
 				CHECK(ast[2].type() == ska::ExpressionType::INT);
-                */
+                
             }
 
 			SUBCASE("function call : array") {
@@ -447,6 +446,26 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(std::string(e.what()) == "trying to access to an undeclared field : ttetetetet of joueur1");
 			}
 		}
+
+		SUBCASE("Array : heterogen types") {
+			try {
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var toto = [1, 2.0];", data);
+				CHECK(false);
+			} catch (std::exception & e) {
+				CHECK(e.what() == std::string{ "array has not uniform types in it : int and float" });
+			}
+		}
+		
+		//TODO : move this test in TypeCross_test
+		SUBCASE("Array : del a range of cell : failure bad type (double)") {
+			try {
+				auto astPtr = ASTFromInputSemanticTC(scriptCache,"var toto = [14.0, 25.0, 13.0, 2.0]; toto = toto - [1.0, 2.0];", data);
+				CHECK(false);
+			} catch (std::exception & e) {
+				CHECK(e.what() == std::string{ "Unable to use operator \"-\" on types array ( - float) and array ( - float)" });
+			}
+		}
+
 
 		SUBCASE("constructor complex with contained function NOT USING the current type and calling member function with a wrong type...") {
 			try {

@@ -148,9 +148,28 @@ TEST_CASE("[Interpreter]") {
 		}
 
 		SUBCASE("Array of int : add a cell") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = [14, 25]; toto = toto + 4; toto[2];", data);
-			auto res = data.interpreter->script(astPtr);
-			CHECK(res.nodeval<int>() == 4);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = [14, 25]; toto = toto + 4;", data);
+			auto res = data.interpreter->script(astPtr).nodeval<ska::NodeValueArray>();
+			CHECK(res->size() == 3);
+			CHECK((*res)[0] == 14);
+			CHECK((*res)[1] == 25);
+			CHECK((*res)[2] == 4);
+		}
+
+		SUBCASE("Array of int : del a cell") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = [14, 25, 13, 2]; toto = toto - 2;", data);
+			auto res = data.interpreter->script(astPtr).nodeval<ska::NodeValueArray>();
+			CHECK(res->size() == 2);
+			CHECK((*res)[0] == 14);
+			CHECK((*res)[1] == 25);
+		}
+
+		SUBCASE("Array of int : del a range of cells") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = [14, 25, 13, 2]; toto = toto - [1, 2];", data);
+			auto res = data.interpreter->script(astPtr).nodeval<ska::NodeValueArray>();
+			CHECK(res->size() == 2);
+			CHECK((*res)[0] == 14);
+			CHECK((*res)[1] == 2);
 		}
 
 		SUBCASE("Assigning a cell of an array of int") {
@@ -199,6 +218,34 @@ TEST_CASE("[Interpreter]") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var Coldragon = function() : var{ var array = [20, 150, 2]; return { array : array }; }; var target = Coldragon(); var data = target.array[0] - 88; data;", data);
 			auto res = data.interpreter->script(astPtr);
 			CHECK(res.nodeval<int>() == -68);
+		}
+
+		SUBCASE("double array string : cell") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var str167 = [[0, 1], [2, 3]]; str167[0]; str167[0][1];", data);
+			auto res = data.interpreter->script(astPtr);
+			CHECK(res.nodeval<int>() == 1);
+		}
+
+		SUBCASE("Fail") {
+			SUBCASE("Array : del cells : failure out of bound") {
+				try {
+					auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = [14.0, 25.0, 13.0, 2.0]; toto = toto - 12;", data);
+					auto res = data.interpreter->script(astPtr).nodeval<ska::NodeValueArray>();
+					CHECK(false);
+				} catch (std::exception & e) {
+					CHECK(e.what() == std::string{ "Bad vector-based index deletion : out of bound" });
+				}
+			}
+			
+			SUBCASE("Array : del a range of cell : failure out of bound") {
+				try {
+					auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = [14.0, 25.0, 13.0, 2.0]; toto = toto - [1, 12];", data);
+					auto res = data.interpreter->script(astPtr).nodeval<ska::NodeValueArray>();
+					CHECK(false);
+				} catch (std::exception & e) {
+					CHECK(e.what() == std::string{ "Bad vector-based index deletion : out of bound" });
+				}
+			}
 		}
 	}
 		

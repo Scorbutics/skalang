@@ -84,6 +84,10 @@ ska::NodeValue ska::InterpretMathematicMinus(TypedNodeValue firstValue, TypedNod
 			if(t2 < 0) {
 				throw std::runtime_error("Bad vector-based index deletion : negative index(es)");
 			}
+			if (t1->size() <= t2) {
+				throw std::runtime_error("Bad vector-based index deletion : out of bound");
+			}
+
 			t1->resize(t1->size() - static_cast<std::size_t>(t2));
 			return t1;
 		}, [](NodeValueArray& t1, NodeValueArray& t2) { 
@@ -111,7 +115,11 @@ ska::NodeValue ska::InterpretMathematicMinus(TypedNodeValue firstValue, TypedNod
 			if(start > end) {
 				std::swap(start, end);
 			}
-			t1->erase(t1->begin() + start , t1->begin() + end);
+			if (t1->size() <= end) {
+				throw std::runtime_error("Bad vector-based index deletion : out of bound");
+			}
+
+			t1->erase(t1->begin() + start , t1->begin() + end + 1);
 			return t1;
 		}
 		default: {
