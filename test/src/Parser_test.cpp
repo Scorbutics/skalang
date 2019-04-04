@@ -176,7 +176,6 @@ TEST_CASE("User defined object") {
 	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
 	
     SUBCASE("constructor with 1 parameter") {
-        //std::cout << std::endl << std::endl << std::endl;
         
         auto astPtr = ASTFromInput(scriptCache, "var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", keywords);
 		CHECK(astPtr.rootNode().size() == 3);
@@ -215,9 +214,6 @@ TEST_CASE("User defined object") {
         const auto& varJoueur1Node = astPtr.rootNode()[1];
         CHECK(varJoueur1Node.op() == ska::Operator::VARIABLE_DECLARATION);
         CHECK(varJoueur1Node.has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER } ));
-        /*CHECK(varJoueur1Node.size() == 1);
-        const auto& joueurFunctionCallNode = varJoueur1Node[0];
-        CHECK(joueurFunctionCallNode.op() == ska::Operator::FUNCTION_CALL);*/
 
         //Checks the field access
         const auto& nomJoueur1FieldNode = astPtr.rootNode()[2];
@@ -226,7 +222,6 @@ TEST_CASE("User defined object") {
 		CHECK(nomJoueur1FieldNode[0].has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER } ));
 		CHECK(nomJoueur1FieldNode[1].has(ska::Token{ "nom", ska::TokenType::IDENTIFIER }));
 
-        //std::cout << std::endl << std::endl << std::endl;
 	}
 
 }

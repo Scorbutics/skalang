@@ -299,7 +299,6 @@ TEST_CASE("[SemanticTypeChecker]") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var var202 = function() : var { var toto = [0]; return { toto : toto }; }; var202().toto[0] + 3 * 2;", data);
 				auto& ast = astPtr.rootNode();
 				CHECK(ast.size() == 2);
-                std::cout << ast[1][0].type().value() << std::endl;
                 CHECK(ast[1][0].type() == ska::ExpressionType::INT);
 			}
 
