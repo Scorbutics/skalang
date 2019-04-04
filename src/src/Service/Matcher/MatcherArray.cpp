@@ -38,6 +38,7 @@ ska::ASTNodePtr ska::MatcherArray::matchDeclaration(Script& input) {
 
 ska::ASTNodePtr ska::MatcherArray::matchUse(Script& input, ASTNodePtr identifierArrayAffected) {
 	//Ensures array expression before the index access
+	assert(identifierArrayAffected != nullptr);
 	SLOG(ska::LogLevel::Debug) << "expression-array : " << *identifierArrayAffected;	
     auto expressionEvent = ArrayTokenEvent{ *identifierArrayAffected, input, ArrayTokenEventType::EXPRESSION };
 	m_parser.observable_priority_queue<ArrayTokenEvent>::notifyObservers(expressionEvent);
@@ -63,15 +64,19 @@ ska::ASTNodePtr ska::MatcherArray::match(Script& input, ExpressionStack& operand
 			const auto& value = std::get<std::string>(lastToken.content());
 			//TODO : handle multi dimensional arrays
 			if (value != "=") {
-				SLOG(ska::LogLevel::Debug) << "\tArray begin use";
 				auto arrayNode = operands.popOperandIfNoOperator(isDoingOperation);
+				/*
 				if (arrayNode == nullptr) {
 					arrayNode = ASTFactory::MakeEmptyNode();
 					//throw std::runtime_error("invalid operator placement");
 				}
-				auto result = matchUse(input, std::move(arrayNode));
-				SLOG(ska::LogLevel::Debug) << "\tArray end";
-				return result;
+				*/
+				if (arrayNode != nullptr) {
+					SLOG(ska::LogLevel::Debug) << "\tArray begin use";
+					auto result = matchUse(input, std::move(arrayNode));
+					SLOG(ska::LogLevel::Debug) << "\tArray end";
+					return result;
+				}
 			}
 		}
 		SLOG(ska::LogLevel::Debug) << "\tArray begin declare";

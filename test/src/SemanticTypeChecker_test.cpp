@@ -267,8 +267,8 @@ TEST_CASE("[SemanticTypeChecker]") {
 			SUBCASE("int : del a cell range, in-place value") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var toto = [14, 25, 3]; toto = toto - [0, 1];", data);
 				auto& ast = astPtr.rootNode();
-				CHECK(ast.size() == 3);
-				CHECK(ast[2].type() == ska::Type::MakeBuiltInArray(ska::ExpressionType::INT));
+				CHECK(ast.size() == 2);
+				CHECK(ast[1].type() == ska::Type::MakeBuiltInArray(ska::ExpressionType::INT));
 			}
 
 			SUBCASE("double array string : cell") {
@@ -354,7 +354,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                         CHECK(ast.size() == 2);
                         CHECK(ast[1].type() == ska::ExpressionType::INT);
                     } catch(std::exception& e) {
-                        CHECK(std::string("invalid operator placement") == e.what());
+                        CHECK(std::string("Unable to use operator \"*\" on types array and int") == e.what());
                     }
                 }
 
