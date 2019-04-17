@@ -110,7 +110,7 @@ bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
     switch(token.type()) {
 	    case ReturnTokenEventType::START: {
 			SLOG(ska::LogLevel::Debug) << "\t\tNew Return : adding a nested symbol table";
-            const auto actualNameSymbol = m_currentTable->owner();
+            const auto actualNameSymbol = m_currentTable->directOwner();
             if (actualNameSymbol == nullptr) {
                 throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
             }

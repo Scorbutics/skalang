@@ -34,6 +34,10 @@ namespace ska {
             return m_parentSymbol == nullptr && &m_parent != this ? m_parent.owner() : m_parentSymbol;
         }
 
+        const Symbol* directOwner() const {
+            return m_parentSymbol;
+        }
+
 		Symbol* operator[](const std::string& key) {
             auto valueIt = m_symbols.find(key);
 			if(valueIt == m_symbols.end()) {
