@@ -1,0 +1,9 @@
+var Character = import "character";
+
+var scorbutics = Character.build("Scorbutics");
+scorbutics.pos.x = 15;
+
+var Runner = import "runner_lib";
+Runner.printInt(scorbutics.pos.x);
+Runner.printInt(scorbutics.pos.y);
+

@@ -1,0 +1,7 @@
+var build = function(x: int, y: int) {
+    return {
+        x: x,
+        y: y
+    };
+};
+
