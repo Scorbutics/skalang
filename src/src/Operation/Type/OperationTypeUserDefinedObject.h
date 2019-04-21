@@ -1,9 +1,9 @@
 #pragma once
 #include <cassert>
 #include "OperationType.h"
+#include "NodeValue/AST.h"
 
 namespace ska {
-	class ASTNode;
 	template<>
     class OperationType<Operator::USER_DEFINED_OBJECT> {
 	private:

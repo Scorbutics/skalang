@@ -175,7 +175,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			auto astPtr = ASTFromInputSemanticComplexTC(scriptCache, "var Dummy = function() : var{ return { data: 3 }; }; Dummy.data; ", data);
 			CHECK(false);
 		} catch (std::exception& e) {
-			CHECK(e.what() == std::string("the variable Dummy is not registered as an object but as a function Dummy ( - var Dummy)"));
+			CHECK(e.what() == std::string("the variable \"Dummy\" is not registered as an object but as a \"function Dummy (var Dummy)\""));
 		}
 	}
 }

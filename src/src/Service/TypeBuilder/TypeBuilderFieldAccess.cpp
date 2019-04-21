@@ -11,9 +11,9 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const Scr
 	if (typeObject != ExpressionType::OBJECT) {
 		auto error = std::stringstream {};
 		if (typeObject == ExpressionType::VOID) {
-			error << "the class symbol table " << node.GetObjectName() << " is not registered. Maybe you're trying to use the type you're defining in its definition...";
+			error << "the class symbol table \"" << node.GetObjectName() << "\" is not registered. Maybe you're trying to use the type you're defining in its definition...";
 		} else {
-			error << "the variable " << node.GetObjectName() << " is not registered as an object but as a " << node.GetObjectType();
+			error << "the variable \"" << node.GetObjectName() << "\" is not registered as an object but as a \"" << node.GetObjectType() << "\"";
 		}
 		throw std::runtime_error(error.str());
 	}
@@ -22,11 +22,11 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const Scr
 	auto* symbolField = typeObject[fieldName];
     if (!typeObject.hasSymbol() || symbolField == nullptr) {
 		auto ss = std::stringstream{};
-		ss << "trying to access to an undeclared field : " << node.GetFieldName() << " of " << node.GetObjectName();
+		ss << "trying to access to an undeclared field : \"" << node.GetFieldName() << "\" of \"" << node.GetObjectName() << "\"";
         throw std::runtime_error(ss.str());
     }
 
-    SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Field accessed " << node.GetFieldName() << " (type " << symbolField->getType() << ") of " << node.GetObjectName();
+    SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Field accessed \"" << node.GetFieldName() << "\" (type \"" << symbolField->getType() << "\") of \"" << node.GetObjectName() << "\"";
 	
 	if (symbolField->getType() == ExpressionType::VOID) {
 		auto ss = std::stringstream{};

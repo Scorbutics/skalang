@@ -42,11 +42,12 @@ std::ostream& ska::operator<<(std::ostream& stream, const ska::Type& type) {
 	auto addedSymbolPart = (type.m_symbolAlias.empty() ? "" : (" " + type.m_symbolAlias));
 	if (type.m_compound.empty()) {
 		stream << mainType << addedSymbolPart;
-	}
-	else {
+	} else {
 		stream << mainType << addedSymbolPart << " (";
+		std::size_t rindex = type.m_compound.size() - 1;
 		for (const auto& childType : type.m_compound) {
-			stream << " - " << childType;
+			stream << childType << (rindex == 0 ? "" : " - ");
+			rindex--;
 		}
 		stream << ")";
 	}

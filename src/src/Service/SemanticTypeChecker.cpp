@@ -71,14 +71,14 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 			auto operationReturn = OperationType<Operator::RETURN>{token.rootNode()};
 			const auto& returnedValue = operationReturn.GetValue();
 			if (type.compound().empty() || !returnedValue.type().has_value()) {
-				throw std::runtime_error(symbol->getName() + " is not a function");
+				throw std::runtime_error("\"" + symbol->getName() + "\" is not a function");
 			}
 
 			const auto expectedReturnType = type.compound().back();
 			if ((returnedValue.op() == Operator::USER_DEFINED_OBJECT && expectedReturnType != ExpressionType::OBJECT) || 
 				returnedValue.op() != Operator::USER_DEFINED_OBJECT && expectedReturnType != returnedValue.type()) {
 				auto ss = std::stringstream{};
-				ss << "bad return type : expected " << expectedReturnType << " on function but got " << returnedValue.type().value() << " on return";
+				ss << "bad return type : expected \"" << expectedReturnType << "\" on function declaration but got \"" << returnedValue.type().value() << "\" on return";
 				throw std::runtime_error(ss.str());
 			}
 
@@ -92,7 +92,7 @@ bool ska::SemanticTypeChecker::matchIfElse(const IfElseTokenEvent& token) {
 	const auto& conditionType = ifElseOperation.GetCondition().type().value_or(Type{});
 	if (conditionType != ExpressionType::BOOLEAN) {
 		auto ss = std::stringstream{};
-		ss << "expression condition is not a boolean (it's a " << conditionType << ")";
+		ss << "expression condition is not a boolean (it's a \"" << conditionType << "\")";
 		throw std::runtime_error(ss.str());
 	}
 	return true;
@@ -107,7 +107,7 @@ bool ska::SemanticTypeChecker::matchArray(const ArrayTokenEvent& token) {
 			for (const auto& arrayElementNode : arrayDeclarationOperation) {
 				if (arraySubType != arrayElementNode->type()) {
 					auto ss = std::stringstream{};
-					ss << "array has not uniform types in it : " << arraySubType << " and " << arrayElementNode->type().value();
+					ss << "array has not uniform types in it : \"" << arraySubType << "\" and \"" << arrayElementNode->type().value() << "\"";
 					throw std::runtime_error(ss.str());
 				}
 			}
@@ -116,7 +116,7 @@ bool ska::SemanticTypeChecker::matchArray(const ArrayTokenEvent& token) {
     case ArrayTokenEventType::EXPRESSION: {
         if(token.rootNode().type() != ExpressionType::ARRAY) {
             auto ss = std::stringstream {}; 
-            ss << "expression is not an array (it's a " << token.rootNode().type().value_or(Type {}) << ")";
+            ss << "expression is not an array (it's a \"" << token.rootNode().type().value_or(Type {}) << "\")";
             throw std::runtime_error(ss.str());
         }
       } break;
@@ -141,7 +141,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
             const auto functionFullRequiredType = functionCallOperation.GetFunctionType();
             if(functionFullRequiredType != ExpressionType::FUNCTION) {
 				auto ss = std::stringstream{};
-				ss << "function " << functionFullRequiredType << " is called before being declared (or has a bad declaration)";
+				ss << "function \"" << functionFullRequiredType << "\" is called before being declared (or has a bad declaration)";
 				throw std::runtime_error(ss.str());
             }
 
@@ -149,9 +149,9 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 			const auto callNodeParameterSize = functionCallOperation.GetFunctionParameterSize();
             if(functionRequiredTypeParameterSize != callNodeParameterSize) {
                 auto ss = std::stringstream {};
-                ss << "bad function call : the function " << functionFullRequiredType << " needs " 
+                ss << "bad function call : the function \"" << functionFullRequiredType << "\" needs " 
 				<< functionRequiredTypeParameterSize << " parameters but is being called with " << callNodeParameterSize 
-				<< " parameters (function type is " << functionFullRequiredType << ")";
+				<< " parameters (function type is \"" << functionFullRequiredType << "\")";
                 throw std::runtime_error(ss.str());
             }
 
@@ -163,7 +163,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 
                 if(requiredParameterType.crossTypes(m_typeCrosser, "=", calculatedArgumentType) == ExpressionType::VOID) {
                     auto ss = std::stringstream {};
-                    ss << "Type  \"" << calculatedArgumentType << "\" is encountered while a type convertible to \"" 
+                    ss << "Type \"" << calculatedArgumentType << "\" is encountered while a type convertible to \"" 
 					<< requiredParameterType << "\" is required";
                     throw std::runtime_error(ss.str());
                 }

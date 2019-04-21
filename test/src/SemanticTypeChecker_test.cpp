@@ -179,9 +179,18 @@ TEST_CASE("[SemanticTypeChecker]") {
                     ASTFromInputSemanticTC(scriptCache, "var testReturn148 = function() { return 2543; }; var value = testReturn148(); value;", data);
                     CHECK(false);
                 } catch (std::exception& e) {
-                    CHECK(e.what() == std::string ("bad return type : expected void on function but got int on return"));
+                    CHECK(e.what() == std::string ("bad return type : expected \"void\" on function declaration but got \"int\" on return"));
                 }
             }
+
+			SUBCASE("bad custom and built-in type mix") {
+				try {
+					ASTFromInputSemanticTC(scriptCache, "var testReturn148 = function() { return { toto : 2 }; }; var value = testReturn148(); value;", data);
+					CHECK(false);
+				} catch (std::exception & e) {
+					CHECK(e.what() == std::string("bad return type : expected \"void\" on function declaration but got \"var\" on return"));
+				}
+			}
 
 			SUBCASE("bad return : not placed in direct function-constructor") {
 				try {
@@ -203,7 +212,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 					ASTFromInputSemanticTC(scriptCache, "var testIf188 = 3; if(testIf188) {}", data);
 					CHECK(false);
 				} catch (std::exception& e) {
-					CHECK(e.what() == std::string("expression condition is not a boolean (it's a int)"));
+					CHECK(e.what() == std::string("expression condition is not a boolean (it's a \"int\")"));
 				}
 			}
 
@@ -342,7 +351,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 						auto astPtr = ASTFromInputSemanticTC(scriptCache, "var var187 = 123; var187[0];", data);
 						CHECK(false);
 					} catch (std::exception& e) {
-						CHECK(std::string("expression is not an array (it's a int)") == e.what());
+						CHECK(std::string("expression is not an array (it's a \"int\")") == e.what());
 					}
 				}
 
@@ -353,7 +362,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                         CHECK(ast.size() == 2);
                         CHECK(ast[1].type() == ska::ExpressionType::INT);
                     } catch(std::exception& e) {
-                        CHECK(std::string("Unable to use operator \"*\" on types array and int") == e.what());
+                        CHECK(std::string("Unable to use operator \"*\" on types \"array\" and \"int\"") == e.what());
                     }
                 }
 
@@ -373,7 +382,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 						CHECK(ast.size() == 2);
 						CHECK(ast[1].type() == ska::Type::MakeBuiltInArray(ska::ExpressionType::INT));
 					} catch(std::exception& e) {
-						CHECK(e.what() == std::string{"Unable to use operator \"-\" on types array and string"});
+						CHECK(e.what() == std::string{"Unable to use operator \"-\" on types \"array\" and \"string\""});
 					}
 				}
 
@@ -384,7 +393,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 						CHECK(ast.size() == 2);
 						CHECK(ast[1].type() == ska::Type::MakeBuiltInArray(ska::ExpressionType::INT));
 					} catch(std::exception& e) {
-						CHECK(e.what() == std::string{"Unable to use operator \"-\" on types int and array"});
+						CHECK(e.what() == std::string{"Unable to use operator \"-\" on types \"int\" and \"array\""});
 					}
 				}
 			}
@@ -416,7 +425,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                 ASTFromInputSemanticTC(scriptCache, "var titi = function() {}; titi = 9;", data);
                 CHECK(false);
             } catch(std::exception& e) {
-                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types function and int");
+                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types \"function\" and \"int\"");
             }
         }
         
@@ -434,7 +443,7 @@ TEST_CASE("[SemanticTypeChecker]") {
                 ASTFromInputSemanticTC(scriptCache, "var titi = function(test:function) {}; titi(23);", data);
                 CHECK(false);
             } catch(std::exception& e) {
-                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types function and int");
+                CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types \"function\" and \"int\"");
             }
         }
 
@@ -443,7 +452,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				ASTFromInputSemanticTC(scriptCache, "var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.ttetetetet;", data);
 				CHECK(false);
 			} catch (std::exception& e) {
-				CHECK(std::string(e.what()) == "trying to access to an undeclared field : ttetetetet of joueur1");
+				CHECK(std::string(e.what()) == "trying to access to an undeclared field : \"ttetetetet\" of \"joueur1\"");
 			}
 		}
 
@@ -452,7 +461,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var toto = [1, 2.0];", data);
 				CHECK(false);
 			} catch (std::exception & e) {
-				CHECK(e.what() == std::string{ "array has not uniform types in it : int and float" });
+				CHECK(e.what() == std::string{ "array has not uniform types in it : \"int\" and \"float\"" });
 			}
 		}
 		
@@ -462,7 +471,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache,"var toto = [14.0, 25.0, 13.0, 2.0]; toto = toto - [1.0, 2.0];", data);
 				CHECK(false);
 			} catch (std::exception & e) {
-				CHECK(e.what() == std::string{ "Unable to use operator \"-\" on types array ( - float) and array ( - float)" });
+				CHECK(e.what() == std::string{ "Unable to use operator \"-\" on types \"array (float)\" and \"array (float)\"" });
 			}
 		}
 		
@@ -471,7 +480,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var str167 = [[0, 1], [2.0]]; str167[1]; str167[1][0];", data);
 				CHECK(false);
 			} catch (std::exception& e) {
-				CHECK(e.what() == std::string{ "array has not uniform types in it : array ( - int) and array ( - float)" });
+				CHECK(e.what() == std::string{ "array has not uniform types in it : \"array (int)\" and \"array (float)\"" });
 			}
 		}
 
@@ -498,7 +507,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				, data);
 				CHECK(false);
 			} catch (std::exception& e) {
-				CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types var and int");
+				CHECK(std::string(e.what()) == "Unable to use operator \"=\" on types \"var\" and \"int\"");
 			}
 		}
     }

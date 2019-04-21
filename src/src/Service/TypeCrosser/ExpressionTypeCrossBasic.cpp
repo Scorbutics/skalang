@@ -136,7 +136,7 @@ ska::ExpressionType ska::typedetail::ExpressionTypeCross(const std::string& op, 
 	const auto typeIdResult = (*typeMap.at(op))[static_cast<std::size_t>(type1)][static_cast<std::size_t>(type2)];
 	if (typeIdResult == 0) {
 		auto ss = std::stringstream{};
-		ss << "Unable to use operator \"" << op << "\" on types " << ExpressionTypeSTR[static_cast<std::size_t>(type1)] << " and " << ExpressionTypeSTR[static_cast<std::size_t>(type2)];
+		ss << "Unable to use operator \"" << op << "\" on types \"" << ExpressionTypeSTR[static_cast<std::size_t>(type1)] << "\" and \"" << ExpressionTypeSTR[static_cast<std::size_t>(type2)] << "\"";
 		throw std::runtime_error(ss.str());
 	}
 	
