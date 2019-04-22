@@ -1,7 +1,7 @@
 var Position = import "point";
 
-var build = function(name: string) : var {
-    var defaultPos = Position.build(0, 0);
+var Fcty = function(name: string) : var {
+    var defaultPos = Position.Fcty(0, 0);
     return {
         name : name,
         direction : 0,

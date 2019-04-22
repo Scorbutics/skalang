@@ -1,0 +1,490 @@
+[16:33:31:606][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "0 with type-node string
+[16:33:31:611][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "0" = "stringerror variant"
+[16:33:31:613][Info ](TypeBuilderParame l.0027) Parameter declaration type built for node "0" = "function DataClass (string 0 - var DataClass)"
+[16:33:31:614][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:615][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:623][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:31:624][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:31:625][Debug](MatcherFunction.c l.0117) name_
+[16:33:31:627][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "name_ with type-node string
+[16:33:31:629][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "name_" = "stringerror variant"
+[16:33:31:629][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:31:631][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:31:632][Debug](MatcherFunction.c l.0034) function read.
+[16:33:31:633][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:638][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:31:640][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:31:641][Debug](MatcherFunction.c l.0117) name_
+[16:33:31:643][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "name_ with type-node string
+[16:33:31:643][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "name_" = "stringerror variant"
+[16:33:31:644][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:31:645][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:31:646][Debug](MatcherFunction.c l.0034) function read.
+[16:33:31:647][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:650][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:658][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:31:661][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:31:664][Debug](MatcherFunction.c l.0117) name_
+[16:33:31:665][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "name_ with type-node string
+[16:33:31:667][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "name_" = "stringerror variant"
+[16:33:31:668][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:31:672][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:31:677][Debug](MatcherFunction.c l.0034) function read.
+[16:33:31:678][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:679][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:689][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:31:691][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:31:695][Debug](MatcherFunction.c l.0117) name_
+[16:33:31:697][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "name_ with type-node string
+[16:33:31:699][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "name_" = "stringerror variant"
+[16:33:31:701][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:31:702][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:31:706][Debug](MatcherFunction.c l.0034) function read.
+[16:33:31:709][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:711][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:718][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:31:718][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:31:722][Debug](MatcherFunction.c l.0117) name_
+[16:33:31:723][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "name_ with type-node string
+[16:33:31:729][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "name_" = "stringerror variant"
+[16:33:31:732][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:31:733][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:31:735][Debug](MatcherFunction.c l.0034) function read.
+[16:33:31:736][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:737][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:750][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:31:752][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:31:754][Debug](MatcherFunction.c l.0117) name_
+[16:33:31:756][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "name_ with type-node string
+[16:33:31:758][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "name_" = "stringerror variant"
+[16:33:31:759][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:31:764][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:31:767][Debug](MatcherFunction.c l.0034) function read.
+[16:33:31:768][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:769][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:775][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "0 with type-node int
+[16:33:31:777][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "0" = "interror variant"
+[16:33:31:780][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "01 with type-node string
+[16:33:31:782][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "01" = "stringerror variant"
+[16:33:31:783][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:787][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:791][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "0 with type-node int
+[16:33:31:793][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "0" = "interror variant"
+[16:33:31:797][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "0 with type-node string
+[16:33:31:799][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "0" = "stringerror variant"
+[16:33:31:801][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:802][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:805][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "0 with type-node int
+[16:33:31:810][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "0" = "interror variant"
+[16:33:31:814][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:817][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "0 with type-node int
+[16:33:31:817][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "0" = "interror variant"
+[16:33:31:822][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:828][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "0 with type-node int
+[16:33:31:836][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "0" = "interror variant"
+[16:33:31:839][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:841][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:849][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "0 with type-node int
+[16:33:31:851][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "0" = "interror variant"
+[16:33:31:854][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:858][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:860][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:930][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:31:931][Debug](MatcherFunction.c l.0151) function type detected : interror variant
+[16:33:31:934][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:31:935][Debug](MatcherFunction.c l.0034) function read.
+[16:33:31:938][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:31:943][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:31:946][Debug](MatcherFunction.c l.0117) value
+[16:33:31:947][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "value with type-node int
+[16:33:31:949][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "value" = "interror variant"
+[16:33:31:950][Debug](MatcherFunction.c l.0151) function type detected : interror variant
+[16:33:31:951][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:31:955][Debug](MatcherFunction.c l.0034) function read.
+[16:33:31:956][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:960][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:31:960][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:31:962][Debug](MatcherFunction.c l.0117) value
+[16:33:31:964][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "value with type-node int
+[16:33:31:966][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "value" = "interror variant"
+[16:33:31:967][Debug](MatcherFunction.c l.0151) function type detected : interror variant
+[16:33:31:968][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:31:969][Debug](MatcherFunction.c l.0034) function read.
+[16:33:31:970][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:971][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:974][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:31:975][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:31:976][Debug](MatcherFunction.c l.0117) value
+[16:33:31:977][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "value with type-node int
+[16:33:31:979][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "value" = "interror variant"
+[16:33:31:980][Debug](MatcherFunction.c l.0151) function type detected : interror variant
+[16:33:31:981][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:31:982][Debug](MatcherFunction.c l.0034) function read.
+[16:33:31:983][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:31:988][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:31:989][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:31:990][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:31:991][Debug](MatcherFunction.c l.0034) function read.
+[16:33:31:995][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:31:996][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:31:998][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:000][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:001][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:002][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:003][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:006][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:007][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:010][Debug](MatcherFunction.c l.0117) i
+[16:33:32:011][Info ](TypeBuilderParame l.0027) Parameter declaration type built for node "i" = "function Dummy (var Dummy)"
+[16:33:32:012][Debug](MatcherFunction.c l.0151) function type detected : interror variant
+[16:33:32:013][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:018][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:019][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:021][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:021][Debug](MatcherFunction.c l.0060) Expression null
+[16:33:32:026][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:033][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:036][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:038][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:068][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:069][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:072][Debug](MatcherFunction.c l.0117) titi
+[16:33:32:074][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:080][Debug](MatcherFunction.c l.0117) toto
+[16:33:32:081][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:082][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:083][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:086][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:086][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:088][Debug](MatcherFunction.c l.0117) titi
+[16:33:32:091][Debug](MatcherFunction.c l.0151) function type detected : interror variant
+[16:33:32:092][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:093][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:096][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:097][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:098][Debug](MatcherFunction.c l.0117) nom
+[16:33:32:100][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:102][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:103][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:118][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:119][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:120][Debug](MatcherFunction.c l.0117) nom
+[16:33:32:121][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "nom with type-node string
+[16:33:32:122][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "nom" = "stringerror variant"
+[16:33:32:124][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:125][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:127][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:130][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:131][Debug](MatcherFunction.c l.0117) degats
+[16:33:32:132][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "degats with type-node int
+[16:33:32:134][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "degats" = "interror variant"
+[16:33:32:135][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:136][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:137][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:141][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:142][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:143][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:147][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:147][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:150][Debug](MatcherFunction.c l.0117) nom
+[16:33:32:151][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "nom with type-node string
+[16:33:32:153][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "nom" = "stringerror variant"
+[16:33:32:154][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:155][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:157][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:159][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:168][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:169][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:171][Debug](MatcherFunction.c l.0117) nom
+[16:33:32:172][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "nom with type-node string
+[16:33:32:174][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "nom" = "stringerror variant"
+[16:33:32:175][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:176][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:178][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:179][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:182][Debug](MatcherFunction.c l.0117) cible
+[16:33:32:183][Info ](TypeBuilderParame l.0027) Parameter declaration type built for node "cible" = "function JoueurClass (string nom - var JoueurClass)"
+[16:33:32:185][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:186][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:187][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:188][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:189][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:193][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:194][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:200][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:201][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:203][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:204][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:205][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:206][Debug](MatcherFunction.c l.0117) degats
+[16:33:32:208][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "degats with type-node int
+[16:33:32:209][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "degats" = "interror variant"
+[16:33:32:211][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:214][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:216][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:217][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:218][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:219][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:220][Debug](MatcherFunction.c l.0117) nom
+[16:33:32:221][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "nom with type-node string
+[16:33:32:226][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "nom" = "stringerror variant"
+[16:33:32:227][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:229][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:230][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:231][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:232][Debug](MatcherFunction.c l.0117) degats
+[16:33:32:233][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "degats with type-node int
+[16:33:32:237][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "degats" = "interror variant"
+[16:33:32:239][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:240][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:242][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:249][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:251][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:254][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:255][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:256][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:261][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:262][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:264][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:265][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:266][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:267][Debug](MatcherFunction.c l.0117) degats
+[16:33:32:269][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "degats with type-node int
+[16:33:32:271][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "degats" = "interror variant"
+[16:33:32:272][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:273][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:274][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:276][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:277][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:280][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:281][Debug](MatcherFunction.c l.0117) nom
+[16:33:32:282][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "nom with type-node string
+[16:33:32:284][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "nom" = "stringerror variant"
+[16:33:32:285][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:286][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:287][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:290][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:291][Debug](MatcherFunction.c l.0117) statsDegats
+[16:33:32:294][Info ](TypeBuilderParame l.0027) Parameter declaration type built for node "statsDegats" = "function Stats (var Stats)"
+[16:33:32:296][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:297][Debug](MatcherFunction.c l.0117) test
+[16:33:32:300][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "test with type-node int
+[16:33:32:301][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "test" = "interror variant"
+[16:33:32:302][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:303][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:304][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:305][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:306][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:308][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:311][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:312][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:316][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:317][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:318][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:321][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:322][Debug](MatcherFunction.c l.0151) function type detected : interror variant
+[16:33:32:324][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:326][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:327][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:332][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:333][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:334][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:335][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:336][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:337][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:338][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:341][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:346][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:347][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:348][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:351][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:376][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:377][Debug](MatcherFunction.c l.0151) function type detected : interror variant
+[16:33:32:378][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:379][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:383][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:383][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:384][Debug](MatcherFunction.c l.0117) test
+[16:33:32:387][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "test with type-node string
+[16:33:32:388][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "test" = "stringerror variant"
+[16:33:32:391][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:392][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:393][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:394][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:399][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:400][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:401][Debug](MatcherFunction.c l.0117) test
+[16:33:32:403][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "test with type-node string
+[16:33:32:404][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "test" = "stringerror variant"
+[16:33:32:407][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:408][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:410][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:411][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:414][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:417][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:418][Debug](MatcherFunction.c l.0117) nomL
+[16:33:32:419][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "nomL with type-node string
+[16:33:32:420][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "nomL" = "stringerror variant"
+[16:33:32:421][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:423][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:424][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:427][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:431][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:432][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:433][Debug](MatcherFunction.c l.0117) nom
+[16:33:32:434][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "nom with type-node string
+[16:33:32:436][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "nom" = "stringerror variant"
+[16:33:32:439][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:441][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:443][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:445][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:451][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:452][Debug](MatcherFunction.c l.0151) function type detected : interror variant
+[16:33:32:455][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:456][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:464][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:465][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:467][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:471][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:472][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:474][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:478][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:479][Debug](MatcherFunction.c l.0151) function type detected : interror variant
+[16:33:32:482][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:485][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:486][Debug](MatcherFunction.c l.0151) function type detected : interror variant
+[16:33:32:487][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:488][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:509][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:510][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:511][Debug](MatcherFunction.c l.0117) test131
+[16:33:32:512][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "test131 with type-node string
+[16:33:32:514][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "test131" = "stringerror variant"
+[16:33:32:515][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:516][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:517][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:518][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:524][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:525][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:526][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:527][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:531][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:532][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:533][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:534][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:537][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:538][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:539][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:544][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:548][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:549][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:550][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:551][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:554][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:555][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:556][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:558][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:562][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:564][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:565][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:567][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:571][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:572][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:575][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:576][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:617][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:624][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:626][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:628][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:639][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:659][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:662][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:678][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:695][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:700][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:706][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:708][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:709][Debug](MatcherFunction.c l.0117) test
+[16:33:32:710][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "test with type-node function
+[16:33:32:712][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "test" = "functionerror variant"
+[16:33:32:713][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:716][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:717][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:718][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:723][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:724][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:726][Debug](MatcherFunction.c l.0117) nom
+[16:33:32:728][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "nom with type-node string
+[16:33:32:729][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "nom" = "stringerror variant"
+[16:33:32:730][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:731][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:732][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:733][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:746][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:747][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:748][Debug](MatcherFunction.c l.0117) nom
+[16:33:32:749][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "nom with type-node string
+[16:33:32:751][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "nom" = "stringerror variant"
+[16:33:32:752][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:753][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:754][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:755][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:758][Debug](MatcherFunction.c l.0117) cible
+[16:33:32:759][Info ](TypeBuilderParame l.0027) Parameter declaration type built for node "cible" = "function Joueur (string nom - var Joueur)"
+[16:33:32:761][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:762][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:763][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:765][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:766][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:769][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:770][Debug](MatcherFunction.c l.0057) Expression not null
+[16:33:32:778][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:779][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:780][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:781][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:784][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:784][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:785][Debug](MatcherFunction.c l.0117) test63
+[16:33:32:788][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:789][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:790][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:794][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:794][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:795][Debug](MatcherFunction.c l.0117) testParam67
+[16:33:32:798][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:800][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:801][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:802][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:803][Debug](MatcherFunction.c l.0117) blurp
+[16:33:32:804][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:805][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:806][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:810][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:813][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:814][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:815][Debug](MatcherFunction.c l.0117) test71
+[16:33:32:816][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:817][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:820][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:826][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:827][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:828][Debug](MatcherFunction.c l.0117) test90
+[16:33:32:830][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:831][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:832][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:836][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:837][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:839][Debug](MatcherFunction.c l.0117) test99
+[16:33:32:841][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:843][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:844][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:846][Debug](MatcherFunction.c l.0132) parameter detected, reading identifier : 
+[16:33:32:847][Debug](MatcherFunction.c l.0117) blurp99
+[16:33:32:850][Debug](MatcherFunction.c l.0155) void function detected
+[16:33:32:851][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:852][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:853][Debug](MatcherFunction.c l.0034) function read.
+[16:33:32:887][Debug](MatcherFunction.c l.0014) function declaration
+[16:33:32:888][Debug](MatcherFunction.c l.0151) function type detected : varerror variant
+[16:33:32:891][Debug](MatcherFunction.c l.0032) reading function body
+[16:33:32:893][Debug](MatcherFunction.c l.0034) function read.

@@ -1,0 +1,5 @@
+var Dummy = function() : var {
+	return {
+		data : 0
+	};
+};

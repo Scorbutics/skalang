@@ -8,7 +8,7 @@
 #include "Service/ASTFactory.h"
 #include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherFunction)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::MatcherFunction)
 
 ska::ASTNodePtr ska::MatcherFunction::matchDeclaration(Script& input) {
 	SLOG(ska::LogLevel::Debug) << "function declaration";
@@ -84,18 +84,25 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationParameter(Script& input) {
 		return nullptr;
 	}
 	const auto& id = input.match(TokenType::IDENTIFIER);
-	SLOG(ska::LogLevel::Debug) << id.name();
-	
-    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
-    const auto typeToken = 
-		input.expect(TokenType::RESERVED) ?
-		input.match(TokenType::RESERVED) : input.match(TokenType::IDENTIFIER);
-	const auto typeStr = typeToken.name();
 
-	SLOG(ska::LogLevel::Debug) << "type is : " << typeStr;
+    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
 	
+	auto typeNameNode = ASTNodePtr{};
+	if (input.expect(TokenType::IDENTIFIER)) {
+		auto typeNamespaceToken = input.match(TokenType::IDENTIFIER);
+		//Handles script namespace
+		auto complexTypeToken = Token{};
+		if (input.expect(TokenType::DOT_SYMBOL)) {
+			input.match(TokenType::DOT_SYMBOL);
+			complexTypeToken  = input.match(TokenType::IDENTIFIER);
+		}
+		typeNameNode = ASTFactory::MakeLogicalNode(std::move(typeNamespaceToken), complexTypeToken.empty() ? nullptr : ASTFactory::MakeLogicalNode(std::move(complexTypeToken)));
+	} else {
+		typeNameNode = ASTFactory::MakeLogicalNode(input.match(TokenType::RESERVED));
+	}
+		
 	//handle arrays
-	auto typeNode = ASTNodePtr{};
+	auto typeArrayNode = ASTNodePtr{};
 	if (input.expect(TokenType::ARRAY)) {
 		auto arrayStartToken = input.match(TokenType::ARRAY);
 		auto arrayEndToken = input.match(TokenType::ARRAY);
@@ -104,12 +111,11 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationParameter(Script& input) {
 			throw std::runtime_error("syntax error : only brackets [] are supported in a parameter declaration type");
 		}
 
-		typeNode = ASTFactory::MakeLogicalNode(typeToken, ASTFactory::MakeLogicalNode(Token{"", TokenType::ARRAY }));
-	} else {
-		typeNode = ASTFactory::MakeLogicalNode(typeToken);
+		typeArrayNode = ASTFactory::MakeLogicalNode(Token{ "", TokenType::ARRAY });
 	}
 
-	auto node = ASTFactory::MakeNode<Operator::PARAMETER_DECLARATION>(id, std::move(typeNode));
+	SLOG(ska::LogLevel::Debug) << id.name();
+	auto node = ASTFactory::MakeNode<Operator::PARAMETER_DECLARATION>(id, std::move(typeNameNode), std::move(typeArrayNode));
 	auto event = VarTokenEvent::MakeParameter(*node, (*node)[0], input);
 	m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 	return node;

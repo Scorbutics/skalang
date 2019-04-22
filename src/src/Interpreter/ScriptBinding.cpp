@@ -17,7 +17,8 @@ ska::ScriptBridge::ScriptBridge(
 	m_symbolTypeUpdater(symbolTypeUpdater),
 	m_functionBinder(typeBuilder, symbolTypeUpdater, reserved),
 	m_name(std::move(scriptName)),
-	m_script(cache, m_name + ".miniska", std::vector<Token>{}) {
+	m_script(cache, m_name + ".miniska", std::vector<Token>{}),
+	m_cache(cache) {
 	observable_priority_queue<VarTokenEvent>::addObserver(m_typeBuilder);
 	observable_priority_queue<VarTokenEvent>::addObserver(m_symbolTypeUpdater);
 	observable_priority_queue<VarTokenEvent>::addObserver(m_script.symbols());

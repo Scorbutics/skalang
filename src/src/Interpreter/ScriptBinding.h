@@ -14,7 +14,8 @@
 
 namespace ska {
     class SymbolTable;
-	
+	class StatementParser;
+
 	class ScriptBridge :
         protected observable_priority_queue<VarTokenEvent> {
 	public:
@@ -40,14 +41,20 @@ namespace ska {
 			m_bindings.push_back(m_functionBinder.bindGenericFunction(m_script, functionName, std::move(typeNames), std::move(f)));
 		}
 
+		void import(StatementParser& parser, std::vector<std::pair<std::string, std::string>> imports) {			
+			m_imports.emplace_back(m_functionBinder.import(parser, m_script, std::move(imports)));
+		}
 	
 	private:
 		TypeBuilder& m_typeBuilder;
 		SymbolTableTypeUpdater& m_symbolTypeUpdater;
 		BindingFactory m_functionBinder;
-		std::vector<BridgeMemory> m_bindings;
 		std::string m_name;
 		Script m_script;
 		ASTNodePtr m_scriptMemoryNode;
+		ScriptCache& m_cache;
+
+		std::vector<ASTNodePtr> m_imports;
+		std::vector<BridgeMemory> m_bindings;
 	};
 }

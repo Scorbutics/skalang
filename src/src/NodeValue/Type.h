@@ -13,6 +13,7 @@ namespace ska {
 	class TypeCrosser;
 
 	struct Type {
+		friend class Symbol;
 		static constexpr bool isNamed(ExpressionType type) {
 			return type == ExpressionType::FUNCTION || type == ExpressionType::OBJECT;
 		}
@@ -70,14 +71,11 @@ namespace ska {
 		ExpressionType type() const {
 			return m_type;
 		}
-
 		bool operator==(const Type& t) const;
 
 		bool hasSymbol() const {
 			return m_symbol != nullptr;
 		}
-
-		Type updateSymbol(const SymbolTable& symbols) const;
 
 		bool operator==(const ExpressionType& t) const {
 			return m_type == t;
@@ -115,20 +113,15 @@ namespace ska {
 
 	private:
 		friend class TypeCrosser;
+		bool equalIgnoreSymbol(const Type& t) const;
 		explicit Type(ExpressionType t) :
 			m_type(std::move(t)) {
 		}
 
 		Type(const Symbol* symbol, ExpressionType t);
 
-		Type(std::string symbol, ExpressionType t) :
-			m_type(t),
-			m_symbolAlias(std::move(symbol)) {
-		}
-
 		ExpressionType m_type = ExpressionType::VOID;
         const Symbol* m_symbol = nullptr;
-		std::string m_symbolAlias;
 		std::vector<Type> m_compound;
 
 		friend std::ostream& operator<<(std::ostream& stream, const Type& type);

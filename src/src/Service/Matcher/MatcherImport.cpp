@@ -33,7 +33,7 @@ ska::ASTNodePtr ska::MatcherImport::matchImport(Script& input) {
 ska::ASTNodePtr ska::MatcherImport::matchExport(Script& input) {
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::EXPORT>());
 	if (!input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>())) {
-		throw std::runtime_error("only a variable can be exported");
+		throw std::runtime_error("only a variable declaration can be exported");
 	}
 	return ASTFactory::MakeNode<Operator::EXPORT>(input.statement(m_parser));
 }

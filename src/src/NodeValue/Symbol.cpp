@@ -41,3 +41,23 @@ ska::Symbol* ska::Symbol::operator[](const std::string& fieldSymbolName) {
 std::size_t ska::Symbol::size() const {
     return m_category.compound().size();
 }
+
+bool ska::Symbol::operator==(const Symbol& sym) const {
+	
+	const auto compareData = (std::holds_alternative<ScopedSymbolTable*>(m_data) ?
+		std::holds_alternative<ScopedSymbolTable*>(sym.m_data) && std::get<ScopedSymbolTable*>(sym.m_data) == std::get<ScopedSymbolTable*>(m_data) :
+		std::holds_alternative<const ScriptHandle*>(sym.m_data) && std::get<const ScriptHandle*>(sym.m_data) == std::get<const ScriptHandle*>(m_data));
+
+	return m_name == sym.m_name && /*
+		m_category== sym.m_category */
+		
+	compareData
+		
+		;
+	
+}
+
+void ska::Symbol::forceType(Type t) {
+	m_category = t;
+	//m_category.m_symbol = this;
+}

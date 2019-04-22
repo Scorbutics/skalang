@@ -21,9 +21,7 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION
 				paramNode->type().value();
 			functionType.add(type);
 		} else {
-			auto type = paramNode->type().value() == ExpressionType::OBJECT && !paramNode->type()->hasSymbol() ?
-				paramNode->type().value().updateSymbol(script.symbols()) :
-				paramNode->type().value();
+			auto type = paramNode->type().value();
 			functionType.add(type);
 		}
 		index++;
