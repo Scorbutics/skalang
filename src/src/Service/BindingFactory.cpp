@@ -65,28 +65,8 @@ ska::ASTNodePtr ska::BindingFactory::getNodeFromTypeName(const std::string& type
 }
 
 ska::ASTNodePtr ska::BindingFactory::createImport(StatementParser& parser, ska::Script& input, Token scriptPathToken) {
-	auto importClassNameFile = scriptPathToken.name() + ".miniska";
-	auto scriptFile = std::ifstream{ importClassNameFile };
-	if (scriptFile.fail()) {
-		throw std::runtime_error("unable to find script named " + importClassNameFile);
-	}
-
-	auto nodeBlock = ska::ASTFactory::MakeNode<ska::Operator::BLOCK>();
-	auto startEvent = ska::BlockTokenEvent{ *nodeBlock, ska::BlockTokenEventType::START };
-	observable_priority_queue<ska::BlockTokenEvent>::notifyObservers(startEvent);
-
-	auto script = input.subParse(parser, importClassNameFile, scriptFile);
-
-	auto importNode = ska::ASTFactory::MakeNode<ska::Operator::IMPORT>(ska::ASTFactory::MakeLogicalNode(std::move(scriptPathToken)));
-	auto importEvent = ska::ImportTokenEvent{ *importNode, input };
-	observable_priority_queue<ska::ImportTokenEvent>::notifyObservers(importEvent);
-
-	auto endEvent = ska::BlockTokenEvent{ *importNode, ska::BlockTokenEventType::END };
-	observable_priority_queue<ska::BlockTokenEvent>::notifyObservers(endEvent);
-
-	return importNode;
+	return MatcherImport::createNewImport(parser, *this, *this, input, std::move(scriptPathToken));
 }
-
 
 ska::ASTNodePtr ska::BindingFactory::import(StatementParser& parser, Script& script, std::vector<std::pair<std::string, std::string>> imports) {
 	listen(script.symbols());
@@ -119,10 +99,6 @@ ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::strin
 	//Build the function
 	auto functionNameToken = Token{ functionName, TokenType::IDENTIFIER };
 
-	/*auto nodeBlock = ASTFactory::MakeNode<Operator::BLOCK>();
-	auto startEvent = BlockTokenEvent{ *nodeBlock, BlockTokenEventType::START };
-	observable_priority_queue<BlockTokenEvent>::notifyObservers(startEvent);
-	*/
 	auto functionNameNode = ASTFactory::MakeLogicalNode(functionNameToken);
 	auto declarationEvent = FunctionTokenEvent{ *functionNameNode, FunctionTokenEventType::DECLARATION_NAME, script, functionNameToken.name() };
 	observable_priority_queue<FunctionTokenEvent>::notifyObservers(declarationEvent);
@@ -155,11 +131,7 @@ ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::strin
 
 	auto statementEvent = FunctionTokenEvent{ *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, script, functionNameToken.name() };
 	observable_priority_queue<FunctionTokenEvent>::notifyObservers(statementEvent);
-	
-	/*auto endEvent = BlockTokenEvent{ *functionDeclarationNode, BlockTokenEventType::END };
-	observable_priority_queue<BlockTokenEvent>::notifyObservers(endEvent);*/
 
 	unlisten(script.symbols());
-
 	return functionDeclarationNode;
 }

@@ -9,8 +9,6 @@
 #include "Service/ASTFactory.h"
 #include "Interpreter/Value/Script.h"
 
-#include "Event/BlockTokenEvent.h"
-#include "Event/ImportTokenEvent.h"
 #include "Event/ScriptLinkTokenEvent.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherImport)
@@ -38,24 +36,35 @@ ska::ASTNodePtr ska::MatcherImport::matchExport(Script& input) {
 	return ASTFactory::MakeNode<Operator::EXPORT>(input.statement(m_parser));
 }
 
-ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, const Token& importNodeClass) {
+ska::ASTNodePtr ska::MatcherImport::matchNewImport(Script& input, Token importNodeClass) {
+	return createNewImport(m_parser, m_parser, m_parser, input, importNodeClass);
+}
+
+ska::ASTNodePtr ska::MatcherImport::createNewImport(
+		StatementParser& parser,
+		observable_priority_queue<ska::BlockTokenEvent>& obsBlock, 
+		observable_priority_queue<ska::ImportTokenEvent>& obsImport,
+		Script& input, 
+		Token importNodeClass) {
+
 	auto importClassNameFile = importNodeClass.name() + ".miniska";
 	auto scriptFile = std::ifstream{ importClassNameFile };
 	if (scriptFile.fail()) {
 		throw std::runtime_error("unable to find script named " + importClassNameFile);
 	}
 
-	auto nodeBlock = ASTFactory::MakeNode<Operator::BLOCK>();
-	auto startEvent = BlockTokenEvent{ *nodeBlock, BlockTokenEventType::START };
-	m_parser.observable_priority_queue<BlockTokenEvent>::notifyObservers(startEvent);
+	auto nodeBlock = ska::ASTFactory::MakeNode<ska::Operator::BLOCK>();
+	auto startEvent = ska::BlockTokenEvent{ *nodeBlock, ska::BlockTokenEventType::START };
+	obsBlock.observable_priority_queue<ska::BlockTokenEvent>::notifyObservers(startEvent);
 
-	auto script = input.subParse(m_parser, importClassNameFile, scriptFile);
+	auto script = input.subParse(parser, importClassNameFile, scriptFile);
 
-	auto importNode = ASTFactory::MakeNode<Operator::IMPORT>(ASTFactory::MakeLogicalNode(std::move(importNodeClass)));
-	auto importEvent = ImportTokenEvent{ *importNode, input };
-	m_parser.observable_priority_queue<ImportTokenEvent>::notifyObservers(importEvent);
+	auto importNode = ska::ASTFactory::MakeNode<ska::Operator::IMPORT>(ska::ASTFactory::MakeLogicalNode(std::move(importNodeClass)));
+	auto importEvent = ska::ImportTokenEvent{ *importNode, input };
+	obsImport.observable_priority_queue<ska::ImportTokenEvent>::notifyObservers(importEvent);
 
-	auto endEvent = BlockTokenEvent{ *importNode, BlockTokenEventType::END };
-	m_parser.observable_priority_queue<BlockTokenEvent>::notifyObservers(endEvent);
+	auto endEvent = ska::BlockTokenEvent{ *importNode, ska::BlockTokenEventType::END };
+	obsBlock.observable_priority_queue<ska::BlockTokenEvent>::notifyObservers(endEvent);
+
 	return importNode;
 }
