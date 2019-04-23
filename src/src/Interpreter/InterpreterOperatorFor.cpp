@@ -12,8 +12,8 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::FOR_LOOP>::interpret(Opera
 		node.parent.pushNestedMemory();
 		m_interpreter.interpret({ node.parent, node.GetStatement() });
 		m_interpreter.interpret({ node.parent, node.GetIncrement() });
-		node.parent.endNestedMemory();
+		node.parent.popNestedMemory();
 	}	
-	node.parent.endNestedMemory();
+	node.parent.popNestedMemory();
 	return {};
 }

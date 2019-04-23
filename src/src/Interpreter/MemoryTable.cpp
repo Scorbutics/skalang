@@ -13,8 +13,13 @@ ska::MemoryTablePtr& ska::MemoryTable::pushNested() {
 }
 
 void ska::MemoryTable::endNested() {
-	//TODO : a remettre, pour le moment bloque le systeme d'import de script
-	//m_current->m_memory.clear();
+	//TODO : devrait être systématiquement un "popNested" sauf pour le cas d'un block type "root script" ?
+	
+	/*
+	if(!isOrphan()) {
+		popNested();
+	}
+	*/
 }
 
 ska::MemoryTable* ska::MemoryTable::popNested() {

@@ -16,7 +16,6 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>::build(
 		//Object case		
 		const Symbol* symbolType = nullptr;
 		
-		//TODO : passer par un operator field access ?
 		auto& symbols = script.symbols();
 		if (type.size() == 1) {
 			const auto* importedScriptSymbol = symbols[type.name()];
