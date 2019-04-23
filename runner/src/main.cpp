@@ -40,13 +40,15 @@ int main(int argc, char* argv[]) {
 	
 	auto scriptCharacterBinding = ska::ScriptBridge{ scriptCache, "character_generator", typeBuilder, symbolsTypeUpdater, reservedKeywords };
 	scriptCharacterBinding.import(parser, { {"Character", "character"} });
-	scriptCharacterBinding.bindGenericFunction("Gen", { "Character::Fcty", "void" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
-		auto& mem = params[0].nodeval<ska::ObjectMemory>();
-		*(*mem)["name"].first = "Toto !";
-		auto& pos = (*mem)["pos"].first->nodeval<ska::ObjectMemory>();
-		*(*pos)["x"].first = 14;
-		*(*pos)["y"].first = 5;
-		return ska::NodeValue{};
+	scriptCharacterBinding.bindGenericFunction("Gen", { "Character::Fcty" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+		auto mem = ska::MemoryTable::create();
+		mem->emplace("name", "Toto !");
+		mem->emplace("direction", 0);
+		auto pos = ska::MemoryTable::create();
+		mem->emplace("pos", pos);
+		pos->emplace("x", 134);
+		pos->emplace("y", 547);
+		return ska::NodeValue{ mem };
 	}));
 	scriptCharacterBinding.build();
 	
@@ -62,7 +64,7 @@ int main(int argc, char* argv[]) {
 	scriptBinding.build();
 
 	auto executor = ska::Script{ scriptCache, "main", ska::Tokenizer{ reservedKeywords, 
-	"var Player = import \"" + std::string{argv[1]} +"\"; var Character = import \"character\"; var CharacterGenerator = import \"character_generator\"; var c = Character.Fcty(\"test\"); CharacterGenerator.Gen(c); Player.run(c);"
+	"var Player = import \"" + std::string{argv[1]} + "\"; var CharacterGenerator = import \"character_generator\"; Player.run(CharacterGenerator.Gen());"
 	}.tokenize() };
 
 	try {

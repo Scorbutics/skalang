@@ -24,6 +24,7 @@ namespace ska {
 		std::vector<ASTNodePtr> fillDeclarationParameters(Script& input);
 		ASTNodePtr matchDeclarationReturnType(Script& input);
 		ASTNodePtr matchDeclarationParameter(Script& input);
+		ASTNodePtr matchTypeNode(Script& input);
 
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		StatementParser& m_parser;

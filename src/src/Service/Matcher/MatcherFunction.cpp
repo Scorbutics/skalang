@@ -78,6 +78,26 @@ ska::ASTNodePtr ska::MatcherFunction::matchCall(Script& input, ASTNodePtr identi
 	return functionCallNode;
 }
 
+ska::ASTNodePtr ska::MatcherFunction::matchTypeNode(Script& input) {
+	const auto& typeDelimiterToken = m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>();
+
+	auto typeNameNode = ASTNodePtr{};
+	if (input.expect(TokenType::IDENTIFIER)) {
+		auto typeNamespaceToken = input.match(TokenType::IDENTIFIER);
+		//Handles script namespace
+		auto complexTypeToken = Token{};
+		if (input.expect(typeDelimiterToken)) {
+			input.match(typeDelimiterToken);
+			input.match(typeDelimiterToken);
+			complexTypeToken = input.match(TokenType::IDENTIFIER);
+		}
+		typeNameNode = ASTFactory::MakeLogicalNode(std::move(typeNamespaceToken), complexTypeToken.empty() ? nullptr : ASTFactory::MakeLogicalNode(std::move(complexTypeToken)));
+	} else {
+		typeNameNode = ASTFactory::MakeLogicalNode(input.match(TokenType::RESERVED));
+	}
+	return typeNameNode;
+}
+
 ska::ASTNodePtr ska::MatcherFunction::matchDeclarationParameter(Script& input) {
 	const auto isRightParenthesis = input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 	if(isRightParenthesis) {
@@ -88,20 +108,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationParameter(Script& input) {
 	const auto& typeDelimiterToken = m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>();
     input.match(typeDelimiterToken);
 	
-	auto typeNameNode = ASTNodePtr{};
-	if (input.expect(TokenType::IDENTIFIER)) {
-		auto typeNamespaceToken = input.match(TokenType::IDENTIFIER);
-		//Handles script namespace
-		auto complexTypeToken = Token{};
-		if (input.expect(typeDelimiterToken)) {
-			input.match(typeDelimiterToken);
-			input.match(typeDelimiterToken);
-			complexTypeToken  = input.match(TokenType::IDENTIFIER);
-		}
-		typeNameNode = ASTFactory::MakeLogicalNode(std::move(typeNamespaceToken), complexTypeToken.empty() ? nullptr : ASTFactory::MakeLogicalNode(std::move(complexTypeToken)));
-	} else {
-		typeNameNode = ASTFactory::MakeLogicalNode(input.match(TokenType::RESERVED));
-	}
+	auto typeNameNode = matchTypeNode(input);
 		
 	//handle arrays
 	auto typeArrayNode = ASTNodePtr{};
@@ -149,9 +156,9 @@ std::vector<ska::ASTNodePtr> ska::MatcherFunction::fillDeclarationParameters(Scr
 ska::ASTNodePtr ska::MatcherFunction::matchDeclarationReturnType(Script& input) {
 	if (input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>())) {
 		input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
-		const auto type = input.match(TokenType::RESERVED);
-		SLOG(ska::LogLevel::Debug) << "function type detected : " << type;
-		return ASTFactory::MakeLogicalNode(type);
+		auto typeNode = matchTypeNode(input);
+		SLOG(ska::LogLevel::Debug) << "function type detected : " << typeNode->name();
+		return typeNode;
 	} 
 
 	SLOG(ska::LogLevel::Debug) << "void function detected";

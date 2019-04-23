@@ -178,4 +178,26 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			CHECK(e.what() == std::string("the variable \"Dummy\" is not registered as an object but as a \"function Dummy (var Dummy)\""));
 		}
 	}
+
+	SUBCASE("return a concrete custom type") {
+		ASTFromInputSemanticComplexTC(scriptCache,
+			"var lvalFunc185 = function() : var {"
+			"return { test : 14 };"
+			"};"
+			"var lvalFunc188 = function() : lvalFunc185 {"
+			"return lvalFunc185();"
+			"};"
+			"var object = lvalFunc188();"
+			"object.test = 1234;", data);
+	}
+
+	SUBCASE("return a concrete custom type with namespace") {
+		ASTFromInputSemanticComplexTC(scriptCache,
+			"var Character = import \"../test/src/resources/character\";"
+			"var lvalFunc188 = function() : Character::build {"
+				"return Character.build(\"t\");"
+			"};"
+			"var object = lvalFunc188();"
+			"object.age = 1234;", data);
+	}
 }
