@@ -91,6 +91,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationParameter(Script& input) {
 	if (input.expect(TokenType::IDENTIFIER)) {
 		auto typeNamespaceToken = input.match(TokenType::IDENTIFIER);
 		//Handles script namespace
+		//TODO : passer par un node field access (expression) ?
 		auto complexTypeToken = Token{};
 		if (input.expect(TokenType::DOT_SYMBOL)) {
 			input.match(TokenType::DOT_SYMBOL);

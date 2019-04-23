@@ -166,7 +166,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 				"object = lvalFunc163();", data);
 			CHECK(false);
 		} catch (std::exception & e) {
-			CHECK(e.what() == std::string("The symbol \"object\" has already been declared as var lvalFunc160 but is now wanted to be var lvalFunc163"));
+			CHECK(e.what() == std::string("The symbol \"object\" has already been declared as \"var lvalFunc160\" but is now wanted to be \"var lvalFunc163\""));
 		}
 	}
 

@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 		std::cout << value << std::endl;
 	}));
 	
-	scriptBinding.bindGenericFunction("print", { "Dummy.Dummy", "void" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+	scriptBinding.bindGenericFunction("print", { "Dummy.Fcty", "void" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 		auto& mem = params[0].nodeval<ska::ObjectMemory>();
 		auto data = (*mem)["data"];
 		std::cout << data.first->convertString() << std::endl;

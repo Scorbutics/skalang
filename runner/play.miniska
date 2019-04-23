@@ -12,7 +12,7 @@ var totoTest = function(c: Bite) {
 	c.data = "1234";
 };
 
-totoTest(scorbutics);
+totoTest(Bite());
 
 var Runner = import "runner_lib";
 Runner.printInt(scorbutics.pos.x);
