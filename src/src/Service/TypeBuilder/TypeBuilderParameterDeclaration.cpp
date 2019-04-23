@@ -6,44 +6,48 @@
 #include "Service/SymbolTable.h"
 #include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>)
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>::build(const Script& script, OperateOn node) {
     
-    const auto typeStr = node.GetTypeValueNode().name();
-
-	auto type = Type{};
-    if (ExpressionTypeMap.find(typeStr) == ExpressionTypeMap.end()) {
-		//Object case
-        /*if (typeStr != "var") {
-            throw std::runtime_error("unknown type detected as function parameter : " + typeStr);
-        }*/
+    const auto& type = node.GetTypeValueNode();
+	auto result = Type{};
+    if (type.size() == 1 || ExpressionTypeMap.find(type.name()) == ExpressionTypeMap.end()) {
+		//Object case		
+		const Symbol* symbolType = nullptr;
+		
 		auto& symbols = script.symbols();
-		const auto symbolType = symbols[typeStr];
-		SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node.GetVariableName() << "\" = \"" << (symbolType != nullptr ? symbolType->getType() : Type{}) << "\"";
-		if (symbolType != nullptr) {
-			type = Type::MakeCustom<ExpressionType::OBJECT>(symbolType);
+		if (type.size() == 1) {
+			const auto* importedScriptSymbol = symbols[type.name()];
+			symbolType = importedScriptSymbol == nullptr ? nullptr : (importedScriptSymbol->getType())[type[0].name()];
 		} else {
-			type = Type::MakeCustom<ExpressionType::OBJECT>(typeStr);
+			symbolType = symbols[type.name()];
 		}
+
+		SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node.GetVariableName() << "\" = \"" << (symbolType != nullptr ? symbolType->getType() : Type{}) << "\"";
+		if (symbolType == nullptr) {
+			throw std::runtime_error("undeclared custom type \"" + (type.size() == 1 ? type.name() + "." + type[0].name() : type.name()) + "\"");
+		}
+		
+		result = Type::MakeCustom<ExpressionType::OBJECT>(symbolType);	
    } else { 
 	   //Built-in case
-       SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type calculating for node \"" << node.GetVariableName() << " with type-node " << typeStr;
-	   type = ExpressionTypeMap.at(node.GetTypeValueNode().name());
+       SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type calculating for node \"" << node.GetVariableName() << " with type-node " << type.name();
+	   result = ExpressionTypeMap.at(node.GetTypeValueNode().name());
 
 	   auto& symbols = script.symbols();
 	   const auto symbolType = symbols[node.GetVariableName()];
 	   if (symbolType != nullptr) {
-		   type = Type::MakeBuiltIn(type.type(), symbolType);
+		   result = Type::MakeBuiltIn(result.type(), symbolType);
 	   }
        SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>) << "Parameter declaration type built for node \"" << node.GetVariableName() << "\" = \"" << type << "\""; 
    }
 
 	//handles arrays
-	if (node.GetTypeValueNode().size() == 1) {
-		type = Type::MakeBuiltIn<ExpressionType::ARRAY>().add(type);
+	if (node.GetTypeArrayNode() != nullptr) {
+		result = Type::MakeBuiltIn<ExpressionType::ARRAY>().add(result);
 	}
 
-	return type;
+	return result;
 }
 

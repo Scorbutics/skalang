@@ -126,6 +126,148 @@ TEST_CASE("[Interpreter Script]") {
 		CHECK(testStr == "titito");
 	}
 
+	SUBCASE("C++ script-function binding generic form, complex object") {
+		ASTFromInputSemanticTCInterpreterScriptNoParse("var User295 = import \"binding295\"; var DataClassImp = import \"dataclass_script\"; var data = DataClassImp.DataClass(\"JeanMi\"); User295.funcTest(data);", data);
+		auto test = 0;
+		std::string name;
+
+		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
+		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+			auto mem = params[0].nodeval<std::string>();
+			auto result = ska::MemoryTable::create();
+			result->emplace("id", 1234);
+			result->emplace("name", std::move(mem));
+			return ska::NodeValue{ std::move(result) };
+		}));
+		scriptBindingDataClass.build();
+
+		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding295", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
+		scriptBinding.import(*data.parser, { { "DataClassScript", "dataclass_script" } });
+		scriptBinding.bindGenericFunction("funcTest", { "DataClassScript::DataClass", "void" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+			auto mem = params[0].nodeval<ska::ObjectMemory>();
+			auto* idMap = (*mem)("id").first;
+			auto* nameMap = (*mem)("name").first;
+			test = idMap->nodeval<int>();
+			name = nameMap->nodeval<std::string>();
+			return ska::NodeValue{};
+		}));
+		scriptBinding.build();
+
+		readerIS->parse(*data.parser);
+		data.interpreter->script(*readerIS);
+		CHECK(test == 1234);
+		CHECK(name == "JeanMi");
+	}
+
+	SUBCASE("C++ -> miniska script-function binding generic") {
+		ASTFromInputSemanticTCInterpreterScriptNoParse(
+		"var DataClassImp = import \"dataclass_script\";"
+		"var funcTest = function(dummy: DataClassImp::DataClass) { };"
+		"var data = DataClassImp.DataClass(\"JeanMi\");"
+		"funcTest(data);", data);
+		auto test = 0;
+		std::string name;
+
+		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
+		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+			auto mem = params[0].nodeval<std::string>();
+			auto result = ska::MemoryTable::create();
+			result->emplace("id", 1234);
+			result->emplace("name", std::move(mem));
+			return ska::NodeValue{ std::move(result) };
+		}));
+		scriptBindingDataClass.build();
+
+		readerIS->parse(*data.parser);
+		data.interpreter->script(*readerIS);
+	}
+
+	//TODO move those tests in semantic check side
+	//TODO fix ?
+	SUBCASE("[fail] C++ -> miniska script-function binding generic : use field defined C++ side") {
+		ASTFromInputSemanticTCInterpreterScriptNoParse(
+		"var DataClassImp = import \"dataclass_script\";"
+		"var funcTest = function(dummy: DataClassImp::DataClass) { dummy.id; };"
+		"var data = DataClassImp.DataClass(\"JeanMi\");"
+		"funcTest(data);", data);
+		auto test = 0;
+		std::string name;
+
+		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
+		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+			auto mem = params[0].nodeval<std::string>();
+			auto result = ska::MemoryTable::create();
+			result->emplace("id", 1234);
+			result->emplace("name", std::move(mem));
+			return ska::NodeValue{ std::move(result) };
+		}));
+		scriptBindingDataClass.build();
+
+		try {
+			readerIS->parse(*data.parser);
+			data.interpreter->script(*readerIS);
+			CHECK(false);
+		} catch (std::exception& e) {
+			CHECK(std::string{e.what()} == "trying to access to an undeclared field : \"id\" of \"dummy\"");
+		}
+	}
+
+	SUBCASE("[fail] (bad namespace) C++ -> miniska script-function binding generic") {
+		ASTFromInputSemanticTCInterpreterScriptNoParse(
+		"var DataClassImp = import \"dataclass_script\";"
+		"var funcTest = function(dummy: DataClassImpTutu::DataClass) { };"
+		"var data = DataClassImp.DataClass(\"JeanMi\");"
+		"funcTest(data);", data);
+		auto test = 0;
+		std::string name;
+
+		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
+		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+			auto mem = params[0].nodeval<std::string>();
+			auto result = ska::MemoryTable::create();
+			result->emplace("id", 1234);
+			result->emplace("name", std::move(mem));
+			return ska::NodeValue{ std::move(result) };
+		}));
+		scriptBindingDataClass.build();
+
+		try {
+			readerIS->parse(*data.parser);
+			data.interpreter->script(*readerIS);
+			CHECK(false);
+		} catch (std::exception& e) {
+			CHECK(std::string{e.what()} == "undeclared custom type \"DataClassImpTutu.DataClass\"");
+		}
+	}
+
+	SUBCASE("[fail] (bad class name in namespace) C++ -> miniska script-function binding generic") {
+		ASTFromInputSemanticTCInterpreterScriptNoParse(
+		"var DataClassImp = import \"dataclass_script\";"
+		"var funcTest = function(dummy: DataClassImp::DataClassImddf) { };"
+		"var data = DataClassImp.DataClass(\"JeanMi\");"
+		"funcTest(data);", data);
+		auto test = 0;
+		std::string name;
+
+		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
+		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+			auto mem = params[0].nodeval<std::string>();
+			auto result = ska::MemoryTable::create();
+			result->emplace("id", 1234);
+			result->emplace("name", std::move(mem));
+			return ska::NodeValue{ std::move(result) };
+		}));
+		scriptBindingDataClass.build();
+
+		try {
+			readerIS->parse(*data.parser);
+			data.interpreter->script(*readerIS);
+			CHECK(false);
+		} catch (std::exception& e) {
+			CHECK(std::string{e.what()} == "undeclared custom type \"DataClassImp.DataClassImddf\"");
+		}
+	}
+
 	SUBCASE("C++ script-function binding with void return") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse("var User264 = import \"binding264\"; User264.funcTest(14);", data);
 		auto test = 0;
@@ -155,28 +297,6 @@ TEST_CASE("[Interpreter Script]") {
 		readerIS->parse(*data.parser);
 		data.interpreter->script(*readerIS);
 		CHECK(test == 10);
-	}
-
-	SUBCASE("C++ script-function binding generic form, complex object") {
-		ASTFromInputSemanticTCInterpreterScriptNoParse("var User295 = import \"binding295\"; var DataClass = function(name: string) : var { return { id : 1234, name : name }; }; var data = DataClass(\"JeanMi\"); User295.funcTest(data);", data);
-		auto test = 0;
-		std::string name;
-
-		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding295", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBinding.bindGenericFunction("funcTest", { "DataClass", "void" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
-			auto mem = params[0].nodeval<ska::ObjectMemory>();
-			auto* idMap = (*mem)("id").first;
-			auto* nameMap = (*mem)("name").first;
-			test = idMap->nodeval<int>();
-			name = nameMap->nodeval<std::string>();
-			return ska::NodeValue{};
-		}));
-		scriptBinding.build();
-
-		readerIS->parse(*data.parser);
-		data.interpreter->script(*readerIS);
-		CHECK(test == 1234);
-		CHECK(name == "JeanMi");
 	}
 
 	SUBCASE("2 outside scripts from file, with C++ bridging") {

@@ -206,9 +206,9 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
         if(newTokenType == ExpressionType::VOID) {
             const auto expressionTypeIndex = tokenNodeExpressionType;
 			auto ss = std::stringstream{};
-			ss << "The symbol \"" << name << "\" has already been declared as " <<
-				type << " but is now wanted to be " <<
-				expressionTypeIndex;
+			ss << "The symbol \"" << name << "\" has already been declared as \"" <<
+				type << "\" but is now wanted to be \"" <<
+				expressionTypeIndex << "\"";
 			throw std::runtime_error(ss.str());		
         }
 

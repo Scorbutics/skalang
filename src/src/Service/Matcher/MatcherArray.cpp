@@ -62,7 +62,6 @@ ska::ASTNodePtr ska::MatcherArray::match(Script& input, ExpressionStack& operand
 		if (input.canReadPrevious(1)) {
 			auto lastToken = input.readPrevious(1);
 			const auto& value = std::get<std::string>(lastToken.content());
-			//TODO : handle multi dimensional arrays
 			if (value != "=") {
 				auto arrayNode = operands.popOperandIfNoOperator(isDoingOperation);
 				if (arrayNode != nullptr) {

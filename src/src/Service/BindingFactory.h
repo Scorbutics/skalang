@@ -10,21 +10,25 @@
 #include "Event/VarTokenEvent.h"
 #include "Event/FunctionTokenEvent.h"
 #include "Event/BlockTokenEvent.h"
+#include "Event/ImportTokenEvent.h"
 #include "Event/ScriptLinkTokenEvent.h"
 #include "Container/sorted_observable.h"
+#include "Interpreter/ScriptCache.h"
 
 namespace ska {
 	class SymbolTable;
 	class TypeBuilder;
 	class SymbolTableTypeUpdater;
 	struct ReservedKeywordsPool;
+	class StatementParser;
 
 	//http://coliru.stacked-crooked.com/a/8efdf80ac4082e22
 	class BindingFactory :
 		public observable_priority_queue<VarTokenEvent>,
 		public observable_priority_queue<FunctionTokenEvent>,
 		public observable_priority_queue<BlockTokenEvent>,
-		public observable_priority_queue<ScriptLinkTokenEvent> {
+		public observable_priority_queue<ScriptLinkTokenEvent>,
+		public observable_priority_queue<ImportTokenEvent> {
 	public:
 		BindingFactory(TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
 		virtual ~BindingFactory();
@@ -43,8 +47,10 @@ namespace ska {
 			return result;
 		}
 
+		ASTNodePtr import(StatementParser& parser, Script& script, std::vector<std::pair<std::string, std::string>> imports);
+
 	private:
-		Token getTokenFromTypeName(const std::string& typeName);
+		ASTNodePtr getNodeFromTypeName(const std::string& typeName);
 		void unlisten(SymbolTable& symbolTable);
 		void listen(SymbolTable& symbolTable);
 
@@ -119,6 +125,7 @@ namespace ska {
 		}
 
 		ASTNodePtr bindSymbol(Script& script, const std::string& functionName, std::vector<std::string> typeNames);
+		ASTNodePtr createImport(StatementParser& parser, Script& script, Token scriptPathToken);
 
 		TypeBuilder& m_typeBuilder;
 		SymbolTableTypeUpdater& m_symbolTypeUpdater;

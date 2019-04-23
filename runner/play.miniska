@@ -1,7 +1,18 @@
 var Character = import "character";
-
-var scorbutics = Character.build("Scorbutics");
+var scorbutics = Character.Fcty("Scorbutics");
 scorbutics.pos.x = 15;
+
+var Bite = function(): var {
+	return {
+		data : "toto"
+	};
+};
+
+var totoTest = function(c: Bite) {
+	c.data = "1234";
+};
+
+totoTest(Bite());
 
 var Runner = import "runner_lib";
 Runner.printInt(scorbutics.pos.x);

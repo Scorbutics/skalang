@@ -1,4 +1,6 @@
 #include <functional>
+#include <fstream>
+#include "Service/Tokenizer.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Interpreter/Value/Script.h"
 #include "Config/LoggerConfigLang.h"
@@ -7,6 +9,7 @@
 #include "Service/SymbolTableTypeUpdater.h"
 #include "ASTFactory.h"
 #include "BindingFactory.h"
+#include "Matcher/MatcherImport.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::BindingFactory)
 
@@ -17,7 +20,7 @@ ska::BindingFactory::BindingFactory(TypeBuilder& typeBuilder, SymbolTableTypeUpd
 	observable_priority_queue<VarTokenEvent>::addObserver(m_typeBuilder);
 	observable_priority_queue<FunctionTokenEvent>::addObserver(m_typeBuilder);
 	observable_priority_queue<ScriptLinkTokenEvent>::addObserver(m_typeBuilder);
-
+	
 	observable_priority_queue<VarTokenEvent>::addObserver(m_symbolTypeUpdater);
 }
 
@@ -26,6 +29,7 @@ void ska::BindingFactory::listen(SymbolTable& symbolTable) {
 	observable_priority_queue<FunctionTokenEvent>::addObserver(symbolTable);
 	observable_priority_queue<BlockTokenEvent>::addObserver(symbolTable);
 	observable_priority_queue<ScriptLinkTokenEvent>::addObserver(symbolTable);
+	observable_priority_queue<ImportTokenEvent>::addObserver(symbolTable);
 }
 
 void ska::BindingFactory::unlisten(SymbolTable& symbolTable) {
@@ -33,6 +37,7 @@ void ska::BindingFactory::unlisten(SymbolTable& symbolTable) {
 	observable_priority_queue<BlockTokenEvent>::removeObserver(symbolTable);
 	observable_priority_queue<FunctionTokenEvent>::removeObserver(symbolTable);
 	observable_priority_queue<VarTokenEvent>::removeObserver(symbolTable);
+	observable_priority_queue<ImportTokenEvent>::removeObserver(symbolTable);
 }
 
 ska::BindingFactory::~BindingFactory() {
@@ -43,11 +48,50 @@ ska::BindingFactory::~BindingFactory() {
 	observable_priority_queue<VarTokenEvent>::removeObserver(m_typeBuilder);
 }
 
-ska::Token ska::BindingFactory::getTokenFromTypeName(const std::string& typeName) {
+ska::ASTNodePtr ska::BindingFactory::getNodeFromTypeName(const std::string& typeName) {
 	if (m_reserved.pool.find(typeName) != m_reserved.pool.end()) {
-		return m_reserved.pool.at(typeName).token;
+		return ASTFactory::MakeLogicalNode(m_reserved.pool.at(typeName).token);
 	}
-	return Token{ typeName, TokenType::IDENTIFIER };
+
+	const auto& typeDelimiterToken = m_reserved.pattern<TokenGrammar::TYPE_DELIMITER>();
+	const auto splitSymbol = typeName.find_last_of(std::get<std::string>(typeDelimiterToken.content()));
+	if (splitSymbol != std::string::npos) {
+		//Handles script namespace
+		auto typeNamespaceToken = Token{ typeName.substr(0, splitSymbol - 1), TokenType::IDENTIFIER };
+		auto typeFieldToken = Token{ typeName.substr(splitSymbol + 1), TokenType::IDENTIFIER };
+		return ASTFactory::MakeLogicalNode(std::move(typeNamespaceToken), ASTFactory::MakeLogicalNode(std::move(typeFieldToken)));
+	}
+
+	return ASTFactory::MakeLogicalNode(Token{ typeName, TokenType::IDENTIFIER });
+}
+
+ska::ASTNodePtr ska::BindingFactory::createImport(StatementParser& parser, ska::Script& input, Token scriptPathToken) {
+	return MatcherImport::createNewImport(parser, *this, *this, input, std::move(scriptPathToken));
+}
+
+ska::ASTNodePtr ska::BindingFactory::import(StatementParser& parser, Script& script, std::vector<std::pair<std::string, std::string>> imports) {
+	listen(script.symbols());
+	auto result = std::vector<ASTNodePtr> {};
+	for (const auto& scriptImporter : imports) {
+		auto importClassNameFile = scriptImporter.second + ".miniska";	
+		auto scriptLinkNode = ASTFactory::MakeNode<Operator::SCRIPT_LINK>(ASTFactory::MakeLogicalNode(Token{ importClassNameFile, TokenType::STRING }, ASTFactory::MakeEmptyNode()));
+		auto scriptLinkEvent = ScriptLinkTokenEvent{ *scriptLinkNode, importClassNameFile, script };
+		observable_priority_queue<ScriptLinkTokenEvent>::notifyObservers(scriptLinkEvent);
+
+		auto varNode = ASTNodePtr{};
+		if (scriptLinkNode->type() == ExpressionType::VOID) {
+			auto importNode = createImport(parser, script, Token{ std::move(scriptImporter.second), TokenType::STRING });
+			varNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(Token{ std::move(scriptImporter.first), TokenType::IDENTIFIER }, std::move(importNode));
+		} else {
+			varNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(Token{ std::move(scriptImporter.first), TokenType::IDENTIFIER }, std::move(scriptLinkNode));
+		}
+
+		auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_DECLARATION>(*varNode, script);
+		observable_priority_queue<VarTokenEvent>::notifyObservers(event);
+		result.emplace_back(std::move(varNode));
+	}
+	unlisten(script.symbols());
+	return ASTFactory::MakeNode<Operator::BLOCK>(std::move(result));
 }
 
 ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::string& functionName, std::vector<std::string> typeNames) {
@@ -55,10 +99,6 @@ ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::strin
 
 	//Build the function
 	auto functionNameToken = Token{ functionName, TokenType::IDENTIFIER };
-
-	auto nodeBlock = ASTFactory::MakeNode<Operator::BLOCK>();
-	auto startEvent = BlockTokenEvent{ *nodeBlock, BlockTokenEventType::START };
-	observable_priority_queue<BlockTokenEvent>::notifyObservers(startEvent);
 
 	auto functionNameNode = ASTFactory::MakeLogicalNode(functionNameToken);
 	auto declarationEvent = FunctionTokenEvent{ *functionNameNode, FunctionTokenEventType::DECLARATION_NAME, script, functionNameToken.name() };
@@ -69,13 +109,13 @@ ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::strin
 	auto ss = std::stringstream{};
 	for (auto index = 0u; index < typeNames.size(); index++) {
 		ss << index;
-		auto t = getTokenFromTypeName(typeNames[index]);
+		auto t = getNodeFromTypeName(typeNames[index]);
 		if (index == typeNames.size() - 1) {
-			parameters.push_back(ASTFactory::MakeLogicalNode(std::move(t)));
+			parameters.push_back(std::move(t));
 		} else {
 			auto parameter = ASTFactory::MakeNode<Operator::PARAMETER_DECLARATION>(
 				Token{ ss.str(), TokenType::IDENTIFIER },
-				ASTFactory::MakeLogicalNode(std::move(t)));
+				std::move(t));
 			auto event = VarTokenEvent::MakeParameter(*parameter, (*parameter)[0], script);
 			observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 			parameters.push_back(std::move(parameter));
@@ -92,11 +132,7 @@ ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::strin
 
 	auto statementEvent = FunctionTokenEvent{ *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, script, functionNameToken.name() };
 	observable_priority_queue<FunctionTokenEvent>::notifyObservers(statementEvent);
-	
-	auto endEvent = BlockTokenEvent{ *functionDeclarationNode, BlockTokenEventType::END };
-	observable_priority_queue<BlockTokenEvent>::notifyObservers(endEvent);
 
 	unlisten(script.symbols());
-
 	return functionDeclarationNode;
 }

@@ -1,0 +1,5 @@
+var Fcty = function() : var {
+	return {
+		data : 0
+	};
+};

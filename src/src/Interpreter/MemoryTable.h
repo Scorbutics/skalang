@@ -71,6 +71,10 @@ namespace ska {
 			m_parent(parent) {
 		}
 
+		bool isOrphan() const {
+			return m_parent == nullptr;
+		}
+
 		MemoryCLValue inMemoryFind(const std::string& key) const {
 			const auto valueIt = m_memory.find(key);
 			if (valueIt == m_memory.end()) {

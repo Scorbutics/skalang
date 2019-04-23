@@ -69,9 +69,7 @@ namespace ska {
                 return m_category;
             }
 
-			void forceType(Type t) {
-				m_category = t;
-			}
+			void forceType(Type t);
 
             bool empty() const {
                 return m_category.compound().empty();
@@ -81,6 +79,12 @@ namespace ska {
             Symbol* operator[](const std::string& fieldSymbolName);
 
             std::size_t size() const;
+
+			bool operator==(const Symbol& sym) const;
+
+			bool operator!=(const Symbol& sym) const {
+				return !(*this == sym);
+			}
 
         private:
 			std::variant<ScopedSymbolTable*, const ScriptHandle* > m_data = static_cast<ScopedSymbolTable*>(nullptr);

@@ -23,4 +23,6 @@ TypeBuilderLogError.txt
 **/TypeBuilderLogError.txt
 **/Log.txt
 Log.txt
+LogError.txt
+**/LogError.txt
 .vscode
