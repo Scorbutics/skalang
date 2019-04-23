@@ -1,4 +1,4 @@
-export var build = function (name_: string) : var {
+var build = function (name_: string) : var {
 	var age = 10;
 	return {
 		age : age,
@@ -8,4 +8,4 @@ export var build = function (name_: string) : var {
 
 var defaultStr = "Default";
 
-export var default = build(defaultStr);
+var default = build(defaultStr);

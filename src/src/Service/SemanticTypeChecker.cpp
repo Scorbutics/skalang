@@ -151,7 +151,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
                 auto ss = std::stringstream {};
                 ss << "bad function call : the function \"" << functionFullRequiredType << "\" needs " 
 				<< functionRequiredTypeParameterSize << " parameters but is being called with " << callNodeParameterSize 
-				<< " parameters (function type is \"" << functionFullRequiredType << "\")";
+				<< " parameters";
                 throw std::runtime_error(ss.str());
             }
 

@@ -26,15 +26,16 @@ namespace ska {
 		ska::Operation<ska::Operator::FUNCTION_DECLARATION>& operateOnFunctionDeclaration,
 		ska::Operation<ska::Operator::FUNCTION_CALL>& node) {
 
+		auto parametersValues = InterpreterOperationFunctionCallExecuteFunctionFromCallParameters(interpreter, operateOnFunctionDeclaration, node);
+		auto index = 0u;
+		auto& functionPrototype = operateOnFunctionDeclaration.GetFunctionPrototype();
+
 		//Centers memory on the current function scope
 		auto currentExecutionMemoryZone = node.parent.pointMemoryTo(memoryForFunctionExecution);
 
 		//Creates function-memory environment scope (including creation of parameters)
 		node.parent.pushNestedMemory();
 
-		auto parametersValues = InterpreterOperationFunctionCallExecuteFunctionFromCallParameters(interpreter, operateOnFunctionDeclaration, node);
-		auto index = 0u;
-		auto& functionPrototype = operateOnFunctionDeclaration.GetFunctionPrototype();
 		for (auto& parameterValue : parametersValues) {
 			auto& functionParameter = functionPrototype[index++];
 			node.parent.putMemory(functionParameter.name(), std::move(parameterValue));

@@ -50,7 +50,7 @@ ska::ASTNodePtr ska::MatcherImport::createNewImport(
 	auto importClassNameFile = importNodeClass.name() + ".miniska";
 	auto scriptFile = std::ifstream{ importClassNameFile };
 	if (scriptFile.fail()) {
-		throw std::runtime_error("unable to find script named " + importClassNameFile);
+		throw std::runtime_error("unable to find script named \"" + importClassNameFile + "\"");
 	}
 
 	auto nodeBlock = ska::ASTFactory::MakeNode<ska::Operator::BLOCK>();

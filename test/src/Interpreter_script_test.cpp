@@ -80,6 +80,11 @@ TEST_CASE("[Interpreter Script]") {
 		CHECK(res.nodeval<int>() == 3);
 	}
 
+	SUBCASE("2 outside scripts imported with different memory contexts") {
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Player = import \"../test/src/resources/play\"; var Character = import \"../test/src/resources/character\"; var c = Character.build(\"test\"); Player.run(c);", data);
+		data.interpreter->script(astPtr);
+	}
+
 	SUBCASE("C++ 1 script-function binding") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse("var User218 = import \"binding\"; User218.funcTest(14, \"titito\");", data);
 		auto test = 0;

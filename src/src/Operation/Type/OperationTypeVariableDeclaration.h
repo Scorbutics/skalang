@@ -18,6 +18,7 @@ namespace ska {
 		}
 		
 		inline const auto& GetVariableValueNode() {
+			assert(node.size() != 0);
 			return node[0];
 		}
 	};
