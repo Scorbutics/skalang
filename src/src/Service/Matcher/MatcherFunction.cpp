@@ -85,15 +85,17 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationParameter(Script& input) {
 	}
 	const auto& id = input.match(TokenType::IDENTIFIER);
 
-    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
+	const auto& typeDelimiterToken = m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>();
+    input.match(typeDelimiterToken);
 	
 	auto typeNameNode = ASTNodePtr{};
 	if (input.expect(TokenType::IDENTIFIER)) {
 		auto typeNamespaceToken = input.match(TokenType::IDENTIFIER);
 		//Handles script namespace
 		auto complexTypeToken = Token{};
-		if (input.expect(TokenType::DOT_SYMBOL)) {
-			input.match(TokenType::DOT_SYMBOL);
+		if (input.expect(typeDelimiterToken)) {
+			input.match(typeDelimiterToken);
+			input.match(typeDelimiterToken);
 			complexTypeToken  = input.match(TokenType::IDENTIFIER);
 		}
 		typeNameNode = ASTFactory::MakeLogicalNode(std::move(typeNamespaceToken), complexTypeToken.empty() ? nullptr : ASTFactory::MakeLogicalNode(std::move(complexTypeToken)));

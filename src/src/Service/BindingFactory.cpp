@@ -53,11 +53,12 @@ ska::ASTNodePtr ska::BindingFactory::getNodeFromTypeName(const std::string& type
 		return ASTFactory::MakeLogicalNode(m_reserved.pool.at(typeName).token);
 	}
 
-	auto dotSymbol = typeName.find_first_of('.');
-	if (dotSymbol != std::string::npos) {
+	const auto& typeDelimiterToken = m_reserved.pattern<TokenGrammar::TYPE_DELIMITER>();
+	const auto splitSymbol = typeName.find_last_of(std::get<std::string>(typeDelimiterToken.content()));
+	if (splitSymbol != std::string::npos) {
 		//Handles script namespace
-		auto typeNamespaceToken = Token{ typeName.substr(0, dotSymbol), TokenType::IDENTIFIER };
-		auto typeFieldToken = Token{ typeName.substr(dotSymbol + 1), TokenType::IDENTIFIER };
+		auto typeNamespaceToken = Token{ typeName.substr(0, splitSymbol - 1), TokenType::IDENTIFIER };
+		auto typeFieldToken = Token{ typeName.substr(splitSymbol + 1), TokenType::IDENTIFIER };
 		return ASTFactory::MakeLogicalNode(std::move(typeNamespaceToken), ASTFactory::MakeLogicalNode(std::move(typeFieldToken)));
 	}
 

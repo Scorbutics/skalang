@@ -143,7 +143,7 @@ TEST_CASE("[Interpreter Script]") {
 
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding295", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBinding.import(*data.parser, { { "DataClassScript", "dataclass_script" } });
-		scriptBinding.bindGenericFunction("funcTest", { "DataClassScript.DataClass", "void" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+		scriptBinding.bindGenericFunction("funcTest", { "DataClassScript::DataClass", "void" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<ska::ObjectMemory>();
 			auto* idMap = (*mem)("id").first;
 			auto* nameMap = (*mem)("name").first;
@@ -162,7 +162,7 @@ TEST_CASE("[Interpreter Script]") {
 	SUBCASE("C++ -> miniska script-function binding generic") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
 		"var DataClassImp = import \"dataclass_script\";"
-		"var funcTest = function(dummy: DataClassImp.DataClass) { };"
+		"var funcTest = function(dummy: DataClassImp::DataClass) { };"
 		"var data = DataClassImp.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
@@ -182,11 +182,12 @@ TEST_CASE("[Interpreter Script]") {
 		data.interpreter->script(*readerIS);
 	}
 
+	//TODO move those tests in semantic check side
 	//TODO fix ?
 	SUBCASE("[fail] C++ -> miniska script-function binding generic : use field defined C++ side") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
 		"var DataClassImp = import \"dataclass_script\";"
-		"var funcTest = function(dummy: DataClassImp.DataClass) { dummy.id; };"
+		"var funcTest = function(dummy: DataClassImp::DataClass) { dummy.id; };"
 		"var data = DataClassImp.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
@@ -214,7 +215,7 @@ TEST_CASE("[Interpreter Script]") {
 	SUBCASE("[fail] (bad namespace) C++ -> miniska script-function binding generic") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
 		"var DataClassImp = import \"dataclass_script\";"
-		"var funcTest = function(dummy: DataClassImpTutu.DataClass) { };"
+		"var funcTest = function(dummy: DataClassImpTutu::DataClass) { };"
 		"var data = DataClassImp.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
@@ -242,7 +243,7 @@ TEST_CASE("[Interpreter Script]") {
 	SUBCASE("[fail] (bad class name in namespace) C++ -> miniska script-function binding generic") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
 		"var DataClassImp = import \"dataclass_script\";"
-		"var funcTest = function(dummy: DataClassImp.DataClassImddf) { };"
+		"var funcTest = function(dummy: DataClassImp::DataClassImddf) { };"
 		"var data = DataClassImp.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
