@@ -13,21 +13,25 @@ namespace ska {
 		const ASTNode& node;
 		
 		inline auto& GetObject() {
+			assert(node.size() > 0);
 			return node[0];
 		}
 		
 		inline auto& GetField() {
-			return node[0];
+			assert(node.size() > 1);
+			return node[1];
 		}
 
 	public:
 		OperationType(const ASTNode& node) : node(node) {}
 		
 		inline std::string GetObjectName() {
+			assert(node.size() > 0);
 			return node[0].name();
 		}
 		
 		inline std::string GetFieldName() {
+			assert(node.size() > 1);
 			return node[1].name();
 		}
 		

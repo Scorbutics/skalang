@@ -7,29 +7,7 @@
 #include "Service/ASTFactory.h"
 #include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ExpressionParser)
-
-//#define SKA_LOG_SHUNTING_YARD_DETAILS
-
-template <class Container>
-void Print(const Container& c, const std::string& name = " ") {
-	std::cout << name << " : ";
-	for(const auto& it : c) {
-		std::cout << it << " ";
-	}
-	std::cout << std::endl;
-}
-
-template <class Container>
-void PrintPtr(const Container& c, const std::string& name = " ") {
-	std::cout << name << " : ";
-	for(const auto& it : c) {
-		if(it != nullptr) {
-			std::cout << (*it) << " ";
-		}
-	}
-	std::cout << std::endl;
-}
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ExpressionParser)
 
 ska::ExpressionParser::ExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, StatementParser& parser) :
 	m_reservedKeywordsPool(reservedKeywordsPool),
@@ -201,10 +179,6 @@ ska::ASTNodePtr ska::ExpressionParser::expression(Script& input, ExpressionStack
 	auto rangeCounter = 0;
     auto isDoingOperation = false;
     while (!isAtEndOfExpression(input) && rangeCounter >= 0) {
-#ifdef SKA_LOG_SHUNTING_YARD_DETAILS
-        PrintPtr(operands, "Operands");
-		Print(operators, "Operators");
-#endif
 		rangeCounter += input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>()) ? 1 : 0;
 		rangeCounter -= input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) ? 1 : 0;
         auto token = input.actual();

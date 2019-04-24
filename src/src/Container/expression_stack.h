@@ -130,21 +130,25 @@ namespace ska {
 
 		[[nodiscard]]
 		Operator& topOperator() {
+			assert(!operators.empty());
 			return operators.top();
 		}
 
 		[[nodiscard]]
 		const Operator& topOperator() const {
+			assert(!operators.empty());
 			return operators.top();
 		}
 
 		Operator popOperator() {
+			assert(!operators.empty());
 			auto result = std::move(operators.top());
 			operators.pop();
 			return result;
 		}
 
 		Operand popOperand() {
+			assert(!operands.empty());
 			auto result = std::move(operands.top());
 			operands.pop();
 			return result;

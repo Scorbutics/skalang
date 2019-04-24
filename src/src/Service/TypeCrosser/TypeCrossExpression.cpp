@@ -9,6 +9,9 @@ namespace ska {
 	}
 }
 
+
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeCrosser)
+
 ska::TypeCrosser::TypeCrossMap ska::TypeCrosser::typeCrossMap = ska::TypeCrosser::BuildTypeCrossMap();
 
 ska::TypeCrosser::TypeCrossMap ska::TypeCrosser::BuildTypeCrossMap() {
@@ -19,10 +22,14 @@ ska::TypeCrosser::TypeCrossMap ska::TypeCrosser::BuildTypeCrossMap() {
 }
 
 ska::Type ska::TypeCrosser::cross(const std::string& op, const Type& type1, const Type& type2) const {
+	SLOG(ska::LogLevel::Info) << "Crossing types between \"" << type1 << " and \"" << type2 << "\" with operator \"" << op << "\"";
 	const auto basicComputedExpressionType = typedetail::ExpressionTypeCross(op, type1.type(), type2.type());
+	SLOG(ska::LogLevel::Info) << "Crossing types basic result = \"" << Type{basicComputedExpressionType} << "\"";
 	const auto& complexTypeCrosser = typeCrossMap[static_cast<std::size_t>(basicComputedExpressionType)];
 	if(complexTypeCrosser != nullptr) {
-		return complexTypeCrosser->cross(op, type1, type2);
+		auto result = complexTypeCrosser->cross(op, type1, type2);
+		SLOG(ska::LogLevel::Info) << "Crossing types full result = \"" << result << "\"";
+		return result;
 	}
 	return Type{ basicComputedExpressionType };
 }

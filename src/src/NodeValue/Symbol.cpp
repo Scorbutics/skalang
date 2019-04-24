@@ -10,8 +10,9 @@ const ska::Symbol* ska::Symbol::operator[](const std::string& fieldSymbolName) c
 		if (!scopedTable->children().empty()) {
 			for(const auto& innerSymbolTable : scopedTable->children()) {
 				if(!innerSymbolTable->children().empty()) {
-					const auto& st = *innerSymbolTable->children().back();
-					const auto* result = st[fieldSymbolName];
+					const auto* lastInnerSymbolElement = innerSymbolTable->children().back().get();
+					assert(lastInnerSymbolElement != nullptr && (std::string{"symbol \""} + fieldSymbolName + "\" doesn't exists for element ").c_str());
+					const auto* result = (*lastInnerSymbolElement)[fieldSymbolName];
 					if(result != nullptr) {
 						return result;
 					}
@@ -19,18 +20,22 @@ const ska::Symbol* ska::Symbol::operator[](const std::string& fieldSymbolName) c
 			}
 		}
 
-		SLOG(ska::LogLevel::Debug) << "Unable to find " << fieldSymbolName << " in this symbol";
+		SLOG(ska::LogLevel::Info) << "Unable to find " << fieldSymbolName << " in this symbol";
 		return nullptr;
 	}
 
+	assert(std::holds_alternative<const ScriptHandle*>(m_data));
 	auto* script = std::get<const ScriptHandle*>(m_data);
 	assert(script != nullptr);
+
+	SLOG(ska::LogLevel::Debug) << "Looking for " << fieldSymbolName << " in the targetted script";
+
 	const auto* result = (script->symbols())[fieldSymbolName];
 	if(result != nullptr) {
 		return result;
 	}
 
-	SLOG(ska::LogLevel::Debug) << "Unable to find " << fieldSymbolName << " in this symbol";
+	SLOG(ska::LogLevel::Info) << "Unable to find " << fieldSymbolName << " in this symbol";
 	return nullptr;
 }
 

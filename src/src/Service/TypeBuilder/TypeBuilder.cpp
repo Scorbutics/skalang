@@ -20,8 +20,9 @@ ska::TypeBuilder::TypeBuilder(StatementParser& parser, const TypeCrosser& typeCr
 }
 bool ska::TypeBuilder::matchVariable(VarTokenEvent& event) const {
 	auto& node = event.rootNode();
+	SLOG(LogLevel::Debug) << "Building type for variable \"" << event.rootNode() << "\" (Operator " << event.rootNode().op() << ")";
 	node.buildType(m_typeBuilder, event.script());
-	SLOG(LogLevel::Debug) << "Type built for variable \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
+	SLOG(LogLevel::Info) << "Type built for variable \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
     return true;
 }
 
@@ -35,30 +36,34 @@ bool ska::TypeBuilder::matchReturn(ReturnTokenEvent& event) const {
 
 bool ska::TypeBuilder::matchArray(ArrayTokenEvent & event) const {
 	auto& node = event.rootNode();
+	SLOG(LogLevel::Debug) << "Building type array (Operator " << event.rootNode().op() << ")";
 	node.buildType(m_typeBuilder, event.script());
-	SLOG(LogLevel::Debug) << "Type built for array = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
+	SLOG(LogLevel::Info) << "Type built for array = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
 	return true;
 }
 
 bool ska::TypeBuilder::matchScriptLink(ScriptLinkTokenEvent& event) const {
 	auto& node = event.rootNode();
+	SLOG(LogLevel::Debug) << "Building type for script link \"" << event.rootNode() << "\" (Operator " << event.rootNode().op() << ")";
 	node.buildType(m_typeBuilder, event.script());
-	SLOG(LogLevel::Debug) << "Type built for script link \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
+	SLOG(LogLevel::Info) << "Type built for script link \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
 	return true;
 }
 
 bool ska::TypeBuilder::matchExpression(ExpressionTokenEvent& event) const {
 	auto& node = event.rootNode();
+	SLOG(LogLevel::Debug) << "Building type for expression \"" << event.rootNode() << "\" (Operator " << event.rootNode().op() << ")";
 	node.buildType(m_typeBuilder, event.script());
-	SLOG(LogLevel::Debug) << "Type built for expression \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
+	SLOG(LogLevel::Info) << "Type built for expression \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
     return true;
 }
 
 bool ska::TypeBuilder::matchFunction(FunctionTokenEvent& event) const {	
 	if (event.type() != FunctionTokenEventType::DECLARATION_NAME) {
 		auto& node = event.rootNode();
+		SLOG(LogLevel::Debug) << "Building type for function parameter declaration / call \"" << event.rootNode() << "\" (Operator " << event.rootNode().op() << ")";
 		node.buildType(m_typeBuilder, event.script());
-		SLOG(LogLevel::Debug) << "Type built for function parameter declaration / call \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
+		SLOG(LogLevel::Info) << "Type built for function parameter declaration / call \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value() << "\" (Operator " << event.rootNode().op() << ")";
 	}
     return true;
 }

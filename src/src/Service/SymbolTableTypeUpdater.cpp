@@ -12,13 +12,17 @@ ska::SymbolTableTypeUpdater::SymbolTableTypeUpdater(StatementParser& parser):
 }
 
 bool ska::SymbolTableTypeUpdater::matchVariable(VarTokenEvent& event) {
+	SLOG(LogLevel::Debug) << "Trying to update symbol-type for \"" << event.rootNode().name() << "\" = \"" << event.rootNode().type().value() << "\"";
+
 	switch (event.type()) {
 		case VarTokenEventType::AFFECTATION:
 		case VarTokenEventType::USE:
+			SLOG(LogLevel::Debug) << "Variable event USE";
 			break;
 		case VarTokenEventType::FUNCTION_DECLARATION:
 		case VarTokenEventType::PARAMETER_DECLARATION:
 		case VarTokenEventType::VARIABLE_DECLARATION:
+			SLOG(LogLevel::Debug) << "Variable event DECLARATION";
 			updateType(event.rootNode(), event.script().symbols());
 		break;
 		
@@ -30,8 +34,9 @@ bool ska::SymbolTableTypeUpdater::matchVariable(VarTokenEvent& event) {
 }
 
 void ska::SymbolTableTypeUpdater::updateType(const ASTNode& node, SymbolTable& symbols) {
+	SLOG(LogLevel::Debug) << "Is operator named : " << OperatorTraits::isNamed(node.op());
 	assert(OperatorTraits::isNamed(node.op()));
-		
+
 	const auto& type = node.type();
 	assert(type.has_value() && !node.name().empty());
 	auto* symbol = symbols[node.name()];	

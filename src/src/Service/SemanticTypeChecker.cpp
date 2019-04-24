@@ -6,6 +6,7 @@
 #include "NodeValue/AST.h"
 #include "NodeValue/OperatorTraits.h"
 #include "Interpreter/Value/Script.h"
+#include "NodeValue/Type.h"
 
 #include "Operation/Type/OperationTypeFunctionDeclaration.h"
 #include "Operation/Type/OperationTypeFunctionCall.h"
@@ -13,7 +14,7 @@
 #include "Operation/Type/OperationTypeArrayDeclaration.h"
 #include "Operation/Type/OperationTypeReturn.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SemanticTypeChecker)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::SemanticTypeChecker)
 
 ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser, const TypeCrosser& typeCrosser) :
     subobserver_priority_queue<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser, 9),
@@ -192,15 +193,16 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
     const auto name = variable.name();
 	const auto type = variable.varType().value();
     
-	SLOG(ska::LogLevel::Debug) << variable << " = " << value << ";\tsymbol = " << type;
+	SLOG(ska::LogLevel::Debug) << name << " = " << value << ";\tsymbol = " << type;
 
     if(variable.type() == VarTokenEventType::AFFECTATION) {
+		assert(variable.rootNode().size() > 0);
 		if (!OperatorTraits::isLvalueCompatible(variable.rootNode()[0].op())) {
 			auto ss = std::stringstream{};
 			ss << "The symbol \"" << name << "\" is not an lvalue, therefore cannot be assigned";
 			throw std::runtime_error(ss.str());
 		}
-
+		
 		const auto tokenNodeExpressionType = variable.valType().value();
 		const auto newTokenType = type.crossTypes(m_typeCrosser, "=", tokenNodeExpressionType);
         if(newTokenType == ExpressionType::VOID) {
@@ -211,7 +213,6 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 				expressionTypeIndex << "\"";
 			throw std::runtime_error(ss.str());		
         }
-
 		if (OperatorTraits::isNamed(variable.rootNode()[0].op()) && name.empty()) {
 			throw std::runtime_error("invalid symbol affectation");
 		}

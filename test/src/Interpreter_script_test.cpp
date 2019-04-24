@@ -1,5 +1,6 @@
 #include <iostream>
 
+
 #include <doctest.h>
 #include "Config/LoggerConfigLang.h"
 #include "DataTestContainer.h"
@@ -213,7 +214,7 @@ TEST_CASE("[Interpreter Script]") {
 			data.interpreter->script(*readerIS);
 			CHECK(false);
 		} catch (std::exception& e) {
-			CHECK(std::string{e.what()} == "trying to access to an undeclared field : \"id\" of \"dummy\"");
+			CHECK(e.what() == std::string{"trying to access to an undeclared field : \"id\" of \"dummy\""});
 		}
 	}
 
@@ -241,7 +242,7 @@ TEST_CASE("[Interpreter Script]") {
 			data.interpreter->script(*readerIS);
 			CHECK(false);
 		} catch (std::exception& e) {
-			CHECK(std::string{e.what()} == "undeclared custom type \"DataClassImpTutu222.DataClass\"");
+			CHECK(e.what() == std::string{"undeclared custom type \"DataClassImpTutu222.DataClass\""});
 		}
 	}
 
@@ -269,7 +270,7 @@ TEST_CASE("[Interpreter Script]") {
 			data.interpreter->script(*readerIS);
 			CHECK(false);
 		} catch (std::exception& e) {
-			CHECK(std::string{e.what()} == "undeclared custom type \"DataClassImp250.DataClassImddf\"");
+			CHECK(e.what() == std::string{"undeclared custom type \"DataClassImp250.DataClassImddf\""});
 		}
 	}
 

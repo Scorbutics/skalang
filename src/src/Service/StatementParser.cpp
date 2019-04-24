@@ -12,7 +12,7 @@
 #include "Service/ASTFactory.h"
 #include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::StatementParser)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::StatementParser)
 
 ska::StatementParser::StatementParser(const ReservedKeywordsPool& reservedKeywordsPool) :
 	m_reservedKeywordsPool(reservedKeywordsPool),
