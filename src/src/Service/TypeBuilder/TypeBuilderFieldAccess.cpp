@@ -4,7 +4,7 @@
 #include "Service/SymbolTable.h"
 #include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>)
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const Script& script, OperateOn node) {
 	auto typeObject = node.GetObjectType();

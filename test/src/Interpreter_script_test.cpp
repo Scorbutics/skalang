@@ -166,9 +166,9 @@ TEST_CASE("[Interpreter Script]") {
 
 	SUBCASE("C++ -> miniska script-function binding generic") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
-		"var DataClassImp = import \"dataclass_script\";"
-		"var funcTest = function(dummy: DataClassImp::DataClass) { };"
-		"var data = DataClassImp.DataClass(\"JeanMi\");"
+		"var DataClassImp169 = import \"dataclass_script\";"
+		"var funcTest = function(dummy: DataClassImp169::DataClass) { };"
+		"var data = DataClassImp169.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
 		std::string name;
@@ -191,9 +191,9 @@ TEST_CASE("[Interpreter Script]") {
 	//TODO fix ?
 	SUBCASE("[fail] C++ -> miniska script-function binding generic : use field defined C++ side") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
-		"var DataClassImp = import \"dataclass_script\";"
-		"var funcTest = function(dummy: DataClassImp::DataClass) { dummy.id; };"
-		"var data = DataClassImp.DataClass(\"JeanMi\");"
+		"var DataClassImp194 = import \"dataclass_script\";"
+		"var funcTest = function(dummy: DataClassImp194::DataClass) { dummy.id; };"
+		"var data = DataClassImp194.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
 		std::string name;
@@ -219,9 +219,9 @@ TEST_CASE("[Interpreter Script]") {
 
 	SUBCASE("[fail] (bad namespace) C++ -> miniska script-function binding generic") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
-		"var DataClassImp = import \"dataclass_script\";"
-		"var funcTest = function(dummy: DataClassImpTutu::DataClass) { };"
-		"var data = DataClassImp.DataClass(\"JeanMi\");"
+		"var DataClassImp222 = import \"dataclass_script\";"
+		"var funcTest = function(dummy: DataClassImpTutu222::DataClass) { };"
+		"var data = DataClassImp222.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
 		std::string name;
@@ -241,15 +241,15 @@ TEST_CASE("[Interpreter Script]") {
 			data.interpreter->script(*readerIS);
 			CHECK(false);
 		} catch (std::exception& e) {
-			CHECK(std::string{e.what()} == "undeclared custom type \"DataClassImpTutu.DataClass\"");
+			CHECK(std::string{e.what()} == "undeclared custom type \"DataClassImpTutu222.DataClass\"");
 		}
 	}
 
 	SUBCASE("[fail] (bad class name in namespace) C++ -> miniska script-function binding generic") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
-		"var DataClassImp = import \"dataclass_script\";"
-		"var funcTest = function(dummy: DataClassImp::DataClassImddf) { };"
-		"var data = DataClassImp.DataClass(\"JeanMi\");"
+		"var DataClassImp250 = import \"dataclass_script\";"
+		"var funcTest = function(dummy: DataClassImp250::DataClassImddf) { };"
+		"var data = DataClassImp250.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
 		std::string name;
@@ -269,7 +269,7 @@ TEST_CASE("[Interpreter Script]") {
 			data.interpreter->script(*readerIS);
 			CHECK(false);
 		} catch (std::exception& e) {
-			CHECK(std::string{e.what()} == "undeclared custom type \"DataClassImp.DataClassImddf\"");
+			CHECK(std::string{e.what()} == "undeclared custom type \"DataClassImp250.DataClassImddf\"");
 		}
 	}
 

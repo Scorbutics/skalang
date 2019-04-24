@@ -1,5 +1,6 @@
 #include <functional>
 #include <fstream>
+#include "Config/LoggerConfigLang.h"
 #include "Service/Tokenizer.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Interpreter/Value/Script.h"
@@ -11,7 +12,7 @@
 #include "BindingFactory.h"
 #include "Matcher/MatcherImport.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::BindingFactory)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::BindingFactory)
 
 ska::BindingFactory::BindingFactory(TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved) :
     m_reserved(reserved),
@@ -50,17 +51,24 @@ ska::BindingFactory::~BindingFactory() {
 
 ska::ASTNodePtr ska::BindingFactory::getNodeFromTypeName(const std::string& typeName) {
 	if (m_reserved.pool.find(typeName) != m_reserved.pool.end()) {
+		SLOG(LogLevel::Debug) << "type for node found in reserved pool : " << typeName;
 		return ASTFactory::MakeLogicalNode(m_reserved.pool.at(typeName).token);
 	}
 
 	const auto& typeDelimiterToken = m_reserved.pattern<TokenGrammar::TYPE_DELIMITER>();
 	const auto splitSymbol = typeName.find_last_of(std::get<std::string>(typeDelimiterToken.content()));
 	if (splitSymbol != std::string::npos) {
+		assert(splitSymbol > 0);
 		//Handles script namespace
 		auto typeNamespaceToken = Token{ typeName.substr(0, splitSymbol - 1), TokenType::IDENTIFIER };
 		auto typeFieldToken = Token{ typeName.substr(splitSymbol + 1), TokenType::IDENTIFIER };
+
+		SLOG(LogLevel::Debug) << "type for node using namespace class " << std::get<std::string>(typeNamespaceToken.content()) << " with class " << std::get<std::string>(typeFieldToken.content());
+
 		return ASTFactory::MakeLogicalNode(std::move(typeNamespaceToken), ASTFactory::MakeLogicalNode(std::move(typeFieldToken)));
 	}
+
+	SLOG(LogLevel::Debug) << "type for node as identifier " << typeName;
 
 	return ASTFactory::MakeLogicalNode(Token{ typeName, TokenType::IDENTIFIER });
 }
@@ -105,9 +113,8 @@ ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::strin
 	observable_priority_queue<FunctionTokenEvent>::notifyObservers(declarationEvent);
 
 	auto parameters = std::vector<ASTNodePtr>{};
-	auto index = 0u;
 	auto ss = std::stringstream{};
-	for (auto index = 0u; index < typeNames.size(); index++) {
+	for (std::size_t index = 0u; index < typeNames.size(); index++) {
 		ss << index;
 		auto t = getNodeFromTypeName(typeNames[index]);
 		if (index == typeNames.size() - 1) {

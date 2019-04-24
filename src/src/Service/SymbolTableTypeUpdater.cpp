@@ -5,7 +5,7 @@
 #include "SymbolTableTypeUpdater.h"
 #include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTableTypeUpdater)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::SymbolTableTypeUpdater)
 
 ska::SymbolTableTypeUpdater::SymbolTableTypeUpdater(StatementParser& parser):
 	subobserver_priority_queue<VarTokenEvent>(std::bind(&SymbolTableTypeUpdater::matchVariable, this, std::placeholders::_1), parser, 7) {
@@ -40,7 +40,7 @@ void ska::SymbolTableTypeUpdater::updateType(const ASTNode& node, SymbolTable& s
 			symbol->forceType(type.value());
 			SLOG(LogLevel::Info) << "Type updated for symbol \"" << node.name() << "\" = \"" << node.type().value() << "\"";
 		} else {
-			SLOG(LogLevel::Error) << "No type detected for symbol \"" << node.name() << "\" with operator \"" << node.op() << "\"";
+			SLOG(LogLevel::Warn) << "No type updated for symbol \"" << node.name() << "\" with operator \"" << node.op() << "\" : existing type \"" << symbol->getType() << "\"";
 		}
 	} else {
 		auto ss = std::stringstream{};
