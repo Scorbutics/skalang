@@ -38,7 +38,7 @@ ska::SymbolTable::SymbolTable(StatementParser& parser) :
 	SymbolTable() {
 	m_rootTable = std::make_unique<ScopedSymbolTable>();
 	m_currentTable = m_rootTable.get();
-	listenParser(parser);
+	internalListenParser(parser);
 }
 
 ska::SymbolTable::SymbolTable() :
@@ -53,11 +53,15 @@ ska::SymbolTable::SymbolTable() :
 }
 
 ska::SymbolTable::~SymbolTable() {
-	unlistenParser();
+	internalUnlistenParser();
 }
 
-void ska::SymbolTable::listenParser(StatementParser& parser) {
-	unlistenParser();
+ska::ParserListenerLock ska::SymbolTable::listenParser(StatementParser& parser) {
+	return ParserListenerLock{*this, parser};
+}
+
+void ska::SymbolTable::internalListenParser(StatementParser& parser) {
+	internalUnlistenParser();
 	m_parser = &parser;
 	detail::symbol::addAsObserver<
 		VarTokenEvent, 
@@ -69,7 +73,7 @@ void ska::SymbolTable::listenParser(StatementParser& parser) {
 	> (*m_parser, *this);
 }
 
-void ska::SymbolTable::unlistenParser() {
+void ska::SymbolTable::internalUnlistenParser() {
 	if(m_parser != nullptr) {
 		detail::symbol::removeAsObserver<
 			VarTokenEvent, 
@@ -200,4 +204,21 @@ bool ska::SymbolTable::matchScriptLink(const ScriptLinkTokenEvent& token) {
 		m_currentTable->emplace(token.name(), *token.bound());
 	}	
 	return true;
+}
+
+
+ska::ParserListenerLock::ParserListenerLock(SymbolTable& symbolTable, StatementParser& parser) :
+	m_symbolTable(symbolTable) {
+	m_symbolTable.internalListenParser(parser);
+}
+
+void ska::ParserListenerLock::release() {
+	if(!m_freed) {
+		m_symbolTable.internalUnlistenParser();
+		m_freed = true;
+	}
+}
+
+ska::ParserListenerLock::~ParserListenerLock() {
+	release();
 }

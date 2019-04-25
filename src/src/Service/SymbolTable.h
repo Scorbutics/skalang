@@ -15,6 +15,17 @@ namespace ska {
    
     class StatementParser;
 
+	class SymbolTable;
+	class ParserListenerLock {
+	public:
+		ParserListenerLock(SymbolTable& symbolTable, StatementParser& parser);
+		~ParserListenerLock();
+		void release();
+	private:
+		SymbolTable& m_symbolTable;
+		bool m_freed = false;
+	};
+
 	class SymbolTable :
         public PriorityObserver<VarTokenEvent>,
        	public PriorityObserver<BlockTokenEvent>,
@@ -24,41 +35,26 @@ namespace ska {
 		public PriorityObserver<ScriptLinkTokenEvent> {
 
         using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
-
+		friend class ParserListenerLock;
     public:
 		SymbolTable();
 		SymbolTable(StatementParser& parser);
 		virtual ~SymbolTable();
 		
-		void listenParser(StatementParser& parser);
-		void unlistenParser();
+		[[nodiscard]]
+		ParserListenerLock listenParser(StatementParser& parser);
 
-		auto* operator[](const std::string& key) {
-            return (*m_currentTable)[key];
-        }
+		auto* operator[](const std::string& key) { return (*m_currentTable)[key]; }
+        const auto* operator[](const std::string& key) const { return (*m_currentTable)[key]; }
 
-        const auto* operator[](const std::string& key) const {
-            return (*m_currentTable)[key];
-        }
+		ScopedSymbolTable::ChildrenScopedSymbolTable& nested() { return m_currentTable->children(); }
+		const ScopedSymbolTable::ChildrenScopedSymbolTable& nested() const { return m_currentTable->children(); }
 
-		ScopedSymbolTable::ChildrenScopedSymbolTable& nested() {
-			return m_currentTable->children();
-		}
+		ScopedSymbolTable* current() { return m_currentTable; }
+		const ScopedSymbolTable* current() const { return m_currentTable; }
 
-		const ScopedSymbolTable::ChildrenScopedSymbolTable& nested() const {
-			return m_currentTable->children();
-		}
-
-        const Symbol* enclosingType() const {
-            return m_currentTable->owner();
-        }
-
-		ScopedSymbolTable* current() {
-			return m_currentTable;
-		}
-
-		const ScopedSymbolTable* current() const {
-			return m_currentTable;
+		const Symbol* enclosingType() const { 
+			return m_currentTable->owner();
 		}
 
     private:
@@ -68,6 +64,9 @@ namespace ska {
 		bool matchReturn(const ReturnTokenEvent&);
 		bool matchImport(const ImportTokenEvent&);
 		bool matchScriptLink(const ScriptLinkTokenEvent&);
+
+		void internalListenParser(StatementParser& parser);
+		void internalUnlistenParser();
 
 		StatementParser* m_parser = nullptr;
         std::unique_ptr<ScopedSymbolTable> m_rootTable;

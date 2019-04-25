@@ -72,9 +72,9 @@ void ska::Script::parse(StatementParser& parser, bool listen) {
 		return;
 	}
 
-	m_handle->m_symbols.listenParser(parser);
+	auto lock = m_handle->m_symbols.listenParser(parser);
 	auto result = parser.parse(*this);
-	m_handle->m_symbols.unlistenParser();
+	lock.release();
 	m_handle->m_ast = std::move(result);
 	return;
 }
