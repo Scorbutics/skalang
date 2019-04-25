@@ -5,7 +5,7 @@ int main() {
     doctest::Context context;
     auto resultCode = 0;
 
-	context.setOption("test-case", "[Interpreter Script]");
+	//context.setOption("test-case", "[Interpreter Script]");
     //context.setOption("order-by", "name");
     //context.setOption("success", "true");
     resultCode = context.run();
