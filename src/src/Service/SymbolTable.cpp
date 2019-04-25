@@ -206,6 +206,11 @@ bool ska::SymbolTable::matchScriptLink(const ScriptLinkTokenEvent& token) {
 	return true;
 }
 
+ska::ParserListenerLock::ParserListenerLock(ParserListenerLock&& pll) noexcept :
+	m_symbolTable(pll.m_symbolTable), 
+	m_freed(pll.m_freed) {
+	pll.m_freed = true;
+}
 
 ska::ParserListenerLock::ParserListenerLock(SymbolTable& symbolTable, StatementParser& parser) :
 	m_symbolTable(symbolTable) {

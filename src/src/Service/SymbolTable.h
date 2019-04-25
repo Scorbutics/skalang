@@ -19,6 +19,11 @@ namespace ska {
 	class ParserListenerLock {
 	public:
 		ParserListenerLock(SymbolTable& symbolTable, StatementParser& parser);
+		ParserListenerLock(ParserListenerLock&&) noexcept;
+		ParserListenerLock(const ParserListenerLock&) = delete;
+		ParserListenerLock& operator=(ParserListenerLock&&) = delete;
+		ParserListenerLock& operator=(const ParserListenerLock&) = delete;
+		
 		~ParserListenerLock();
 		void release();
 	private:

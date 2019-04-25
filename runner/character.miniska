@@ -1,11 +1,13 @@
 var Position = import "point";
+var EntityManager = import "em_lib";
 
 var Fcty = function(name: string) : var {
     var defaultPos = Position.Fcty(0, 0);
     return {
         name : name,
         direction : 0,
-        pos : defaultPos
+        pos : defaultPos,
+		getInput : EntityManager.getInput
     };
 };
 

@@ -38,6 +38,12 @@ int main(int argc, char* argv[]) {
 	}
 
 	
+	auto scriptEmBinding = ska::ScriptBridge{ scriptCache, "em_lib", typeBuilder, symbolsTypeUpdater, reservedKeywords };
+	scriptEmBinding.bindFunction("getInput", std::function<std::string()>([]() {
+		return "tototo !";
+	}));
+	scriptEmBinding.build();
+
 	auto scriptCharacterBinding = ska::ScriptBridge{ scriptCache, "character_generator", typeBuilder, symbolsTypeUpdater, reservedKeywords };
 	scriptCharacterBinding.import(parser, { {"Character", "character"} });
 	scriptCharacterBinding.bindGenericFunction("Gen", { "Character::Fcty" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
@@ -51,7 +57,6 @@ int main(int argc, char* argv[]) {
 		return ska::NodeValue{ mem };
 	}));
 	scriptCharacterBinding.build();
-	
 
 	auto scriptBinding = ska::ScriptBridge{ scriptCache, "runner_lib", typeBuilder, symbolsTypeUpdater, reservedKeywords };
 	scriptBinding.bindFunction("printInt", std::function<void(int)>([](int value) {

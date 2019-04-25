@@ -20,8 +20,8 @@ namespace ska {
 		SymbolTable& symbols() { return m_symbols; }
 		const SymbolTable& symbols() const { return m_symbols; }
 		
-		MemoryTable& currentMemory() { return *m_currentMemory; }
-		const MemoryTable& currentMemory() const { return *m_currentMemory; }
+		MemoryTable& currentMemory() { assert(m_currentMemory != nullptr);  return *m_currentMemory; }
+		const MemoryTable& currentMemory() const { assert(m_currentMemory != nullptr); return *m_currentMemory; }
 
 		ASTNode& rootNode() { assert(m_ast != nullptr);  return *m_ast; }
 		const ASTNode& rootNode() const { assert(m_ast != nullptr);  return *m_ast; }

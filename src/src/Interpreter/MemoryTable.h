@@ -13,6 +13,11 @@ namespace ska {
 	class MemoryTableLock {
 	public:
 		MemoryTableLock(MemoryTable& instance, MemoryTablePtr* cursorCurrent, bool pop);
+		MemoryTableLock(MemoryTableLock&&) noexcept;
+		MemoryTableLock operator=(MemoryTableLock&&) = delete;
+		MemoryTableLock(const MemoryTableLock&) = delete;
+		MemoryTableLock& operator=(const MemoryTableLock&) = delete;
+		
 		void release();
 		~MemoryTableLock();
 

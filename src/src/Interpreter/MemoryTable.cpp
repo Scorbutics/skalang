@@ -77,13 +77,21 @@ ska::MemoryTableLock::MemoryTableLock(MemoryTable& instance, MemoryTablePtr* cur
 		*m_cursorCurrent = m_instance.internalPushNested();
 	}
 }
-	
+
+ska::MemoryTableLock::MemoryTableLock(MemoryTableLock&& m) noexcept :
+	m_pop(m.m_pop),
+	m_instance(m.m_instance),
+	m_cursorCurrent(m.m_cursorCurrent),
+	m_freed(m.m_freed) {
+	m.m_freed = true;
+}
+
 void ska::MemoryTableLock::release() {
 	if(m_freed) {
 		return;
 	}
 
-	if(m_cursorCurrent != nullptr && *m_cursorCurrent != nullptr) {
+	if(m_cursorCurrent != nullptr && *m_cursorCurrent != nullptr && (*m_cursorCurrent)->parent().lock() != nullptr) {
 		*m_cursorCurrent = (*m_cursorCurrent)->parent().lock();
 	}
 

@@ -1,37 +1,683 @@
-[01:08:41:276][Debug](MatcherFunction.c l.0014) function declaration
-[01:08:41:280][Debug](MatcherFunction.c l.0134) parameter detected, reading identifier : 
-[01:08:41:281][Debug](MatcherFunction.c l.0119) x
-[01:08:41:282][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "x with type-node int
-[01:08:41:283][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "x" = "interror variant"
-[01:08:41:284][Debug](MatcherFunction.c l.0134) parameter detected, reading identifier : 
-[01:08:41:285][Debug](MatcherFunction.c l.0119) y
-[01:08:41:286][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "y with type-node int
-[01:08:41:288][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "y" = "interror variant"
-[01:08:41:289][Debug](MatcherFunction.c l.0153) function type detected : varerror variant
-[01:08:41:290][Debug](MatcherFunction.c l.0032) reading function body
-[01:08:41:291][Debug](MatcherFunction.c l.0034) function read.
-[01:08:41:298][Debug](MatcherFunction.c l.0014) function declaration
-[01:08:41:300][Debug](MatcherFunction.c l.0134) parameter detected, reading identifier : 
-[01:08:41:301][Debug](MatcherFunction.c l.0119) name
-[01:08:41:302][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "name with type-node string
-[01:08:41:303][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "name" = "stringerror variant"
-[01:08:41:304][Debug](MatcherFunction.c l.0153) function type detected : varerror variant
-[01:08:41:305][Debug](MatcherFunction.c l.0032) reading function body
-[01:08:41:306][Debug](MatcherFunction.c l.0057) Expression not null
-[01:08:41:308][Debug](MatcherFunction.c l.0057) Expression not null
-[01:08:41:310][Debug](MatcherFunction.c l.0034) function read.
-[01:08:41:311][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "0 with type-node int
-[01:08:41:312][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "0" = "interror variant"
-[01:08:41:314][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "0 with type-node string
-[01:08:41:314][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "0" = "stringerror variant"
-[01:08:45:069][Debug](MatcherFunction.c l.0014) function declaration
-[01:08:45:072][Debug](MatcherFunction.c l.0134) parameter detected, reading identifier : 
-[01:08:45:073][Debug](MatcherFunction.c l.0119) ch
-[01:08:45:074][Info ](TypeBuilderParame l.0027) Parameter declaration type built for node "ch" = "function Fcty (string name - var Fcty)"
-[01:08:45:076][Debug](MatcherFunction.c l.0157) void function detected
-[01:08:45:077][Debug](MatcherFunction.c l.0032) reading function body
-[01:08:45:078][Debug](MatcherFunction.c l.0057) Expression not null
-[01:08:45:081][Debug](MatcherFunction.c l.0057) Expression not null
-[01:08:45:083][Debug](MatcherFunction.c l.0034) function read.
-[01:08:45:085][Debug](MatcherFunction.c l.0057) Expression not null
-[01:08:45:086][Debug](MatcherFunction.c l.0060) Expression null
+[23:34:21:847][Debug](         Symbol.h l.0023) Creating Symbol "getInput" from table
+[23:34:21:850][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to getInput void
+[23:34:21:851][Debug](BindingFactory.cp l.0054) type for node found in reserved pool : string
+[23:34:21:852][Debug](  TypeBuilder.cpp l.0023) Building type for variable "getInput" (Operator FUNCTION_PROTOTYPE_DECLARATION)
+[23:34:21:853][Info ](TypeBuilderFuncti l.0039) string
+[23:34:21:853][Info ](TypeBuilderFuncti l.0027) function prototype declaration has a return type "string" for function "getInput"
+[23:34:21:854][Info ](  TypeBuilder.cpp l.0025) Type built for variable "getInput" = "function getInput (string)" (Operator FUNCTION_PROTOTYPE_DECLARATION)
+[23:34:21:855][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "getInput" = "function getInput (string)"
+[23:34:21:856][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:21:857][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:21:861][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "getInput" = "function getInput (string)"
+[23:34:21:863][Debug](  TypeBuilder.cpp l.0064) Building type for function parameter declaration / call "getInput" (Operator FUNCTION_DECLARATION)
+[23:34:21:864][Info ](  TypeBuilder.cpp l.0066) Type built for function parameter declaration / call "getInput" = "function getInput (string)" (Operator FUNCTION_DECLARATION)
+[23:34:29:685][Debug](  TypeBuilder.cpp l.0023) Building type for variable "getInput" (Operator VARIABLE_DECLARATION)
+[23:34:29:687][Info ](  TypeBuilder.cpp l.0025) Type built for variable "getInput" = "function getInput (string)" (Operator VARIABLE_DECLARATION)
+[23:34:29:689][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "getInput" = "function getInput (string)"
+[23:34:29:689][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:29:690][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:29:691][Warn ](SymbolTableTypeUp l.0048) No type updated for symbol "getInput" with operator "VARIABLE_DECLARATION" : existing type "function getInput (string)"
+[23:34:29:692][Debug](  TypeBuilder.cpp l.0047) Building type for script link "" (Operator SCRIPT_LINK)
+[23:34:29:693][Info ](  TypeBuilder.cpp l.0049) Type built for script link "" = "void" (Operator SCRIPT_LINK)
+[23:34:29:696][Info ](StatementParser.c l.0130) SubParsing script character.miniska : in cache
+[23:34:29:698][Debug](ExpressionParser. l.0030) 	Pushing reserved
+[23:34:29:700][Debug](  TypeBuilder.cpp l.0047) Building type for script link "" (Operator SCRIPT_LINK)
+[23:34:29:701][Info ](  TypeBuilder.cpp l.0049) Type built for script link "" = "void" (Operator SCRIPT_LINK)
+[23:34:29:704][Info ](StatementParser.c l.0130) SubParsing script point.miniska : in cache
+[23:34:29:705][Debug](ExpressionParser. l.0030) 	Pushing reserved
+[23:34:29:708][Debug](MatcherFunction.c l.0014) function declaration
+[23:34:29:709][Debug](         Symbol.h l.0023) Creating Symbol "Fcty" from table
+[23:34:29:710][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to Fcty void
+[23:34:29:712][Debug](MatcherFunction.c l.0141) parameter detected, reading identifier : 
+[23:34:29:713][Debug](MatcherFunction.c l.0126) x
+[23:34:29:714][Debug](         Symbol.h l.0023) Creating Symbol "x" from table
+[23:34:29:716][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to x void
+[23:34:29:719][Debug](  TypeBuilder.cpp l.0023) Building type for variable "x" (Operator PARAMETER_DECLARATION)
+[23:34:29:720][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "x with type-node int
+[23:34:29:721][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "x" = "interror variant"
+[23:34:29:723][Info ](  TypeBuilder.cpp l.0025) Type built for variable "x" = "int x" (Operator PARAMETER_DECLARATION)
+[23:34:29:724][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "x" = "int x"
+[23:34:29:725][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:29:728][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:29:729][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "x" = "int x"
+[23:34:29:730][Debug](SemanticTypeCheck l.0196) x = int;	symbol = int x
+[23:34:29:732][Debug](MatcherFunction.c l.0141) parameter detected, reading identifier : 
+[23:34:29:733][Debug](MatcherFunction.c l.0126) y
+[23:34:29:734][Debug](         Symbol.h l.0023) Creating Symbol "y" from table
+[23:34:29:736][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to y void
+[23:34:29:739][Debug](  TypeBuilder.cpp l.0023) Building type for variable "y" (Operator PARAMETER_DECLARATION)
+[23:34:29:741][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "y with type-node int
+[23:34:29:742][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "y" = "interror variant"
+[23:34:29:743][Info ](  TypeBuilder.cpp l.0025) Type built for variable "y" = "int y" (Operator PARAMETER_DECLARATION)
+[23:34:29:745][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "y" = "int y"
+[23:34:29:746][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:29:747][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:29:750][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "y" = "int y"
+[23:34:29:751][Debug](SemanticTypeCheck l.0196) y = int;	symbol = int y
+[23:34:29:753][Debug](MatcherFunction.c l.0160) function type detected : var
+[23:34:29:754][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Fcty" (Operator FUNCTION_PROTOTYPE_DECLARATION)
+[23:34:29:756][Info ](TypeBuilderFuncti l.0039) x
+[23:34:29:757][Info ](TypeBuilderFuncti l.0039) y
+[23:34:29:760][Info ](TypeBuilderFuncti l.0039) var
+[23:34:29:761][Info ](TypeBuilderFuncti l.0015) function prototype declaration has an OBJECT return type "Fcty"
+[23:34:29:762][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Fcty" = "function Fcty (int x - int y - var Fcty)" (Operator FUNCTION_PROTOTYPE_DECLARATION)
+[23:34:29:764][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Fcty" = "function Fcty (int x - int y - var Fcty)"
+[23:34:29:766][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:29:767][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:29:770][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "Fcty" = "function Fcty (int x - int y - var Fcty)"
+[23:34:29:771][Debug](SemanticTypeCheck l.0196) Fcty = x;	symbol = function Fcty (int x - int y - var Fcty)
+[23:34:29:773][Debug](MatcherFunction.c l.0032) reading function body
+[23:34:29:774][Debug](ExpressionParser. l.0045) 	Pushing var operand x
+[23:34:29:775][Debug](  TypeBuilder.cpp l.0023) Building type for variable "x" (Operator UNARY)
+[23:34:29:776][Info ](  TypeBuilder.cpp l.0025) Type built for variable "x" = "int x" (Operator UNARY)
+[23:34:29:778][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "x" = "int x"
+[23:34:29:781][Debug](SymbolTableTypeUp l.0020) Variable event USE
+[23:34:29:783][Debug](SemanticTypeCheck l.0196) x = ;	symbol = int x
+[23:34:29:784][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:29:785][Debug](  TypeBuilder.cpp l.0055) Building type for expression "x" (Operator UNARY)
+[23:34:29:786][Info ](  TypeBuilder.cpp l.0057) Type built for expression "x" = "int x" (Operator UNARY)
+[23:34:29:787][Debug](         Symbol.h l.0023) Creating Symbol "x" from table
+[23:34:29:789][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to x void
+[23:34:29:792][Debug](  TypeBuilder.cpp l.0023) Building type for variable "x" (Operator VARIABLE_DECLARATION)
+[23:34:29:793][Info ](  TypeBuilder.cpp l.0025) Type built for variable "x" = "int x" (Operator VARIABLE_DECLARATION)
+[23:34:29:796][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "x" = "int x"
+[23:34:29:797][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:29:798][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:29:800][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "x" = "int x"
+[23:34:29:802][Debug](SemanticTypeCheck l.0196) x = x;	symbol = int x
+[23:34:29:803][Debug](ExpressionParser. l.0045) 	Pushing var operand y
+[23:34:29:805][Debug](  TypeBuilder.cpp l.0023) Building type for variable "y" (Operator UNARY)
+[23:34:29:806][Info ](  TypeBuilder.cpp l.0025) Type built for variable "y" = "int y" (Operator UNARY)
+[23:34:29:807][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "y" = "int y"
+[23:34:29:808][Debug](SymbolTableTypeUp l.0020) Variable event USE
+[23:34:29:811][Debug](SemanticTypeCheck l.0196) y = ;	symbol = int y
+[23:34:29:812][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:29:814][Debug](  TypeBuilder.cpp l.0055) Building type for expression "y" (Operator UNARY)
+[23:34:29:816][Info ](  TypeBuilder.cpp l.0057) Type built for expression "y" = "int y" (Operator UNARY)
+[23:34:29:817][Debug](         Symbol.h l.0023) Creating Symbol "y" from table
+[23:34:29:818][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to y void
+[23:34:29:821][Debug](  TypeBuilder.cpp l.0023) Building type for variable "y" (Operator VARIABLE_DECLARATION)
+[23:34:29:822][Info ](  TypeBuilder.cpp l.0025) Type built for variable "y" = "int y" (Operator VARIABLE_DECLARATION)
+[23:34:29:823][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "y" = "int y"
+[23:34:29:825][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:29:826][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:29:827][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "y" = "int y"
+[23:34:29:828][Debug](SemanticTypeCheck l.0196) y = y;	symbol = int y
+[23:34:29:831][Debug](MatcherFunction.c l.0034) function read.
+[23:34:29:832][Debug](  TypeBuilder.cpp l.0064) Building type for function parameter declaration / call "Fcty" (Operator FUNCTION_DECLARATION)
+[23:34:29:835][Info ](  TypeBuilder.cpp l.0066) Type built for function parameter declaration / call "Fcty" = "function Fcty (int x - int y - var Fcty)" (Operator FUNCTION_DECLARATION)
+[23:34:29:836][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:29:837][Debug](  TypeBuilder.cpp l.0055) Building type for expression "Fcty" (Operator FUNCTION_DECLARATION)
+[23:34:29:838][Info ](  TypeBuilder.cpp l.0057) Type built for expression "Fcty" = "function Fcty (int x - int y - var Fcty)" (Operator FUNCTION_DECLARATION)
+[23:34:29:842][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Fcty" (Operator VARIABLE_DECLARATION)
+[23:34:29:843][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Fcty" = "function Fcty (int x - int y - var Fcty)" (Operator VARIABLE_DECLARATION)
+[23:34:29:845][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Fcty" = "function Fcty (int x - int y - var Fcty)"
+[23:34:29:846][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:29:847][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:29:849][Warn ](SymbolTableTypeUp l.0048) No type updated for symbol "Fcty" with operator "VARIABLE_DECLARATION" : existing type "function Fcty (int x - int y - var Fcty)"
+[23:34:29:853][Debug](SemanticTypeCheck l.0196) Fcty = Fcty;	symbol = function Fcty (int x - int y - var Fcty)
+[23:34:29:855][Debug](         Symbol.h l.0029) Creating Symbol "point" from script
+[23:34:29:856][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to point void
+[23:34:29:857][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:29:858][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator IMPORT)
+[23:34:29:859][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "var point" (Operator IMPORT)
+[23:34:29:862][Debug](         Symbol.h l.0023) Creating Symbol "Position" from table
+[23:34:29:864][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to Position void
+[23:34:29:865][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Position" (Operator VARIABLE_DECLARATION)
+[23:34:29:867][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Position" = "var point" (Operator VARIABLE_DECLARATION)
+[23:34:29:868][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Position" = "var point"
+[23:34:29:869][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:29:872][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:29:873][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "Position" = "var point"
+[23:34:29:875][Debug](SemanticTypeCheck l.0196) Position = ;	symbol = var point
+[23:34:29:877][Debug](ExpressionParser. l.0030) 	Pushing reserved
+[23:34:29:878][Debug](         Symbol.h l.0029) Creating Symbol "em_lib.miniska" from script
+[23:34:29:879][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to em_lib.miniska void
+[23:34:29:882][Debug](  TypeBuilder.cpp l.0047) Building type for script link "" (Operator SCRIPT_LINK)
+[23:34:29:883][Info ](  TypeBuilder.cpp l.0049) Type built for script link "" = "var em_lib.miniska" (Operator SCRIPT_LINK)
+[23:34:29:885][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:29:887][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator SCRIPT_LINK)
+[23:34:29:889][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "var em_lib.miniska" (Operator SCRIPT_LINK)
+[23:34:29:892][Debug](         Symbol.h l.0023) Creating Symbol "EntityManager" from table
+[23:34:29:894][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to EntityManager void
+[23:34:29:896][Debug](  TypeBuilder.cpp l.0023) Building type for variable "EntityManager" (Operator VARIABLE_DECLARATION)
+[23:34:29:898][Info ](  TypeBuilder.cpp l.0025) Type built for variable "EntityManager" = "var em_lib.miniska" (Operator VARIABLE_DECLARATION)
+[23:34:29:899][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "EntityManager" = "var em_lib.miniska"
+[23:34:29:902][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:29:903][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:29:904][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "EntityManager" = "var em_lib.miniska"
+[23:34:29:906][Debug](SemanticTypeCheck l.0196) EntityManager = ;	symbol = var em_lib.miniska
+[23:34:29:907][Debug](ExpressionParser. l.0030) 	Pushing reserved
+[23:34:29:908][Debug](MatcherFunction.c l.0014) function declaration
+[23:34:29:909][Debug](         Symbol.h l.0023) Creating Symbol "Fcty" from table
+[23:34:29:913][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to Fcty void
+[23:34:29:915][Debug](MatcherFunction.c l.0141) parameter detected, reading identifier : 
+[23:34:29:916][Debug](MatcherFunction.c l.0126) name
+[23:34:29:918][Debug](         Symbol.h l.0023) Creating Symbol "name" from table
+[23:34:29:919][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to name void
+[23:34:29:920][Debug](  TypeBuilder.cpp l.0023) Building type for variable "name" (Operator PARAMETER_DECLARATION)
+[23:34:29:923][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "name with type-node string
+[23:34:29:925][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "name" = "stringerror variant"
+[23:34:29:926][Info ](  TypeBuilder.cpp l.0025) Type built for variable "name" = "string name" (Operator PARAMETER_DECLARATION)
+[23:34:29:928][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "name" = "string name"
+[23:34:29:929][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:29:930][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:29:934][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "name" = "string name"
+[23:34:29:935][Debug](SemanticTypeCheck l.0196) name = string;	symbol = string name
+[23:34:29:938][Debug](MatcherFunction.c l.0160) function type detected : var
+[23:34:29:939][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Fcty" (Operator FUNCTION_PROTOTYPE_DECLARATION)
+[23:34:29:941][Info ](TypeBuilderFuncti l.0039) name
+[23:34:29:942][Info ](TypeBuilderFuncti l.0039) var
+[23:34:29:944][Info ](TypeBuilderFuncti l.0015) function prototype declaration has an OBJECT return type "Fcty"
+[23:34:29:946][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Fcty" = "function Fcty (string name - var Fcty)" (Operator FUNCTION_PROTOTYPE_DECLARATION)
+[23:34:29:947][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Fcty" = "function Fcty (string name - var Fcty)"
+[23:34:29:949][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:29:950][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:29:951][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "Fcty" = "function Fcty (string name - var Fcty)"
+[23:34:29:955][Debug](SemanticTypeCheck l.0196) Fcty = name;	symbol = function Fcty (string name - var Fcty)
+[23:34:29:957][Debug](MatcherFunction.c l.0032) reading function body
+[23:34:29:958][Debug](ExpressionParser. l.0045) 	Pushing var operand Position
+[23:34:29:959][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Position" (Operator UNARY)
+[23:34:29:960][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Position" = "var point" (Operator UNARY)
+[23:34:29:961][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Position" = "var point"
+[23:34:29:962][Debug](SymbolTableTypeUp l.0020) Variable event USE
+[23:34:29:965][Debug](SemanticTypeCheck l.0196) Position = ;	symbol = var point
+[23:34:29:967][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FIELD_ACCESS)
+[23:34:29:968][Debug](       Symbol.cpp l.0031) Looking for Fcty in the targetted script
+[23:34:29:969][Info ](TypeBuilderFieldA l.0030) Field accessed "Fcty" (type "function Fcty (int x - int y - var Fcty)") of "Position"
+[23:34:29:971][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "function Fcty (int x - int y - var Fcty)" (Operator FIELD_ACCESS)
+[23:34:29:972][Debug](ExpressionParser. l.0148) 	Function call !
+[23:34:29:973][Debug](ExpressionParser. l.0040) 	Pushing operand 0
+[23:34:29:977][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:29:978][Debug](  TypeBuilder.cpp l.0055) Building type for expression "0" (Operator LITERAL)
+[23:34:29:980][Info ](  TypeBuilder.cpp l.0057) Type built for expression "0" = "int" (Operator LITERAL)
+[23:34:29:981][Debug](MatcherFunction.c l.0057) Expression not null
+[23:34:29:982][Debug](ExpressionParser. l.0040) 	Pushing operand 0
+[23:34:29:983][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:29:984][Debug](  TypeBuilder.cpp l.0055) Building type for expression "0" (Operator LITERAL)
+[23:34:29:987][Info ](  TypeBuilder.cpp l.0057) Type built for expression "0" = "int" (Operator LITERAL)
+[23:34:29:988][Debug](MatcherFunction.c l.0057) Expression not null
+[23:34:29:989][Debug](  TypeBuilder.cpp l.0064) Building type for function parameter declaration / call "" (Operator FUNCTION_CALL)
+[23:34:29:991][Info ](  TypeBuilder.cpp l.0066) Type built for function parameter declaration / call "" = "var Fcty" (Operator FUNCTION_CALL)
+[23:34:29:992][Debug](SemanticTypeCheck l.0159) function Fcty (int x - int y - var Fcty) function has the following arguments types during its call : 
+[23:34:29:994][Info ](TypeCrossExpressi l.0025) Crossing types between "int x and "int" with operator "="
+[23:34:29:997][Info ](TypeCrossExpressi l.0027) Crossing types basic result = "int"
+[23:34:29:998][Info ](TypeCrossExpressi l.0025) Crossing types between "int y and "int" with operator "="
+[23:34:29:999][Info ](TypeCrossExpressi l.0027) Crossing types basic result = "int"
+[23:34:30:001][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:30:003][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FUNCTION_CALL)
+[23:34:30:004][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "var Fcty" (Operator FUNCTION_CALL)
+[23:34:30:007][Debug](         Symbol.h l.0023) Creating Symbol "defaultPos" from table
+[23:34:30:008][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to defaultPos void
+[23:34:30:009][Debug](  TypeBuilder.cpp l.0023) Building type for variable "defaultPos" (Operator VARIABLE_DECLARATION)
+[23:34:30:011][Info ](  TypeBuilder.cpp l.0025) Type built for variable "defaultPos" = "var Fcty" (Operator VARIABLE_DECLARATION)
+[23:34:30:013][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "defaultPos" = "var Fcty"
+[23:34:30:014][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:30:018][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:30:019][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "defaultPos" = "var Fcty"
+[23:34:30:020][Debug](SemanticTypeCheck l.0196) defaultPos = ;	symbol = var Fcty
+[23:34:30:021][Debug](ExpressionParser. l.0045) 	Pushing var operand name
+[23:34:30:023][Debug](  TypeBuilder.cpp l.0023) Building type for variable "name" (Operator UNARY)
+[23:34:30:024][Info ](  TypeBuilder.cpp l.0025) Type built for variable "name" = "string name" (Operator UNARY)
+[23:34:30:027][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "name" = "string name"
+[23:34:30:028][Debug](SymbolTableTypeUp l.0020) Variable event USE
+[23:34:30:029][Debug](SemanticTypeCheck l.0196) name = ;	symbol = string name
+[23:34:30:030][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:30:032][Debug](  TypeBuilder.cpp l.0055) Building type for expression "name" (Operator UNARY)
+[23:34:30:034][Info ](  TypeBuilder.cpp l.0057) Type built for expression "name" = "string name" (Operator UNARY)
+[23:34:30:037][Debug](         Symbol.h l.0023) Creating Symbol "name" from table
+[23:34:30:038][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to name void
+[23:34:30:039][Debug](  TypeBuilder.cpp l.0023) Building type for variable "name" (Operator VARIABLE_DECLARATION)
+[23:34:30:040][Info ](  TypeBuilder.cpp l.0025) Type built for variable "name" = "string name" (Operator VARIABLE_DECLARATION)
+[23:34:30:042][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "name" = "string name"
+[23:34:30:043][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:30:044][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:30:047][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "name" = "string name"
+[23:34:30:048][Debug](SemanticTypeCheck l.0196) name = name;	symbol = string name
+[23:34:30:049][Debug](ExpressionParser. l.0040) 	Pushing operand 0
+[23:34:30:050][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:30:052][Debug](  TypeBuilder.cpp l.0055) Building type for expression "0" (Operator LITERAL)
+[23:34:30:053][Info ](  TypeBuilder.cpp l.0057) Type built for expression "0" = "int" (Operator LITERAL)
+[23:34:30:054][Debug](         Symbol.h l.0023) Creating Symbol "direction" from table
+[23:34:30:057][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to direction void
+[23:34:30:058][Debug](  TypeBuilder.cpp l.0023) Building type for variable "direction" (Operator VARIABLE_DECLARATION)
+[23:34:30:060][Info ](  TypeBuilder.cpp l.0025) Type built for variable "direction" = "int" (Operator VARIABLE_DECLARATION)
+[23:34:30:062][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "direction" = "int"
+[23:34:30:063][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:30:064][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:30:067][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "direction" = "int"
+[23:34:30:068][Debug](SemanticTypeCheck l.0196) direction = 0;	symbol = int
+[23:34:30:069][Debug](ExpressionParser. l.0045) 	Pushing var operand defaultPos
+[23:34:30:071][Debug](  TypeBuilder.cpp l.0023) Building type for variable "defaultPos" (Operator UNARY)
+[23:34:30:072][Info ](  TypeBuilder.cpp l.0025) Type built for variable "defaultPos" = "var Fcty" (Operator UNARY)
+[23:34:30:073][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "defaultPos" = "var Fcty"
+[23:34:30:074][Debug](SymbolTableTypeUp l.0020) Variable event USE
+[23:34:30:077][Debug](SemanticTypeCheck l.0196) defaultPos = ;	symbol = var Fcty
+[23:34:30:079][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:30:080][Debug](  TypeBuilder.cpp l.0055) Building type for expression "defaultPos" (Operator UNARY)
+[23:34:30:081][Info ](  TypeBuilder.cpp l.0057) Type built for expression "defaultPos" = "var Fcty" (Operator UNARY)
+[23:34:30:082][Debug](         Symbol.h l.0023) Creating Symbol "pos" from table
+[23:34:30:084][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to pos void
+[23:34:30:087][Debug](  TypeBuilder.cpp l.0023) Building type for variable "pos" (Operator VARIABLE_DECLARATION)
+[23:34:30:089][Info ](  TypeBuilder.cpp l.0025) Type built for variable "pos" = "var Fcty" (Operator VARIABLE_DECLARATION)
+[23:34:30:091][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "pos" = "var Fcty"
+[23:34:30:093][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:30:094][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:30:097][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "pos" = "var Fcty"
+[23:34:30:098][Debug](SemanticTypeCheck l.0196) pos = defaultPos;	symbol = var Fcty
+[23:34:30:099][Debug](ExpressionParser. l.0045) 	Pushing var operand EntityManager
+[23:34:30:101][Debug](  TypeBuilder.cpp l.0023) Building type for variable "EntityManager" (Operator UNARY)
+[23:34:30:102][Info ](  TypeBuilder.cpp l.0025) Type built for variable "EntityManager" = "var em_lib.miniska" (Operator UNARY)
+[23:34:30:103][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "EntityManager" = "var em_lib.miniska"
+[23:34:30:104][Debug](SymbolTableTypeUp l.0020) Variable event USE
+[23:34:30:107][Debug](SemanticTypeCheck l.0196) EntityManager = ;	symbol = var em_lib.miniska
+[23:34:30:109][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:30:110][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FIELD_ACCESS)
+[23:34:30:112][Debug](       Symbol.cpp l.0031) Looking for getInput in the targetted script
+[23:34:30:113][Info ](TypeBuilderFieldA l.0030) Field accessed "getInput" (type "function getInput (string)") of "EntityManager"
+[23:34:30:117][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "function getInput (string)" (Operator FIELD_ACCESS)
+[23:34:30:118][Debug](         Symbol.h l.0023) Creating Symbol "getInput" from table
+[23:34:30:120][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to getInput void
+[23:34:30:121][Debug](  TypeBuilder.cpp l.0023) Building type for variable "getInput" (Operator VARIABLE_DECLARATION)
+[23:34:30:122][Info ](  TypeBuilder.cpp l.0025) Type built for variable "getInput" = "function getInput (string)" (Operator VARIABLE_DECLARATION)
+[23:34:30:123][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "getInput" = "function getInput (string)"
+[23:34:30:129][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:30:130][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:30:131][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "getInput" = "function getInput (string)"
+[23:34:30:132][Debug](SemanticTypeCheck l.0196) getInput = ;	symbol = function getInput (string)
+[23:34:30:133][Debug](MatcherFunction.c l.0034) function read.
+[23:34:30:134][Debug](  TypeBuilder.cpp l.0064) Building type for function parameter declaration / call "Fcty" (Operator FUNCTION_DECLARATION)
+[23:34:30:136][Info ](  TypeBuilder.cpp l.0066) Type built for function parameter declaration / call "Fcty" = "function Fcty (string name - var Fcty)" (Operator FUNCTION_DECLARATION)
+[23:34:30:140][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:30:141][Debug](  TypeBuilder.cpp l.0055) Building type for expression "Fcty" (Operator FUNCTION_DECLARATION)
+[23:34:30:142][Info ](  TypeBuilder.cpp l.0057) Type built for expression "Fcty" = "function Fcty (string name - var Fcty)" (Operator FUNCTION_DECLARATION)
+[23:34:30:144][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Fcty" (Operator VARIABLE_DECLARATION)
+[23:34:30:145][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Fcty" = "function Fcty (string name - var Fcty)" (Operator VARIABLE_DECLARATION)
+[23:34:30:147][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Fcty" = "function Fcty (string name - var Fcty)"
+[23:34:30:150][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:30:151][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:30:152][Warn ](SymbolTableTypeUp l.0048) No type updated for symbol "Fcty" with operator "VARIABLE_DECLARATION" : existing type "function Fcty (string name - var Fcty)"
+[23:34:30:154][Debug](SemanticTypeCheck l.0196) Fcty = Fcty;	symbol = function Fcty (string name - var Fcty)
+[23:34:30:155][Debug](         Symbol.h l.0029) Creating Symbol "character" from script
+[23:34:30:156][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to character void
+[23:34:30:157][Debug](         Symbol.h l.0023) Creating Symbol "Character" from table
+[23:34:30:161][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to Character void
+[23:34:30:162][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Character" (Operator VARIABLE_DECLARATION)
+[23:34:30:164][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Character" = "var character" (Operator VARIABLE_DECLARATION)
+[23:34:30:166][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Character" = "var character"
+[23:34:30:167][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:30:168][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:30:171][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "Character" = "var character"
+[23:34:30:172][Debug](         Symbol.h l.0023) Creating Symbol "Gen" from table
+[23:34:30:173][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to Gen void
+[23:34:30:175][Debug](BindingFactory.cp l.0066) type for node using namespace class Character with class Fcty
+[23:34:30:176][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Gen" (Operator FUNCTION_PROTOTYPE_DECLARATION)
+[23:34:30:177][Info ](TypeBuilderFuncti l.0039) Character
+[23:34:30:180][Info ](TypeBuilderFuncti l.0015) function prototype declaration has an OBJECT return type "Gen"
+[23:34:30:181][Debug](       Symbol.cpp l.0031) Looking for Fcty in the targetted script
+[23:34:30:183][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Gen" = "function Gen (var Fcty)" (Operator FUNCTION_PROTOTYPE_DECLARATION)
+[23:34:30:184][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Gen" = "function Gen (var Fcty)"
+[23:34:30:186][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:30:187][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:30:190][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "Gen" = "function Gen (var Fcty)"
+[23:34:30:191][Debug](  TypeBuilder.cpp l.0064) Building type for function parameter declaration / call "Gen" (Operator FUNCTION_DECLARATION)
+[23:34:30:193][Info ](  TypeBuilder.cpp l.0066) Type built for function parameter declaration / call "Gen" = "function Gen (var Fcty)" (Operator FUNCTION_DECLARATION)
+[23:34:31:917][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Gen" (Operator VARIABLE_DECLARATION)
+[23:34:31:919][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Gen" = "function Gen (var Fcty)" (Operator VARIABLE_DECLARATION)
+[23:34:31:922][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Gen" = "function Gen (var Fcty)"
+[23:34:31:923][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:31:924][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:31:925][Warn ](SymbolTableTypeUp l.0048) No type updated for symbol "Gen" with operator "VARIABLE_DECLARATION" : existing type "function Gen (var Fcty)"
+[23:34:31:927][Debug](         Symbol.h l.0023) Creating Symbol "printInt" from table
+[23:34:31:930][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to printInt void
+[23:34:31:932][Debug](BindingFactory.cp l.0054) type for node found in reserved pool : int
+[23:34:31:933][Debug](         Symbol.h l.0023) Creating Symbol "0" from table
+[23:34:31:934][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to 0 void
+[23:34:31:936][Debug](  TypeBuilder.cpp l.0023) Building type for variable "0" (Operator PARAMETER_DECLARATION)
+[23:34:31:938][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "0 with type-node int
+[23:34:31:941][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "0" = "interror variant"
+[23:34:31:942][Info ](  TypeBuilder.cpp l.0025) Type built for variable "0" = "int 0" (Operator PARAMETER_DECLARATION)
+[23:34:31:943][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "0" = "int 0"
+[23:34:31:944][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:31:945][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:31:946][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "0" = "int 0"
+[23:34:31:947][Debug](BindingFactory.cp l.0054) type for node found in reserved pool : void
+[23:34:31:948][Debug](  TypeBuilder.cpp l.0023) Building type for variable "printInt" (Operator FUNCTION_PROTOTYPE_DECLARATION)
+[23:34:31:952][Info ](TypeBuilderFuncti l.0039) 0
+[23:34:31:954][Info ](TypeBuilderFuncti l.0039) void
+[23:34:31:955][Info ](TypeBuilderFuncti l.0027) function prototype declaration has a return type "void" for function "printInt"
+[23:34:31:957][Info ](  TypeBuilder.cpp l.0025) Type built for variable "printInt" = "function printInt (int 0 - void)" (Operator FUNCTION_PROTOTYPE_DECLARATION)
+[23:34:31:958][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "printInt" = "function printInt (int 0 - void)"
+[23:34:31:962][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:31:964][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:31:965][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "printInt" = "function printInt (int 0 - void)"
+[23:34:31:966][Debug](  TypeBuilder.cpp l.0064) Building type for function parameter declaration / call "printInt" (Operator FUNCTION_DECLARATION)
+[23:34:31:967][Info ](  TypeBuilder.cpp l.0066) Type built for function parameter declaration / call "printInt" = "function printInt (int 0 - void)" (Operator FUNCTION_DECLARATION)
+[23:34:31:970][Debug](         Symbol.h l.0023) Creating Symbol "printString" from table
+[23:34:31:973][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to printString void
+[23:34:31:974][Debug](BindingFactory.cp l.0054) type for node found in reserved pool : string
+[23:34:31:976][Debug](         Symbol.h l.0023) Creating Symbol "0" from table
+[23:34:31:977][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to 0 void
+[23:34:31:978][Debug](  TypeBuilder.cpp l.0023) Building type for variable "0" (Operator PARAMETER_DECLARATION)
+[23:34:31:980][Info ](TypeBuilderParame l.0035) Parameter declaration type calculating for node "0 with type-node string
+[23:34:31:981][Info ](TypeBuilderParame l.0043) Parameter declaration type built for node "0" = "stringerror variant"
+[23:34:31:984][Info ](  TypeBuilder.cpp l.0025) Type built for variable "0" = "string 0" (Operator PARAMETER_DECLARATION)
+[23:34:31:986][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "0" = "string 0"
+[23:34:31:988][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:31:989][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:31:990][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "0" = "string 0"
+[23:34:31:992][Debug](BindingFactory.cp l.0054) type for node found in reserved pool : void
+[23:34:31:995][Debug](  TypeBuilder.cpp l.0023) Building type for variable "printString" (Operator FUNCTION_PROTOTYPE_DECLARATION)
+[23:34:31:996][Info ](TypeBuilderFuncti l.0039) 0
+[23:34:31:997][Info ](TypeBuilderFuncti l.0039) void
+[23:34:31:999][Info ](TypeBuilderFuncti l.0027) function prototype declaration has a return type "void" for function "printString"
+[23:34:32:000][Info ](  TypeBuilder.cpp l.0025) Type built for variable "printString" = "function printString (string 0 - void)" (Operator FUNCTION_PROTOTYPE_DECLARATION)
+[23:34:32:002][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "printString" = "function printString (string 0 - void)"
+[23:34:32:005][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:32:007][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:32:008][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "printString" = "function printString (string 0 - void)"
+[23:34:32:009][Debug](  TypeBuilder.cpp l.0064) Building type for function parameter declaration / call "printString" (Operator FUNCTION_DECLARATION)
+[23:34:32:011][Info ](  TypeBuilder.cpp l.0066) Type built for function parameter declaration / call "printString" = "function printString (string 0 - void)" (Operator FUNCTION_DECLARATION)
+[23:34:33:382][Debug](  TypeBuilder.cpp l.0023) Building type for variable "printInt" (Operator VARIABLE_DECLARATION)
+[23:34:33:384][Info ](  TypeBuilder.cpp l.0025) Type built for variable "printInt" = "function printInt (int 0 - void)" (Operator VARIABLE_DECLARATION)
+[23:34:33:387][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "printInt" = "function printInt (int 0 - void)"
+[23:34:33:388][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:33:389][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:33:390][Warn ](SymbolTableTypeUp l.0048) No type updated for symbol "printInt" with operator "VARIABLE_DECLARATION" : existing type "function printInt (int 0 - void)"
+[23:34:33:392][Debug](  TypeBuilder.cpp l.0023) Building type for variable "printString" (Operator VARIABLE_DECLARATION)
+[23:34:33:395][Info ](  TypeBuilder.cpp l.0025) Type built for variable "printString" = "function printString (string 0 - void)" (Operator VARIABLE_DECLARATION)
+[23:34:33:398][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "printString" = "function printString (string 0 - void)"
+[23:34:33:401][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:33:402][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:33:404][Warn ](SymbolTableTypeUp l.0048) No type updated for symbol "printString" with operator "VARIABLE_DECLARATION" : existing type "function printString (string 0 - void)"
+[23:34:33:407][Debug](ExpressionParser. l.0030) 	Pushing reserved
+[23:34:33:408][Debug](  TypeBuilder.cpp l.0047) Building type for script link "" (Operator SCRIPT_LINK)
+[23:34:33:409][Info ](  TypeBuilder.cpp l.0049) Type built for script link "" = "void" (Operator SCRIPT_LINK)
+[23:34:33:412][Info ](StatementParser.c l.0130) SubParsing script play.miniska : in cache
+[23:34:33:415][Debug](ExpressionParser. l.0030) 	Pushing reserved
+[23:34:33:416][Debug](  TypeBuilder.cpp l.0047) Building type for script link "" (Operator SCRIPT_LINK)
+[23:34:33:417][Info ](  TypeBuilder.cpp l.0049) Type built for script link "" = "void" (Operator SCRIPT_LINK)
+[23:34:33:420][Info ](StatementParser.c l.0130) SubParsing script character.miniska : not in cache
+[23:34:33:421][Debug](         Symbol.h l.0029) Creating Symbol "character" from script
+[23:34:33:422][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to character void
+[23:34:33:426][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:428][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator IMPORT)
+[23:34:33:429][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "var character" (Operator IMPORT)
+[23:34:33:430][Debug](         Symbol.h l.0023) Creating Symbol "Character" from table
+[23:34:33:432][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to Character void
+[23:34:33:434][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Character" (Operator VARIABLE_DECLARATION)
+[23:34:33:437][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Character" = "var character" (Operator VARIABLE_DECLARATION)
+[23:34:33:438][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Character" = "var character"
+[23:34:33:439][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:33:441][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:33:442][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "Character" = "var character"
+[23:34:33:445][Debug](SemanticTypeCheck l.0196) Character = ;	symbol = var character
+[23:34:33:446][Debug](ExpressionParser. l.0030) 	Pushing reserved
+[23:34:33:447][Debug](         Symbol.h l.0029) Creating Symbol "runner_lib.miniska" from script
+[23:34:33:448][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to runner_lib.miniska void
+[23:34:33:450][Debug](  TypeBuilder.cpp l.0047) Building type for script link "" (Operator SCRIPT_LINK)
+[23:34:33:451][Info ](  TypeBuilder.cpp l.0049) Type built for script link "" = "var runner_lib.miniska" (Operator SCRIPT_LINK)
+[23:34:33:452][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:455][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator SCRIPT_LINK)
+[23:34:33:457][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "var runner_lib.miniska" (Operator SCRIPT_LINK)
+[23:34:33:459][Debug](         Symbol.h l.0023) Creating Symbol "Runner" from table
+[23:34:33:460][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to Runner void
+[23:34:33:462][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Runner" (Operator VARIABLE_DECLARATION)
+[23:34:33:463][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Runner" = "var runner_lib.miniska" (Operator VARIABLE_DECLARATION)
+[23:34:33:466][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Runner" = "var runner_lib.miniska"
+[23:34:33:467][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:33:468][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:33:470][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "Runner" = "var runner_lib.miniska"
+[23:34:33:471][Debug](SemanticTypeCheck l.0196) Runner = ;	symbol = var runner_lib.miniska
+[23:34:33:472][Debug](ExpressionParser. l.0030) 	Pushing reserved
+[23:34:33:473][Debug](MatcherFunction.c l.0014) function declaration
+[23:34:33:476][Debug](         Symbol.h l.0023) Creating Symbol "run" from table
+[23:34:33:478][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to run void
+[23:34:33:479][Debug](MatcherFunction.c l.0141) parameter detected, reading identifier : 
+[23:34:33:480][Debug](MatcherFunction.c l.0126) origin
+[23:34:33:481][Debug](         Symbol.h l.0023) Creating Symbol "origin" from table
+[23:34:33:483][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to origin void
+[23:34:33:485][Debug](  TypeBuilder.cpp l.0023) Building type for variable "origin" (Operator PARAMETER_DECLARATION)
+[23:34:33:487][Debug](       Symbol.cpp l.0031) Looking for Fcty in the targetted script
+[23:34:33:488][Info ](TypeBuilderParame l.0027) Parameter declaration type built for node "origin" = "function Fcty (string name - var Fcty)"
+[23:34:33:490][Info ](  TypeBuilder.cpp l.0025) Type built for variable "origin" = "var Fcty" (Operator PARAMETER_DECLARATION)
+[23:34:33:492][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "origin" = "var Fcty"
+[23:34:33:493][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:33:496][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:33:497][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "origin" = "var Fcty"
+[23:34:33:498][Debug](SemanticTypeCheck l.0196) origin = Character;	symbol = var Fcty
+[23:34:33:500][Debug](MatcherFunction.c l.0164) void function detected
+[23:34:33:502][Debug](  TypeBuilder.cpp l.0023) Building type for variable "run" (Operator FUNCTION_PROTOTYPE_DECLARATION)
+[23:34:33:503][Info ](TypeBuilderFuncti l.0039) origin
+[23:34:33:506][Info ](TypeBuilderFuncti l.0039) 
+[23:34:33:507][Info ](TypeBuilderFuncti l.0027) function prototype declaration has a return type "void" for function "run"
+[23:34:33:509][Info ](  TypeBuilder.cpp l.0025) Type built for variable "run" = "function run (var Fcty - void)" (Operator FUNCTION_PROTOTYPE_DECLARATION)
+[23:34:33:510][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "run" = "function run (var Fcty - void)"
+[23:34:33:512][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:33:513][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:33:516][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "run" = "function run (var Fcty - void)"
+[23:34:33:517][Debug](SemanticTypeCheck l.0196) run = origin;	symbol = function run (var Fcty - void)
+[23:34:33:518][Debug](MatcherFunction.c l.0032) reading function body
+[23:34:33:520][Debug](ExpressionParser. l.0045) 	Pushing var operand Character
+[23:34:33:522][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Character" (Operator UNARY)
+[23:34:33:523][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Character" = "var character" (Operator UNARY)
+[23:34:33:525][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Character" = "var character"
+[23:34:33:527][Debug](SymbolTableTypeUp l.0020) Variable event USE
+[23:34:33:529][Debug](SemanticTypeCheck l.0196) Character = ;	symbol = var character
+[23:34:33:530][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FIELD_ACCESS)
+[23:34:33:531][Debug](       Symbol.cpp l.0031) Looking for Fcty in the targetted script
+[23:34:33:533][Info ](TypeBuilderFieldA l.0030) Field accessed "Fcty" (type "function Fcty (string name - var Fcty)") of "Character"
+[23:34:33:536][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "function Fcty (string name - var Fcty)" (Operator FIELD_ACCESS)
+[23:34:33:537][Debug](ExpressionParser. l.0148) 	Function call !
+[23:34:33:539][Debug](ExpressionParser. l.0040) 	Pushing operand test_tititi
+[23:34:33:540][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:541][Debug](  TypeBuilder.cpp l.0055) Building type for expression "test_tititi" (Operator LITERAL)
+[23:34:33:543][Info ](  TypeBuilder.cpp l.0057) Type built for expression "test_tititi" = "string" (Operator LITERAL)
+[23:34:33:546][Debug](MatcherFunction.c l.0057) Expression not null
+[23:34:33:547][Debug](  TypeBuilder.cpp l.0064) Building type for function parameter declaration / call "" (Operator FUNCTION_CALL)
+[23:34:33:549][Info ](  TypeBuilder.cpp l.0066) Type built for function parameter declaration / call "" = "var Fcty" (Operator FUNCTION_CALL)
+[23:34:33:550][Debug](SemanticTypeCheck l.0159) function Fcty (string name - var Fcty) function has the following arguments types during its call : 
+[23:34:33:552][Info ](TypeCrossExpressi l.0025) Crossing types between "string name and "string" with operator "="
+[23:34:33:555][Info ](TypeCrossExpressi l.0027) Crossing types basic result = "string"
+[23:34:33:557][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:558][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FUNCTION_CALL)
+[23:34:33:559][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "var Fcty" (Operator FUNCTION_CALL)
+[23:34:33:560][Debug](         Symbol.h l.0023) Creating Symbol "ch" from table
+[23:34:33:562][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to ch void
+[23:34:33:563][Debug](  TypeBuilder.cpp l.0023) Building type for variable "ch" (Operator VARIABLE_DECLARATION)
+[23:34:33:566][Info ](  TypeBuilder.cpp l.0025) Type built for variable "ch" = "var Fcty" (Operator VARIABLE_DECLARATION)
+[23:34:33:568][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "ch" = "var Fcty"
+[23:34:33:569][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:33:570][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:33:571][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "ch" = "var Fcty"
+[23:34:33:572][Debug](SemanticTypeCheck l.0196) ch = ;	symbol = var Fcty
+[23:34:33:573][Info ](StatementParser.c l.0064) Expression-statement found
+[23:34:33:576][Debug](ExpressionParser. l.0045) 	Pushing var operand Runner
+[23:34:33:578][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Runner" (Operator UNARY)
+[23:34:33:579][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Runner" = "var runner_lib.miniska" (Operator UNARY)
+[23:34:33:580][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Runner" = "var runner_lib.miniska"
+[23:34:33:582][Debug](SymbolTableTypeUp l.0020) Variable event USE
+[23:34:33:583][Debug](SemanticTypeCheck l.0196) Runner = ;	symbol = var runner_lib.miniska
+[23:34:33:588][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FIELD_ACCESS)
+[23:34:33:589][Debug](       Symbol.cpp l.0031) Looking for printString in the targetted script
+[23:34:33:591][Info ](TypeBuilderFieldA l.0030) Field accessed "printString" (type "function printString (string 0 - void)") of "Runner"
+[23:34:33:593][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "function printString (string 0 - void)" (Operator FIELD_ACCESS)
+[23:34:33:595][Debug](ExpressionParser. l.0148) 	Function call !
+[23:34:33:599][Debug](ExpressionParser. l.0045) 	Pushing var operand ch
+[23:34:33:600][Debug](  TypeBuilder.cpp l.0023) Building type for variable "ch" (Operator UNARY)
+[23:34:33:602][Info ](  TypeBuilder.cpp l.0025) Type built for variable "ch" = "var Fcty" (Operator UNARY)
+[23:34:33:604][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "ch" = "var Fcty"
+[23:34:33:605][Debug](SymbolTableTypeUp l.0020) Variable event USE
+[23:34:33:608][Debug](SemanticTypeCheck l.0196) ch = ;	symbol = var Fcty
+[23:34:33:609][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FIELD_ACCESS)
+[23:34:33:611][Info ](TypeBuilderFieldA l.0030) Field accessed "getInput" (type "function getInput (string)") of "ch"
+[23:34:33:614][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "function getInput (string)" (Operator FIELD_ACCESS)
+[23:34:33:615][Debug](ExpressionParser. l.0148) 	Function call !
+[23:34:33:618][Debug](  TypeBuilder.cpp l.0064) Building type for function parameter declaration / call "" (Operator FUNCTION_CALL)
+[23:34:33:620][Info ](  TypeBuilder.cpp l.0066) Type built for function parameter declaration / call "" = "string" (Operator FUNCTION_CALL)
+[23:34:33:622][Debug](SemanticTypeCheck l.0159) function getInput (string) function has the following arguments types during its call : 
+[23:34:33:623][Debug](ExpressionParser. l.0106) 	Range end
+[23:34:33:624][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:625][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FUNCTION_CALL)
+[23:34:33:629][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "string" (Operator FUNCTION_CALL)
+[23:34:33:630][Debug](MatcherFunction.c l.0057) Expression not null
+[23:34:33:632][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:633][Debug](MatcherFunction.c l.0060) Expression null
+[23:34:33:634][Debug](  TypeBuilder.cpp l.0064) Building type for function parameter declaration / call "" (Operator FUNCTION_CALL)
+[23:34:33:635][Info ](  TypeBuilder.cpp l.0066) Type built for function parameter declaration / call "" = "void" (Operator FUNCTION_CALL)
+[23:34:33:637][Debug](SemanticTypeCheck l.0159) function printString (string 0 - void) function has the following arguments types during its call : 
+[23:34:33:641][Info ](TypeCrossExpressi l.0025) Crossing types between "string 0 and "string" with operator "="
+[23:34:33:642][Info ](TypeCrossExpressi l.0027) Crossing types basic result = "string"
+[23:34:33:644][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:645][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FUNCTION_CALL)
+[23:34:33:646][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "void" (Operator FUNCTION_CALL)
+[23:34:33:647][Info ](StatementParser.c l.0064) Expression-statement found
+[23:34:33:648][Debug](ExpressionParser. l.0045) 	Pushing var operand Runner
+[23:34:33:651][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Runner" (Operator UNARY)
+[23:34:33:652][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Runner" = "var runner_lib.miniska" (Operator UNARY)
+[23:34:33:654][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Runner" = "var runner_lib.miniska"
+[23:34:33:655][Debug](SymbolTableTypeUp l.0020) Variable event USE
+[23:34:33:657][Debug](SemanticTypeCheck l.0196) Runner = ;	symbol = var runner_lib.miniska
+[23:34:33:658][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FIELD_ACCESS)
+[23:34:33:659][Debug](       Symbol.cpp l.0031) Looking for printInt in the targetted script
+[23:34:33:662][Info ](TypeBuilderFieldA l.0030) Field accessed "printInt" (type "function printInt (int 0 - void)") of "Runner"
+[23:34:33:664][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "function printInt (int 0 - void)" (Operator FIELD_ACCESS)
+[23:34:33:665][Debug](ExpressionParser. l.0148) 	Function call !
+[23:34:33:666][Debug](ExpressionParser. l.0045) 	Pushing var operand ch
+[23:34:33:667][Debug](  TypeBuilder.cpp l.0023) Building type for variable "ch" (Operator UNARY)
+[23:34:33:668][Info ](  TypeBuilder.cpp l.0025) Type built for variable "ch" = "var Fcty" (Operator UNARY)
+[23:34:33:671][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "ch" = "var Fcty"
+[23:34:33:672][Debug](SymbolTableTypeUp l.0020) Variable event USE
+[23:34:33:674][Debug](SemanticTypeCheck l.0196) ch = ;	symbol = var Fcty
+[23:34:33:675][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:676][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FIELD_ACCESS)
+[23:34:33:677][Info ](TypeBuilderFieldA l.0030) Field accessed "pos" (type "var Fcty") of "ch"
+[23:34:33:679][Info ](TypeBuilderFieldA l.0030) Field accessed "x" (type "int x") of ""
+[23:34:33:681][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "int x" (Operator FIELD_ACCESS)
+[23:34:33:683][Debug](MatcherFunction.c l.0057) Expression not null
+[23:34:33:684][Debug](  TypeBuilder.cpp l.0064) Building type for function parameter declaration / call "" (Operator FUNCTION_CALL)
+[23:34:33:686][Info ](  TypeBuilder.cpp l.0066) Type built for function parameter declaration / call "" = "void" (Operator FUNCTION_CALL)
+[23:34:33:687][Debug](SemanticTypeCheck l.0159) function printInt (int 0 - void) function has the following arguments types during its call : 
+[23:34:33:689][Info ](TypeCrossExpressi l.0025) Crossing types between "int 0 and "int x" with operator "="
+[23:34:33:692][Info ](TypeCrossExpressi l.0027) Crossing types basic result = "int"
+[23:34:33:693][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:696][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FUNCTION_CALL)
+[23:34:33:698][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "void" (Operator FUNCTION_CALL)
+[23:34:33:699][Info ](StatementParser.c l.0064) Expression-statement found
+[23:34:33:702][Debug](ExpressionParser. l.0045) 	Pushing var operand Runner
+[23:34:33:703][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Runner" (Operator UNARY)
+[23:34:33:704][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Runner" = "var runner_lib.miniska" (Operator UNARY)
+[23:34:33:706][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Runner" = "var runner_lib.miniska"
+[23:34:33:707][Debug](SymbolTableTypeUp l.0020) Variable event USE
+[23:34:33:708][Debug](SemanticTypeCheck l.0196) Runner = ;	symbol = var runner_lib.miniska
+[23:34:33:709][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FIELD_ACCESS)
+[23:34:33:712][Debug](       Symbol.cpp l.0031) Looking for printInt in the targetted script
+[23:34:33:714][Info ](TypeBuilderFieldA l.0030) Field accessed "printInt" (type "function printInt (int 0 - void)") of "Runner"
+[23:34:33:716][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "function printInt (int 0 - void)" (Operator FIELD_ACCESS)
+[23:34:33:717][Debug](ExpressionParser. l.0148) 	Function call !
+[23:34:33:719][Debug](ExpressionParser. l.0045) 	Pushing var operand ch
+[23:34:33:720][Debug](  TypeBuilder.cpp l.0023) Building type for variable "ch" (Operator UNARY)
+[23:34:33:723][Info ](  TypeBuilder.cpp l.0025) Type built for variable "ch" = "var Fcty" (Operator UNARY)
+[23:34:33:724][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "ch" = "var Fcty"
+[23:34:33:725][Debug](SymbolTableTypeUp l.0020) Variable event USE
+[23:34:33:726][Debug](SemanticTypeCheck l.0196) ch = ;	symbol = var Fcty
+[23:34:33:728][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:729][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FIELD_ACCESS)
+[23:34:33:730][Info ](TypeBuilderFieldA l.0030) Field accessed "pos" (type "var Fcty") of "ch"
+[23:34:33:733][Info ](TypeBuilderFieldA l.0030) Field accessed "y" (type "int y") of ""
+[23:34:33:734][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "int y" (Operator FIELD_ACCESS)
+[23:34:33:735][Debug](MatcherFunction.c l.0057) Expression not null
+[23:34:33:736][Debug](  TypeBuilder.cpp l.0064) Building type for function parameter declaration / call "" (Operator FUNCTION_CALL)
+[23:34:33:738][Info ](  TypeBuilder.cpp l.0066) Type built for function parameter declaration / call "" = "void" (Operator FUNCTION_CALL)
+[23:34:33:739][Debug](SemanticTypeCheck l.0159) function printInt (int 0 - void) function has the following arguments types during its call : 
+[23:34:33:743][Info ](TypeCrossExpressi l.0025) Crossing types between "int 0 and "int y" with operator "="
+[23:34:33:744][Info ](TypeCrossExpressi l.0027) Crossing types basic result = "int"
+[23:34:33:745][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:746][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FUNCTION_CALL)
+[23:34:33:748][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "void" (Operator FUNCTION_CALL)
+[23:34:33:749][Debug](MatcherFunction.c l.0034) function read.
+[23:34:33:750][Debug](  TypeBuilder.cpp l.0064) Building type for function parameter declaration / call "run" (Operator FUNCTION_DECLARATION)
+[23:34:33:754][Info ](  TypeBuilder.cpp l.0066) Type built for function parameter declaration / call "run" = "function run (var Fcty - void)" (Operator FUNCTION_DECLARATION)
+[23:34:33:755][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:756][Debug](  TypeBuilder.cpp l.0055) Building type for expression "run" (Operator FUNCTION_DECLARATION)
+[23:34:33:757][Info ](  TypeBuilder.cpp l.0057) Type built for expression "run" = "function run (var Fcty - void)" (Operator FUNCTION_DECLARATION)
+[23:34:33:759][Debug](  TypeBuilder.cpp l.0023) Building type for variable "run" (Operator VARIABLE_DECLARATION)
+[23:34:33:760][Info ](  TypeBuilder.cpp l.0025) Type built for variable "run" = "function run (var Fcty - void)" (Operator VARIABLE_DECLARATION)
+[23:34:33:764][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "run" = "function run (var Fcty - void)"
+[23:34:33:766][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:33:767][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:33:768][Warn ](SymbolTableTypeUp l.0048) No type updated for symbol "run" with operator "VARIABLE_DECLARATION" : existing type "function run (var Fcty - void)"
+[23:34:33:770][Debug](SemanticTypeCheck l.0196) run = run;	symbol = function run (var Fcty - void)
+[23:34:33:771][Debug](         Symbol.h l.0029) Creating Symbol "play" from script
+[23:34:33:774][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to play void
+[23:34:33:775][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:777][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator IMPORT)
+[23:34:33:778][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "var play" (Operator IMPORT)
+[23:34:33:780][Debug](         Symbol.h l.0023) Creating Symbol "Player" from table
+[23:34:33:781][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to Player void
+[23:34:33:784][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Player" (Operator VARIABLE_DECLARATION)
+[23:34:33:785][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Player" = "var play" (Operator VARIABLE_DECLARATION)
+[23:34:33:787][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Player" = "var play"
+[23:34:33:788][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:33:789][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:33:790][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "Player" = "var play"
+[23:34:33:791][Debug](SemanticTypeCheck l.0196) Player = ;	symbol = var play
+[23:34:33:792][Debug](ExpressionParser. l.0030) 	Pushing reserved
+[23:34:33:796][Debug](         Symbol.h l.0029) Creating Symbol "character_generator.miniska" from script
+[23:34:33:797][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to character_generator.miniska void
+[23:34:33:799][Debug](  TypeBuilder.cpp l.0047) Building type for script link "" (Operator SCRIPT_LINK)
+[23:34:33:800][Info ](  TypeBuilder.cpp l.0049) Type built for script link "" = "var character_generator.miniska" (Operator SCRIPT_LINK)
+[23:34:33:801][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:802][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator SCRIPT_LINK)
+[23:34:33:805][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "var character_generator.miniska" (Operator SCRIPT_LINK)
+[23:34:33:807][Debug](         Symbol.h l.0023) Creating Symbol "CharacterGenerator" from table
+[23:34:33:808][Debug](         Symbol.h l.0052)    Move, Symbol  void moved to CharacterGenerator void
+[23:34:33:809][Debug](  TypeBuilder.cpp l.0023) Building type for variable "CharacterGenerator" (Operator VARIABLE_DECLARATION)
+[23:34:33:813][Info ](  TypeBuilder.cpp l.0025) Type built for variable "CharacterGenerator" = "var character_generator.miniska" (Operator VARIABLE_DECLARATION)
+[23:34:33:817][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "CharacterGenerator" = "var character_generator.miniska"
+[23:34:33:819][Debug](SymbolTableTypeUp l.0025) Variable event DECLARATION
+[23:34:33:821][Debug](SymbolTableTypeUp l.0037) Is operator named : 1
+[23:34:33:822][Info ](SymbolTableTypeUp l.0046) Type updated for symbol "CharacterGenerator" = "var character_generator.miniska"
+[23:34:33:826][Debug](SemanticTypeCheck l.0196) CharacterGenerator = ;	symbol = var character_generator.miniska
+[23:34:33:827][Info ](StatementParser.c l.0064) Expression-statement found
+[23:34:33:829][Debug](ExpressionParser. l.0045) 	Pushing var operand Player
+[23:34:33:831][Debug](  TypeBuilder.cpp l.0023) Building type for variable "Player" (Operator UNARY)
+[23:34:33:832][Info ](  TypeBuilder.cpp l.0025) Type built for variable "Player" = "var play" (Operator UNARY)
+[23:34:33:833][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "Player" = "var play"
+[23:34:33:836][Debug](SymbolTableTypeUp l.0020) Variable event USE
+[23:34:33:837][Debug](SemanticTypeCheck l.0196) Player = ;	symbol = var play
+[23:34:33:838][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FIELD_ACCESS)
+[23:34:33:839][Debug](       Symbol.cpp l.0031) Looking for run in the targetted script
+[23:34:33:841][Info ](TypeBuilderFieldA l.0030) Field accessed "run" (type "function run (var Fcty - void)") of "Player"
+[23:34:33:842][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "function run (var Fcty - void)" (Operator FIELD_ACCESS)
+[23:34:33:843][Debug](ExpressionParser. l.0148) 	Function call !
+[23:34:33:847][Debug](ExpressionParser. l.0045) 	Pushing var operand CharacterGenerator
+[23:34:33:848][Debug](  TypeBuilder.cpp l.0023) Building type for variable "CharacterGenerator" (Operator UNARY)
+[23:34:33:849][Info ](  TypeBuilder.cpp l.0025) Type built for variable "CharacterGenerator" = "var character_generator.miniska" (Operator UNARY)
+[23:34:33:851][Debug](SymbolTableTypeUp l.0015) Trying to update symbol-type for "CharacterGenerator" = "var character_generator.miniska"
+[23:34:33:852][Debug](SymbolTableTypeUp l.0020) Variable event USE
+[23:34:33:853][Debug](SemanticTypeCheck l.0196) CharacterGenerator = ;	symbol = var character_generator.miniska
+[23:34:33:854][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FIELD_ACCESS)
+[23:34:33:858][Debug](       Symbol.cpp l.0031) Looking for Gen in the targetted script
+[23:34:33:859][Info ](TypeBuilderFieldA l.0030) Field accessed "Gen" (type "function Gen (var Fcty)") of "CharacterGenerator"
+[23:34:33:861][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "function Gen (var Fcty)" (Operator FIELD_ACCESS)
+[23:34:33:862][Debug](ExpressionParser. l.0148) 	Function call !
+[23:34:33:864][Debug](  TypeBuilder.cpp l.0064) Building type for function parameter declaration / call "" (Operator FUNCTION_CALL)
+[23:34:33:865][Info ](  TypeBuilder.cpp l.0066) Type built for function parameter declaration / call "" = "var Fcty" (Operator FUNCTION_CALL)
+[23:34:33:868][Debug](SemanticTypeCheck l.0159) function Gen (var Fcty) function has the following arguments types during its call : 
+[23:34:33:870][Debug](ExpressionParser. l.0106) 	Range end
+[23:34:33:871][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:872][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FUNCTION_CALL)
+[23:34:33:873][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "var Fcty" (Operator FUNCTION_CALL)
+[23:34:33:875][Debug](MatcherFunction.c l.0057) Expression not null
+[23:34:33:876][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:879][Debug](MatcherFunction.c l.0060) Expression null
+[23:34:33:880][Debug](  TypeBuilder.cpp l.0064) Building type for function parameter declaration / call "" (Operator FUNCTION_CALL)
+[23:34:33:882][Info ](  TypeBuilder.cpp l.0066) Type built for function parameter declaration / call "" = "void" (Operator FUNCTION_CALL)
+[23:34:33:883][Debug](SemanticTypeCheck l.0159) function run (var Fcty - void) function has the following arguments types during its call : 
+[23:34:33:885][Info ](TypeCrossExpressi l.0025) Crossing types between "var Fcty and "var Fcty" with operator "="
+[23:34:33:886][Info ](TypeCrossExpressi l.0027) Crossing types basic result = "var"
+[23:34:33:887][Info ](TypeCrossExpressi l.0031) Crossing types full result = "var Fcty"
+[23:34:33:890][Debug](ExpressionParser. l.0189) 	Poping everything
+[23:34:33:891][Debug](  TypeBuilder.cpp l.0055) Building type for expression "" (Operator FUNCTION_CALL)
+[23:34:33:893][Info ](  TypeBuilder.cpp l.0057) Type built for expression "" = "void" (Operator FUNCTION_CALL)
