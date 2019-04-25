@@ -5,15 +5,13 @@
 #include "Interpreter/Value/Script.h"
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::FOR_LOOP>::interpret(OperateOn node) {
-	node.parent.pushNestedMemory();
+	auto lock = node.parent.pushNestedMemory(true);
 	m_interpreter.interpret({ node.parent, node.GetInitialization() });
 	auto condition = NodeValue {};
 	while ((condition = m_interpreter.interpret({ node.parent, node.GetCondition() }).asRvalue().object).nodeval<bool>()) {
-		node.parent.pushNestedMemory();
+		auto innerlock = node.parent.pushNestedMemory(true);
 		m_interpreter.interpret({ node.parent, node.GetStatement() });
 		m_interpreter.interpret({ node.parent, node.GetIncrement() });
-		node.parent.popNestedMemory();
 	}	
-	node.parent.popNestedMemory();
 	return {};
 }

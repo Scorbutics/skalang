@@ -4,7 +4,7 @@ std::weak_ptr<ska::MemoryTable> ska::MemoryTable::parent() {
 	return m_parent;
 }
 
-ska::MemoryTablePtr& ska::MemoryTable::pushNested() {
+ska::MemoryTablePtr& ska::MemoryTable::internalPushNested() {
 	m_children.push_back(MemoryTable::create(shared_from_this()));
 	auto& lastChild = m_children.back();
 	//No bad memory access possible when smart ptr are moved, that's why it's safe to return the address of contained item
@@ -12,7 +12,7 @@ ska::MemoryTablePtr& ska::MemoryTable::pushNested() {
 	return lastChild;
 }
 
-void ska::MemoryTable::endNested() {
+void ska::MemoryTable::internalEndNested() {
 	//TODO : devrait être systématiquement un "popNested" sauf pour le cas d'un block type "root script" ?
 	
 	/*
@@ -22,9 +22,8 @@ void ska::MemoryTable::endNested() {
 	*/
 }
 
-ska::MemoryTable* ska::MemoryTable::popNested() {
+void ska::MemoryTable::internalPopNested() {
 	m_children.pop_back();
-	return this;
 }
 
 ska::MemoryLValue ska::MemoryTable::put(const std::string& name, NodeValue value) {
@@ -63,4 +62,39 @@ ska::MemoryLValue ska::MemoryTable::emplace(const std::string& name, NodeValue v
 	}
 
 	return std::make_pair(memValue, shared_from_this());
+}
+
+ska::MemoryTableLock ska::MemoryTable::pushNested(bool pop, MemoryTablePtr* target) {
+	return MemoryTableLock{*this, target, pop};
+}
+
+
+ska::MemoryTableLock::MemoryTableLock(MemoryTable& instance, MemoryTablePtr* cursorCurrent, bool pop) : 
+	m_pop(pop),
+	m_instance(instance),
+	m_cursorCurrent(cursorCurrent) {
+	if(m_cursorCurrent != nullptr) {
+		*m_cursorCurrent = m_instance.internalPushNested();
+	}
+}
+	
+void ska::MemoryTableLock::release() {
+	if(m_freed) {
+		return;
+	}
+
+	if(m_cursorCurrent != nullptr && *m_cursorCurrent != nullptr) {
+		*m_cursorCurrent = (*m_cursorCurrent)->parent().lock();
+	}
+
+	if(m_pop) {
+		m_instance.internalPopNested();
+	} else {
+		m_instance.internalEndNested();
+	}
+	m_freed = true;
+}
+
+ska::MemoryTableLock::~MemoryTableLock() {
+	release();
 }

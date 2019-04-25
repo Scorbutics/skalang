@@ -63,25 +63,14 @@ namespace ska {
 		SymbolTable& symbols() { return m_handle->m_symbols; }
 		const SymbolTable& symbols() const { return m_handle->m_symbols; }
 
-		void pushNestedMemory() {
-			m_handle->m_currentMemory = m_handle->m_currentMemory->pushNested();
+		auto pushNestedMemory(bool pop) {
+			auto lock = m_handle->m_currentMemory->pushNested(pop, &m_handle->m_currentMemory);
+			return lock;
 		}
 		
-		void popNestedMemory() {
-			endNestedMemory();
-			if (m_handle->m_currentMemory != nullptr) {
-				m_handle->m_currentMemory->popNested();
-			}
-		}
-
 		template <class T>
 		auto putMemory(const std::string& s, T&& value) {
 			return m_handle->m_currentMemory->put(s, std::forward<T>(value));
-		}
-
-		void endNestedMemory() {
-			m_handle->m_currentMemory->endNested();
-			m_handle->m_currentMemory = m_handle->m_currentMemory->parent().lock();
 		}
 
 		MemoryTablePtr pointMemoryTo(MemoryTablePtr& to) {

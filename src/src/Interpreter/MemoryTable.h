@@ -10,7 +10,21 @@
 
 namespace ska {
 
+	class MemoryTableLock {
+	public:
+		MemoryTableLock(MemoryTable& instance, MemoryTablePtr* cursorCurrent, bool pop);
+		void release();
+		~MemoryTableLock();
+
+	private:
+		MemoryTablePtr* m_cursorCurrent = nullptr;
+		bool m_pop = false;
+		bool m_freed = false;
+		MemoryTable& m_instance;
+	};
+
 	class MemoryTable : public  std::enable_shared_from_this<MemoryTable> {
+		friend class MemoryTableLock;
 	public:
 		MemoryTable(const MemoryTable&) = delete;
 		MemoryTable& operator=(const MemoryTable&) = delete;
@@ -28,21 +42,15 @@ namespace ska {
 			return *this;
 		}
 
-		MemoryTablePtr& pushNested();
-		void endNested();
-		MemoryTable* popNested();
+		[[nodiscard]]
+		MemoryTableLock pushNested(bool pop, MemoryTablePtr* target);
+
 		MemoryLValue put(const std::string& name, NodeValue value);
 		MemoryLValue emplace(const std::string& name, NodeValue value);
 		void put(const std::string& name, std::size_t index, NodeValue value);
 
-		MemoryLValue operator[](const std::string& key) {
-			return inMemoryFind(key);
-		}
-
-		MemoryCLValue operator[](const std::string& key) const {
-			return inMemoryFind(key);
-		}
-
+		MemoryLValue operator[](const std::string& key) { return inMemoryFind(key); }
+		MemoryCLValue operator[](const std::string& key) const { return inMemoryFind(key); }
 
 		MemoryLValue operator()(const std::string& key) {
 			auto valueIt = m_memory.find(key);
@@ -64,6 +72,10 @@ namespace ska {
 		}
 
 	private:
+		MemoryTablePtr& internalPushNested();
+		void internalEndNested();
+		void internalPopNested();
+
 		MemoryTable(MemoryTable&& o) noexcept = default;
 		MemoryTable& operator=(MemoryTable&& o) noexcept = default;
 

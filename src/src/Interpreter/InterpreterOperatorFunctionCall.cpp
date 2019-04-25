@@ -34,7 +34,7 @@ namespace ska {
 		auto currentExecutionMemoryZone = node.parent.pointMemoryTo(memoryForFunctionExecution);
 
 		//Creates function-memory environment scope (including creation of parameters)
-		node.parent.pushNestedMemory();
+		auto lock = node.parent.pushNestedMemory(true);
 
 		for (auto& parameterValue : parametersValues) {
 			auto& functionParameter = functionPrototype[index++];
@@ -43,7 +43,7 @@ namespace ska {
 		auto result = interpreter.interpret({ node.parent, operateOnFunctionDeclaration.GetFunctionBody() });
 
 		//Go back to the current execution scope, while destroying the memory used during function execution
-		node.parent.popNestedMemory();
+		lock.release();
 		node.parent.pointMemoryTo(currentExecutionMemoryZone);
 		return result;
 	}
