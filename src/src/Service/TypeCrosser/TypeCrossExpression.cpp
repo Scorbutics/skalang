@@ -10,7 +10,7 @@ namespace ska {
 }
 
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeCrosser)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeCrosser)
 
 ska::TypeCrosser::TypeCrossMap ska::TypeCrosser::typeCrossMap = ska::TypeCrosser::BuildTypeCrossMap();
 

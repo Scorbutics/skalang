@@ -4,8 +4,8 @@
 #include "TypeBuilderCalculatorDispatcher.h"
 #include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::LITERAL>);
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::UNARY>);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::LITERAL>);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::UNARY>);
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::LITERAL>::build(const Script& script, OperateOn node) {
 	auto& symbols = script.symbols();

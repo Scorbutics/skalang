@@ -6,7 +6,7 @@
 #include "Service/SymbolTable.h"
 #include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>)
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>::build(const Script& script, OperateOn node) {
     

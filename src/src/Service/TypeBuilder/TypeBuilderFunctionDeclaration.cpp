@@ -5,7 +5,7 @@
 #include "NodeValue/AST.h"
 #include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::FUNCTION_DECLARATION>)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_DECLARATION>)
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_DECLARATION>::build(const Script& script, OperateOn node) {
 	auto functionName = node.GetFunctionName();

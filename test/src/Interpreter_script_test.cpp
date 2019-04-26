@@ -274,6 +274,35 @@ TEST_CASE("[Interpreter Script]") {
 		}
 	}
 
+	SUBCASE("Using a binding in another binding ") {
+		ASTFromInputSemanticTCInterpreterScriptNoParse(
+			"var DataClassImp280 = import \"dataclass_script\";"
+			"DataClassImp280.run().getToto();", data);
+		
+		auto scriptEmBinding = ska::ScriptBridge{ scriptCacheIS, "binding1_lib", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
+		scriptEmBinding.bindFunction("getToto", std::function<std::string()>([]() {
+			return "tototo !";
+		}));
+		scriptEmBinding.build();
+
+		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
+		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Test293", "../test/src/resources/test293"}, {"Binding1", "binding1_lib"} });
+		scriptBindingDataClass.bindGenericFunction("run", { "Test293::Fcty" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+			auto& em = scriptBindingDataClass.findInMemoryTree("Binding1").first->nodeval<ska::ExecutionContext>();
+			auto& emScriptMemory = em.program().currentMemory().down();
+			auto mem = scriptBindingDataClass.createMemory();
+			auto* inputFunc = (emScriptMemory)("getToto").first;
+			assert(inputFunc != nullptr);
+			mem->emplace("getToto", inputFunc->clone());
+			return ska::NodeValue{ std::move(mem) };
+		}));
+		scriptBindingDataClass.build();
+
+		readerIS->parse(*data.parser);
+		auto result = data.interpreter->script(*readerIS);
+		CHECK(result.nodeval<std::string>() == "tototo !");
+	}
+
 	SUBCASE("C++ script-function binding with void return") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse("var User264 = import \"binding264\"; User264.funcTest(14);", data);
 		auto test = 0;

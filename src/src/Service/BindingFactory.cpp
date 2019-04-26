@@ -13,7 +13,7 @@
 #include "Matcher/MatcherImport.h"
 #include "Interpreter/Interpreter.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::BindingFactory)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::BindingFactory)
 
 ska::BindingFactory::BindingFactory(TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved) :
     m_reserved(reserved),

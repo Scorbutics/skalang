@@ -8,7 +8,7 @@
 #include "Service/ASTFactory.h"
 #include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::MatcherFunction)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherFunction)
 
 ska::ASTNodePtr ska::MatcherFunction::matchDeclaration(Script& input) {
 	SLOG(ska::LogLevel::Debug) << "function declaration";
