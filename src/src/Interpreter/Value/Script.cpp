@@ -13,6 +13,9 @@ ska::ScriptPtr ska::Script::subScript(const std::string& name) {
 
 ska::ASTNode& ska::Script::fromBridge(std::vector<BridgeMemory> bindings) {
 	assert(m_handle->m_ast == nullptr && "Script built from a bridge must be empty");
+	
+	//use existing memory to point to it (a bit hacky, it would be nice to copy...)
+	m_handle->m_currentMemory = m_handle->m_currentMemory->down().shared_from_this();
 
 	auto lock = pushNestedMemory(false);
 	auto functionListNodes = bindings.empty() ? std::vector<ASTNodePtr>() : std::vector<ASTNodePtr>(bindings.size());

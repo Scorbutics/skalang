@@ -21,6 +21,7 @@ namespace ska {
 	class SymbolTableTypeUpdater;
 	struct ReservedKeywordsPool;
 	class StatementParser;
+	class Interpreter;
 
 	//http://coliru.stacked-crooked.com/a/8efdf80ac4082e22
 	class BindingFactory :
@@ -47,7 +48,7 @@ namespace ska {
 			return result;
 		}
 
-		ASTNodePtr import(StatementParser& parser, Script& script, std::vector<std::pair<std::string, std::string>> imports);
+		ASTNodePtr import(StatementParser& parser, Script& script, Interpreter& interpreter, std::vector<std::pair<std::string, std::string>> imports);
 
 	private:
 		ASTNodePtr getNodeFromTypeName(const std::string& typeName);

@@ -11,6 +11,7 @@
 #include "ASTFactory.h"
 #include "BindingFactory.h"
 #include "Matcher/MatcherImport.h"
+#include "Interpreter/Interpreter.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::BindingFactory)
 
@@ -77,7 +78,7 @@ ska::ASTNodePtr ska::BindingFactory::createImport(StatementParser& parser, ska::
 	return MatcherImport::createNewImport(parser, *this, *this, input, std::move(scriptPathToken));
 }
 
-ska::ASTNodePtr ska::BindingFactory::import(StatementParser& parser, Script& script, std::vector<std::pair<std::string, std::string>> imports) {
+ska::ASTNodePtr ska::BindingFactory::import(StatementParser& parser, Script& script, Interpreter& interpreter, std::vector<std::pair<std::string, std::string>> imports) {
 	listen(script.symbols());
 	auto result = std::vector<ASTNodePtr> {};
 	for (const auto& scriptImporter : imports) {
@@ -99,7 +100,10 @@ ska::ASTNodePtr ska::BindingFactory::import(StatementParser& parser, Script& scr
 		result.emplace_back(std::move(varNode));
 	}
 	unlisten(script.symbols());
-	return ASTFactory::MakeNode<Operator::BLOCK>(std::move(result));
+
+	auto block = ASTFactory::MakeNode<Operator::BLOCK>(std::move(result));
+	interpreter.interpret({ script, *block}); 
+	return block;
 }
 
 ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::string& functionName, std::vector<std::string> typeNames) {

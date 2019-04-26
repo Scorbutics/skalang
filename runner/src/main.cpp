@@ -45,17 +45,16 @@ int main(int argc, char* argv[]) {
 	scriptEmBinding.build();
 
 	auto scriptCharacterBinding = ska::ScriptBridge{ scriptCache, "character_generator", typeBuilder, symbolsTypeUpdater, reservedKeywords };
-	scriptCharacterBinding.import(parser, { {"Character", "character"}, {"EntityManager", "em_lib"} });
+	scriptCharacterBinding.import(parser, interpreter, { {"Character", "character"}, {"EntityManager", "em_lib"} });
 	scriptCharacterBinding.bindGenericFunction("Gen", { "Character::Fcty" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
-		auto em = scriptCharacterBinding.findInMemoryTree("EntityManager").second;
-		assert(em != nullptr);
-
+		auto& em = scriptCharacterBinding.findInMemoryTree("EntityManager").first->nodeval<ska::ExecutionContext>();
+		auto& emScriptMemory = em.program().currentMemory().down();
 		auto mem = scriptCharacterBinding.createMemory();
 		mem->emplace("name", "Toto !");
 		mem->emplace("direction", 0);
-		auto* inputFunc = (*em)("getInput").first;
+		auto* inputFunc = (emScriptMemory)("getInput").first;
 		assert(inputFunc != nullptr);
-		mem->emplace("getInput", std::move(*inputFunc));
+		mem->emplace("getInput", inputFunc->clone());
 		auto pos = scriptCharacterBinding.createMemory();
 		mem->emplace("pos", pos);
 		pos->emplace("x", 134);

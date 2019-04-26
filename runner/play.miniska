@@ -2,9 +2,8 @@ var Character = import "character";
 var Runner = import "runner_lib";
 
 var run = function(origin: Character::Fcty) {
-	var ch = Character.Fcty("test_tititi");
-	Runner.printString(ch.getInput());
-	Runner.printInt(ch.pos.x);
-	Runner.printInt(ch.pos.y);
+	Runner.printString(origin.getInput());
+	Runner.printInt(origin.pos.x);
+	Runner.printInt(origin.pos.y);
 };
 

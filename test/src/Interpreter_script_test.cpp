@@ -148,7 +148,7 @@ TEST_CASE("[Interpreter Script]") {
 		scriptBindingDataClass.build();
 
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding295", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBinding.import(*data.parser, { { "DataClassScript", "dataclass_script" } });
+		scriptBinding.import(*data.parser, *data.interpreter, { { "DataClassScript", "dataclass_script" } });
 		scriptBinding.bindGenericFunction("funcTest", { "DataClassScript::DataClass", "void" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<ska::ObjectMemory>();
 			auto* idMap = (*mem)("id").first;
