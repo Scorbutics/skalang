@@ -45,12 +45,18 @@ int main(int argc, char* argv[]) {
 	scriptEmBinding.build();
 
 	auto scriptCharacterBinding = ska::ScriptBridge{ scriptCache, "character_generator", typeBuilder, symbolsTypeUpdater, reservedKeywords };
-	scriptCharacterBinding.import(parser, { {"Character", "character"} });
+	scriptCharacterBinding.import(parser, { {"Character", "character"}, {"EntityManager", "em_lib"} });
 	scriptCharacterBinding.bindGenericFunction("Gen", { "Character::Fcty" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
-		auto mem = ska::MemoryTable::create();
+		auto em = scriptCharacterBinding.findInMemoryTree("EntityManager").second;
+		assert(em != nullptr);
+
+		auto mem = scriptCharacterBinding.createMemory();
 		mem->emplace("name", "Toto !");
 		mem->emplace("direction", 0);
-		auto pos = ska::MemoryTable::create();
+		auto* inputFunc = (*em)("getInput").first;
+		assert(inputFunc != nullptr);
+		mem->emplace("getInput", std::move(*inputFunc));
+		auto pos = scriptCharacterBinding.createMemory();
 		mem->emplace("pos", pos);
 		pos->emplace("x", 134);
 		pos->emplace("y", 547);

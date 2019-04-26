@@ -45,6 +45,13 @@ namespace ska {
 			m_imports.emplace_back(m_functionBinder.import(parser, m_script, std::move(imports)));
 		}
 	
+		MemoryTablePtr createMemory() { return m_script.createMemory(); }
+		auto findInMemoryTree(const std::string& key) { auto& memScript = m_script.handle()->currentMemory().down(); return memScript[key]; }
+		auto findInMemory(const std::string& key) { auto& memScript = m_script.handle()->currentMemory().down(); return memScript(key); }
+
+		template <class T>
+		auto emplaceMemory(const std::string& key, T&& value) { return m_script.emplaceMemory(key, std::forward<T>(value)); }
+
 	private:
 		TypeBuilder& m_typeBuilder;
 		SymbolTableTypeUpdater& m_symbolTypeUpdater;
