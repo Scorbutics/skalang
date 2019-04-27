@@ -23,6 +23,23 @@ namespace ska {
 	class StatementParser;
 	class Interpreter;
 
+	class BindingFactory;
+	class BindingFactorySymbolTableLock {	
+	public:
+		BindingFactorySymbolTableLock(BindingFactory& factory, SymbolTable& table);
+		BindingFactorySymbolTableLock(BindingFactorySymbolTableLock&&) noexcept;
+		BindingFactorySymbolTableLock(const BindingFactorySymbolTableLock&) = delete;
+		BindingFactorySymbolTableLock& operator=(BindingFactorySymbolTableLock&&) = delete;
+		BindingFactorySymbolTableLock& operator=(const BindingFactorySymbolTableLock&) = delete;
+
+		~BindingFactorySymbolTableLock();
+		void release();
+	private:
+		BindingFactory& m_factory;
+		SymbolTable& m_symbolTable;
+		bool m_freed = false;
+	};
+
 	//http://coliru.stacked-crooked.com/a/8efdf80ac4082e22
 	class BindingFactory :
 		public observable_priority_queue<VarTokenEvent>,
@@ -30,6 +47,7 @@ namespace ska {
 		public observable_priority_queue<BlockTokenEvent>,
 		public observable_priority_queue<ScriptLinkTokenEvent>,
 		public observable_priority_queue<ImportTokenEvent> {
+		friend class BindingFactorySymbolTableLock;
 	public:
 		BindingFactory(TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
 		virtual ~BindingFactory();
@@ -52,8 +70,8 @@ namespace ska {
 
 	private:
 		ASTNodePtr getNodeFromTypeName(const std::string& typeName);
-		void unlisten(SymbolTable& symbolTable);
-		void listen(SymbolTable& symbolTable);
+		void internalUnlisten(SymbolTable& symbolTable);
+		void internalListen(SymbolTable& symbolTable);
 
 		template <class ReturnType, class ... ParameterTypes, std::size_t... Idx>
 		auto callNativeFromScript(std::function<ReturnType(ParameterTypes...)> f, const std::vector<NodeValue>& v, std::index_sequence<Idx...>) {

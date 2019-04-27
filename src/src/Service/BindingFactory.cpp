@@ -26,7 +26,7 @@ ska::BindingFactory::BindingFactory(TypeBuilder& typeBuilder, SymbolTableTypeUpd
 	observable_priority_queue<VarTokenEvent>::addObserver(m_symbolTypeUpdater);
 }
 
-void ska::BindingFactory::listen(SymbolTable& symbolTable) {
+void ska::BindingFactory::internalListen(SymbolTable& symbolTable) {
 	observable_priority_queue<VarTokenEvent>::addObserver(symbolTable);
 	observable_priority_queue<FunctionTokenEvent>::addObserver(symbolTable);
 	observable_priority_queue<BlockTokenEvent>::addObserver(symbolTable);
@@ -34,7 +34,7 @@ void ska::BindingFactory::listen(SymbolTable& symbolTable) {
 	observable_priority_queue<ImportTokenEvent>::addObserver(symbolTable);
 }
 
-void ska::BindingFactory::unlisten(SymbolTable& symbolTable) {
+void ska::BindingFactory::internalUnlisten(SymbolTable& symbolTable) {
 	observable_priority_queue<ScriptLinkTokenEvent>::removeObserver(symbolTable);
 	observable_priority_queue<BlockTokenEvent>::removeObserver(symbolTable);
 	observable_priority_queue<FunctionTokenEvent>::removeObserver(symbolTable);
@@ -79,7 +79,7 @@ ska::ASTNodePtr ska::BindingFactory::createImport(StatementParser& parser, ska::
 }
 
 ska::ASTNodePtr ska::BindingFactory::import(StatementParser& parser, Script& script, Interpreter& interpreter, std::vector<std::pair<std::string, std::string>> imports) {
-	listen(script.symbols());
+	auto lock = BindingFactorySymbolTableLock{ *this, script.symbols() };
 	auto result = std::vector<ASTNodePtr> {};
 	for (const auto& scriptImporter : imports) {
 		auto importClassNameFile = scriptImporter.second + ".miniska";	
@@ -99,7 +99,7 @@ ska::ASTNodePtr ska::BindingFactory::import(StatementParser& parser, Script& scr
 		observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 		result.emplace_back(std::move(varNode));
 	}
-	unlisten(script.symbols());
+	lock.release();
 
 	auto block = ASTFactory::MakeNode<Operator::BLOCK>(std::move(result));
 	interpreter.interpret({ script, *block}); 
@@ -107,7 +107,7 @@ ska::ASTNodePtr ska::BindingFactory::import(StatementParser& parser, Script& scr
 }
 
 ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::string& functionName, std::vector<std::string> typeNames) {
-	listen(script.symbols());
+	auto lock = BindingFactorySymbolTableLock{*this, script.symbols() };
 
 	//Build the function
 	auto functionNameToken = Token{ functionName, TokenType::IDENTIFIER };
@@ -144,6 +144,30 @@ ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::strin
 	auto statementEvent = FunctionTokenEvent{ *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, script, functionNameToken.name() };
 	observable_priority_queue<FunctionTokenEvent>::notifyObservers(statementEvent);
 
-	unlisten(script.symbols());
 	return functionDeclarationNode;
+}
+
+
+ska::BindingFactorySymbolTableLock::BindingFactorySymbolTableLock(BindingFactory& factory, SymbolTable& table) :
+	m_factory(factory), 
+	m_symbolTable(table) {
+	m_factory.internalListen(m_symbolTable);
+}
+
+ska::BindingFactorySymbolTableLock::BindingFactorySymbolTableLock(BindingFactorySymbolTableLock&& factoryLock) noexcept :
+	m_factory(factoryLock.m_factory),
+	m_symbolTable(factoryLock.m_symbolTable),
+	m_freed(factoryLock.m_freed){
+	factoryLock.m_freed = true;
+}
+
+ska::BindingFactorySymbolTableLock::~BindingFactorySymbolTableLock() {
+	release();
+}
+
+void ska::BindingFactorySymbolTableLock::release() {
+	if (!m_freed) {
+		m_factory.internalUnlisten(m_symbolTable);
+		m_freed = true;
+	}
 }
