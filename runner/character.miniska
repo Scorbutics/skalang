@@ -1,13 +1,17 @@
 var Position = import "point";
-var EntityManager = import "em_lib";
+var InputComponent = import "input_component";
+
+var GlobalId = 0;
 
 var Fcty = function(name: string) : var {
     var defaultPos = Position.Fcty(0, 0);
+	var input = InputComponent.Fcty(GlobalId);
+	GlobalId = GlobalId + 1;
     return {
         name : name,
         direction : 0,
         pos : defaultPos,
-		getInput : EntityManager.getInput
+		input : input
     };
 };
 

@@ -16,6 +16,8 @@
 #include "Interpreter/Interpreter.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
+#include "Operation/Interpreter/OperationFunctionDeclaration.h"
+
 int main(int argc, char* argv[]) {
 	if (argc <= 1) {
         std::cout << "No file name entered. Exiting...";
@@ -36,25 +38,44 @@ int main(int argc, char* argv[]) {
 		std::cout << "File not found : \"" << argv[1] << ".miniska\"";
         return -1;
 	}
-
 	
 	auto scriptEmBinding = ska::ScriptBridge{ scriptCache, "em_lib", typeBuilder, symbolsTypeUpdater, reservedKeywords };
-	scriptEmBinding.bindFunction("getInput", std::function<std::string()>([]() {
-		return "tototo !";
+	
+	auto memInputComponent = scriptEmBinding.createMemory();
+	scriptEmBinding.bindFunction("setInputMovePower", std::function<void(int, int)>([](int characterId, int value) {
+		std::cout << "move power for " << characterId << " is now " << value << std::endl;
+	}));
+	scriptEmBinding.bindFunction("setInputJumpPower", std::function<void(int, int)>([](int characterId, int value) {
+		std::cout << "jump power for " << characterId << " is now " << value << std::endl;
 	}));
 	scriptEmBinding.build();
 
 	auto scriptCharacterBinding = ska::ScriptBridge{ scriptCache, "character_generator", typeBuilder, symbolsTypeUpdater, reservedKeywords };
-	scriptCharacterBinding.import(parser, interpreter, { {"Character", "character"}, {"EntityManager", "em_lib"} });
+	scriptCharacterBinding.import(parser, interpreter, { {"Character", "character"}, {"InputComponent", "input_component"} });
 	scriptCharacterBinding.bindGenericFunction("Gen", { "Character::Fcty" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
-		auto& em = scriptCharacterBinding.findInMemoryTree("EntityManager").first->nodeval<ska::ExecutionContext>();
-		auto& emScriptMemory = em.program().currentMemory().down();
+		
+		//TODO : utility ? ultra verbose & error prone
+		auto inputComponentImport = scriptCharacterBinding.findInMemoryTree("InputComponent");
+		auto& em = inputComponentImport.first->nodeval<ska::ExecutionContext>();
+		auto& memoryFcty = em.program().currentMemory().down();
+		auto& factory = memoryFcty("Fcty").first->nodeval<ska::ExecutionContext>();
+		auto operateOnFunctionDeclaration = ska::Operation<ska::Operator::FUNCTION_DECLARATION>(factory);
+		auto script = ska::Script{ factory.program() };
+
+		auto currentExecutionMemoryZone = script.pointMemoryTo(inputComponentImport.second);
+
+		auto lock = script.pushNestedMemory(true);
+
+		auto objectResult = interpreter.interpret({ script, operateOnFunctionDeclaration.GetFunctionBody() });
+
+		lock.release();
+		script.pointMemoryTo(currentExecutionMemoryZone);
+
+
 		auto mem = scriptCharacterBinding.createMemory();
 		mem->emplace("name", "Toto !");
 		mem->emplace("direction", 0);
-		auto* inputFunc = (emScriptMemory)("getInput").first;
-		assert(inputFunc != nullptr);
-		mem->emplace("getInput", inputFunc->clone());
+		mem->emplace("input", std::move(objectResult.asRvalue().object));
 		auto pos = scriptCharacterBinding.createMemory();
 		mem->emplace("pos", pos);
 		pos->emplace("x", 134);

@@ -1,0 +1,12 @@
+var EntityManager = import "em_lib";
+
+var Fcty = function(characterId: int): var {
+    var movePower_ = 25;
+	var jumpPower_ = 20;
+	return {
+        movePower: function(): int { return movePower_; },
+        jumpPower: function(): int { return jumpPower_; },
+		setMovePower : function(movePow: int) { movePower_ = movePow; EntityManager.setInputMovePower(characterId, movePow); },
+		setJumpPower : function(jumpPow: int) { jumpPower_ = jumpPow; EntityManager.setInputJumpPower(characterId, jumpPow);}
+    };
+};

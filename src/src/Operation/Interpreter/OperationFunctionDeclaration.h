@@ -12,7 +12,7 @@ namespace ska {
 		ASTNode& node;
 	public:
 		Script parent;
-		Operation(ExecutionContext& context) : node(context.pointer()), parent(context.program()) {}
+		Operation(ExecutionContext& context) : node(context.pointer()), parent(context.program()) {  }
 
 		inline auto GetFunctionName() {
 			return node.name();
