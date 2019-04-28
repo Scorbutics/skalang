@@ -75,7 +75,9 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>::interpret(
 		assert(inMemoryFunctionZone.memory != nullptr);
 		auto functionExecutionContext = inMemoryFunctionZone.object.nodeval<ExecutionContext>();
 		auto operateOnFunction = Operation<Operator::FUNCTION_DECLARATION>(functionExecutionContext);
-		return InterpreterOperationFunctionCallScript(m_interpreter, inMemoryFunctionZone.memory, operateOnFunction, node);
+		return InterpreterOperationFunctionCallScript(m_interpreter, 
+			inMemoryFunctionZone.memory /* TODO replace this parameter with : 'functionExecutionContext.memory()' when a unit test will be written (handling bad function execution context) */
+			, operateOnFunction, node);
 	} else {
 		assert(std::holds_alternative<BridgeMemory>(functionValue));
 		auto bridgeCall = inMemoryFunctionZone.object.nodeval<BridgeMemory>();

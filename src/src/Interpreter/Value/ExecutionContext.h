@@ -1,12 +1,12 @@
 #pragma once
 #include <cassert>
+#include "Interpreter/MemoryTablePtr.h"
 
 namespace ska {
 	
 	class ASTNode;
 	struct ScriptHandle;
 	class Script;
-	class MemoryTable;
 	class ExecutionContext {
 		friend bool operator!=(const ska::ExecutionContext& lhs, const ska::ExecutionContext& rhs);
 	public:
@@ -17,10 +17,11 @@ namespace ska {
 
 		ASTNode& pointer() { assert(m_pointer != nullptr); return *m_pointer; }
 		ScriptHandle& program() { assert(m_program != nullptr); return *m_program; }
-
+		MemoryTablePtr& memory() { assert(m_currentMemory != nullptr); return m_currentMemory; }
 	private:
 		ScriptHandle* m_program {};
-		ASTNode* m_pointer{};
+		ASTNode* m_pointer {};
+		MemoryTablePtr m_currentMemory {};
 	};
 
 

@@ -22,7 +22,7 @@ ska::NodeCell ska::NodeCell::operator()(const std::string& key) {
 	}
 	
 	auto& scriptZone = std::get<ExecutionContext>(variant);
-	auto& memoryScript = scriptZone.program().currentMemory().down();
+	auto& memoryScript = scriptZone.program().downMemory();
 	auto memoryField = (memoryScript)(key);
 	return build(memoryField);
 }
