@@ -226,6 +226,31 @@ TEST_CASE("[Interpreter]") {
 			CHECK(res.nodeval<int>() == 1);
 		}
 
+		SUBCASE("using a function as a parameter") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter(
+				"var lvalFunc206 = function() : var {"
+				"return { test : 14 };"
+				"};"
+				"var lvalFunc209 = function(toto: lvalFunc206) : lvalFunc206() {"
+				"return toto();"
+				"};"
+				"var object = lvalFunc209(lvalFunc206);"
+				"object.test;", data);
+			auto res = data.interpreter->script(astPtr);
+			CHECK(res.nodeval<int>() == 14);
+		}
+
+		SUBCASE("using a callback function as a parameter without using the source type (function type compatibility)") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter(
+				"var lvalFunc218 = function() {};"
+				"var lvalFunc219 = function(toto: lvalFunc218) : lvalFunc218() {"
+				"return toto();"
+				"};"
+				"var callback = function() {};"
+				"var object = lvalFunc219(callback);", data);
+			data.interpreter->script(astPtr);
+		}
+
 		SUBCASE("Fail") {
 			SUBCASE("Array : del cells : failure out of bound") {
 				try {

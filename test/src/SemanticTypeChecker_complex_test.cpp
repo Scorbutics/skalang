@@ -212,4 +212,14 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			"var object = lvalFunc209(lvalFunc206);"
 			"object.test = 1234;", data);
 	}
+
+	SUBCASE("using a callback function as a parameter without using the source type (function type compatibility)") {
+		ASTFromInputSemanticComplexTC(scriptCache,
+			"var lvalFunc218 = function() {};"
+			"var lvalFunc219 = function(toto: lvalFunc218) : lvalFunc218() {"
+			"return toto();"
+			"};"
+			"var callback = function() {};"
+			"var object = lvalFunc219(callback);", data);
+	}
 }
