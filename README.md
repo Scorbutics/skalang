@@ -24,7 +24,7 @@ var Coldragon = function(): var {
 var Scorbutics = function(): var {
 	var power = 88;
 	return {
-		attack : function(target: Coldragon) {
+		attack : function(target: Coldragon()) {
 			target.data = target.data - power;
 		}
 	};
