@@ -76,6 +76,13 @@ namespace ska {
 			return std::shared_ptr<MemoryTable>(new MemoryTable(parent));
 		}
 
+		void stealFirstChildContent() {
+			auto& mem = down();
+			m_memory = std::move(mem.m_memory);
+			mem.clear();
+			m_children.clear();
+		}
+
 	private:
 		MemoryTablePtr& internalPushNested();
 		void internalEndNested();

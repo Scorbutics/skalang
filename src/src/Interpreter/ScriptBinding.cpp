@@ -5,6 +5,8 @@
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/SymbolTableTypeUpdater.h"
 
+#include "Interpreter/InterpreterOperatorFunctionCall.h"
+
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptBridge);
 
 ska::ScriptBridge::ScriptBridge(
@@ -40,4 +42,20 @@ void ska::ScriptBridge::build() {
 	}
 
 	m_bindings = { };
+}
+
+ska::NodeValue ska::ScriptBridge::callFunction(Interpreter& interpreter, std::string importName, std::string functionName, std::vector<ska::NodeValue> parametersValues) {
+	auto import = m_script.findInMemoryTree(importName);
+	auto importedScript = import.first->nodeval<ska::ExecutionContext>();
+	auto& functionToCallMemory = importedScript.program().currentMemory().down()(functionName);
+	auto& functionToExecute = functionToCallMemory.first->nodeval<ska::ExecutionContext>();
+
+	auto operateOnFunction = ska::Operation<ska::Operator::FUNCTION_DECLARATION>(functionToExecute);
+	return ska::InterpreterOperationFunctionCallScriptWithParams(m_script, interpreter, functionToCallMemory.second, operateOnFunction, std::move(parametersValues)).asRvalue().object;
+}
+
+ska::MemoryLValue ska::ScriptBridge::accessMemory(std::string importName, std::string field) {
+	auto& em = m_script.findInMemoryTree(importName).first->nodeval<ska::ExecutionContext>();
+	auto& emScriptMemory = em.program().currentMemory().down();
+	return (emScriptMemory)(field);
 }

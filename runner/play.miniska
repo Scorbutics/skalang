@@ -2,13 +2,8 @@ var Character = import "character";
 var Runner = import "runner_lib";
 
 var run = function(origin: Character::Fcty) {
-	var toto = Character.Fcty("test");
-	toto.input.setMovePower(1476);
-	Runner.printInt(toto.input.movePower());
-	Runner.printInt(origin.input.movePower());
+	Runner.printInt(origin.id);
 	origin.input.setMovePower(1234);
 	Runner.printInt(origin.input.movePower());
-	Runner.printInt(origin.pos.x);
-	Runner.printInt(origin.pos.y);
 };
 

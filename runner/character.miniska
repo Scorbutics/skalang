@@ -5,9 +5,11 @@ var GlobalId = 0;
 
 var Fcty = function(name: string) : var {
     var defaultPos = Position.Fcty(0, 0);
-	var input = InputComponent.Fcty(GlobalId);
+	var id = GlobalId;
+	var input = InputComponent.Fcty(id);
 	GlobalId = GlobalId + 1;
     return {
+		id : id,
         name : name,
         direction : 0,
         pos : defaultPos,

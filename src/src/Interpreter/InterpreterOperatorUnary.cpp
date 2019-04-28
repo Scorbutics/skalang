@@ -23,7 +23,7 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::UNARY>::interpret(OperateO
 	assert(!node.GetValue().empty());
 	auto nodeValue = node.parent.findInMemoryTree(node.GetValue());
     if(nodeValue.first == nullptr) {
-		throw std::runtime_error("unable to find symbol \"" + node.GetValue() + "\" in memory");
+		throw std::runtime_error("unable to find symbol \"" + node.GetValue() + "\" in memory of current script");
     }
 
 	return NodeLValue{ std::move(nodeValue.first), std::move(nodeValue.second) };

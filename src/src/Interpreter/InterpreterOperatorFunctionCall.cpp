@@ -1,7 +1,6 @@
 #include "NodeValue/AST.h"
 #include "Interpreter.h"
 #include "InterpreterOperatorFunctionCall.h"
-#include "Operation/Interpreter/OperationFunctionDeclaration.h"
 #include "Interpreter/Value/Script.h"
 
 namespace ska {
@@ -20,32 +19,40 @@ namespace ska {
 		return result;
 	}
 
+	ska::NodeCell InterpreterOperationFunctionCallScriptWithParams(
+		ska::Script& parentScript,
+		ska::Interpreter& interpreter,
+		ska::MemoryTablePtr& memoryForFunctionExecution,
+		ska::Operation<ska::Operator::FUNCTION_DECLARATION>& operateOnFunctionDeclaration,
+		std::vector<ska::NodeValue> parametersValues) {
+		auto index = 0u;
+		auto& functionPrototype = operateOnFunctionDeclaration.GetFunctionPrototype();
+
+		//Centers memory on the current function scope
+		auto currentExecutionMemoryZone = parentScript.pointMemoryTo(memoryForFunctionExecution);
+
+		//Creates function-memory environment scope (including creation of parameters)
+		auto lock = parentScript.pushNestedMemory(true);
+
+		for (auto& parameterValue : parametersValues) {
+			auto& functionParameter = functionPrototype[index++];
+			parentScript.putMemory(functionParameter.name(), std::move(parameterValue));
+		}
+		auto result = interpreter.interpret({ parentScript, operateOnFunctionDeclaration.GetFunctionBody() });
+
+		//Go back to the current execution scope, while destroying the memory used during function execution
+		lock.release();
+		parentScript.pointMemoryTo(currentExecutionMemoryZone);
+		return result;
+	}
+
 	ska::NodeCell InterpreterOperationFunctionCallScript(
 		ska::Interpreter& interpreter,
 		ska::MemoryTablePtr& memoryForFunctionExecution,
 		ska::Operation<ska::Operator::FUNCTION_DECLARATION>& operateOnFunctionDeclaration,
 		ska::Operation<ska::Operator::FUNCTION_CALL>& node) {
-
 		auto parametersValues = InterpreterOperationFunctionCallExecuteFunctionFromCallParameters(interpreter, operateOnFunctionDeclaration, node);
-		auto index = 0u;
-		auto& functionPrototype = operateOnFunctionDeclaration.GetFunctionPrototype();
-
-		//Centers memory on the current function scope
-		auto currentExecutionMemoryZone = node.parent.pointMemoryTo(memoryForFunctionExecution);
-
-		//Creates function-memory environment scope (including creation of parameters)
-		auto lock = node.parent.pushNestedMemory(true);
-
-		for (auto& parameterValue : parametersValues) {
-			auto& functionParameter = functionPrototype[index++];
-			node.parent.putMemory(functionParameter.name(), std::move(parameterValue));
-		}
-		auto result = interpreter.interpret({ node.parent, operateOnFunctionDeclaration.GetFunctionBody() });
-
-		//Go back to the current execution scope, while destroying the memory used during function execution
-		lock.release();
-		node.parent.pointMemoryTo(currentExecutionMemoryZone);
-		return result;
+		return InterpreterOperationFunctionCallScriptWithParams(node.parent, interpreter, memoryForFunctionExecution, operateOnFunctionDeclaration, std::move(parametersValues));
 	}
 
 	ska::NodeCell InterpreterOperationFunctionCallBridge(

@@ -16,8 +16,6 @@
 #include "Interpreter/Interpreter.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
-#include "Operation/Interpreter/OperationFunctionDeclaration.h"
-
 int main(int argc, char* argv[]) {
 	if (argc <= 1) {
         std::cout << "No file name entered. Exiting...";
@@ -51,36 +49,11 @@ int main(int argc, char* argv[]) {
 	scriptEmBinding.build();
 
 	auto scriptCharacterBinding = ska::ScriptBridge{ scriptCache, "character_generator", typeBuilder, symbolsTypeUpdater, reservedKeywords };
-	scriptCharacterBinding.import(parser, interpreter, { {"Character", "character"}, {"InputComponent", "input_component"} });
+	scriptCharacterBinding.import(parser, interpreter, { {"Character", "character"} });
 	scriptCharacterBinding.bindGenericFunction("Gen", { "Character::Fcty" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
-		
-		//TODO : utility ? ultra verbose & error prone
-		auto inputComponentImport = scriptCharacterBinding.findInMemoryTree("InputComponent");
-		auto& em = inputComponentImport.first->nodeval<ska::ExecutionContext>();
-		auto& memoryFcty = em.program().currentMemory().down();
-		auto& factory = memoryFcty("Fcty").first->nodeval<ska::ExecutionContext>();
-		auto operateOnFunctionDeclaration = ska::Operation<ska::Operator::FUNCTION_DECLARATION>(factory);
-		auto script = ska::Script{ factory.program() };
-
-		auto currentExecutionMemoryZone = script.pointMemoryTo(inputComponentImport.second);
-
-		auto lock = script.pushNestedMemory(true);
-
-		auto objectResult = interpreter.interpret({ script, operateOnFunctionDeclaration.GetFunctionBody() });
-
-		lock.release();
-		script.pointMemoryTo(currentExecutionMemoryZone);
-
-
-		auto mem = scriptCharacterBinding.createMemory();
-		mem->emplace("name", "Toto !");
-		mem->emplace("direction", 0);
-		mem->emplace("input", std::move(objectResult.asRvalue().object));
-		auto pos = scriptCharacterBinding.createMemory();
-		mem->emplace("pos", pos);
-		pos->emplace("x", 134);
-		pos->emplace("y", 547);
-		return ska::NodeValue{ mem };
+		auto parametersValues = std::vector<ska::NodeValue>{};
+		parametersValues.push_back("toto");
+		return scriptCharacterBinding.callFunction(interpreter, "Character", "Fcty", std::move(parametersValues));
 	}));
 	scriptCharacterBinding.build();
 

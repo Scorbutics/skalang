@@ -46,11 +46,9 @@ namespace ska {
 		}
 	
 		MemoryTablePtr createMemory() { return m_script.createMemory(); }
-		auto findInMemoryTree(const std::string& key) { return m_script.findInMemoryTree(key); }
-		auto findInMemory(const std::string& key) { auto& memScript = m_script.handle()->currentMemory().down(); return memScript(key); }
 
-		template <class T>
-		auto emplaceMemory(const std::string& key, T&& value) { return m_script.emplaceMemory(key, std::forward<T>(value)); }
+		NodeValue callFunction(Interpreter& interpreter, std::string importName, std::string functionName, std::vector<ska::NodeValue> parametersValues);
+		MemoryLValue accessMemory(std::string importName, std::string field);
 
 	private:
 		TypeBuilder& m_typeBuilder;
