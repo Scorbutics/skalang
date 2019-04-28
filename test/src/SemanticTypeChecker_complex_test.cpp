@@ -64,7 +64,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 		"var JoueurClass = function(nom:string) : var { "
 			"var puissance = 10;"
 
-			"var attaquer = function(cible:JoueurClass) {"
+			"var attaquer = function(cible:JoueurClass()) {"
 			"};"
 
 			"return {"
@@ -124,7 +124,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			"var JoueurClass = function(nom:string) : var { "
 			"var stats = Stats();"
 
-			"var attaquer = function(statsDegats:Stats, test:int) {"
+			"var attaquer = function(statsDegats:Stats(), test:int) {"
 			"stats.blesser(statsDegats.pdv);"
 			"};"
 
@@ -172,7 +172,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 
 	SUBCASE("Function 0 parameter creating custom object but forget to use it as a factory (direct use of function)") {
 		try {
-			auto astPtr = ASTFromInputSemanticComplexTC(scriptCache, "var Dummy = function() : var{ return { data: 3 }; }; Dummy.data; ", data);
+			auto astPtr = ASTFromInputSemanticComplexTC(scriptCache, "var Dummy = function() : var { return { data: 3 }; }; Dummy.data; ", data);
 			CHECK(false);
 		} catch (std::exception& e) {
 			CHECK(e.what() == std::string("the variable \"Dummy\" is not registered as an object but as a \"function Dummy (var Dummy)\""));
@@ -184,7 +184,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			"var lvalFunc185 = function() : var {"
 			"return { test : 14 };"
 			"};"
-			"var lvalFunc188 = function() : lvalFunc185 {"
+			"var lvalFunc188 = function() : lvalFunc185() {"
 			"return lvalFunc185();"
 			"};"
 			"var object = lvalFunc188();"
@@ -194,10 +194,22 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	SUBCASE("return a concrete custom type with namespace") {
 		ASTFromInputSemanticComplexTC(scriptCache,
 			"var Character = import \"../test/src/resources/character\";"
-			"var lvalFunc188 = function() : Character::build {"
+			"var lvalFunc188 = function() : Character::build() {"
 				"return Character.build(\"t\");"
 			"};"
 			"var object = lvalFunc188();"
 			"object.age = 1234;", data);
+	}
+
+	SUBCASE("using a function as a parameter") {
+		ASTFromInputSemanticComplexTC(scriptCache,
+			"var lvalFunc206 = function() : var {"
+				"return { test : 14 };"
+			"};"
+			"var lvalFunc209 = function(toto: lvalFunc206) : lvalFunc206() {"
+				"return toto();"
+			"};"
+			"var object = lvalFunc209(lvalFunc206);"
+			"object.test = 1234;", data);
 	}
 }

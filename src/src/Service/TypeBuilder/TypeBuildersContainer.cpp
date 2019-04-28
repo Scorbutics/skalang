@@ -34,6 +34,7 @@ ska::TypeBuildersContainer ska::BuildTypeBuildersContainer(const TypeCrosser& ty
 	TypeBuilderMakeBuilder<Operator::IF_ELSE>(result);
 	TypeBuilderMakeBuilder<Operator::RETURN>(result);
 	TypeBuilderMakeBuilder<Operator::SCRIPT_LINK>(result);
+	TypeBuilderMakeBuilder<Operator::TYPE>(result);
 
 	for (std::size_t i = 0; i < MaxOperatorSize; i++) {
 		assert(result[i] != nullptr);

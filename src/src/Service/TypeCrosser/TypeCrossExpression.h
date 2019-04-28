@@ -15,7 +15,7 @@
 
 namespace ska {
 	class TypeCrosser : 
-		public TypeCross {		
+		public TypeCross {
 	public:
 		TypeCrosser() = default;
 		TypeCrosser(const TypeCrosser&) = delete;
@@ -46,3 +46,4 @@ namespace ska {
 
 #include "TypeCrossExpressionArray.h"
 #include "TypeCrossExpressionObject.h"
+#include "TypeCrossExpressionFunction.h"

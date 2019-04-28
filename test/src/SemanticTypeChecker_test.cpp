@@ -490,7 +490,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				"var Joueur = function(nom:string) : var { "
 					"var puissance = 10;"
 
-					"var attaquer = function(cible:Joueur) {"
+					"var attaquer = function(cible:Joueur()) {"
 					"};"
 
 					"return {"

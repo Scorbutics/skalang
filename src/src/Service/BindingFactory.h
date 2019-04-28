@@ -15,6 +15,8 @@
 #include "Container/sorted_observable.h"
 #include "Interpreter/ScriptCache.h"
 
+#include "Service/Matcher/MatcherType.h"
+
 namespace ska {
 	class SymbolTable;
 	class TypeBuilder;
@@ -69,7 +71,6 @@ namespace ska {
 		ASTNodePtr import(StatementParser& parser, Script& script, Interpreter& interpreter, std::vector<std::pair<std::string, std::string>> imports);
 
 	private:
-		ASTNodePtr getNodeFromTypeName(const std::string& typeName);
 		void internalUnlisten(SymbolTable& symbolTable);
 		void internalListen(SymbolTable& symbolTable);
 
@@ -149,5 +150,6 @@ namespace ska {
 		TypeBuilder& m_typeBuilder;
 		SymbolTableTypeUpdater& m_symbolTypeUpdater;
         const ReservedKeywordsPool& m_reserved;
+		MatcherType m_matcherType;
 	};
 }

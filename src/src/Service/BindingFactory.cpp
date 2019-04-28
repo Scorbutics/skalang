@@ -16,9 +16,10 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::BindingFactory)
 
 ska::BindingFactory::BindingFactory(TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved) :
-    m_reserved(reserved),
+	m_reserved(reserved),
 	m_typeBuilder(typeBuilder),
-	m_symbolTypeUpdater(symbolTypeUpdater) {
+	m_symbolTypeUpdater(symbolTypeUpdater),
+	m_matcherType(reserved) {
 	observable_priority_queue<VarTokenEvent>::addObserver(m_typeBuilder);
 	observable_priority_queue<FunctionTokenEvent>::addObserver(m_typeBuilder);
 	observable_priority_queue<ScriptLinkTokenEvent>::addObserver(m_typeBuilder);
@@ -48,30 +49,6 @@ ska::BindingFactory::~BindingFactory() {
 	observable_priority_queue<ScriptLinkTokenEvent>::removeObserver(m_typeBuilder);
 	observable_priority_queue<FunctionTokenEvent>::removeObserver(m_typeBuilder);
 	observable_priority_queue<VarTokenEvent>::removeObserver(m_typeBuilder);
-}
-
-ska::ASTNodePtr ska::BindingFactory::getNodeFromTypeName(const std::string& typeName) {
-	if (m_reserved.pool.find(typeName) != m_reserved.pool.end()) {
-		SLOG(LogLevel::Debug) << "type for node found in reserved pool : " << typeName;
-		return ASTFactory::MakeLogicalNode(m_reserved.pool.at(typeName).token);
-	}
-
-	const auto& typeDelimiterToken = m_reserved.pattern<TokenGrammar::TYPE_DELIMITER>();
-	const auto splitSymbol = typeName.find_last_of(std::get<std::string>(typeDelimiterToken.content()));
-	if (splitSymbol != std::string::npos) {
-		assert(splitSymbol > 0);
-		//Handles script namespace
-		auto typeNamespaceToken = Token{ typeName.substr(0, splitSymbol - 1), TokenType::IDENTIFIER };
-		auto typeFieldToken = Token{ typeName.substr(splitSymbol + 1), TokenType::IDENTIFIER };
-
-		SLOG(LogLevel::Debug) << "type for node using namespace class " << std::get<std::string>(typeNamespaceToken.content()) << " with class " << std::get<std::string>(typeFieldToken.content());
-
-		return ASTFactory::MakeLogicalNode(std::move(typeNamespaceToken), ASTFactory::MakeLogicalNode(std::move(typeFieldToken)));
-	}
-
-	SLOG(LogLevel::Debug) << "type for node as identifier " << typeName;
-
-	return ASTFactory::MakeLogicalNode(Token{ typeName, TokenType::IDENTIFIER });
 }
 
 ska::ASTNodePtr ska::BindingFactory::createImport(StatementParser& parser, ska::Script& input, Token scriptPathToken) {
@@ -120,7 +97,9 @@ ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::strin
 	auto ss = std::stringstream{};
 	for (std::size_t index = 0u; index < typeNames.size(); index++) {
 		ss << index;
-		auto t = getNodeFromTypeName(typeNames[index]);
+		auto tokens = ska::Tokenizer{m_reserved, typeNames[index] }.tokenize();
+		auto reader = ska::TokenReader{std::move(tokens )};
+		auto t = m_matcherType.match(reader);
 		if (index == typeNames.size() - 1) {
 			parameters.push_back(std::move(t));
 		} else {

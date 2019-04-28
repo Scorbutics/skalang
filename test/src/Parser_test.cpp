@@ -193,10 +193,11 @@ TEST_CASE("User defined object") {
         //Checks the parameter name and type
         CHECK(astFuncParameters154[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER})); 
         CHECK(astFuncParameters154[0].size() == 1);
-        CHECK(astFuncParameters154[0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
+		CHECK(astFuncParameters154[0][0].size() == 3);
+        CHECK(astFuncParameters154[0][0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
 
         //Checks the return type
-        CHECK(astFuncParameters154[1].has(keywords.pattern<ska::TokenGrammar::VARIABLE>()));
+        CHECK(astFuncParameters154[1][0].has(keywords.pattern<ska::TokenGrammar::VARIABLE>()));
 
         //Checks the function body
         CHECK(astFunc154[1].size() == 1);

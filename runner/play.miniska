@@ -1,7 +1,7 @@
 var Character = import "character";
 var Runner = import "runner_lib";
 
-var run = function(origin: Character::Fcty) {
+var run = function(origin: Character::Fcty()) {
 	Runner.printInt(origin.id);
 	origin.input.setMovePower(1234);
 	Runner.printInt(origin.input.movePower());

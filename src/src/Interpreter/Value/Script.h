@@ -36,6 +36,8 @@ namespace ska {
 			return m_handle->m_input.rewind();
 		}
 
+		auto& reader() { return m_handle->m_input; }
+
         const Token& readPrevious(std::size_t offset) const;
 		bool canReadPrevious(std::size_t offset) const;
 		bool empty() const;

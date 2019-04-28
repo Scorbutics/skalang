@@ -1,6 +1,6 @@
 var Character = import "../test/src/resources/character";
 
-var run = function(ch: Character::build) {
+var run = function(ch: Character::build()) {
 	ch.age;
 };
 

@@ -46,6 +46,34 @@ ska::Script ASTFromInputSemanticTCInterpreterScript(const std::string& input, Da
 TEST_CASE("[Interpreter Script]") {
 	DataTestContainer data;
 
+	SUBCASE("miniska -> C++ binding : using a miniska field from a C++ -> miniska binding") {
+		ASTFromInputSemanticTCInterpreterScriptNoParse(
+			"var DataClassImp280 = import \"dataclass_script\";"
+			"var runner = DataClassImp280.run();"
+			"runner.getToto();", data);
+
+		auto scriptEmBinding = ska::ScriptBridge{ scriptCacheIS, "binding1_lib", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
+		scriptEmBinding.bindFunction("getToto", std::function<std::string()>([]() {
+			return "tototo !";
+		}));
+		scriptEmBinding.buildFunctions();
+
+		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
+		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Test293", "../test/src/resources/test293"}, {"Binding1", "binding1_lib"} });
+		scriptBindingDataClass.bindGenericFunction("run", { "Test293::Fcty()" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+			auto getTotoMemory = scriptBindingDataClass.accessMemory("Binding1", "getToto");
+			assert(getTotoMemory.first != nullptr);
+			auto mem = scriptBindingDataClass.createMemory();
+			mem->emplace("getToto", getTotoMemory.first->clone());
+			return ska::NodeValue{ std::move(mem) };
+		}));
+		scriptBindingDataClass.buildFunctions();
+
+		readerIS->parse(*data.parser);
+		auto result = data.interpreter->script(*readerIS);
+		CHECK(result.nodeval<std::string>() == "tototo !");
+	}
+
 	SUBCASE("Outside script from file (import)") {
 		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Character179 = import \"../test/src/resources/character\";", data);
 		auto res = data.interpreter->script(astPtr);
@@ -149,7 +177,7 @@ TEST_CASE("[Interpreter Script]") {
 
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding295", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBinding.import(*data.parser, *data.interpreter, { { "DataClassScript", "dataclass_script" } });
-		scriptBinding.bindGenericFunction("funcTest", { "DataClassScript::DataClass", "void" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+		scriptBinding.bindGenericFunction("funcTest", { "DataClassScript::DataClass()", "void" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<ska::ObjectMemory>();
 			auto* idMap = (*mem)("id").first;
 			auto* nameMap = (*mem)("name").first;
@@ -168,7 +196,7 @@ TEST_CASE("[Interpreter Script]") {
 	SUBCASE("C++ -> miniska script-function binding generic") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
 		"var DataClassImp169 = import \"dataclass_script\";"
-		"var funcTest = function(dummy: DataClassImp169::DataClass) { };"
+		"var funcTest = function(dummy: DataClassImp169::DataClass()) { };"
 		"var data = DataClassImp169.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
@@ -193,7 +221,7 @@ TEST_CASE("[Interpreter Script]") {
 	SUBCASE("[fail] C++ -> miniska script-function binding generic : use field defined C++ side") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
 		"var DataClassImp194 = import \"dataclass_script\";"
-		"var funcTest = function(dummy: DataClassImp194::DataClass) { dummy.id; };"
+		"var funcTest = function(dummy: DataClassImp194::DataClass()) { dummy.id; };"
 		"var data = DataClassImp194.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
@@ -221,7 +249,7 @@ TEST_CASE("[Interpreter Script]") {
 	SUBCASE("[fail] (bad namespace) C++ -> miniska script-function binding generic") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
 		"var DataClassImp222 = import \"dataclass_script\";"
-		"var funcTest = function(dummy: DataClassImpTutu222::DataClass) { };"
+		"var funcTest = function(dummy: DataClassImpTutu222::DataClass()) { };"
 		"var data = DataClassImp222.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
@@ -249,7 +277,7 @@ TEST_CASE("[Interpreter Script]") {
 	SUBCASE("[fail] (bad class name in namespace) C++ -> miniska script-function binding generic") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
 		"var DataClassImp250 = import \"dataclass_script\";"
-		"var funcTest = function(dummy: DataClassImp250::DataClassImddf) { };"
+		"var funcTest = function(dummy: DataClassImp250::DataClassImddf()) { };"
 		"var data = DataClassImp250.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
@@ -274,33 +302,6 @@ TEST_CASE("[Interpreter Script]") {
 		}
 	}
 
-	SUBCASE("miniska -> C++ binding : using a miniska field from a C++ -> miniska binding") {
-		ASTFromInputSemanticTCInterpreterScriptNoParse(
-			"var DataClassImp280 = import \"dataclass_script\";"
-			"DataClassImp280.run().getToto();", data);
-		
-		auto scriptEmBinding = ska::ScriptBridge{ scriptCacheIS, "binding1_lib", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptEmBinding.bindFunction("getToto", std::function<std::string()>([]() {
-			return "tototo !";
-		}));
-		scriptEmBinding.buildFunctions();
-
-		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Test293", "../test/src/resources/test293"}, {"Binding1", "binding1_lib"} });
-		scriptBindingDataClass.bindGenericFunction("run", { "Test293::Fcty" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
-			auto getTotoMemory = scriptBindingDataClass.accessMemory("Binding1", "getToto");
-			assert(getTotoMemory.first != nullptr);
-			auto mem = scriptBindingDataClass.createMemory();
-			mem->emplace("getToto", getTotoMemory.first->clone());
-			return ska::NodeValue{ std::move(mem) };
-		}));
-		scriptBindingDataClass.buildFunctions();
-
-		readerIS->parse(*data.parser);
-		auto result = data.interpreter->script(*readerIS);
-		CHECK(result.nodeval<std::string>() == "tototo !");
-	}
-
 	SUBCASE("miniska -> C++ binding : calling a miniska function from a C++ -> miniska binding") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
 			"var DataClassImp306 = import \"dataclass_script\";"
@@ -309,7 +310,7 @@ TEST_CASE("[Interpreter Script]") {
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Character", "../test/src/resources/character"} });
-		scriptBindingDataClass.bindGenericFunction("run", { "Character::build" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> p) -> ska::NodeValue {
+		scriptBindingDataClass.bindGenericFunction("run", { "Character::build()" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> p) -> ska::NodeValue {
 			auto params = std::vector<ska::NodeValue>{};
 			params.push_back(std::string{ "babar" });
 			auto character = scriptBindingDataClass.callFunction(*data.interpreter, "Character", "build", std::move(params));

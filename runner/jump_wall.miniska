@@ -1,0 +1,15 @@
+var Character = import "character";
+var Runner = import "runner_lib";
+var Parameters = import "parameters_lib";
+
+var run = function(origin: Character::Fcty(), parameters: Parameters::Fcty()) {
+	var jumpDirection = parameters.asInt(0);
+	var blockId = parameters.asInt(1);
+	
+	origin.input.remove();
+	origin.move(jumpDirection, 30, 1, function(){});
+	Runner.wait(400);
+	origin.jump(14);
+	origin.move(jumpDirection, 60, 1, origin.input.restore);
+};
+

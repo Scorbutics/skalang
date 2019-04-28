@@ -209,7 +209,7 @@ TEST_CASE("[Interpreter]") {
 		}
 			
 		SUBCASE("Function 0 parameter creating custom object with use as parameter of another one") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var Dummy = function(): var { return { data: 3 }; }; var Runner = function(): var { var print = function(i: Dummy): int { return i.data; }; return { print : print }; }; Runner().print(Dummy());", data);
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var Dummy = function(): var { return { data: 3 }; }; var Runner = function(): var { var print = function(i: Dummy()): int { return i.data; }; return { print : print }; }; Runner().print(Dummy());", data);
 			auto res = data.interpreter->script(astPtr);
 			CHECK(res.nodeval<int>() == 3);
 		}

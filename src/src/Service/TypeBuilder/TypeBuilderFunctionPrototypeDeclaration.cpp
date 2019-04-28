@@ -5,17 +5,29 @@
 #include "NodeValue/AST.h"
 #include "Interpreter/Value/Script.h"
 
+#include "Operation/Type/OperationTypeType.h"
+
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
 
 namespace ska {
-	Type TypeBuilderFunctionPrototypeDeclarationDeduceReturnType(const ASTNode& node, const Symbol* symbolFunction) {
+	Type TypeBuilderFunctionPrototypeDeclarationDeduceReturnType(const ASTNode& node, const SymbolTable& symbolTable, const Symbol* symbolFunction) {
 		const auto type = node.type().value();
 		const auto objectIsVar = type == ExpressionType::OBJECT;
 		if (objectIsVar) {
 			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function prototype declaration has an OBJECT return type \""<< (symbolFunction != nullptr ? symbolFunction->getName() : "") << "\"";
 			const auto objectDoesntRefersToItself = type.hasSymbol();
+			if (!objectDoesntRefersToItself) {
+				return Type::MakeCustom<ExpressionType::OBJECT>(symbolFunction);
+			}
+			const auto operateOnType = OperationType<Operator::TYPE>{node};
+			const auto* symbol = operateOnType.GetSymbol(symbolTable);
+			assert(symbol != nullptr);
+			return symbol->getType().compound().back();
+
+			/*
 			const auto* returnSymbol = objectDoesntRefersToItself ? (node.size() == 1 ? (type)[node[0].name()] : type[node.name()]) : symbolFunction;
 			return Type::MakeCustom<ExpressionType::OBJECT>(returnSymbol);
+			*/
 		}
 		
 		if(type == ExpressionType::FUNCTION) {
@@ -38,7 +50,7 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION
     for (auto& paramNode : node) {
 			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << paramNode->name();
 		if (index == node.GetParameterSize()) {
-			functionType.add(TypeBuilderFunctionPrototypeDeclarationDeduceReturnType(*paramNode, symbolFunction));
+			functionType.add(TypeBuilderFunctionPrototypeDeclarationDeduceReturnType(*paramNode, script.symbols(), symbolFunction));
 		} else {
 			auto type = paramNode->type().value();
 			functionType.add(type);
