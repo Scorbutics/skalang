@@ -99,7 +99,7 @@ TEST_CASE("[Interpreter Script]") {
 		
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBinding.bindFunction("funcTest", std::move(function));
-		scriptBinding.build();
+		scriptBinding.buildFunctions();
 
 		readerIS->parse(*data.parser);
 		data.interpreter->script(*readerIS);
@@ -124,7 +124,7 @@ TEST_CASE("[Interpreter Script]") {
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding239", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBinding.bindFunction("funcTest", std::move(function1));
 		scriptBinding.bindFunction("funcTest2", std::move(function2));
-		scriptBinding.build();
+		scriptBinding.buildFunctions();
 
 		readerIS->parse(*data.parser);
 		data.interpreter->script(*readerIS);
@@ -145,7 +145,7 @@ TEST_CASE("[Interpreter Script]") {
 			result->emplace("name", std::move(mem));
 			return ska::NodeValue{ std::move(result) };
 		}));
-		scriptBindingDataClass.build();
+		scriptBindingDataClass.buildFunctions();
 
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding295", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBinding.import(*data.parser, *data.interpreter, { { "DataClassScript", "dataclass_script" } });
@@ -157,7 +157,7 @@ TEST_CASE("[Interpreter Script]") {
 			name = nameMap->nodeval<std::string>();
 			return ska::NodeValue{};
 		}));
-		scriptBinding.build();
+		scriptBinding.buildFunctions();
 
 		readerIS->parse(*data.parser);
 		data.interpreter->script(*readerIS);
@@ -182,7 +182,7 @@ TEST_CASE("[Interpreter Script]") {
 			result->emplace("name", std::move(mem));
 			return ska::NodeValue{ std::move(result) };
 		}));
-		scriptBindingDataClass.build();
+		scriptBindingDataClass.buildFunctions();
 
 		readerIS->parse(*data.parser);
 		data.interpreter->script(*readerIS);
@@ -207,7 +207,7 @@ TEST_CASE("[Interpreter Script]") {
 			result->emplace("name", std::move(mem));
 			return ska::NodeValue{ std::move(result) };
 		}));
-		scriptBindingDataClass.build();
+		scriptBindingDataClass.buildFunctions();
 
 		try {
 			readerIS->parse(*data.parser);
@@ -235,7 +235,7 @@ TEST_CASE("[Interpreter Script]") {
 			result->emplace("name", std::move(mem));
 			return ska::NodeValue{ std::move(result) };
 		}));
-		scriptBindingDataClass.build();
+		scriptBindingDataClass.buildFunctions();
 
 		try {
 			readerIS->parse(*data.parser);
@@ -263,7 +263,7 @@ TEST_CASE("[Interpreter Script]") {
 			result->emplace("name", std::move(mem));
 			return ska::NodeValue{ std::move(result) };
 		}));
-		scriptBindingDataClass.build();
+		scriptBindingDataClass.buildFunctions();
 
 		try {
 			readerIS->parse(*data.parser);
@@ -283,7 +283,7 @@ TEST_CASE("[Interpreter Script]") {
 		scriptEmBinding.bindFunction("getToto", std::function<std::string()>([]() {
 			return "tototo !";
 		}));
-		scriptEmBinding.build();
+		scriptEmBinding.buildFunctions();
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Test293", "../test/src/resources/test293"}, {"Binding1", "binding1_lib"} });
@@ -294,7 +294,7 @@ TEST_CASE("[Interpreter Script]") {
 			mem->emplace("getToto", getTotoMemory.first->clone());
 			return ska::NodeValue{ std::move(mem) };
 		}));
-		scriptBindingDataClass.build();
+		scriptBindingDataClass.buildFunctions();
 
 		readerIS->parse(*data.parser);
 		auto result = data.interpreter->script(*readerIS);
@@ -317,7 +317,7 @@ TEST_CASE("[Interpreter Script]") {
 			memCharacter->emplace("name", std::string{ "titito" });
 			return ska::NodeValue{ std::move(memCharacter) };
 		}));
-		scriptBindingDataClass.build();
+		scriptBindingDataClass.buildFunctions();
 
 		readerIS->parse(*data.parser);
 		auto result = data.interpreter->script(*readerIS);
@@ -332,7 +332,7 @@ TEST_CASE("[Interpreter Script]") {
 		scriptBinding.bindFunction("funcTest", std::function<void(int)>([&](int toto) {
 			test = toto;
 		}));
-		scriptBinding.build();
+		scriptBinding.buildFunctions();
 
 		readerIS->parse(*data.parser);
 		data.interpreter->script(*readerIS);
@@ -348,7 +348,7 @@ TEST_CASE("[Interpreter Script]") {
 			test = params[0].nodeval<int>();
 			return ska::NodeValue{};
 		}));
-		scriptBinding.build();
+		scriptBinding.buildFunctions();
 
 		readerIS->parse(*data.parser);
 		data.interpreter->script(*readerIS);
@@ -365,7 +365,7 @@ TEST_CASE("[Interpreter Script]") {
 			test += toto;
 			count++;
 		}));
-		scriptBinding.build();
+		scriptBinding.buildFunctions();
 
 		readerIS->parse(*data.parser);
 		data.interpreter->script(*readerIS);
@@ -383,7 +383,7 @@ TEST_CASE("[Interpreter Script]") {
 			test += toto;
 			count++;
 		}));
-		scriptBinding.build();
+		scriptBinding.buildFunctions();
 
 		readerIS->parse(*data.parser);
 		data.interpreter->script(*readerIS);

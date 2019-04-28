@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
 	scriptEmBinding.bindFunction("setInputJumpPower", std::function<void(int, int)>([](int characterId, int value) {
 		std::cout << "jump power for " << characterId << " is now " << value << std::endl;
 	}));
-	scriptEmBinding.build();
+	scriptEmBinding.buildFunctions();
 
 	auto scriptCharacterBinding = ska::ScriptBridge{ scriptCache, "character_generator", typeBuilder, symbolsTypeUpdater, reservedKeywords };
 	scriptCharacterBinding.import(parser, interpreter, { {"Character", "character"} });
@@ -55,7 +55,7 @@ int main(int argc, char* argv[]) {
 		parametersValues.push_back("toto");
 		return scriptCharacterBinding.callFunction(interpreter, "Character", "Fcty", std::move(parametersValues));
 	}));
-	scriptCharacterBinding.build();
+	scriptCharacterBinding.buildFunctions();
 
 	auto scriptBinding = ska::ScriptBridge{ scriptCache, "runner_lib", typeBuilder, symbolsTypeUpdater, reservedKeywords };
 	scriptBinding.bindFunction("printInt", std::function<void(int)>([](int value) {
@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
 	scriptBinding.bindFunction("printString", std::function<void(std::string)>([](std::string value) {
 		std::cout << value << std::endl;
 	}));
-	scriptBinding.build();
+	scriptBinding.buildFunctions();
 
 	auto executor = ska::Script{ scriptCache, "main", ska::Tokenizer{ reservedKeywords, 
 	"var Player = import \"" + std::string{argv[1]} + "\"; var CharacterGenerator = import \"character_generator\"; Player.run(CharacterGenerator.Gen());"

@@ -32,7 +32,7 @@ ska::ScriptBridge::~ScriptBridge() {
 	observable_priority_queue<VarTokenEvent>::removeObserver(m_script.symbols());
 }
 
-void ska::ScriptBridge::build() {
+void ska::ScriptBridge::buildFunctions() {
 	assert(!m_bindings.empty() && "Bridge is empty");
 	auto& scriptAst = m_script.fromBridge( std::move(m_bindings));
 	

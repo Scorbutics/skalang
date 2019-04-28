@@ -28,7 +28,7 @@ namespace ska {
 			
 		virtual ~ScriptBridge();
 
-		void build();
+		void buildFunctions();
 
 		template <class ReturnType, class ... ParameterTypes>
 		void bindFunction(const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
