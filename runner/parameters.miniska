@@ -1,0 +1,6 @@
+var Fcty = function() : var {
+	return {
+		asInt : function(index: int) : int { return 0;},
+		asString : function(index: int) : string { return "";}
+	};
+};

@@ -1,5 +1,7 @@
 var Position = import "point";
 var InputComponent = import "input_component";
+var CharacterCommands = import "character_commands_lib";
+var Callback = import "callback";
 
 var Fcty = function(id: int) : var {
     var defaultPos = Position.Fcty(0, 0);
@@ -8,8 +10,12 @@ var Fcty = function(id: int) : var {
 		id : id,
         direction : 0,
         pos : defaultPos,
-		input : input
+		input : input,
+		jump : CharacterCommands.jump,
+		move : function(direction: int, power: int, t: int, callback: Callback::Default) {
+			CharacterCommands.move(direction, power, t);
+			callback();
+		}
     };
 };
-
 
