@@ -33,9 +33,11 @@ ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, const Script& scr
 	return emplace(Symbol{ name, script.handle() });
 }
 
-ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested() {
+ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(Symbol* s) {
 	m_children.push_back(std::make_unique<ska::ScopedSymbolTable>(*this));
 	auto& lastChild = *m_children.back();
+	lastChild.m_parentSymbol = s;
+	
 	//No bad memory access possible when unique_ptr are moved, that's why it's safe to return the address of contained item
 	//even if we move the vector or if the vector moves its content automatically 
 	return lastChild;
