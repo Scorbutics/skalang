@@ -325,6 +325,12 @@ TEST_CASE("[Interpreter Script]") {
 		CHECK(result.nodeval<std::string>() == "titito");
 	}
 
+	SUBCASE("using a callback in another script & another context") {
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Script317 = import \"../test/src/resources/test317_1\"; Script317.actualCharacter.name;", data);
+		auto result = data.interpreter->script(astPtr);
+		CHECK(result.nodeval<std::string>() == "test317");
+	}
+
 	SUBCASE("C++ script-function binding with void return") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse("var User264 = import \"binding264\"; User264.funcTest(14);", data);
 		auto test = 0;

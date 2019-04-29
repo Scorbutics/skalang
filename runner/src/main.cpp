@@ -56,9 +56,11 @@ int main(int argc, char* argv[]) {
 		auto result = scriptParametersBinding.createMemory();
 		result->emplace("asInt", std::make_unique<ska::BridgeFunction>(std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) {
 			auto index = params[0].nodeval<int>();
+			std::cout << "accessing parameter " << index << " as int" << std::endl;
 			return ska::NodeValue{ index };
 		})));
 		result->emplace("asString", std::make_unique<ska::BridgeFunction>(std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) {
+			std::cout << "accessing parameter " << params[0].nodeval<int>() << " as string" << std::endl;
 			return ska::NodeValue{ "toto" };
 		})));
 		return result;

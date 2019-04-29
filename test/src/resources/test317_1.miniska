@@ -1,0 +1,10 @@
+var Test = import "../test/src/resources/test317_2";
+var Character = import "../test/src/resources/character";
+
+var actualCharacter = Character.build("");
+
+var callback = function() {
+	actualCharacter = Character.build("test317");
+};
+
+Test.run(callback);
