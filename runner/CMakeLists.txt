@@ -9,6 +9,7 @@ include_directories(../src/src)
 
 link_directories(../../ska/ska_core/lib)
 link_directories(../lib)
+link_directories(../bin)
 
 #Runner part
 file(GLOB_RECURSE SOURCES
