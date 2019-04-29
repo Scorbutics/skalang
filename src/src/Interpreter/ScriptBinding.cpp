@@ -47,7 +47,7 @@ void ska::ScriptBridge::buildFunctions() {
 ska::NodeValue ska::ScriptBridge::callFunction(Interpreter& interpreter, std::string importName, std::string functionName, std::vector<ska::NodeValue> parametersValues) {
 	auto import = m_script.findInMemoryTree(importName);
 	auto importedScript = import.first->nodeval<ska::ExecutionContext>();
-	auto& functionToCallMemory = importedScript.program().downMemory()(functionName);
+	auto functionToCallMemory = importedScript.program().downMemory()(functionName);
 	auto& functionToExecute = functionToCallMemory.first->nodeval<ska::ExecutionContext>();
 
 	auto operateOnFunction = ska::Operation<ska::Operator::FUNCTION_DECLARATION>(functionToExecute);

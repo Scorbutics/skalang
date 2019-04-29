@@ -1,0 +1,5 @@
+var Callback = import "../test/src/resources/callback";
+
+var run = function(callback: Callback::Default) {
+    callback();
+};
