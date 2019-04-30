@@ -26,3 +26,4 @@ Log.txt
 LogError.txt
 **/LogError.txt
 .vscode
+**/*.dir
