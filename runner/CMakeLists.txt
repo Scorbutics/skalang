@@ -1,15 +1,10 @@
-cmake_minimum_required(VERSION 3.9)
 project(skalang_runner)
 
-set(CMAKE_CXX_STANDARD 17)
-include_directories(../../ska/ska_core/src)
-include_directories(../external/doctest)
-include_directories(../external/skalog/src/src)
+include_directories(../../ska/ska_core/src/src)
 include_directories(../src/src)
 
-link_directories(../../ska/ska_core/lib)
+link_directories(../../ska/lib)
 link_directories(../lib)
-link_directories(../bin)
 
 #Runner part
 file(GLOB_RECURSE SOURCES
@@ -22,4 +17,5 @@ string(REGEX REPLACE "[^;]*CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
 add_executable(skalang_runner ${SOURCES})
 
 find_package(Threads REQUIRED)
-target_link_libraries(skalang_runner skalang ska_core skalog Threads::Threads)
+target_link_libraries(skalang_runner skalang -Wl,--allow-multiple-definition ska_core skalog Threads::Threads)
+target_include_directories(skalang_runner PUBLIC ../external/skalog/src/src)
