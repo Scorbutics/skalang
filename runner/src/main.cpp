@@ -102,7 +102,7 @@ int main(int argc, char* argv[]) {
 		scriptBinding.buildFunctions();
 
 		auto executor = ska::Script{ scriptCache, "main", ska::Tokenizer{ reservedKeywords, 
-		"var Player = import \"" + std::string{argv[1]} + "\"; var CharacterGenerator = import \"character_generator\"; var ParametersGenerator = import \"parameters_gen_lib\"; Player.run(CharacterGenerator.Gen(), ParametersGenerator.Gen());"
+		"var Script = import \"" + std::string{argv[1]} + "\"; var CharacterGenerator = import \"character_generator\"; var ParametersGenerator = import \"parameters_gen_lib\"; Script.run(CharacterGenerator.Gen(), ParametersGenerator.Gen());"
 		}.tokenize() };
 
 	
