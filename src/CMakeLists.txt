@@ -13,6 +13,6 @@ string(REGEX REPLACE "[^;]*CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
 
 add_library(skalang ${SOURCES})
 find_package(Threads REQUIRED)
-target_link_libraries(skalang ska_core skabase skalog Threads::Threads)
+target_link_libraries(skalang skabase skalog Threads::Threads)
 target_include_directories(skalang PUBLIC ../external/skalog/src/src)
 target_include_directories(skalang PUBLIC ../external/skabase/src/src)
