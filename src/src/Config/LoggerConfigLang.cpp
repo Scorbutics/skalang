@@ -3,7 +3,7 @@
 #include "LoggerConfigLang.h"
 #include <Signal/SignalHandler.h>
 
-ska::detail::SkaLangLogger ska::detail::Logger = ska::detail::BuildLogger("LogError.txt");
+ska::detail::SkaLangLogger ska::detail::Logger = ska::detail::BuildLogger("Log.txt");
 
 namespace ska {
 	namespace detail {

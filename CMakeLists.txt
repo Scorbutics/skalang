@@ -15,8 +15,8 @@ include_directories(${SKA_BASE_DIR})
 include_directories(${SKA_LOG_DIR})
 
 add_subdirectory(external/doctest)
-add_subdirectory(external/skabase/src)
 add_subdirectory(external/skalog/src)
+add_subdirectory(external/skabase/src)
 
 add_subdirectory(src)
 add_subdirectory(test)
