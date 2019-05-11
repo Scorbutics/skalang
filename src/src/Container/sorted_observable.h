@@ -1,6 +1,6 @@
 #pragma once
-#include <Utils/Observable.h>
-#include <Utils/SubObserver.h>
+#include <Base/Patterns/Observable.h>
+#include <Base/Patterns/SubObserver.h>
 #include "unique_buffered_priority_indexed_fixed_queue.h"
 
 namespace ska {

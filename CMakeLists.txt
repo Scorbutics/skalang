@@ -8,8 +8,16 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
 
+set(SKA_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/skabase/src/src)
+set(SKA_LOG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/skalog/src/src)
+
+include_directories(${SKA_BASE_DIR})
+include_directories(${SKA_LOG_DIR})
+
 add_subdirectory(external/doctest)
+add_subdirectory(external/skabase/src)
 add_subdirectory(external/skalog/src)
+
 add_subdirectory(src)
 add_subdirectory(test)
 add_subdirectory(runner)

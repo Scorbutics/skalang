@@ -5,8 +5,8 @@
 
 #include "NodeValue/ASTNodePtr.h"
 #include "Interpreter/Value/BridgeFunction.h"
-#include "Utils/Observable.h"
-#include "Utils/TupleUtils.h"
+#include "Base/Patterns/Observable.h"
+#include "Base/Meta/TupleUtils.h"
 #include "Event/VarTokenEvent.h"
 #include "Event/FunctionTokenEvent.h"
 #include "Event/BlockTokenEvent.h"

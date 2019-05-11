@@ -3,7 +3,6 @@
 #include <cassert>
 #include <vector>
 #include <unordered_map>
-#include <Data/Events/EventDispatcher.h>
 
 #include "Container/sorted_observable.h"
 #include "Interpreter/Value/BridgeFunction.h"
