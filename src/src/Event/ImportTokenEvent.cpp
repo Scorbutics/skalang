@@ -1,4 +1,5 @@
 #include <cassert>
+#include "Config/LoggerConfigLang.h"
 #include "ImportTokenEvent.h"
 #include "Interpreter/Value/Script.h"
 

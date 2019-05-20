@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "ScriptBinding.h"
 #include "Service/ASTFactory.h"
 #include "Service/SymbolTable.h"

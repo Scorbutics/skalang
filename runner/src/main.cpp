@@ -3,6 +3,7 @@
 #include <streambuf>
 #include <iostream>
 
+#include "Config/LoggerConfigLang.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
 #include "Interpreter/ScriptBinding.h"

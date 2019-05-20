@@ -1,4 +1,5 @@
 #define DOCTEST_CONFIG_IMPLEMENT
+#include "Config/LoggerConfigLang.h"
 #include <doctest.h>
 
 int main() {

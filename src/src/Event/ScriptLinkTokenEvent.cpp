@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "ScriptLinkTokenEvent.h"
 #include "Interpreter/Value/Script.h"
 

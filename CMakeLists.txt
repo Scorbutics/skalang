@@ -13,6 +13,7 @@ set(SKA_LOG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/skalog/src/src)
 
 include_directories(${SKA_BASE_DIR})
 include_directories(${SKA_LOG_DIR})
+include_directories(src/src)
 
 add_subdirectory(external/doctest)
 add_subdirectory(external/skalog/src)
