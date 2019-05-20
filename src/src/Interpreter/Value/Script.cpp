@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include <memory>
 #include "Script.h"
 #include "Service/StatementParser.h"

@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "NodeCell.h"
 #include "NodeValue/ObjectMemory.h"
 #include "Interpreter/Value/ScriptHandle.h"

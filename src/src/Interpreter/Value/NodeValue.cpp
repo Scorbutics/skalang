@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "NodeValue.h"
 
  double ska::NodeValue::convertNumeric() const { 

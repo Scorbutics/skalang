@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "ScriptHandle.h"
 
 ska::ScriptHandle::ScriptHandle(ScriptCache& cache, std::vector<Token> input, std::size_t startIndex) : 

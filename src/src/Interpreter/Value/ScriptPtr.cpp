@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "ScriptPtr.h"
 #include "Script.h"
 
