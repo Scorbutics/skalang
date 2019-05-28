@@ -3,7 +3,10 @@
 #include "LoggerConfigLang.h"
 #include <Signal/SignalHandler.h>
 
-ska::detail::SkaLangLogger ska::detail::Logger = ska::detail::BuildLogger("Log.txt");
+ska::detail::SkaLangLogger& ska::detail::LangLogger() {
+	static auto logger = ska::detail::BuildLangLogger("Log.txt");
+	return logger;
+}
 
 namespace ska {
 	namespace detail {
@@ -16,7 +19,7 @@ namespace ska {
 		}
 	}
 }
-ska::detail::SkaLangLogger ska::detail::BuildLogger(const char * filename) {
+ska::detail::SkaLangLogger ska::detail::BuildLangLogger(const char * filename) {
 	static auto TypeBuilderLogFileOutput = std::ofstream { filename };
 	auto logger = SkaLangLogger{};
 	logger.get<0>().addOutputTarget(TypeBuilderLogFileOutput);
@@ -26,7 +29,7 @@ ska::detail::SkaLangLogger ska::detail::BuildLogger(const char * filename) {
     UpdatePatterns(logger.get<1>());
     
     ska::process::SignalHandlerAddAction([](int signalCode) {
-        detail::Logger.terminate();
+        detail::LangLogger().terminate();
         TypeBuilderLogFileOutput.close();
     });
     
