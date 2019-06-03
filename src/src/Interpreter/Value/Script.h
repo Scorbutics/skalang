@@ -18,7 +18,7 @@ namespace ska {
 
 		Script(ScriptCache& scriptCache, const std::string& name, std::vector<Token> input, std::size_t startIndex = 0) :
 			m_cache(scriptCache) {
-            auto handle = std::make_unique<ScriptHandle>(m_cache, std::move(input), startIndex);
+            auto handle = std::make_unique<ScriptHandle>(m_cache, std::move(input), startIndex, name);
             if(m_cache.find(name) == m_cache.end()) {
 				m_cache.emplace(name, std::move(handle));
             } else {
@@ -64,6 +64,8 @@ namespace ska {
 
 		SymbolTable& symbols() { return m_handle->m_symbols; }
 		const SymbolTable& symbols() const { return m_handle->m_symbols; }
+
+		const std::string& name() const { return m_handle->name(); }
 
 		auto pushNestedMemory(bool pop) {
 			auto lock = m_handle->m_currentMemory->pushNested(pop, &m_handle->m_currentMemory);

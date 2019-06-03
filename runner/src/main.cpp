@@ -17,12 +17,20 @@
 #include "Interpreter/Interpreter.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
+#include "std/module/io.h"
+
 int main(int argc, char* argv[]) {
 	if (argc <= 1) {
-        std::cout << "No file name entered. Exiting...";
+        std::cout << "No file name entered. Exiting..." << std::endl;
         return -1;
     }
 	
+	auto inputFile = std::ifstream{ std::string{argv[1]} + ".miniska" };
+	if(inputFile.fail()) {
+		std::cout << "File not found : \"" << argv[1] << ".miniska\"" << std::endl;
+        return -1;
+	}
+
     const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto scriptCache = ska::ScriptCache{};
 	auto typeCrosser = ska::TypeCrosser{};
@@ -32,11 +40,7 @@ int main(int argc, char* argv[]) {
 	auto typeChecker = ska::SemanticTypeChecker {parser, typeCrosser };
 	auto interpreter = ska::Interpreter {reservedKeywords, typeCrosser };
 
-	auto inputFile = std::ifstream{ std::string{argv[1]} + ".miniska" };
-	if(inputFile.fail()) {
-		std::cout << "File not found : \"" << argv[1] << ".miniska\"";
-        return -1;
-	}
+	auto moduleConfiguration = ska::lang::ModuleConfiguration{scriptCache, typeBuilder, symbolsTypeUpdater, reservedKeywords};
 
 	try {
 		auto scriptEmBinding = ska::ScriptBridge{ scriptCache, "em_lib", typeBuilder, symbolsTypeUpdater, reservedKeywords };
@@ -90,17 +94,7 @@ int main(int argc, char* argv[]) {
 		}));
 		scriptCharacterBinding.buildFunctions();
 
-		auto scriptBinding = ska::ScriptBridge{ scriptCache, "runner_lib", typeBuilder, symbolsTypeUpdater, reservedKeywords };
-		scriptBinding.bindFunction("printInt", std::function<void(int)>([](int value) {
-			std::cout << value << std::endl;
-		}));
-		scriptBinding.bindFunction("printString", std::function<void(std::string)>([](std::string value) {
-			std::cout << value << std::endl;
-		}));
-		scriptBinding.bindFunction("wait", std::function<void(int)>([](int value) {
-			std::cout << "wait " << value << std::endl;
-		}));
-		scriptBinding.buildFunctions();
+		ska::lang::UseModuleIO(moduleConfiguration);
 
 		auto executor = ska::Script{ scriptCache, "main", ska::Tokenizer{ reservedKeywords, 
 		"var Script = import \"" + std::string{argv[1]} + "\"; var CharacterGenerator = import \"character_generator\"; var ParametersGenerator = import \"parameters_gen_lib\"; Script.run(CharacterGenerator.Gen(), ParametersGenerator.Gen());"

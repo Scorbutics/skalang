@@ -1,6 +1,7 @@
 project(skalang_runner)
 
 include_directories(${SKA_BASE_DIR})
+include_directories(src)
 include_directories(../src/src)
 
 link_directories(../lib)

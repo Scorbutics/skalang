@@ -14,7 +14,7 @@ namespace ska {
 	using ScriptCache = std::unordered_map<std::string, ScriptHandlePtr>;
 
 	struct ScriptHandle {
-		ScriptHandle(ScriptCache& cache, std::vector<Token> input, std::size_t startIndex = 0);
+		ScriptHandle(ScriptCache& cache, std::vector<Token> input, std::size_t startIndex = 0, std::string name = "");
 	
 	public:
 		SymbolTable& symbols() { return m_symbols; }
@@ -29,6 +29,8 @@ namespace ska {
 		ASTNode& rootNode() { assert(m_ast != nullptr);  return *m_ast; }
 		const ASTNode& rootNode() const { assert(m_ast != nullptr);  return *m_ast; }
 
+		const std::string& name() const { return m_name; }
+
 	private:
 		friend class Script;
 		
@@ -38,6 +40,7 @@ namespace ska {
 		MemoryTablePtr m_memory;
 		MemoryTablePtr m_currentMemory;
 		ASTNodePtr m_ast;
+		std::string m_name;
 		bool m_bridged = false;
 	};
 

@@ -11,6 +11,7 @@
 #include "Service/TokenReader.h"
 #include "Service/ASTFactory.h"
 #include "Interpreter/Value/Script.h"
+#include "Error/LangError.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::StatementParser)
 
@@ -30,16 +31,21 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::parse(Script& input) {
 		return nullptr;
 	}
 
-	auto blockNodeStatements = std::vector<ASTNodePtr>{};
-    while (!input.empty()) {
-		auto optionalStatement = optstatement(input);
-		if (optionalStatement != nullptr && !optionalStatement->logicalEmpty()) {
-			blockNodeStatements.push_back(std::move(optionalStatement));
-		} else {
-			break;
+	
+	try {
+		auto blockNodeStatements = std::vector<ASTNodePtr>{};
+			while (!input.empty()) {
+			auto optionalStatement = optstatement(input);
+			if (optionalStatement != nullptr && !optionalStatement->logicalEmpty()) {
+				blockNodeStatements.push_back(std::move(optionalStatement));
+			} else {
+				break;
+			}
 		}
+		return ASTFactory::MakeNode<Operator::BLOCK>(std::move(blockNodeStatements));
+	} catch(std::exception& e) {
+		throw LangError(input.name(), e);
 	}
-	return ASTFactory::MakeNode<Operator::BLOCK>(std::move(blockNodeStatements));
 }
 
 ska::StatementParser::ASTNodePtr ska::StatementParser::statement(Script& input) {

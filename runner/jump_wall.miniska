@@ -1,5 +1,5 @@
 var Character = import "character";
-var Runner = import "runner_lib";
+var IO = import "io_lib";
 var Parameters = import "parameters";
 
 var run = function(origin: Character::Fcty(), parameters: Parameters::Fcty()) {
@@ -9,7 +9,7 @@ var run = function(origin: Character::Fcty(), parameters: Parameters::Fcty()) {
 	
 	origin.input.remove();
 	origin.move(jumpDirection, 30, 1, emptyCallback);
-	Runner.wait(400);
+	IOr.wait(400);
 	origin.jump(14);
 	origin.move(jumpDirection, 60, 1, origin.input.restore);
 };
