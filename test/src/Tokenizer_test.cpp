@@ -288,5 +288,13 @@ TEST_CASE("Symbol by symbol") {
 		CHECK(tokens.size() == 1);
 		CHECK(tokens[0] == ska::Token {"--", ska::TokenType::SYMBOL} );
 	}
+
+	SUBCASE("lot of spaces and whitespaces characters") {
+		const auto input = std::string("       \t     \n");
+		auto t = ska::Tokenizer { keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.empty());
+	}
 }
 
