@@ -331,5 +331,6 @@ TEST_CASE("Expression and priorities") {
 		CHECK(innerOp[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));	
 		CHECK(innerOp.has(ska::Token { "+", ska::TokenType::SYMBOL, {} }));
 	}
-	
+
+	//TODO Unit tests on tokens position in script
 }
