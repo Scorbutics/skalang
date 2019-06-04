@@ -10,7 +10,7 @@ namespace ska {
             std::runtime_error(std::move(message)) {}
 
         LangError(std::string message, std::exception& exception) : 
-            std::runtime_error("in \"" + std::move(message) + "\" - " + std::string{exception.what()}) {}
+            std::runtime_error("in \"" + std::move(message) + "\"\n\t" + std::string{exception.what()}) {}
         
         virtual ~LangError() = default;
     };

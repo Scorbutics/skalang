@@ -6,6 +6,7 @@
 #include <memory>
 
 #include "TokenGrammar.h"
+#include "Cursor.h"
 
 namespace ska {
 	class MemoryTable;
@@ -41,21 +42,26 @@ namespace ska {
 	};
 
 	struct Token {
-		
-
 		Token() = default;
 		Token(const Token& t) = default;
 		Token(Token&& t) noexcept = default;
 		Token& operator=(const Token& t) = default;
 		Token& operator=(Token&& t) noexcept = default;
 
-		Token(std::string c, TokenType t) :
-			m_type(std::move(t)) {
+		Token(const Token& t, Cursor position) :
+			Token(t) {
+			m_position = std::move(position);
+		}
+
+		Token(std::string c, TokenType t, Cursor position) :
+			m_type(std::move(t)),
+			m_position(std::move(position)) {
 			init(c, m_type);
 		}
 
-		Token(std::size_t c, TokenType t) :
-			m_type(std::move(t)) {
+		Token(std::size_t c, TokenType t, Cursor position) :
+			m_type(std::move(t)),
+			m_position(std::move(position)) {
 			if (m_type == TokenType::EMPTY) {
 				m_content = "";
 			} else {
@@ -93,6 +99,10 @@ namespace ska {
 			return m_type == TokenType::EMPTY;
 		}
 
+		const Cursor& position() const {
+			return m_position;
+		}
+
 		bool operator==(const Token& t1) const {
 			return m_type == t1.m_type && m_content == t1.m_content;
 		}
@@ -117,6 +127,7 @@ namespace ska {
 
 		Variant m_content = std::string{};
 		TokenType m_type = TokenType::EMPTY;
+		Cursor m_position;
 
 		friend std::ostream& operator<<(std::ostream& stream, const Token& token);
 	};

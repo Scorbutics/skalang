@@ -15,6 +15,7 @@
 #include "Type.h"
 
 namespace ska {
+	struct Cursor;
 	class Symbol;
 	class StatementParser;
 	class ASTFactory;
@@ -39,6 +40,10 @@ namespace ska {
 
 		std::size_t size() const {
 			return m_children.size();
+		}
+
+		const Cursor& positionInScript() const {
+			return token.position();
 		}
 
 		TokenType tokenType() const {

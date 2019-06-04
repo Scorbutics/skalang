@@ -18,8 +18,8 @@ TEST_CASE("[TypeBuilderVariableDeclaration]") {
 	script.parse(*data.parser);
 		auto typeBuilder = ska::TypeBuilderOperator<ska::Operator::VARIABLE_DECLARATION>{};
 	
-	auto nameToken = ska::Token{"toto", ska::TokenType::IDENTIFIER };
-	auto valueToken = ska::Token{ "1", ska::TokenType::DIGIT };
+	auto nameToken = ska::Token{"toto", ska::TokenType::IDENTIFIER, {} };
+	auto valueToken = ska::Token{ "1", ska::TokenType::DIGIT, {} };
 	auto typeCrosser = ska::TypeCrosser{};
 
 	auto valueNode = ska::ASTFactory::MakeLogicalNode(valueToken);

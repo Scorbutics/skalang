@@ -13,23 +13,23 @@ TEST_CASE("test") {
 	CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::FOR>());
 	CHECK(tokens[1] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_BEGIN>());
 	CHECK(tokens[2] == keywords.pattern<ska::TokenGrammar::VARIABLE>());
-	CHECK(tokens[3] == ska::Token{"i", ska::TokenType::IDENTIFIER});
-	CHECK(tokens[4] == ska::Token{"=", ska::TokenType::SYMBOL});
-	CHECK(tokens[5] == ska::Token{"0", ska::TokenType::DIGIT});
+	CHECK(tokens[3] == ska::Token{"i", ska::TokenType::IDENTIFIER, {}});
+	CHECK(tokens[4] == ska::Token{"=", ska::TokenType::SYMBOL, {}});
+	CHECK(tokens[5] == ska::Token{"0", ska::TokenType::DIGIT, {}});
 	CHECK(tokens[6] == keywords.pattern<ska::TokenGrammar::STATEMENT_END>());
-	CHECK(tokens[7] == ska::Token{"i", ska::TokenType::IDENTIFIER});
-	CHECK(tokens[8] == ska::Token{"<", ska::TokenType::SYMBOL});
-	CHECK(tokens[9] == ska::Token{"5", ska::TokenType::DIGIT});
+	CHECK(tokens[7] == ska::Token{"i", ska::TokenType::IDENTIFIER, {}});
+	CHECK(tokens[8] == ska::Token{"<", ska::TokenType::SYMBOL, {}});
+	CHECK(tokens[9] == ska::Token{"5", ska::TokenType::DIGIT, {}});
 	CHECK(tokens[10] == keywords.pattern<ska::TokenGrammar::STATEMENT_END>());
-	CHECK(tokens[11] == ska::Token{"i", ska::TokenType::IDENTIFIER});
-	CHECK(tokens[12] == ska::Token{"++", ska::TokenType::SYMBOL});
+	CHECK(tokens[11] == ska::Token{"i", ska::TokenType::IDENTIFIER, {}});
+	CHECK(tokens[12] == ska::Token{"++", ska::TokenType::SYMBOL, {}});
 	CHECK(tokens[13] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_END>());
 	CHECK(tokens[14] == keywords.pattern<ska::TokenGrammar::BLOCK_BEGIN>());
-	CHECK(tokens[15] == ska::Token { "lol", ska::TokenType::IDENTIFIER});
+	CHECK(tokens[15] == ska::Token { "lol", ska::TokenType::IDENTIFIER, {}});
 	CHECK(tokens[16] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_BEGIN>());
-	CHECK(tokens[17] == ska::Token { "mdr", ska::TokenType::STRING});
+	CHECK(tokens[17] == ska::Token { "mdr", ska::TokenType::STRING, {}});
 	CHECK(tokens[18] == keywords.pattern<ska::TokenGrammar::ARGUMENT_DELIMITER>());
-	CHECK(tokens[19] == ska::Token { "12", ska::TokenType::DIGIT});
+	CHECK(tokens[19] == ska::Token { "12", ska::TokenType::DIGIT, {}});
 	CHECK(tokens[20] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_END>());
 	CHECK(tokens[21] == keywords.pattern<ska::TokenGrammar::STATEMENT_END>());
 	CHECK(tokens[22] == keywords.pattern<ska::TokenGrammar::BLOCK_END>());
@@ -125,7 +125,7 @@ TEST_CASE("Symbol by symbol") {
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.size() == 1);
-		CHECK(tokens[0] == ska::Token{"testId", ska::TokenType::IDENTIFIER});
+		CHECK(tokens[0] == ska::Token{"testId", ska::TokenType::IDENTIFIER, {}});
 	}
 
 	SUBCASE("end statement symbol") {
@@ -179,7 +179,7 @@ TEST_CASE("Symbol by symbol") {
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.size() == 1);
-		CHECK(tokens[0] == ska::Token {"=", ska::TokenType::SYMBOL});
+		CHECK(tokens[0] == ska::Token {"=", ska::TokenType::SYMBOL, {}});
 	}
 
 	SUBCASE("integer") {
@@ -188,7 +188,7 @@ TEST_CASE("Symbol by symbol") {
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.size() == 1);
-		CHECK(tokens[0] == ska::Token { "234", ska::TokenType::DIGIT});
+		CHECK(tokens[0] == ska::Token { "234", ska::TokenType::DIGIT, {}});
 	}
 	
 	SUBCASE("real number") {
@@ -197,7 +197,7 @@ TEST_CASE("Symbol by symbol") {
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.size() == 1);
-		CHECK(tokens[0] == ska::Token {"32.1", ska::TokenType::DIGIT});
+		CHECK(tokens[0] == ska::Token {"32.1", ska::TokenType::DIGIT, {}});
 	}
 
 	SUBCASE("Dot symbol (for method call)") {
@@ -215,7 +215,7 @@ TEST_CASE("Symbol by symbol") {
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.size() == 1);
-		CHECK(tokens[0] == ska::Token {"tettttt", ska::TokenType::STRING});
+		CHECK(tokens[0] == ska::Token {"tettttt", ska::TokenType::STRING, {}});
 	}
 
 	SUBCASE("Full method call 0 args") {
@@ -224,9 +224,9 @@ TEST_CASE("Symbol by symbol") {
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.size() == 5);
-		CHECK(tokens[0] == ska::Token { "test", ska::TokenType::IDENTIFIER});
+		CHECK(tokens[0] == ska::Token { "test", ska::TokenType::IDENTIFIER, {}});
 		CHECK(tokens[1] == keywords.pattern<ska::TokenGrammar::METHOD_CALL_OPERATOR>());
-		CHECK(tokens[2] == ska::Token { "call", ska::TokenType::IDENTIFIER});
+		CHECK(tokens[2] == ska::Token { "call", ska::TokenType::IDENTIFIER, {}});
 		CHECK(tokens[3] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_BEGIN>());
 		CHECK(tokens[4] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_END>());
 	}
@@ -245,7 +245,7 @@ TEST_CASE("Symbol by symbol") {
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.size() == 1);
-		CHECK(tokens[0] == ska::Token { "o", ska::TokenType::IDENTIFIER});
+		CHECK(tokens[0] == ska::Token { "o", ska::TokenType::IDENTIFIER, {}});
 	}
 	
 	SUBCASE("string with noise around") {
@@ -254,8 +254,8 @@ TEST_CASE("Symbol by symbol") {
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.size() == 3);
-		CHECK(tokens[0] == ska::Token { "13.23", ska::TokenType::DIGIT });
-		CHECK(tokens[1] == ska::Token { "testString", ska::TokenType::STRING});
+		CHECK(tokens[0] == ska::Token { "13.23", ska::TokenType::DIGIT , {}});
+		CHECK(tokens[1] == ska::Token { "testString", ska::TokenType::STRING, {}});
 		CHECK(tokens[2] == keywords.pattern<ska::TokenGrammar::VARIABLE>());
 	}
 
@@ -265,7 +265,7 @@ TEST_CASE("Symbol by symbol") {
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.size() == 1);
-		CHECK(tokens[0] == ska::Token { "var i = 0; {}", ska::TokenType::STRING});
+		CHECK(tokens[0] == ska::Token { "var i = 0; {}", ska::TokenType::STRING, {}});
 	}
 
 	SUBCASE("symbols in queue") {
@@ -274,10 +274,10 @@ TEST_CASE("Symbol by symbol") {
 		auto tokens = t.tokenize();
 		
 		CHECK(tokens.size() == 4);
-		CHECK(tokens[0] == ska::Token {";", ska::TokenType::SYMBOL});
-		CHECK(tokens[1] == ska::Token {";", ska::TokenType::SYMBOL});
-		CHECK(tokens[2] == ska::Token {"++", ska::TokenType::SYMBOL});
-		CHECK(tokens[3] == ska::Token {"--", ska::TokenType::SYMBOL});
+		CHECK(tokens[0] == ska::Token {";", ska::TokenType::SYMBOL, {}});
+		CHECK(tokens[1] == ska::Token {";", ska::TokenType::SYMBOL, {}});
+		CHECK(tokens[2] == ska::Token {"++", ska::TokenType::SYMBOL, {}});
+		CHECK(tokens[3] == ska::Token {"--", ska::TokenType::SYMBOL, {}});
 	}
 
 	SUBCASE("double symbols tokens") {
@@ -286,7 +286,7 @@ TEST_CASE("Symbol by symbol") {
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.size() == 1);
-		CHECK(tokens[0] == ska::Token {"--", ska::TokenType::SYMBOL} );
+		CHECK(tokens[0] == ska::Token {"--", ska::TokenType::SYMBOL, {}} );
 	}
 
 	SUBCASE("lot of spaces and whitespaces characters") {
@@ -295,6 +295,14 @@ TEST_CASE("Symbol by symbol") {
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.empty());
+	}
+	
+	SUBCASE("unterminated string") {
+		const auto input = std::string(" \"   1234 eetr ;");
+		auto t = ska::Tokenizer { keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(false);
 	}
 }
 

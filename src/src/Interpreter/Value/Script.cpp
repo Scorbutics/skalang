@@ -22,7 +22,7 @@ ska::ASTNode& ska::Script::fromBridge(std::vector<BridgeMemory> bindings) {
 	auto functionListNodes = bindings.empty() ? std::vector<ASTNodePtr>() : std::vector<ASTNodePtr>(bindings.size());
 	for (auto& bridgeFunction : bindings) {
 		auto functionName = bridgeFunction->node->name();
-		auto functionVarDeclarationNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(Token{ functionName, TokenType::IDENTIFIER }), std::move(bridgeFunction->node));
+		auto functionVarDeclarationNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(Token{ functionName, TokenType::IDENTIFIER , {}}), std::move(bridgeFunction->node));
 		functionListNodes.push_back(std::move(functionVarDeclarationNode));
 		m_handle->m_currentMemory->emplace(functionName, NodeValue{ std::move(bridgeFunction) });
 	}

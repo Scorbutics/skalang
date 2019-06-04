@@ -11,7 +11,9 @@
 #include "Service/TokenReader.h"
 #include "Service/ASTFactory.h"
 #include "Interpreter/Value/Script.h"
+
 #include "Error/LangError.h"
+#include "Error/ParserError.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::StatementParser)
 
@@ -53,16 +55,23 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::statement(Script& input) 
 		return nullptr;
 	}
 
-	const auto token = input.actual();
-	switch (token.type()) {
-	case TokenType::RESERVED:
-		return matchReservedKeyword(input, std::get<std::size_t>(token.content()));
+	
+		const auto token = input.actual();
+	try {
+		switch (token.type()) {
+		case TokenType::RESERVED:
+			return matchReservedKeyword(input, std::get<std::size_t>(token.content()));
 
-	case TokenType::RANGE:
-		return m_matcherBlock.match(input, std::get<std::string>(token.content()));
+		case TokenType::RANGE:
+			return m_matcherBlock.match(input, std::get<std::string>(token.content()));
 
-	default:
-        return matchExpressionStatement(input);
+		default:
+					return matchExpressionStatement(input);
+		}
+	} catch (ParserError& error) {
+		throw error;
+	} catch (std::runtime_error& error) {
+		throw ParserError(error.what(), input.actual().position());
 	}
 }
 

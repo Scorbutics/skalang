@@ -7,9 +7,9 @@ std::unordered_map<std::string, ska::ReservedKeywordsPool::TokenInfo> ska::Reser
 	
 	const auto emplacer = [&](std::size_t index, TokenType type) {
 		if(type == TokenType::RESERVED) {
-			pool.emplace(TokenGrammarSTR[index], TokenInfo { TokenGrammarSTR[index], Token{ index, TokenType::RESERVED } });
+			pool.emplace(TokenGrammarSTR[index], TokenInfo { TokenGrammarSTR[index], Token{ index, TokenType::RESERVED, {} } });
 		} else {
-			pool.emplace(TokenGrammarSTR[index], TokenInfo { TokenGrammarSTR[index], Token{ TokenGrammarSTR[index], std::move(type) } });
+			pool.emplace(TokenGrammarSTR[index], TokenInfo { TokenGrammarSTR[index], Token{ TokenGrammarSTR[index], std::move(type), {} } });
 		}
 	};
 

@@ -31,10 +31,10 @@ namespace ska {
 		static std::unordered_set<std::string> BuildAllowedMultipleCharTokenSymbolsSet();
 
 		RequiredToken determineCurrentToken(const std::size_t startIndex) const;
-		std::pair<std::size_t, Token> tokenizeNext(const RequiredToken& requiredToken, const std::size_t startIndex = 0) const;
+		std::pair<Cursor, Token> tokenizeNext(const RequiredToken& requiredToken, const Cursor& lastCursor) const;
 		RequiredToken initializeCharType(const TokenType charTokenType) const;
-		Token finalizeToken(std::size_t index, const RequiredToken& requiredToken, const std::size_t startIndex = 0) const;
-		Token postComputing(std::size_t index, const RequiredToken& requiredToken, const std::size_t startIndex) const;
+		Token finalizeToken(std::size_t index, const RequiredToken& requiredToken, const Cursor& lastCursor) const;
+		Token postComputing(std::size_t index, const RequiredToken& requiredToken, const Cursor& lastCursor) const;
 		TokenType calculateCharacterTokenType(const char c) const;
 		static std::pair<ska::Token, ska::Token> stackToken(TokenType currentType, Token token, std::vector<Token>& stackSymbol);
 
@@ -42,10 +42,12 @@ namespace ska {
 			return std::isalnum(c) || c == '_';
 		}
 		
-		static bool ignoreBlankToken(TokenType token) {
+		static bool isNotBlankToken(TokenType token) {
 			return token != ska::TokenType::EMPTY &&
 				token != ska::TokenType::SPACE;
 		}
+
+		static Cursor computeTokenPositionCursor(std::size_t index, const Token& readToken, bool wasRequired, const Cursor& lastCursor);
 
 		static Token group(std::vector<Token>& symbolStack);
 		static void push(Token t, std::vector<Token>& output);

@@ -30,20 +30,20 @@ TEST_CASE("[Parser]") {
 	const auto& declaration = tree[0];
 	CHECK(declaration.op() == ska::Operator::VARIABLE_DECLARATION);
 	CHECK(declaration.size() == 1);
-	CHECK(declaration.has(ska::Token { "i", ska::TokenType::IDENTIFIER }));
-	CHECK(declaration[0].has(ska::Token { "0", ska::TokenType::DIGIT }));
+	CHECK(declaration.has(ska::Token { "i", ska::TokenType::IDENTIFIER, {} }));
+	CHECK(declaration[0].has(ska::Token { "0", ska::TokenType::DIGIT, {} }));
 
 	const auto& checkStatement = tree[1];
 	CHECK(checkStatement.op() == ska::Operator::BINARY);
 	CHECK(checkStatement.size() == 2);
-	CHECK(checkStatement[0].has(ska::Token { "i", ska::TokenType::IDENTIFIER }));
-	CHECK(checkStatement.has(ska::Token { "<", ska::TokenType::SYMBOL }));
-	CHECK(checkStatement[1].has(ska::Token { "5", ska::TokenType::DIGIT }));
+	CHECK(checkStatement[0].has(ska::Token { "i", ska::TokenType::IDENTIFIER, {} }));
+	CHECK(checkStatement.has(ska::Token { "<", ska::TokenType::SYMBOL, {} }));
+	CHECK(checkStatement[1].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
 
 	const auto& incrementStatement = tree[2];
 	CHECK(incrementStatement.op() == ska::Operator::UNARY);
 	CHECK(incrementStatement.size() == 1);
-	CHECK(incrementStatement[0].has(ska::Token { "i", ska::TokenType::IDENTIFIER }));
+	CHECK(incrementStatement[0].has(ska::Token { "i", ska::TokenType::IDENTIFIER, {} }));
 	
 	const auto& loopStatementBody = tree[3];
 	CHECK(loopStatementBody.op() == ska::Operator::BLOCK);
@@ -76,7 +76,7 @@ TEST_CASE("Block") {
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BLOCK);
 		CHECK(ast.size() == 1);
-		CHECK(ast[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER}));
+		CHECK(ast[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER, {}}));
 	}
 
 	SUBCASE("1 statement block statement") {
@@ -84,8 +84,8 @@ TEST_CASE("Block") {
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BLOCK);
 		CHECK(ast.size() == 2);
-		CHECK(ast[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER}));
-		CHECK(ast[1].has(ska::Token { "titi", ska::TokenType::IDENTIFIER}));
+		CHECK(ast[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER, {}}));
+		CHECK(ast[1].has(ska::Token { "titi", ska::TokenType::IDENTIFIER, {}}));
 	}
 
 	SUBCASE("1 statement, then a block statement") {
@@ -120,14 +120,14 @@ TEST_CASE("booleans") {
 		auto astPtr = ASTFromInput(scriptCache, "true;", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::LITERAL);
-		CHECK(ast.has(ska::Token{ "true", ska::TokenType::BOOLEAN }));
+		CHECK(ast.has(ska::Token{ "true", ska::TokenType::BOOLEAN, {}}));
 	}
 
 	SUBCASE("false") {
 		auto astPtr = ASTFromInput(scriptCache, "false;", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::LITERAL);
-		CHECK(ast.has(ska::Token{ "false", ska::TokenType::BOOLEAN }));
+		CHECK(ast.has(ska::Token{ "false", ska::TokenType::BOOLEAN, {}}));
 	}
 }
 
@@ -139,7 +139,7 @@ TEST_CASE("If keyword pattern") {
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::IF);
 		CHECK(ast.size() == 2);
-		CHECK(ast[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER}));
+		CHECK(ast[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER, {}}));
 		CHECK(ast[1].op() == ska::Operator::BLOCK);
 	}
 }
@@ -191,7 +191,7 @@ TEST_CASE("User defined object") {
         CHECK(astFuncParameters154.size() == 2);
     
         //Checks the parameter name and type
-        CHECK(astFuncParameters154[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER})); 
+        CHECK(astFuncParameters154[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}})); 
         CHECK(astFuncParameters154[0].size() == 1);
 		CHECK(astFuncParameters154[0][0].size() == 3);
         CHECK(astFuncParameters154[0][0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
@@ -209,19 +209,19 @@ TEST_CASE("User defined object") {
 
         const auto& returnNomNode = userDefinedObjectNode[0];
         CHECK(returnNomNode.size() == 1);
-        CHECK(returnNomNode.has(ska::Token { "nom", ska::TokenType::IDENTIFIER }));
+        CHECK(returnNomNode.has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
         
         //Checks the variable declaration and the function call
         const auto& varJoueur1Node = astPtr.rootNode()[1];
         CHECK(varJoueur1Node.op() == ska::Operator::VARIABLE_DECLARATION);
-        CHECK(varJoueur1Node.has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER } ));
+        CHECK(varJoueur1Node.has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER, {}} ));
 
         //Checks the field access
         const auto& nomJoueur1FieldNode = astPtr.rootNode()[2];
         CHECK(nomJoueur1FieldNode.op() == ska::Operator::FIELD_ACCESS);
 		CHECK(nomJoueur1FieldNode.size() == 2);
-		CHECK(nomJoueur1FieldNode[0].has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER } ));
-		CHECK(nomJoueur1FieldNode[1].has(ska::Token{ "nom", ska::TokenType::IDENTIFIER }));
+		CHECK(nomJoueur1FieldNode[0].has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER, {}} ));
+		CHECK(nomJoueur1FieldNode[1].has(ska::Token{ "nom", ska::TokenType::IDENTIFIER, {}}));
 
 	}
 
@@ -235,9 +235,9 @@ TEST_CASE("Expression and priorities") {
         auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
-		CHECK(ast.has(ska::Token { "*", ska::TokenType::SYMBOL }));
-		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT }));
-		CHECK(ast[1].has(ska::Token { "2", ska::TokenType::DIGIT }));
+		CHECK(ast.has(ska::Token { "*", ska::TokenType::SYMBOL, {}}));
+		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT, {}}));
+		CHECK(ast[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
 	}
 
 	SUBCASE("Syntax error : not an expression") {
@@ -264,9 +264,9 @@ TEST_CASE("Expression and priorities") {
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
-		CHECK(ast.has(ska::Token { "/", ska::TokenType::SYMBOL }));
-		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT }));
-		CHECK(ast[1].has(ska::Token { "2", ska::TokenType::DIGIT }));
+		CHECK(ast.has(ska::Token { "/", ska::TokenType::SYMBOL, {} }));
+		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
+		CHECK(ast[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
 	}
 	
 	SUBCASE("Simple add") {
@@ -274,9 +274,9 @@ TEST_CASE("Expression and priorities") {
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
-		CHECK(ast.has(ska::Token { "+", ska::TokenType::SYMBOL }));
-		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT }));
-		CHECK(ast[1].has(ska::Token { "2", ska::TokenType::DIGIT }));
+		CHECK(ast.has(ska::Token { "+", ska::TokenType::SYMBOL, {} }));
+		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
+		CHECK(ast[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
 	}
 
 	SUBCASE("Simple sub") {
@@ -284,9 +284,9 @@ TEST_CASE("Expression and priorities") {
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
-		CHECK(ast.has(ska::Token { "-", ska::TokenType::SYMBOL }));
-		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT }));
-		CHECK(ast[1].has(ska::Token { "2", ska::TokenType::DIGIT }));
+		CHECK(ast.has(ska::Token { "-", ska::TokenType::SYMBOL, {} }));
+		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
+		CHECK(ast[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
 	}
 
 	SUBCASE("Priorization with mul before add") {
@@ -294,13 +294,13 @@ TEST_CASE("Expression and priorities") {
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
-		CHECK(ast.has(ska::Token { "+", ska::TokenType::SYMBOL }));
-		CHECK(ast[1].has(ska::Token { "4", ska::TokenType::DIGIT }));
+		CHECK(ast.has(ska::Token { "+", ska::TokenType::SYMBOL, {} }));
+		CHECK(ast[1].has(ska::Token { "4", ska::TokenType::DIGIT, {} }));
 		CHECK(ast[0].op() == ska::Operator::BINARY);
 		const auto& innerOp = ast[0];
-		CHECK(innerOp[0].has(ska::Token { "5", ska::TokenType::DIGIT }));
-		CHECK(innerOp[1].has(ska::Token { "2", ska::TokenType::DIGIT }));
-		CHECK(innerOp.has(ska::Token { "*", ska::TokenType::SYMBOL }));
+		CHECK(innerOp[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
+		CHECK(innerOp[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
+		CHECK(innerOp.has(ska::Token { "*", ska::TokenType::SYMBOL, {} }));
 	}
 
 	SUBCASE("Priorization with mul after add") {
@@ -308,13 +308,13 @@ TEST_CASE("Expression and priorities") {
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
-		CHECK(ast.has(ska::Token { "+", ska::TokenType::SYMBOL }));
-		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT }));
+		CHECK(ast.has(ska::Token { "+", ska::TokenType::SYMBOL, {} }));
+		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
 		CHECK(ast[1].op() == ska::Operator::BINARY);
 		const auto& innerOp = ast[1];
-		CHECK(innerOp[0].has(ska::Token { "2", ska::TokenType::DIGIT }));
-		CHECK(innerOp[1].has(ska::Token { "4", ska::TokenType::DIGIT }));	
-		CHECK(innerOp.has(ska::Token { "*", ska::TokenType::SYMBOL }));
+		CHECK(innerOp[0].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
+		CHECK(innerOp[1].has(ska::Token { "4", ska::TokenType::DIGIT, {} }));	
+		CHECK(innerOp.has(ska::Token { "*", ska::TokenType::SYMBOL, {} }));
 	}
 
 
@@ -323,13 +323,13 @@ TEST_CASE("Expression and priorities") {
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
-		CHECK(ast.has(ska::Token { "*", ska::TokenType::SYMBOL }));
-		CHECK(ast[1].has(ska::Token { "4", ska::TokenType::DIGIT }));
+		CHECK(ast.has(ska::Token { "*", ska::TokenType::SYMBOL, {} }));
+		CHECK(ast[1].has(ska::Token { "4", ska::TokenType::DIGIT, {} }));
 		CHECK(ast[0].op() == ska::Operator::BINARY);
 		const auto& innerOp = ast[0];
-		CHECK(innerOp[0].has(ska::Token { "5", ska::TokenType::DIGIT }));
-		CHECK(innerOp[1].has(ska::Token { "2", ska::TokenType::DIGIT }));	
-		CHECK(innerOp.has(ska::Token { "+", ska::TokenType::SYMBOL }));
+		CHECK(innerOp[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
+		CHECK(innerOp[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));	
+		CHECK(innerOp.has(ska::Token { "+", ska::TokenType::SYMBOL, {} }));
 	}
 	
 }

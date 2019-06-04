@@ -29,24 +29,24 @@ ska::ASTNodePtr ska::MatcherType::match(TokenReader& input) {
 
 	//handle objects
 	if (input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>())) {
-		input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
+		const auto firstParenthesis = input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 		input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 
 		if (isBuiltIn) {
 			throw std::runtime_error("syntax error : \"" + nodes[0]->name() + "\" is used as a function-object but is a built-in type");
 		}
 
-		nodes.push_back(ASTFactory::MakeLogicalNode(Token{ "", TokenType::RANGE }));
+		nodes.push_back(ASTFactory::MakeLogicalNode(Token{ "", TokenType::RANGE, firstParenthesis.position() }));
 	} else {
 		nodes.push_back(ASTFactory::MakeEmptyNode());
 	}
 
 	//handle arrays
 	if (input.expect(TokenType::ARRAY)) {
-		input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());
+		const auto firstBracket = input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());
 		input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 
-		nodes.push_back(ASTFactory::MakeLogicalNode(Token{ "", TokenType::ARRAY }));
+		nodes.push_back(ASTFactory::MakeLogicalNode(Token{ "", TokenType::ARRAY, firstBracket.position()}));
 	} else {
 		nodes.push_back(ASTFactory::MakeEmptyNode());
 	}

@@ -16,7 +16,7 @@ const ska::Token& ska::TokenReader::match(const TokenType type) {
     }
     auto ss = std::stringstream {};
     ss << "a token with type \"" << TokenTypeSTR[static_cast<std::size_t>(type)] << "\"" ;
-    auto t = Token { ss.str(), TokenType::IDENTIFIER };
+    auto t = Token { ss.str(), TokenType::IDENTIFIER, (m_lookAhead != nullptr ? m_lookAhead->position() : Cursor {}) };
     error(&t);
 	throw std::runtime_error("unexpected error");
 }
@@ -32,7 +32,7 @@ ska::Token ska::TokenReader::actual() const {
     if (m_lookAhead != nullptr) {
         return *m_lookAhead;
     }
-    return Token {"", TokenType::EMPTY};
+    return Token {};
 }
 
 bool ska::TokenReader::expect(const Token& token) const {

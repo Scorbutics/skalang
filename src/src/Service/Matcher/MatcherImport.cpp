@@ -21,7 +21,7 @@ ska::ASTNodePtr ska::MatcherImport::matchImport(Script& input) {
 	auto importNodeClass = input.match(TokenType::STRING);
 	auto importClassName = importNodeClass.name() + ".miniska";
 
-	auto scriptLinkNode = ASTFactory::MakeNode<Operator::SCRIPT_LINK>(ASTFactory::MakeLogicalNode(Token{ importClassName, TokenType::STRING }, ASTFactory::MakeEmptyNode()));
+	auto scriptLinkNode = ASTFactory::MakeNode<Operator::SCRIPT_LINK>(ASTFactory::MakeLogicalNode(Token{ importClassName, TokenType::STRING, importNodeClass.position() }, ASTFactory::MakeEmptyNode()));
 	auto scriptLinkEvent = ScriptLinkTokenEvent{ *scriptLinkNode, importClassName, input };
 	m_parser.observable_priority_queue<ScriptLinkTokenEvent>::notifyObservers(scriptLinkEvent);
 

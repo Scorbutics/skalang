@@ -3,7 +3,6 @@
 #include "Config/LoggerConfigLang.h"
 #include "Tokenizer.h"
 
-
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Tokenizer)
 
 const std::unordered_set<std::string> ska::Tokenizer::ALLOWED_MULTIPLE_CHAR_TOKEN_SYMBOLS = BuildAllowedMultipleCharTokenSymbolsSet();
@@ -54,23 +53,44 @@ std::pair<ska::Token, ska::Token> ska::Tokenizer::stackToken(TokenType currentTy
 	return std::make_pair(group(stackSymbol), std::move(token));
 }
 
-std::vector<ska::Token> ska::Tokenizer::tokenize() const {
-	auto currentTokenToRead = determineCurrentToken(0);
+ska::Cursor ska::Tokenizer::computeTokenPositionCursor(std::size_t index, const Token& readToken, bool wasRequired, const Cursor& lastCursor) {
+	const auto rawIndex = (wasRequired ? 0 : 1 ) + index;
+	const auto isEOL = readToken.type() == TokenType::SPACE && std::get<std::string>(readToken.content()) == "\n";
+	const auto tokenLength = readToken.name().size();
+	
+	const auto column =  
+		isEOL ? 1u : 
+		(lastCursor.line == 1 ? 
+			(static_cast<unsigned int>(rawIndex) + 1) : 
+			lastCursor.column + static_cast<unsigned int>(tokenLength));
 
+	const auto line = isEOL ? (lastCursor.line + 1) : lastCursor.line;
+	
+	SLOG_STATIC(LogLevel::Debug, Tokenizer) << "Token calculated \"" << readToken.name() << "\" at (l." << line << ", c. " << column << ")";
+
+	return { 
+		.rawIndex = rawIndex, 
+		.column = column,
+		.line = line
+	};
+}
+
+std::vector<ska::Token> ska::Tokenizer::tokenize() const {
+	auto currentTokenToRead = RequiredToken {};
 	auto stackSymbol = std::vector<Token> {};
 	auto result = std::vector<Token>{};
-	auto startIndex = 0u;
-	auto token = Token{};
-	do {
-		std::tie(startIndex, token) = tokenizeNext(currentTokenToRead, startIndex);
 
-		if (ignoreBlankToken(currentTokenToRead.current)) {	
+	auto cursor = Cursor {};
+	auto token = Token {};
+	do {
+		currentTokenToRead = determineCurrentToken(cursor.rawIndex);
+		std::tie(cursor, token) = tokenizeNext(currentTokenToRead, cursor);
+		if (isNotBlankToken(currentTokenToRead.current)) {	
 			auto group = stackToken(currentTokenToRead.current, std::move(token), stackSymbol);
 			push(std::move(group.first), result);
 			push(std::move(group.second), result);			
 		}
-
-		currentTokenToRead = determineCurrentToken(startIndex);
+	
 	} while (currentTokenToRead.current != ska::TokenType::EMPTY);
 	
 	push(group(stackSymbol), result);
@@ -87,8 +107,9 @@ ska::Token ska::Tokenizer::group(std::vector<Token>& symbolStack) {
 	for(const auto& s : symbolStack) {
 		ss << s;
 	}
-	SLOG_STATIC(LogLevel::Debug, Tokenizer) << "Pushing compound symbol : " <<  ss.str();
-	auto symbolToken = ska::Token { ss.str(), TokenType::SYMBOL };
+	auto tokenValueStr = ss.str();
+	SLOG_STATIC(LogLevel::Info, Tokenizer) << "Pushing compound symbol \"" <<  tokenValueStr << "\"";
+	auto symbolToken = ska::Token {std::move(tokenValueStr) , TokenType::SYMBOL, symbolStack.empty() ? Cursor {} : symbolStack[0].position() };
 	symbolStack.clear();
 	return symbolToken;
 	
@@ -157,13 +178,13 @@ int ska::Tokenizer::stopSymbolCharAggregation(char symbol) {
 	}
 }
 
-std::pair<std::size_t, ska::Token> ska::Tokenizer::tokenizeNext(const ska::RequiredToken& requiredToken, const std::size_t startIndex) const {
-	auto index = startIndex == 0 ? 0u : startIndex + 1;
+std::pair<ska::Cursor, ska::Token> ska::Tokenizer::tokenizeNext(const ska::RequiredToken& requiredToken, const Cursor& lastCursor) const {
+	auto index = lastCursor.rawIndex == 0 ? 0u : lastCursor.rawIndex + 1;
 	if (index < m_input.size()) {
 		auto charTokenType = requiredToken.current;
 		for (; index < m_input.size(); index++) {
 			charTokenType = calculateCharacterTokenType(m_input[index]);
-			if (index > startIndex && requiredToken.required ^ requiredToken.requiredOrUntil[static_cast<std::size_t>(charTokenType)]) {
+			if (index > lastCursor.rawIndex && requiredToken.required ^ requiredToken.requiredOrUntil[static_cast<std::size_t>(charTokenType)]) {
 				if (index == 0) {
 					index++;
 				}
@@ -173,7 +194,9 @@ std::pair<std::size_t, ska::Token> ska::Tokenizer::tokenizeNext(const ska::Requi
 	} else {
 		index = m_input.size();
 	}
-	return std::make_pair((requiredToken.required ? 0 : 1 ) + index, finalizeToken(index, requiredToken, startIndex));
+	auto token = finalizeToken(index, requiredToken, lastCursor);
+	auto nextCursor = computeTokenPositionCursor(index, token, requiredToken.required, lastCursor);
+	return std::make_pair(std::move(nextCursor), std::move(token));
 }
 
 ska::RequiredToken ska::Tokenizer::initializeCharType(const ska::TokenType charTokenType) const {
@@ -218,25 +241,25 @@ ska::RequiredToken ska::Tokenizer::initializeCharType(const ska::TokenType charT
 	return required;
 }
 
-ska::Token ska::Tokenizer::postComputing(std::size_t index, const ska::RequiredToken& requiredToken, const std::size_t startIndex) const {
+ska::Token ska::Tokenizer::postComputing(std::size_t index, const ska::RequiredToken& requiredToken, const Cursor& lastCursor) const {
 	switch (requiredToken.current) {
 	case TokenType::IDENTIFIER: {
-		const auto value = m_input.substr(startIndex, index - startIndex);
-		return m_reserved.pool.find(value) != m_reserved.pool.end() ? m_reserved.pool.at(value).token : Token{value, requiredToken.current};
+		const auto value = m_input.substr(lastCursor.rawIndex, index - lastCursor.rawIndex);
+		return m_reserved.pool.find(value) != m_reserved.pool.end() ? Token{ m_reserved.pool.at(value).token, lastCursor} : Token{value, requiredToken.current, lastCursor};
 	}
 	
 	case TokenType::STRING:
-		return Token{ m_input.substr(startIndex + 1, index - startIndex - 2), requiredToken.current };
+		return Token{ m_input.substr(lastCursor.rawIndex + 1, index - lastCursor.rawIndex - 2), requiredToken.current, lastCursor };
 	
 	default:
-		return Token(m_input.substr(startIndex, index - startIndex), requiredToken.current);
+		return Token{ m_input.substr(lastCursor.rawIndex, index - lastCursor.rawIndex), requiredToken.current, lastCursor };
 	}
 }
 
-ska::Token ska::Tokenizer::finalizeToken(std::size_t index, const ska::RequiredToken& requiredToken, const std::size_t startIndex) const {
+ska::Token ska::Tokenizer::finalizeToken(std::size_t index, const ska::RequiredToken& requiredToken, const Cursor& lastCursor) const {
 	index += (!requiredToken.required ? 1 : 0);
-	if (index != startIndex) {
-		return postComputing(index, requiredToken, startIndex);
+	if (index != lastCursor.rawIndex) {
+		return postComputing(index, requiredToken, lastCursor);
 	}
 	return {};
 }

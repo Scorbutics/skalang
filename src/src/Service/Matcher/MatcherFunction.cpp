@@ -130,7 +130,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationReturnType(Script& input) 
 	} 
 
 	SLOG(ska::LogLevel::Debug) << "void function detected";
-	return ASTFactory::MakeLogicalNode(ska::Token{ "", ska::TokenType::IDENTIFIER });
+	return ASTFactory::MakeLogicalNode(ska::Token{ "", ska::TokenType::IDENTIFIER, input.actual().position() });
 }
 
 ska::ASTNodePtr ska::MatcherFunction::matchDeclarationBody(Script& input) {
