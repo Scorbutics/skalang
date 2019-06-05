@@ -18,6 +18,7 @@
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
 #include "std/module/io.h"
+#include "std/module/parameter.h"
 
 int main(int argc, char* argv[]) {
 	if (argc <= 1) {
@@ -40,7 +41,7 @@ int main(int argc, char* argv[]) {
 	auto typeChecker = ska::SemanticTypeChecker {parser, typeCrosser };
 	auto interpreter = ska::Interpreter {reservedKeywords, typeCrosser };
 
-	auto moduleConfiguration = ska::lang::ModuleConfiguration{scriptCache, typeBuilder, symbolsTypeUpdater, reservedKeywords};
+	auto moduleConfiguration = ska::lang::ModuleConfiguration {scriptCache, typeBuilder, symbolsTypeUpdater, reservedKeywords, parser, interpreter};
 
 	try {
 		auto scriptEmBinding = ska::ScriptBridge{ scriptCache, "em_lib", typeBuilder, symbolsTypeUpdater, reservedKeywords };
@@ -56,25 +57,7 @@ int main(int argc, char* argv[]) {
 		}));
 		scriptEmBinding.buildFunctions();
 
-		auto scriptParametersBinding = ska::ScriptBridge{ scriptCache, "parameters_gen_lib", typeBuilder, symbolsTypeUpdater, reservedKeywords };
-		scriptParametersBinding.import(parser, interpreter, { {"Parameters", "parameters"} });
-		scriptParametersBinding.bindGenericFunction("Gen", { "Parameters::Fcty" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
-			auto result = scriptParametersBinding.createMemory();
-			result->emplace("asInt", std::make_unique<ska::BridgeFunction>(std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) {
-				auto index = params[0].nodeval<int>();
-				std::cout << "accessing parameter " << index << " as int" << std::endl;
-				return ska::NodeValue{ index };
-			})));
-			result->emplace("asString", std::make_unique<ska::BridgeFunction>(std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) {
-				std::cout << "accessing parameter " << params[0].nodeval<int>() << " as string" << std::endl;
-				return ska::NodeValue{ "toto" };
-			})));
-			return result;
-		}));
-		scriptParametersBinding.bindFunction("asString", std::function<std::string(int)>([](int index) {
-			return "";
-		}));
-		scriptParametersBinding.buildFunctions();
+		auto parameterModule = ska::lang::ParameterModule(moduleConfiguration);
 
 		auto scriptCharacterCommands = ska::ScriptBridge{ scriptCache, "character_commands_lib", typeBuilder, symbolsTypeUpdater, reservedKeywords };
 		scriptCharacterCommands.bindFunction("jump", std::function<void(int)>([](int index) {
@@ -94,12 +77,11 @@ int main(int argc, char* argv[]) {
 		}));
 		scriptCharacterBinding.buildFunctions();
 
-		ska::lang::UseModuleIO(moduleConfiguration);
+		auto iomodule = ska::lang::IOModule(moduleConfiguration);
 
 		auto executor = ska::Script{ scriptCache, "main", ska::Tokenizer{ reservedKeywords, 
-		"var Script = import \"" + std::string{argv[1]} + "\"; var CharacterGenerator = import \"character_generator\"; var ParametersGenerator = import \"parameters_gen_lib\"; Script.run(CharacterGenerator.Gen(), ParametersGenerator.Gen());"
+		"var Script = import \"" + std::string{argv[1]} + "\"; var CharacterGenerator = import \"character_generator\"; var ParametersGenerator = import \"parameter_lib\"; Script.run(CharacterGenerator.Gen(), ParametersGenerator.Gen());"
 		}.tokenize() };
-
 	
 		executor.parse(parser);
 		interpreter.script(executor);

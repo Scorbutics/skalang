@@ -5,9 +5,9 @@
 
 namespace ska {
     namespace lang {
-        class IOModule {
+        class ParameterModule {
         public:
-            IOModule(ModuleConfiguration& config);
+            ParameterModule(ModuleConfiguration& config);
         private:
             ScriptBridge m_bridge;
         };
