@@ -30,6 +30,7 @@ namespace ska {
 	private:
 		static std::unordered_set<std::string> BuildAllowedMultipleCharTokenSymbolsSet();
 
+		std::string getInputStringTokenOrThrow(const TokenType& tokenType, std::size_t index, const Cursor& lastCursor, const std::size_t offset) const;
 		RequiredToken determineCurrentToken(const std::size_t startIndex) const;
 		std::pair<Cursor, Token> tokenizeNext(const RequiredToken& requiredToken, const Cursor& lastCursor) const;
 		RequiredToken initializeCharType(const TokenType charTokenType) const;

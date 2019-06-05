@@ -149,7 +149,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 				"object.test() = 1234;", data);
 			CHECK(false);
 		} catch (std::exception& e) {
-			CHECK(e.what() == std::string("The symbol \"\" is not an lvalue, therefore cannot be assigned"));
+			CHECK(std::string{e.what()}.find("The symbol \"\" is not an lvalue, therefore cannot be assigned") != std::string::npos);
 		}
 	}
 
@@ -166,7 +166,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 				"object = lvalFunc163();", data);
 			CHECK(false);
 		} catch (std::exception & e) {
-			CHECK(e.what() == std::string("The symbol \"object\" has already been declared as \"var lvalFunc160\" but is now wanted to be \"var lvalFunc163\""));
+			CHECK(std::string{e.what()}.find("The symbol \"object\" has already been declared as \"var lvalFunc160\" but is now wanted to be \"var lvalFunc163\"") != std::string::npos);
 		}
 	}
 
@@ -175,7 +175,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			auto astPtr = ASTFromInputSemanticComplexTC(scriptCache, "var Dummy = function() : var { return { data: 3 }; }; Dummy.data; ", data);
 			CHECK(false);
 		} catch (std::exception& e) {
-			CHECK(e.what() == std::string("the variable \"Dummy\" is not registered as an object but as a \"function Dummy (var Dummy)\""));
+			CHECK(std::string{e.what()}.find("the variable \"Dummy\" is not registered as an object but as a \"function Dummy (var Dummy)\"") != std::string::npos);
 		}
 	}
 

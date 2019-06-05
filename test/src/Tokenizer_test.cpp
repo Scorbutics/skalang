@@ -300,9 +300,13 @@ TEST_CASE("Symbol by symbol") {
 	SUBCASE("unterminated string") {
 		const auto input = std::string(" \"   1234 eetr ;");
 		auto t = ska::Tokenizer { keywords, input };
-		auto tokens = t.tokenize();
-
-		CHECK(false);
+		
+		try {
+			auto tokens = t.tokenize();
+			CHECK(false);
+		} catch (std::exception& e) {
+			CHECK(std::string{e.what()}.find("unterminated token") != std::string::npos);
+		}
 	}
 }
 

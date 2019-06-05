@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Config/LoggerConfigLang.h"
+#include "Error/ParserError.h"
 #include "Tokenizer.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Tokenizer)
@@ -241,19 +242,36 @@ ska::RequiredToken ska::Tokenizer::initializeCharType(const ska::TokenType charT
 	return required;
 }
 
+std::string ska::Tokenizer::getInputStringTokenOrThrow(const TokenType& tokenType, std::size_t index, const Cursor& lastCursor, const std::size_t offset) const {
+	if((lastCursor.rawIndex + offset) >= m_input.size()) {
+		throw ParserError("unterminated token " + std::string{TokenTypeSTR[static_cast<std::size_t>(tokenType)]}, lastCursor);
+	}
+
+	return m_input.substr(lastCursor.rawIndex + offset, index - lastCursor.rawIndex - 2 * offset);
+}
+
 ska::Token ska::Tokenizer::postComputing(std::size_t index, const ska::RequiredToken& requiredToken, const Cursor& lastCursor) const {
+	std::string value;
 	switch (requiredToken.current) {
-	case TokenType::IDENTIFIER: {
-		const auto value = m_input.substr(lastCursor.rawIndex, index - lastCursor.rawIndex);
-		return m_reserved.pool.find(value) != m_reserved.pool.end() ? Token{ m_reserved.pool.at(value).token, lastCursor} : Token{value, requiredToken.current, lastCursor};
-	}
+	case TokenType::IDENTIFIER:
+		value = getInputStringTokenOrThrow(requiredToken.current, index, lastCursor, 0);
+		if(m_reserved.pool.find(value) != m_reserved.pool.end()) { 
+			return Token{ m_reserved.pool.at(value).token, lastCursor};
+		}
+		break;
 	
-	case TokenType::STRING:
-		return Token{ m_input.substr(lastCursor.rawIndex + 1, index - lastCursor.rawIndex - 2), requiredToken.current, lastCursor };
 	
+	case TokenType::STRING: 
+		value = getInputStringTokenOrThrow(requiredToken.current, index, lastCursor, 1);
+		break;
+	
+
 	default:
-		return Token{ m_input.substr(lastCursor.rawIndex, index - lastCursor.rawIndex), requiredToken.current, lastCursor };
+		value = getInputStringTokenOrThrow(requiredToken.current, index, lastCursor, 0);
+		break;
+		
 	}
+	return Token{ std::move(value), requiredToken.current, lastCursor };
 }
 
 ska::Token ska::Tokenizer::finalizeToken(std::size_t index, const ska::RequiredToken& requiredToken, const Cursor& lastCursor) const {

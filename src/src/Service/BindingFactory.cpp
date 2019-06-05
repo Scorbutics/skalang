@@ -104,7 +104,7 @@ ska::ASTNodePtr ska::BindingFactory::bindSymbol(Script& script, const std::strin
 			parameters.push_back(std::move(t));
 		} else {
 			auto parameter = ASTFactory::MakeNode<Operator::PARAMETER_DECLARATION>(
-				Token{ ss.str(), TokenType::IDENTIFIER, Cursor{ index, index, 1 } },
+				Token{ ss.str(), TokenType::IDENTIFIER, Cursor{ index, static_cast<ColumnIndex>(index), static_cast<LineIndex>(1) } },
 				std::move(t));
 			auto event = VarTokenEvent::MakeParameter(*parameter, (*parameter)[0], script);
 			observable_priority_queue<VarTokenEvent>::notifyObservers(event);

@@ -242,7 +242,7 @@ TEST_CASE("[Interpreter Script]") {
 			data.interpreter->script(*readerIS);
 			CHECK(false);
 		} catch (std::exception& e) {
-			CHECK(e.what() == std::string{"trying to access to an undeclared field : \"id\" of \"dummy\""});
+			CHECK(std::string{e.what()}.find("trying to access to an undeclared field : \"id\" of \"dummy\"") != std::string::npos);
 		}
 	}
 
@@ -270,7 +270,7 @@ TEST_CASE("[Interpreter Script]") {
 			data.interpreter->script(*readerIS);
 			CHECK(false);
 		} catch (std::exception& e) {
-			CHECK(e.what() == std::string{"undeclared custom type \"DataClassImpTutu222.DataClass\""});
+			CHECK(std::string{e.what()}.find("undeclared custom type \"DataClassImpTutu222.DataClass\"") != std::string::npos);
 		}
 	}
 
@@ -298,7 +298,7 @@ TEST_CASE("[Interpreter Script]") {
 			data.interpreter->script(*readerIS);
 			CHECK(false);
 		} catch (std::exception& e) {
-			CHECK(e.what() == std::string{"undeclared custom type \"DataClassImp250.DataClassImddf\""});
+			CHECK(std::string{e.what()}.find("undeclared custom type \"DataClassImp250.DataClassImddf\"") != std::string::npos);
 		}
 	}
 
