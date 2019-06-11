@@ -1,15 +1,18 @@
 #pragma once
+#include <vector>
+
+#include "Interpreter/Value/NodeValue.h"
 
 #include "std/module.h"
-#include "Interpreter/ScriptBinding.h"
 
 namespace ska {
     namespace lang {
-        class ParameterModule {
+        class ParameterModule : public Module {
         public:
-            ParameterModule(ModuleConfiguration& config);
+            ParameterModule(ModuleConfiguration& config, const std::vector<NodeValue>& parameterValues);
+            ~ParameterModule() override = default;
         private:
-            ScriptBridge m_bridge;
+            const std::vector<NodeValue>& m_parameters;
         };
     }
 }

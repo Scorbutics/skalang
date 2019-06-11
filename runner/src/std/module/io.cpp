@@ -8,7 +8,7 @@
 #include "Interpreter/Value/Script.h"
 
 ska::lang::IOModule::IOModule(ModuleConfiguration& config) :
-	m_bridge {config.scriptCache, "io_lib", config.typeBuilder, config.symbolTableTypeUpdater, config.reservedKeywords } {
+	Module {config, "io_lib"} {
 	m_bridge.bindFunction("printInt", std::function<void(int)>([](int value) {
 		std::cout << value << std::endl;
 	}));

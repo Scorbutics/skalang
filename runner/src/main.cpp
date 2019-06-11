@@ -26,9 +26,9 @@ int main(int argc, char* argv[]) {
         return -1;
     }
 	
-	auto inputFile = std::ifstream{ std::string{argv[1]} + ".miniska" };
+	auto inputFile = std::ifstream{ std::string{argv[1]}};
 	if(inputFile.fail()) {
-		std::cout << "File not found : \"" << argv[1] << ".miniska\"" << std::endl;
+		std::cout << "File not found : \"" << argv[1] << std::endl;
         return -1;
 	}
 
@@ -57,7 +57,10 @@ int main(int argc, char* argv[]) {
 		}));
 		scriptEmBinding.buildFunctions();
 
-		auto parameterModule = ska::lang::ParameterModule(moduleConfiguration);
+		auto parameterValues = std::vector<ska::NodeValue>{};
+		parameterValues.push_back(1234);
+		parameterValues.push_back(5566);
+		auto parameterModule = ska::lang::ParameterModule(moduleConfiguration, parameterValues);
 
 		auto scriptCharacterCommands = ska::ScriptBridge{ scriptCache, "character_commands_lib", typeBuilder, symbolsTypeUpdater, reservedKeywords };
 		scriptCharacterCommands.bindFunction("jump", std::function<void(int)>([](int index) {
@@ -79,8 +82,13 @@ int main(int argc, char* argv[]) {
 
 		auto iomodule = ska::lang::IOModule(moduleConfiguration);
 
+		auto scriptFileName = std::string{argv[1]};
+		auto scriptName = scriptFileName.substr(0, scriptFileName.find_last_of('.'));
 		auto executor = ska::Script{ scriptCache, "main", ska::Tokenizer{ reservedKeywords, 
-		"var Script = import \"" + std::string{argv[1]} + "\"; var CharacterGenerator = import \"character_generator\"; var ParametersGenerator = import \"parameter_lib\"; Script.run(CharacterGenerator.Gen(), ParametersGenerator.Gen());"
+		"var Script = import \"" + scriptName + "\";"
+		"var CharacterGenerator = import \"character_generator\";"
+		"var ParametersGenerator = import \"parameter_lib\";"
+		"Script.run(CharacterGenerator.Gen(), ParametersGenerator.Gen(\"" + scriptName + "\"));"
 		}.tokenize() };
 	
 		executor.parse(parser);

@@ -5,11 +5,10 @@
 
 namespace ska {
     namespace lang {
-        class IOModule {
+        class IOModule : public Module {
         public:
             IOModule(ModuleConfiguration& config);
-        private:
-            ScriptBridge m_bridge;
+            ~IOModule() override = default;
         };
     }
 }
