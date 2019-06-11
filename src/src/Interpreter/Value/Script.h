@@ -16,16 +16,7 @@ namespace ska {
 			m_handle = &handle;
 		}
 
-		Script(ScriptCache& scriptCache, const std::string& name, std::vector<Token> input, std::size_t startIndex = 0) :
-			m_cache(scriptCache) {
-            auto handle = std::make_unique<ScriptHandle>(m_cache, std::move(input), startIndex, name);
-            if(m_cache.find(name) == m_cache.end()) {
-				m_cache.emplace(name, std::move(handle));
-            } else {
-				m_inCache = true;
-			}
-            m_handle = m_cache.at(name).get();
-		}
+		Script(ScriptCache& scriptCache, const std::string& name, std::vector<Token> input, std::size_t startIndex = 0);
 		virtual ~Script() = default;
 	
 		bool existsInCache(const std::string& name) const {

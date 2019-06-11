@@ -13,6 +13,8 @@
 #include "Matcher/MatcherImport.h"
 #include "Interpreter/Interpreter.h"
 
+#include "Service/ScriptNameBuilder.h"
+
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::BindingFactory)
 
 ska::BindingFactory::BindingFactory(TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved) :
@@ -59,7 +61,7 @@ ska::ASTNodePtr ska::BindingFactory::import(StatementParser& parser, Script& scr
 	auto lock = BindingFactorySymbolTableLock{ *this, script.symbols() };
 	auto result = std::vector<ASTNodePtr> {};
 	for (const auto& scriptImporter : imports) {
-		auto importClassNameFile = scriptImporter.second + ".miniska";	
+		auto importClassNameFile = ScriptNameDeduce(script.name(), scriptImporter.second, ScriptNameStrategy::WORKING_DIRECTORY);
 		auto scriptLinkNode = ASTFactory::MakeNode<Operator::SCRIPT_LINK>(ASTFactory::MakeLogicalNode(Token{ importClassNameFile, TokenType::STRING, {} }, ASTFactory::MakeEmptyNode()));
 		auto scriptLinkEvent = ScriptLinkTokenEvent{ *scriptLinkNode, importClassNameFile, script };
 		observable_priority_queue<ScriptLinkTokenEvent>::notifyObservers(scriptLinkEvent);

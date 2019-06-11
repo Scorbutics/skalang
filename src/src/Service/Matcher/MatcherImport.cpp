@@ -11,6 +11,8 @@
 
 #include "Event/ScriptLinkTokenEvent.h"
 
+#include "Service/ScriptNameBuilder.h"
+
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherImport)
 
 ska::ASTNodePtr ska::MatcherImport::matchImport(Script& input) {
@@ -19,7 +21,7 @@ ska::ASTNodePtr ska::MatcherImport::matchImport(Script& input) {
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::IMPORT>());
 
 	auto importNodeClass = input.match(TokenType::STRING);
-	auto importClassName = importNodeClass.name() + ".miniska";
+	auto importClassName = ScriptNameDeduce(input.name(), importNodeClass.name(), ScriptNameStrategy::WORKING_DIRECTORY);
 
 	auto scriptLinkNode = ASTFactory::MakeNode<Operator::SCRIPT_LINK>(ASTFactory::MakeLogicalNode(Token{ importClassName, TokenType::STRING, importNodeClass.position() }, ASTFactory::MakeEmptyNode()));
 	auto scriptLinkEvent = ScriptLinkTokenEvent{ *scriptLinkNode, importClassName, input };
@@ -46,18 +48,21 @@ ska::ASTNodePtr ska::MatcherImport::createNewImport(
 		observable_priority_queue<ska::ImportTokenEvent>& obsImport,
 		Script& input, 
 		Token importNodeClass) {
+	
+	const auto& importedScriptPath = ScriptNameDeduce(input.name(), importNodeClass.name(), ScriptNameStrategy::WORKING_DIRECTORY);
 
-	auto importClassNameFile = importNodeClass.name() + ".miniska";
-	auto scriptFile = std::ifstream{ importClassNameFile };
+	SLOG_STATIC(ska::LogLevel::Info, ska::MatcherImport) << "Create import node script "<< importedScriptPath;
+
+	auto scriptFile = std::ifstream{ importedScriptPath };
 	if (scriptFile.fail()) {
-		throw std::runtime_error("unable to find script named \"" + importClassNameFile + "\"");
+		throw std::runtime_error("unable to find script with full-path \"" + importedScriptPath + "\"");
 	}
 
 	auto nodeBlock = ska::ASTFactory::MakeNode<ska::Operator::BLOCK>();
 	auto startEvent = ska::BlockTokenEvent{ *nodeBlock, ska::BlockTokenEventType::START };
 	obsBlock.observable_priority_queue<ska::BlockTokenEvent>::notifyObservers(startEvent);
 
-	auto script = input.subParse(parser, importClassNameFile, scriptFile);
+	auto script = input.subParse(parser, importedScriptPath, scriptFile);
 
 	auto importNode = ska::ASTFactory::MakeNode<ska::Operator::IMPORT>(ska::ASTFactory::MakeLogicalNode(std::move(importNodeClass)));
 	auto importEvent = ska::ImportTokenEvent{ *importNode, input };

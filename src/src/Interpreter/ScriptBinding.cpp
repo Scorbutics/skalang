@@ -5,6 +5,7 @@
 #include "Interpreter/Value/Script.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/SymbolTableTypeUpdater.h"
+#include "Service/ScriptNameBuilder.h"
 
 #include "Interpreter/InterpreterOperatorFunctionCall.h"
 
@@ -20,7 +21,7 @@ ska::ScriptBridge::ScriptBridge(
 	m_symbolTypeUpdater(symbolTypeUpdater),
 	m_functionBinder(typeBuilder, symbolTypeUpdater, reserved),
 	m_name(std::move(scriptName)),
-	m_script(cache, m_name + ".miniska", std::vector<Token>{}),
+	m_script(cache, ScriptNameDeduce("", m_name, ScriptNameStrategy::WORKING_DIRECTORY), std::vector<Token>{}),
 	m_cache(cache) {
 	observable_priority_queue<VarTokenEvent>::addObserver(m_typeBuilder);
 	observable_priority_queue<VarTokenEvent>::addObserver(m_symbolTypeUpdater);

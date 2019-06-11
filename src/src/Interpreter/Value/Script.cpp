@@ -4,6 +4,21 @@
 #include "Service/StatementParser.h"
 #include "Service/ASTFactory.h"
 
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Script)
+
+ska::Script::Script(ScriptCache& scriptCache, const std::string& name, std::vector<Token> input, std::size_t startIndex) :
+	m_cache(scriptCache) {
+	auto handle = std::make_unique<ScriptHandle>(m_cache, std::move(input), startIndex, name);
+	if(m_cache.find(name) == m_cache.end()) {
+		SLOG(LogLevel::Info) << "Adding script " << name << " in cache";
+		m_cache.emplace(name, std::move(handle));
+	} else {
+		SLOG(LogLevel::Info) << "Script " << name << " is already in cache";
+		m_inCache = true;
+	}
+	m_handle = m_cache.at(name).get();
+}
+
 const ska::Token& ska::Script::readPrevious(std::size_t offset) const {
 	return m_handle->m_input.readPrevious(offset);
 }
