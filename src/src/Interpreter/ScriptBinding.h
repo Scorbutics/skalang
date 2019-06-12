@@ -30,7 +30,7 @@ namespace ska {
 		void buildFunctions();
 
 		template <class ReturnType, class ... ParameterTypes>
-		void bindFunction(const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
+		void bindFunction(const std::string& functionName, std::function<ReturnType(Script&, ParameterTypes...)> f) {
 			assert(m_scriptMemoryNode == nullptr);
 			m_bindings.push_back(m_functionBinder.bindFunction<ReturnType, ParameterTypes...>(m_script, functionName, std::move(f)));
 		}

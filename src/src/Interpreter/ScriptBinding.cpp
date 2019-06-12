@@ -20,8 +20,8 @@ ska::ScriptBridge::ScriptBridge(
 	m_typeBuilder(typeBuilder),
 	m_symbolTypeUpdater(symbolTypeUpdater),
 	m_functionBinder(typeBuilder, symbolTypeUpdater, reserved),
-	m_name(std::move(scriptName)),
-	m_script(cache, ScriptNameDeduce("", m_name, ScriptNameStrategy::WORKING_DIRECTORY), std::vector<Token>{}),
+	m_name(ScriptNameDeduce("", std::move(scriptName), ScriptNameStrategy::WORKING_DIRECTORY)),
+	m_script(cache, m_name, std::vector<Token>{}),
 	m_cache(cache) {
 	observable_priority_queue<VarTokenEvent>::addObserver(m_typeBuilder);
 	observable_priority_queue<VarTokenEvent>::addObserver(m_symbolTypeUpdater);

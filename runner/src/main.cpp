@@ -14,6 +14,7 @@
 #include "Service/SymbolTableTypeUpdater.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
+#include "Service/ScriptNameBuilder.h"
 #include "Interpreter/Interpreter.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
@@ -32,6 +33,8 @@ int main(int argc, char* argv[]) {
         return -1;
 	}
 
+	ska::ScriptNameStandardLibraryPrefix() = "../runner/scripts/std";
+
     const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto scriptCache = ska::ScriptCache{};
 	auto typeCrosser = ska::TypeCrosser{};
@@ -45,14 +48,14 @@ int main(int argc, char* argv[]) {
 
 	try {
 		auto scriptEmBinding = ska::ScriptBridge{ scriptCache, "em_lib", typeBuilder, symbolsTypeUpdater, reservedKeywords };
-		scriptEmBinding.bindFunction("setInputMovePower", std::function<void(int, int)>([](int characterId, int value) {
+		scriptEmBinding.bindFunction("setInputMovePower", std::function<void(ska::Script&, int, int)>([](ska::Script&, int characterId, int value) {
 			std::cout << "move power for " << characterId << " is now " << value << std::endl;
 		}));
-		scriptEmBinding.bindFunction("setInputJumpPower", std::function<void(int, int)>([](int characterId, int value) {
+		scriptEmBinding.bindFunction("setInputJumpPower", std::function<void(ska::Script&, int, int)>([](ska::Script&, int characterId, int value) {
 			std::cout << "jump power for " << characterId << " is now " << value << std::endl;
 		}));
-		scriptEmBinding.bindFunction("removeInputComponent", std::function<void(int)>([](int characterId) { }));
-		scriptEmBinding.bindFunction("restoreInputComponent", std::function<void(int, int, int)>([](int characterId, int movePower, int jumpPower) {
+		scriptEmBinding.bindFunction("removeInputComponent", std::function<void(ska::Script&, int)>([](ska::Script&, int characterId) { }));
+		scriptEmBinding.bindFunction("restoreInputComponent", std::function<void(ska::Script&, int, int, int)>([](ska::Script&, int characterId, int movePower, int jumpPower) {
 			std::cout << "restoring input with move " << movePower << " and jump " << jumpPower << std::endl;
 		}));
 		scriptEmBinding.buildFunctions();
@@ -60,34 +63,35 @@ int main(int argc, char* argv[]) {
 		auto parameterValues = std::vector<ska::NodeValue>{};
 		parameterValues.push_back(1234);
 		parameterValues.push_back(5566);
+		
 		auto parameterModule = ska::lang::ParameterModule(moduleConfiguration, parameterValues);
+		auto iomodule = ska::lang::IOModule(moduleConfiguration);
 
 		auto scriptCharacterCommands = ska::ScriptBridge{ scriptCache, "character_commands_lib", typeBuilder, symbolsTypeUpdater, reservedKeywords };
-		scriptCharacterCommands.bindFunction("jump", std::function<void(int)>([](int index) {
+		scriptCharacterCommands.bindFunction("jump", std::function<void(ska::Script&, int)>([](ska::Script&, int index) {
 			std::cout << "jump ! " << index << std::endl;
 		}));
-		scriptCharacterCommands.bindFunction("move", std::function<void(int, int, int)>([](int direction, int power, int t) {
+		scriptCharacterCommands.bindFunction("move", std::function<void(ska::Script&, int, int, int)>([](ska::Script&, int direction, int power, int t) {
 			std::cout << "move ! direction " << direction << " power " << power << " ??? " << t << std::endl;
 		}));
 		scriptCharacterCommands.buildFunctions();
 
 		auto scriptCharacterBinding = ska::ScriptBridge{ scriptCache, "character_generator", typeBuilder, symbolsTypeUpdater, reservedKeywords };
 		scriptCharacterBinding.import(parser, interpreter, { {"Character", "character"} });
-		scriptCharacterBinding.bindGenericFunction("Gen", { "Character::Fcty" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+		scriptCharacterBinding.bindGenericFunction("Gen", { "Character::Fcty" }, 
+		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto parametersValues = std::vector<ska::NodeValue>{};
 			parametersValues.push_back("toto");
 			return scriptCharacterBinding.callFunction(interpreter, "Character", "Fcty", std::move(parametersValues));
 		}));
 		scriptCharacterBinding.buildFunctions();
 
-		auto iomodule = ska::lang::IOModule(moduleConfiguration);
-
 		auto scriptFileName = std::string{argv[1]};
 		auto scriptName = scriptFileName.substr(0, scriptFileName.find_last_of('.'));
 		auto executor = ska::Script{ scriptCache, "main", ska::Tokenizer{ reservedKeywords, 
 		"var Script = import \"" + scriptName + "\";"
 		"var CharacterGenerator = import \"character_generator\";"
-		"var ParametersGenerator = import \"parameter_lib\";"
+		"var ParametersGenerator = import \"std:std.native.parameter\";"
 		"Script.run(CharacterGenerator.Gen(), ParametersGenerator.Gen(\"" + scriptName + "\"));"
 		}.tokenize() };
 	

@@ -1,6 +1,6 @@
 var Character = import "character";
-var Runner = import "runner_lib";
-var Parameters = import "parameters";
+var Runner = import "std:runner_lib";
+var Parameters = import "std:std.parameters";
 
 var run = function(origin: Character::Fcty(), parameters: Parameters::Fcty()) {
 	Runner.printInt(origin.id);

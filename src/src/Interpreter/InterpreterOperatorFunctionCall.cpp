@@ -61,7 +61,7 @@ namespace ska {
 		ska::Operation<ska::Operator::FUNCTION_DECLARATION>& operateOnFunctionDeclaration,
 		ska::Operation<ska::Operator::FUNCTION_CALL>& operateOnFunctionCall) {
 		auto parametersValues = InterpreterOperationFunctionCallExecuteFunctionFromCallParameters(interpreter, operateOnFunctionDeclaration, operateOnFunctionCall);
-		return NodeRValue{(bridgeCall.function)(std::move(parametersValues)), nullptr };
+		return NodeRValue{(bridgeCall.function)(operateOnFunctionCall.parent, std::move(parametersValues)), nullptr };
 	}
 
 }

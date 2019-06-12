@@ -1,5 +1,4 @@
 ﻿**/CMakeFiles
-**/bin
 **/lib
 **/Debug
 **.cmake
@@ -8,7 +7,7 @@
 **.user
 **.a
 **/skalog_bench
-**/skalang_test
+**/skalang_runner
 **/skalang_test
 **.sln
 CMakeCache.txt

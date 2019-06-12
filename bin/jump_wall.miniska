@@ -1,6 +1,7 @@
+var IO = import "std:std.native.io";
+var Parameters = "std:std.parameters";
+
 var Character = import "character";
-var IO = import "io_lib";
-var Parameters = import "parameters";
 
 var run = function(origin: Character::Fcty(), parameters: Parameters::Fcty()) {
 	var jumpDirection = parameters.asInt(0);

@@ -53,14 +53,14 @@ TEST_CASE("[Interpreter Script]") {
 			"runner.getToto();", data);
 
 		auto scriptEmBinding = ska::ScriptBridge{ scriptCacheIS, "binding1_lib", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptEmBinding.bindFunction("getToto", std::function<std::string()>([]() {
+		scriptEmBinding.bindFunction("getToto", std::function<std::string(ska::Script&)>([](ska::Script&) {
 			return "tototo !";
 		}));
 		scriptEmBinding.buildFunctions();
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Test293", "../test/src/resources/test293"}, {"Binding1", "binding1_lib"} });
-		scriptBindingDataClass.bindGenericFunction("run", { "Test293::Fcty()" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+		scriptBindingDataClass.bindGenericFunction("run", { "Test293::Fcty()" }, std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script& caller, std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto getTotoMemory = scriptBindingDataClass.accessMemory("Binding1", "getToto");
 			assert(getTotoMemory.first != nullptr);
 			auto mem = scriptBindingDataClass.createMemory();
@@ -118,7 +118,7 @@ TEST_CASE("[Interpreter Script]") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse("var User218 = import \"binding\"; User218.funcTest(14, \"titito\");", data);
 		auto test = 0;
 		auto testStr = std::string{ "" };
-		auto function = std::function<int(int, std::string)>([&](int toto, std::string titi) -> int {
+		auto function = std::function<int(ska::Script&, int, std::string)>([&](ska::Script&, int toto, std::string titi) -> int {
 			test = toto;
 			testStr = std::move(titi);
 			return 0;
@@ -140,11 +140,11 @@ TEST_CASE("[Interpreter Script]") {
 		auto test = 0;
 		auto testStr = std::string{ "" };
 
-		auto function1 = std::function<int(int)>([&](int toto) -> int {
+		auto function1 = std::function<int(ska::Script&, int)>([&](ska::Script&, int toto) -> int {
 			test = toto;
 			return 0;
 		});
-		auto function2 = std::function<int(std::string)>([&](std::string titi) -> int {
+		auto function2 = std::function<int(ska::Script&, std::string)>([&](ska::Script&, std::string titi) -> int {
 			testStr = std::move(titi);
 			return 0;
 		});
@@ -166,7 +166,8 @@ TEST_CASE("[Interpreter Script]") {
 		std::string name;
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, 
+		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<std::string>();
 			auto result = ska::MemoryTable::create();
 			result->emplace("id", 1234);
@@ -177,7 +178,8 @@ TEST_CASE("[Interpreter Script]") {
 
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding295", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBinding.import(*data.parser, *data.interpreter, { { "DataClassScript", "dataclass_script" } });
-		scriptBinding.bindGenericFunction("funcTest", { "DataClassScript::DataClass()", "void" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+		scriptBinding.bindGenericFunction("funcTest", { "DataClassScript::DataClass()", "void" }, 
+		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<ska::ObjectMemory>();
 			auto* idMap = (*mem)("id").first;
 			auto* nameMap = (*mem)("name").first;
@@ -203,7 +205,8 @@ TEST_CASE("[Interpreter Script]") {
 		std::string name;
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, 
+		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<std::string>();
 			auto result = ska::MemoryTable::create();
 			result->emplace("id", 1234);
@@ -228,7 +231,8 @@ TEST_CASE("[Interpreter Script]") {
 		std::string name;
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, 
+		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<std::string>();
 			auto result = ska::MemoryTable::create();
 			result->emplace("id", 1234);
@@ -256,7 +260,8 @@ TEST_CASE("[Interpreter Script]") {
 		std::string name;
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, 
+		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<std::string>();
 			auto result = ska::MemoryTable::create();
 			result->emplace("id", 1234);
@@ -284,7 +289,8 @@ TEST_CASE("[Interpreter Script]") {
 		std::string name;
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, 
+		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<std::string>();
 			auto result = ska::MemoryTable::create();
 			result->emplace("id", 1234);
@@ -310,7 +316,8 @@ TEST_CASE("[Interpreter Script]") {
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Character", "../test/src/resources/character"} });
-		scriptBindingDataClass.bindGenericFunction("run", { "Character::build()" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> p) -> ska::NodeValue {
+		scriptBindingDataClass.bindGenericFunction("run", { "Character::build()" }, 
+		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> p) -> ska::NodeValue {
 			auto params = std::vector<ska::NodeValue>{};
 			params.push_back(std::string{ "babar" });
 			auto character = scriptBindingDataClass.callFunction(*data.interpreter, "Character", "build", std::move(params));
@@ -336,7 +343,7 @@ TEST_CASE("[Interpreter Script]") {
 		auto test = 0;
 		
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding264", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBinding.bindFunction("funcTest", std::function<void(int)>([&](int toto) {
+		scriptBinding.bindFunction("funcTest", std::function<void(ska::Script&, int)>([&](ska::Script&, int toto) {
 			test = toto;
 		}));
 		scriptBinding.buildFunctions();
@@ -351,7 +358,8 @@ TEST_CASE("[Interpreter Script]") {
 		auto test = 0;
 
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding279", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBinding.bindGenericFunction("funcTest", {"int", "void"}, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+		scriptBinding.bindGenericFunction("funcTest", {"int", "void"}, 
+		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			test = params[0].nodeval<int>();
 			return ska::NodeValue{};
 		}));
@@ -368,7 +376,7 @@ TEST_CASE("[Interpreter Script]") {
 		auto count = 0;
 
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding322", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBinding.bindFunction("funcTest", std::function<void(int)>([&](int toto) {
+		scriptBinding.bindFunction("funcTest", std::function<void(ska::Script&, int)>([&](ska::Script&, int toto) {
 			test += toto;
 			count++;
 		}));
@@ -386,7 +394,7 @@ TEST_CASE("[Interpreter Script]") {
 		auto count = 0;
 
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding322", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBinding.bindFunction("funcTest", std::function<void(int)>([&](int toto) {
+		scriptBinding.bindFunction("funcTest", std::function<void(ska::Script&, int)>([&](ska::Script&, int toto) {
 			test += toto;
 			count++;
 		}));
