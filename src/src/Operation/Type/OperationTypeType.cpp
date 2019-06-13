@@ -22,5 +22,5 @@ bool ska::OperationType<ska::Operator::TYPE>::IsObject() const {
 
 std::string ska::OperationType<ska::Operator::TYPE>::GetName() const {
 	auto& typeNode = node[0];
-	return typeNode.size() == 1 ? (typeNode.name() + "." + typeNode[0].name()) : typeNode.name();
+	return typeNode.size() == 1 ? (typeNode.name() + "::" + typeNode[0].name()) : typeNode.name();
 }

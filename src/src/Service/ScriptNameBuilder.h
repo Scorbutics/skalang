@@ -13,13 +13,13 @@ namespace ska {
 
     //Execution relative path (based on current working directory)
     inline std::string ScriptNameCurrentWorkingDirectory(const std::string& scriptCalled) {    
-	    return FileUtils::getCurrentDirectory() + "/" + scriptCalled + ".miniska";
+	    return FileUtils::getCanonicalPath(FileUtils::getCurrentDirectory() + "/" + scriptCalled + ".miniska");
     }
 
     //Executable relative path
     inline std::string ScriptNameRelativeToRunnerDirectory(const std::string& scriptCalled) {
         const auto fileNameData = FileNameData {FileUtils::getExecutablePath()};
-        return fileNameData.path + "/" + ScriptNameStandardLibraryPrefix() + "/" + scriptCalled + ".miniska";
+        return FileUtils::getCanonicalPath(fileNameData.path + "/" + ScriptNameStandardLibraryPrefix() + "/" + scriptCalled + ".miniska");
     }
 
     //File relative path
@@ -27,16 +27,16 @@ namespace ska {
 	    const auto fileNameData = FileNameData {scriptCaller};
         if(fileNameData.path.empty() || fileNameData.name.empty()) {
             const auto subfileNameData = FileNameData {FileUtils::getExecutablePath()};
-            return subfileNameData.path + "/" + scriptCalled + ".miniska";
+            return FileUtils::getCanonicalPath(subfileNameData.path + "/" + scriptCalled + ".miniska");
         }
-        return fileNameData.path + "/" + scriptCalled + ".miniska";
+        return FileUtils::getCanonicalPath(fileNameData.path + "/" + scriptCalled + ".miniska");
     }
 
 
 
     inline std::string ScriptNameDeduce(const std::string& scriptCaller, const std::string& scriptCalled, ScriptNameStrategy empty = ScriptNameStrategy::RELATIVE_TO_PARENT) {
         if(FileUtils::isAbsolutePath(scriptCalled)) {
-            return scriptCalled;
+            return FileUtils::getCanonicalPath(scriptCalled);
         }
 
         auto strategy = ScriptNameStrategy::RELATIVE_TO_PARENT;
