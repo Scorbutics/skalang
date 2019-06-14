@@ -13,7 +13,7 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::TYPE>::build(const Script& scr
 		const Symbol* symbolType = node.GetSymbol(script.symbols());
 		SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::TYPE>) << "Type-node looked \"" << (symbolType != nullptr ? symbolType->getType() : Type{}) << "\"";
 		if (symbolType == nullptr) {
-			throw std::runtime_error("undeclared custom type \"" + node.GetName() + "\"");
+			throw std::runtime_error("undeclared custom type \"" + node.GetName() + "\" (when trying to look on token type \"" + node.GetTypeName() + "\")");
 		}
 		
 		result = node.IsObject() ? Type::MakeCustom<ExpressionType::OBJECT>(symbolType) : symbolType->getType();

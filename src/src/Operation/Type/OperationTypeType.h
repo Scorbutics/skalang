@@ -18,6 +18,7 @@ namespace ska {
 		bool IsBuiltIn() const;
 		bool IsObject() const;
 		std::string GetName() const;
+		std::string GetTypeName() const;
 
 		bool IsArray() const  {
 			return !node[2].logicalEmpty();

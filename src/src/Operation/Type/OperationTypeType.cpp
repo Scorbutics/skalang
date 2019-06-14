@@ -24,3 +24,10 @@ std::string ska::OperationType<ska::Operator::TYPE>::GetName() const {
 	auto& typeNode = node[0];
 	return typeNode.size() == 1 ? (typeNode.name() + "::" + typeNode[0].name()) : typeNode.name();
 }
+
+std::string ska::OperationType<ska::Operator::TYPE>::GetTypeName() const {
+	auto& typeNode = node[0];
+	auto ss = std::stringstream{};
+	ss << typeNode.type().value();
+	return ss.str();
+}

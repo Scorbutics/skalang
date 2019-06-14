@@ -68,7 +68,7 @@ ska::ASTNodePtr ska::BindingFactory::import(StatementParser& parser, Script& scr
 
 		auto varNode = ASTNodePtr{};
 		if (scriptLinkNode->type() == ExpressionType::VOID) {
-			auto importNode = createImport(parser, script, Token{ std::move(scriptImporter.second), TokenType::STRING, {} });
+			auto importNode = createImport(parser, script, Token{ importClassNameFile, TokenType::STRING, {} });
 			varNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(Token{ std::move(scriptImporter.first), TokenType::IDENTIFIER, {} }, std::move(importNode));
 		} else {
 			varNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(Token{ std::move(scriptImporter.first), TokenType::IDENTIFIER, {} }, std::move(scriptLinkNode));
