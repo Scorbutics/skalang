@@ -33,7 +33,12 @@ int main(int argc, char* argv[]) {
         return -1;
 	}
 
+	//TODO configuration
+#ifdef _MSC_VER 
+	ska::ScriptNameStandardLibraryPrefix() = "../../runner/scripts/std";
+#else
 	ska::ScriptNameStandardLibraryPrefix() = "../runner/scripts/std";
+#endif
 
     const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto scriptCache = ska::ScriptCache{};
@@ -89,7 +94,7 @@ int main(int argc, char* argv[]) {
 		auto scriptFileName = std::string{argv[1]};
 		auto scriptName = scriptFileName.substr(0, scriptFileName.find_last_of('.'));
 		auto executor = ska::Script{ scriptCache, "main", ska::Tokenizer{ reservedKeywords, 
-		"var Script = import \"" + scriptName + "\";"
+		"var Script = import \"wd:" + scriptName + "\";"
 		"var CharacterGenerator = import \"character_generator\";"
 		"var ParametersGenerator = import \"std:std.native.parameter\";"
 		"Script.run(CharacterGenerator.Gen(), ParametersGenerator.Gen(\"" + scriptName + "\"));"
@@ -99,6 +104,7 @@ int main(int argc, char* argv[]) {
 		interpreter.script(executor);
 	} catch (std::exception& e) {
 		std::cout << e.what() << std::endl;
+		return -1;
 	}
 	return 0;
 }
