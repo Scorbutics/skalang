@@ -70,9 +70,9 @@ ska::Cursor ska::Tokenizer::computeTokenPositionCursor(std::size_t index, const 
 	SLOG_STATIC(LogLevel::Debug, Tokenizer) << "Token calculated \"" << readToken.name() << "\" at (l." << line << ", c. " << column << ")";
 
 	return { 
-		.rawIndex = rawIndex, 
-		.column = column,
-		.line = line
+		rawIndex, 
+		column,
+		line
 	};
 }
 
