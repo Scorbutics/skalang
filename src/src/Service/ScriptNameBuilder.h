@@ -1,4 +1,5 @@
 #pragma once
+#include <stdexcept>
 #include "Base/IO/Files/FileUtils.h"
 
 namespace ska {
@@ -48,7 +49,11 @@ namespace ska {
                 strategy = ScriptNameStrategy::RELATIVE_TO_RUNNER;
             } else if(namespace_ == "wd") {
                 strategy = ScriptNameStrategy::WORKING_DIRECTORY;
-            }
+			} else if (namespace_ == "bind") {
+				strategy = ScriptNameStrategy::RELATIVE_TO_RUNNER;
+			} else {
+				throw std::runtime_error("undefined namespace \"" + namespace_ + "\"used in script declaration \"" + scriptCalled + "\"");
+			}
             scriptCalledName = scriptCalled.substr(namespaceSeparatorPosition + 1);
         } else {
             scriptCalledName = scriptCalled;

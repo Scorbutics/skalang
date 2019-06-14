@@ -48,7 +48,7 @@ TEST_CASE("[Interpreter Script]") {
 
 	SUBCASE("miniska -> C++ binding : using a miniska field from a C++ -> miniska binding") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
-			"var DataClassImp280 = import \"dataclass_script\";"
+			"var DataClassImp280 = import \"bind:dataclass_script\";"
 			"var runner = DataClassImp280.run();"
 			"runner.getToto();", data);
 
@@ -59,7 +59,7 @@ TEST_CASE("[Interpreter Script]") {
 		scriptEmBinding.buildFunctions();
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Test293", "../test/src/resources/test293"}, {"Binding1", "binding1_lib"} });
+		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Test293", "../../../test/src/resources/test293"}, {"Binding1", "bind:binding1_lib"} });
 		scriptBindingDataClass.bindGenericFunction("run", { "Test293::Fcty()" }, std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script& caller, std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto getTotoMemory = scriptBindingDataClass.accessMemory("Binding1", "getToto");
 			assert(getTotoMemory.first != nullptr);
@@ -75,47 +75,47 @@ TEST_CASE("[Interpreter Script]") {
 	}
 
 	SUBCASE("Outside script from file (import)") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Character179 = import \"../test/src/resources/character\";", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Character179 = import \"../../test/src/resources/character\";", data);
 		auto res = data.interpreter->script(astPtr);
 	}
 
 	SUBCASE("Outside script from file (import) and use") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Character184 = import \"../test/src/resources/character\";var player = Character184.build(\"Player\");var enemy = Character184.default; enemy.age;", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Character184 = import \"../../test/src/resources/character\";var player = Character184.build(\"Player\");var enemy = Character184.default; enemy.age;", data);
 		auto res = data.interpreter->script(astPtr);
 		CHECK(res.nodeval<int>() == 10);
 	}
 
 	SUBCASE("Outside script from file (import) used by another script, and use") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var CharacterUser190 = import \"../test/src/resources/character_user\"; CharacterUser190.player.age;", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var CharacterUser190 = import \"../../test/src/resources/character_user\"; CharacterUser190.player.age;", data);
 		auto res = data.interpreter->script(astPtr);
 		CHECK(res.nodeval<int>() == 10);
 	}
 	
 	SUBCASE("Outside script from file (import) used by another script, and use") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var CharacterUser196 = import \"../test/src/resources/character_user\"; CharacterUser196.player.age;", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var CharacterUser196 = import \"../../test/src/resources/character_user\"; CharacterUser196.player.age;", data);
 		auto res = data.interpreter->script(astPtr);
 		CHECK(res.nodeval<int>() == 10);
 	}
 
 	SUBCASE("Custom script starter") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Custom202 = import \"../test/src/resources/custom\"; Custom202.totalAge;", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Custom202 = import \"../../test/src/resources/custom\"; Custom202.totalAge;", data);
 		auto res = data.interpreter->script(astPtr);
 		CHECK(res.nodeval<int>() == 30);
 	}
 
 	SUBCASE("2 outside scripts from file (import)") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var CharacterUser208 = import \"../test/src/resources/character_user\"; CharacterUser208.player.age = 3; var CharacterUser2 = import \"../test/src/resources/character_user\"; CharacterUser2.player.age;", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var CharacterUser208 = import \"../../test/src/resources/character_user\"; CharacterUser208.player.age = 3; var CharacterUser2 = import \"../../test/src/resources/character_user\"; CharacterUser2.player.age;", data);
 		auto res = data.interpreter->script(astPtr);
 		CHECK(res.nodeval<int>() == 3);
 	}
 
 	SUBCASE("2 outside scripts imported with different memory contexts") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Player = import \"../test/src/resources/play\"; var Character = import \"../test/src/resources/character\"; var c = Character.build(\"test\"); Player.run(c);", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Player = import \"../../test/src/resources/play\"; var Character = import \"../../test/src/resources/character\"; var c = Character.build(\"test\"); Player.run(c);", data);
 		data.interpreter->script(astPtr);
 	}
 
 	SUBCASE("C++ 1 script-function binding") {
-		ASTFromInputSemanticTCInterpreterScriptNoParse("var User218 = import \"binding\"; User218.funcTest(14, \"titito\");", data);
+		ASTFromInputSemanticTCInterpreterScriptNoParse("var User218 = import \"bind:binding\"; User218.funcTest(14, \"titito\");", data);
 		auto test = 0;
 		auto testStr = std::string{ "" };
 		auto function = std::function<int(ska::Script&, int, std::string)>([&](ska::Script&, int toto, std::string titi) -> int {
@@ -136,7 +136,7 @@ TEST_CASE("[Interpreter Script]") {
 	}
 
 	SUBCASE("C++ several script-function binding") {
-		ASTFromInputSemanticTCInterpreterScriptNoParse("var User239 = import \"binding239\"; User239.funcTest(14); User239.funcTest2(\"titito\");", data);
+		ASTFromInputSemanticTCInterpreterScriptNoParse("var User239 = import \"bind:binding239\"; User239.funcTest(14); User239.funcTest2(\"titito\");", data);
 		auto test = 0;
 		auto testStr = std::string{ "" };
 
@@ -161,7 +161,7 @@ TEST_CASE("[Interpreter Script]") {
 	}
 
 	SUBCASE("C++ script-function binding generic form, complex object") {
-		ASTFromInputSemanticTCInterpreterScriptNoParse("var User295 = import \"binding295\"; var DataClassImp = import \"dataclass_script\"; var data = DataClassImp.DataClass(\"JeanMi\"); User295.funcTest(data);", data);
+		ASTFromInputSemanticTCInterpreterScriptNoParse("var User295 = import \"bind:binding295\"; var DataClassImp = import \"bind:dataclass_script\"; var data = DataClassImp.DataClass(\"JeanMi\"); User295.funcTest(data);", data);
 		auto test = 0;
 		std::string name;
 
@@ -177,7 +177,7 @@ TEST_CASE("[Interpreter Script]") {
 		scriptBindingDataClass.buildFunctions();
 
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding295", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBinding.import(*data.parser, *data.interpreter, { { "DataClassScript", "dataclass_script" } });
+		scriptBinding.import(*data.parser, *data.interpreter, { { "DataClassScript", "bind:dataclass_script" } });
 		scriptBinding.bindGenericFunction("funcTest", { "DataClassScript::DataClass()", "void" }, 
 		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<ska::ObjectMemory>();
@@ -197,7 +197,7 @@ TEST_CASE("[Interpreter Script]") {
 
 	SUBCASE("C++ -> miniska script-function binding generic") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
-		"var DataClassImp169 = import \"dataclass_script\";"
+		"var DataClassImp169 = import \"bind:dataclass_script\";"
 		"var funcTest = function(dummy: DataClassImp169::DataClass()) { };"
 		"var data = DataClassImp169.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
@@ -223,7 +223,7 @@ TEST_CASE("[Interpreter Script]") {
 	//TODO fix ?
 	SUBCASE("[fail] C++ -> miniska script-function binding generic : use field defined C++ side") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
-		"var DataClassImp194 = import \"dataclass_script\";"
+		"var DataClassImp194 = import \"bind:dataclass_script\";"
 		"var funcTest = function(dummy: DataClassImp194::DataClass()) { dummy.id; };"
 		"var data = DataClassImp194.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
@@ -252,7 +252,7 @@ TEST_CASE("[Interpreter Script]") {
 
 	SUBCASE("[fail] (bad namespace) C++ -> miniska script-function binding generic") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
-		"var DataClassImp222 = import \"dataclass_script\";"
+		"var DataClassImp222 = import \"bind:dataclass_script\";"
 		"var funcTest = function(dummy: DataClassImpTutu222::DataClass()) { };"
 		"var data = DataClassImp222.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
@@ -275,13 +275,13 @@ TEST_CASE("[Interpreter Script]") {
 			data.interpreter->script(*readerIS);
 			CHECK(false);
 		} catch (std::exception& e) {
-			CHECK(std::string{e.what()}.find("undeclared custom type \"DataClassImpTutu222.DataClass\"") != std::string::npos);
+			CHECK(std::string{e.what()}.find("undeclared custom type \"DataClassImpTutu222::DataClass\" (when trying to look on token type \"void\")") != std::string::npos);
 		}
 	}
 
 	SUBCASE("[fail] (bad class name in namespace) C++ -> miniska script-function binding generic") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
-		"var DataClassImp250 = import \"dataclass_script\";"
+		"var DataClassImp250 = import \"bind:dataclass_script\";"
 		"var funcTest = function(dummy: DataClassImp250::DataClassImddf()) { };"
 		"var data = DataClassImp250.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
@@ -304,18 +304,18 @@ TEST_CASE("[Interpreter Script]") {
 			data.interpreter->script(*readerIS);
 			CHECK(false);
 		} catch (std::exception& e) {
-			CHECK(std::string{e.what()}.find("undeclared custom type \"DataClassImp250.DataClassImddf\"") != std::string::npos);
+			CHECK(std::string{e.what()}.find("undeclared custom type \"DataClassImp250::DataClassImddf\" (when trying to look on token type \"var C:\\DevFast\\skalang\\bin\\Debug\\std\\dataclass_script.miniska\")") != std::string::npos);
 		}
 	}
 
 	SUBCASE("miniska -> C++ binding : calling a miniska function from a C++ -> miniska binding") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
-			"var DataClassImp306 = import \"dataclass_script\";"
+			"var DataClassImp306 = import \"bind:dataclass_script\";"
 			"DataClassImp306.run().name;", data);
 
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Character", "../test/src/resources/character"} });
+		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Character", "../../../test/src/resources/character"} });
 		scriptBindingDataClass.bindGenericFunction("run", { "Character::build()" }, 
 		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> p) -> ska::NodeValue {
 			auto params = std::vector<ska::NodeValue>{};
@@ -333,13 +333,13 @@ TEST_CASE("[Interpreter Script]") {
 	}
 
 	SUBCASE("using a callback in another script & another context") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Script317 = import \"../test/src/resources/test317_1\"; Script317.actualCharacter.name;", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Script317 = import \"../../test/src/resources/test317_1\"; Script317.actualCharacter.name;", data);
 		auto result = data.interpreter->script(astPtr);
 		CHECK(result.nodeval<std::string>() == "test317");
 	}
 
 	SUBCASE("C++ script-function binding with void return") {
-		ASTFromInputSemanticTCInterpreterScriptNoParse("var User264 = import \"binding264\"; User264.funcTest(14);", data);
+		ASTFromInputSemanticTCInterpreterScriptNoParse("var User264 = import \"bind:binding264\"; User264.funcTest(14);", data);
 		auto test = 0;
 		
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding264", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
@@ -354,7 +354,7 @@ TEST_CASE("[Interpreter Script]") {
 	}
 
 	SUBCASE("C++ script-function binding generic form") {
-		ASTFromInputSemanticTCInterpreterScriptNoParse("var User279 = import \"binding279\"; User279.funcTest(10);", data);
+		ASTFromInputSemanticTCInterpreterScriptNoParse("var User279 = import \"bind:binding279\"; User279.funcTest(10);", data);
 		auto test = 0;
 
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding279", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
@@ -371,7 +371,7 @@ TEST_CASE("[Interpreter Script]") {
 	}
 
 	SUBCASE("2 outside scripts from file, with C++ bridging") {
-		ASTFromInputSemanticTCInterpreterScriptNoParse("var BridgeScript = import \"../test/src/resources/bridge_user\"; var BridgeScript2 = import \"../test/src/resources/bridge_user2\";", data);
+		ASTFromInputSemanticTCInterpreterScriptNoParse("var BridgeScript = import \"../../test/src/resources/bridge_user\"; var BridgeScript2 = import \"../../test/src/resources/bridge_user2\";", data);
 		auto test = 0;
 		auto count = 0;
 
@@ -389,7 +389,7 @@ TEST_CASE("[Interpreter Script]") {
 	}
 
 	SUBCASE("2 outside scripts from file, with C++ bridging, common script in cache") {
-		ASTFromInputSemanticTCInterpreterScriptNoParse("var BridgeScript2 = import \"../test/src/resources/bridge_user2\"; var BridgeScript3 = import \"../test/src/resources/bridge_user3\";", data);
+		ASTFromInputSemanticTCInterpreterScriptNoParse("var BridgeScript2 = import \"../../test/src/resources/bridge_user2\"; var BridgeScript3 = import \"../../test/src/resources/bridge_user3\";", data);
 		auto test = 0;
 		auto count = 0;
 
