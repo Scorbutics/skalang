@@ -1,5 +1,5 @@
-var Test = import "../test/src/resources/test317_2";
-var Character = import "../test/src/resources/character";
+var Test = import "test317_2";
+var Character = import "character";
 
 var actualCharacter = Character.build("");
 

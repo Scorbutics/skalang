@@ -61,14 +61,14 @@ ska::ASTNodePtr ska::BindingFactory::import(StatementParser& parser, Script& scr
 	auto lock = BindingFactorySymbolTableLock{ *this, script.symbols() };
 	auto result = std::vector<ASTNodePtr> {};
 	for (const auto& scriptImporter : imports) {
-		auto importClassNameFile = ScriptNameDeduce(script.name(), scriptImporter.second, ScriptNameStrategy::WORKING_DIRECTORY);
+		auto importClassNameFile = ScriptNameDeduce(script.name(), scriptImporter.second);
 		auto scriptLinkNode = ASTFactory::MakeNode<Operator::SCRIPT_LINK>(ASTFactory::MakeLogicalNode(Token{ importClassNameFile, TokenType::STRING, {} }, ASTFactory::MakeEmptyNode()));
 		auto scriptLinkEvent = ScriptLinkTokenEvent{ *scriptLinkNode, importClassNameFile, script };
 		observable_priority_queue<ScriptLinkTokenEvent>::notifyObservers(scriptLinkEvent);
 
 		auto varNode = ASTNodePtr{};
 		if (scriptLinkNode->type() == ExpressionType::VOID) {
-			auto importNode = createImport(parser, script, Token{ std::move(scriptImporter.second), TokenType::STRING, {} });
+			auto importNode = createImport(parser, script, Token{ importClassNameFile, TokenType::STRING, {} });
 			varNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(Token{ std::move(scriptImporter.first), TokenType::IDENTIFIER, {} }, std::move(importNode));
 		} else {
 			varNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(Token{ std::move(scriptImporter.first), TokenType::IDENTIFIER, {} }, std::move(scriptLinkNode));

@@ -1,6 +1,6 @@
 var Position = import "point";
 var InputComponent = import "input_component";
-var CharacterCommands = import "character_commands_lib";
+var CharacterCommands = import "bind:character_commands_lib";
 var Callback = import "callback";
 
 var Fcty = function(id: int) : var {

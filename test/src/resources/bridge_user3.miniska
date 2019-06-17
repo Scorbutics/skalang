@@ -1,1 +1,1 @@
-(import "../test/src/resources/bridge_user").Bridge.funcTest(1);
+(import "bridge_user").Bridge.funcTest(1);

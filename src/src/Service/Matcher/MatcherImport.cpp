@@ -21,7 +21,7 @@ ska::ASTNodePtr ska::MatcherImport::matchImport(Script& input) {
 	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::IMPORT>());
 
 	auto importNodeClass = input.match(TokenType::STRING);
-	auto importClassName = ScriptNameDeduce(input.name(), importNodeClass.name(), ScriptNameStrategy::WORKING_DIRECTORY);
+	auto importClassName = ScriptNameDeduce(input.name(), importNodeClass.name());
 
 	auto scriptLinkNode = ASTFactory::MakeNode<Operator::SCRIPT_LINK>(ASTFactory::MakeLogicalNode(Token{ importClassName, TokenType::STRING, importNodeClass.position() }, ASTFactory::MakeEmptyNode()));
 	auto scriptLinkEvent = ScriptLinkTokenEvent{ *scriptLinkNode, importClassName, input };
@@ -49,13 +49,13 @@ ska::ASTNodePtr ska::MatcherImport::createNewImport(
 		Script& input, 
 		Token importNodeClass) {
 	
-	const auto& importedScriptPath = ScriptNameDeduce(input.name(), importNodeClass.name(), ScriptNameStrategy::WORKING_DIRECTORY);
+	const auto& importedScriptPath = ScriptNameDeduce(input.name(), importNodeClass.name());
 
 	SLOG_STATIC(ska::LogLevel::Info, ska::MatcherImport) << "Create import node script "<< importedScriptPath;
 
 	auto scriptFile = std::ifstream{ importedScriptPath };
 	if (scriptFile.fail()) {
-		throw std::runtime_error("unable to find script with full-path \"" + importedScriptPath + "\"");
+		throw std::runtime_error("unable to open script with full-path \"" + importedScriptPath + "\"");
 	}
 
 	auto nodeBlock = ska::ASTFactory::MakeNode<ska::Operator::BLOCK>();
@@ -64,7 +64,7 @@ ska::ASTNodePtr ska::MatcherImport::createNewImport(
 
 	auto script = input.subParse(parser, importedScriptPath, scriptFile);
 
-	auto importNode = ska::ASTFactory::MakeNode<ska::Operator::IMPORT>(ska::ASTFactory::MakeLogicalNode(std::move(importNodeClass)));
+	auto importNode = ska::ASTFactory::MakeNode<ska::Operator::IMPORT>(ska::ASTFactory::MakeLogicalNode(Token{importedScriptPath, importNodeClass.type(), importNodeClass.position()}));
 	auto importEvent = ska::ImportTokenEvent{ *importNode, input };
 	obsImport.observable_priority_queue<ska::ImportTokenEvent>::notifyObservers(importEvent);
 

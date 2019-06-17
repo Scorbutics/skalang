@@ -55,7 +55,7 @@ namespace ska {
 		virtual ~BindingFactory();
 
 		template <class ReturnType, class ... ParameterTypes>
-		BridgeMemory bindFunction(Script& script, const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
+		BridgeMemory bindFunction(Script& script, const std::string& functionName, std::function<ReturnType(Script&, ParameterTypes...)> f) {
 			auto typeNames = buildTypes<ParameterTypes..., ReturnType>();
 			auto result = makeScriptSideBridge(std::move(f));
 			result->node = bindSymbol(script, functionName, std::move(typeNames));
@@ -75,18 +75,18 @@ namespace ska {
 		void internalListen(SymbolTable& symbolTable);
 
 		template <class ReturnType, class ... ParameterTypes, std::size_t... Idx>
-		auto callNativeFromScript(std::function<ReturnType(ParameterTypes...)> f, const std::vector<NodeValue>& v, std::index_sequence<Idx...>) {
-			return f(convertTypeFromScript<ParameterTypes, Idx>(v)...);
+		auto callNativeFromScript(Script& caller, std::function<ReturnType(Script&, ParameterTypes...)> f, const std::vector<NodeValue>& v, std::index_sequence<Idx...>) {
+			return f(caller, convertTypeFromScript<ParameterTypes, Idx>(v)...);
 		}
 
 		template <class ReturnType, class ... ParameterTypes>
-		BridgeMemory makeScriptSideBridge(std::function<ReturnType(ParameterTypes...)> f) {
-			auto lambdaWrapped = [f, this](std::vector<NodeValue> v) {
+		BridgeMemory makeScriptSideBridge(std::function<ReturnType(Script&, ParameterTypes...)> f) {
+			auto lambdaWrapped = [f, this](Script& caller, std::vector<NodeValue> v) {
 				if constexpr(std::is_same_v<ReturnType, void>) {
-					callNativeFromScript(std::move(f), v, std::make_index_sequence<sizeof ...(ParameterTypes)>());
+					callNativeFromScript(caller, std::move(f), v, std::make_index_sequence<sizeof ...(ParameterTypes)>());
 					return NodeValue{};
 				} else {
-					return NodeValue(callNativeFromScript(std::move(f), v, std::make_index_sequence<sizeof ...(ParameterTypes)>()));
+					return NodeValue(callNativeFromScript(caller, std::move(f), v, std::make_index_sequence<sizeof ...(ParameterTypes)>()));
 				}
 			};
 
