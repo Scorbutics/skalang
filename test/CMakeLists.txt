@@ -12,6 +12,7 @@ file(GLOB_RECURSE SOURCES
 
 string(REGEX REPLACE "[^;]*CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
 
+add_definitions(-DSKALANG_TEST_DIR="${SKALANG_TEST_DIR}")
 add_executable(skalang_test ${SOURCES})
 
 find_package(Threads REQUIRED)

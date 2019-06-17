@@ -2,6 +2,8 @@
 #include <stdexcept>
 #include "Base/IO/Files/FileUtils.h"
 
+#define SKALANG_SCRIPT_EXT "miniska"
+
 namespace ska {
     
     enum class ScriptNameStrategy {
@@ -14,13 +16,13 @@ namespace ska {
 
     //Execution relative path (based on current working directory)
     inline std::string ScriptNameCurrentWorkingDirectory(const std::string& scriptCalled) {    
-	    return FileUtils::getCanonicalPath(FileUtils::getCurrentDirectory() + "/" + scriptCalled + ".miniska");
+	    return FileUtils::getCanonicalPath(FileUtils::getCurrentDirectory() + "/" + scriptCalled + "." SKALANG_SCRIPT_EXT );
     }
 
     //Executable relative path
     inline std::string ScriptNameRelativeToRunnerDirectory(const std::string& scriptCalled) {
         const auto fileNameData = FileNameData {FileUtils::getExecutablePath()};
-        return FileUtils::getCanonicalPath(fileNameData.path + "/" + ScriptNameStandardLibraryPrefix() + "/" + scriptCalled + ".miniska");
+        return FileUtils::getCanonicalPath(fileNameData.path + "/" + ScriptNameStandardLibraryPrefix() + "/" + scriptCalled + "." SKALANG_SCRIPT_EXT);
     }
 
     //File relative path
@@ -28,16 +30,19 @@ namespace ska {
 	    const auto fileNameData = FileNameData {scriptCaller};
         if(fileNameData.path.empty() || fileNameData.name.empty()) {
             const auto subfileNameData = FileNameData {FileUtils::getExecutablePath()};
-            return FileUtils::getCanonicalPath(subfileNameData.path + "/" + scriptCalled + ".miniska");
+            return FileUtils::getCanonicalPath(subfileNameData.path + "/" + scriptCalled + "." SKALANG_SCRIPT_EXT);
         }
-        return FileUtils::getCanonicalPath(fileNameData.path + "/" + scriptCalled + ".miniska");
+        return FileUtils::getCanonicalPath(fileNameData.path + "/" + scriptCalled + "." SKALANG_SCRIPT_EXT);
     }
 
 
 
-    inline std::string ScriptNameDeduce(const std::string& scriptCaller, const std::string& scriptCalled, ScriptNameStrategy empty = ScriptNameStrategy::RELATIVE_TO_PARENT) {
+    inline std::string ScriptNameDeduce(const std::string& scriptCaller, const std::string& scriptCalled) {
         if(FileUtils::isAbsolutePath(scriptCalled)) {
-            return FileUtils::getCanonicalPath(scriptCalled);
+            const auto lastDotPos = scriptCalled.find_last_of('.');
+            const auto ext = (lastDotPos == std::string::npos || scriptCalled.substr(lastDotPos) != "." SKALANG_SCRIPT_EXT) ? "." SKALANG_SCRIPT_EXT : "";
+            const auto fileScriptCalled = scriptCalled + ext;
+            return FileUtils::getCanonicalPath(fileScriptCalled);
         }
 
         auto strategy = ScriptNameStrategy::RELATIVE_TO_PARENT;

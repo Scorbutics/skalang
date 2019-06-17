@@ -59,7 +59,7 @@ TEST_CASE("[Interpreter Script]") {
 		scriptEmBinding.buildFunctions();
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Test293", "../../../test/src/resources/test293"}, {"Binding1", "bind:binding1_lib"} });
+		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Test293", "" SKALANG_TEST_DIR "/src/resources/test293"}, {"Binding1", "bind:binding1_lib"} });
 		scriptBindingDataClass.bindGenericFunction("run", { "Test293::Fcty()" }, std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script& caller, std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto getTotoMemory = scriptBindingDataClass.accessMemory("Binding1", "getToto");
 			assert(getTotoMemory.first != nullptr);
@@ -75,42 +75,42 @@ TEST_CASE("[Interpreter Script]") {
 	}
 
 	SUBCASE("Outside script from file (import)") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Character179 = import \"../../test/src/resources/character\";", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Character179 = import \"" SKALANG_TEST_DIR "/src/resources/character\";", data);
 		auto res = data.interpreter->script(astPtr);
 	}
 
 	SUBCASE("Outside script from file (import) and use") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Character184 = import \"../../test/src/resources/character\";var player = Character184.build(\"Player\");var enemy = Character184.default; enemy.age;", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\";var player = Character184.build(\"Player\");var enemy = Character184.default; enemy.age;", data);
 		auto res = data.interpreter->script(astPtr);
 		CHECK(res.nodeval<int>() == 10);
 	}
 
 	SUBCASE("Outside script from file (import) used by another script, and use") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var CharacterUser190 = import \"../../test/src/resources/character_user\"; CharacterUser190.player.age;", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var CharacterUser190 = import \"" SKALANG_TEST_DIR "/src/resources/character_user\"; CharacterUser190.player.age;", data);
 		auto res = data.interpreter->script(astPtr);
 		CHECK(res.nodeval<int>() == 10);
 	}
 	
 	SUBCASE("Outside script from file (import) used by another script, and use") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var CharacterUser196 = import \"../../test/src/resources/character_user\"; CharacterUser196.player.age;", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var CharacterUser196 = import \"" SKALANG_TEST_DIR "/src/resources/character_user\"; CharacterUser196.player.age;", data);
 		auto res = data.interpreter->script(astPtr);
 		CHECK(res.nodeval<int>() == 10);
 	}
 
 	SUBCASE("Custom script starter") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Custom202 = import \"../../test/src/resources/custom\"; Custom202.totalAge;", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Custom202 = import \"" SKALANG_TEST_DIR "/src/resources/custom\"; Custom202.totalAge;", data);
 		auto res = data.interpreter->script(astPtr);
 		CHECK(res.nodeval<int>() == 30);
 	}
 
 	SUBCASE("2 outside scripts from file (import)") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var CharacterUser208 = import \"../../test/src/resources/character_user\"; CharacterUser208.player.age = 3; var CharacterUser2 = import \"../../test/src/resources/character_user\"; CharacterUser2.player.age;", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var CharacterUser208 = import \"" SKALANG_TEST_DIR "/src/resources/character_user\"; CharacterUser208.player.age = 3; var CharacterUser2 = import \"" SKALANG_TEST_DIR "/src/resources/character_user\"; CharacterUser2.player.age;", data);
 		auto res = data.interpreter->script(astPtr);
 		CHECK(res.nodeval<int>() == 3);
 	}
 
 	SUBCASE("2 outside scripts imported with different memory contexts") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Player = import \"../../test/src/resources/play\"; var Character = import \"../../test/src/resources/character\"; var c = Character.build(\"test\"); Player.run(c);", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Player = import \"" SKALANG_TEST_DIR "/src/resources/play\"; var Character = import \"" SKALANG_TEST_DIR "/src/resources/character\"; var c = Character.build(\"test\"); Player.run(c);", data);
 		data.interpreter->script(astPtr);
 	}
 
@@ -304,7 +304,7 @@ TEST_CASE("[Interpreter Script]") {
 			data.interpreter->script(*readerIS);
 			CHECK(false);
 		} catch (std::exception& e) {
-			CHECK(std::string{e.what()}.find("undeclared custom type \"DataClassImp250::DataClassImddf\" (when trying to look on token type \"var C:\\DevFast\\skalang\\bin\\Debug\\std\\dataclass_script.miniska\")") != std::string::npos);
+			CHECK(std::string{e.what()}.find("undeclared custom type \"DataClassImp250::DataClassImddf\" (when trying to look on token type \"var ") != std::string::npos);
 		}
 	}
 
@@ -315,7 +315,7 @@ TEST_CASE("[Interpreter Script]") {
 
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Character", "../../../test/src/resources/character"} });
+		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Character", "" SKALANG_TEST_DIR "/src/resources/character"} });
 		scriptBindingDataClass.bindGenericFunction("run", { "Character::build()" }, 
 		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> p) -> ska::NodeValue {
 			auto params = std::vector<ska::NodeValue>{};
@@ -333,7 +333,7 @@ TEST_CASE("[Interpreter Script]") {
 	}
 
 	SUBCASE("using a callback in another script & another context") {
-		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Script317 = import \"../../test/src/resources/test317_1\"; Script317.actualCharacter.name;", data);
+		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Script317 = import \"" SKALANG_TEST_DIR "/src/resources/test317_1\"; Script317.actualCharacter.name;", data);
 		auto result = data.interpreter->script(astPtr);
 		CHECK(result.nodeval<std::string>() == "test317");
 	}
@@ -371,7 +371,7 @@ TEST_CASE("[Interpreter Script]") {
 	}
 
 	SUBCASE("2 outside scripts from file, with C++ bridging") {
-		ASTFromInputSemanticTCInterpreterScriptNoParse("var BridgeScript = import \"../../test/src/resources/bridge_user\"; var BridgeScript2 = import \"../../test/src/resources/bridge_user2\";", data);
+		ASTFromInputSemanticTCInterpreterScriptNoParse("var BridgeScript = import \"" SKALANG_TEST_DIR "/src/resources/bridge_user\"; var BridgeScript2 = import \"" SKALANG_TEST_DIR "/src/resources/bridge_user2\";", data);
 		auto test = 0;
 		auto count = 0;
 
@@ -389,7 +389,7 @@ TEST_CASE("[Interpreter Script]") {
 	}
 
 	SUBCASE("2 outside scripts from file, with C++ bridging, common script in cache") {
-		ASTFromInputSemanticTCInterpreterScriptNoParse("var BridgeScript2 = import \"../../test/src/resources/bridge_user2\"; var BridgeScript3 = import \"../../test/src/resources/bridge_user3\";", data);
+		ASTFromInputSemanticTCInterpreterScriptNoParse("var BridgeScript2 = import \"" SKALANG_TEST_DIR "/src/resources/bridge_user2\"; var BridgeScript3 = import \"" SKALANG_TEST_DIR "/src/resources/bridge_user3\";", data);
 		auto test = 0;
 		auto count = 0;
 

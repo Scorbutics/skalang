@@ -7,6 +7,6 @@
 ska::ImportTokenEvent::ImportTokenEvent(ASTNode& node, Script& s) : 
     m_node(node), 
     m_script(s),
-    m_boundScript(m_script.subScript(ScriptNameDeduce(s.name(), node[0].name(), ScriptNameStrategy::WORKING_DIRECTORY))) {
+    m_boundScript(m_script.subScript(ScriptNameDeduce(s.name(), node[0].name()))) {
     assert(m_boundScript != nullptr && "bad parameter : null bound script to an import event");
 }

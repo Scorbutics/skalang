@@ -193,7 +193,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 
 	SUBCASE("return a concrete custom type with namespace") {
 		ASTFromInputSemanticComplexTC(scriptCache,
-			"var Character = import \"../../test/src/resources/character\";"
+			"var Character = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
 			"var lvalFunc188 = function() : Character::build() {"
 				"return Character.build(\"t\");"
 			"};"
