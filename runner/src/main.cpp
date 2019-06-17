@@ -95,8 +95,8 @@ int main(int argc, char* argv[]) {
 		auto scriptName = scriptFileName.substr(0, scriptFileName.find_last_of('.'));
 		auto executor = ska::Script{ scriptCache, "main", ska::Tokenizer{ reservedKeywords, 
 		"var Script = import \"wd:" + scriptName + "\";"
-		"var CharacterGenerator = import \"character_generator\";"
-		"var ParametersGenerator = import \"std:std.native.parameter\";"
+		"var CharacterGenerator = import \"bind:character_generator\";"
+		"var ParametersGenerator = import \"bind:std.native.parameter\";"
 		"Script.run(CharacterGenerator.Gen(), ParametersGenerator.Gen(\"" + scriptName + "\"));"
 		}.tokenize() };
 	

@@ -1,4 +1,4 @@
-var EntityManager = import "em_lib";
+var EntityManager = import "bind:em_lib";
 
 var Fcty = function(characterId: int): var {
     var movePower_ = 25;

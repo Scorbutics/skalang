@@ -1,4 +1,4 @@
-var IO = import "std:std.native.io";
+var IO = import "bind:std.native.io";
 var Parameters = import "std:std.parameters";
 
 var Character = import "character";
