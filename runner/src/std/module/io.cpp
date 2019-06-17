@@ -8,7 +8,7 @@
 #include "Interpreter/Value/Script.h"
 
 ska::lang::IOModule::IOModule(ModuleConfiguration& config) :
-	Module {config, "std:std.native.io"} {
+	Module {config, "std.native.io"} {
 	m_bridge.bindFunction("printInt", std::function<void(Script&, int)>([](Script&, int value) {
 		std::cout << value << std::endl;
 	}));

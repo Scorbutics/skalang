@@ -9,7 +9,7 @@
 #include "Interpreter/Value/Script.h"
 
 ska::lang::ParameterModule::ParameterModule(ModuleConfiguration& config, const std::vector<NodeValue>& parameterValues) :
-    Module { config, "std:std.native.parameter" },
+    Module { config, "std.native.parameter" },
     m_parameters(parameterValues) {
     m_bridge.import(config.parser, config.interpreter, { {"Parameters", "std:std.parameters"} });
     m_bridge.bindGenericFunction("Gen", { "string", "Parameters::Fcty" }, 
