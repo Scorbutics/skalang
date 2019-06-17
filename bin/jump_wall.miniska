@@ -1,5 +1,5 @@
 var IO = import "std:std.native.io";
-var Parameters = "std:std.parameters";
+var Parameters = import "std:std.parameters";
 
 var Character = import "character";
 
