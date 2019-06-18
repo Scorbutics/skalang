@@ -9,7 +9,7 @@
 #include "Service/ASTFactory.h"
 #include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::MatcherIfElse)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherIfElse)
 
 ska::ASTNodePtr ska::MatcherIfElse::match(Script& input) {
     auto ifNode = ASTNodePtr{};

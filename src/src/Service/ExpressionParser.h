@@ -30,17 +30,17 @@ namespace ska {
 		ASTNodePtr parse(Script& input);
 
 	private:
-		bool parseTokenExpression(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
-        
-        bool matchSymbol(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
-		void matchRange(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
-		void matchParenthesis(Script& input, ExpressionStack& expressions, bool isDoingOperation);
+		std::pair<bool, int> parseTokenExpression(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
 
-        ASTNodePtr matchReserved(Script& input);
-		ASTNodePtr matchObjectFieldAccess(Script& input, ASTNodePtr objectAccessed);      
+		bool matchSymbol(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
+		int matchRange(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
+		int matchParenthesis(Script& input, ExpressionStack& expressions, bool isDoingOperation);
 
-        bool isAtEndOfExpression(Script& input) const;
-		
+		ASTNodePtr matchReserved(Script& input);
+		ASTNodePtr matchObjectFieldAccess(Script& input, ASTNodePtr objectAccessed);
+
+		bool isAtEndOfExpression(Script& input) const;
+
 		ASTNodePtr expression(Script& input, ExpressionStack& expressions);
 
 		static void error(const std::string& message);
