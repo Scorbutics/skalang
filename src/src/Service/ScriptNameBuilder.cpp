@@ -7,12 +7,12 @@ namespace ska {
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptNameDeduceTag)
 
-std::string& ska::ScriptNameStandardLibraryPrefix() {
-	static std::string prefix = "std";
+std::string& ska::ScriptNameStandardLibraryPath() {
+	static std::string prefix = "" SKALANG_SRC_DIR "/../runner/scripts/std";
 	return prefix;
 }
 
-std::string ska::ScriptNameDeduce(const std::string& scriptCaller, const std::string& scriptCalled, const std::string& stdPrefixPath) {
+std::string ska::ScriptNameDeduce(const std::string& scriptCaller, const std::string& scriptCalled, const std::string& stdPath) {
 	if(ska::FileUtils::isAbsolutePath(scriptCalled)) {
 		const auto lastDotPos = scriptCalled.find_last_of('.');
 		const auto ext = (lastDotPos == std::string::npos || scriptCalled.substr(lastDotPos) != "." SKALANG_SCRIPT_EXT) ? "." SKALANG_SCRIPT_EXT : "";
@@ -44,14 +44,14 @@ std::string ska::ScriptNameDeduce(const std::string& scriptCaller, const std::st
 	case ska::ScriptNameStrategy::WORKING_DIRECTORY:
 		SLOG_STATIC(LogLevel::Debug, ska::ScriptNameDeduceTag) << "Script name deducing strategy WORKING_DIRECTORY for script " << scriptCalled;
 		return ska::ScriptNameCurrentWorkingDirectory(scriptCalledName);
-	
+
 	case ScriptNameStrategy::RELATIVE_TO_RUNNER:
 		SLOG_STATIC(LogLevel::Debug, ska::ScriptNameDeduceTag) << "Script name deducing strategy RELATIVE_TO_RUNNER for script " << scriptCalled;
-		return ska::ScriptNameRelativeToRunnerDirectory(scriptCalledName, "");
+		return ska::ScriptNameRelativeToRunnerDirectory(scriptCalledName);
 
 	case ScriptNameStrategy::STD_DIRECTORY:
 		SLOG_STATIC(LogLevel::Debug, ska::ScriptNameDeduceTag) << "Script name deducing strategy STD_DIRECTORY for script " << scriptCalled;
-		return ska::ScriptNameRelativeToRunnerDirectory(scriptCalledName, stdPrefixPath);
+		return ska::ScriptNameRelativeToStandardLibraryDirectory(scriptCalledName, stdPath);
 	default:
 		SLOG_STATIC(LogLevel::Debug, ska::ScriptNameDeduceTag) << "Script name deducing strategy PARENT_DIRECTORY for script " << scriptCalled;
 		return ska::ScriptNameRelativeToParentDirectory(scriptCaller, scriptCalledName);

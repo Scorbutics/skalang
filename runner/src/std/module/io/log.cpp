@@ -1,14 +1,14 @@
 #include <iostream>
 
 #include "Config/LoggerConfigLang.h"
-#include "io.h"
+#include "log.h"
 
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
 #include "Interpreter/Value/Script.h"
 
-ska::lang::IOModule::IOModule(ModuleConfiguration& config) :
-	Module {config, "std.native.io"} {
+ska::lang::IOLogModule::IOLogModule(ModuleConfiguration& config) :
+	Module {config, "std.native.io.log"} {
 	m_bridge.bindFunction("printInt", std::function<void(Script&, int)>([](Script&, int value) {
 		std::cout << value << std::endl;
 	}));

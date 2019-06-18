@@ -1,0 +1,5 @@
+var Fcty = function(path: string) : var {
+	return {
+		canonical : function() : string { return "";}
+	};
+};

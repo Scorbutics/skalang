@@ -12,6 +12,8 @@ set(SKA_BASE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/skabase/src/src)
 set(SKA_LOG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/external/skalog/src/src)
 
 set(SKALANG_TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test)
+set(SKALANG_RUNNER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/runner)
+set(SKALANG_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 include_directories(${SKA_BASE_DIR})
 include_directories(${SKA_LOG_DIR})
@@ -21,7 +23,6 @@ add_subdirectory(external/doctest)
 add_subdirectory(external/skalog/src)
 add_subdirectory(external/skabase/src)
 
-add_subdirectory(src)
-add_subdirectory(test)
-add_subdirectory(runner)
-
+add_subdirectory(${SKALANG_SRC_DIR})
+add_subdirectory(${SKALANG_TEST_DIR})
+add_subdirectory(${SKALANG_RUNNER_DIR})

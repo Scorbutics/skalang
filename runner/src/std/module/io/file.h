@@ -5,10 +5,10 @@
 
 namespace ska {
     namespace lang {
-        class IOModule : public Module {
+        class IOFileModule : public Module {
         public:
-            IOModule(ModuleConfiguration& config);
-            ~IOModule() override = default;
+            IOFileModule(ModuleConfiguration& config);
+            ~IOFileModule() override = default;
         };
     }
 }
