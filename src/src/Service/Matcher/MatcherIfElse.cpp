@@ -9,22 +9,27 @@
 #include "Service/ASTFactory.h"
 #include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherIfElse)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::MatcherIfElse)
 
 ska::ASTNodePtr ska::MatcherIfElse::match(Script& input) {
     auto ifNode = ASTNodePtr{};
 
+    SLOG(ska::LogLevel::Debug) << "Matching if";
+
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::IF>());
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
-    
+
     {
         auto conditionExpression = input.expr(m_parser);
+        SLOG(ska::LogLevel::Debug) << "Matching if - expression done";
         input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 
         auto conditionStatement = input.statement(m_parser);
+        SLOG(ska::LogLevel::Debug) << "Matching if - if statement done";
 
         const auto elseToken = m_reservedKeywordsPool.pattern<TokenGrammar::ELSE>();
         if (input.expect(elseToken)) {
+            SLOG(ska::LogLevel::Debug) << "Matching if - else statement done";
             input.match(elseToken);
             auto elseBlockStatement = input.statement(m_parser);
             ifNode = ASTFactory::MakeNode<Operator::IF_ELSE>(std::move(conditionExpression), std::move(conditionStatement), std::move(elseBlockStatement));
@@ -32,7 +37,7 @@ ska::ASTNodePtr ska::MatcherIfElse::match(Script& input) {
             ifNode = ASTFactory::MakeNode<Operator::IF>(std::move(conditionExpression), std::move(conditionStatement));
         }
     }
-
+    SLOG(ska::LogLevel::Debug) << "if matching done";
     auto event = IfElseTokenEvent {*ifNode};
 	m_parser.observable_priority_queue<IfElseTokenEvent>::notifyObservers(event);
     return ifNode;

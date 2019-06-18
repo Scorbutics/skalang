@@ -3,12 +3,10 @@ var Parameters = import "std:std.function.parameters";
 var PathFcty = import "bind:std.native.io.path";
 
 var run = function (parameters: Parameters::Fcty()) {
-	var parametersSize = parameters.size();
-	if (parametersSize > 0) {
+	if (parameters.size() > 0) {
 		var path = PathFcty.Build(parameters.asString(0));
 		Log.printString(path.canonical());
 	} else {
 		Log.printString("No argument provided");
 	}
 };
-

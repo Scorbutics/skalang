@@ -36,11 +36,6 @@ ska::Script SmashAndDashSpecific(ska::lang::ModuleConfiguration& module, const s
 		}));
 		scriptEmBinding.buildFunctions();
 
-		auto parameterValues = std::vector<ska::NodeValue>{};
-		parameterValues.push_back(1234);
-		parameterValues.push_back(5566);
-
-
 		auto scriptCharacterCommands = ska::ScriptBridge{ module.scriptCache, "character_commands_lib", module.typeBuilder, module.symbolTableTypeUpdater, module.reservedKeywords };
 		scriptCharacterCommands.bindFunction("jump", std::function<void(ska::Script&, int)>([](ska::Script&, int index) {
 			std::cout << "jump ! " << index << std::endl;
@@ -118,14 +113,16 @@ int main(int argc, char* argv[]) {
 		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);
 		auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
 
+		auto parameterValues = std::vector<ska::NodeValue>{};
+
 		/*
 			auto scriptFileName = std::string{argv[1]};
 			auto scriptName = scriptFileName.substr(0, scriptFileName.find_last_of('.'));
-			auto parameterModule = ska::lang::ParameterModule(moduleConfiguration, {}});
+			auto parameterModule = ska::lang::ParameterModule(moduleConfiguration, parameterValues);
 			auto executor = SmashAndDashSpecific(moduleConfiguration, scriptName);
 		*/
 
-		auto parameterValues = std::vector<ska::NodeValue>{};
+
 		auto parameterModule = ska::BasicParameterModuleBuilder(moduleConfiguration, parameterValues, argc, argv);
 		auto executor = ska::BasicProgramScriptStarter(moduleConfiguration, argv);
 

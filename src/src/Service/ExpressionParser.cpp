@@ -7,7 +7,7 @@
 #include "Service/ASTFactory.h"
 #include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ExpressionParser)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ExpressionParser)
 
 ska::ExpressionParser::ExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, StatementParser& parser) :
 	m_reservedKeywordsPool(reservedKeywordsPool),
@@ -66,7 +66,7 @@ bool ska::ExpressionParser::parseTokenExpression(Script& input, ExpressionStack&
 		}
 		expressions.push(matchObjectFieldAccess(input, std::move(expressionObject)));
 	} break;
-		
+
 
 	case TokenType::SYMBOL:
         return matchSymbol(input, expressions, token, isDoingOperation);
@@ -84,26 +84,26 @@ void ska::ExpressionParser::matchRange(Script& input, ExpressionStack& expressio
 		matchParenthesis(input, expressions, isDoingOperation);
 	break;
     case ')': {
-		expressions.push(Token{ input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) });
-		
-        auto endGrouping = false;
-		auto groupParenthesisRange = [&endGrouping](const Token& t) {
-            if(endGrouping) {
-                return Group::FlowControl::STOP;
-            }
-            const auto& strValue = t.name();
-			if (t.type() == TokenType::RANGE) {
-                endGrouping = strValue == "(";
-				return Group::FlowControl::IGNORE_AND_CONTINUE;
-			}
-			return Group::FlowControl::GROUP;
-		};
+			expressions.push(Token{ input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) });
 
-		auto result = expressions.groupAndPop<ASTFactory>(std::move(groupParenthesisRange));
-		if (result != nullptr) {
-			expressions.push(std::move(result));
-		}
-		SLOG(ska::LogLevel::Debug) << "\tRange end";
+			auto endGrouping = false;
+			auto groupParenthesisRange = [&endGrouping](const Token& t) {
+				if(endGrouping) {
+						return Group::FlowControl::STOP;
+				}
+				const auto& strValue = t.name();
+				if (t.type() == TokenType::RANGE) {
+									endGrouping = strValue == "(";
+					return Group::FlowControl::IGNORE_AND_CONTINUE;
+				}
+				return Group::FlowControl::GROUP;
+			};
+
+			auto result = expressions.groupAndPop<ASTFactory>(std::move(groupParenthesisRange));
+			if (result != nullptr) {
+				expressions.push(std::move(result));
+			}
+			SLOG(ska::LogLevel::Debug) << "\tRange end";
     } break;
 
     default:
@@ -112,18 +112,18 @@ void ska::ExpressionParser::matchRange(Script& input, ExpressionStack& expressio
 }
 
 bool ska::ExpressionParser::matchSymbol(Script& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
-    const auto& value = std::get<std::string>(token.content());
-    if(value == "=") {
+	const auto& value = std::get<std::string>(token.content());
+	if (value == "=") {
 		//We must check that the token before the '=' is an lvalue : done in the semantic check pass.
 		expressions.push(m_matcherVar.matchAffectation(input, expressions.popOperandIfNoOperator(isDoingOperation)));
-        return false;
-    }
+		return false;
+	}
 
-    SLOG(ska::LogLevel::Debug) << "\t\tPushing operator symbol " << value;
+	SLOG(ska::LogLevel::Debug) << "\t\tPushing operator symbol " << value;
 
-    const auto shouldPopOperatorsStack = expressions.checkLessPriorityOperator(value[0]);
-    if (shouldPopOperatorsStack) {
-        SLOG(ska::LogLevel::Debug) << "\tLess precedence, poping first (top) operator before adding " << value;
+	const auto shouldPopOperatorsStack = expressions.checkLessPriorityOperator(value[0]);
+	if (shouldPopOperatorsStack) {
+		SLOG(ska::LogLevel::Debug) << "\tLess precedence, poping first (top) operator before adding " << value;
 
 		auto poped = false;
 		auto expressionGroup = expressions.groupAndPop<ASTFactory>(Group::FirstOnly<Token>(poped));
@@ -134,8 +134,7 @@ bool ska::ExpressionParser::matchSymbol(Script& input, ExpressionStack& expressi
 	} else {
 		expressions.push(Token{ input.match(TokenType::SYMBOL) });
 	}
-    return true;
-    
+	return true;
 }
 
 void ska::ExpressionParser::matchParenthesis(Script& input, ExpressionStack& expressions, bool isDoingOperation) {
@@ -169,10 +168,10 @@ ska::ASTNodePtr ska::ExpressionParser::matchObjectFieldAccess(Script& input, AST
 }
 
 bool ska::ExpressionParser::isAtEndOfExpression(Script& input) const {
-    return input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()) || 
+    return input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()) ||
             input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>()) ||
             input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()) ||
-            input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>()); 
+            input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 }
 
 ska::ASTNodePtr ska::ExpressionParser::expression(Script& input, ExpressionStack& expressions) {
