@@ -33,7 +33,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::parse(Script& input) {
 		return nullptr;
 	}
 
-	
+
 	try {
 		auto blockNodeStatements = std::vector<ASTNodePtr>{};
 			while (!input.empty()) {
@@ -55,7 +55,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::statement(Script& input) 
 		return nullptr;
 	}
 
-	
+
 		const auto token = input.actual();
 	try {
 		switch (token.type()) {
@@ -101,9 +101,9 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::matchReservedKeyword(Scri
 	case static_cast<std::size_t>(TokenGrammar::FUNCTION):
 		return expr(input);
 
-    case static_cast<std::size_t>(TokenGrammar::RETURN):
-        return m_matcherReturn.match(input);
-	
+	case static_cast<std::size_t>(TokenGrammar::RETURN):
+		return m_matcherReturn.match(input);
+
 	case static_cast<std::size_t>(TokenGrammar::EXPORT) :
 		return m_matcherImport.matchExport(input);
 
@@ -135,7 +135,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::optexpr(Script& input, co
 ska::ScriptPtr ska::StatementParser::subParse(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& name, std::ifstream& file) {
 	auto content = std::string (
 		(std::istreambuf_iterator<char>(file)),
-		(std::istreambuf_iterator<char>()) 
+		(std::istreambuf_iterator<char>())
 	);
 
 	auto tokenizer = Tokenizer{ m_reservedKeywordsPool, std::move(content)};
@@ -144,7 +144,7 @@ ska::ScriptPtr ska::StatementParser::subParse(std::unordered_map<std::string, sk
 	const auto scriptAlreadyExists = scriptCache.find(name) != scriptCache.end();
 	SLOG(ska::LogLevel::Info) << "SubParsing script " << name << " : " << (scriptAlreadyExists ? "not " : "") << "in cache";
 	auto script = ScriptPtr{std::make_unique<Script>( scriptCache, name, tokens )};
-	script->parse(*this);	
+	script->parse(*this);
 	return script;
 }
 

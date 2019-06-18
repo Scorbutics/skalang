@@ -1,0 +1,9 @@
+var Path = import "std:std.native.io.path";
+
+var Fcty = function(filePath: string) : var {
+	var path_ Path.Fcty(filePath);
+
+	return {
+		path : function() : Path::Fcty() { return path_; }
+	};
+};

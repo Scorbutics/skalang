@@ -21,11 +21,11 @@ TEST_CASE("[Parser]") {
 	auto p = ska::StatementParser{ keywords };
 	reader.parse(p, false);
 	auto ast = &reader.rootNode();
-	
+
 	CHECK(ast->size() == 1);
 
 	auto& tree = (*ast)[0];
-	
+
 	CHECK(tree.size() == 4);
 	const auto& declaration = tree[0];
 	CHECK(declaration.op() == ska::Operator::VARIABLE_DECLARATION);
@@ -44,7 +44,7 @@ TEST_CASE("[Parser]") {
 	CHECK(incrementStatement.op() == ska::Operator::UNARY);
 	CHECK(incrementStatement.size() == 1);
 	CHECK(incrementStatement[0].has(ska::Token { "i", ska::TokenType::IDENTIFIER, {} }));
-	
+
 	const auto& loopStatementBody = tree[3];
 	CHECK(loopStatementBody.op() == ska::Operator::BLOCK);
 	CHECK(loopStatementBody.size() == 3);
@@ -154,11 +154,11 @@ TEST_CASE("function") {
         const auto& astFunc133 = ast[0];
         CHECK(astFunc133.op() == ska::Operator::FUNCTION_DECLARATION);
 		CHECK(astFunc133.size() == 2);
-		
+
         CHECK(astFunc133[0].size() == 3);
         CHECK(astFunc133[1].size() == 0);
         //CHECK(ast[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
-		
+
 	}
 	//TODO rework : doesn't properly work (doesn't detect a good function returning type)
 	SUBCASE("with 2 return placements (early return support)") {
@@ -174,13 +174,13 @@ TEST_CASE("function") {
 TEST_CASE("User defined object") {
     const auto keywords = ska::ReservedKeywordsPool {};
 	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
-	
+
     SUBCASE("constructor with 1 parameter") {
-        
+
         auto astPtr = ASTFromInput(scriptCache, "var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", keywords);
 		CHECK(astPtr.rootNode().size() == 3);
         CHECK(astPtr.rootNode().op() == ska::Operator::BLOCK);
-        
+
         auto& varJoueurNode = astPtr.rootNode()[0];
         CHECK(varJoueurNode.size() == 1);
         CHECK(varJoueurNode.op() == ska::Operator::VARIABLE_DECLARATION);
@@ -189,9 +189,9 @@ TEST_CASE("User defined object") {
 		CHECK(astFunc154.size() == 2);
         const auto& astFuncParameters154 = astFunc154[0];
         CHECK(astFuncParameters154.size() == 2);
-    
+
         //Checks the parameter name and type
-        CHECK(astFuncParameters154[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}})); 
+        CHECK(astFuncParameters154[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
         CHECK(astFuncParameters154[0].size() == 1);
 		CHECK(astFuncParameters154[0][0].size() == 3);
         CHECK(astFuncParameters154[0][0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
@@ -201,7 +201,7 @@ TEST_CASE("User defined object") {
 
         //Checks the function body
         CHECK(astFunc154[1].size() == 1);
-        
+
         const auto& userDefinedObjectNode = astFunc154[1][0][0];
 		CHECK(astFunc154[1][0].op() == ska::Operator::RETURN);
         CHECK(userDefinedObjectNode.op() == ska::Operator::USER_DEFINED_OBJECT);
@@ -210,7 +210,7 @@ TEST_CASE("User defined object") {
         const auto& returnNomNode = userDefinedObjectNode[0];
         CHECK(returnNomNode.size() == 1);
         CHECK(returnNomNode.has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
-        
+
         //Checks the variable declaration and the function call
         const auto& varJoueur1Node = astPtr.rootNode()[1];
         CHECK(varJoueur1Node.op() == ska::Operator::VARIABLE_DECLARATION);
@@ -223,6 +223,19 @@ TEST_CASE("User defined object") {
 		CHECK(nomJoueur1FieldNode[0].has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER, {}} ));
 		CHECK(nomJoueur1FieldNode[1].has(ska::Token{ "nom", ska::TokenType::IDENTIFIER, {}}));
 
+	}
+
+	SUBCASE("Method call in if condition statement [var]") {
+		auto astPtr = ASTFromInput(scriptCache,
+		"var Fcty230 = function() : var { return { size : function(): int { return 0;}}; };\n"
+		"var t = Fcty230();\n"
+		"if (t.size() > 0) {}", keywords);
+	}
+
+	SUBCASE("Method call in if condition statement [direct]") {
+		auto astPtr = ASTFromInput(scriptCache,
+		"var Fcty230 = function() : var { return { size : function(): int { return 0;}}; };\n"
+		"if (Fcty230().size() > 0) {}", keywords);
 	}
 
 }
@@ -249,7 +262,7 @@ TEST_CASE("Expression and priorities") {
 		}
 		CHECK(!toCheck);
 	}
-	
+
     SUBCASE("Syntax error : no existing operator") {
         try {
             ASTFromInput(scriptCache, "5 ' 3;", keywords);
@@ -268,7 +281,7 @@ TEST_CASE("Expression and priorities") {
 		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
 		CHECK(ast[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
 	}
-	
+
 	SUBCASE("Simple add") {
 		auto astPtr = ASTFromInput(scriptCache, "5 + 2;", keywords);
 		auto& ast = astPtr.rootNode()[0];
@@ -313,7 +326,7 @@ TEST_CASE("Expression and priorities") {
 		CHECK(ast[1].op() == ska::Operator::BINARY);
 		const auto& innerOp = ast[1];
 		CHECK(innerOp[0].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
-		CHECK(innerOp[1].has(ska::Token { "4", ska::TokenType::DIGIT, {} }));	
+		CHECK(innerOp[1].has(ska::Token { "4", ska::TokenType::DIGIT, {} }));
 		CHECK(innerOp.has(ska::Token { "*", ska::TokenType::SYMBOL, {} }));
 	}
 
@@ -328,9 +341,8 @@ TEST_CASE("Expression and priorities") {
 		CHECK(ast[0].op() == ska::Operator::BINARY);
 		const auto& innerOp = ast[0];
 		CHECK(innerOp[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
-		CHECK(innerOp[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));	
+		CHECK(innerOp[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
 		CHECK(innerOp.has(ska::Token { "+", ska::TokenType::SYMBOL, {} }));
 	}
 
-	//TODO Unit tests on tokens position in script
 }

@@ -1,28 +1,12 @@
-var Coldragon = function(): var { 
-	var array = [20, 150, 2];
-	
-	return { 
-		data: 500,
-		array : array
-	}; 
+var Log = import "bind:std.native.io.log";
+var Parameters = import "std:std.function.parameters";
+var PathFcty = import "bind:std.native.io.path";
+
+var run = function (parameters: Parameters::Fcty()) {
+	if (parameters.size() > 0) {
+		var path = PathFcty.Build(parameters.asString(0));
+		Log.printString(path.canonical());
+	} else {
+		Log.printString("No argument provided");
+	}
 };
-
-var Scorbutics = function(): var {
-	var power = 88;
-	var i = 0;
-	return {
-		attack : function(target: Coldragon) {
-			target.data = target.array[i] - power;
-			i = i + 1;
-			if( i >= 3 ) {
-				i = 0;
-			}
-		}
-	};
-}; 
-
-var coldragon = Coldragon();
-Scorbutics().attack(coldragon);
-
-var Runner = import "runner_lib";
-Runner.print(coldragon);

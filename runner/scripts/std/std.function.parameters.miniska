@@ -1,6 +1,7 @@
 var Fcty = function() : var {
 	return {
 		asInt : function(index: int) : int { return 0;},
-		asString : function(index: int) : string { return "";}
+		asString : function(index: int) : string { return "";},
+		size : function() : int { return 0;}
 	};
 };

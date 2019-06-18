@@ -11,6 +11,7 @@ file(GLOB_RECURSE SOURCES
 
 string(REGEX REPLACE "[^;]*CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
 
+add_definitions(-DSKALANG_SRC_DIR="${SKALANG_SRC_DIR}")
 add_library(skalang ${SOURCES})
 find_package(Threads REQUIRED)
 target_link_libraries(skalang skalog skabase Threads::Threads)

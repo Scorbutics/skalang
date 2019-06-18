@@ -1,0 +1,2 @@
+var Fcty = function() : var { return { size : function(): int { return 0;}}; };
+if (Fcty().size() > 0) {}
