@@ -8,7 +8,7 @@ namespace ska {
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptNameDeduceTag)
 
 std::string& ska::ScriptNameStandardLibraryPath() {
-	static std::string prefix = "" SKALANG_SRC_DIR "/../runner/scripts/std";
+	static std::string prefix = "" SKALANG_SRC_DIR "/../std/src/std/scripts";
 	return prefix;
 }
 
