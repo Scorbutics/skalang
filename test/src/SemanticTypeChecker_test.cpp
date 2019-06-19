@@ -233,6 +233,12 @@ TEST_CASE("[SemanticTypeChecker]") {
 
 		}
 
+		SUBCASE("Loop") {
+				SUBCASE("using inner for variable successively ") {
+            ASTFromInputSemanticTC(scriptCache, "for(var i = 0; i < 10; i = i + 1); for(var i = 0; i < 10; i = i + 1);", data);
+        }
+		}
+
 		SUBCASE("Array") {
 
 			SUBCASE("string") {
