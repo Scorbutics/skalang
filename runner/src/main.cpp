@@ -67,7 +67,7 @@ ska::Script SmashAndDashSpecific(ska::lang::ModuleConfiguration& module, const s
 namespace ska {
 	ska::lang::ParameterModule BasicParameterModuleBuilder(ska::lang::ModuleConfiguration& module, std::vector<ska::NodeValue>& parameters, int argc, char* argv[]) {
 		for(auto i = 2; i < argc; i++) {
-			parameters.push_back(std::string{argv[i]});
+			parameters.push_back(std::make_shared<std::string>(argv[i]));
 		}
 
 		return ska::lang::ParameterModule(module, parameters);

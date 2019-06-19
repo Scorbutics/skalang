@@ -78,25 +78,25 @@ TEST_CASE("[Interpreter]") {
 		SUBCASE("Var reaffected using the same var (string)") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = \"ti\"; toto; toto = toto * 2;", data);
 			auto res = data.interpreter->script(astPtr);
-			CHECK(res.nodeval<std::string>() == "titi");
+			CHECK((*res.nodeval<ska::StringShared>() == "titi"));
 		}
 
 		SUBCASE("Var reaffected string") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = \"ti\" * 2 + \"to\"; toto;", data);
 			auto res = data.interpreter->script(astPtr);
-			CHECK(res.nodeval<std::string>() == "titito");
+			CHECK((*res.nodeval<ska::StringShared>() == "titito"));
 		}
 		
 		SUBCASE("Var reaffected string with number") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 2 + \"ti\"; toto;", data);
 			auto res = data.interpreter->script(astPtr);
-			CHECK(res.nodeval<std::string>() == "2ti");
+			CHECK((*res.nodeval<ska::StringShared>() == "2ti"));
 		}
 
 		SUBCASE("Var reaffected string with number * 2") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 2 + \"ti\" * 2; toto;", data);
 			auto res = data.interpreter->script(astPtr);
-			CHECK(res.nodeval<std::string>() == "2titi");
+			CHECK((*res.nodeval<ska::StringShared>() == "2titi"));
 		}
 
 		SUBCASE("For loop statement") {
@@ -138,7 +138,7 @@ TEST_CASE("[Interpreter]") {
 		SUBCASE("Var reaffected string with number") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 2 + \"ti\"; toto;", data);
 			auto res = data.interpreter->script(astPtr);
-			CHECK(res.nodeval<std::string>() == "2ti");
+			CHECK((*res.nodeval<ska::StringShared>() == "2ti"));
 		}
 
 		SUBCASE("Array of int") {

@@ -1,5 +1,6 @@
 #include "Config/LoggerConfigLang.h"
 #include "NodeValue.h"
+#include "NodeValue/StringShared.h"
 
  double ska::NodeValue::convertNumeric() const { 
 	double numeric = 0.0;
@@ -13,8 +14,8 @@
 			numeric = arg;
 		} else if constexpr (std::is_same<T, bool>::value) {
 			numeric = arg ? 1.0 : 0.0;
-		} else if constexpr (std::is_same<T, std::string>::value) {
-			numeric = std::stod(arg);
+		} else if constexpr (std::is_same<T, StringShared>::value) {
+			numeric = std::stod(*arg);
 		} else {
 			throw std::runtime_error("cannot convert the node value to a numeric format");
 		}
@@ -34,8 +35,8 @@ std::string ska::NodeValue::convertString() const {
 			result = std::to_string(arg);
 		} else if constexpr (std::is_same<T, bool>::value) {
 			result = arg ? "true" : "false";
-		} else if constexpr (std::is_same<T, std::string>::value) {
-			result = arg;
+		} else if constexpr (std::is_same<T, StringShared>::value) {
+			result = *arg;
 		} else {
 			throw std::runtime_error("cannot convert the node value to a numeric format");
 		}

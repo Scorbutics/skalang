@@ -13,5 +13,5 @@ namespace ska {
 	}
 
 	template <>
-	std::string nodeval_to_string<std::string>(const std::string& obj);
+	std::string nodeval_to_string<StringShared>(const StringShared& obj);
 }

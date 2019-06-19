@@ -18,12 +18,12 @@ ska::lang::IOPathModule::IOPathModule(ModuleConfiguration& config) :
 		//Query input parameters
 		const auto* memberPathValue = (*memPath)["path"].first;
 		assert(memberPathValue != nullptr);
-		auto pathStr = std::move(memberPathValue->nodeval<std::string>());
+		auto pathStr = std::move(memberPathValue->nodeval<StringShared>());
 
 		//Build output object
 		memPath->emplace("canonical", std::make_unique<ska::BridgeFunction>(
             std::function<ska::NodeValue(Script&, std::vector<ska::NodeValue>)>([&, pathStr(std::move(pathStr))](Script&, std::vector<ska::NodeValue> unused) {
-            return FileUtils::getCanonicalPath(pathStr);
+            return std::make_shared<std::string>(std::move(FileUtils::getCanonicalPath(*pathStr)));
         })));
 
 		return ska::NodeValue{ std::move(memPath) };

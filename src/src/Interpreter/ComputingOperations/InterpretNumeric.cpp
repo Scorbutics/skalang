@@ -2,16 +2,16 @@
 #include "ComputeTwoTypeOperation.h"
 
 template <>
-std::string ska::nodeval_to_string<std::string>(const std::string& obj) {
-	return obj;
+std::string ska::nodeval_to_string<ska::StringShared>(const StringShared& obj) {
+	return obj == nullptr ? "" : *obj;
 }
 
 ska::NodeValue ska::InterpretMathematicPlus(TypedNodeValue firstValue, TypedNodeValue secondValue, const Type& destinationType) {
 	switch (destinationType.type()) {
 	case ExpressionType::STRING: {
-		return ComputeTwoTypeOperation<int, std::string>(std::move(firstValue), std::move(secondValue),
+		return ComputeTwoTypeOperation<int, StringShared>(std::move(firstValue), std::move(secondValue),
 		[](const auto& t1, const auto& t2) {
-			return nodeval_to_string(t1) + nodeval_to_string(t2);
+			return std::make_shared<std::string>((nodeval_to_string(t1) + nodeval_to_string(t2)));
 		});
 	}
 
@@ -38,7 +38,7 @@ ska::NodeValue ska::InterpretMathematicPlus(TypedNodeValue firstValue, TypedNode
 
 		switch (firstValue.type.compound()[0].type()) {
 		case ExpressionType::STRING:
-			return ComputeTwoTypeOperation<std::string, NodeValueArray>(std::move(firstValue), std::move(secondValue),
+			return ComputeTwoTypeOperation<StringShared, NodeValueArray>(std::move(firstValue), std::move(secondValue),
 			std::get<0>(lambdas),
 			std::get<1>(lambdas),
 			std::get<2>(lambdas)
@@ -139,22 +139,22 @@ ska::NodeValue ska::InterpretMathematicMinus(TypedNodeValue firstValue, TypedNod
 ska::NodeValue ska::InterpretMathematicMultiply(TypedNodeValue firstValue, TypedNodeValue secondValue, const Type& destinationType) {
 	switch (destinationType.type()) {
 	case ExpressionType::STRING: {
-		return ComputeTwoTypeOperation<int, std::string>(std::move(firstValue), std::move(secondValue),
-		[](int t1, const std::string& t2) {
+		return ComputeTwoTypeOperation<int, StringShared>(std::move(firstValue), std::move(secondValue),
+		[](int t1, const StringShared& t2) {
 			assert(t1 > 0);
 			auto ss = std::stringstream{};
 			for (auto i = 0u; i < static_cast<std::size_t>(t1); i++) {
-				ss << t2;
+				ss << (*t2);
 			}
-			return ss.str();
-		}, [](const std::string& t2, int t1) {
+			return std::make_shared<std::string>(ss.str());
+		}, [](const StringShared& t2, int t1) {
 			assert(t1 > 0);
 			auto ss = std::stringstream{};
 			for (auto i = 0u; i < static_cast<std::size_t>(t1); i++) {
-				ss << t2;
+				ss << (*t2);
 			}
-			return ss.str();
-		}, [](const std::string& t1, const std::string& t2) {
+			return std::make_shared<std::string>(ss.str());
+		}, [](const StringShared& t1, const StringShared& t2) {
 			throw std::runtime_error("unhandled case : string multiply by string");
 			return "";
 		});

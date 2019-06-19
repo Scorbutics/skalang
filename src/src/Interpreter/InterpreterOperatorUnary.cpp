@@ -8,13 +8,13 @@ namespace ska {
 	NodeValue InterpreterOperatorConvertValue(ExpressionType type, const TokenVariant& value) {
         switch(type) {
 		case ExpressionType::INT:
-            return std::holds_alternative<int>(value) ? value : std::stoi(std::get<std::string>(value));
+            return std::holds_alternative<int>(value) ? value : std::stoi(*std::get<StringShared>(value));
 		case ExpressionType::FLOAT:
-            return std::holds_alternative<double>(value) ? value : std::stof(std::get<std::string>(value));
+            return std::holds_alternative<double>(value) ? value : std::stof(*std::get<StringShared>(value));
 		case ExpressionType::BOOLEAN:
-			return std::holds_alternative<bool>(value) ? value : (std::get<std::string>(value) == "true");
+			return std::holds_alternative<bool>(value) ? value : (*std::get<StringShared>(value) == "true");
 		default:
-			return std::get<std::string>(value);
+			return std::get<StringShared>(value);
         }
     }
 }
@@ -30,5 +30,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::UNARY>::interpret(OperateO
 }
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::LITERAL>::interpret(OperateOn node) {
-	return NodeRValue{ InterpreterOperatorConvertValue(node.GetType().value().type(), node.GetValue()), nullptr };
+	return NodeRValue{ InterpreterOperatorConvertValue(node.GetType().value().type(), std::make_shared<std::string>(node.GetValue())), nullptr };
 }

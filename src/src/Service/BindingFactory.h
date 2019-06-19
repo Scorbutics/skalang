@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 #include "NodeValue/ASTNodePtr.h"
+#include "NodeValue/StringShared.h"
 #include "Interpreter/Value/BridgeFunction.h"
 #include "Base/Patterns/Observable.h"
 #include "Base/Meta/TupleUtils.h"
@@ -97,8 +98,8 @@ namespace ska {
 		T convertTypeFromScript(const std::vector<NodeValue>& vect) {
 			assert(Id < vect.size());
 			const auto& v = vect[Id];
-			if constexpr (std::is_same<T, std::string>()) {
-				return v.convertString();
+			if constexpr (std::is_same<T, StringShared>()) {
+				return std::make_shared<std::string>(v.convertString());
 			} else if constexpr (std::is_same<T, int>()) {
 				return static_cast<T>(v.convertNumeric());
 			} else if constexpr (std::is_same<T, std::size_t>()) {
@@ -110,14 +111,13 @@ namespace ska {
 			} else if constexpr (std::is_same<T, double>()) {
 				return static_cast<T>(v.convertNumeric());
 			} else {
-				assert(!"Invalid type for bridge function");
-				return T{};
+				throw std::runtime_error("Invalid type for bridge function");
 			}
 		}
 
 		template <class T>
 		void buildType(std::vector<std::string>& ss) {
-			if constexpr (std::is_same<T, std::string>()) {
+			if constexpr (std::is_same<T, StringShared>()) {
 				ss.push_back("string");
 			} else if constexpr (std::is_same<T, int>()) {
 				ss.push_back("int");
@@ -132,7 +132,7 @@ namespace ska {
 			} else if constexpr (std::is_same<T, void>()) {
 				ss.push_back("void");
 			} else {
-				assert(!"Invalid type for bridge function");
+				throw std::runtime_error("Invalid type for bridge function");
 			}
 		}
 

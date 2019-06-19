@@ -25,7 +25,7 @@ ska::lang::ParameterModule::ParameterModule(ModuleConfiguration& config, const s
             std::function<ska::NodeValue(Script&, std::vector<ska::NodeValue>)>([&](Script&, std::vector<ska::NodeValue> params) {
             const auto index = params[0].nodeval<int>();
             std::cout << "accessing parameter " << index << " as string" << std::endl;
-            return m_parameters.size() > index ? m_parameters[index].convertString() : "";
+            return std::make_shared<std::string>(std::move(m_parameters.size() > index ? m_parameters[index].convertString() : ""));
         })));
         result->emplace("size", std::make_unique<ska::BridgeFunction>(
             std::function<ska::NodeValue(Script&, std::vector<ska::NodeValue>)>([&](Script&, std::vector<ska::NodeValue> params) {

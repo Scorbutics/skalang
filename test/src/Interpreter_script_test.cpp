@@ -15,6 +15,7 @@
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/ScriptCache.h"
 #include "NodeValue/ObjectMemory.h"
+#include "NodeValue/StringShared.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
 const auto reservedKeywordsS = ska::ReservedKeywordsPool{};
@@ -53,8 +54,8 @@ TEST_CASE("[Interpreter Script]") {
 			"runner.getToto();", data);
 
 		auto scriptEmBinding = ska::ScriptBridge{ scriptCacheIS, "binding1_lib", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptEmBinding.bindFunction("getToto", std::function<std::string(ska::Script&)>([](ska::Script&) {
-			return "tototo !";
+		scriptEmBinding.bindFunction("getToto", std::function<ska::StringShared(ska::Script&)>([](ska::Script&) {
+			return std::make_shared<std::string>("tototo !");
 		}));
 		scriptEmBinding.buildFunctions();
 
@@ -71,7 +72,7 @@ TEST_CASE("[Interpreter Script]") {
 
 		readerIS->parse(*data.parser);
 		auto result = data.interpreter->script(*readerIS);
-		CHECK(result.nodeval<std::string>() == "tototo !");
+		CHECK(*result.nodeval<ska::StringShared>() == "tototo !");
 	}
 
 	SUBCASE("Outside script from file (import)") {
@@ -118,9 +119,10 @@ TEST_CASE("[Interpreter Script]") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse("var User218 = import \"bind:binding\"; User218.funcTest(14, \"titito\");", data);
 		auto test = 0;
 		auto testStr = std::string{ "" };
-		auto function = std::function<int(ska::Script&, int, std::string)>([&](ska::Script&, int toto, std::string titi) -> int {
+		auto function = std::function<int(ska::Script&, int, ska::StringShared)>(
+			[&](ska::Script&, int toto, ska::StringShared titi) -> int {
 			test = toto;
-			testStr = std::move(titi);
+			testStr = std::move(*titi);
 			return 0;
 		});
 
@@ -144,8 +146,9 @@ TEST_CASE("[Interpreter Script]") {
 			test = toto;
 			return 0;
 		});
-		auto function2 = std::function<int(ska::Script&, std::string)>([&](ska::Script&, std::string titi) -> int {
-			testStr = std::move(titi);
+		auto function2 = std::function<int(ska::Script&, ska::StringShared)>(
+			[&](ska::Script&, ska::StringShared titi) -> int {
+			testStr = std::move(*titi);
 			return 0;
 		});
 
@@ -163,12 +166,12 @@ TEST_CASE("[Interpreter Script]") {
 	SUBCASE("C++ script-function binding generic form, complex object") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse("var User295 = import \"bind:binding295\"; var DataClassImp = import \"bind:dataclass_script\"; var data = DataClassImp.DataClass(\"JeanMi\"); User295.funcTest(data);", data);
 		auto test = 0;
-		std::string name;
+		ska::StringShared name;
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, 
 		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> params) -> ska::NodeValue {
-			auto mem = params[0].nodeval<std::string>();
+			auto mem = params[0].nodeval<ska::StringShared>();
 			auto result = ska::MemoryTable::create();
 			result->emplace("id", 1234);
 			result->emplace("name", std::move(mem));
@@ -184,7 +187,7 @@ TEST_CASE("[Interpreter Script]") {
 			auto* idMap = (*mem)("id").first;
 			auto* nameMap = (*mem)("name").first;
 			test = idMap->nodeval<int>();
-			name = nameMap->nodeval<std::string>();
+			name = nameMap->nodeval<ska::StringShared>();
 			return ska::NodeValue{};
 		}));
 		scriptBinding.buildFunctions();
@@ -192,7 +195,7 @@ TEST_CASE("[Interpreter Script]") {
 		readerIS->parse(*data.parser);
 		data.interpreter->script(*readerIS);
 		CHECK(test == 1234);
-		CHECK(name == "JeanMi");
+		CHECK((*name == "JeanMi"));
 	}
 
 	SUBCASE("C++ -> miniska script-function binding generic") {
@@ -202,12 +205,11 @@ TEST_CASE("[Interpreter Script]") {
 		"var data = DataClassImp169.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
-		std::string name;
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, 
 		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> params) -> ska::NodeValue {
-			auto mem = params[0].nodeval<std::string>();
+			auto mem = params[0].nodeval<ska::StringShared>();
 			auto result = ska::MemoryTable::create();
 			result->emplace("id", 1234);
 			result->emplace("name", std::move(mem));
@@ -228,12 +230,11 @@ TEST_CASE("[Interpreter Script]") {
 		"var data = DataClassImp194.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
-		std::string name;
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, 
 		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> params) -> ska::NodeValue {
-			auto mem = params[0].nodeval<std::string>();
+			auto mem = params[0].nodeval<ska::StringShared>();
 			auto result = ska::MemoryTable::create();
 			result->emplace("id", 1234);
 			result->emplace("name", std::move(mem));
@@ -257,12 +258,11 @@ TEST_CASE("[Interpreter Script]") {
 		"var data = DataClassImp222.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
-		std::string name;
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, 
 		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> params) -> ska::NodeValue {
-			auto mem = params[0].nodeval<std::string>();
+			auto mem = params[0].nodeval<ska::StringShared>();
 			auto result = ska::MemoryTable::create();
 			result->emplace("id", 1234);
 			result->emplace("name", std::move(mem));
@@ -286,12 +286,11 @@ TEST_CASE("[Interpreter Script]") {
 		"var data = DataClassImp250.DataClass(\"JeanMi\");"
 		"funcTest(data);", data);
 		auto test = 0;
-		std::string name;
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBindingDataClass.bindGenericFunction("DataClass", { "string", "var" }, 
 		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> params) -> ska::NodeValue {
-			auto mem = params[0].nodeval<std::string>();
+			auto mem = params[0].nodeval<ska::StringShared>();
 			auto result = ska::MemoryTable::create();
 			result->emplace("id", 1234);
 			result->emplace("name", std::move(mem));
@@ -319,23 +318,23 @@ TEST_CASE("[Interpreter Script]") {
 		scriptBindingDataClass.bindGenericFunction("run", { "Character::build()" }, 
 		std::function<ska::NodeValue(ska::Script&, std::vector<ska::NodeValue>)>([&](ska::Script&, std::vector<ska::NodeValue> p) -> ska::NodeValue {
 			auto params = std::vector<ska::NodeValue>{};
-			params.push_back(std::string{ "babar" });
+			params.push_back(std::make_shared<std::string>("babar"));
 			auto character = scriptBindingDataClass.callFunction(*data.interpreter, "Character", "build", std::move(params));
 			auto& memCharacter = character.nodeval<ska::ObjectMemory>();
-			memCharacter->emplace("name", std::string{ "titito" });
+			memCharacter->emplace("name", std::make_shared<std::string>( "titito" ));
 			return ska::NodeValue{ std::move(memCharacter) };
 		}));
 		scriptBindingDataClass.buildFunctions();
 
 		readerIS->parse(*data.parser);
 		auto result = data.interpreter->script(*readerIS);
-		CHECK(result.nodeval<std::string>() == "titito");
+		CHECK(*result.nodeval<ska::StringShared>() == "titito");
 	}
 
 	SUBCASE("using a callback in another script & another context") {
 		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Script317 = import \"" SKALANG_TEST_DIR "/src/resources/test317_1\"; Script317.actualCharacter.name;", data);
 		auto result = data.interpreter->script(astPtr);
-		CHECK(result.nodeval<std::string>() == "test317");
+		CHECK( (*result.nodeval<ska::StringShared>() == "test317") );
 	}
 
 	SUBCASE("C++ script-function binding with void return") {

@@ -3,6 +3,7 @@
 #include <string>
 #include "Type.h"
 #include "NodeValueArray.h"
+#include "StringShared.h"
 
 namespace ska {
 	template<class T>
@@ -29,7 +30,7 @@ namespace ska {
 	};
 
 	template<>
-	struct TypeFromNative<std::string> {
+	struct TypeFromNative<StringShared> {
 		static const Type value;
 	};
 
