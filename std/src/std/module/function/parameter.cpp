@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "Config/LoggerConfigLang.h"
 #include "parameter.h"
 
@@ -18,13 +16,11 @@ ska::lang::ParameterModule::ParameterModule(ModuleConfiguration& config, const s
         result->emplace("asInt", std::make_unique<ska::BridgeFunction>(
             std::function<ska::NodeValue(Script&, std::vector<ska::NodeValue>)>([&](Script& caller, std::vector<ska::NodeValue> params) {
             const auto index = params[0].nodeval<int>();
-            std::cout << "accessing parameter " << index << " as int in script " << caller.name() << std::endl;
             return m_parameters.size() > index ? static_cast<int>(m_parameters[index].convertNumeric()) : -1;
         })));
         result->emplace("asString", std::make_unique<ska::BridgeFunction>(
             std::function<ska::NodeValue(Script&, std::vector<ska::NodeValue>)>([&](Script&, std::vector<ska::NodeValue> params) {
             const auto index = params[0].nodeval<int>();
-            std::cout << "accessing parameter " << index << " as string" << std::endl;
             return std::make_shared<std::string>(std::move(m_parameters.size() > index ? m_parameters[index].convertString() : ""));
         })));
         result->emplace("size", std::make_unique<ska::BridgeFunction>(
