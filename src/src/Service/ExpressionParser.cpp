@@ -63,7 +63,7 @@ std::pair<bool, int> ska::ExpressionParser::parseTokenExpression(Script& input, 
 		//Field access only (digits are DIGIT token type, even real ones)
 		auto expressionObject = expressions.popOperandIfNoOperator(isDoingOperation);
 		if (expressionObject == nullptr) {
-			throw std::runtime_error("invalid operator placement");
+			throw std::runtime_error("invalid operator \".\" placement");
 		}
 		expressions.push(matchObjectFieldAccess(input, std::move(expressionObject)));
 	} break;

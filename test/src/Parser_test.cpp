@@ -225,19 +225,6 @@ TEST_CASE("User defined object") {
 
 	}
 
-	SUBCASE("Method call in if condition statement [var]") {
-		auto astPtr = ASTFromInput(scriptCache,
-		"var Fcty230 = function() : var { return { size : function(): int { return 0;}}; };\n"
-		"var t = Fcty230();\n"
-		"if (t.size() > 0) {}", keywords);
-	}
-
-	SUBCASE("Method call in if condition statement [direct]") {
-		auto astPtr = ASTFromInput(scriptCache,
-		"var Fcty230 = function() : var { return { size : function(): int { return 0;}}; };\n"
-		"if (Fcty230().size() > 0) {}", keywords);
-	}
-
 }
 
 TEST_CASE("Expression and priorities") {
