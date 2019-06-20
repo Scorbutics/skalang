@@ -66,7 +66,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::statement(Script& input) 
 			return m_matcherBlock.match(input, std::get<std::string>(token.content()));
 
 		default:
-					return matchExpressionStatement(input);
+			return matchExpressionStatement(input);
 		}
 	} catch (ParserError& error) {
 		throw error;
