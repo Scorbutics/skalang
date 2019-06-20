@@ -251,16 +251,6 @@ TEST_CASE("[Interpreter]") {
 			data.interpreter->script(astPtr);
 		}
 
-		SUBCASE("Empty statement") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter(";", data);
-			data.interpreter->script(astPtr);
-		}
-
-		SUBCASE("Empty statement-function") {
-			auto astPtr = ASTFromInputSemanticTCInterpreter("var test255 = function() { ; }; test255();", data);
-			data.interpreter->script(astPtr);
-		}
-
 		SUBCASE("for with empty statement in if") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter(
 				"var size = function() : int { return 10;};"

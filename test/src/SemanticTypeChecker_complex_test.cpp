@@ -222,4 +222,12 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			"var callback = function() {};"
 			"var object = lvalFunc219(callback);", data);
 	}
+
+	SUBCASE("for with empty statement in if") {
+		ASTFromInputSemanticComplexTC(scriptCache, 
+			"var size = function() : int { return 10;};"
+			"if (size() > 0) {"
+				"for(var i = 0; i < size(); i = i + 1);"
+			"}", data);
+	}
 }

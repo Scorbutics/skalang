@@ -105,11 +105,11 @@ TEST_CASE("for") {
 		auto astPtr = ASTFromInput(scriptCache, "for(;;);", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::FOR_LOOP);
-		CHECK(ast.size() == 3);
+		CHECK(ast.size() == 4);
 		CHECK(ast[0].logicalEmpty());
 		CHECK(ast[1].logicalEmpty());
 		CHECK(ast[2].logicalEmpty());
-
+		CHECK(ast[3].logicalEmpty());
 	}
 }
 
@@ -168,6 +168,18 @@ TEST_CASE("function") {
         const auto& astFunc157 = ast[0];
         CHECK(astFunc157.op() == ska::Operator::FUNCTION_DECLARATION);
 		CHECK(astFunc157.size() == 2);
+	}
+	
+	SUBCASE("Empty statement") {
+		ASTFromInput(scriptCache, ";", keywords);
+	}
+
+	SUBCASE("Empty statement-block") {
+		ASTFromInput(scriptCache, "{;}", keywords);
+	}
+
+	SUBCASE("Empty statement-function") {
+		ASTFromInput(scriptCache, "var test255 = function() { ; }; test255();", keywords);
 	}
 }
 
