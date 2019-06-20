@@ -15,7 +15,13 @@
 		} else if constexpr (std::is_same<T, bool>::value) {
 			numeric = arg ? 1.0 : 0.0;
 		} else if constexpr (std::is_same<T, StringShared>::value) {
-			numeric = std::stod(*arg);
+			try {
+				numeric = std::stod(*arg);
+			} catch(std::logic_error& e) {
+				auto ss = std::stringstream{}; 
+				ss << "cannot convert the node value \"" << *arg << "\" to a numeric format";
+				throw std::runtime_error(ss.str());
+			}
 		} else {
 			throw std::runtime_error("cannot convert the node value to a numeric format");
 		}

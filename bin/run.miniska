@@ -11,7 +11,7 @@ var run = function (parameters: Parameters::Fcty()) {
 
 		var all = ArrayFcty.FctyInteger();
 
-		for(var i = 0; i < parameters.size(); i = i + 1) {
+		for(var i = 1; i < parameters.size(); i = i + 1) {
 			all.add(parameters.asInt(i) + i * i);
 		}
 
