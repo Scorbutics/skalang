@@ -32,8 +32,8 @@ namespace ska {
 	struct ScriptHandle;
 
 	class StatementParser :
-	    public observable_priority_queue<ForTokenEvent>,
-        public observable_priority_queue<IfElseTokenEvent>,
+		public observable_priority_queue<ForTokenEvent>,
+		public observable_priority_queue<IfElseTokenEvent>,
 		public observable_priority_queue<VarTokenEvent>,
 		public observable_priority_queue<FunctionTokenEvent>,
 		public observable_priority_queue<BlockTokenEvent>,

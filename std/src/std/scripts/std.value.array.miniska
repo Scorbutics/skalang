@@ -1,0 +1,29 @@
+var FctyString = function() : var {
+	var array_ = [""];
+  var size_ = 1;
+	return {
+    add : function(str: string) { array_ = array_ + str; size_ = size_ + 1; },
+    get : function(index: int) : string { return array_[index + 1]; },
+    size : function() : int { return size_ - 1; }
+	};
+};
+
+var FctyFloat = function() : var {
+	var array_ = [0.0];
+  var size_ = 1;
+	return {
+    add : function(v: float) { array_ = array_ + v; size_ = size_ + 1; },
+    get : function(index: int) : float { return array_[index + 1]; },
+    size : function() : int { return size_ - 1; }
+	};
+};
+
+var FctyInteger = function() : var {
+	var array_ = [0];
+  var size_ = 1;
+	return {
+    add : function(v: int) { array_ = array_ + v; size_ = size_ + 1; },
+    get : function(index: int) : int { return array_[index + 1]; },
+    size : function() : int { return size_ - 1; }
+	};
+};

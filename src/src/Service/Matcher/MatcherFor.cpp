@@ -12,6 +12,10 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherFor)
 
 ska::ASTNodePtr ska::MatcherFor::match(Script& input) {
+    auto emptyNode = ASTFactory::MakeEmptyNode();
+    auto blockEventBegin = BlockTokenEvent { *emptyNode, BlockTokenEventType::START };
+	m_parser.observable_priority_queue<BlockTokenEvent>::notifyObservers(blockEventBegin);
+
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::FOR>());
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
@@ -36,5 +40,8 @@ ska::ASTNodePtr ska::MatcherFor::match(Script& input) {
     
     auto event = ForTokenEvent {*forNode};
 	m_parser.observable_priority_queue<ForTokenEvent>::notifyObservers(event);
+    
+    auto blockEventEnd = BlockTokenEvent { *emptyNode, BlockTokenEventType::END };
+	m_parser.observable_priority_queue<BlockTokenEvent>::notifyObservers(blockEventEnd);
 	return forNode;
 }
