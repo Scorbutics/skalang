@@ -139,7 +139,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationBody(Script& input) {
 	auto statements = std::vector<ASTNodePtr>{};
 	while (!input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
 		auto optionalStatement = input.statement(m_parser);
-		if (!optionalStatement->logicalEmpty()) {
+		if (optionalStatement != nullptr && !optionalStatement->logicalEmpty()) {
 			statements.push_back(std::move(optionalStatement));
 		} else {
 			break;

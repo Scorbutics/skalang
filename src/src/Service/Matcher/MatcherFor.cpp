@@ -33,10 +33,15 @@ ska::ASTNodePtr ska::MatcherFor::match(Script& input) {
     auto forNodeLastExpression = input.optexpr(m_parser, m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
     input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 
-    auto forNodeStatement = input.statement(m_parser);
+    auto forNodeStatement = input.optstatement(m_parser);
 	SLOG(ska::LogLevel::Info) << "end for loop statement";
 
-    auto forNode = ASTFactory::MakeNode<Operator::FOR_LOOP>(std::move(forNodeFirstExpression), std::move(forNodeMidExpression), std::move(forNodeLastExpression), std::move(forNodeStatement));
+    auto forNode = ASTFactory::MakeNode<Operator::FOR_LOOP>(
+        std::move(forNodeFirstExpression), 
+        std::move(forNodeMidExpression), 
+        std::move(forNodeLastExpression), 
+        std::move(forNodeStatement) 
+    );
     
     auto event = ForTokenEvent {*forNode};
 	m_parser.observable_priority_queue<ForTokenEvent>::notifyObservers(event);
