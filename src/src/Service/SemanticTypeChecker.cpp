@@ -76,8 +76,8 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 			}
 
 			const auto expectedReturnType = type.compound().back();
-			if ((returnedValue.op() == Operator::USER_DEFINED_OBJECT && expectedReturnType != ExpressionType::OBJECT) || 
-				returnedValue.op() != Operator::USER_DEFINED_OBJECT && expectedReturnType != returnedValue.type()) {
+			if (((returnedValue.op() == Operator::USER_DEFINED_OBJECT) && (expectedReturnType != ExpressionType::OBJECT)) || 
+				(returnedValue.op() != Operator::USER_DEFINED_OBJECT && expectedReturnType != returnedValue.type())) {
 				auto ss = std::stringstream{};
 				ss << "bad return type : expected \"" << expectedReturnType << "\" on function declaration but got \"" << returnedValue.type().value() << "\" on return";
 				throw std::runtime_error(ss.str());

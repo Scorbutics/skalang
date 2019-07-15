@@ -110,6 +110,7 @@ int ska::ExpressionParser::matchRange(Script& input, ExpressionStack& expression
 
     default:
         error("Unexpected token (range type) : " + token.name());
+        return 0;
     }
 }
 

@@ -53,7 +53,9 @@ ska::NodeValue ska::InterpretMathematicPlus(TypedNodeValue firstValue, TypedNode
 			std::get<0>(lambdas),
 			std::get<1>(lambdas),
 			std::get<2>(lambdas));
-		}
+		default:
+            throw std::runtime_error("Unhandled math plus operation result");
+        }
 		return "";
 	}
 
