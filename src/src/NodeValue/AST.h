@@ -87,7 +87,6 @@ namespace ska {
         ASTNode(Operator o, Token identifierToken = Token{}, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{});
         ASTNode(Operator o, Token identifierToken = Token{});
 
-
 		Operator m_op = Operator::UNARY;
 		std::optional<Type> m_type;
 
