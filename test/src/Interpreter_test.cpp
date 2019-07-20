@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <doctest.h>
 #include "Config/LoggerConfigLang.h"
 #include "DataTestContainer.h"

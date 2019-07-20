@@ -1,9 +1,10 @@
 #pragma once
 
 #include "OperationType.h"
+#include "NodeValue/AST.h"
 
 namespace ska {
-	class ASTNode;
+	
 	template<>
 	class OperationType<Operator::BLOCK> {
 	private:

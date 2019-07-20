@@ -4,8 +4,7 @@
 #include "GeneratorOperatorUnit.h"
 #include "NodeValue/Operator.h"
 #include "NodeValue/ASTNodePtr.h"
-
-#include "Interpreter/Value/ExecutionContext.h"
+#include "BytecodeGenerationContext.h"
 
 namespace ska {
     struct ReservedKeywordsPool;
@@ -18,8 +17,8 @@ namespace ska {
 		BytecodeGenerator(const ReservedKeywordsPool& reserved, const TypeCrosser& typeCrosser);
 		~BytecodeGenerator() = default;
 
-		NodeCell generate(ExecutionContext node);
-		NodeValue generate(Script& script);
+		BytecodeCellGroup generate(BytecodeGenerationContext node);
+		BytecodeCellGroup generate(Script& script);
 	private:
 		OperatorGenerator build();
 		OperatorGenerator m_operatorGenerator;

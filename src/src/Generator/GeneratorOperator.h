@@ -3,31 +3,23 @@
 #include "NodeValue/Operator.h"
 #include "BytecodeGenerator.h"
 #include "GeneratorOperatorUnit.h"
-#include "Interpreter/Value/ExecutionContext.h"
+#include "BytecodeGenerationContext.h"
 
 #define SKALANG_GENERATOR_OPERATOR_DEFINE(OperatorType)\
     template<>\
     class GeneratorOperator<OperatorType> : \
 		public GeneratorOperatorBase {\
 	private:\
-		using OperateOn = Operation<OperatorType>;\
+		using OperateOn = OperationType<OperatorType>;\
 	public:\
 		using GeneratorOperatorBase::GeneratorOperatorBase;\
-        BytecodeCell generate(ExecutionContext& node) override final {\
-			return generate(OperateOn{node});\
+        BytecodeCellGroup generate(BytecodeGenerationContext& node) override final {\
+			return generate(OperateOn{node.pointer()}, node);\
 		}\
-	    BytecodeCell generate(OperateOn node);\
+		BytecodeCellGroup generate(OperateOn node, BytecodeGenerationContext& context);\
     };
 
 namespace ska {
-	class SymbolTable;
-	class MemoryTable;
-	class ASTNode;
-
 	template <Operator O>
-	class GeneratorOperator : 
-		public GeneratorOperatorUnit {
-	public:
-		BytecodeCell generate(ExecutionContext node) override { return BytecodeCell {}; }
-	};
+	class GeneratorOperator;
 }

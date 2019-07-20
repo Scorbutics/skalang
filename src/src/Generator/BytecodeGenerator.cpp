@@ -6,14 +6,22 @@
 #include "NodeValue/AST.h"
 #include "Interpreter/Value/Script.h"
 
+#include "GeneratorOperatorBlock.h"
+#include "GeneratorOperatorUnary.h"
+#include "GeneratorOperatorVariable.h"
+
 #include "GeneratorDeclarer.h"
 
-std::vector<std::unique_ptr<ska::BytecodeOperatorUnit>> ska::BytecodeGenerator::build() {
-	auto result = std::vector<std::unique_ptr<ska::BytecodeOperatorUnit>> {};
+std::vector<std::unique_ptr<ska::GeneratorOperatorUnit>> ska::BytecodeGenerator::build() {
+	auto result = std::vector<std::unique_ptr<ska::GeneratorOperatorUnit>> {};
 	static constexpr auto maxOperatorEnumIndex = static_cast<std::size_t>(ska::Operator::UNUSED_Last_Length);
 	result.resize(maxOperatorEnumIndex);
 
-	//GeneratorOperatorDeclare<ska::Operator::ARRAY_USE>(*this, result);
+	GeneratorOperatorDeclare<ska::Operator::BLOCK>(*this, result);
+	GeneratorOperatorDeclare<ska::Operator::UNARY>(*this, result);
+	GeneratorOperatorDeclare<ska::Operator::LITERAL>(*this, result);
+	GeneratorOperatorDeclare<ska::Operator::VARIABLE_DECLARATION>(*this, result);
+	GeneratorOperatorDeclare<ska::Operator::VARIABLE_AFFECTATION>(*this, result);
 	return result;
 }
 
@@ -22,12 +30,12 @@ ska::BytecodeGenerator::BytecodeGenerator(const ReservedKeywordsPool& reserved, 
 	m_typeCrosser(typeCrosser) {
 }
 
-ska::BytecodeCell ska::BytecodeGenerator::generate(ExecutionContext node) {
+ska::BytecodeCellGroup ska::BytecodeGenerator::generate(BytecodeGenerationContext node) {
 	auto& builder = m_operatorGenerator[static_cast<std::size_t>(node.pointer().op())];
 	assert(builder != nullptr);
 	return builder->generate(node);
 }
 
-ska::BytecodeCell ska::BytecodeGenerator::generate(Script& script) {
-	return interpret(ExecutionContext{ script });
+ska::BytecodeCellGroup ska::BytecodeGenerator::generate(Script& script) {
+	return generate(BytecodeGenerationContext{ script });
 }

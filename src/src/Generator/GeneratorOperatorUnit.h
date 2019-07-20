@@ -1,14 +1,14 @@
 #pragma once
 
-#include "Value/BytecodeCell.h"
+#include "Value/BytecodeCellGroup.h"
 
 namespace ska {
 	class BytecodeGenerator;
-	class ExecutionContext;
+	class BytecodeGenerationContext;
 
 	class GeneratorOperatorUnit {
 	public:
-		virtual BytecodeCell generate(ExecutionContext& node) = 0;
+		virtual BytecodeCellGroup generate(BytecodeGenerationContext& node) = 0;
 	};
 
 	class GeneratorOperatorBase :
