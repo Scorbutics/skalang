@@ -86,30 +86,31 @@ int ska::ExpressionParser::matchRange(Script& input, ExpressionStack& expression
 		return matchParenthesis(input, expressions, isDoingOperation);
 
     case ')': {
-			expressions.push(Token{ input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) });
+		expressions.push(Token{ input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) });
 
-			auto endGrouping = false;
-			auto groupParenthesisRange = [&endGrouping](const Token& t) {
-				if(endGrouping) {
-						return Group::FlowControl::STOP;
-				}
-				const auto& strValue = t.name();
-				if (t.type() == TokenType::RANGE) {
-									endGrouping = strValue == "(";
-					return Group::FlowControl::IGNORE_AND_CONTINUE;
-				}
-				return Group::FlowControl::GROUP;
-			};
-
-			auto result = expressions.groupAndPop<ASTFactory>(std::move(groupParenthesisRange));
-			if (result != nullptr) {
-				expressions.push(std::move(result));
+		auto endGrouping = false;
+		auto groupParenthesisRange = [&endGrouping](const Token& t) {
+			if(endGrouping) {
+				return Group::FlowControl::STOP;
 			}
-			SLOG(ska::LogLevel::Info) << "\tRange end";
+			const auto& strValue = t.name();
+			if (t.type() == TokenType::RANGE) {
+				endGrouping = strValue == "(";
+				return Group::FlowControl::IGNORE_AND_CONTINUE;
+			}
+			return Group::FlowControl::GROUP;
+		};
+
+		auto result = expressions.groupAndPop<ASTFactory>(std::move(groupParenthesisRange));
+		if (result != nullptr) {
+			expressions.push(std::move(result));
+		}
+		SLOG(ska::LogLevel::Info) << "\tRange end";
     } return 0;
 
     default:
         error("Unexpected token (range type) : " + token.name());
+		return 0;
     }
 }
 

@@ -9,6 +9,7 @@
 #include "GeneratorOperatorBlock.h"
 #include "GeneratorOperatorUnary.h"
 #include "GeneratorOperatorVariable.h"
+#include "GeneratorOperatorBinary.h"
 
 #include "GeneratorDeclarer.h"
 
@@ -20,6 +21,7 @@ std::vector<std::unique_ptr<ska::GeneratorOperatorUnit>> ska::BytecodeGenerator:
 	GeneratorOperatorDeclare<ska::Operator::BLOCK>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::UNARY>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::LITERAL>(*this, result);
+	GeneratorOperatorDeclare<ska::Operator::BINARY>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::VARIABLE_DECLARATION>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::VARIABLE_AFFECTATION>(*this, result);
 	return result;

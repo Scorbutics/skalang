@@ -2,7 +2,7 @@
 #include <variant>
 #include "NodeValue/Token.h"
 #include "NodeValue/Type.h"
-#include "BytecodeCommand.h"
+#include "../BytecodeCommand.h"
 
 namespace ska {
 	class BytecodeRValue {
@@ -17,7 +17,19 @@ namespace ska {
 			m_command(std::move(command)) {
 		}
 
+		BytecodeRValue(BytecodeCommand command, const ASTNode& node);
+
 		BytecodeRValue() = default;
+
+		bool hasCommand() const { return m_command != BytecodeCommand::NOP; }
+		
+		BytecodeRValue toInCell(std::string name) const {
+			return { BytecodeCommand::IN, m_type, Token{std::move(name), TokenType::IDENTIFIER, m_value.position() } };
+		}
+
+		const auto& value() const {
+			return m_value;
+		}
 
 	private:
 		BytecodeCommand m_command = BytecodeCommand::NOP;

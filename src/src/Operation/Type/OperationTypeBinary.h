@@ -19,6 +19,18 @@ namespace ska {
 			return node[1].type().value();
 		}
 
+		inline const auto& GetFirstNode() {
+			return node[0];
+		}
+
+		inline const auto& GetSecondNode() {
+			return node[1];
+		}
+
+		inline auto& asNode() {
+			return node;
+		}
+
 		inline auto GetOperator() {
 			return node.name();
 		}
