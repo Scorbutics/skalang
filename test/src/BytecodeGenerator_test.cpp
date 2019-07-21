@@ -10,6 +10,7 @@
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/ScriptCache.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
+#include "Generator/Value/BytecodeScript.h"
 
 static const auto reservedKeywords = ska::ReservedKeywordsPool{};
 static auto tokenizer = std::unique_ptr<ska::Tokenizer>{};
@@ -31,10 +32,10 @@ static void ASTFromInputBytecodeGeneratorNoParse(const std::string& input, Bytec
 	data.generator = std::make_unique<ska::BytecodeGenerator>(reservedKeywords, typeCrosserI);
 }
 
-static ska::Script ASTFromInputBytecodeGenerator(const std::string& input, BytecodeGeneratorDataTestContainer& data) {
+static auto ASTFromInputBytecodeGenerator(const std::string& input, BytecodeGeneratorDataTestContainer& data) {
 	ASTFromInputBytecodeGeneratorNoParse(input, data);
 	readerI->parse(*data.parser);
-    return *readerI;
+	return ska::BytecodeScript{ *readerI };
 }
 
 TEST_CASE("[BytecodeGenerator]") {
@@ -50,12 +51,10 @@ TEST_CASE("[BytecodeGenerator]") {
 			auto astPtr = ASTFromInputBytecodeGenerator("var toto = 4;", data);
 			auto res = data.generator->generate(astPtr);			
 		}
-
-		/*
+		
 		SUBCASE("Basic Maths with var") {
 			auto astPtr = ASTFromInputBytecodeGenerator("var toto = 4; toto; (toto * 5) + 2 * (3 + 4 - 1) + 1 + 9;", data);
 			auto res = data.generator->generate(astPtr);
 		}
-		*/
 	}
 }

@@ -2,6 +2,7 @@
 #include "NodeValue/LogicalOperator.h"
 #include "GeneratorOperatorBinary.h"
 #include "Interpreter/Value/TypedNodeValue.h"
+#include "Generator/Value/BytecodeScript.h"
 
 namespace ska {
 
@@ -53,19 +54,19 @@ namespace ska {
 }
 
 ska::BytecodeCellGroup ska::GeneratorOperator<ska::Operator::BINARY>::generate(OperateOn node, BytecodeGenerationContext& context) {
-	auto firstValue = m_generator.generate({ context.program(), node.GetFirstNode() });
+	auto firstValue = m_generator.generate({ context.script(), node.GetFirstNode() });
 	
 	//create a temporary variable (left operand)
 	if (firstValue.size() > 1) {
-		auto tmpGroup = m_generator.newGroup(firstValue);
+		auto tmpGroup = context.script().newGroup(firstValue);
 		firstValue.push_back(firstValue[0].toInCell(std::move(tmpGroup)));
 	}
 
-	auto secondValue = m_generator.generate({ context.program(), node.GetSecondNode() });
+	auto secondValue = m_generator.generate({ context.script(), node.GetSecondNode() });
 
 	//create a temporary variable (right operand)
 	if (secondValue.size() > 1) {
-		auto tmpGroup = m_generator.newGroup(secondValue);
+		auto tmpGroup = context.script().newGroup(secondValue);
 		secondValue.push_back(secondValue[0].toInCell(std::move(tmpGroup)));
 	}
 

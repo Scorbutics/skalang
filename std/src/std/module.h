@@ -6,7 +6,7 @@
 namespace ska {
     class TypeBuilder;
     class SymbolTableTypeUpdater;
-    class ReservedKeywordsPool;
+    struct ReservedKeywordsPool;
     class StatementParser;
     class Interpreter;
 

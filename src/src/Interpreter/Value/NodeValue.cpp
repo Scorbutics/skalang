@@ -19,7 +19,7 @@
 				numeric = std::stod(*arg);
 			} catch(std::logic_error& e) {
 				auto ss = std::stringstream{}; 
-				ss << "cannot convert the node value \"" << *arg << "\" to a numeric format";
+				ss << "cannot convert the node value \"" << *arg << "\" to a numeric format : " << e.what();
 				throw std::runtime_error(ss.str());
 			}
 		} else {

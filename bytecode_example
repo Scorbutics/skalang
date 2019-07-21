@@ -1,7 +1,7 @@
 //var a = import "test";
 //var b = 1;
 //var t = function(toto: int) : int { var a = toto + 2; var dummy = a; return dummy; };
-//var c = 5 * a.get() + b;
+//var c = 5 * a.get() + b * 2;
 //var result = t(c);
 //var object = function() : var { return { titi : function(test: int) {} }; };
 //object.titi(result);
@@ -33,6 +33,15 @@ jump                   | ESP push current register value; EP = ESP back
 
 // * 5
 mul 5
+
+//b
+in c_1
+out b
+
+// * 2
+mul 2
+in c_2
+
 // + b
 add b
 

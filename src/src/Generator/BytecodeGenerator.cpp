@@ -4,7 +4,7 @@
 
 #include "NodeValue/Operator.h"
 #include "NodeValue/AST.h"
-#include "Interpreter/Value/Script.h"
+#include "Generator/Value/BytecodeScript.h"
 
 #include "GeneratorOperatorBlock.h"
 #include "GeneratorOperatorUnary.h"
@@ -36,8 +36,4 @@ ska::BytecodeCellGroup ska::BytecodeGenerator::generate(BytecodeGenerationContex
 	auto& builder = m_operatorGenerator[static_cast<std::size_t>(node.pointer().op())];
 	assert(builder != nullptr);
 	return builder->generate(node);
-}
-
-ska::BytecodeCellGroup ska::BytecodeGenerator::generate(Script& script) {
-	return generate(BytecodeGenerationContext{ script });
 }
