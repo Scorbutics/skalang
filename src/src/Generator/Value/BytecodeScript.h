@@ -21,7 +21,7 @@ namespace ska {
 		void setReg(BytecodeCell regist);
 		void setGroup(std::string group);
 
-		std::optional<ska::BytecodeCell> package(BytecodeCellGroup cellGroup);
+		std::optional<ska::BytecodeCell> package(BytecodeCellGroup& cellGroup);
 		
 		Script program() {
 			return Script{ *m_script };

@@ -12,7 +12,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::GeneratorOperator<ska::Operator::FUNC
 
 namespace ska {
 
-	static BytecodeCell GenerateMathematicBinaryExpression(std::string mathOperator, const BytecodeCell& first, const BytecodeCell& second, const Type& destinationType) {
+	static BytecodeCell GenerateMathematicBinaryExpression(std::string mathOperator, const BytecodeCell& second, const Type& destinationType) {
 		assert(!mathOperator.empty());
 		auto operatorIt = LogicalOperatorMap.find(mathOperator);
         if(operatorIt != LogicalOperatorMap.end()) {
@@ -70,7 +70,7 @@ ska::BytecodeCellGroup ska::GeneratorOperator<ska::Operator::BINARY>::generate(O
 	auto leftVariable = context.script().package(leftGroup);
 	assert(leftVariable.has_value());
 #ifdef SKA_DEBUG_LOGS
-	if(leftGroup.size() > 1) {
+	if(leftGroup.size() >= 1) {
 		LOG_DEBUG << "\t in variable \"" << *leftVariable << "\"";
 	}
 #endif
@@ -79,7 +79,7 @@ ska::BytecodeCellGroup ska::GeneratorOperator<ska::Operator::BINARY>::generate(O
 	auto rightVariable = context.script().package(rightGroup);
 	assert(rightVariable.has_value());
 #ifdef SKA_DEBUG_LOGS
-	if(rightGroup.size() > 1) {
+	if(rightGroup.size() >= 1) {
 		LOG_DEBUG << "\t in variable \"" << *rightVariable << "\"";
 	}
 #endif
@@ -87,7 +87,6 @@ ska::BytecodeCellGroup ska::GeneratorOperator<ska::Operator::BINARY>::generate(O
 	auto mathOperator = node.GetOperator();
 	auto operationValue = GenerateMathematicBinaryExpression(
 		std::move(mathOperator),
-		*leftVariable,
 		*rightVariable,
 		node.asNode().type().value());
 
@@ -95,19 +94,9 @@ ska::BytecodeCellGroup ska::GeneratorOperator<ska::Operator::BINARY>::generate(O
 	
 	//It is important to put the right group before the left one : the ast order has to be reversed
 	//TODO move instead of copy
-	if(rightGroup.size() > 1) {
-		result.insert(result.end(), rightGroup.begin() + 1, rightGroup.end());
-		result.push_back(*rightVariable);
-	} else {
-		result.insert(result.end(), rightGroup.begin(), rightGroup.end());
-	}
-	
-	if(leftGroup.size() > 1) {
-		result.insert(result.end(), leftGroup.begin() + 1, leftGroup.end());
-		result.push_back(*leftVariable);
-	} else {
-		result.insert(result.end(), leftGroup.begin(), leftGroup.end());
-	}
+	result.insert(result.end(), rightGroup.begin(), rightGroup.end());
+	result.insert(result.end(), leftGroup.begin(), leftGroup.end());
+	result.push_back(*leftVariable);
 	result.push_back(std::move(operationValue));
 	
 	LOG_DEBUG << "Result \"" << result << "\"\n";
