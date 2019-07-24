@@ -1,8 +1,14 @@
+#include "Config/LoggerConfigLang.h"
+#include "Base/SkaConstants.h"
 #include "NodeValue/AST.h"
 #include "NodeValue/LogicalOperator.h"
 #include "GeneratorOperatorBinary.h"
 #include "Interpreter/Value/TypedNodeValue.h"
 #include "Generator/Value/BytecodeScript.h"
+
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::GeneratorOperator<ska::Operator::FUNCTION_CALL>);
+
+#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::GeneratorOperator<ska::Operator::FUNCTION_CALL>)
 
 namespace ska {
 
@@ -54,41 +60,57 @@ namespace ska {
 }
 
 ska::BytecodeCellGroup ska::GeneratorOperator<ska::Operator::BINARY>::generate(OperateOn node, BytecodeGenerationContext& context) {
-	auto firstValue = m_generator.generate({ context.script(), node.GetFirstNode() });
-	
 	//create a temporary variable (left operand)
-	if (firstValue.size() > 1) {
-		auto tmpGroup = context.script().newGroup(firstValue);
-		firstValue.push_back(firstValue[0].toInCell(std::move(tmpGroup)));
-	}
-
-	auto secondValue = m_generator.generate({ context.script(), node.GetSecondNode() });
+	auto leftGroup = m_generator.generate({ context.script(), node.GetFirstNode() });
 
 	//create a temporary variable (right operand)
-	if (secondValue.size() > 1) {
-		auto tmpGroup = context.script().newGroup(secondValue);
-		secondValue.push_back(secondValue[0].toInCell(std::move(tmpGroup)));
+	auto rightGroup = m_generator.generate({ context.script(), node.GetSecondNode() });
+
+	LOG_DEBUG << "Creating left tmp group \"" << leftGroup << "\"";
+	auto leftVariable = context.script().package(leftGroup);
+	assert(leftVariable.has_value());
+#ifdef SKA_DEBUG_LOGS
+	if(leftGroup.size() > 1) {
+		LOG_DEBUG << "\t in variable \"" << *leftVariable << "\"";
 	}
+#endif
+	
+	LOG_DEBUG << "Creating right tmp group \"" << rightGroup << "\"";
+	auto rightVariable = context.script().package(rightGroup);
+	assert(rightVariable.has_value());
+#ifdef SKA_DEBUG_LOGS
+	if(rightGroup.size() > 1) {
+		LOG_DEBUG << "\t in variable \"" << *rightVariable << "\"";
+	}
+#endif
 
 	auto mathOperator = node.GetOperator();
-	auto resultValue = GenerateMathematicBinaryExpression(
+	auto operationValue = GenerateMathematicBinaryExpression(
 		std::move(mathOperator),
-		firstValue.back(),
-		secondValue.back(),
+		*leftVariable,
+		*rightVariable,
 		node.asNode().type().value());
 
 	auto result = BytecodeCellGroup{};
-	//TODO move instead of copy
-	result.insert(result.end(), firstValue.begin(), firstValue.end());
-	result.push_back(std::move(resultValue));
-	//result.insert(result.end(), secondValue.begin(), secondValue.end());
 	
+	//It is important to put the right group before the left one : the ast order has to be reversed
+	//TODO move instead of copy
+	if(rightGroup.size() > 1) {
+		result.insert(result.end(), rightGroup.begin() + 1, rightGroup.end());
+		result.push_back(*rightVariable);
+	} else {
+		result.insert(result.end(), rightGroup.begin(), rightGroup.end());
+	}
+	
+	if(leftGroup.size() > 1) {
+		result.insert(result.end(), leftGroup.begin() + 1, leftGroup.end());
+		result.push_back(*leftVariable);
+	} else {
+		result.insert(result.end(), leftGroup.begin(), leftGroup.end());
+	}
+	result.push_back(std::move(operationValue));
+	
+	LOG_DEBUG << "Result \"" << result << "\"\n";
+
 	return result;
 }
-
-/*
-ska::GeneratorOperator<ska::Operator::BINARY>::GeneratorOperator(BytecodeGenerator& generator, const TypeCrosser& typeCrosser) :
-	ska::GeneratorOperatorBase(generator),
-	m_typeCrosser(typeCrosser) {
-}
-*/

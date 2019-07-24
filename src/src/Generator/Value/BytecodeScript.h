@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <optional>
 #include <unordered_map>
 
 #include "Generator/Value/BytecodeCellGroup.h"
@@ -19,8 +20,9 @@ namespace ska {
 		BytecodeCell stealReg();
 		void setReg(BytecodeCell regist);
 		void setGroup(std::string group);
-		std::string newGroup(BytecodeCellGroup cellGroup);
 
+		std::optional<ska::BytecodeCell> package(BytecodeCellGroup cellGroup);
+		
 		Script program() {
 			return Script{ *m_script };
 		}

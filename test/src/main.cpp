@@ -2,8 +2,8 @@
 #include "Config/LoggerConfigLang.h"
 #include <doctest.h>
 
-int main() {
-    doctest::Context context;
+int main(int argc, char* argv[]) {
+    doctest::Context context = doctest::Context{argc, argv};
     auto resultCode = 0;
 
 	//context.setOption("test-case", "[Interpreter Script]");

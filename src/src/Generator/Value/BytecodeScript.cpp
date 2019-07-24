@@ -36,10 +36,19 @@ ska::BytecodeScript::BytecodeScript(Script& script) :
 	m_script(script.handle()) {
 }
 
-std::string ska::BytecodeScript::newGroup(BytecodeCellGroup cellGroup) {
+std::optional<ska::BytecodeCell> ska::BytecodeScript::package(BytecodeCellGroup cellGroup) {
+	if(cellGroup.empty()) {
+		return {};
+	}
+
+	if(cellGroup.size() == 1) {
+		return std::move(cellGroup[0]);
+	}
+
 	auto groupName = nextGroupName();
-	m_groupsSymbolTable[groupName] = std::move(cellGroup);
-	return groupName;
+	auto& result = m_groupsSymbolTable[groupName];
+	result = std::move(cellGroup);	
+	return result[0].makeInVariableCell(std::move(groupName));
 }
 
 std::string ska::BytecodeScript::nextGroupName() {
