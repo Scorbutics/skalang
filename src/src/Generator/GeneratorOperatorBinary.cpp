@@ -63,8 +63,8 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 		rightGroup.value()
 	);
 
-	auto result = GenerationOutput{ std::move(rightGroup) };
-	result.push(std::move(leftGroup));
+	auto result = GenerationOutput{ std::move(leftGroup) };
+	result.push(std::move(rightGroup));
 	result.push( InstructionPack{ std::move(operationValue) } );
 
 	//It is important to put the right group before the left one : the ast order has to be reversed

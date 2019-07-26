@@ -111,8 +111,8 @@ TEST_CASE("[BytecodeGenerator] Basic Maths subparts") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::ADD, "R1", "1", "2"},
 		{ska::bytecode::Command::ADD, "R0", "3", "4"},
+		{ska::bytecode::Command::ADD, "R1", "1", "2"},
 		{ska::bytecode::Command::MUL, "R2", "R0", "R1"}
 	});
 }
@@ -123,13 +123,13 @@ TEST_CASE("[BytecodeGenerator] Basic Maths with var") {
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::MOV, "toto", "4"},
-		{ska::bytecode::Command::ADD, "R5", "1", "9"},
+		{ska::bytecode::Command::MUL, "R0", "toto", "5"},
 		{ska::bytecode::Command::DIV, "R1", "1", "4"},
 		{ska::bytecode::Command::SUB, "R2", "4", "R1"},
 		{ska::bytecode::Command::ADD, "R3", "3", "R2"},
 		{ska::bytecode::Command::MUL, "R4", "2", "R3"},
-		{ska::bytecode::Command::ADD, "R6", "R4", "R5"},
-		{ska::bytecode::Command::MUL, "R0", "toto", "5"},
+		{ska::bytecode::Command::ADD, "R5", "1", "9"},
+		{ska::bytecode::Command::ADD, "R6", "R4", "R5"},	
 		{ska::bytecode::Command::ADD, "R7", "R0", "R6"}
 	});
 }
