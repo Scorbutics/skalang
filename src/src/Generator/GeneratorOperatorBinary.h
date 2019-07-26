@@ -4,5 +4,7 @@
 #include "Operation/Type/OperationTypeBinary.h"
 
 namespace ska {
-	SKALANG_GENERATOR_OPERATOR_DEFINE(Operator::BINARY);
+	namespace bytecode {
+		SKALANG_GENERATOR_OPERATOR_DEFINE(Operator::BINARY);
+	}
 }

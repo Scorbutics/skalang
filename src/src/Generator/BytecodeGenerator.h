@@ -8,20 +8,23 @@
 #include "BytecodeGenerationContext.h"
 
 namespace ska {
-    struct ReservedKeywordsPool;
-	class BytecodeScript;
+	struct ReservedKeywordsPool;
 	class TypeCrosser;
 
-	class BytecodeGenerator {
-		using OperatorGenerator = std::vector<std::unique_ptr<GeneratorOperatorUnit>>;
-	public:
-		BytecodeGenerator(const ReservedKeywordsPool& reserved, const TypeCrosser& typeCrosser);
-		~BytecodeGenerator() = default;
+	namespace bytecode {
+		class Script;
 
-		BytecodeCellGroup generate(BytecodeGenerationContext node);
-	private:
-		OperatorGenerator build();
-		OperatorGenerator m_operatorGenerator;
-		const TypeCrosser& m_typeCrosser;
-	};
+		class Generator {
+			using OperatorGenerator = std::vector<std::unique_ptr<GeneratorOperatorUnit>>;
+		public:
+			Generator(const ReservedKeywordsPool& reserved, const TypeCrosser& typeCrosser);
+			~Generator() = default;
+
+			GenerationOutput generate(GenerationContext node);
+		private:
+			OperatorGenerator build();
+			OperatorGenerator m_operatorGenerator;
+			const TypeCrosser& m_typeCrosser;
+		};
+	}
 }

@@ -1,23 +1,24 @@
 #pragma once
 
-#include "Value/BytecodeCellGroup.h"
+#include "Value/BytecodeGenerationOutput.h"
 
 namespace ska {
-	class BytecodeGenerator;
-	class BytecodeGenerationContext;
+	namespace bytecode {
+		class Generator;
+		class GenerationContext;
 
-	class GeneratorOperatorUnit {
-	public:
-		virtual BytecodeCellGroup generate(BytecodeGenerationContext& node) = 0;
-	};
+		class GeneratorOperatorUnit {
+		public:
+			virtual GenerationOutput generate(GenerationContext& node) = 0;
+		};
 
-	class GeneratorOperatorBase :
-		public GeneratorOperatorUnit {
-	public:
-		GeneratorOperatorBase(BytecodeGenerator& generator) :
-			m_generator(generator) {}
-	protected:
-		BytecodeGenerator& m_generator;
-	};
-
+		class GeneratorOperatorBase :
+			public GeneratorOperatorUnit {
+		public:
+			GeneratorOperatorBase(Generator& generator) :
+				m_generator(generator) {}
+		protected:
+			Generator& m_generator;
+		};
+	}
 }

@@ -30,27 +30,31 @@ static void ASTFromInputBytecodeGeneratorNoParse(const std::string& input, Bytec
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosserI);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser);
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, typeCrosserI);
-	data.generator = std::make_unique<ska::BytecodeGenerator>(reservedKeywords, typeCrosserI);
+	data.generator = std::make_unique<ska::bytecode::Generator>(reservedKeywords, typeCrosserI);
 }
 
-static std::pair<ska::BytecodeScript, BytecodeGeneratorDataTestContainer> ASTFromInputBytecodeGenerator(const std::string& input) {
+static std::pair<ska::bytecode::Script, BytecodeGeneratorDataTestContainer> ASTFromInputBytecodeGenerator(const std::string& input) {
 	auto data = BytecodeGeneratorDataTestContainer{};
 	ASTFromInputBytecodeGeneratorNoParse(input, data);
 	readerI->parse(*data.parser);
-	return std::make_pair<ska::BytecodeScript, BytecodeGeneratorDataTestContainer>(ska::BytecodeScript{ *readerI }, std::move(data));
+	return std::make_pair<ska::bytecode::Script, BytecodeGeneratorDataTestContainer>(ska::bytecode::Script{ *readerI }, std::move(data));
 }
 
 struct BytecodePart {
-	ska::BytecodeCommand command;
-	std::string value;
+	ska::bytecode::Command command;
+	std::string dest;
+	std::string left;
+	std::string right;
 };
 
-static void BytecodeCompare(const ska::BytecodeCellGroup& result, std::vector<BytecodePart> expected) {
+static void BytecodeCompare(const ska::bytecode::GenerationOutput& result, std::vector<BytecodePart> expected) {
 	auto index = std::size_t {0};
-	for(const auto& r : result) {
+	for(const auto& r : result.pack()) {
 		CHECK(index < expected.size());
 		CHECK(r.command() == expected[index].command);
-		CHECK(r.value().name() == expected[index].value);
+		CHECK(r.dest().content == expected[index].dest);
+		CHECK(r.left().content == expected[index].left);
+		CHECK(r.right().content == expected[index].right);
 		index++;
 	}
 }
@@ -70,11 +74,8 @@ TEST_CASE("[BytecodeGenerator] Basic Maths linear") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::BytecodeCommand::OUT, "4"},
-		{ska::BytecodeCommand::SUB, "1"},
-		{ska::BytecodeCommand::IN, " 0"},
-		{ska::BytecodeCommand::OUT, "3"},
-		{ska::BytecodeCommand::ADD, " 0"}
+		{ska::bytecode::Command::SUB, "4"},
+		{ska::bytecode::Command::SUB, "1"},
 	});
 }
 
@@ -83,11 +84,7 @@ TEST_CASE("[BytecodeGenerator] Basic Maths 1 left subpart") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::BytecodeCommand::OUT, "2"},
-		{ska::BytecodeCommand::IN, " 0"},
-		{ska::BytecodeCommand::OUT, "3"},
-		{ska::BytecodeCommand::ADD, "4"},
-		{ska::BytecodeCommand::MUL, " 0"}
+
 	});
 }
 
@@ -96,11 +93,7 @@ TEST_CASE("[BytecodeGenerator] Basic Maths 1 right subpart") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::BytecodeCommand::OUT, "3"},
-		{ska::BytecodeCommand::ADD, "4"},
-		{ska::BytecodeCommand::IN, " 0"},
-		{ska::BytecodeCommand::OUT, "2"},
-		{ska::BytecodeCommand::MUL, " 0"}
+
 	});
 }
 
@@ -109,13 +102,7 @@ TEST_CASE("[BytecodeGenerator] Basic Maths subparts") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::BytecodeCommand::OUT, "1"},
-		{ska::BytecodeCommand::ADD, "2"},
-		{ska::BytecodeCommand::IN, " 1"},
-		{ska::BytecodeCommand::OUT, "3"},
-		{ska::BytecodeCommand::ADD, "4"},
-		{ska::BytecodeCommand::IN, " 0"},
-		{ska::BytecodeCommand::MUL, " 1"}
+
 	});
 }
 

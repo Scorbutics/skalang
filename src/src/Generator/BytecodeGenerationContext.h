@@ -1,25 +1,31 @@
 #pragma once
 #include <cassert>
-#include "Value/BytecodeCellGroup.h"
 #include "Value/BytecodeScript.h"
+#include "Value/BytecodeValue.h"
 
 namespace ska {
 	class ASTNode;
-	
-	class BytecodeGenerationContext {
-	public:
-		BytecodeGenerationContext() = default;
-		BytecodeGenerationContext(BytecodeScript& script);
-		BytecodeGenerationContext(BytecodeScript& script, const ASTNode& node);
+	namespace bytecode {
+		class GenerationContext {
+		public:
+			GenerationContext() = default;
+			GenerationContext(Script& script);
+			GenerationContext(Script& script, const ASTNode& node);
 
-		const ASTNode& pointer() { assert(m_pointer != nullptr); return *m_pointer; }
-		BytecodeScript& script() { assert(m_script != nullptr); return *m_script; }
+			const ASTNode& pointer() { assert(m_pointer != nullptr); return *m_pointer; }
+			Script& script() { assert(m_script != nullptr); return *m_script; }
 
-		BytecodeCell cellFromValue(BytecodeCommand commandToGenerate);
+			Register queryNextRegister(Type type) {
+				auto ss = std::stringstream {};
+				ss << m_register++;
+				return { ss.str(), std::move(type) };
+			}
 
-	private:
-		BytecodeScript* m_script{};
-		const ASTNode* m_pointer {};
-		std::size_t m_bytecodeGenerationIndex = 0;
-	};
+		private:
+			Script* m_script {};
+			const ASTNode* m_pointer {};
+			std::size_t m_bytecodeGenerationIndex = 0;
+			std::size_t m_register = 0;
+		};
+	}
 }

@@ -3,40 +3,25 @@
 #include <optional>
 #include <unordered_map>
 
-#include "Generator/Value/BytecodeCellGroup.h"
 #include "Base/Values/MovableNonCopyable.h"
 #include "Interpreter/Value/Script.h"
 
 namespace ska {
-	class BytecodeScript : 
-		public MovableNonCopyable {
-	public:
-		BytecodeScript(Script& script);
+	namespace bytecode {
+		class Script :
+			public MovableNonCopyable {
+		public:
+			Script(ska::Script& script);
 
-		BytecodeScript(BytecodeScript&&) = default;
-		BytecodeScript& operator=(BytecodeScript&&) = default;
+			Script(Script&&) = default;
+			Script& operator=(Script&&) = default;
 
-		const BytecodeCell& reg() const;
-		BytecodeCell stealReg();
-		void setReg(BytecodeCell regist);
-		void setGroup(std::string group);
+			ska::Script program() { return ska::Script{ *m_script }; }
 
-		std::optional<ska::BytecodeCell> package(BytecodeCellGroup& cellGroup);
-		
-		Script program() {
-			return Script{ *m_script };
-		}
+		private:
+			//Value m_register;
 
-	private:
-		std::string nextGroupName();
-		std::string currentGroupName();
-		
-		BytecodeCell m_register;
-		std::string m_group = " ";
-		
-		std::unordered_map<std::string, std::size_t> m_groupsSubVar;
-		std::unordered_map<std::string, BytecodeCellGroup> m_groupsSymbolTable;
-
-		ScriptHandle* m_script{};
-	};
+			ska::ScriptHandle* m_script{};
+		};
+	}
 }

@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "BytecodeGenerator.h"
 
 #include "NodeValue/Operator.h"
@@ -13,8 +11,8 @@
 
 #include "GeneratorDeclarer.h"
 
-std::vector<std::unique_ptr<ska::GeneratorOperatorUnit>> ska::BytecodeGenerator::build() {
-	auto result = std::vector<std::unique_ptr<ska::GeneratorOperatorUnit>> {};
+std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode::Generator::build() {
+	auto result = std::vector<std::unique_ptr<GeneratorOperatorUnit>> {};
 	static constexpr auto maxOperatorEnumIndex = static_cast<std::size_t>(ska::Operator::UNUSED_Last_Length);
 	result.resize(maxOperatorEnumIndex);
 
@@ -27,12 +25,12 @@ std::vector<std::unique_ptr<ska::GeneratorOperatorUnit>> ska::BytecodeGenerator:
 	return result;
 }
 
-ska::BytecodeGenerator::BytecodeGenerator(const ReservedKeywordsPool& reserved, const TypeCrosser& typeCrosser) :
+ska::bytecode::Generator::Generator(const ReservedKeywordsPool& reserved, const TypeCrosser& typeCrosser) :
 	m_operatorGenerator(build()),
 	m_typeCrosser(typeCrosser) {
 }
 
-ska::BytecodeCellGroup ska::BytecodeGenerator::generate(BytecodeGenerationContext node) {
+ska::bytecode::GenerationOutput ska::bytecode::Generator::generate(GenerationContext node) {
 	auto& builder = m_operatorGenerator[static_cast<std::size_t>(node.pointer().op())];
 	assert(builder != nullptr);
 	return builder->generate(node);

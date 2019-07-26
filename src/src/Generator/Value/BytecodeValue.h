@@ -1,46 +1,44 @@
 #pragma once
 #include <variant>
-#include "NodeValue/Token.h"
 #include "NodeValue/Type.h"
 #include "Generator/BytecodeCommand.h"
 
+/*
+Opcode : enum value (MOV, SUB, ADD, MUL, DIV...)
+
+Value :
+	- std::string
+	- Type
+
+Register : value
+
+Instruction :
+	- opcode
+	- left value
+	- right value
+	- dest value
+	(- debug infos :
+		- line
+		- column) -> not for now...
+
+
+
+GenerationOutput :
+	- std::vector<Instruction>
+*/
+
 namespace ska {
-	class BytecodeRValue {
-	public:
-        BytecodeRValue(BytecodeCommand command, Type type, Token value) :
-			m_command(std::move(command)),
-			m_value(std::move(value)),
-            m_type(std::move(type)) {
-        }
+	namespace bytecode {
 
-		BytecodeRValue(BytecodeCommand command) :
-			m_command(std::move(command)) {
-		}
+		struct Value {
+			std::string content;
+			Type type;
 
-		BytecodeRValue(BytecodeCommand command, const ASTNode& node);
+			bool empty() const {
+				return content.empty() && type.type() == ExpressionType::VOID;
+			}
+		};
 
-		BytecodeRValue() = default;
-
-		auto command() const { return m_command; }
-
-		BytecodeRValue makeInVariableCell(std::string name) const {
-			return { BytecodeCommand::IN, m_type, Token{std::move(name), TokenType::IDENTIFIER, m_value.position() } };
-		}
-
-		const auto& value() const {
-			return m_value;
-		}
-
-		friend std::ostream& operator<<(std::ostream& stream, const BytecodeRValue&);
-
-	private:
-		BytecodeCommand m_command = BytecodeCommand::NOP;
-		Token m_value;
-		Type m_type;
-	};
-
-	using BytecodeLValue = BytecodeRValue*;
-  using BytecodeValue = std::variant<BytecodeLValue, BytecodeRValue>;
-
-	std::ostream& operator<<(std::ostream& stream, const BytecodeRValue&);
+		using Register = Value;
+	}
 }

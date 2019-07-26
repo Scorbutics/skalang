@@ -4,5 +4,7 @@
 #include "Operation/Type/OperationTypeBlock.h"
 
 namespace ska {
-	SKALANG_GENERATOR_OPERATOR_DEFINE(Operator::BLOCK);
+	namespace bytecode {
+		SKALANG_GENERATOR_OPERATOR_DEFINE(ska::Operator::BLOCK);
+	}
 }
