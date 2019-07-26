@@ -11,11 +11,11 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Oper
 
 namespace ska {
 	namespace bytecode {
-		static Instruction GenerateMathematicBinaryExpression(std::string logicalOperator, Register dest, const GenerationOutput& left, const GenerationOutput& right) {
+		static Instruction GenerateMathematicBinaryExpression(std::string logicalOperator, Register dest, Value left, Value right) {
 			assert(!logicalOperator.empty());
 			auto operatorIt = CommandMap.find(logicalOperator);
 			if(operatorIt != CommandMap.end()) {
-				return { operatorIt->second, std::move(dest), left.value(), right.value() };
+				return { operatorIt->second, std::move(dest), std::move(left), std::move(right) };
 			}
 			throw std::runtime_error("Unhandled operator " + logicalOperator);
 		}
@@ -54,13 +54,13 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 #endif
 */
 
-	auto currentRegister = context.queryNextRegister(node.asNode().type().value());
+	auto currentRegister = context.script().queryNextRegister(node.asNode().type().value());
 
 	auto operationValue = GenerateMathematicBinaryExpression(
 		node.GetOperator(),
 		std::move(currentRegister),
-		leftGroup,
-		rightGroup
+		leftGroup.value(),
+		rightGroup.value()
 	);
 
 	auto result = GenerationOutput{ std::move(rightGroup) };

@@ -18,4 +18,5 @@ std::ostream& ska::bytecode::operator<<(std::ostream& stream, const Instruction&
 	<< cell.m_right.content
 	#endif
 	<< "]";
+	return stream;
 }

@@ -14,18 +14,11 @@ namespace ska {
 
 			const ASTNode& pointer() { assert(m_pointer != nullptr); return *m_pointer; }
 			Script& script() { assert(m_script != nullptr); return *m_script; }
-
-			Register queryNextRegister(Type type) {
-				auto ss = std::stringstream {};
-				ss << m_register++;
-				return { ss.str(), std::move(type) };
-			}
-
+		
 		private:
 			Script* m_script {};
 			const ASTNode* m_pointer {};
 			std::size_t m_bytecodeGenerationIndex = 0;
-			std::size_t m_register = 0;
 		};
 	}
 }

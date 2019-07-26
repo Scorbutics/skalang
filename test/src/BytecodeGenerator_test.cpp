@@ -62,11 +62,18 @@ static void BytecodeCompare(const ska::bytecode::GenerationOutput& result, std::
 TEST_CASE("[BytecodeGenerator] literal") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("4;");
 	auto res = data.generator->generate(astPtr);
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::MOV, "R0", "4"}
+	});
 }
 
 TEST_CASE("[BytecodeGenerator] var declaration") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = 4;");
 	auto res = data.generator->generate(astPtr);
+	
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::MOV, "toto", "4"}
+	});
 }
 
 TEST_CASE("[BytecodeGenerator] Basic Maths linear") {
@@ -74,8 +81,8 @@ TEST_CASE("[BytecodeGenerator] Basic Maths linear") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::SUB, "4"},
-		{ska::bytecode::Command::SUB, "1"},
+		{ska::bytecode::Command::SUB, "R0", "4", "1"},
+		{ska::bytecode::Command::ADD, "R1", "3", "R0"},
 	});
 }
 
@@ -84,7 +91,8 @@ TEST_CASE("[BytecodeGenerator] Basic Maths 1 left subpart") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-
+		{ska::bytecode::Command::ADD, "R0", "3", "4"},
+		{ska::bytecode::Command::MUL, "R1", "R0", "2"}
 	});
 }
 
@@ -93,7 +101,8 @@ TEST_CASE("[BytecodeGenerator] Basic Maths 1 right subpart") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-
+		{ska::bytecode::Command::ADD, "R0", "3", "4"},
+		{ska::bytecode::Command::MUL, "R1", "2", "R0"}
 	});
 }
 
@@ -102,34 +111,25 @@ TEST_CASE("[BytecodeGenerator] Basic Maths subparts") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-
+		{ska::bytecode::Command::ADD, "R1", "1", "2"},
+		{ska::bytecode::Command::ADD, "R0", "3", "4"},
+		{ska::bytecode::Command::MUL, "R2", "R0", "R1"}
 	});
 }
 
 TEST_CASE("[BytecodeGenerator] Basic Maths with var") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = 4; (toto * 5) + 2 * (3 + 4 - 1) + 1 + 9;");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = 4; (toto * 5) + 2 * (3 + 4 - 1 / 4) + 1 + 9;");
 	auto res = data.generator->generate(astPtr);
 
-	// 	Expected : 
-	
-	// 	out 4
-	// 	in toto
-	// 	out toto
-	// 	out toto
-	// 	mul 5
-	// 	in v0
-	// 	out v0
-	// 	out 3
-	// 	add 4
-	// 	in v1
-	// 	sub 1
-	// 	in v2
-	// 	out 2
-	// 	mul v2
-	// 	in v3
-	// 	add 1
-	// 	in v4
-	// 	add 9
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::MOV, "toto", "4"},
+		{ska::bytecode::Command::ADD, "R5", "1", "9"},
+		{ska::bytecode::Command::DIV, "R1", "1", "4"},
+		{ska::bytecode::Command::SUB, "R2", "4", "R1"},
+		{ska::bytecode::Command::ADD, "R3", "3", "R2"},
+		{ska::bytecode::Command::MUL, "R4", "2", "R3"},
+		{ska::bytecode::Command::ADD, "R6", "R4", "R5"},
+		{ska::bytecode::Command::MUL, "R0", "toto", "5"},
+		{ska::bytecode::Command::ADD, "R7", "R0", "R6"}
+	});
 }
-
-

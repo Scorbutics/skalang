@@ -22,8 +22,6 @@ namespace ska {
 			}
 
 			void push(GenerationOutput value) {
-				value.transferValueToPack();
-				transferValueToPack();
 				//TODO move
 				m_pack.insert(m_pack.end(), value.m_pack.begin(), value.m_pack.end());
 			}
@@ -40,14 +38,14 @@ namespace ska {
 				return m_pack;
 			}
 
-		private:
-			void transferValueToPack() {
-				if(!m_value.empty()) {
-					m_pack.push_back(Instruction{Command::MOV, std::move(m_value)});
+			void transferValueToPack(Register r) {
+				if (!m_value.empty()) {
+					m_pack.push_back(Instruction{ Command::MOV, std::move(r), std::move(m_value) });
 					m_value = {};
 				}
 			}
 
+		private:
 			 InstructionPack m_pack;
 			 Value m_value;
 		};
