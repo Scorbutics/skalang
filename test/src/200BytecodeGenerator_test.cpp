@@ -30,7 +30,7 @@ static void ASTFromInputBytecodeGeneratorNoParse(const std::string& input, Bytec
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosserI);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser);
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, typeCrosserI);
-	data.generator = std::make_unique<ska::bytecode::Generator>(reservedKeywords, typeCrosserI);
+	data.generator = std::make_unique<ska::bytecode::Generator>(reservedKeywords);
 }
 
 static std::pair<ska::bytecode::Script, BytecodeGeneratorDataTestContainer> ASTFromInputBytecodeGenerator(const std::string& input) {
@@ -50,11 +50,13 @@ struct BytecodePart {
 static void BytecodeCompare(const ska::bytecode::GenerationOutput& result, std::vector<BytecodePart> expected) {
 	auto index = std::size_t {0};
 	for(const auto& r : result.pack()) {
-		CHECK(index < expected.size());
-		CHECK(r.command() == expected[index].command);
-		CHECK(r.dest().content == expected[index].dest);
-		CHECK(r.left().content == expected[index].left);
-		CHECK(r.right().content == expected[index].right);
+		const auto equality =
+			index < expected.size() &&
+			r.command() == expected[index].command &&
+			r.dest().content == expected[index].dest &&
+			r.left().content == expected[index].left &&
+			r.right().content == expected[index].right;
+		CHECK(equality);
 		index++;
 	}
 }
@@ -72,7 +74,7 @@ TEST_CASE("[BytecodeGenerator] var declaration") {
 	auto res = data.generator->generate(astPtr);
 	
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::MOV, "toto", "4"}
+		{ska::bytecode::Command::MOV, "V0", "4"}
 	});
 }
 
@@ -122,8 +124,8 @@ TEST_CASE("[BytecodeGenerator] Basic Maths with var") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::MOV, "toto", "4"},
-		{ska::bytecode::Command::MUL, "R0", "toto", "5"},
+		{ska::bytecode::Command::MOV, "V0", "4"},
+		{ska::bytecode::Command::MUL, "R0", "V0", "5"},
 		{ska::bytecode::Command::DIV, "R1", "1", "4"},
 		{ska::bytecode::Command::SUB, "R2", "4", "R1"},
 		{ska::bytecode::Command::ADD, "R3", "3", "R2"},
@@ -131,5 +133,17 @@ TEST_CASE("[BytecodeGenerator] Basic Maths with var") {
 		{ska::bytecode::Command::ADD, "R5", "1", "9"},
 		{ska::bytecode::Command::ADD, "R6", "R4", "R5"},	
 		{ska::bytecode::Command::ADD, "R7", "R0", "R6"}
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] Introducing block sub-variable") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = 4; { var toto = 5; toto + 1; } toto + 1;");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::MOV, "V0", "4"},
+		{ska::bytecode::Command::MOV, "V1", "5"},
+		{ska::bytecode::Command::ADD, "R0", "V1", "1"},
+		{ska::bytecode::Command::ADD, "R1", "V0", "1"}
 	});
 }
