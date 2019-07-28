@@ -5,7 +5,7 @@
 
 namespace ska {
     class TypeBuilder;
-    class SymbolTableTypeUpdater;
+    class SymbolTableUpdater;
     struct ReservedKeywordsPool;
     class StatementParser;
     class Interpreter;
@@ -14,7 +14,7 @@ namespace ska {
         struct ModuleConfiguration {
             ScriptCache& scriptCache;
             TypeBuilder& typeBuilder;
-            SymbolTableTypeUpdater& symbolTableTypeUpdater;
+            SymbolTableUpdater& SymbolTableUpdater;
             const ReservedKeywordsPool& reservedKeywords;
             StatementParser& parser;
             Interpreter& interpreter;

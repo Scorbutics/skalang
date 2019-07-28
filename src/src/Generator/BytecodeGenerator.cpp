@@ -25,9 +25,8 @@ std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode
 	return result;
 }
 
-ska::bytecode::Generator::Generator(const ReservedKeywordsPool& reserved, const TypeCrosser& typeCrosser) :
-	m_operatorGenerator(build()),
-	m_typeCrosser(typeCrosser) {
+ska::bytecode::Generator::Generator(const ReservedKeywordsPool& reserved) :
+	m_operatorGenerator(build()) {
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::Generator::generate(GenerationContext node) {

@@ -15,7 +15,7 @@ ska::Script TypeBuilderTestCommonBuildAST(std::unordered_map<std::string, ska::S
 	//data.symbols = std::make_unique<ska::SymbolTable>(*data.parser);
 	if (buildType) {
 		data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosser);
-		data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser);
+		data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableUpdater>(*data.parser);
 	}
 	return reader;
 }

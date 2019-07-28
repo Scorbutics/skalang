@@ -15,7 +15,7 @@
 
 auto readerSTC = std::unique_ptr<ska::Script>{};
 
-ska::Script ASTFromInputSemanticTC(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, DataTestContainer& data) {
+static ska::Script ASTFromInputSemanticTC(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, DataTestContainer& data) {
 
 	auto tokenizer = ska::Tokenizer { data.reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
@@ -23,10 +23,34 @@ ska::Script ASTFromInputSemanticTC(std::unordered_map<std::string, ska::ScriptHa
 	readerSTC = std::make_unique<ska::Script>(scriptCache, "main", tokens );
 	data.parser = std::make_unique<ska::StatementParser> ( data.reservedKeywords );
     data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosser);
-	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableTypeUpdater>(*data.parser);
+	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableUpdater>(*data.parser);
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, typeCrosser);
     readerSTC->parse(*data.parser);
     return *readerSTC;
+}
+
+TEST_CASE("[SymbolTableUpdater] update node symbol") {
+	DataTestContainer data;
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+
+	auto astPtr = ASTFromInputSemanticTC(scriptCache, "var i = 0; var titi = \"llllll\"; { var toto = 2; var i = titi; }", data);
+
+	auto& table = astPtr.symbols();
+
+	CHECK(table.nested().size() == 1);
+	const auto* i = table["i"];
+	const auto* nestedToto = (*table.nested()[0])["toto"];
+	const auto* toto = table["toto"];
+	const auto* titi = table["titi"];
+	const auto* nestedI = (*table.nested()[0])["i"];
+
+	auto& ast = astPtr.rootNode();
+	CHECK(i == ast[0].symbol());
+	CHECK(titi == ast[1].symbol());
+	CHECK(ast[1].symbol() != ast[0].symbol());
+	CHECK(nestedToto == ast[2][0].symbol());
+	CHECK(nestedI == ast[2][1].symbol());
+	CHECK(nestedI != i);
 }
 
 TEST_CASE("[SemanticTypeChecker]") {

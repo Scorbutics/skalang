@@ -4,7 +4,7 @@
 #include "Service/SymbolTable.h"
 #include "Interpreter/Value/Script.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
-#include "Service/SymbolTableTypeUpdater.h"
+#include "Service/SymbolTableUpdater.h"
 #include "Service/ScriptNameBuilder.h"
 
 #include "Interpreter/InterpreterOperatorFunctionCall.h"
@@ -15,7 +15,7 @@ ska::ScriptBridge::ScriptBridge(
 	ScriptCache& cache,
 	std::string scriptName,
 	TypeBuilder& typeBuilder,
-	SymbolTableTypeUpdater& symbolTypeUpdater,
+	SymbolTableUpdater& symbolTypeUpdater,
 	const ReservedKeywordsPool& reserved) :
 	m_typeBuilder(typeBuilder),
 	m_symbolTypeUpdater(symbolTypeUpdater),

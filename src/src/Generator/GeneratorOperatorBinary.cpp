@@ -5,7 +5,7 @@
 #include "Interpreter/Value/TypedNodeValue.h"
 #include "Generator/Value/BytecodeScript.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>)
 
@@ -20,9 +20,9 @@ namespace ska {
 			throw std::runtime_error("Unhandled operator " + logicalOperator);
 		}
 
-		static GenerationOutput GenerateInstructionValue(Generator& generator, Script& script, const ASTNode& node) {
+		static GenerationOutput GenerateInstructionValue(Generator& generator, Script& script, const ASTNode& parent, const ASTNode& node) {
 			if(node.size() == 0) {
-				return Value { node.name(), node.type().value() };
+				return script.queryVariableOrValue(node);
 			}
 			return generator.generate({ script, node });
 		}
@@ -30,29 +30,9 @@ namespace ska {
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::BINARY>::generate(OperateOn node, GenerationContext& context) {
-	auto leftGroup = GenerateInstructionValue(m_generator, context.script(), node.GetFirstNode());
+	auto leftGroup = GenerateInstructionValue(m_generator, context.script(), node.asNode(), node.GetFirstNode());
 
-	auto rightGroup = GenerateInstructionValue(m_generator, context.script(), node.GetSecondNode());
-
-/*
-	LOG_DEBUG << "Creating left tmp group \"" << leftGroup << "\"";
-	auto leftVariable = context.script().package(leftGroup);
-	assert(leftVariable.has_value());
-#ifdef SKA_DEBUG_LOGS
-	if(leftGroup.size() >= 1) {
-		LOG_DEBUG << "\t in variable \"" << *leftVariable << "\"";
-	}
-#endif
-
-	LOG_DEBUG << "Creating right tmp group \"" << rightGroup << "\"";
-	auto rightVariable = context.script().package(rightGroup);
-	assert(rightVariable.has_value());
-#ifdef SKA_DEBUG_LOGS
-	if(rightGroup.size() >= 1) {
-		LOG_DEBUG << "\t in variable \"" << *rightVariable << "\"";
-	}
-#endif
-*/
+	auto rightGroup = GenerateInstructionValue(m_generator, context.script(), node.asNode(), node.GetSecondNode());
 
 	auto currentRegister = context.script().queryNextRegister(node.asNode().type().value());
 

@@ -8,15 +8,16 @@ namespace ska {
 	class SymbolTable;
 	class StatementParser;
 
-	class SymbolTableTypeUpdater :
+	class SymbolTableUpdater :
 		public subobserver_priority_queue<VarTokenEvent> {
 	public:
-		SymbolTableTypeUpdater(StatementParser& parser);
-		~SymbolTableTypeUpdater() = default;
+		SymbolTableUpdater(StatementParser& parser);
+		~SymbolTableUpdater() = default;
 
 	private:
 		bool matchVariable(VarTokenEvent& token);
 
 		void updateType(const ASTNode& node, SymbolTable& s);
+		void updateNode(ASTNode& node, const std::string& variableName, const SymbolTable& s);
 	};
 }

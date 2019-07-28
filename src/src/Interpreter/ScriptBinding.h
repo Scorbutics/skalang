@@ -22,7 +22,7 @@ namespace ska {
 			ScriptCache& cache,
 			std::string scriptName,
 			TypeBuilder& typeBuilder,
-			SymbolTableTypeUpdater& symbolTypeUpdater,
+			SymbolTableUpdater& symbolTypeUpdater,
 			const ReservedKeywordsPool& reserved);
 			
 		virtual ~ScriptBridge();
@@ -51,7 +51,7 @@ namespace ska {
 
 	private:
 		TypeBuilder& m_typeBuilder;
-		SymbolTableTypeUpdater& m_symbolTypeUpdater;
+		SymbolTableUpdater& m_symbolTypeUpdater;
 		BindingFactory m_functionBinder;
 		std::string m_name;
 		Script m_script;

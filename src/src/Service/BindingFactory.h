@@ -21,7 +21,7 @@
 namespace ska {
 	class SymbolTable;
 	class TypeBuilder;
-	class SymbolTableTypeUpdater;
+	class SymbolTableUpdater;
 	struct ReservedKeywordsPool;
 	class StatementParser;
 	class Interpreter;
@@ -52,7 +52,7 @@ namespace ska {
 		public observable_priority_queue<ImportTokenEvent> {
 		friend class BindingFactorySymbolTableLock;
 	public:
-		BindingFactory(TypeBuilder& typeBuilder, SymbolTableTypeUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
+		BindingFactory(TypeBuilder& typeBuilder, SymbolTableUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
 		virtual ~BindingFactory();
 
 		template <class ReturnType, class ... ParameterTypes>
@@ -148,7 +148,7 @@ namespace ska {
 		ASTNodePtr createImport(StatementParser& parser, Script& script, Token scriptPathToken);
 
 		TypeBuilder& m_typeBuilder;
-		SymbolTableTypeUpdater& m_symbolTypeUpdater;
+		SymbolTableUpdater& m_symbolTypeUpdater;
         const ReservedKeywordsPool& m_reserved;
 		MatcherType m_matcherType;
 	};

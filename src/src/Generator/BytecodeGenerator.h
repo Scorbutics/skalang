@@ -17,14 +17,13 @@ namespace ska {
 		class Generator {
 			using OperatorGenerator = std::vector<std::unique_ptr<GeneratorOperatorUnit>>;
 		public:
-			Generator(const ReservedKeywordsPool& reserved, const TypeCrosser& typeCrosser);
+			Generator(const ReservedKeywordsPool& reserved);
 			~Generator() = default;
 
 			GenerationOutput generate(GenerationContext node);
 		private:
 			OperatorGenerator build();
 			OperatorGenerator m_operatorGenerator;
-			const TypeCrosser& m_typeCrosser;
 		};
 	}
 }

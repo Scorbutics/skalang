@@ -58,10 +58,6 @@ namespace ska {
 		    return *m_children[index];
 		}
 
-		ASTNodePtr stealChild(const std::size_t index) {
-			return std::move(m_children[index]);
-		}
-
 		auto begin() { return std::begin(m_children); }
 		auto end() { return std::end(m_children); }
 
@@ -73,9 +69,16 @@ namespace ska {
 		}
 
 	    void buildType(const TypeBuildersContainer& typeBuilder, const Script& script);
+		void linkSymbol(const Symbol& symbol) {
+			m_symbol = &symbol;
+		}
 
 		const auto& type() const {
 			return m_type;
+		}
+
+		const auto* symbol() const {
+			return m_symbol;
 		}
 
 	private:
@@ -89,6 +92,7 @@ namespace ska {
 
 		Operator m_op = Operator::UNARY;
 		std::optional<Type> m_type;
+		const Symbol* m_symbol = nullptr;
 
 		Token token;
 		std::vector<ASTNodePtr> m_children;
