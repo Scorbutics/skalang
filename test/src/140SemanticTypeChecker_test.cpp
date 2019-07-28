@@ -53,6 +53,22 @@ TEST_CASE("[SymbolTableUpdater] update node symbol") {
 	CHECK(nestedI != i);
 }
 
+TEST_CASE("[SymbolTableUpdater] function declaration") {
+	DataTestContainer data;
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+
+	auto astPtr = ASTFromInputSemanticTC(scriptCache, "var toto = function() {};", data);
+
+	auto& table = astPtr.symbols();
+
+	const auto* toto = table["toto"];
+
+	auto& ast = astPtr.rootNode();
+	CHECK(toto != nullptr);
+	CHECK(toto == ast[0].symbol());
+	CHECK(toto == ast[0][0].symbol());
+}
+
 TEST_CASE("[SemanticTypeChecker]") {
     DataTestContainer data;
 	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};

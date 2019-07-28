@@ -8,7 +8,8 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTableUpdater)
 
 ska::SymbolTableUpdater::SymbolTableUpdater(StatementParser& parser):
-	subobserver_priority_queue<VarTokenEvent>(std::bind(&SymbolTableUpdater::matchVariable, this, std::placeholders::_1), parser, 7) {
+	subobserver_priority_queue<VarTokenEvent>(std::bind(&SymbolTableUpdater::matchVariable, this, std::placeholders::_1), parser, 7),
+	subobserver_priority_queue<FunctionTokenEvent>(std::bind(&SymbolTableUpdater::matchFunction, this, std::placeholders::_1), parser, 7) {
 }
 
 bool ska::SymbolTableUpdater::matchVariable(VarTokenEvent& event) {
@@ -40,6 +41,17 @@ bool ska::SymbolTableUpdater::matchVariable(VarTokenEvent& event) {
 	break;
 	}
 
+	return true;
+}
+
+bool ska::SymbolTableUpdater::matchFunction(FunctionTokenEvent& event) {
+	switch (event.type()) {
+	case FunctionTokenEventType::DECLARATION_STATEMENT:
+		updateNode(event.rootNode(), event.name(), event.script().symbols());
+		break;
+	default:
+		break;
+	}
 	return true;
 }
 

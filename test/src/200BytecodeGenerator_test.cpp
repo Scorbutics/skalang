@@ -147,3 +147,13 @@ TEST_CASE("[BytecodeGenerator] Introducing block sub-variable") {
 		{ska::bytecode::Command::ADD, "R1", "V0", "1"}
 	});
 }
+
+
+TEST_CASE("[BytecodeGenerator] Function") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function() { };");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::MOV, "V0", ""}
+	});
+}
