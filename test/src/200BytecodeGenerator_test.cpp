@@ -189,9 +189,8 @@ TEST_CASE("[BytecodeGenerator] Basic function with 1 return type") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP, "4"},
+		{ska::bytecode::Command::JUMP, "2"},
 		{ska::bytecode::Command::LABEL, "toto"},
-		{ska::bytecode::Command::MOV, "R0", "0"},
-		{ska::bytecode::Command::END }
+		{ska::bytecode::Command::END, "0" }
 	});
 }

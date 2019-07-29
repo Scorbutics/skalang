@@ -9,6 +9,7 @@
 #include "GeneratorOperatorVariable.h"
 #include "GeneratorOperatorBinary.h"
 #include "GeneratorOperatorFunction.h"
+#include "GeneratorOperatorReturn.h"
 
 #include "GeneratorDeclarer.h"
 
@@ -26,6 +27,7 @@ std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode
 	GeneratorOperatorDeclare<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::FUNCTION_DECLARATION>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::FUNCTION_CALL>(*this, result);
+	GeneratorOperatorDeclare<ska::Operator::RETURN>(*this, result);
 	return result;
 }
 

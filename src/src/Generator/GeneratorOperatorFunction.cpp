@@ -55,7 +55,11 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	auto valueGroup = m_generator.generate({ context.script(), node.GetFunctionPrototype() });
 	LOG_DEBUG << "Generating body : ";
 	valueGroup.push(m_generator.generate({ context.script(), node.GetFunctionBody() }));
-	valueGroup.push(Instruction{ Command::END, Value{}});
+
+	if(valueGroup.pack().back().command() != Command::END) {
+		valueGroup.push(Instruction{ Command::END, Value{}});
+	}
+
 	LOG_DEBUG << "\tPrototype and Body : " << valueGroup.pack();
 	return AddRelativeJumpInstruction(std::move(valueGroup));
 }

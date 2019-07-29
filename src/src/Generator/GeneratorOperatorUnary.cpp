@@ -8,12 +8,7 @@
 namespace ska {
 	namespace bytecode {
 		static GenerationOutput CommonGenerate(Generator& generator, GenerationContext& context) {
-			/*if (generator.reg().hasCommand()) {
-				return {};
-			}*/
 			auto result = Value {context.pointer().name(), context.pointer().type().value() };
-			//auto result = context.cellFromValue(ska::BytecodeCommand::OUT);
-			//context.script().setReg(result);
 			return { std::move(result) };
 		}
 	}
