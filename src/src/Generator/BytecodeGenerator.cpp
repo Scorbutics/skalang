@@ -23,6 +23,7 @@ std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode
 	GeneratorOperatorDeclare<ska::Operator::BINARY>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::VARIABLE_DECLARATION>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::VARIABLE_AFFECTATION>(*this, result);
+	GeneratorOperatorDeclare<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::FUNCTION_DECLARATION>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::FUNCTION_CALL>(*this, result);
 	return result;

@@ -15,6 +15,13 @@ namespace ska {
 				m_right(std::move(right)) {
 			}
 
+			Instruction(Command command, std::vector<Value> operands) :
+				m_command(std::move(command)),
+				m_dest(operands.size() >= 1 ? std::move(operands[0]) : Value{}),
+				m_left(operands.size() >= 2 ? std::move(operands[1]) : Value{}),
+				m_right(operands.size() >= 3 ? std::move(operands[2]) : Value{}) {
+			}
+
 			Instruction() = default;
 
 			auto command() const { return m_command; }

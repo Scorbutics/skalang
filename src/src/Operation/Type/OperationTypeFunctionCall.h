@@ -18,11 +18,15 @@ namespace ska {
 			return node[0].type().value();
 		}
 
-		auto begin() {
+		inline const auto& GetFunctionNameNode() {
+			return node[0];
+		}
+
+		auto begin() const {
 			return node.begin() + 1;
 		}
-		
-		auto end() {
+
+		auto end() const {
 			return node.end();
 		}
 

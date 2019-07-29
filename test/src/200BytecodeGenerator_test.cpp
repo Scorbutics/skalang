@@ -49,6 +49,7 @@ struct BytecodePart {
 
 static void BytecodeCompare(const ska::bytecode::GenerationOutput& result, std::vector<BytecodePart> expected) {
 	auto index = std::size_t {0};
+	CHECK(result.pack().size() == expected.size());
 	for(const auto& r : result.pack()) {
 		const auto equality =
 			index < expected.size() &&
@@ -61,18 +62,16 @@ static void BytecodeCompare(const ska::bytecode::GenerationOutput& result, std::
 	}
 }
 
-TEST_CASE("[BytecodeGenerator] literal") {
+TEST_CASE("[BytecodeGenerator] literal alone") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("4;");
 	auto res = data.generator->generate(astPtr);
-	BytecodeCompare(res, {
-		{ska::bytecode::Command::MOV, "R0", "4"}
-	});
+	BytecodeCompare(res, { });
 }
 
 TEST_CASE("[BytecodeGenerator] var declaration") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = 4;");
 	auto res = data.generator->generate(astPtr);
-	
+
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::MOV, "V0", "4"}
 	});
@@ -131,7 +130,7 @@ TEST_CASE("[BytecodeGenerator] Basic Maths with var") {
 		{ska::bytecode::Command::ADD, "R3", "3", "R2"},
 		{ska::bytecode::Command::MUL, "R4", "2", "R3"},
 		{ska::bytecode::Command::ADD, "R5", "1", "9"},
-		{ska::bytecode::Command::ADD, "R6", "R4", "R5"},	
+		{ska::bytecode::Command::ADD, "R6", "R4", "R5"},
 		{ska::bytecode::Command::ADD, "R7", "R0", "R6"}
 	});
 }
@@ -149,11 +148,50 @@ TEST_CASE("[BytecodeGenerator] Introducing block sub-variable") {
 }
 
 
-TEST_CASE("[BytecodeGenerator] Function") {
+TEST_CASE("[BytecodeGenerator] Empty function only void") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function() { };");
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::MOV, "V0", ""}
+		{ska::bytecode::Command::JUMP, "2"},
+		{ska::bytecode::Command::LABEL, "toto"},
+		{ska::bytecode::Command::END }
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] Empty function with 1 parameter") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function(t: int) { };");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::JUMP, "3"},
+		{ska::bytecode::Command::LABEL, "toto"},
+		{ska::bytecode::Command::POP, "V0"},
+		{ska::bytecode::Command::END }
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] Empty function with 4 parameters (> 3)") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function(t: int, t1: string, t2: int, t3: int) { };");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::JUMP, "4"},
+		{ska::bytecode::Command::LABEL, "toto"},
+		{ska::bytecode::Command::POP, "V0", "V1", "V2"},
+		{ska::bytecode::Command::POP, "V3" },
+		{ska::bytecode::Command::END }
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] Basic function with 1 return type") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function(): int { return 0; };");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::JUMP, "4"},
+		{ska::bytecode::Command::LABEL, "toto"},
+		{ska::bytecode::Command::MOV, "R0", "0"},
+		{ska::bytecode::Command::END }
 	});
 }

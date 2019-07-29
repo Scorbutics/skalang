@@ -13,6 +13,10 @@ namespace ska {
 
 		class GenerationOutput {
 		public:
+			GenerationOutput(Instruction instruction) :
+				m_pack(InstructionPack { std::move(instruction) }) {
+			}
+
 			GenerationOutput(InstructionPack pack) :
 				m_pack(std::move(pack)) {
 			}
@@ -22,8 +26,7 @@ namespace ska {
 			}
 
 			void push(GenerationOutput value) {
-				//TODO move
-				m_pack.insert(m_pack.end(), value.m_pack.begin(), value.m_pack.end());
+				m_pack.insert(m_pack.end(), std::make_move_iterator(value.m_pack.begin()), std::make_move_iterator(value.m_pack.end()));
 			}
 
 			bool empty() const {

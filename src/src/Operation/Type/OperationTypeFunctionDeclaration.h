@@ -48,11 +48,11 @@ namespace ska {
 			return node;
 		}
 
-		auto begin() {
+		auto begin() const {
 			return node.begin();
 		}
 		
-		auto end() {
+		auto end() const {
 			return node.end();
 		}
 

@@ -22,7 +22,7 @@ namespace ska {
 			ska::Script program() { return ska::Script{ *m_script }; }
 
 			Register queryNextRegister(Type type);
-			Value queryVariableOrValue(const ASTNode& node);
+			Value queryVariableOrValue(const ASTNode& node, const Type* type = nullptr);
 
 		private:
 			std::size_t m_register = 0;
