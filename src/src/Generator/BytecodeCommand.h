@@ -5,6 +5,7 @@ namespace ska {
 	namespace bytecode {
 		enum class Command {
 			MOV,
+			CONV,
 			LABEL,
 			JUMP,
 			PUSH,
@@ -21,6 +22,7 @@ namespace ska {
 
 		static constexpr const char* CommandSTR[] = {
 			"MOV",
+			"CONV",
 			"LABEL",
 			"JUMP",
 			"PUSH",

@@ -145,6 +145,18 @@ TEST_CASE("[BytecodeGenerator] var expression declaration") {
 	});
 }
 
+//TODO
+TEST_CASE("[BytecodeGenerator] type conversion") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 7 + \"3\";");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::CONV, "R0", "0", "7"},
+		{ska::bytecode::Command::ADD, "R1", "R0", "3"},
+		{ska::bytecode::Command::MOV, "V0", "R1"}
+	});
+}
+
 TEST_CASE("[BytecodeGenerator] Introducing block sub-variable") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = 4; { var toto = 5; toto + 1; } toto + 1;");
 	auto res = data.generator->generate(astPtr);
