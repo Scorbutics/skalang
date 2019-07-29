@@ -8,7 +8,7 @@ namespace ska {
 		static GenerationOutput CommonGenerate(Generator& generator, const ASTNode& dest, const ska::ASTNode& node, GenerationContext& context) {
 			auto valueGroup = generator.generate({ context.script(), node });
 			if(dest.symbol() != node.symbol() || node.symbol() == nullptr) {
-				valueGroup.push(InstructionPack{ Instruction { Command::MOV, context.script().queryVariableOrValue(dest) , context.script().queryVariableOrValue(node) } });
+				valueGroup.push(InstructionPack{ Instruction { Command::MOV, context.script().queryVariableOrValue(dest) , valueGroup.value() } });
 			}
 			return valueGroup;
 		}

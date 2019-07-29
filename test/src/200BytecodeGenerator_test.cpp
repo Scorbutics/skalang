@@ -140,7 +140,8 @@ TEST_CASE("[BytecodeGenerator] var expression declaration") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::ADD, "V0", "7", "3"}
+		{ska::bytecode::Command::ADD, "R0", "7", "3"},
+		{ska::bytecode::Command::MOV, "V0", "R0"}
 	});
 }
 
@@ -221,10 +222,11 @@ TEST_CASE("[BytecodeGenerator] Function with 1 parameter and some computing insi
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP, "4"},
+		{ska::bytecode::Command::JUMP, "5"},
 		{ska::bytecode::Command::LABEL, "toto"},
 		{ska::bytecode::Command::POP, "V0"},
-		{ska::bytecode::Command::ADD, "V1", "V0", "3"},
+		{ska::bytecode::Command::ADD, "R0", "V0", "3"},
+		{ska::bytecode::Command::MOV, "V1", "R0"},
 		{ska::bytecode::Command::END, "V1" }
 	});
 }
