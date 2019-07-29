@@ -135,6 +135,15 @@ TEST_CASE("[BytecodeGenerator] Basic Maths with var") {
 	});
 }
 
+TEST_CASE("[BytecodeGenerator] var expression declaration") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 7 + 3;");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::ADD, "V0", "7", "3"}
+	});
+}
+
 TEST_CASE("[BytecodeGenerator] Introducing block sub-variable") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = 4; { var toto = 5; toto + 1; } toto + 1;");
 	auto res = data.generator->generate(astPtr);
@@ -192,5 +201,30 @@ TEST_CASE("[BytecodeGenerator] Basic function with 1 return type") {
 		{ska::bytecode::Command::JUMP, "2"},
 		{ska::bytecode::Command::LABEL, "toto"},
 		{ska::bytecode::Command::END, "0" }
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] Basic function with 1 parameter 1 return type") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function(test: int): int { return 0; };");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::JUMP, "3"},
+		{ska::bytecode::Command::LABEL, "toto"},
+		{ska::bytecode::Command::POP, "V0"},
+		{ska::bytecode::Command::END, "0" }
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] Function with 1 parameter and some computing inside") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function(test: int): int { var result = test + 3; return result; };");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::JUMP, "4"},
+		{ska::bytecode::Command::LABEL, "toto"},
+		{ska::bytecode::Command::POP, "V0"},
+		{ska::bytecode::Command::ADD, "V1", "V0", "3"},
+		{ska::bytecode::Command::END, "V1" }
 	});
 }
