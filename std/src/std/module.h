@@ -14,7 +14,7 @@ namespace ska {
         struct ModuleConfiguration {
             ScriptCache& scriptCache;
             TypeBuilder& typeBuilder;
-            SymbolTableUpdater& SymbolTableUpdater;
+            SymbolTableUpdater& symbolTableUpdater;
             const ReservedKeywordsPool& reservedKeywords;
             StatementParser& parser;
             Interpreter& interpreter;
