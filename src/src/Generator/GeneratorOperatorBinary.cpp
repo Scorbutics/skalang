@@ -4,6 +4,7 @@
 #include "GeneratorOperatorBinary.h"
 #include "Interpreter/Value/TypedNodeValue.h"
 #include "Generator/Value/BytecodeScript.h"
+#include "ComputingOperations/BytecodeTypeConversion.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::BINARY>);
 
@@ -30,21 +31,34 @@ namespace ska {
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::BINARY>::generate(OperateOn node, GenerationContext& context) {
-	auto leftGroup = GenerateInstructionValue(m_generator, context.script(), node.asNode(), node.GetFirstNode());
+	auto logicalOperator = LogicalOperatorMap.at(node.GetOperator());
 
-	auto rightGroup = GenerateInstructionValue(m_generator, context.script(), node.asNode(), node.GetSecondNode());
+	auto children = std::vector<const ASTNode*> { &node.GetFirstNode(), &node.GetSecondNode() };
+	auto groups = std::vector<GenerationOutput>{};
+
+	for(const auto* child : children) {
+		groups.push_back(InstructionPack{});
+		auto group = GenerateInstructionValue(m_generator, context.script(), node.asNode(), *child);
+
+		auto conversionGroup = TypeConversion(logicalOperator, group.value(), child->type().value(), node.asNode().type().value());
+		if(conversionGroup.has_value()) {
+			groups.back().push(std::move(conversionGroup.value()));
+		}
+
+		groups.back().push(std::move(group));
+	}
 
 	auto currentRegister = context.script().queryNextRegister(node.asNode().type().value());
 
 	auto operationValue = GenerateMathematicBinaryExpression(
 		node.GetOperator(),
 		std::move(currentRegister),
-		leftGroup.value(),
-		rightGroup.value()
+		groups[0].value(),
+		groups[1].value()
 	);
 
-	auto result = GenerationOutput{ std::move(leftGroup) };
-	result.push(std::move(rightGroup));
+	auto result = GenerationOutput{ std::move(groups[0]) };
+	result.push(std::move(groups[1]));
 	result.push( InstructionPack{ std::move(operationValue) } );
 
 	//It is important to put the right group before the left one : the ast order has to be reversed

@@ -25,7 +25,7 @@ static void ASTFromInputBytecodeGeneratorNoParse(const std::string& input, Bytec
   tokens = tokenizer->tokenize();
 	scriptCacheI.clear();
 	readerI = std::make_unique<ska::Script>(scriptCacheI, "main", tokens);
-    
+
   data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosserI);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableUpdater>(*data.parser);
@@ -61,114 +61,6 @@ static void BytecodeCompare(const ska::bytecode::GenerationOutput& result, std::
 		index++;
 	}
 }
-
-TEST_CASE("[BytecodeGenerator] literal alone") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("4;");
-	auto res = data.generator->generate(astPtr);
-	BytecodeCompare(res, { });
-}
-
-TEST_CASE("[BytecodeGenerator] var declaration") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = 4;");
-	auto res = data.generator->generate(astPtr);
-
-	BytecodeCompare(res, {
-		{ska::bytecode::Command::MOV, "V0", "4"}
-	});
-}
-
-TEST_CASE("[BytecodeGenerator] Basic Maths linear") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("3 + 4 - 1;");
-	auto res = data.generator->generate(astPtr);
-
-	BytecodeCompare(res, {
-		{ska::bytecode::Command::SUB, "R0", "4", "1"},
-		{ska::bytecode::Command::ADD, "R1", "3", "R0"},
-	});
-}
-
-TEST_CASE("[BytecodeGenerator] Basic Maths 1 left subpart") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("(3 + 4) * 2;");
-	auto res = data.generator->generate(astPtr);
-
-	BytecodeCompare(res, {
-		{ska::bytecode::Command::ADD, "R0", "3", "4"},
-		{ska::bytecode::Command::MUL, "R1", "R0", "2"}
-	});
-}
-
-TEST_CASE("[BytecodeGenerator] Basic Maths 1 right subpart") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("2 * (3 + 4);");
-	auto res = data.generator->generate(astPtr);
-
-	BytecodeCompare(res, {
-		{ska::bytecode::Command::ADD, "R0", "3", "4"},
-		{ska::bytecode::Command::MUL, "R1", "2", "R0"}
-	});
-}
-
-TEST_CASE("[BytecodeGenerator] Basic Maths subparts") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("(3 + 4) * (1 + 2);");
-	auto res = data.generator->generate(astPtr);
-
-	BytecodeCompare(res, {
-		{ska::bytecode::Command::ADD, "R0", "3", "4"},
-		{ska::bytecode::Command::ADD, "R1", "1", "2"},
-		{ska::bytecode::Command::MUL, "R2", "R0", "R1"}
-	});
-}
-
-TEST_CASE("[BytecodeGenerator] Basic Maths with var") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = 4; (toto * 5) + 2 * (3 + 4 - 1 / 4) + 1 + 9;");
-	auto res = data.generator->generate(astPtr);
-
-	BytecodeCompare(res, {
-		{ska::bytecode::Command::MOV, "V0", "4"},
-		{ska::bytecode::Command::MUL, "R0", "V0", "5"},
-		{ska::bytecode::Command::DIV, "R1", "1", "4"},
-		{ska::bytecode::Command::SUB, "R2", "4", "R1"},
-		{ska::bytecode::Command::ADD, "R3", "3", "R2"},
-		{ska::bytecode::Command::MUL, "R4", "2", "R3"},
-		{ska::bytecode::Command::ADD, "R5", "1", "9"},
-		{ska::bytecode::Command::ADD, "R6", "R4", "R5"},
-		{ska::bytecode::Command::ADD, "R7", "R0", "R6"}
-	});
-}
-
-TEST_CASE("[BytecodeGenerator] var expression declaration") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 7 + 3;");
-	auto res = data.generator->generate(astPtr);
-
-	BytecodeCompare(res, {
-		{ska::bytecode::Command::ADD, "R0", "7", "3"},
-		{ska::bytecode::Command::MOV, "V0", "R0"}
-	});
-}
-
-//TODO
-TEST_CASE("[BytecodeGenerator] type conversion") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 7 + \"3\";");
-	auto res = data.generator->generate(astPtr);
-
-	BytecodeCompare(res, {
-		{ska::bytecode::Command::CONV, "R0", "0", "7"},
-		{ska::bytecode::Command::ADD, "R1", "R0", "3"},
-		{ska::bytecode::Command::MOV, "V0", "R1"}
-	});
-}
-
-TEST_CASE("[BytecodeGenerator] Introducing block sub-variable") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = 4; { var toto = 5; toto + 1; } toto + 1;");
-	auto res = data.generator->generate(astPtr);
-
-	BytecodeCompare(res, {
-		{ska::bytecode::Command::MOV, "V0", "4"},
-		{ska::bytecode::Command::MOV, "V1", "5"},
-		{ska::bytecode::Command::ADD, "R0", "V1", "1"},
-		{ska::bytecode::Command::ADD, "R1", "V0", "1"}
-	});
-}
-
 
 TEST_CASE("[BytecodeGenerator] Empty function only void") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function() { };");
@@ -237,7 +129,7 @@ TEST_CASE("[BytecodeGenerator] Function with 1 parameter and some computing insi
 		{ska::bytecode::Command::JUMP, "5"},
 		{ska::bytecode::Command::LABEL, "toto"},
 		{ska::bytecode::Command::POP, "V0"},
-		{ska::bytecode::Command::ADD, "R0", "V0", "3"},
+		{ska::bytecode::Command::ADD_I, "R0", "V0", "3"},
 		{ska::bytecode::Command::MOV, "V1", "R0"},
 		{ska::bytecode::Command::END, "V1" }
 	});

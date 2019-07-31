@@ -21,7 +21,8 @@ namespace ska {
 		GREATER_OR_EQUAL,
 		GREATER,
         AND,
-        OR
+        OR,
+        UNUSED_Last_Length
     };
 
     static const auto LogicalOperatorMap = std::unordered_map<std::string, LogicalOperator>{
