@@ -10,7 +10,9 @@ namespace ska {
 			CONV_I_D,
 			CONV_D_I,
 			PUSH_F_ARR,
+			PUSH_F_ARR_ARR,
 			PUSH_B_ARR,
+			PUSH_B_ARR_ARR,
 			POP_F_ARR,
 			POP_B_ARR,
 			LABEL,
@@ -22,6 +24,7 @@ namespace ska {
 			END,
 			MUL_I,
 			MUL_I_STR,
+			MUL_I_ARR,
 			MUL_D,
 			ADD_I,
 			ADD_STR,
@@ -31,7 +34,6 @@ namespace ska {
 			SUB_I,
 			SUB_D,
 			SUB_ARR,
-			SUB_ARR_RANGE,
 			NOP,
 			UNUSED_Last_Length
 		};
@@ -43,7 +45,9 @@ namespace ska {
 			"CONV_I_D",
 			"CONV_D_I",
 			"PUSH_F_ARR",
+			"PUSH_F_ARR_ARR",
 			"PUSH_B_ARR",
+			"PUSH_B_ARR_ARR",
 			"POP_F_ARR",
 			"POP_B_ARR",
 			"LABEL",
@@ -55,6 +59,7 @@ namespace ska {
 			"END",
 			"MUL_I",
 			"MUL_I_STR",
+			"MUL_I_ARR",
 			"MUL_D",
 			"ADD_I",
 			"ADD_STR",
@@ -64,7 +69,6 @@ namespace ska {
 			"SUB_I",
 			"SUB_D",
 			"SUB_ARR",
-			"SUB_ARR_RANGE",
 			"NOP",
 			"UNUSED_Last_Length"
 		};

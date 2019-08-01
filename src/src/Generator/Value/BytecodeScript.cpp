@@ -4,7 +4,7 @@
 #include "BytecodeScript.h"
 #include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Script);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::Script);
 
 ska::bytecode::Script::Script(ska::Script& script) :
 	m_script(script.handle()) {

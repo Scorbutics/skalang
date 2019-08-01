@@ -41,12 +41,14 @@ namespace ska {
 				return m_pack;
 			}
 
+			/*
 			void transferValueToPack(Register r) {
 				if (!m_value.empty()) {
 					m_pack.push_back(Instruction{ Command::MOV, std::move(r), std::move(m_value) });
 					m_value = {};
 				}
 			}
+			*/
 
 		private:
 			 InstructionPack m_pack;

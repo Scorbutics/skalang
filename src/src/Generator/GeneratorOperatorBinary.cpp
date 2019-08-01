@@ -12,11 +12,17 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::O
 
 namespace ska {
 	namespace bytecode {
-		static Instruction GenerateMathematicBinaryExpression(std::string logicalOperator, Register dest, Value left, Value right) {
+		static GenerationOutput GenerateMathematicBinaryExpression(Script& script, std::string logicalOperator, const TypedValueRef& dest, const TypedValueRef& left, const TypedValueRef& right) {
 			assert(!logicalOperator.empty());
-			auto operatorIt = CommandMap.find(logicalOperator);
-			if(operatorIt != CommandMap.end()) {
-				return { operatorIt->second, std::move(dest), std::move(left), std::move(right) };
+			auto operatorIt = LogicalOperatorMap.find(logicalOperator);
+			if(operatorIt != LogicalOperatorMap.end()) {
+				return TypeConversionBinary(
+					script,
+					operatorIt->second,
+					left,
+					right,
+					dest
+				);
 			}
 			throw std::runtime_error("Unhandled operator " + logicalOperator);
 		}
@@ -31,35 +37,28 @@ namespace ska {
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::BINARY>::generate(OperateOn node, GenerationContext& context) {
-	auto logicalOperator = LogicalOperatorMap.at(node.GetOperator());
-
 	auto children = std::vector<const ASTNode*> { &node.GetFirstNode(), &node.GetSecondNode() };
 	auto groups = std::vector<GenerationOutput>{};
 
 	for(const auto* child : children) {
-		groups.push_back(InstructionPack{});
 		auto group = GenerateInstructionValue(m_generator, context.script(), node.asNode(), *child);
-
-		auto conversionGroup = TypeConversion(logicalOperator, group.value(), child->type().value(), node.asNode().type().value());
-		if(conversionGroup.has_value()) {
-			groups.back().push(std::move(conversionGroup.value()));
-		}
-
-		groups.back().push(std::move(group));
+		groups.push_back(std::move(group));
+		LOG_DEBUG << "Binary : Value node child " << groups.back().value().content;
 	}
 
 	auto currentRegister = context.script().queryNextRegister(node.asNode().type().value());
 
 	auto operationValue = GenerateMathematicBinaryExpression(
+		context.script(),
 		node.GetOperator(),
-		std::move(currentRegister),
-		groups[0].value(),
-		groups[1].value()
+		{node.asNode().type().value(), currentRegister},
+		{children[0]->type().value(), groups[0].value()},
+		{children[1]->type().value(), groups[1].value()}
 	);
 
 	auto result = GenerationOutput{ std::move(groups[0]) };
 	result.push(std::move(groups[1]));
-	result.push( InstructionPack{ std::move(operationValue) } );
+	result.push(std::move(operationValue));
 
 	//It is important to put the right group before the left one : the ast order has to be reversed
 	LOG_DEBUG << "Result \"" << result.pack() << "\"\n";

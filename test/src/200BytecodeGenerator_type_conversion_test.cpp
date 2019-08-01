@@ -67,8 +67,8 @@ TEST_CASE("[BytecodeGenerator] type conversion") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::MOV, "R0", "7"},
-		{ska::bytecode::Command::ADD_STR, "R1", "R0", "3"},
-		{ska::bytecode::Command::MOV, "V0", "R1"}
+		{ska::bytecode::Command::CONV_I_STR, "R1", "7"},
+		{ska::bytecode::Command::ADD_STR, "R0", "R1", "3"},
+		{ska::bytecode::Command::MOV, "V0", "R0"}
 	});
 }
