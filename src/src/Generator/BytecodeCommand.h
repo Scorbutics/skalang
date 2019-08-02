@@ -15,6 +15,7 @@ namespace ska {
 			PUSH_B_ARR_ARR,
 			POP_F_ARR,
 			POP_B_ARR,
+			POP_IN_ARR,
 			LABEL,
 			JUMP,
 			PUSH,
@@ -50,6 +51,7 @@ namespace ska {
 			"PUSH_B_ARR_ARR",
 			"POP_F_ARR",
 			"POP_B_ARR",
+			"POP_IN_ARR",
 			"LABEL",
 			"JUMP",
 			"PUSH",
@@ -73,11 +75,5 @@ namespace ska {
 			"UNUSED_Last_Length"
 		};
 
-		static const auto CommandMap = std::unordered_map<std::string, Command> {
-			{"+",  Command::ADD_I},
-			{"*",  Command::MUL_I},
-			{"/",  Command::DIV_I},
-			{"-",  Command::SUB_I}
-		};
 	}
 }

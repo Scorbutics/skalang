@@ -14,6 +14,6 @@ namespace ska {
       const Value value;
     };
 
-    GenerationOutput TypeConversionBinary(Script& script, LogicalOperator logicalOperator, const TypedValueRef& node1, const TypedValueRef& node2, const TypedValueRef& destination);
+    GenerationOutput TypeConversionBinary(LogicalOperator logicalOperator, const TypedValueRef& node1, const TypedValueRef& node2, const TypedValueRef& destination);
 	}
 }

@@ -12,12 +12,11 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::O
 
 namespace ska {
 	namespace bytecode {
-		static GenerationOutput GenerateMathematicBinaryExpression(Script& script, std::string logicalOperator, const TypedValueRef& dest, const TypedValueRef& left, const TypedValueRef& right) {
+		static GenerationOutput GenerateMathematicBinaryExpression(std::string logicalOperator, const TypedValueRef& dest, const TypedValueRef& left, const TypedValueRef& right) {
 			assert(!logicalOperator.empty());
 			auto operatorIt = LogicalOperatorMap.find(logicalOperator);
 			if(operatorIt != LogicalOperatorMap.end()) {
 				return TypeConversionBinary(
-					script,
 					operatorIt->second,
 					left,
 					right,
@@ -49,7 +48,6 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	auto currentRegister = context.script().queryNextRegister(node.asNode().type().value());
 
 	auto operationValue = GenerateMathematicBinaryExpression(
-		context.script(),
 		node.GetOperator(),
 		{node.asNode().type().value(), currentRegister},
 		{children[0]->type().value(), groups[0].value()},

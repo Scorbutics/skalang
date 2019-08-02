@@ -138,11 +138,12 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::TypeConversionData);
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::TypeConversionData)
 #define LOG_ERROR SLOG_STATIC(ska::LogLevel::Error, ska::bytecode::TypeConversionData)
 
-ska::bytecode::GenerationOutput ska::bytecode::TypeConversionBinary(Script& script, LogicalOperator logicalOperator, const TypedValueRef& node1, const TypedValueRef& node2, const TypedValueRef& destination) {
+ska::bytecode::GenerationOutput ska::bytecode::TypeConversionBinary(LogicalOperator logicalOperator, const TypedValueRef& node1, const TypedValueRef& node2, const TypedValueRef& destination) {
 	LOG_DEBUG << "Binary operation for nodes " << node1.value.content << " and " << node2.value.content << " with types " << node1.type  << " and " << node2.type;
 	const auto& selectedNode = ConvertWhich(destination.type, node1, node2);
 
-	auto result = TypeConversion(logicalOperator, selectedNode.type, destination.type, &selectedNode == &node2);
+	const auto reverseOrder = &selectedNode == &node2;
+	auto result = TypeConversion(logicalOperator, selectedNode.type, destination.type, reverseOrder);
 	if(result.empty()) {
 		LOG_ERROR << "No conversion found for nodes " << node1.value.content << " and " << node2.value.content << " with types " << node1.type  << " and " << node2.type;
 		return InstructionPack{};
@@ -151,15 +152,14 @@ ska::bytecode::GenerationOutput ska::bytecode::TypeConversionBinary(Script& scri
 	assert(result.size() == 2 || result.size() == 1);
 
 	if(result.size() == 2) {
-		auto tempRegister = script.queryNextRegister(destination.type);
-		auto group = GenerationOutput{ { Instruction {result[0], tempRegister, selectedNode.value} } };
-		group.push(Instruction { result[1], destination.value, tempRegister, &selectedNode == &node1 ? node2.value : node1.value });
+		auto group = GenerationOutput{ { Instruction {result[0], destination.value, selectedNode.value} } };
+		group.push(Instruction { result[1], destination.value, reverseOrder ? node1.value : destination.value, reverseOrder ? destination.value : node2.value });
 		LOG_INFO << "Conversion detected : " << group.pack();
 		return group;
 	}
 
 	LOG_DEBUG << "Command output : " << CommandSTR[static_cast<std::size_t>(result[0])];
 
-	return Instruction{result[0], destination.value, node1.value, node2.value };
+	return Instruction{result[0], destination.value, node1.value, node2.value};
 }
 
