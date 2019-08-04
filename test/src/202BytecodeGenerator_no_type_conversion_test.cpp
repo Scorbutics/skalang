@@ -62,64 +62,23 @@ static void BytecodeCompare(const ska::bytecode::GenerationOutput& result, std::
 	}
 }
 
-TEST_CASE("[BytecodeGenerator] type conversion + int => string") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 7 + \"3\";");
+TEST_CASE("[BytecodeGenerator] no type conversion string + string") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = \"3\" + \"7\";");
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::CONV_I_STR, "R0", "7"},
-		{ska::bytecode::Command::ADD_STR, "R0", "R0", "3"},
+		{ska::bytecode::Command::ADD_STR, "R0", "3", "7"},
 		{ska::bytecode::Command::MOV, "V0", "R0"}
 	});
 }
 
-/*
-//TODO : conversion unsupported atm
-
-TEST_CASE("[BytecodeGenerator] type conversion + float => string") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 7.0 + \"3\";");
+TEST_CASE("[BytecodeGenerator] no type conversion float + float") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3.0 + 7.4;");
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::CONV_D_STR, "R1", "7.0"},
-		{ska::bytecode::Command::ADD_STR, "R0", "R1", "3"},
+		{ska::bytecode::Command::ADD_D, "R0", "3.0", "7.4"},
 		{ska::bytecode::Command::MOV, "V0", "R0"}
-	});
-}
-*/
-
-TEST_CASE("[BytecodeGenerator] type conversion + int => float") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 7.0 + 3;");
-	auto res = data.generator->generate(astPtr);
-
-	BytecodeCompare(res, {
-		{ska::bytecode::Command::CONV_I_D, "R0", "3"},
-		{ska::bytecode::Command::ADD_D, "R0", "7.0", "R0"},
-		{ska::bytecode::Command::MOV, "V0", "R0"}
-	});
-}
-
-TEST_CASE("[BytecodeGenerator] type conversion + int => array (back)") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = [7, 12, 25] + 3;");
-	auto res = data.generator->generate(astPtr);
-
-	BytecodeCompare(res, {
-		{ska::bytecode::Command::PUSH, "7", "12", "25"},
-		{ska::bytecode::Command::POP_IN_ARR, "R0"},
-		{ska::bytecode::Command::PUSH_B_ARR, "R1", "R0", "3"},
-		{ska::bytecode::Command::MOV, "V0", "R1"}
-	});
-}
-
-TEST_CASE("[BytecodeGenerator] type conversion + int => array (front)") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3 + [7, 12, 25];");
-	auto res = data.generator->generate(astPtr);
-
-	BytecodeCompare(res, {
-		{ska::bytecode::Command::PUSH, "7", "12", "25"},
-		{ska::bytecode::Command::POP_IN_ARR, "R0"},
-		{ska::bytecode::Command::PUSH_F_ARR, "R1", "3", "R0"},
-		{ska::bytecode::Command::MOV, "V0", "R1"}
 	});
 }
 
@@ -134,5 +93,79 @@ TEST_CASE("[BytecodeGenerator] no type conversion array + array") {
 		{ska::bytecode::Command::POP_IN_ARR, "R1"},
 		{ska::bytecode::Command::PUSH_ARR_ARR, "R2", "R0", "R1"},
 		{ska::bytecode::Command::MOV, "V0", "R2"}
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] no type conversion int - int") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3 - 4;");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::SUB_I, "R0", "3", "4"},
+		{ska::bytecode::Command::MOV, "V0", "R0"}
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] no type conversion float - float") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3.1 - 4.2;");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::SUB_D, "R0", "3.1", "4.2"},
+		{ska::bytecode::Command::MOV, "V0", "R0"}
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] no type conversion array - array") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = [11, 4, 9] - [1, 2];");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::PUSH, "11", "4", "9"},
+		{ska::bytecode::Command::POP_IN_ARR, "R0"},
+		{ska::bytecode::Command::PUSH, "1", "2"},
+		{ska::bytecode::Command::POP_IN_ARR, "R1"},
+		{ska::bytecode::Command::SUB_ARR, "R2", "R0", "R1"},
+		{ska::bytecode::Command::MOV, "V0", "R2"}
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] no type conversion int * int") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3 * 4;");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::MUL_I, "R0", "3", "4"},
+		{ska::bytecode::Command::MOV, "V0", "R0"}
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] no type conversion float * float") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3.0 * 4.4;");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::MUL_D, "R0", "3.0", "4.4"},
+		{ska::bytecode::Command::MOV, "V0", "R0"}
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] no type conversion int / int") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3 / 4;");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::DIV_I, "R0", "3", "4"},
+		{ska::bytecode::Command::MOV, "V0", "R0"}
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] no type conversion float / float") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3.0 / 4.4;");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::DIV_D, "R0", "3.0", "4.4"},
+		{ska::bytecode::Command::MOV, "V0", "R0"}
 	});
 }
