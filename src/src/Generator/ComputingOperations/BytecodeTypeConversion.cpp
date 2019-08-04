@@ -69,6 +69,7 @@ namespace ska {
 			EnqueueConverterItem<Command::ADD_I>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::INT, ExpressionType::INT);
 			EnqueueConverterItem<Command::ADD_D>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::FLOAT, ExpressionType::FLOAT);
 			EnqueueConverterItem<Command::ADD_STR>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::STRING, ExpressionType::STRING);
+			EnqueueConverterItem<Command::PUSH_ARR_ARR>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::ARRAY, ExpressionType::ARRAY);
 
 			EnqueueConverterItem<Command::SUB_I>::enqueue(result, LogicalOperator::SUBSTRACT, ExpressionType::INT, ExpressionType::INT);
 			EnqueueConverterItem<Command::SUB_D>::enqueue(result, LogicalOperator::SUBSTRACT, ExpressionType::FLOAT, ExpressionType::FLOAT);
@@ -85,7 +86,6 @@ namespace ska {
 			EnqueueConverterItem<Command::CONV_D_STR, Command::ADD_STR>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::FLOAT, ExpressionType::STRING);
 			EnqueueConverterItem<Command::CONV_I_D, Command::ADD_D>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::INT, ExpressionType::FLOAT);
 			EnqueueConverterItemPack<CommandPackOr<Command::PUSH_F_ARR, Command::PUSH_B_ARR>>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::INT, ExpressionType::ARRAY);
-			EnqueueConverterItem<Command::PUSH_ARR_ARR>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::ARRAY, ExpressionType::ARRAY);
 
 			EnqueueConverterItem<Command::CONV_I_D, Command::SUB_D>::enqueue(result, LogicalOperator::SUBSTRACT, ExpressionType::INT, ExpressionType::FLOAT);
 			EnqueueConverterItemPack<CommandPackOr<Command::POP_F_ARR, Command::POP_B_ARR>>::enqueue(result, LogicalOperator::SUBSTRACT, ExpressionType::INT, ExpressionType::ARRAY);

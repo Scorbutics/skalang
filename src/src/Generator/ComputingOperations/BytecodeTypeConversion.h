@@ -5,15 +5,15 @@
 #include "NodeValue/ExpressionType.h"
 
 namespace ska {
-  class Type;
+	struct Type;
 	namespace bytecode {
-    class Script;
-    struct TypedValueRef {
-      TypedValueRef(const Type& type, const Value value) : type(type), value(value) {}
-      const Type& type;
-      const Value value;
-    };
+		class Script;
+		struct TypedValueRef {
+			TypedValueRef(const Type& type, const Value value) : type(type), value(value) {}
+			const Type& type;
+			const Value value;
+		};
 
-    GenerationOutput TypeConversionBinary(LogicalOperator logicalOperator, const TypedValueRef& node1, const TypedValueRef& node2, const TypedValueRef& destination);
+		GenerationOutput TypeConversionBinary(LogicalOperator logicalOperator, const TypedValueRef& node1, const TypedValueRef& node2, const TypedValueRef& destination);
 	}
 }
