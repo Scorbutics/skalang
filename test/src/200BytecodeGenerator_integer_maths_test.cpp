@@ -77,6 +77,16 @@ TEST_CASE("[BytecodeGenerator] var declaration") {
 	});
 }
 
+TEST_CASE("[BytecodeGenerator] var declaration from var") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = 4; var titi = toto;");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::MOV, "V0", "4"},
+		{ska::bytecode::Command::MOV, "V1", "V0"}
+	});
+}
+
 TEST_CASE("[BytecodeGenerator] Basic Maths linear") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("3 + 4 - 1;");
 	auto res = data.generator->generate(astPtr);

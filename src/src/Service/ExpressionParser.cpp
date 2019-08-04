@@ -124,7 +124,7 @@ bool ska::ExpressionParser::matchSymbol(Script& input, ExpressionStack& expressi
 
 	SLOG(ska::LogLevel::Info) << "\t\tPushing operator symbol " << value;
 
-	const auto shouldPopOperatorsStack = expressions.checkLessPriorityOperator(value[0]);
+	const auto shouldPopOperatorsStack = expressions.checkLessPriorityOperator(value);
 	if (shouldPopOperatorsStack) {
 		SLOG(ska::LogLevel::Debug) << "\tLess precedence, poping first (top) operator before adding " << value;
 
