@@ -27,6 +27,7 @@ namespace ska {
 
 			void push(GenerationOutput value) {
 				m_pack.insert(m_pack.end(), std::make_move_iterator(value.m_pack.begin()), std::make_move_iterator(value.m_pack.end()));
+				m_value = {};
 			}
 
 			bool empty() const {

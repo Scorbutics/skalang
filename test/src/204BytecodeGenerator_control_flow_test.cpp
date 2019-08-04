@@ -103,3 +103,60 @@ TEST_CASE("[BytecodeGenerator] if else with body") {
 
 }
 
+TEST_CASE("[BytecodeGenerator] empty for") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("for(;;) {}");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ Command::JUMP, "-1" }
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] for without body") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("for(var i = 0; i < 10; i = i + 1);");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		// Initialization part
+		{ Command::MOV, "V0", "0" },
+		
+		// Check part
+		{ Command::SUB_I, "R0", "V0", "10" },
+		{ Command::TEST_L, "R0", "R0" },
+		{ Command::JUMP_NIF, "R0", "3" },
+		
+		// Body part
+		
+		// Increment part
+		{ Command::ADD_I, "R1", "V0", "1"},
+		{ Command::MOV, "V0", "R1" },
+		{ Command::JUMP, "-6" }
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] for with body") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("for(var i = 0; i < 10; i = i + 1) { var toto = 123; toto + i; } var test = 1234;");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		// Initialization part
+		{ Command::MOV, "V0", "0" },
+
+		// Check part
+		{ Command::SUB_I, "R0", "V0", "10" },
+		{ Command::TEST_L, "R0", "R0" },
+		{ Command::JUMP_NIF, "R0", "5" },
+		
+		// Body part
+		{ Command::MOV, "V1", "123" },
+		{ Command::ADD_I, "R1", "V1", "V0" },
+
+		// Increment part
+		{ Command::ADD_I, "R2", "V0", "1"},
+		{ Command::MOV, "V0", "R2" },
+		{ Command::JUMP, "-8" },
+
+		// Post part
+		{ Command::MOV, "V2", "1234"}
+	});
+}
