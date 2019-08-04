@@ -122,3 +122,17 @@ TEST_CASE("[BytecodeGenerator] type conversion + int => array (front)") {
 		{ska::bytecode::Command::MOV, "V0", "R1"}
 	});
 }
+
+TEST_CASE("[BytecodeGenerator] no type conversion array + array") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = [3] + [7, 12, 25];");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::PUSH, "3"},
+		{ska::bytecode::Command::POP_IN_ARR, "R0"},
+		{ska::bytecode::Command::PUSH, "7", "12", "25"},
+		{ska::bytecode::Command::POP_IN_ARR, "R1"},
+		{ska::bytecode::Command::PUSH_ARR_ARR, "R2", "R0", "R1"},
+		{ska::bytecode::Command::MOV, "V0", "R2"}
+	});
+}
