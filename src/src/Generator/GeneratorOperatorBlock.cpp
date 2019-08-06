@@ -14,7 +14,7 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 		group.push(std::move(childCellGroup));
 	}
 
-	LOG_DEBUG << group.pack();
+	LOG_DEBUG << group;
 
 	return group;
 }

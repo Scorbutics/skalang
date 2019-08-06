@@ -171,7 +171,7 @@ namespace ska {
 	}
 }
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::TypeConversionData);
+SKA_LOGC_CONFIG(ska::LogLevel::Error, ska::bytecode::TypeConversionData);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::TypeConversionData)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::TypeConversionData)
 #define LOG_ERROR SLOG_STATIC(ska::LogLevel::Error, ska::bytecode::TypeConversionData)
@@ -196,7 +196,7 @@ ska::bytecode::GenerationOutput ska::bytecode::TypeConversionBinary(LogicalOpera
 		case OperationType::SPLIT: {
 			auto group = GenerationOutput{ { Instruction {container[0], destination.value, selectedNode.value} } };
 			group.push(Instruction{ container[1], destination.value, reverseOrder ? node1.value : destination.value, reverseOrder ? destination.value : node2.value });
-			LOG_INFO << "Conversion detected : " << group.pack();
+			LOG_INFO << "Conversion detected : " << group;
 			return group;
 		}
 		case OperationType::FULL_FIRST:
@@ -206,7 +206,7 @@ ska::bytecode::GenerationOutput ska::bytecode::TypeConversionBinary(LogicalOpera
 			if (container.size() > 1) {
 				group.push(Instruction{ container[1], destination.value, destination.value });
 			}
-			LOG_INFO << "Conversion detected : " << group.pack();
+			LOG_INFO << "Conversion detected : " << group;
 			return group;
 		}
 	}

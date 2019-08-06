@@ -45,7 +45,7 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 		LOG_DEBUG << "Binary : Value node child " << groups.back().value().content;
 	}
 
-	auto currentRegister = context.script().queryNextRegister(node.asNode().type().value());
+	auto currentRegister = context.script().queryNextRegister();
 
 	auto operationValue = GenerateMathematicBinaryExpression(
 		node.GetOperator(),
@@ -59,7 +59,7 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	result.push(std::move(operationValue));
 
 	//It is important to put the right group before the left one : the ast order has to be reversed
-	LOG_DEBUG << "Result \"" << result.pack() << "\"\n";
+	LOG_DEBUG << "Result \"" << result << "\"\n";
 
 	return result;
 }

@@ -32,10 +32,9 @@ namespace ska {
 
 		struct Value {
 			std::string content;
-			Type type;
 
 			bool empty() const {
-				return content.empty() && type.type() == ExpressionType::VOID;
+				return content.empty();
 			}
 		};
 

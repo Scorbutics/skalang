@@ -13,6 +13,7 @@
 #include "GeneratorOperatorArray.h"
 #include "GeneratorOperatorIf.h"
 #include "GeneratorOperatorFor.h"
+#include "GeneratorOperatorUserDefinedObject.h"
 
 #include "GeneratorDeclarer.h"
 
@@ -36,6 +37,7 @@ std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode
 	GeneratorOperatorDeclare<ska::Operator::IF>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::IF_ELSE>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::FOR_LOOP>(*this, result);
+	GeneratorOperatorDeclare<ska::Operator::USER_DEFINED_OBJECT>(*this, result);
 
 	return result;
 }

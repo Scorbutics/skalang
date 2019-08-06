@@ -39,7 +39,7 @@ namespace ska {
 		inline auto GetFunctionName() {
 			return node.name();
 		}
-		
+
 		inline auto GetParameterSize() {
 			return node.size() - 1;
 		}
@@ -51,7 +51,7 @@ namespace ska {
 		auto begin() const {
 			return node.begin();
 		}
-		
+
 		auto end() const {
 			return node.end();
 		}

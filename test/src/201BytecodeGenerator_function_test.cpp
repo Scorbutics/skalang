@@ -49,8 +49,8 @@ struct BytecodePart {
 
 static void BytecodeCompare(const ska::bytecode::GenerationOutput& result, std::vector<BytecodePart> expected) {
 	auto index = std::size_t {0};
-	CHECK(result.pack().size() == expected.size());
-	for(const auto& r : result.pack()) {
+	CHECK(result.size() == expected.size());
+	for(const auto& r : result) {
 		const auto equality =
 			index < expected.size() &&
 			r.command() == expected[index].command &&
@@ -68,8 +68,8 @@ TEST_CASE("[BytecodeGenerator] Empty function only void") {
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP, "2"},
-		{ska::bytecode::Command::LABEL, "toto"},
-		{ska::bytecode::Command::END }
+		{ska::bytecode::Command::LABEL, "L0"},
+		{ska::bytecode::Command::END, "L0" }
 	});
 }
 
@@ -79,9 +79,9 @@ TEST_CASE("[BytecodeGenerator] Empty function with 1 parameter") {
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP, "3"},
-		{ska::bytecode::Command::LABEL, "toto"},
+		{ska::bytecode::Command::LABEL, "L0"},
 		{ska::bytecode::Command::POP, "V0"},
-		{ska::bytecode::Command::END }
+		{ska::bytecode::Command::END, "L0"}
 	});
 }
 
@@ -91,10 +91,10 @@ TEST_CASE("[BytecodeGenerator] Empty function with 4 parameters (> 3)") {
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP, "4"},
-		{ska::bytecode::Command::LABEL, "toto"},
+		{ska::bytecode::Command::LABEL, "L0"},
 		{ska::bytecode::Command::POP, "V0", "V1", "V2"},
 		{ska::bytecode::Command::POP, "V3" },
-		{ska::bytecode::Command::END }
+		{ska::bytecode::Command::END, "L0"}
 	});
 }
 
@@ -104,8 +104,8 @@ TEST_CASE("[BytecodeGenerator] Basic function with 1 return type") {
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP, "2"},
-		{ska::bytecode::Command::LABEL, "toto"},
-		{ska::bytecode::Command::END, "0" }
+		{ska::bytecode::Command::LABEL, "L0"},
+		{ska::bytecode::Command::END, "L0", "0" }
 	});
 }
 
@@ -115,9 +115,9 @@ TEST_CASE("[BytecodeGenerator] Basic function with 1 parameter 1 return type") {
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP, "3"},
-		{ska::bytecode::Command::LABEL, "toto"},
+		{ska::bytecode::Command::LABEL, "L0"},
 		{ska::bytecode::Command::POP, "V0"},
-		{ska::bytecode::Command::END, "0" }
+		{ska::bytecode::Command::END, "L0", "0" }
 	});
 }
 
@@ -127,10 +127,32 @@ TEST_CASE("[BytecodeGenerator] Function with 1 parameter and some computing insi
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP, "5"},
-		{ska::bytecode::Command::LABEL, "toto"},
+		{ska::bytecode::Command::LABEL, "L0"},
 		{ska::bytecode::Command::POP, "V0"},
 		{ska::bytecode::Command::ADD_I, "R0", "V0", "3"},
 		{ska::bytecode::Command::MOV, "V1", "R0"},
-		{ska::bytecode::Command::END, "V1" }
+		{ska::bytecode::Command::END, "L0", "V1" }
+	});
+}
+
+
+TEST_CASE("[BytecodeGenerator] Function with 1 parameter and some computing inside") {
+	constexpr auto progStr =
+		"var toto = function() : var {"
+			"var priv_test = 1;"
+			"return {"
+				"test : priv_test,"
+				"say : function(more : string) : string {"
+					"var s = \"lol\" + priv_test + more;"
+					"return s;"
+				"}"
+			"};"
+		"};"
+		"var test = toto();";
+
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
 	});
 }

@@ -49,8 +49,8 @@ struct BytecodePart {
 
 static void BytecodeCompare(const ska::bytecode::GenerationOutput& result, std::vector<BytecodePart> expected) {
 	auto index = std::size_t {0};
-	CHECK(result.pack().size() == expected.size());
-	for(const auto& r : result.pack()) {
+	CHECK(result.size() == expected.size());
+	for(const auto& r : result) {
 		const auto equality =
 			index < expected.size() &&
 			r.command() == expected[index].command &&

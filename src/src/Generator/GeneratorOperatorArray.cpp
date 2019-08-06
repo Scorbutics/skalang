@@ -6,7 +6,7 @@
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::ARRAY_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	auto result = GenerationOutput{ InstructionPack{} };
 	ApplyNOperations(context.script(), node, Command::PUSH, result);
-	result.push(Instruction { Command::POP_IN_ARR, context.script().queryNextRegister(Type {}) });
+	result.push(Instruction { Command::POP_IN_ARR, context.script().queryNextRegister() });
 	return result;
 }
 

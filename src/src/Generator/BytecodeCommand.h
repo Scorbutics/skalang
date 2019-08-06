@@ -15,7 +15,10 @@ namespace ska {
 			POP_F_ARR,
 			POP_B_ARR,
 			POP_IN_ARR,
+			POP_IN_VAR,
 			LABEL,
+			LABEL_AS_REF,
+			CALL,
 			JUMP,
 			JUMP_NIF,
 			PUSH,
@@ -59,7 +62,10 @@ namespace ska {
 			"POP_F_ARR",
 			"POP_B_ARR",
 			"POP_IN_ARR",
+			"POP_IN_VAR",
 			"LABEL",
+			"LABEL_AS_REF",
+			"CALL",
 			"JUMP",
 			"JUMP_NIF",
 			"PUSH",
@@ -90,6 +96,8 @@ namespace ska {
 			"NOP",
 			"UNUSED_Last_Length"
 		};
+
+		static_assert(sizeof(CommandSTR) / sizeof(CommandSTR[0]) == (static_cast<std::size_t>(Command::UNUSED_Last_Length) + 1));
 
 	}
 }
