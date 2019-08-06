@@ -8,7 +8,7 @@
 namespace ska {
 	namespace bytecode {
 		static GenerationOutput CommonGenerate(Generator& generator, GenerationContext& context) {
-			auto result = context.script().queryVariableOrValue(context.pointer());
+			auto result = context.script().querySymbolOrValue(context.pointer());
 			return { std::move(result) };
 		}
 	}

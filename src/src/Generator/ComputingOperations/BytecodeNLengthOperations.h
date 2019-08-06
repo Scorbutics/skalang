@@ -13,7 +13,7 @@ namespace ska {
 			std::size_t index = 0u;
 			for (const auto& paramNode : std::forward<NodeIterable>(node)) {
 				if (paramNode != nullptr && index < maxSize) {
-					temporaryContainer.push_back(script.queryVariableOrValue(*paramNode));
+					temporaryContainer.push_back(script.querySymbolOrValue(*paramNode));
 					if (temporaryContainer.size() == Modulo) {
 						output.push(Instruction { command, std::move(temporaryContainer)});
 						temporaryContainer = {};

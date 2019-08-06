@@ -28,7 +28,7 @@ namespace ska {
 
 		static GenerationOutput GenerateInstructionValue(Generator& generator, Script& script, const ASTNode& parent, const ASTNode& node) {
 			if(node.size() == 0) {
-				return script.queryVariableOrValue(node);
+				return script.querySymbolOrValue(node);
 			}
 			return generator.generate({ script, node });
 		}

@@ -4,7 +4,7 @@
 #include "Generator/Value/BytecodeScript.h"
 #include "Generator/ComputingOperations/BytecodeNLengthOperations.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>)
 
@@ -75,7 +75,9 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	valueGroup.push(Instruction{ Command::END, valueGroup.name(), isVoidReturningFunction ? Value{} : valueGroup.value() });
 
 	LOG_DEBUG << "\tPrototype and Body : " << valueGroup;
-	return AddRelativeJumpInstruction(std::move(valueGroup));
+	auto fullFunction = AddRelativeJumpInstruction(std::move(valueGroup));
+	fullFunction.push(Instruction{ Command::LABEL_AS_REF, context.script().querySymbolOrValue(node.GetFunction()), fullFunction.value() });
+	return fullFunction;
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
@@ -87,7 +89,7 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>::generate(OperateOn node, GenerationContext& context) {
-	auto callInstruction = Instruction { Command::CALL, context.script().queryLabel(node.GetFunctionNameNode()) };
+	auto callInstruction = Instruction { Command::CALL, context.script().querySymbolOrValue(node.GetFunctionNameNode()) };
 	auto result = GenerationOutput{ InstructionPack {} };
 
 	ApplyNOperations(context.script(), node, Command::PUSH, result, node.GetFunctionParameterSize());

@@ -51,7 +51,7 @@ namespace ska {
 			ska::Script program() { return ska::Script{ *m_script }; }
 
 			Register queryNextRegister();
-			Value queryVariableOrValue(const ASTNode& node);
+			Value querySymbolOrValue(const ASTNode& node);
 			Value queryLabel(const ASTNode& node);
 
 			~Script() override = default;

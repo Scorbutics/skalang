@@ -17,8 +17,15 @@ ska::bytecode::Register ska::bytecode::Script::queryNextRegister() {
 	return { ss.str() };
 }
 
-ska::bytecode::Value ska::bytecode::Script::queryVariableOrValue(const ASTNode& node) {
-	return VariableGetter::query(node);
+ska::bytecode::Value ska::bytecode::Script::querySymbolOrValue(const ASTNode& node) {
+	/*
+	switch(node.type().value().symbolType().type()) {
+	case ExpressionType::FUNCTION:
+		return LabelGetter::query(node);
+	default:
+	*/
+		return VariableGetter::query(node);
+	/*}*/
 }
 
 ska::bytecode::Value ska::bytecode::Script::queryLabel(const ASTNode& node) {
