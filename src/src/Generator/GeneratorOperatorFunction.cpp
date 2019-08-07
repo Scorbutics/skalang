@@ -95,6 +95,6 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	ApplyNOperations(context.script(), node, Command::PUSH, result, node.GetFunctionParameterSize());
 	LOG_DEBUG << result;
 	result.push(std::move(callInstruction));
-
+	result.push(Instruction{ Command::POP, context.script().queryNextRegister()});
 	return result;
 }

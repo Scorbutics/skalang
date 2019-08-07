@@ -179,6 +179,7 @@ TEST_CASE("[BytecodeGenerator] Custom object creation") {
 		{ska::bytecode::Command::END, "L0", "R2"},
 		{ska::bytecode::Command::LABEL_AS_REF, "V5", "L0"},
 		{ska::bytecode::Command::CALL, "V5"},
-		{ska::bytecode::Command::POP, "V6"}
+		{ska::bytecode::Command::POP, "R3"},
+		{ska::bytecode::Command::MOV, "V6", "R3"}
 	});
 }
