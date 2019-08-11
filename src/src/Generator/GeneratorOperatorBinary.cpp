@@ -54,7 +54,7 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 		{children[1]->type().value(), groups[1].value()}
 	);
 
-	auto result = GenerationOutput{ std::move(groups[0]) };
+	auto result = std::move(groups[0]);
 	result.push(std::move(groups[1]));
 	result.push(std::move(operationValue));
 

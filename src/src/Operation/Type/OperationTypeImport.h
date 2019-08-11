@@ -12,8 +12,8 @@ namespace ska {
 	public:
 		OperationType(const ASTNode& node) : node(node) {}
 
-		inline auto GetScriptPath() {
-			return node[0].name();
+		inline const auto& GetScriptPathNode() const {
+			return node[0];
 		}
 	};
 }
