@@ -102,6 +102,9 @@ namespace ska {
 		bool isBridged() const { return m_handle != nullptr && m_handle->m_bridged; }
 
 	private:
+		void astFromBridge(const std::vector<BridgeMemory>& bindings);
+		void memoryFromBridge(const ASTNode& declaredAstBlock, std::vector<BridgeMemory> bindings);
+
         ScriptHandle* m_handle = nullptr;
 		ScriptCache& m_cache;
 		bool m_inCache = false;
