@@ -2,7 +2,6 @@
 #include "Base/SkaConstants.h"
 #include "NodeValue/AST.h"
 #include "GeneratorOperatorBinary.h"
-#include "Interpreter/Value/TypedNodeValue.h"
 #include "Generator/Value/BytecodeScript.h"
 #include "ComputingOperations/BytecodeTypeConversion.h"
 

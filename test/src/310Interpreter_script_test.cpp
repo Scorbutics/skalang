@@ -28,7 +28,8 @@ auto typeCrosserIS = ska::TypeCrosser{};
 void ASTFromInputSemanticTCInterpreterScriptNoParse(const std::string& input, DataTestContainer& data) {
     tokenizerS = std::make_unique<ska::Tokenizer>(reservedKeywordsS, input);
     tokensS = tokenizerS->tokenize();
-	scriptCacheIS.clear();
+	scriptCacheIS.cache.clear();
+	scriptCacheIS.astCache.clear();
 	readerIS = std::make_unique<ska::Script>(scriptCacheIS, "main", tokensS);
     
     data.parser = std::make_unique<ska::StatementParser>(reservedKeywordsS);
@@ -40,7 +41,7 @@ void ASTFromInputSemanticTCInterpreterScriptNoParse(const std::string& input, Da
 
 ska::Script ASTFromInputSemanticTCInterpreterScript(const std::string& input, DataTestContainer& data) {
 	ASTFromInputSemanticTCInterpreterScriptNoParse(input, data);
-	readerIS->parse(*data.parser);
+	readerIS->astScript().parse(*data.parser);
     return *readerIS;
 }
 
@@ -70,7 +71,7 @@ TEST_CASE("[Interpreter Script]") {
 		}));
 		scriptBindingDataClass.buildFunctions();
 
-		readerIS->parse(*data.parser);
+		readerIS->astScript().parse(*data.parser);
 		auto result = data.interpreter->script(*readerIS);
 		CHECK(*result.nodeval<ska::StringShared>() == "tototo !");
 	}
@@ -131,7 +132,7 @@ TEST_CASE("[Interpreter Script]") {
 		scriptBinding.bindFunction("funcTest", std::move(function));
 		scriptBinding.buildFunctions();
 
-		readerIS->parse(*data.parser);
+		readerIS->astScript().parse(*data.parser);
 		data.interpreter->script(*readerIS);
 		CHECK(test == 14);
 		CHECK(testStr == "titito");
@@ -157,7 +158,7 @@ TEST_CASE("[Interpreter Script]") {
 		scriptBinding.bindFunction("funcTest2", std::move(function2));
 		scriptBinding.buildFunctions();
 
-		readerIS->parse(*data.parser);
+		readerIS->astScript().parse(*data.parser);
 		data.interpreter->script(*readerIS);
 		CHECK(test == 14);
 		CHECK(testStr == "titito");
@@ -192,7 +193,7 @@ TEST_CASE("[Interpreter Script]") {
 		}));
 		scriptBinding.buildFunctions();
 
-		readerIS->parse(*data.parser);
+		readerIS->astScript().parse(*data.parser);
 		data.interpreter->script(*readerIS);
 		CHECK(test == 1234);
 		CHECK((*name == "JeanMi"));
@@ -217,7 +218,7 @@ TEST_CASE("[Interpreter Script]") {
 		}));
 		scriptBindingDataClass.buildFunctions();
 
-		readerIS->parse(*data.parser);
+		readerIS->astScript().parse(*data.parser);
 		data.interpreter->script(*readerIS);
 	}
 
@@ -243,7 +244,7 @@ TEST_CASE("[Interpreter Script]") {
 		scriptBindingDataClass.buildFunctions();
 
 		try {
-			readerIS->parse(*data.parser);
+			readerIS->astScript().parse(*data.parser);
 			data.interpreter->script(*readerIS);
 			CHECK(false);
 		} catch (std::exception& e) {
@@ -271,7 +272,7 @@ TEST_CASE("[Interpreter Script]") {
 		scriptBindingDataClass.buildFunctions();
 
 		try {
-			readerIS->parse(*data.parser);
+			readerIS->astScript().parse(*data.parser);
 			data.interpreter->script(*readerIS);
 			CHECK(false);
 		} catch (std::exception& e) {
@@ -299,7 +300,7 @@ TEST_CASE("[Interpreter Script]") {
 		scriptBindingDataClass.buildFunctions();
 
 		try {
-			readerIS->parse(*data.parser);
+			readerIS->astScript().parse(*data.parser);
 			data.interpreter->script(*readerIS);
 			CHECK(false);
 		} catch (std::exception& e) {
@@ -326,7 +327,7 @@ TEST_CASE("[Interpreter Script]") {
 		}));
 		scriptBindingDataClass.buildFunctions();
 
-		readerIS->parse(*data.parser);
+		readerIS->astScript().parse(*data.parser);
 		auto result = data.interpreter->script(*readerIS);
 		CHECK(*result.nodeval<ska::StringShared>() == "titito");
 	}
@@ -347,7 +348,7 @@ TEST_CASE("[Interpreter Script]") {
 		}));
 		scriptBinding.buildFunctions();
 
-		readerIS->parse(*data.parser);
+		readerIS->astScript().parse(*data.parser);
 		data.interpreter->script(*readerIS);
 		CHECK(test == 14);
 	}
@@ -364,7 +365,7 @@ TEST_CASE("[Interpreter Script]") {
 		}));
 		scriptBinding.buildFunctions();
 
-		readerIS->parse(*data.parser);
+		readerIS->astScript().parse(*data.parser);
 		data.interpreter->script(*readerIS);
 		CHECK(test == 10);
 	}
@@ -381,7 +382,7 @@ TEST_CASE("[Interpreter Script]") {
 		}));
 		scriptBinding.buildFunctions();
 
-		readerIS->parse(*data.parser);
+		readerIS->astScript().parse(*data.parser);
 		data.interpreter->script(*readerIS);
 		CHECK(test == 3);
 		CHECK(count == 2);
@@ -399,7 +400,7 @@ TEST_CASE("[Interpreter Script]") {
 		}));
 		scriptBinding.buildFunctions();
 
-		readerIS->parse(*data.parser);
+		readerIS->astScript().parse(*data.parser);
 		data.interpreter->script(*readerIS);
 		CHECK(test == 4);
 		CHECK(count == 3);

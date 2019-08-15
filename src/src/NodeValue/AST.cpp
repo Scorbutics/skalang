@@ -1,6 +1,6 @@
 #include "AST.h"
 #include "Service/ASTFactory.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
 
 ska::ASTNode::ASTNode(): 
@@ -42,7 +42,7 @@ ska::ASTNode::ASTNode(Operator o, Token identifierToken) :
     token(std::move(identifierToken)) {
 }
 
-void ska::ASTNode::buildType(const TypeBuildersContainer& typeBuilders, const Script& script) {
+void ska::ASTNode::buildType(const TypeBuildersContainer& typeBuilders, const ScriptAST& script) {
 	if (m_type.has_value()) {
 		return;
 	}

@@ -23,13 +23,14 @@
 #include "Matcher/MatcherVar.h"
 #include "Matcher/MatcherReturn.h"
 
-#include "Interpreter/Value/ScriptPtr.h"
+#include "NodeValue/ScriptASTPtr.h"
+#include "NodeValue/ScriptCacheAST.h"
 
 namespace ska {
 	struct ReservedKeywordsPool;
-	class Script;
+	class ScriptAST;
 	class ExpressionParser;
-	struct ScriptHandle;
+	struct ScriptHandleAST;
 
 	class StatementParser :
 		public observable_priority_queue<ForTokenEvent>,
@@ -44,24 +45,24 @@ namespace ska {
 		public observable_priority_queue<ScriptLinkTokenEvent> {
 
 		using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
-		friend class Script;
+		friend class ScriptAST;
 		
-		using ScriptHandlePtr = std::unique_ptr<ScriptHandle>;
+		using ScriptHandleASTPtr = std::unique_ptr<ScriptHandleAST>;
 	public:
 		StatementParser(const ReservedKeywordsPool& reservedKeywordsPool);
-		ScriptPtr subParse(std::unordered_map<std::string, ScriptHandlePtr>& scriptCache, const std::string& name, std::ifstream& file);
+		ScriptASTPtr subParse(ScriptCacheAST& scriptCache, const std::string& name, std::ifstream& file);
 
 	private:
-		ASTNodePtr parse(Script& input);
+		ASTNodePtr parse(ScriptAST& input);
 
-		ASTNodePtr statement(Script& input);
-        ASTNodePtr optstatement(Script& input, const Token& mustNotBe = Token{});
+		ASTNodePtr statement(ScriptAST& input);
+        ASTNodePtr optstatement(ScriptAST& input, const Token& mustNotBe = Token{});
 
-		ASTNodePtr expr(Script& input);
-		ASTNodePtr optexpr(Script& input, const Token& mustNotBe = Token{});
+		ASTNodePtr expr(ScriptAST& input);
+		ASTNodePtr optexpr(ScriptAST& input, const Token& mustNotBe = Token{});
 
-		ASTNodePtr matchExpressionStatement(Script& input);
-		ASTNodePtr matchReservedKeyword(Script& input, const std::size_t keywordIndex);
+		ASTNodePtr matchExpressionStatement(ScriptAST& input);
+		ASTNodePtr matchReservedKeyword(ScriptAST& input, const std::size_t keywordIndex);
 		static void error(const std::string& message);
 
 		const ReservedKeywordsPool& m_reservedKeywordsPool;

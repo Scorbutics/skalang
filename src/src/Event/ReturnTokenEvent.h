@@ -3,7 +3,7 @@
 
 namespace ska {
     class ASTNode;
-	class Script;
+	class ScriptAST;
 
     enum class ReturnTokenEventType {
         START,
@@ -13,10 +13,10 @@ namespace ska {
 
     class ReturnTokenEvent {
 	public:
-        ReturnTokenEvent(Script& s) : m_type(ReturnTokenEventType::START), m_script(s) {}
+        ReturnTokenEvent(ScriptAST& s) : m_type(ReturnTokenEventType::START), m_script(s) {}
 		
         template<ReturnTokenEventType type>
-        static ReturnTokenEvent Make(ASTNode& node, Script& s) {
+        static ReturnTokenEvent Make(ASTNode& node, ScriptAST& s) {
             static_assert(type != ReturnTokenEventType::START);
             return ReturnTokenEvent { node, type, s };
         }
@@ -44,11 +44,11 @@ namespace ska {
 		}
 
 	private:
-        ReturnTokenEvent(ASTNode& node, ReturnTokenEventType type, Script& s) : m_node(&node), m_type(type), m_script(s) {
+        ReturnTokenEvent(ASTNode& node, ReturnTokenEventType type, ScriptAST& s) : m_node(&node), m_type(type), m_script(s) {
         }
 
 		ASTNode* m_node = nullptr;
         ReturnTokenEventType m_type;
-		Script& m_script;
+		ScriptAST& m_script;
     };
 }

@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "Base/Values/MovableNonCopyable.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 #include "Generator/Value/BytecodeValue.h"
 
 namespace ska {
@@ -43,12 +43,12 @@ namespace ska {
 			using LabelGetter = UniqueSymbolGetter<'L'>;
 			using VariableGetter = UniqueSymbolGetter<'V'>;
 		public:
-			Script(ska::Script& script);
+			Script(ska::ScriptAST& script);
 
 			Script(Script&&) = default;
 			Script& operator=(Script&&) = default;
 
-			ska::Script program() { return ska::Script{ *m_script }; }
+			ska::ScriptAST program() { return ska::ScriptAST{ *m_script }; }
 
 			Register queryNextRegister();
 			Value querySymbolOrValue(const ASTNode& node);
@@ -57,7 +57,7 @@ namespace ska {
 			~Script() override = default;
 		private:
 			std::size_t m_register = 0;
-			ska::ScriptHandle* m_script{};
+			ska::ScriptHandleAST* m_script{};
 		};
 	}
 }

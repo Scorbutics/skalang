@@ -4,7 +4,7 @@
 #include "NodeValue/AST.h"
 #include "Service/ASTFactory.h"
 
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 #include "Service/StatementParser.h"
 
 SKA_LOGC_CONFIG(LogLevel::Disabled, TypeBuilder)

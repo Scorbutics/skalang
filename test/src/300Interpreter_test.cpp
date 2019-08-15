@@ -24,7 +24,8 @@ auto typeCrosserI = ska::TypeCrosser{};
 void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTestContainer& data) {
     tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);
     tokens = tokenizer->tokenize();
-	scriptCacheI.clear();
+	scriptCacheI.cache.clear();
+	scriptCacheI.astCache.clear();
 	readerI = std::make_unique<ska::Script>(scriptCacheI, "main", tokens);
     
     data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
@@ -36,7 +37,7 @@ void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTest
 
 ska::Script ASTFromInputSemanticTCInterpreter(const std::string& input, DataTestContainer& data) {
 	ASTFromInputSemanticTCInterpreterNoParse(input, data);
-	readerI->parse(*data.parser);
+	readerI->astScript().parse(*data.parser);
     return *readerI;
 }
 

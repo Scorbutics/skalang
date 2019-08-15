@@ -4,7 +4,7 @@
 
 namespace ska {
     class ASTNode;
-	class Script;
+	class ScriptAST;
 
 	enum class FunctionTokenEventType {
 		DECLARATION_NAME,		
@@ -15,7 +15,7 @@ namespace ska {
     class FunctionTokenEvent {
 	public:
 
-		FunctionTokenEvent(ASTNode& content, FunctionTokenEventType type, Script& s, std::string name = "") :
+		FunctionTokenEvent(ASTNode& content, FunctionTokenEventType type, ScriptAST& s, std::string name = "") :
 			m_contentNode(content),
 			m_name(std::move(name)),
 			m_type(type),
@@ -44,7 +44,7 @@ namespace ska {
 			return m_contentNode;
 		}
 
-		Script& script() {
+		ScriptAST& script() {
 			return m_script;
 		}
 
@@ -52,6 +52,6 @@ namespace ska {
 		std::string m_name;
         ASTNode& m_contentNode;
 	    FunctionTokenEventType m_type;
-		Script& m_script;
+		ScriptAST& m_script;
     };
 }

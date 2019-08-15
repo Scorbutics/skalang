@@ -5,7 +5,7 @@
 #include "SymbolTable.h"
 #include "NodeValue/AST.h"
 #include "NodeValue/OperatorTraits.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 #include "NodeValue/Type.h"
 
 #include "Operation/Type/OperationTypeFunctionDeclaration.h"

@@ -8,8 +8,8 @@
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
-#include "Interpreter/Value/Script.h"
-#include "Interpreter/ScriptCache.h"
+#include "NodeValue/ScriptAST.h"
+#include "NodeValue/ScriptCacheAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 #include "Generator/Value/BytecodeScript.h"
 #include "Service/ScriptNameBuilder.h"
@@ -17,8 +17,8 @@
 static const auto reservedKeywords = ska::ReservedKeywordsPool{};
 static auto tokenizer = std::unique_ptr<ska::Tokenizer>{};
 static std::vector<ska::Token> tokens;
-static auto readerI = std::unique_ptr<ska::Script>{};
-static auto scriptCacheI = ska::ScriptCache{};
+static auto readerI = std::unique_ptr<ska::ScriptAST>{};
+static auto scriptCacheI = ska::ScriptCacheAST{};
 static auto typeCrosserI = ska::TypeCrosser{};
 
 static BytecodeGeneratorDataTestContainer ASTFromInputBytecodeGeneratorNoParse(const std::string& input) {
@@ -26,7 +26,7 @@ static BytecodeGeneratorDataTestContainer ASTFromInputBytecodeGeneratorNoParse(c
 	tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);
 	tokens = tokenizer->tokenize();
 	scriptCacheI.clear();
-	readerI = std::make_unique<ska::Script>(scriptCacheI, "main", tokens);
+	readerI = std::make_unique<ska::ScriptAST>(scriptCacheI, "main", tokens);
 
 	data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosserI);
@@ -77,11 +77,11 @@ TEST_CASE("[BytecodeGenerator] import ") {
 }
 
 TEST_CASE("[BytecodeGenerator] C++ 1 script-function binding") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var User77 = import \"bind:binding\"; User77.funcTest(14, \"titito\");");
+	/*auto [astPtr, data] = ASTFromInputBytecodeGenerator("var User77 = import \"bind:binding\"; User77.funcTest(14, \"titito\");");
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-	});
+	});*/
 
 	/*
 	auto data = ASTFromInputBytecodeGeneratorNoParse("var User77 = import \"bind:binding\"; User77.funcTest(14, \"titito\");");

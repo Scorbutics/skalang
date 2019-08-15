@@ -5,13 +5,13 @@
 #include "Service/Tokenizer.h"
 #include "Service/StatementParser.h"
 #include "DataTestContainer.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
-auto reader = std::unique_ptr<ska::Script>{};
-ska::Script ASTFromInput(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, DataTestContainer& data) {
+auto reader = std::unique_ptr<ska::ScriptAST>{};
+ska::ScriptAST ASTFromInput(std::unordered_map<std::string, ska::ScriptHandleASTPtr>& scriptCache, const std::string& input, DataTestContainer& data) {
 	auto tokenizer = ska::Tokenizer { data.reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
-	reader = std::make_unique<ska::Script>(scriptCache, "main", tokens);
+	reader = std::make_unique<ska::ScriptAST>(scriptCache, "main", tokens);
 	data.parser = std::make_unique<ska::StatementParser> ( data.reservedKeywords );
     reader->parse(*data.parser);
     return *reader;
@@ -19,7 +19,7 @@ ska::Script ASTFromInput(std::unordered_map<std::string, ska::ScriptHandlePtr>& 
 
 TEST_CASE("test") {
     DataTestContainer data;
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
 
     auto astPtr = ASTFromInput(scriptCache, "var i = 0; var titi = \"llllll\"; { var toto = 2; var i = 9; }", data);
     auto& table = reader->symbols();
@@ -46,7 +46,7 @@ TEST_CASE("Matching") {
 	
 	SUBCASE("Matching OK") {
         DataTestContainer data;
-		auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+		auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
         SUBCASE("Overriding into subscope") {
 			auto astPtr = ASTFromInput(scriptCache, "var i = 0; i = 123; { i = 9; }", data);
 			auto& table = reader->symbols();
@@ -78,7 +78,7 @@ TEST_CASE("Matching") {
 
 	SUBCASE("Matching failed") {
 		DataTestContainer data;
-		auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+		auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
         {
 			SUBCASE("Because of unknown symbol") {
 				try {

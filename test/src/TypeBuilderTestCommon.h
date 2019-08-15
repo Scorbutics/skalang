@@ -1,6 +1,6 @@
 #pragma once
 #include "NodeValue/AST.h"
 #include "DataTestContainer.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
-ska::Script TypeBuilderTestCommonBuildAST(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, DataTestContainer& data, bool buildType = true);
+ska::ScriptAST TypeBuilderTestCommonBuildAST(std::unordered_map<std::string, ska::ScriptHandleASTPtr>& scriptCache, const std::string& input, DataTestContainer& data, bool buildType = true);

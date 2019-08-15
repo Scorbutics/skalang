@@ -9,7 +9,7 @@
 
 namespace ska {
 	struct ReservedKeywordsPool;
-	class Script;
+	class ScriptAST;
 	class StatementParser;
 	struct Token;
 
@@ -22,18 +22,18 @@ namespace ska {
 		MatcherImport(const ReservedKeywordsPool& pool, StatementParser& parser) :
 			m_reservedKeywordsPool(pool), m_parser(parser) {}
 	
-		ASTNodePtr matchImport(Script& input);
-		ASTNodePtr matchExport(Script& input);
+		ASTNodePtr matchImport(ScriptAST& input);
+		ASTNodePtr matchExport(ScriptAST& input);
 		
 		static ASTNodePtr createNewImport(
 			StatementParser& parser,
 			observable_priority_queue<ska::BlockTokenEvent>& obsBlock,
 			observable_priority_queue<ska::ImportTokenEvent>& obsImport,
-			Script& input,
+			ScriptAST& input,
 			Token importNodeClass);
 
 	private:
-		ASTNodePtr matchNewImport(Script& input, Token importNodeClass);
+		ASTNodePtr matchNewImport(ScriptAST& input, Token importNodeClass);
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		StatementParser& m_parser;
 	};

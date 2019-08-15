@@ -8,23 +8,23 @@
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
-#include "Interpreter/Value/Script.h"
-#include "Interpreter/ScriptCache.h"
+#include "NodeValue/ScriptAST.h"
+#include "NodeValue/ScriptCacheAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 #include "Generator/Value/BytecodeScript.h"
 
 static const auto reservedKeywords = ska::ReservedKeywordsPool{};
 static auto tokenizer = std::unique_ptr<ska::Tokenizer>{};
 static std::vector<ska::Token> tokens;
-static auto readerI = std::unique_ptr<ska::Script>{};
-static auto scriptCacheI = ska::ScriptCache{};
+static auto readerI = std::unique_ptr<ska::ScriptAST>{};
+static auto scriptCacheI = ska::ScriptCacheAST{};
 static auto typeCrosserI = ska::TypeCrosser{};
 
 static void ASTFromInputBytecodeGeneratorNoParse(const std::string& input, BytecodeGeneratorDataTestContainer& data) {
 	tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);
 	tokens = tokenizer->tokenize();
 	scriptCacheI.clear();
-	readerI = std::make_unique<ska::Script>(scriptCacheI, "main", tokens);
+	readerI = std::make_unique<ska::ScriptAST>(scriptCacheI, "main", tokens);
 
 	data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosserI);

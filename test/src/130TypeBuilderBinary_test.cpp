@@ -4,11 +4,11 @@
 #include "TypeBuilderTestCommon.h"
 #include "Service/TypeBuilder/TypeBuilderBinary.h"
 #include "Service/ASTFactory.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
 TEST_CASE("[TypeBuilderBinary]") {
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
 	DataTestContainer data;
 	auto script = TypeBuilderTestCommonBuildAST(scriptCache, "", data, false);
 	script.parse(*data.parser);

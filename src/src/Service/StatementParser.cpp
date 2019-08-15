@@ -10,7 +10,7 @@
 #include "Service/Tokenizer.h"
 #include "Service/TokenReader.h"
 #include "Service/ASTFactory.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
 #include "Error/LangError.h"
 #include "Error/ParserError.h"
@@ -28,15 +28,14 @@ ska::StatementParser::StatementParser(const ReservedKeywordsPool& reservedKeywor
 	m_matcherImport(m_reservedKeywordsPool, *this) {
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::parse(Script& input) {
-  if(input.empty()) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::parse(ScriptAST& input) {
+  if(input.reader().empty()) {
 		return nullptr;
 	}
 
-
 	try {
 		auto blockNodeStatements = std::vector<ASTNodePtr>{};
-			while (!input.empty()) {
+			while (!input.reader().empty()) {
 			auto optionalStatement = optstatement(input);
 			if (optionalStatement != nullptr && !optionalStatement->logicalEmpty()) {
 				blockNodeStatements.push_back(std::move(optionalStatement));
@@ -50,13 +49,13 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::parse(Script& input) {
 	}
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::statement(Script& input) {
-	if (input.empty()) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::statement(ScriptAST& input) {
+	if (input.reader().empty()) {
 		return nullptr;
 	}
 
 
-		const auto token = input.actual();
+		const auto token = input.reader().actual();
 	try {
 		switch (token.type()) {
 		case TokenType::RESERVED:
@@ -71,15 +70,15 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::statement(Script& input) 
 	} catch (ParserError& error) {
 		throw error;
 	} catch (std::runtime_error& error) {
-		throw ParserError(error.what(), input.actual().position());
+		throw ParserError(error.what(), input.reader().actual().position());
 	}
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::matchExpressionStatement(Script& input) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::matchExpressionStatement(ScriptAST& input) {
 	SLOG(ska::LogLevel::Info) << "Expression-statement found";
 
     auto expressionResult = expr(input);
-    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+    input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
     if(expressionResult == nullptr) {
 			SLOG(ska::LogLevel::Info) << "NOP statement";
 			return nullptr;
@@ -87,7 +86,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::matchExpressionStatement(
     return expressionResult;
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::matchReservedKeyword(Script& input, const std::size_t keywordIndex) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::matchReservedKeyword(ScriptAST& input, const std::size_t keywordIndex) {
 	switch (keywordIndex) {
 	case static_cast<std::size_t>(TokenGrammar::FOR):
 		return m_matcherFor.match(input);
@@ -116,7 +115,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::matchReservedKeyword(Scri
 	}
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::expr(Script& input) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::expr(ScriptAST& input) {
 	return m_expressionParser.parse(input);
 }
 
@@ -124,15 +123,15 @@ void ska::StatementParser::error(const std::string& message) {
 	throw std::runtime_error("syntax error : " + message);
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::optexpr(Script& input, const Token& mustNotBe) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::optexpr(ScriptAST& input, const Token& mustNotBe) {
 	auto node = ASTNodePtr {};
-	if (!input.expect(mustNotBe)) {
+	if (!input.reader().expect(mustNotBe)) {
 		node = expr(input);
 	}
 	return node != nullptr ? std::move(node) : ASTFactory::MakeEmptyNode();
 }
 
-ska::ScriptPtr ska::StatementParser::subParse(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& name, std::ifstream& file) {
+ska::ScriptASTPtr ska::StatementParser::subParse(ScriptCacheAST& scriptCache, const std::string& name, std::ifstream& file) {
 	auto content = std::string (
 		(std::istreambuf_iterator<char>(file)),
 		(std::istreambuf_iterator<char>())
@@ -143,14 +142,14 @@ ska::ScriptPtr ska::StatementParser::subParse(std::unordered_map<std::string, sk
 
 	const auto scriptAlreadyExists = scriptCache.find(name) != scriptCache.end();
 	SLOG(ska::LogLevel::Info) << "SubParsing script " << name << " : " << (scriptAlreadyExists ? "not " : "") << "in cache";
-	auto script = ScriptPtr{std::make_unique<Script>( scriptCache, name, tokens )};
+	auto script = ScriptASTPtr{std::make_unique<ScriptAST>( scriptCache, name, tokens )};
 	script->parse(*this);
 	return script;
 }
 
-ska::StatementParser::ASTNodePtr ska::StatementParser::optstatement(Script& input, const Token& mustNotBe) {
+ska::StatementParser::ASTNodePtr ska::StatementParser::optstatement(ScriptAST& input, const Token& mustNotBe) {
 	auto node = ASTNodePtr {};
-	if (!input.expect(mustNotBe)) {
+	if (!input.reader().expect(mustNotBe)) {
 		node = statement(input);
 	}
 

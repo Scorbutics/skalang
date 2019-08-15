@@ -2,46 +2,38 @@
 #include <vector>
 #include <memory>
 #include "NodeValue/ASTNodePtr.h"
+#include "NodeValue/ScriptHandleAST.h"
 #include "Service/SymbolTable.h"
 #include "Service/TokenReader.h"
 #include "NodeValue/Token.h"
+#include "Interpreter/MemoryTable.h"
 
 namespace ska {
 	class Script;
 	struct ScriptHandle;
 	using ScriptHandlePtr = std::unique_ptr<ScriptHandle>;
-
-	using ScriptCache = std::unordered_map<std::string, ScriptHandlePtr>;
-
+	struct ScriptCache;
 	struct ScriptHandle {
-		ScriptHandle(ScriptCache& cache, std::vector<Token> input, std::size_t startIndex = 0, std::string name = "");
 	
 	public:
-		SymbolTable& symbols() { return m_symbols; }
-		const SymbolTable& symbols() const { return m_symbols; }
-		
 		MemoryTablePtr& currentMemory() { return m_currentMemory; }
 		const MemoryTablePtr& currentMemory() const { return m_currentMemory; }
 
 		MemoryTable& downMemory() { assert(m_currentMemory != nullptr);  return m_currentMemory->down(); }
 		const MemoryTable& downMemory() const { assert(m_currentMemory != nullptr);  return m_currentMemory->down(); }
 
-		ASTNode& rootNode() { assert(m_ast != nullptr);  return *m_ast; }
-		const ASTNode& rootNode() const { assert(m_ast != nullptr);  return *m_ast; }
-
-		const std::string& name() const { return m_name; }
+		auto& rootNode() { return m_handleAst.rootNode(); }
 
 	private:
+		ScriptHandle(ScriptCache& cache, ScriptHandleAST& astHandle);
 		friend class Script;
 		
-		ScriptCache& m_cache;
-		TokenReader m_input;
-		SymbolTable m_symbols;
+		ScriptCache& m_cache;	
 		MemoryTablePtr m_memory;
 		MemoryTablePtr m_currentMemory;
-		ASTNodePtr m_ast;
-		std::string m_name;
 		bool m_bridged = false;
+
+		ScriptHandleAST& m_handleAst;
 	};
 
 	

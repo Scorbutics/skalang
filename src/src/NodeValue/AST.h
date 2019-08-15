@@ -7,9 +7,6 @@
 #include "ASTNodePtr.h"
 #include "Operator.h"
 #include "ExpressionType.h"
-#include "Interpreter/Value/ScriptPtr.h"
-#include "Interpreter/MemoryTable.h"
-#include "Interpreter/Value/NodeValue.h"
 
 #include "Service/TypeBuilder/TypeBuildersContainer.h"
 #include "Type.h"
@@ -19,6 +16,7 @@ namespace ska {
 	class Symbol;
 	class StatementParser;
 	class ASTFactory;
+	class ScriptAST;
 
 	class ASTNode {
 	public:
@@ -68,7 +66,7 @@ namespace ska {
 			return m_op;
 		}
 
-	    void buildType(const TypeBuildersContainer& typeBuilder, const Script& script);
+	    void buildType(const TypeBuildersContainer& typeBuilder, const ScriptAST& script);
 		void linkSymbol(const Symbol& symbol) {
 			m_symbol = &symbol;
 		}

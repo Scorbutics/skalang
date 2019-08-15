@@ -1,7 +1,7 @@
 #include <string>
 #include "NodeValue/AST.h"
 #include "GeneratorOperatorIf.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 #include "BytecodeCommand.h"
 #include "Generator/Value/BytecodeScript.h"
 

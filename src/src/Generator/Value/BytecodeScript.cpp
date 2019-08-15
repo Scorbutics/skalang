@@ -2,12 +2,12 @@
 #include "Config/LoggerConfigLang.h"
 #include "NodeValue/AST.h"
 #include "BytecodeScript.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::Script);
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::UniqueSymbolGetterBase);
 
-ska::bytecode::Script::Script(ska::Script& script) :
+ska::bytecode::Script::Script(ska::ScriptAST& script) :
 	m_script(script.handle()) {
 }
 

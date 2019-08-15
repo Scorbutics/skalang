@@ -4,7 +4,7 @@
 #include "Service/Tokenizer.h"
 #include "Service/SymbolTable.h"
 #include "Service/StatementParser.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
 using SymbolTablePtr = std::unique_ptr<ska::SymbolTable>;
 using ParserPtr = std::unique_ptr<ska::StatementParser>;
@@ -12,19 +12,19 @@ using ParserPtr = std::unique_ptr<ska::StatementParser>;
 const auto reservedKeywords = ska::ReservedKeywordsPool{};
 
 
-ska::Script ASTFromInputSemanticExpressionType(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, ParserPtr& parser_test) {
+ska::ScriptAST ASTFromInputSemanticExpressionType(std::unordered_map<std::string, ska::ScriptHandleASTPtr>& scriptCache, const std::string& input, ParserPtr& parser_test) {
 	static auto refCounter = 0;
     
 	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
-	auto reader = ska::Script { scriptCache, "main", std::move(tokens) };
+	auto reader = ska::ScriptAST { scriptCache, "main", std::move(tokens) };
 	parser_test = std::make_unique<ska::StatementParser> ( reservedKeywords );
     return reader;
 }
 
 TEST_CASE("[ExpressionType]") {
     ParserPtr parser_test;
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
     auto script = ASTFromInputSemanticExpressionType(scriptCache, "{var toto = 2;}", parser_test);
 	script.parse(*parser_test);
 	auto* symbol_test = &script.symbols();

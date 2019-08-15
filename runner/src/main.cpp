@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
 		auto parameterModule = ska::BasicParameterModuleBuilder(moduleConfiguration, parameterValues, argc, argv);
 		auto executor = ska::BasicProgramScriptStarter(moduleConfiguration, argv);
 
-		executor.parse(parser);
+		executor.astScript().parse(parser);
 		interpreter.script(executor);
 	} catch (std::exception& e) {
 		std::cout << e.what() << std::endl;

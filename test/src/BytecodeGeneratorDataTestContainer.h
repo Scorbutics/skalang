@@ -8,7 +8,6 @@
 #include "Service/TypeBuilder/TypeBuildUnit.h"
 #include "Service/SymbolTableUpdater.h"
 #include "Service/ReservedKeywordsPool.h"
-#include "Interpreter/Interpreter.h"
 #include "Generator/BytecodeGenerator.h"
 
 struct BytecodeGeneratorDataTestContainer {

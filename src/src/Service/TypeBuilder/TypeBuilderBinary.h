@@ -14,9 +14,9 @@ namespace ska {
 		const TypeCrosser& m_typeCrosser;
 	public:
 		TypeBuilderOperator(const TypeCrosser& typeCrosser);
-        Type build(const Script& script, const ASTNode& node) override final {
+        Type build(const ScriptAST& script, const ASTNode& node) override final {
 			return build(script, OperateOn{node});
 		}
-		Type build(const Script& script, OperateOn node);
+		Type build(const ScriptAST& script, OperateOn node);
 	};
 }

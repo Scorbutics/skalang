@@ -2,7 +2,7 @@
 #include "NodeValue/AST.h"
 #include "BytecodeGenerationContext.h"
 #include "Generator/Value/BytecodeScript.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
 ska::bytecode::GenerationContext::GenerationContext(Script& script) :
 	m_script(&script),

@@ -8,11 +8,11 @@
 #include "Service/TypeBuilder/TypeBuilderVariableDeclaration.h"
 #include "TypeBuilderTestCommon.h"
 #include "Service/ASTFactory.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
 TEST_CASE("[TypeBuilderVariableDeclaration]") {
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr> {};
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr> {};
 	DataTestContainer data;
 	auto script = TypeBuilderTestCommonBuildAST(scriptCache, "", data, false);
 	script.parse(*data.parser);

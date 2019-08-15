@@ -10,17 +10,17 @@
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
-auto readerSTC = std::unique_ptr<ska::Script>{};
+auto readerSTC = std::unique_ptr<ska::ScriptAST>{};
 
-static ska::Script ASTFromInputSemanticTC(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, DataTestContainer& data) {
+static ska::ScriptAST ASTFromInputSemanticTC(std::unordered_map<std::string, ska::ScriptHandleASTPtr>& scriptCache, const std::string& input, DataTestContainer& data) {
 
 	auto tokenizer = ska::Tokenizer { data.reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
 	auto typeCrosser = ska::TypeCrosser{};
-	readerSTC = std::make_unique<ska::Script>(scriptCache, "main", tokens );
+	readerSTC = std::make_unique<ska::ScriptAST>(scriptCache, "main", tokens );
 	data.parser = std::make_unique<ska::StatementParser> ( data.reservedKeywords );
     data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosser);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableUpdater>(*data.parser);
@@ -31,7 +31,7 @@ static ska::Script ASTFromInputSemanticTC(std::unordered_map<std::string, ska::S
 
 TEST_CASE("[SymbolTableUpdater] update node symbol") {
 	DataTestContainer data;
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
 
 	auto astPtr = ASTFromInputSemanticTC(scriptCache, "var i = 0; var titi = \"llllll\"; { var toto = 2; var i = titi; }", data);
 
@@ -55,7 +55,7 @@ TEST_CASE("[SymbolTableUpdater] update node symbol") {
 
 TEST_CASE("[SymbolTableUpdater] function declaration") {
 	DataTestContainer data;
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
 
 	auto astPtr = ASTFromInputSemanticTC(scriptCache, "var toto = function() {};", data);
 
@@ -71,7 +71,7 @@ TEST_CASE("[SymbolTableUpdater] function declaration") {
 
 TEST_CASE("[SemanticTypeChecker]") {
     DataTestContainer data;
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
 
 	SUBCASE("OK") {
         SUBCASE("boolean") {

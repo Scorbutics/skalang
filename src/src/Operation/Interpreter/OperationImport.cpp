@@ -4,5 +4,5 @@
 #include "Service/ScriptNameBuilder.h"
 
 ska::ScriptPtr ska::Operation<ska::Operator::IMPORT>::GetScript() {
-	return parent.subScript(ScriptNameDeduce(parent.name(), node[0].name()));
+	return parent.createImport(ScriptNameDeduce(parent.name(), node[0].name()));
 }

@@ -5,7 +5,7 @@
 
 namespace ska {
 	class SymbolTable;
-	class Script;
+	class ScriptAST;
 	
 	class ScopedSymbolTable {
 	using ChildrenScopedSymbolTable = std::vector<std::unique_ptr<ScopedSymbolTable>>;
@@ -24,7 +24,7 @@ namespace ska {
 
 		ScopedSymbolTable& createNested(Symbol* s = nullptr);
 		Symbol& emplace(std::string name);
-		Symbol& emplace(std::string name, const Script& script);
+		Symbol& emplace(std::string name, const ScriptAST& script);
 
         const Symbol* owner() const {
             return m_parentSymbol == nullptr && &m_parent != this ? m_parent.owner() : m_parentSymbol;

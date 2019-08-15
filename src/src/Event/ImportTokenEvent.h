@@ -1,15 +1,15 @@
 #pragma once
 #include <cassert>
 #include <string>
-#include "Interpreter/Value/ScriptPtr.h"
+#include "NodeValue/ScriptASTPtr.h"
 
 namespace ska {
     class ASTNode;
-    class Script;
+    class ScriptAST;
     
     class ImportTokenEvent {
 	public:
-		ImportTokenEvent(ASTNode& node, Script& s);
+		ImportTokenEvent(ASTNode& node, ScriptAST& s);
 		
         auto& rootNode() {
             return m_node;
@@ -19,21 +19,21 @@ namespace ska {
             return m_node;
 		}
 
-		const Script& script() const {
+		const ScriptAST& script() const {
 			return m_script;
 		}
 
-		const Script& bound() const {
+		const ScriptAST& bound() const {
 			return *m_boundScript;
 		}
 
-		Script& bound() {
+		ScriptAST& bound() {
 			return *m_boundScript;
 		}
 
 	private:
 		ASTNode& m_node;
-        Script& m_script;
-		ScriptPtr m_boundScript;
+        ScriptAST& m_script;
+		ScriptASTPtr m_boundScript;
     };
 }

@@ -8,16 +8,16 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
 #include "NodeValue/Operator.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
 TEST_CASE("[Parser]") {
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
 
 	const auto inputStr = std::string("for(var i = 0; i < 5; i++) { lol; \"mdr\"; 12; }");
 	const auto keywords = ska::ReservedKeywordsPool{};
 	auto t = ska::Tokenizer {keywords, inputStr};
 	auto tokens = t.tokenize();
-	auto reader = ska::Script { scriptCache, "main", tokens };
+	auto reader = ska::ScriptAST { scriptCache, "main", tokens };
 	auto p = ska::StatementParser{ keywords };
 	reader.parse(p, false);
 	auto ast = &reader.rootNode();
@@ -51,10 +51,10 @@ TEST_CASE("[Parser]") {
 	const auto& functionCallStatement = loopStatementBody[0];
 }
 
-ska::Script ASTFromInput(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, const ska::ReservedKeywordsPool& keywords) {
+ska::ScriptAST ASTFromInput(std::unordered_map<std::string, ska::ScriptHandleASTPtr>& scriptCache, const std::string& input, const ska::ReservedKeywordsPool& keywords) {
 	auto t = ska::Tokenizer {keywords, input};
 	auto tokens = t.tokenize();
-	auto reader = ska::Script { scriptCache, "main", tokens };
+	auto reader = ska::ScriptAST { scriptCache, "main", tokens };
 	auto p = ska::StatementParser{ keywords };
 	reader.parse(p, false);
     return reader;
@@ -62,7 +62,7 @@ ska::Script ASTFromInput(std::unordered_map<std::string, ska::ScriptHandlePtr>& 
 
 TEST_CASE("Block") {
 	const auto keywords = ska::ReservedKeywordsPool {};
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
 
 	SUBCASE("Empty block statement") {
 		auto astPtr = ASTFromInput(scriptCache, "{}", keywords);
@@ -99,7 +99,7 @@ TEST_CASE("Block") {
 }
 
 TEST_CASE("for") {
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
 	const auto keywords = ska::ReservedKeywordsPool {};
 	SUBCASE("All empty") {
 		auto astPtr = ASTFromInput(scriptCache, "for(;;);", keywords);
@@ -115,7 +115,7 @@ TEST_CASE("for") {
 
 TEST_CASE("booleans") {
 	const auto keywords = ska::ReservedKeywordsPool{};
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
 	SUBCASE("true") {
 		auto astPtr = ASTFromInput(scriptCache, "true;", keywords);
 		auto& ast = astPtr.rootNode()[0];
@@ -133,7 +133,7 @@ TEST_CASE("booleans") {
 
 TEST_CASE("If keyword pattern") {
 	const auto keywords = ska::ReservedKeywordsPool {};
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
 	SUBCASE("If only with cond and block statement") {
 		auto astPtr = ASTFromInput(scriptCache, "if (test) {}", keywords);
 		auto& ast = astPtr.rootNode()[0];
@@ -146,7 +146,7 @@ TEST_CASE("If keyword pattern") {
 
 TEST_CASE("function") {
 	const auto keywords = ska::ReservedKeywordsPool {};
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
 	SUBCASE("with 2 arguments built-in types and no return type") {
 		auto astPtr = ASTFromInput(scriptCache, "var f = function(titi:int, toto:string) { };", keywords);
 		auto& ast = astPtr.rootNode()[0];
@@ -185,7 +185,7 @@ TEST_CASE("function") {
 
 TEST_CASE("User defined object") {
     const auto keywords = ska::ReservedKeywordsPool {};
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
 
     SUBCASE("constructor with 1 parameter") {
 
@@ -241,7 +241,7 @@ TEST_CASE("User defined object") {
 
 TEST_CASE("Expression and priorities") {
 	const auto keywords = ska::ReservedKeywordsPool {};
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandlePtr>{};
+	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
 	SUBCASE("Simple mul") {
 		auto astPtr = ASTFromInput(scriptCache, "5 * 2;", keywords);
         auto& ast = astPtr.rootNode()[0];

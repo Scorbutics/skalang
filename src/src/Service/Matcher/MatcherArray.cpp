@@ -7,36 +7,36 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
 #include "Service/ASTFactory.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherArray)
 
-ska::ASTNodePtr ska::MatcherArray::matchDeclaration(Script& input) {
-	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());
+ska::ASTNodePtr ska::MatcherArray::matchDeclaration(ScriptAST& input) {
+	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());
 
 	auto arrayNode = std::vector<ASTNodePtr>{};
 	auto isComma = true;
 	while (isComma) {
-		if (!input.expect(TokenType::SYMBOL)) {
+		if (!input.reader().expect(TokenType::SYMBOL)) {
 			SLOG(ska::LogLevel::Debug) << "array entry detected, reading expression : ";
 			
 			auto expression = input.expr(m_parser);
 			arrayNode.push_back(std::move(expression));
-			isComma = input.expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
+			isComma = input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
 			if (isComma) {
-				input.match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
+				input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
 			}
 		}
 	}
 
-    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
+    input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 	auto declarationNode = ASTFactory::MakeNode<ska::Operator::ARRAY_DECLARATION>(std::move(arrayNode));
 	auto event = ArrayTokenEvent{ *declarationNode, input, ArrayTokenEventType::DECLARATION };
 	m_parser.observable_priority_queue<ArrayTokenEvent>::notifyObservers(event);
 	return declarationNode;
 }
 
-ska::ASTNodePtr ska::MatcherArray::matchUse(Script& input, ASTNodePtr identifierArrayAffected) {
+ska::ASTNodePtr ska::MatcherArray::matchUse(ScriptAST& input, ASTNodePtr identifierArrayAffected) {
 	//Ensures array expression before the index access
 	assert(identifierArrayAffected != nullptr);
 	SLOG(ska::LogLevel::Debug) << "expression-array : " << *identifierArrayAffected;	
@@ -44,9 +44,9 @@ ska::ASTNodePtr ska::MatcherArray::matchUse(Script& input, ASTNodePtr identifier
 	m_parser.observable_priority_queue<ArrayTokenEvent>::notifyObservers(expressionEvent);
 
     //Gets the index part with bracket syntax
-	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());
+	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());
 	auto indexNode = input.expr(m_parser);
-	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
+	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 
 	auto declarationNode = ASTFactory::MakeNode<ska::Operator::ARRAY_USE>(std::move(identifierArrayAffected), std::move(indexNode));
 	
@@ -56,11 +56,11 @@ ska::ASTNodePtr ska::MatcherArray::matchUse(Script& input, ASTNodePtr identifier
 	return declarationNode;
 }
 
-ska::ASTNodePtr ska::MatcherArray::match(Script& input, ExpressionStack& operands, char token, bool isDoingOperation) {
+ska::ASTNodePtr ska::MatcherArray::match(ScriptAST& input, ExpressionStack& operands, char token, bool isDoingOperation) {
 	switch (token) {
 	case '[': {
-		if (input.canReadPrevious(1)) {
-			auto lastToken = input.readPrevious(1);
+		if (input.reader().canReadPrevious(1)) {
+			auto lastToken = input.reader().readPrevious(1);
 			const auto& value = std::get<std::string>(lastToken.content());
 			if (value != "=") {
 				auto arrayNode = operands.popOperandIfNoOperator(isDoingOperation);

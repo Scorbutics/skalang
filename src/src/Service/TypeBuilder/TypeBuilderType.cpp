@@ -2,11 +2,11 @@
 
 #include "NodeValue/AST.h"
 #include "Service/SymbolTable.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::TYPE>)
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::TYPE>::build(const Script& script, OperateOn node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::TYPE>::build(const ScriptAST& script, OperateOn node) {
 	auto result = Type{};
 	const auto isBuiltIn = node.IsBuiltIn();
     if (!isBuiltIn) {

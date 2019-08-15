@@ -2,11 +2,11 @@
 
 namespace ska {
 	class ASTNode;
-	class Script;
+	class ScriptAST;
 
 	class ExpressionTokenEvent {
 	public:
-		ExpressionTokenEvent(ASTNode& node, Script& s) : node(node), m_script(s) {}
+		ExpressionTokenEvent(ASTNode& node, ScriptAST& s) : node(node), m_script(s) {}
 
 		auto& rootNode() {
 			return node;
@@ -16,12 +16,12 @@ namespace ska {
 			return node;
 		}
 
-		Script& script() {
+		ScriptAST& script() {
 			return m_script;
 		}
 
 	private:
 		ASTNode& node;
-		Script& m_script;
+		ScriptAST& m_script;
 	};
 }

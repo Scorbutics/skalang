@@ -5,10 +5,10 @@
 #include "Service/SymbolTable.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
-ska::Script TypeBuilderTestCommonBuildAST(std::unordered_map<std::string, ska::ScriptHandlePtr>& scriptCache, const std::string& input, DataTestContainer& data, bool buildType) {
+ska::ScriptAST TypeBuilderTestCommonBuildAST(std::unordered_map<std::string, ska::ScriptHandleASTPtr>& scriptCache, const std::string& input, DataTestContainer& data, bool buildType) {
 	auto tokenizer = ska::Tokenizer{ data.reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
-	auto reader = ska::Script{scriptCache, "main", tokens };
+	auto reader = ska::ScriptAST{scriptCache, "main", tokens };
 	auto typeCrosser = ska::TypeCrosser{};
 
 	data.parser = std::make_unique<ska::StatementParser>(data.reservedKeywords);

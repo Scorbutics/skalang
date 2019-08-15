@@ -3,7 +3,7 @@
 #include "TypeBuilderCalculatorDispatcher.h"
 #include "Service/SymbolTable.h"
 #include "NodeValue/AST.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
 #include "Operation/Type/OperationTypeType.h"
 
@@ -41,7 +41,7 @@ namespace ska {
 	}
 }
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::build(const Script& script, OperateOn node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::build(const ScriptAST& script, OperateOn node) {
 	auto functionName = node.GetFunctionName();
     auto& symbols = script.symbols();
 	const auto* symbolFunction = symbols[functionName];

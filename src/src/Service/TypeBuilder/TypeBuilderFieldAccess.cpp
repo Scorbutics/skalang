@@ -2,11 +2,11 @@
 
 #include "NodeValue/AST.h"
 #include "Service/SymbolTable.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>)
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const Script& script, OperateOn node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const ScriptAST& script, OperateOn node) {
 	const auto typeObject = node.GetObjectType();
 
 	if (typeObject != ExpressionType::OBJECT) {
