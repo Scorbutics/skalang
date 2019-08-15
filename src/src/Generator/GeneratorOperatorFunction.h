@@ -1,8 +1,8 @@
 #pragma once
 
 #include "GeneratorOperator.h"
-#include "Operation/Type/OperationTypeFunctionDeclaration.h"
-#include "Operation/Type/OperationTypeFunctionCall.h"
+#include "Operation/OperationTypeFunctionDeclaration.h"
+#include "Operation/OperationTypeFunctionCall.h"
 
 namespace ska {
 	namespace bytecode {

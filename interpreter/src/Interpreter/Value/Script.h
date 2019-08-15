@@ -4,8 +4,9 @@
 #include "ScriptPtr.h"
 #include "ScriptHandle.h"
 #include "Interpreter/ScriptCache.h"
-#include "Interpreter/Value/BridgeFunction.h"
+#include "BridgeFunction.h"
 #include "NodeValue/ScriptAST.h"
+#include "Interpreter/Value/BridgeMemory.h"
 
 namespace ska {
 	class StatementParser;

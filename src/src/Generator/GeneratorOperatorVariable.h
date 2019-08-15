@@ -1,8 +1,8 @@
 #pragma once
 
 #include "GeneratorOperator.h"
-#include "Operation/Type/OperationTypeVariableAffectation.h"
-#include "Operation/Type/OperationTypeVariableDeclaration.h"
+#include "Operation/OperationTypeVariableAffectation.h"
+#include "Operation/OperationTypeVariableDeclaration.h"
 
 namespace ska {
 	namespace bytecode {

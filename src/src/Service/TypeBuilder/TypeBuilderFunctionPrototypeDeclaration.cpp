@@ -5,7 +5,7 @@
 #include "NodeValue/AST.h"
 #include "NodeValue/ScriptAST.h"
 
-#include "Operation/Type/OperationTypeType.h"
+#include "Operation/OperationTypeType.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
 

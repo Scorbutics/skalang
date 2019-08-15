@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GeneratorOperator.h"
-#include "Operation/Type/OperationTypeImport.h"
+#include "Operation/OperationTypeImport.h"
 
 namespace ska {
 	namespace bytecode {

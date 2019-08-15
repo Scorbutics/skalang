@@ -48,7 +48,15 @@ void ska::Script::memoryFromBridge(const ASTNode& declaredAstBlock, std::vector<
 }
 
 ska::ASTNode& ska::Script::fromBridge(std::vector<BridgeMemory> bindings) {
-	m_ast.fromBridge(bindings);
+	
+	auto bindingsAST = std::vector<ASTNodePtr>{};
+	if (!bindings.empty()) {
+		bindingsAST.reserve(bindings.size());
+		std::transform(bindings.begin(), bindings.end(), std::back_inserter(bindingsAST), [](auto& el) {
+			return std::move(el->node);
+		});
+	}
+	m_ast.fromBridge(std::move(bindingsAST));
 	memoryFromBridge(m_ast.rootNode(), std::move(bindings));
 	return m_ast.rootNode();
 }

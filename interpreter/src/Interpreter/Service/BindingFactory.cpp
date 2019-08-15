@@ -8,9 +8,9 @@
 #include "Service/SymbolTable.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/SymbolTableUpdater.h"
-#include "ASTFactory.h"
+#include "Service/ASTFactory.h"
 #include "BindingFactory.h"
-#include "Matcher/MatcherImport.h"
+#include "Service/Matcher/MatcherImport.h"
 #include "Interpreter/Interpreter.h"
 
 #include "Service/ScriptNameBuilder.h"

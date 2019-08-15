@@ -1,8 +1,8 @@
 #pragma once
 
 #include "InterpreterOperator.h"
-#include "Operation/Interpreter/OperationFunctionCall.h"
-#include "Operation/Interpreter/OperationFunctionDeclaration.h"
+#include "Operation/OperationFunctionCall.h"
+#include "Operation/OperationFunctionDeclaration.h"
 #include "Interpreter/MemoryTablePtr.h"
 
 namespace ska {

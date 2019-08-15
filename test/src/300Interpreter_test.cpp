@@ -8,7 +8,7 @@
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
-#include "Interpreter/ScriptBinding.h"
+#include "Interpreter/Service/ScriptBinding.h"
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/ScriptCache.h"
 #include "NodeValue/ObjectMemory.h"

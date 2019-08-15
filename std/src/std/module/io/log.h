@@ -1,7 +1,7 @@
 #pragma once
 
 #include "std/module.h"
-#include "Interpreter/ScriptBinding.h"
+#include "Interpreter/Service/ScriptBinding.h"
 
 namespace ska {
     namespace lang {

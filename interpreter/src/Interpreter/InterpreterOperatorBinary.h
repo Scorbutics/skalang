@@ -1,7 +1,7 @@
 #pragma once
 
 #include "InterpreterOperator.h"
-#include "Operation/Interpreter/OperationBinary.h"
+#include "Operation/OperationBinary.h"
 
 namespace ska {
 	class TypeCrosser;

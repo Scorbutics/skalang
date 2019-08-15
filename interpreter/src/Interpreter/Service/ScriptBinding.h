@@ -6,10 +6,11 @@
 
 #include "Container/sorted_observable.h"
 #include "Interpreter/Value/BridgeFunction.h"
-#include "Service/BindingFactory.h"
+#include "Interpreter/Value/BridgeMemory.h"
+#include "Interpreter/Service/BindingFactory.h"
 #include "Event/VarTokenEvent.h"
 #include "Interpreter/Value/Script.h"
-#include "ScriptCache.h"
+#include "Interpreter/ScriptCache.h"
 
 namespace ska {
     class SymbolTable;

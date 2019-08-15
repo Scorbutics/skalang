@@ -8,11 +8,11 @@
 #include "NodeValue/ScriptAST.h"
 #include "NodeValue/Type.h"
 
-#include "Operation/Type/OperationTypeFunctionDeclaration.h"
-#include "Operation/Type/OperationTypeFunctionCall.h"
-#include "Operation/Type/OperationTypeIfElse.h"
-#include "Operation/Type/OperationTypeArrayDeclaration.h"
-#include "Operation/Type/OperationTypeReturn.h"
+#include "Operation/OperationTypeFunctionDeclaration.h"
+#include "Operation/OperationTypeFunctionCall.h"
+#include "Operation/OperationTypeIfElse.h"
+#include "Operation/OperationTypeArrayDeclaration.h"
+#include "Operation/OperationTypeReturn.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SemanticTypeChecker)
 

@@ -2,7 +2,7 @@
 
 
 #include "TypeBuilderOperator.h"
-#include "Operation/Type/OperationTypeExport.h"
+#include "Operation/OperationTypeExport.h"
 
 namespace ska {
     SKALANG_BUILDER_TYPE_OPERATOR_DEFINE(Operator::EXPORT);

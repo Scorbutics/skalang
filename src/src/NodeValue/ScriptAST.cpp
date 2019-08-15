@@ -3,7 +3,6 @@
 #include "ScriptAST.h"
 #include "Service/StatementParser.h"
 #include "Service/ASTFactory.h"
-#include "Interpreter/Value/BridgeFunction.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptAST)
 
@@ -24,7 +23,7 @@ ska::ScriptASTPtr ska::ScriptAST::useImport(const std::string& name) {
 	return existsInCache(name) ? std::make_unique<ScriptAST>(*m_cache, name, std::vector<Token>{}) : nullptr;
 }
 
-void ska::ScriptAST::astFromBridge(const std::vector<BridgeMemory>& bindings) {
+void ska::ScriptAST::astFromBridge(std::vector<ASTNodePtr> bindings) {
 	assert(m_handle->m_ast == nullptr && "Script built from a bridge must be empty");
 
 	auto functionListNodes = std::vector<ASTNodePtr>();
@@ -33,8 +32,8 @@ void ska::ScriptAST::astFromBridge(const std::vector<BridgeMemory>& bindings) {
 	}
 
 	for (auto& bridgeFunction : bindings) {
-		auto functionName = bridgeFunction->node->name();
-		auto functionVarDeclarationNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(Token{ functionName, TokenType::IDENTIFIER , {} }), std::move(bridgeFunction->node));
+		auto functionName = bridgeFunction->name();
+		auto functionVarDeclarationNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(Token{ functionName, TokenType::IDENTIFIER , {} }), std::move(bridgeFunction));
 		functionListNodes.push_back(std::move(functionVarDeclarationNode));
 	}
 
@@ -65,8 +64,8 @@ void ska::ScriptAST::parse(StatementParser& parser, bool listen) {
 }
 
 
-ska::ASTNode& ska::ScriptAST::fromBridge(std::vector<BridgeMemory> bindings) {
-	astFromBridge(bindings);
+ska::ASTNode& ska::ScriptAST::fromBridge(std::vector<ASTNodePtr> bindings) {
+	astFromBridge(std::move(bindings));
 	return *m_handle->m_ast;
 }
 
