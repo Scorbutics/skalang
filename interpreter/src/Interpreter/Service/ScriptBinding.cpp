@@ -46,6 +46,12 @@ void ska::ScriptBridge::buildFunctions() {
 	m_bindings = { };
 }
 
+void ska::ScriptBridge::import(StatementParser& parser, Interpreter& interpreter, std::vector<std::pair<std::string, std::string>> imports) {
+	auto importBlock = m_functionBinder.import(parser, m_script.astScript(), std::move(imports));
+	interpreter.interpret({ m_script, *importBlock});
+	m_imports.push_back(std::move(importBlock));
+}
+
 ska::NodeValue ska::ScriptBridge::callFunction(Interpreter& interpreter, std::string importName, std::string functionName, std::vector<ska::NodeValue> parametersValues) {
 	auto import = m_script.findInMemoryTree(importName);
 	auto importedScript = import.first->nodeval<ska::ExecutionContext>();

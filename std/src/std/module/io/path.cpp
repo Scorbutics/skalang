@@ -11,7 +11,7 @@ ska::lang::IOPathModule::IOPathModule(ModuleConfiguration& config) :
 	Module {config, "std.native.io.path"} {
 	m_bridge.import(config.parser, config.interpreter, { {"Path", "std:std.io.path"} });
 	m_bridge.bindGenericFunction("Build", { "string", "Path::Fcty()" },
-    	std::function<ska::NodeValue(Script&, std::vector<ska::NodeValue>)>([&](Script&, std::vector<ska::NodeValue> buildParams) -> ska::NodeValue {
+    	std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> buildParams) -> ska::NodeValue {
 		auto path = m_bridge.callFunction(config.interpreter, "Path", "Fcty", std::move(buildParams));
 		auto& memPath = path.nodeval<ska::ObjectMemory>();
 
@@ -22,7 +22,7 @@ ska::lang::IOPathModule::IOPathModule(ModuleConfiguration& config) :
 
 		//Build output object
 		memPath->emplace("canonical", std::make_unique<ska::BridgeFunction>(
-            std::function<ska::NodeValue(Script&, std::vector<ska::NodeValue>)>([&, pathStr(std::move(pathStr))](Script&, std::vector<ska::NodeValue> unused) {
+            std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&, pathStr(std::move(pathStr))](std::vector<ska::NodeValue> unused) {
             return std::make_shared<std::string>(std::move(FileUtils::getCanonicalPath(*pathStr)));
         })));
 

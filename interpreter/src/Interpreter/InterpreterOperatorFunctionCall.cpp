@@ -75,7 +75,7 @@ namespace ska {
 		ska::Operation<ska::Operator::FUNCTION_CALL>& operateOnFunctionCall) {
 		auto parametersValues = InterpreterOperationFunctionCallExecuteFunctionFromCallParameters(interpreter, operateOnFunctionDeclaration, operateOnFunctionCall);
 		SLOG_STATIC(ska::LogLevel::Debug, ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>) << "Function is a bridge, transfering parameters";
-		return NodeRValue{(bridgeCall.function)(operateOnFunctionCall.parent, std::move(parametersValues)), nullptr };
+		return NodeRValue{(bridgeCall.function)(std::move(parametersValues)), nullptr };
 	}
 
 }
