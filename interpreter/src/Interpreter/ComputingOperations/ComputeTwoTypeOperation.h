@@ -10,12 +10,12 @@ namespace ska {
 		MathComputerSimple&& computer,
 		MathComputerSimpleInv&& computerInv,
 		MathComputerDouble&& computerEx) {
-		if (firstValue.type != TypeFromNative<SimpleType>::value &&
-			secondValue.type != TypeFromNative<SimpleType>::value) {
+		if (firstValue.type != TypeFromNative<SimpleType>::value() &&
+			secondValue.type != TypeFromNative<SimpleType>::value()) {
 			return computerEx(firstValue.value.nodeval<DoubleType>(), secondValue.value.nodeval<DoubleType>());
 		}
 
-		return firstValue.type == TypeFromNative<SimpleType>::value ?
+		return firstValue.type == TypeFromNative<SimpleType>::value() ?
 			computer(firstValue.value.nodeval<SimpleType>(), secondValue.value.nodeval<DoubleType>()) :
 			computerInv(firstValue.value.nodeval<DoubleType>(), secondValue.value.nodeval<SimpleType>());
 	}
