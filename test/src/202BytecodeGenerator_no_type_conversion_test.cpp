@@ -82,6 +82,17 @@ TEST_CASE("[BytecodeGenerator] no type conversion float + float") {
 	});
 }
 
+TEST_CASE("[BytecodeGenerator] no type conversion array") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = [3];");
+	auto res = data.generator->generate(astPtr);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::PUSH, "3"},
+		{ska::bytecode::Command::POP_IN_ARR, "R0"},
+		{ska::bytecode::Command::MOV, "V0", "R0"}
+	});
+}
+
 TEST_CASE("[BytecodeGenerator] no type conversion array + array") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = [3] + [7, 12, 25];");
 	auto res = data.generator->generate(astPtr);
