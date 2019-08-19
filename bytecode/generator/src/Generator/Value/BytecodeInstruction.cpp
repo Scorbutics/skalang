@@ -13,9 +13,9 @@ std::ostream& ska::bytecode::operator<<(std::ostream& stream, const Instruction&
 	<< CommandSTR[static_cast<std::size_t>(cell.m_command)] << "|"
 	#endif
 	#ifdef LOG_VALUE
-	<< cell.m_dest.content << "|"
-	<< cell.m_left.content << "|"
-	<< cell.m_right.content
+	<< cell.m_dest.toString() << "|"
+	<< cell.m_left.toString() << "|"
+	<< cell.m_right.toString()
 	#endif
 	<< "]";
 	return stream;

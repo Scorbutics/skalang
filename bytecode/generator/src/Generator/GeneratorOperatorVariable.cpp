@@ -12,7 +12,7 @@ namespace ska {
 			auto valueGroup = generator.generate({ context.script(), node });
 			if((dest.symbol() != node.symbol() || node.symbol() == nullptr) && !valueGroup.empty()) {
 				/*LOG_DEBUG << "Storage instruction for type " << node.type().value() << " is " << node.type().value().symbolType();
-				const auto type = valueGroup.value().content;
+				const auto type = valueGroup.value().toString();
 				if(!type.empty() && type[0] == 'L') {
 					LOG_DEBUG << "Label";
 					valueGroup.push(InstructionPack{ Instruction { Command::LABEL_AS_REF, context.script().queryVariableOrValue(dest), valueGroup.value() } });

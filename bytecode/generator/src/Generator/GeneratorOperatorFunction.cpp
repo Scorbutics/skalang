@@ -54,7 +54,7 @@ namespace ska {
 		static GenerationOutput AddRelativeJumpInstruction(GenerationOutput output) {
 			auto ss = std::stringstream {};
 			ss << output.size();
-			auto jumpInstruction = Instruction { Command::JUMP, Value {ss.str()}};
+			auto jumpInstruction = Instruction { Command::JUMP, Value { std::make_shared<std::string>(ss.str()) }};
 			auto result = GenerationOutput{ std::move(jumpInstruction) };
 			result.push(std::move(output));
 			return result;

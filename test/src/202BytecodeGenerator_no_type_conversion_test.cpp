@@ -54,9 +54,9 @@ static void BytecodeCompare(const ska::bytecode::GenerationOutput& result, std::
 		const auto equality =
 			index < expected.size() &&
 			r.command() == expected[index].command &&
-			r.dest().content == expected[index].dest &&
-			r.left().content == expected[index].left &&
-			r.right().content == expected[index].right;
+			r.dest().toString() == expected[index].dest &&
+			r.left().toString() == expected[index].left &&
+			r.right().toString() == expected[index].right;
 		CHECK(equality);
 		index++;
 	}

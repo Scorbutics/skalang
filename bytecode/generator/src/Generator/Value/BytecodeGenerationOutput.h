@@ -42,6 +42,8 @@ namespace ska {
 
 			Value value() const {	return m_value.empty() ? packAsValue() : m_value;	}
 
+			const Instruction& operator[](std::size_t index) const { return m_pack[index]; }
+
 		private:
 			friend std::ostream& operator<<(std::ostream& stream, const GenerationOutput&);
 

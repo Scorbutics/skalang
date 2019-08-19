@@ -12,9 +12,7 @@ ska::bytecode::Script::Script(ska::ScriptAST& script) :
 }
 
 ska::bytecode::Register ska::bytecode::Script::queryNextRegister() {
-	auto ss = std::stringstream{};
-	ss << "R" << m_register++;
-	return { ss.str() };
+	return { m_register++, ValueType::REG };
 }
 
 ska::bytecode::Value ska::bytecode::Script::querySymbolOrValue(const ASTNode& node) {
@@ -35,7 +33,8 @@ ska::bytecode::Value ska::bytecode::Script::queryLabel(const ASTNode& node) {
 ska::bytecode::Value ska::bytecode::UniqueSymbolGetterBase::query(const ASTNode& node) {
 	if (node.symbol() == nullptr) {
 		SLOG(ska::LogLevel::Debug) << "Querying symbol node with value " << node.name();
-		return { node.name() };
+		//TODO : rework ?
+		return node.name().empty() ? Value{} : Value{ std::make_shared<std::string>(node.name()) };
 	}
 
 	auto varCount = m_container.find(node.symbol());
@@ -47,5 +46,5 @@ ska::bytecode::Value ska::bytecode::UniqueSymbolGetterBase::query(const ASTNode&
 
 	SLOG(ska::LogLevel::Debug) << "Querying symbol node " << node.name() << " with value " << ss.str();
 
-	return { ss.str() };
+	return { varCount->second, m_symbol == 'V' ? ValueType::VAR : ValueType::LBL };
 }

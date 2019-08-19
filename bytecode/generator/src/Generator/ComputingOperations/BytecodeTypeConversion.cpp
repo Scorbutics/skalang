@@ -177,14 +177,14 @@ SKA_LOGC_CONFIG(ska::LogLevel::Error, ska::bytecode::TypeConversionData);
 #define LOG_ERROR SLOG_STATIC(ska::LogLevel::Error, ska::bytecode::TypeConversionData)
 
 ska::bytecode::GenerationOutput ska::bytecode::TypeConversionBinary(LogicalOperator logicalOperator, const TypedValueRef& node1, const TypedValueRef& node2, const TypedValueRef& destination) {
-	LOG_DEBUG << "Binary operation for nodes " << node1.value.content << " and " << node2.value.content << " with types " << node1.type  << " and " << node2.type;
+	LOG_DEBUG << "Binary operation for nodes " << node1.value.toString() << " and " << node2.value.toString() << " with types " << node1.type  << " and " << node2.type;
 	const auto& selectedNode = ConvertWhich(destination.type, node1, node2);
 	const auto reverseOrder = &selectedNode == &node2;
 	const auto& unselectedNode = reverseOrder ? node1 : node2;
 
 	auto result = TypeConversion(logicalOperator, selectedNode.type, unselectedNode.type, reverseOrder);
 	if(result.container.empty()) {
-		LOG_ERROR << "No command found for nodes " << node1.value.content << " and " << node2.value.content << " with types " << node1.type  << " and " << node2.type;
+		LOG_ERROR << "No command found for nodes " << node1.value.toString() << " and " << node2.value.toString() << " with types " << node1.type  << " and " << node2.type;
 		assert(false);
 		return InstructionPack{};
 	}

@@ -21,7 +21,7 @@ void ska::bytecode::GenerationOutput::push(GenerationOutput value) {
 std::ostream& ska::bytecode::operator<<(std::ostream& stream, const GenerationOutput& output) {
 	if(output.m_pack.empty()) {
 		if(!output.m_value.empty()) {
-			stream << output.m_value.content;
+			stream << output.m_value.toString();
 		}
 	} else {
 		stream << output.m_pack;

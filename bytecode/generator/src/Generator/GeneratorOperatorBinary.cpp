@@ -41,7 +41,7 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	for(const auto* child : children) {
 		auto group = GenerateInstructionValue(m_generator, context.script(), node.asNode(), *child);
 		groups.push_back(std::move(group));
-		LOG_DEBUG << "Binary : Value node child " << groups.back().value().content;
+		LOG_DEBUG << "Binary : Value node child " << groups.back().value().toString();
 	}
 
 	auto currentRegister = context.script().queryNextRegister();

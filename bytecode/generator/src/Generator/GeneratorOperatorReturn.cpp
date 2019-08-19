@@ -12,10 +12,8 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	auto objectResult = m_generator.generate({context.script(), node.GetValue()});
 
 	if(node.GetValue().type() == ExpressionType::OBJECT) {
-		auto ss = std::stringstream{};
-		ss << node.GetValue().size();
 		auto registerV = context.script().queryNextRegister();
-		objectResult.push(Instruction { Command::POP_IN_VAR, registerV, Value { ss.str() } });
+		objectResult.push(Instruction { Command::POP_IN_VAR, registerV, Value { node.GetValue().size() } });
 	}
 
 	LOG_DEBUG << "Returning : " << objectResult ;
