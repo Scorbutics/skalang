@@ -1,5 +1,4 @@
 #include <doctest.h>
-#include <iostream>
 #include <tuple>
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeInterpreterDataTestContainer.h"
@@ -59,39 +58,62 @@ TEST_CASE("[BytecodeInterpreter] var declaration") {
 	auto [script, data] = Interpret("var toto = 4;");
 	auto gen = data.generator->generate(script);
 	auto res = data.interpreter->interpret(gen);
-	std::cout << res.convertString() << std::endl;
 	CHECK(res.nodeval<long>() == 4);
 }
 
 TEST_CASE("[BytecodeInterpreter] var declaration from var") {
-	Interpret("var toto = 4; var titi = toto;");
+	auto [script, data] = Interpret("var toto = 4; var titi = toto;");
+	auto gen = data.generator->generate(script);
+	auto res = data.interpreter->interpret(gen);
+	//CHECK(res.nodeval<long>() == 4);
 }
 
 TEST_CASE("[BytecodeInterpreter] Basic Maths linear") {
-	Interpret("3 + 4 - 1;");
+	auto [script, data] = Interpret("3 + 4 - 1;");
+	auto gen = data.generator->generate(script);
+	auto res = data.interpreter->interpret(gen);
+	CHECK(res.nodeval<long>() == 6);
 }
 
 TEST_CASE("[BytecodeInterpreter] Basic Maths 1 left subpart") {
-	Interpret("(3 + 4) * 2;");
+	auto [script, data] = Interpret("(3 + 4) * 2;");
+	auto gen = data.generator->generate(script);
+	auto res = data.interpreter->interpret(gen);
+	CHECK(res.nodeval<long>() == 14);
 }
 
 TEST_CASE("[BytecodeInterpreter] Basic Maths 1 right subpart") {
-	Interpret("2 * (3 + 4);");
+	auto [script, data] = Interpret("2 * (3 + 4);");
+	auto gen = data.generator->generate(script);
+	auto res = data.interpreter->interpret(gen);
+	CHECK(res.nodeval<long>() == 14);
 }
 
 TEST_CASE("[BytecodeInterpreter] Basic Maths subparts") {
-	Interpret("(3 + 4) * (1 + 2);");
+	auto [script, data] = Interpret("(3 + 4) * (1 + 2);");
+	auto gen = data.generator->generate(script);
+	auto res = data.interpreter->interpret(gen);
+	CHECK(res.nodeval<long>() == 21);
 }
 
 TEST_CASE("[BytecodeInterpreter] Basic Maths with var") {
-	Interpret("var toto = 4; (toto * 5) + 2 * (3 + 4 - 1 / 4) + 1 + 9;");
+	auto [script, data] = Interpret("var toto = 4; (toto * 5) + 2 * (3 + 4 - 1 / 4) + 1 + 9;");
+	auto gen = data.generator->generate(script);
+	auto res = data.interpreter->interpret(gen);
+	CHECK(res.nodeval<long>() == 44);
 }
 
 TEST_CASE("[BytecodeInterpreter] var expression declaration") {
-  Interpret("var result = 7 + 3;");
+  auto [script, data] = Interpret("var result = 7 + 3;");
+	auto gen = data.generator->generate(script);
+	auto res = data.interpreter->interpret(gen);
+	//CHECK(res.nodeval<long>() == 10);
 }
 
 TEST_CASE("[BytecodeInterpreter] Introducing block sub-variable") {
-	Interpret("var toto = 4; { var toto = 5; toto + 1; } toto + 1;");
+	auto [script, data] = Interpret("var toto = 4; { var toto = 5; toto + 1; } toto + 1;");
+	auto gen = data.generator->generate(script);
+	auto res = data.interpreter->interpret(gen);
+	CHECK(res.nodeval<long>() == 5);
 }
 
