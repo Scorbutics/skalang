@@ -42,6 +42,7 @@ ska::bytecode::ExecutionOutput ska::bytecode::Interpreter::interpret(ExecutionCo
 		auto& builder = m_commandInterpreter[static_cast<std::size_t>(instruction.command())];
 		assert(builder != nullptr);
 		auto result = builder->interpret(node);
+		lastValue = instruction.dest();
 		node.set(instruction.dest(), std::move(result));
 	}
 
