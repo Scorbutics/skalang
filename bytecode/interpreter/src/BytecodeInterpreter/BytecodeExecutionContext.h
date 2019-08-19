@@ -21,6 +21,8 @@ namespace ska {
 			bool empty() const { return instructions.size() == 0; }
 
 			const Instruction& currentInstruction() const { assert(executionPointer >= 0 && executionPointer < instructions.size()); return instructions[executionPointer]; }
+			Instruction& currentInstruction() { assert(executionPointer >= 0 && executionPointer < instructions.size()); return instructions[executionPointer]; }
+
 			bool incInstruction() {
 				return ++executionPointer < instructions.size();
 			}

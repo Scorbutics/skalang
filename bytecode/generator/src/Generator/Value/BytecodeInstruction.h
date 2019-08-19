@@ -25,9 +25,13 @@ namespace ska {
 			Instruction() = default;
 
 			auto command() const { return m_command; }
-			const auto& left() const { return m_left;	}
+			const auto& left() const { return m_left; }
 			const auto& right() const { return m_right;	}
 			const auto& dest() const { return m_dest; }
+
+			auto& left() { return m_left; }
+			auto& right() { return m_right; }
+			
 
 			friend std::ostream& operator<<(std::ostream& stream, const Instruction&);
 

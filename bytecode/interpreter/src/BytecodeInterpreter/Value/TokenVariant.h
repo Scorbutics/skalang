@@ -10,7 +10,5 @@
 namespace ska {
 	namespace bytecode {
 		using TokenVariant = std::variant<std::size_t, bool, long, double, StringShared, ObjectMemory, BridgeMemory>;
-
-		TokenVariant TokenVariantFromValue(const Value& value);
 	}
 }

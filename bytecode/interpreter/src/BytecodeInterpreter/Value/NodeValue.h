@@ -13,6 +13,7 @@
 
 namespace ska {
 	namespace bytecode {
+		class ExecutionContext;
 
 		using NodeValueVariant_ = std::variant<
 			TokenVariant,
@@ -79,5 +80,7 @@ namespace ska {
 		};
 
 		bool operator==(const NodeValue& lhs, const NodeValue& rhs);
+
+		NodeValue TokenVariantFromValue(ExecutionContext& context, Value& value);
 	}
 }

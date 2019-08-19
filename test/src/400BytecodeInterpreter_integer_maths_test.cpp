@@ -65,7 +65,7 @@ TEST_CASE("[BytecodeInterpreter] var declaration from var") {
 	auto [script, data] = Interpret("var toto = 4; var titi = toto;");
 	auto gen = data.generator->generate(script);
 	auto res = data.interpreter->interpret(gen);
-	//CHECK(res.nodeval<long>() == 4);
+	CHECK(res.nodeval<long>() == 4);
 }
 
 TEST_CASE("[BytecodeInterpreter] Basic Maths linear") {
@@ -107,7 +107,7 @@ TEST_CASE("[BytecodeInterpreter] var expression declaration") {
   auto [script, data] = Interpret("var result = 7 + 3;");
 	auto gen = data.generator->generate(script);
 	auto res = data.interpreter->interpret(gen);
-	//CHECK(res.nodeval<long>() == 10);
+	CHECK(res.nodeval<long>() == 10);
 }
 
 TEST_CASE("[BytecodeInterpreter] Introducing block sub-variable") {
