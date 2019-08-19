@@ -69,7 +69,7 @@ TEST_CASE("[BytecodeGenerator] empty if") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ Command::JUMP_NIF, "true", "0" }
+		{ Command::JUMP_NIF, "1", "0" }
 	});
 }
 
@@ -78,7 +78,7 @@ TEST_CASE("[BytecodeGenerator] if with body") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ Command::JUMP_NIF, "true", "1" },
+		{ Command::JUMP_NIF, "1", "1" },
 		{ Command::MOV, "V0", "5" }
 	});
 }

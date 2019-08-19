@@ -11,7 +11,7 @@ namespace ska {
 	class TypeCrosser;
 
 	namespace bytecode {
-		class Script;
+		class GenerationOutput;
 
 		class Interpreter {
 		public:
@@ -21,6 +21,7 @@ namespace ska {
 			~Interpreter() = default;
 
 			ExecutionOutput interpret(ExecutionContext& node);
+			ExecutionOutput interpret(GenerationOutput& script);
 		private:
 			CommandInterpreter build();
 			CommandInterpreter m_commandInterpreter;

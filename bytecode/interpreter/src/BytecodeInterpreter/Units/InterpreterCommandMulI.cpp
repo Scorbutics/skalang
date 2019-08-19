@@ -1,7 +1,5 @@
 #include "InterpreterCommandMulI.h"
 
-SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(MUL_I) {
-  const auto& instruction = context.currentInstruction();
-  context.set(instruction.dest(), instruction.left().as<long>() * instruction.right().as<long>());
-  return {};
+SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(MUL_I)(ExecutionContext& context, const Value& left, const Value& right) {
+  return context.get<long>(left) * context.get<long>(right);
 }

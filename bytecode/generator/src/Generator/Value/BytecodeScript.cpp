@@ -33,8 +33,7 @@ ska::bytecode::Value ska::bytecode::Script::queryLabel(const ASTNode& node) {
 ska::bytecode::Value ska::bytecode::UniqueSymbolGetterBase::query(const ASTNode& node) {
 	if (node.symbol() == nullptr) {
 		SLOG(ska::LogLevel::Debug) << "Querying symbol node with value " << node.name();
-		//TODO : rework ?
-		return node.name().empty() ? Value{} : Value{ std::make_shared<std::string>(node.name()) };
+		return Value { node };
 	}
 
 	auto varCount = m_container.find(node.symbol());

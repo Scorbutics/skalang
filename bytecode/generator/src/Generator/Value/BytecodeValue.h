@@ -28,6 +28,8 @@ GenerationOutput :
 */
 
 namespace ska {
+	class ASTNode;
+
 	namespace bytecode {
 
 		using ValueVariant = std::variant<std::size_t, long, bool, double, StringShared>;
@@ -42,6 +44,8 @@ namespace ska {
 
 		struct Value {
 			Value() = default;
+
+			Value(const ASTNode& node);
 
 			Value(ValueVariant var, ValueType type = ValueType::PURE) :
 				content(std::move(var)),

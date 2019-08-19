@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "BytecodeInterpreter.h"
 
 #include "NodeValue/AST.h"
@@ -10,6 +11,10 @@
 #include "Units/InterpreterCommandDivI.h"
 
 #include "InterpreterDeclarer.h"
+
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Interpreter);
+
+#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Interpreter)
 
 ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build() {
 	auto result = CommandInterpreter {};
@@ -31,12 +36,21 @@ ska::bytecode::Interpreter::Interpreter(const ReservedKeywordsPool& reserved) :
 }
 
 ska::bytecode::ExecutionOutput ska::bytecode::Interpreter::interpret(ExecutionContext& node) {
-	auto& builder = m_commandInterpreter[static_cast<std::size_t>(node.currentInstruction().command())];
-	assert(builder != nullptr);
-
+	auto lastValue = Value{};
 	for(auto continueExecution = !node.empty(); continueExecution; continueExecution = node.incInstruction()) {
+		auto& instruction = node.currentInstruction();
+		auto& builder = m_commandInterpreter[static_cast<std::size_t>(instruction.command())];
+		assert(builder != nullptr);
 		auto result = builder->interpret(node);
+		node.set(instruction.dest(), std::move(result));
 	}
 
-	return {};
+	return lastValue.empty() ? ExecutionOutput{} : std::move(node.getVariant(lastValue));
+}
+
+ska::bytecode::ExecutionOutput ska::bytecode::Interpreter::interpret(GenerationOutput& instructions) {
+	LOG_DEBUG << "Interpreting " << instructions;
+
+	auto context = ExecutionContext { instructions };
+	return interpret(context);
 }

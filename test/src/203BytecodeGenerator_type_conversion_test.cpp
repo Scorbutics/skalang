@@ -94,7 +94,7 @@ TEST_CASE("[BytecodeGenerator] type conversion + int => float") {
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::CONV_I_D, "R0", "3"},
-		{ska::bytecode::Command::ADD_D, "R0", "7.0", "R0"},
+		{ska::bytecode::Command::ADD_D, "R0", "7.000000", "R0"},
 		{ska::bytecode::Command::MOV, "V0", "R0"}
 	});
 }

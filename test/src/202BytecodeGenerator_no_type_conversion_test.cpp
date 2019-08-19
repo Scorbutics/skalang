@@ -77,7 +77,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion float + float") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::ADD_D, "R0", "3.0", "7.4"},
+		{ska::bytecode::Command::ADD_D, "R0", "3.000000", "7.400000"},
 		{ska::bytecode::Command::MOV, "V0", "R0"}
 	});
 }
@@ -111,7 +111,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion float - float") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::SUB_D, "R0", "3.1", "4.2"},
+		{ska::bytecode::Command::SUB_D, "R0", "3.100000", "4.200000"},
 		{ska::bytecode::Command::MOV, "V0", "R0"}
 	});
 }
@@ -145,7 +145,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion float * float") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::MUL_D, "R0", "3.0", "4.4"},
+		{ska::bytecode::Command::MUL_D, "R0", "3.000000", "4.400000"},
 		{ska::bytecode::Command::MOV, "V0", "R0"}
 	});
 }
@@ -165,7 +165,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion float / float") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::DIV_D, "R0", "3.0", "4.4"},
+		{ska::bytecode::Command::DIV_D, "R0", "3.000000", "4.400000"},
 		{ska::bytecode::Command::MOV, "V0", "R0"}
 	});
 }

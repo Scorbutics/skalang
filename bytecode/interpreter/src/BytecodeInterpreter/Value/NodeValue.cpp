@@ -8,12 +8,14 @@
 	std::visit([&numeric](auto && arg){
 		using T = std::decay_t<decltype(arg)>;
 
-		if constexpr (std::is_same<T, int>::value) {
+		if constexpr (std::is_same<T, long>::value) {
 			numeric = static_cast<double>(arg);
 		} else if constexpr (std::is_same<T, double>::value) {
 			numeric = arg;
 		} else if constexpr (std::is_same<T, bool>::value) {
 			numeric = arg ? 1.0 : 0.0;
+		} else if constexpr (std::is_same<T, std::size_t>::value) {
+			numeric = arg;
 		} else if constexpr (std::is_same<T, StringShared>::value) {
 			try {
 				numeric = std::stod(*arg);
@@ -35,16 +37,18 @@ std::string ska::bytecode::NodeValue::convertString() const {
 	std::visit([&result](auto && arg) {
 		using T = std::decay_t<decltype(arg)>;
 
-		if constexpr (std::is_same<T, int>::value) {
+		if constexpr (std::is_same<T, long>::value) {
 			result = std::to_string(arg);
 		} else if constexpr (std::is_same<T, double>::value) {
+			result = std::to_string(arg);
+		} else if constexpr (std::is_same<T, std::size_t>::value) {
 			result = std::to_string(arg);
 		} else if constexpr (std::is_same<T, bool>::value) {
 			result = arg ? "true" : "false";
 		} else if constexpr (std::is_same<T, StringShared>::value) {
 			result = *arg;
 		} else {
-			throw std::runtime_error("cannot convert the node value to a numeric format");
+			throw std::runtime_error("cannot convert the node value to a string format");
 		}
 	}, valueVariant);
 	return result;

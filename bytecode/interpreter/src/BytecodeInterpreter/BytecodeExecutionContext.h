@@ -4,38 +4,60 @@
 #include "Generator/Value/BytecodeGenerationOutput.h"
 #include "Generator/Value/BytecodeValue.h"
 #include "Value/PlainMemoryTable.h"
+#include "Value/TokenVariant.h"
 
 namespace ska {
 	namespace bytecode {
+
 		class ExecutionContext {
 		public:
+			ExecutionContext(GenerationOutput& instructions) :
+				instructions(instructions) {
+			}
+
 			ExecutionContext(const ExecutionContext&) = delete;
 			ExecutionContext& operator=(const ExecutionContext&) = delete;
 
-			bool empty() const { return instructions.empty(); }
+			bool empty() const { return instructions.size() == 0; }
 
 			const Instruction& currentInstruction() const { assert(executionPointer >= 0 && executionPointer < instructions.size()); return instructions[executionPointer]; }
 			bool incInstruction() {
 				return ++executionPointer < instructions.size();
 			}
 
+			auto& getVariant(const Value& v) {
+				auto* memory = selectMemory(v);
+				if(memory == nullptr) { throw std::runtime_error("invalid bytecode destination cell"); }
+				return (*memory)[v.as<std::size_t>()];
+			}
+
+			template <class T>
+			T get(const Value& v) {
+				auto* memory = selectMemory(v);
+				if(memory == nullptr) {
+					return v.as<T>();
+				}
+				return (*memory)[v.as<std::size_t>()].nodeval<T>();
+			}
+
 			template <class T>
 			void set(const Value& dest, T&& src) {
-				auto& memory = selectMemory(dest);
-				push(memory, dest, std::forward<T>(src));
+				auto* memory = selectMemory(dest);
+				if(memory == nullptr) { throw std::runtime_error("invalid bytecode destination cell"); }
+				push(*memory, dest, std::forward<T>(src));
 			}
 
 		private:
-			PlainMemoryTable& selectMemory(const Value& dest) {
+			PlainMemoryTable* selectMemory(const Value& dest) {
 				switch(dest.type) {
 					case ValueType::PURE:
 					default:
-						throw std::runtime_error("invalid bytecode destination cell");
+						return nullptr;
 					case ValueType::REG:
-						return registers;
+						return &registers;
 					break;
 					case ValueType::VAR:
-						return variables;
+						return &variables;
 				}
 			}
 
