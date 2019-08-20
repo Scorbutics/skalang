@@ -5,7 +5,7 @@ SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(PUSH_ARR_ARR)(ExecutionContext& con
 	auto& rightSide = *context.get<NodeValueArray>(right);
 
 	auto container = NodeValueArray{};
-	container->insert(container->end(), std::make_move_iterator(leftSide.begin()), std::make_move_iterator(leftSide.end()));
-	container->insert(container->end(), std::make_move_iterator(rightSide.begin()), std::make_move_iterator(rightSide.end()));
+	container->insert(container->end(), leftSide.begin(), leftSide.end());
+	container->insert(container->end(), rightSide.begin(), rightSide.end());
 	return container;
 }

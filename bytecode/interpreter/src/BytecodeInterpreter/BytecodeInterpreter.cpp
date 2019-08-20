@@ -9,7 +9,21 @@
 #include "Units/InterpreterCommandSubI.h"
 #include "Units/InterpreterCommandMulI.h"
 #include "Units/InterpreterCommandDivI.h"
-
+#include "Units/InterpreterCommandAddD.h"
+#include "Units/InterpreterCommandSubD.h"
+#include "Units/InterpreterCommandMulD.h"
+#include "Units/InterpreterCommandDivD.h"
+#include "Units/InterpreterCommandAddStr.h"
+#include "Units/InterpreterCommandPushArrArr.h"
+#include "Units/InterpreterCommandSubArr.h"
+#include "Units/InterpreterCommandCmpStr.h"
+#include "Units/InterpreterCommandCmpArr.h"
+#include "Units/InterpreterCommandTestEq.h"
+#include "Units/InterpreterCommandTestG.h"
+#include "Units/InterpreterCommandTestGe.h"
+#include "Units/InterpreterCommandTestL.h"
+#include "Units/InterpreterCommandTestLe.h"
+#include "Units/InterpreterCommandTestNeq.h"
 #include "InterpreterDeclarer.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Interpreter);
@@ -27,6 +41,24 @@ ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build
 	InterpreterCommandDeclare<Command::SUB_I>(*this, result);
 	InterpreterCommandDeclare<Command::MUL_I>(*this, result);
 	InterpreterCommandDeclare<Command::DIV_I>(*this, result);
+
+	InterpreterCommandDeclare<Command::ADD_D>(*this, result);
+	InterpreterCommandDeclare<Command::SUB_D>(*this, result);
+	InterpreterCommandDeclare<Command::MUL_D>(*this, result);
+	InterpreterCommandDeclare<Command::DIV_D>(*this, result);
+
+	InterpreterCommandDeclare<Command::ADD_STR>(*this, result);
+	InterpreterCommandDeclare<Command::PUSH_ARR_ARR>(*this, result);
+	InterpreterCommandDeclare<Command::SUB_ARR>(*this, result);
+
+	InterpreterCommandDeclare<Command::CMP_STR>(*this, result);
+	InterpreterCommandDeclare<Command::CMP_ARR>(*this, result);
+	InterpreterCommandDeclare<Command::TEST_EQ>(*this, result);
+	InterpreterCommandDeclare<Command::TEST_G>(*this, result);
+	InterpreterCommandDeclare<Command::TEST_GE>(*this, result);
+	InterpreterCommandDeclare<Command::TEST_L>(*this, result);
+	InterpreterCommandDeclare<Command::TEST_LE>(*this, result);
+	InterpreterCommandDeclare<Command::TEST_NEQ>(*this, result);
 
 	return result;
 }

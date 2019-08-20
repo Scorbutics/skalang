@@ -67,7 +67,7 @@ using namespace ska::bytecode;
 TEST_CASE("[BytecodeGenerator] equal") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("4 == 1;");
 	auto res = data.generator->generate(astPtr);
-	BytecodeCompare(res, { 
+	BytecodeCompare(res, {
 		{Command::SUB_I, "R0", "4", "1"},
 		{Command::TEST_EQ, "R0", "R0"}
 	});
@@ -80,6 +80,28 @@ TEST_CASE("[BytecodeGenerator] var declaration : conditional") {
 		{Command::SUB_I, "R0", "4", "1"},
 		{Command::TEST_EQ, "R0", "R0"},
 		{Command::MOV, "V0", "R0"}
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] conditional strings") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("\"4\" == \"1\";");
+	auto res = data.generator->generate(astPtr);
+	BytecodeCompare(res, {
+		{Command::CMP_STR, "R0", "4", "1"},
+		{Command::TEST_EQ, "R0", "R0"}
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] conditional arrays") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("[4] == [1];");
+	auto res = data.generator->generate(astPtr);
+	BytecodeCompare(res, {
+		{Command::PUSH, "4"},
+		{Command::POP_IN_ARR, "R0"},
+		{Command::PUSH, "1"},
+		{Command::POP_IN_ARR, "R1"},
+		{Command::CMP_ARR, "R2", "R0", "R1"},
+		{Command::TEST_EQ, "R2", "R2"}
 	});
 }
 

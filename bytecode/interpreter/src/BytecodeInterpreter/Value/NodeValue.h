@@ -35,17 +35,22 @@ namespace ska {
 			NodeValue() = default;
 
 			template <class Arg>
-			NodeValue(Arg&& arg) : m_variant(std::forward<Arg>(arg)) {}
+			NodeValue(Arg&& arg) {
+				if constexpr(std::is_same_v<NodeValue, std::decay_t<Arg>>) {
+					*this = std::forward<Arg>(arg);
+				} else {
+					m_variant = std::forward<Arg>(arg);
+				}
+			}
 			NodeValue(NodeValueArray arg) : m_variant(arg) {}
 			NodeValue(NodeValueMap arg) : m_variant(arg) {}
 
 			NodeValue(NodeValue&&) noexcept = default;
 
 			NodeValue& operator=(NodeValue&&) noexcept = default;
-			NodeValue& operator=(const NodeValue&) = delete;
+			NodeValue(const NodeValue&) = default;
+			NodeValue& operator=(const NodeValue&) = default;
 			~NodeValue() = default;
-
-			NodeValue clone() const { return *this; }
 
 			template<class T> auto& as() { return std::get<T>(m_variant); }
 			template<class T> const auto& as() const { return std::get<T>(m_variant); }
@@ -80,7 +85,6 @@ namespace ska {
 			friend bool operator==(const NodeValue& lhs, const NodeValue& rhs);
 
 		private:
-			NodeValue(const NodeValue&) = default;
 			NodeValueVariant_ m_variant;
 		};
 
