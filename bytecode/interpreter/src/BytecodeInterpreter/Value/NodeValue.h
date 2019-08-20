@@ -55,6 +55,11 @@ namespace ska {
 			std::string convertString() const;
 
 			template <class Converted>
+			static constexpr bool is_container_of_values() {
+				return !detail::isVariantMember<Converted, TokenVariant>::value;
+			}
+
+			template <class Converted>
 			Converted& nodeval() {
 				if constexpr(detail::isVariantMember<Converted, TokenVariant>::value) {
 					return std::get<Converted>(std::get<TokenVariant>(m_variant));
@@ -80,7 +85,5 @@ namespace ska {
 		};
 
 		bool operator==(const NodeValue& lhs, const NodeValue& rhs);
-
-		NodeValue TokenVariantFromValue(ExecutionContext& context, Value& value);
 	}
 }

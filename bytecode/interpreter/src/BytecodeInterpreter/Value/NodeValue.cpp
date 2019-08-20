@@ -56,29 +56,6 @@ std::string ska::bytecode::NodeValue::convertString() const {
 	return result;
 }
 
-ska::bytecode::NodeValue ska::bytecode::TokenVariantFromValue(ExecutionContext& context, Value& value) {
-	auto output = NodeValue{};
-	std::visit([&](const auto& content) {
-		using TypeT = std::decay_t<decltype(content)>;
-		if constexpr (std::is_same_v<StringShared, TypeT>) {
-			output = content;
-		} else if constexpr (std::is_same_v<long, TypeT>) {
-			output = content;
-		} else if constexpr (std::is_same_v<double, TypeT>) {
-			output = content;
-		} else if constexpr (std::is_same_v<std::size_t, TypeT>) {
-			output = std::move(context.getVariant(value));
-		} else if constexpr (std::is_same_v<bool, TypeT>) {
-			output = content;
-		} else {
-			TypeT::lol;
-			throw std::runtime_error("error variant type");
-		}
-	}, value.content);
-	return output;
-};
-
-
 namespace ska {
 	namespace bytecode {
 		bool operator==(const NodeValue& lhs, const NodeValue& rhs) {

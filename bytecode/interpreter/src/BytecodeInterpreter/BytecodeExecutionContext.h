@@ -27,19 +27,19 @@ namespace ska {
 				return ++executionPointer < instructions.size();
 			}
 
-			auto& getVariant(const Value& v) {
-				auto* memory = selectMemory(v);
-				if(memory == nullptr) { throw std::runtime_error("invalid bytecode destination cell"); }
-				return (*memory)[v.as<std::size_t>()];
-			}
+			NodeValue getCell(const Value& v);
 
 			template <class T>
 			T get(const Value& v) {
 				auto* memory = selectMemory(v);
 				if(memory == nullptr) {
-					return v.as<T>();
+					if constexpr (NodeValue::is_container_of_values<T>()) {
+						throw std::runtime_error("invalid get cell value usage by querying a variable container without a valid value provided");
+					} else {
+						return v.as<T>();
+					}
 				}
-				return (*memory)[v.as<std::size_t>()].nodeval<T>();
+				return (*memory)[v.as<VariableRef>()].nodeval<T>();
 			}
 
 			template <class T>

@@ -46,7 +46,7 @@ ska::bytecode::ExecutionOutput ska::bytecode::Interpreter::interpret(ExecutionCo
 		node.set(instruction.dest(), std::move(result));
 	}
 
-	return lastValue.empty() ? ExecutionOutput{} : std::move(node.getVariant(lastValue));
+	return lastValue.empty() ? ExecutionOutput{} : node.getCell(lastValue);
 }
 
 ska::bytecode::ExecutionOutput ska::bytecode::Interpreter::interpret(GenerationOutput& instructions) {

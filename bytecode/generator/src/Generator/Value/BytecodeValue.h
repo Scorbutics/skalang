@@ -31,8 +31,8 @@ namespace ska {
 	class ASTNode;
 
 	namespace bytecode {
-
-		using ValueVariant = std::variant<std::size_t, long, bool, double, StringShared>;
+		using VariableRef = std::size_t;
+		using ValueVariant = std::variant<VariableRef, long, bool, double, StringShared>;
 
 		enum class ValueType {
 			PURE,
