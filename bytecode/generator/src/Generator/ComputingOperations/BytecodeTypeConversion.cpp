@@ -128,8 +128,8 @@ namespace ska {
 			EnqueueConverterItemPack<OperationType::FULL_FIRST, CommandPackOr<Command::POP_F_ARR, Command::POP_B_ARR>>::enqueue(result, LogicalOperator::SUBSTRACT, ExpressionType::INT, ExpressionType::ARRAY);
 
 			EnqueueConverterItem<OperationType::SPLIT, Command::CONV_I_D, Command::MUL_D>::enqueue(result, LogicalOperator::MULTIPLY, ExpressionType::INT, ExpressionType::FLOAT);
-			EnqueueConverterItem<OperationType::SPLIT, Command::MUL_I_ARR>::enqueue(result, LogicalOperator::MULTIPLY, ExpressionType::INT, ExpressionType::ARRAY);
-			EnqueueConverterItem<OperationType::SPLIT, Command::MUL_I_STR>::enqueue(result, LogicalOperator::MULTIPLY, ExpressionType::INT, ExpressionType::STRING);
+			EnqueueConverterItemPack<OperationType::SPLIT, CommandPackOr<Command::MUL_I_ARR, Command::MUL_ARR_I>>::enqueue(result, LogicalOperator::MULTIPLY, ExpressionType::INT, ExpressionType::ARRAY);
+			EnqueueConverterItemPack<OperationType::SPLIT, CommandPackOr<Command::MUL_I_STR, Command::MUL_STR_I>>::enqueue(result, LogicalOperator::MULTIPLY, ExpressionType::INT, ExpressionType::STRING);
 
 			EnqueueConverterItem<OperationType::SPLIT, Command::CONV_I_D, Command::DIV_D>::enqueue(result, LogicalOperator::DIVIDE, ExpressionType::INT, ExpressionType::FLOAT);
 
