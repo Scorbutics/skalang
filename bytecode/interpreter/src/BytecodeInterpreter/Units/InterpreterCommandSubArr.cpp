@@ -29,7 +29,7 @@ SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(SUB_ARR)(ExecutionContext& context,
     lastVal = firstVal;
   }
 
-  auto container = NodeValueArray{};
+  auto container = context.get<NodeValueArray>(left);
   for(std::size_t i = 0; i < leftSide.size(); i = (i >= firstVal && i <= lastVal) ? lastVal + 1 : i + 1 ) {
     container->push_back(leftSide[i]);
   }

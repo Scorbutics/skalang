@@ -6,6 +6,7 @@
 namespace ska {
     namespace bytecode {
         class NodeValue;
-        using NodeValueArray = std::shared_ptr<std::deque<NodeValue>>;
+        using NodeValueArrayRaw = std::deque<NodeValue>;
+        using NodeValueArray = std::shared_ptr<NodeValueArrayRaw>;
     }
 }

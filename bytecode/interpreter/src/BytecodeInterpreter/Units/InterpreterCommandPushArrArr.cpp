@@ -4,8 +4,7 @@ SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(PUSH_ARR_ARR)(ExecutionContext& con
 	auto& leftSide = *context.get<NodeValueArray>(left);
 	auto& rightSide = *context.get<NodeValueArray>(right);
 
-	auto container = NodeValueArray{};
-	container->insert(container->end(), leftSide.begin(), leftSide.end());
+	auto container = context.get<NodeValueArray>(left);
 	container->insert(container->end(), rightSide.begin(), rightSide.end());
 	return container;
 }
