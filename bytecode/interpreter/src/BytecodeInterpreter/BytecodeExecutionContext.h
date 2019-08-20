@@ -29,6 +29,21 @@ namespace ska {
 
 			NodeValue getCell(const Value& v);
 
+			void pop(NodeValue& dest) {
+				dest = stack.back();
+				stack.pop_back();
+			}
+
+			void pop(NodeValueArrayRaw& dest) {
+				dest.insert(dest.begin(), std::make_move_iterator(stack.begin()), std::make_move_iterator(stack.end()));
+				stack.clear();
+			}
+			
+			template <class ... Items>
+			void push(Items&& ... items) {
+				(stack.push_back(std::forward<decltype(items)>(items)), ...);
+			}
+
 			template <class T>
 			T get(const Value& v) {
 				auto* memory = selectMemory(v);
