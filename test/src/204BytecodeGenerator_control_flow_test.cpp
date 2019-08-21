@@ -93,7 +93,7 @@ TEST_CASE("[BytecodeGenerator] if else with body") {
 		{ Command::JUMP_NIF, "R0", "3" },
 		{ Command::ADD_I, "R1", "1", "3" },
 		{ Command::MOV, "V0", "R1" },
-		{ Command::JUMP, "4" },
+		{ Command::JUMP_REL, "4" },
 		{ Command::ADD_I, "R2", "2", "1" },
 		{ Command::ADD_I, "R3", "4", "R2" },
 		{ Command::MOV, "V1", "R3" },
@@ -108,7 +108,7 @@ TEST_CASE("[BytecodeGenerator] empty for") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ Command::JUMP, "-1" }
+		{ Command::JUMP_REL, "-1" }
 	});
 }
 
@@ -130,7 +130,7 @@ TEST_CASE("[BytecodeGenerator] for without body") {
 		// Increment part
 		{ Command::ADD_I, "R1", "V0", "1"},
 		{ Command::MOV, "V0", "R1" },
-		{ Command::JUMP, "-6" }
+		{ Command::JUMP_REL, "-6" }
 	});
 }
 
@@ -154,7 +154,7 @@ TEST_CASE("[BytecodeGenerator] for with body") {
 		// Increment part
 		{ Command::ADD_I, "R2", "V0", "1"},
 		{ Command::MOV, "V0", "R2" },
-		{ Command::JUMP, "-8" },
+		{ Command::JUMP_REL, "-8" },
 
 		// Post part
 		{ Command::MOV, "V2", "1234"}

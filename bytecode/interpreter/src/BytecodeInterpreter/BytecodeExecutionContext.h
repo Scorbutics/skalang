@@ -4,6 +4,7 @@
 #include "Generator/Value/BytecodeGenerationOutput.h"
 #include "Generator/Value/BytecodeValue.h"
 #include "Value/PlainMemoryTable.h"
+#include "Value/InstructionMemoryTable.h"
 #include "Value/TokenVariant.h"
 
 namespace ska {
@@ -20,8 +21,8 @@ namespace ska {
 
 			bool empty() const { return instructions.size() == 0; }
 
-			const Instruction& currentInstruction() const { assert(executionPointer >= 0 && executionPointer < instructions.size()); return instructions[executionPointer]; }
-			Instruction& currentInstruction() { assert(executionPointer >= 0 && executionPointer < instructions.size()); return instructions[executionPointer]; }
+			const Instruction& currentInstruction() const { assert(executionPointer < instructions.size()); return instructions[executionPointer]; }
+			Instruction& currentInstruction() { assert(executionPointer < instructions.size()); return instructions[executionPointer]; }
 
 			bool incInstruction() {
 				return ++executionPointer < instructions.size();
@@ -34,14 +35,29 @@ namespace ska {
 				stack.pop_back();
 			}
 
-			void pop(NodeValueArrayRaw& dest) {
-				dest.insert(dest.begin(), std::make_move_iterator(stack.begin()), std::make_move_iterator(stack.end()));
-				stack.clear();
+			void pop(NodeValueArrayRaw& dest, long count) {
+				for(auto i = 0; i < count && stack.size() > 0; i++) {
+					dest.push_back(stack.back());
+					stack.pop_back();
+				}
 			}
-			
+
+			long markLabel() {
+				labels.push_back(executionPointer);
+				return static_cast<long>(executionPointer);
+			}
+
+			void jumpAbsolute(std::size_t value) {
+				executionPointer = value;
+			}
+
+			void jumpRelative(long value) {
+				executionPointer += value;
+			}
+
 			template <class ... Items>
 			void push(Items&& ... items) {
-				(stack.push_back(std::forward<decltype(items)>(items)), ...);
+				(pushIfNotEmpty(std::forward<decltype(items)>(items)), ...);
 			}
 
 			template <class T>
@@ -65,6 +81,12 @@ namespace ska {
 			}
 
 		private:
+			void pushIfNotEmpty(NodeValue value) {
+				if(!value.empty()) {
+					stack.push_back(std::move(value));
+				}
+			}
+
 			PlainMemoryTable* selectMemory(const Value& dest) {
 				switch(dest.type) {
 					case ValueType::PURE:
@@ -72,6 +94,8 @@ namespace ska {
 						return nullptr;
 					case ValueType::REG:
 						return &registers;
+					case ValueType::LBL:
+						return &labels;
 					break;
 					case ValueType::VAR:
 						return &variables;
@@ -98,6 +122,7 @@ namespace ska {
 			PlainMemoryTable variables;
 			PlainMemoryTable registers;
 			PlainMemoryTable stack;
+			PlainMemoryTable labels;
 		};
 	}
 }

@@ -32,7 +32,9 @@ namespace ska {
 
 		class NodeValue {
 		public:
-			NodeValue() = default;
+			NodeValue():
+				m_emptyVariant(true) {
+			}
 
 			template <class Arg>
 			NodeValue(Arg&& arg) {
@@ -42,8 +44,14 @@ namespace ska {
 					m_variant = std::forward<Arg>(arg);
 				}
 			}
-			NodeValue(NodeValueArray arg) : m_variant(arg) {}
-			NodeValue(NodeValueMap arg) : m_variant(arg) {}
+
+			NodeValue(NodeValueArray arg) :
+				m_variant(arg) {
+			}
+
+			NodeValue(NodeValueMap arg) :
+				m_variant(arg) {
+			}
 
 			NodeValue(NodeValue&&) noexcept = default;
 
@@ -56,7 +64,7 @@ namespace ska {
 			template<class T> const auto& as() const { return std::get<T>(m_variant); }
 
 			double convertNumeric() const;
-
+			bool empty() const { return m_emptyVariant;	}
 			std::string convertString() const;
 
 			template <class Converted>
@@ -86,6 +94,7 @@ namespace ska {
 
 		private:
 			NodeValueVariant_ m_variant;
+			bool m_emptyVariant = false;
 		};
 
 		bool operator==(const NodeValue& lhs, const NodeValue& rhs);

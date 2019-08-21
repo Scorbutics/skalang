@@ -117,3 +117,22 @@ TEST_CASE("[BytecodeInterpreter] Introducing block sub-variable") {
 	CHECK(res.nodeval<long>() == 5);
 }
 
+TEST_CASE("[BytecodeGenerator] Custom object creation") {
+	constexpr auto progStr =
+		"var toto = function() : var {"
+			"var priv_test = 1;"
+			"return {"
+				"test : priv_test,"
+				"say : function(more : string) : string {"
+					"var s = \"lol\" + priv_test + more;"
+					"return s;"
+				"}"
+			"};"
+		"};"
+		"var test = toto();";
+
+	auto [script, data] = Interpret(progStr);
+	auto gen = data.generator->generate(script);
+	auto res = data.interpreter->interpret(gen);
+	CHECK(res.nodeval<long>() == 5);
+}

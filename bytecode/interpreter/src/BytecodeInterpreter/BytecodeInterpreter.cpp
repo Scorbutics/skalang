@@ -24,6 +24,20 @@
 #include "Units/InterpreterCommandTestL.h"
 #include "Units/InterpreterCommandTestLe.h"
 #include "Units/InterpreterCommandTestNeq.h"
+#include "Units/InterpreterCommandPushFArr.h"
+#include "Units/InterpreterCommandPushBArr.h"
+#include "Units/InterpreterCommandLabel.h"
+#include "Units/InterpreterCommandEnd.h"
+#include "Units/InterpreterCommandPush.h"
+#include "Units/InterpreterCommandPop.h"
+#include "Units/InterpreterCommandPopInArr.h"
+#include "Units/InterpreterCommandPopInVar.h"
+#include "Units/InterpreterCommandJumpAbs.h"
+#include "Units/InterpreterCommandJumpRel.h"
+#include "Units/InterpreterCommandConvID.h"
+#include "Units/InterpreterCommandConvDI.h"
+#include "Units/InterpreterCommandConvDStr.h"
+#include "Units/InterpreterCommandConvIStr.h"
 #include "InterpreterDeclarer.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Interpreter);
@@ -49,7 +63,14 @@ ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build
 
 	InterpreterCommandDeclare<Command::ADD_STR>(*this, result);
 	InterpreterCommandDeclare<Command::PUSH_ARR_ARR>(*this, result);
+	InterpreterCommandDeclare<Command::PUSH_F_ARR>(*this, result);
+	InterpreterCommandDeclare<Command::PUSH_B_ARR>(*this, result);
 	InterpreterCommandDeclare<Command::SUB_ARR>(*this, result);
+
+	InterpreterCommandDeclare<Command::CONV_D_I>(*this, result);
+	InterpreterCommandDeclare<Command::CONV_I_D>(*this, result);
+	InterpreterCommandDeclare<Command::CONV_I_STR>(*this, result);
+	InterpreterCommandDeclare<Command::CONV_D_STR>(*this, result);
 
 	InterpreterCommandDeclare<Command::CMP_STR>(*this, result);
 	InterpreterCommandDeclare<Command::CMP_ARR>(*this, result);
@@ -59,6 +80,15 @@ ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build
 	InterpreterCommandDeclare<Command::TEST_L>(*this, result);
 	InterpreterCommandDeclare<Command::TEST_LE>(*this, result);
 	InterpreterCommandDeclare<Command::TEST_NEQ>(*this, result);
+
+	InterpreterCommandDeclare<Command::LABEL>(*this, result);
+	InterpreterCommandDeclare<Command::END>(*this, result);
+	InterpreterCommandDeclare<Command::PUSH>(*this, result);
+	InterpreterCommandDeclare<Command::POP>(*this, result);
+	InterpreterCommandDeclare<Command::POP_IN_ARR>(*this, result);
+	InterpreterCommandDeclare<Command::POP_IN_VAR>(*this, result);
+	InterpreterCommandDeclare<Command::JUMP_ABS>(*this, result);
+	InterpreterCommandDeclare<Command::JUMP_REL>(*this, result);
 
 	return result;
 }
@@ -74,8 +104,10 @@ ska::bytecode::ExecutionOutput ska::bytecode::Interpreter::interpret(ExecutionCo
 		auto& builder = m_commandInterpreter[static_cast<std::size_t>(instruction.command())];
 		assert(builder != nullptr);
 		auto result = builder->interpret(node);
-		lastValue = instruction.dest();
-		node.set(instruction.dest(), std::move(result));
+		if(!result.empty()) {
+			lastValue = instruction.dest();
+			node.set(instruction.dest(), std::move(result));
+		}
 	}
 
 	return lastValue.empty() ? ExecutionOutput{} : node.getCell(lastValue);

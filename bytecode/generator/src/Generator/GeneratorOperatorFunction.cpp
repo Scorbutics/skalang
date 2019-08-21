@@ -52,9 +52,7 @@ POP_IN_VAR V3, 2
 namespace ska {
 	namespace bytecode {
 		static GenerationOutput AddRelativeJumpInstruction(GenerationOutput output) {
-			auto ss = std::stringstream {};
-			ss << output.size();
-			auto jumpInstruction = Instruction { Command::JUMP, Value { std::make_shared<std::string>(ss.str()) }};
+			auto jumpInstruction = Instruction { Command::JUMP_REL, Value { output.size() }};
 			auto result = GenerationOutput{ std::move(jumpInstruction) };
 			result.push(std::move(output));
 			return result;
@@ -72,11 +70,10 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	LOG_DEBUG << "Generated " << valueGroup << " with value " << valueGroup.value();
 
 	const auto isVoidReturningFunction = node.GetFunctionPrototype().type().value().compound().back() == ExpressionType::VOID;
-	valueGroup.push(Instruction{ Command::END, valueGroup.name(), isVoidReturningFunction ? Value{} : valueGroup.value() });
+	valueGroup.push(Instruction{ Command::END, context.script().querySymbolOrValue(node.GetFunction()), valueGroup.name(), isVoidReturningFunction ? Value{} : valueGroup.value() });
 
 	LOG_DEBUG << "\tPrototype and Body : " << valueGroup;
 	auto fullFunction = AddRelativeJumpInstruction(std::move(valueGroup));
-	fullFunction.push(Instruction{ Command::LABEL_AS_REF, context.script().querySymbolOrValue(node.GetFunction()), fullFunction.value() });
 	return fullFunction;
 }
 
@@ -89,7 +86,7 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>::generate(OperateOn node, GenerationContext& context) {
-	auto callInstruction = Instruction { Command::CALL, context.script().querySymbolOrValue(node.GetFunctionNameNode()) };
+	auto callInstruction = Instruction { Command::JUMP_ABS, context.script().querySymbolOrValue(node.GetFunctionNameNode()) };
 	auto result = GenerationOutput{ InstructionPack {} };
 
 	ApplyNOperations(context.script(), node, Command::PUSH, result, node.GetFunctionParameterSize());

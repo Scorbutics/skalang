@@ -5,10 +5,10 @@ SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(MUL_STR_I)(ExecutionContext& contex
   if(container->empty()) {
 	  return container;
   }
-  
+
   auto count = context.get<long>(right);
   if(count < 0) {
-	  throw std::runtime_error("cannot multiplay an array a negative number of times");
+	  throw std::runtime_error("cannot multiply a string a negative number of times");
   }
 
   if(count == 0) {

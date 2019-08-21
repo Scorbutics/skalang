@@ -18,7 +18,7 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	auto ifGroup = m_generator.generate({ context.script(), node.GetIfStatement() });
 	auto elseGroup = m_generator.generate({ context.script(), node.GetElseStatement() });
 
-	ifGroup.push(Instruction{ Command::JUMP, Value { elseGroup.size() } });
+	ifGroup.push(Instruction{ Command::JUMP_REL, Value { elseGroup.size() } });
 
 	conditionGroup.push(Instruction{ Command::JUMP_NIF, conditionGroup.value(), Value { ifGroup.size() } });
 	conditionGroup.push(std::move(ifGroup));
