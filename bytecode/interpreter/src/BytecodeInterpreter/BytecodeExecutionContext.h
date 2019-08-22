@@ -70,7 +70,7 @@ namespace ska {
 						return v.as<T>();
 					}
 				}
-				return (*memory)[v.as<VariableRef>()].nodeval<T>();
+				return (*memory)[std::get<std::size_t>(v.as<VariableRef>())].nodeval<T>();
 			}
 
 			template <class T>
@@ -104,7 +104,7 @@ namespace ska {
 
 			template <class T>
 			void push(PlainMemoryTable& memory, const Value& dest, T&& src) {
-				auto index = dest.as<std::size_t>();
+				auto index = std::get<std::size_t>(dest.as<VariableRef>());
 				if(index >= memory.size()) {
 					if(index == memory.size()) {
 						memory.push_back(std::forward<T>(src));

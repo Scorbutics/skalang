@@ -36,7 +36,9 @@ std::string ska::bytecode::Value::toString() const {
   auto output = std::string {};
   std::visit([&output](const auto& value) {
     using TypeT = std::decay_t<decltype(value)>;
-    if constexpr(!std::is_same_v<StringShared, TypeT>) {
+	if constexpr (std::is_same_v<VariableRef, TypeT>) {
+		output = std::to_string(std::get<std::size_t>(value));
+	} else if constexpr (!std::is_same_v<StringShared, TypeT>) {
       output = std::to_string(value);
     }
   }, content);

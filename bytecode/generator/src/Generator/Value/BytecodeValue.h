@@ -1,5 +1,6 @@
 #pragma once
 #include <variant>
+#include <tuple>
 #include "NodeValue/Type.h"
 #include "Generator/BytecodeCommand.h"
 #include "NodeValue/StringShared.h"
@@ -31,7 +32,7 @@ namespace ska {
 	class ASTNode;
 
 	namespace bytecode {
-		using VariableRef = std::size_t;
+		using VariableRef = std::tuple<std::size_t>;
 		using ValueVariant = std::variant<VariableRef, long, bool, double, StringShared>;
 
 		enum class ValueType {

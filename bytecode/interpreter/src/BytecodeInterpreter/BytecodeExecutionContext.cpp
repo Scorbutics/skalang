@@ -14,5 +14,5 @@ ska::bytecode::NodeValue ska::bytecode::ExecutionContext::getCell(const Value& v
 		}, v.content);
 		return output;
 	}
-	return (*memory)[v.as<VariableRef>()];
+	return (*memory)[std::get<std::size_t>(v.as<VariableRef>())];
 }

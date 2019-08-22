@@ -52,7 +52,7 @@ POP_IN_VAR V3, 2
 namespace ska {
 	namespace bytecode {
 		static GenerationOutput AddRelativeJumpInstruction(GenerationOutput output) {
-			auto jumpInstruction = Instruction { Command::JUMP_REL, Value { output.size() }};
+			auto jumpInstruction = Instruction { Command::JUMP_REL, Value { static_cast<long>(output.size()) }};
 			auto result = GenerationOutput{ std::move(jumpInstruction) };
 			result.push(std::move(output));
 			return result;

@@ -12,7 +12,7 @@ ska::bytecode::Script::Script(ska::ScriptAST& script) :
 }
 
 ska::bytecode::Register ska::bytecode::Script::queryNextRegister() {
-	return { m_register++, ValueType::REG };
+	return { VariableRef { m_register++ }, ValueType::REG };
 }
 
 ska::bytecode::Value ska::bytecode::Script::querySymbolOrValue(const ASTNode& node) {
@@ -45,5 +45,5 @@ ska::bytecode::Value ska::bytecode::UniqueSymbolGetterBase::query(const ASTNode&
 
 	SLOG(ska::LogLevel::Debug) << "Querying symbol node " << node.name() << " with value " << ss.str();
 
-	return { varCount->second, m_symbol == 'V' ? ValueType::VAR : ValueType::LBL };
+	return { VariableRef{ varCount->second }, m_symbol == 'V' ? ValueType::VAR : ValueType::LBL };
 }
