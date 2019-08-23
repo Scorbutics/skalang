@@ -6,6 +6,8 @@
 #include "NodeValue/Operator.h"
 #include "NodeValue/ASTNodePtr.h"
 #include "BytecodeGenerationContext.h"
+#include "LabelReplacer.h"
+#include "SymbolInfoAdder.h"
 
 namespace ska {
 	struct ReservedKeywordsPool;
@@ -22,8 +24,12 @@ namespace ska {
 
 			GenerationOutput generate(GenerationContext node);
 		private:
+			GenerationOutput& postProcessing(Script& script, GenerationOutput& generated);
 			OperatorGenerator build();
+
 			OperatorGenerator m_operatorGenerator;
+			LabelReplacer m_labelReplacer;
+			SymbolInfoAdder m_symbolInfoAdder;
 		};
 	}
 }

@@ -40,6 +40,12 @@ namespace ska {
 			auto begin() const { return m_pack.begin(); }
 			auto end() const { return m_pack.end(); }
 
+			auto begin() { return m_pack.begin(); }
+			auto end() { return m_pack.end(); }
+
+			template <class It>
+			auto erase(It it) { return m_pack.erase(it); }
+
 			Value value() const {	return m_value.empty() ? packAsValue() : m_value;	}
 
 			const Instruction& operator[](std::size_t index) const { return m_pack[index]; }

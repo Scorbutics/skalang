@@ -14,7 +14,7 @@ namespace ska {
 
 			const ASTNode& pointer() { assert(m_pointer != nullptr); return *m_pointer; }
 			Script& script() { assert(m_script != nullptr); return *m_script; }
-		
+
 		private:
 			Script* m_script {};
 			const ASTNode* m_pointer {};

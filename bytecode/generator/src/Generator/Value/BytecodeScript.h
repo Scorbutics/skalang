@@ -19,7 +19,7 @@ namespace ska {
 		protected:
 			UniqueSymbolGetterBase(char symbol) : m_symbol(symbol) {}
 
-			Value query(const ASTNode& node);
+			std::pair<Value, bool> query(const ASTNode& node);
 
 			SymbolUIDContainer m_container;
 			std::size_t m_count = 0;
@@ -40,6 +40,7 @@ namespace ska {
 			private UniqueSymbolGetter<'V'>,
 			private UniqueSymbolGetter<'L'> {
 
+			using LabelContainer = std::vector<std::size_t>;
 			using LabelGetter = UniqueSymbolGetter<'L'>;
 			using VariableGetter = UniqueSymbolGetter<'V'>;
 		public:
@@ -55,6 +56,7 @@ namespace ska {
 			Value queryLabel(const ASTNode& node);
 
 			~Script() override = default;
+
 		private:
 			std::size_t m_register = 0;
 			ska::ScriptHandleAST* m_script{};
