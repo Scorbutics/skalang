@@ -1,6 +1,10 @@
 #include "BytecodeExecutionContext.h"
 
 ska::bytecode::NodeValue ska::bytecode::ExecutionContext::getCell(const Value& v) {
+	if (v.empty()) {
+		return {};
+	}
+
 	auto* memory = selectMemory(v);
 	if(memory == nullptr) {
 		auto output = NodeValue{};

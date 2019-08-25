@@ -25,11 +25,11 @@ namespace ska {
 			throw std::runtime_error("Unhandled operator " + logicalOperator);
 		}
 
-		static GenerationOutput GenerateInstructionValue(Generator& generator, Script& script, const ASTNode& parent, const ASTNode& node) {
+		static GenerationOutput GenerateInstructionValue(GeneratorOperator<ska::Operator::BINARY>& generator, GenerationContext& context, const ASTNode& parent, const ASTNode& node) {
 			if(node.size() == 0) {
-				return script.querySymbolOrValue(node);
+				return context.script().querySymbolOrValue(node);
 			}
-			return generator.generate({ script, node });
+			return generator.generateNext({ context.script(), node, context.scope() });
 		}
 	}
 }
@@ -39,7 +39,7 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	auto groups = std::vector<GenerationOutput>{};
 
 	for(const auto* child : children) {
-		auto group = GenerateInstructionValue(m_generator, context.script(), node.asNode(), *child);
+		auto group = GenerateInstructionValue(*this, context, node.asNode(), *child);
 		groups.push_back(std::move(group));
 		LOG_DEBUG << "Binary : Value node child " << groups.back().value().toString();
 	}

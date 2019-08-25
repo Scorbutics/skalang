@@ -5,10 +5,10 @@
 #include "Generator/Value/BytecodeScript.h"
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::USER_DEFINED_OBJECT>::generate(OperateOn node, GenerationContext& context) {
-	auto objectResult = GenerationOutput{ InstructionPack{} };
+	auto objectResult = GenerationOutput{ };
 
 	for(auto& field: node) {
-		auto valueGroup = m_generator.generate({ context.script(), *field });
+		auto valueGroup = generateNext({ context.script(), *field, context.scope() + 1 });
 		valueGroup.push(Instruction { Command::PUSH, valueGroup.value() });
 		objectResult.push(std::move(valueGroup));
 	}

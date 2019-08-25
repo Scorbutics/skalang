@@ -1,7 +1,7 @@
 #include "InterpreterCommandEnd.h"
 
 SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(END)(ExecutionContext& context, Value& left, Value& right) {
-	auto label = context.getCell(left);
+	auto outputVar = context.getRelativeInstruction(left.as<long>() + 2);
 	context.push(context.getCell(right));
-	return label;
+	return outputVar;
 }

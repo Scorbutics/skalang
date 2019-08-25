@@ -10,7 +10,7 @@ namespace ska {
     public:
       void process(GenerationOutput& generated);
     private:
-      static void insertLabel(LabelContainer& container, std::size_t labelRef, std::size_t generationIndex);
+      static void insertLabel(LabelContainer& container, std::size_t variableRef, std::size_t generationIndex);
     };
   }
 }

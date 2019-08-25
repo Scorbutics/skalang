@@ -186,7 +186,7 @@ ska::bytecode::GenerationOutput ska::bytecode::TypeConversionBinary(LogicalOpera
 	if(result.container.empty()) {
 		LOG_ERROR << "No command found for nodes " << node1.value.toString() << " and " << node2.value.toString() << " with types " << node1.type  << " and " << node2.type;
 		assert(false);
-		return InstructionPack{};
+		return {};
 	}
 
 	assert(result.container.size() == 2 || result.container.size() == 1);

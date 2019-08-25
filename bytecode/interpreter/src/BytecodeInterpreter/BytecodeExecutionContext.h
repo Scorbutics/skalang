@@ -48,11 +48,15 @@ namespace ska {
 			}
 
 			void jumpAbsolute(std::size_t value) {
-				executionPointer = value;
+				executionPointer = value - 1;
 			}
 
 			void jumpRelative(long value) {
-				executionPointer += value;
+				executionPointer += (value - 1);
+			}
+
+			std::size_t getRelativeInstruction(long relativeValue) const {
+				return executionPointer + relativeValue;
 			}
 
 			template <class ... Items>
@@ -99,6 +103,8 @@ namespace ska {
 					break;
 					case ValueType::VAR:
 						return &variables;
+					case ValueType::EMPTY:
+						throw std::runtime_error("cannot select empty variable relative memory");
 				}
 			}
 

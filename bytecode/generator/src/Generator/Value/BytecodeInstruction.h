@@ -31,7 +31,6 @@ namespace ska {
 
 			auto& left() { return m_left; }
 			auto& right() { return m_right; }
-			
 
 			friend std::ostream& operator<<(std::ostream& stream, const Instruction&);
 
@@ -40,7 +39,6 @@ namespace ska {
 			Value m_dest;
 			Value m_left;
 			Value m_right;
-			Type m_type;
 		};
 
 		std::ostream& operator<<(std::ostream& stream, const Instruction&);

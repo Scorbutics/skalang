@@ -17,7 +17,10 @@ namespace ska {
 		public:
 			GeneratorOperatorBase(Generator& generator) :
 				m_generator(generator) {}
-		protected:
+
+			GenerationOutput generateNext(GenerationContext node);
+
+		private:
 			Generator& m_generator;
 		};
 	}

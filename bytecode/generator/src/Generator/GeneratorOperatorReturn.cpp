@@ -9,7 +9,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::O
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::RETURN>)
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::RETURN>::generate(OperateOn node, GenerationContext& context) {
-	auto objectResult = m_generator.generate({context.script(), node.GetValue()});
+	auto objectResult = generateNext({context.script(), node.GetValue(), context.scope() });
 
 	if(node.GetValue().type() == ExpressionType::OBJECT) {
 		auto registerV = context.script().queryNextRegister();

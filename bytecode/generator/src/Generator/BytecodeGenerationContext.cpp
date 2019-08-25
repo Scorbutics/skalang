@@ -9,7 +9,8 @@ ska::bytecode::GenerationContext::GenerationContext(Script& script) :
 	m_pointer(&script.program().rootNode()) {
 }
 
-ska::bytecode::GenerationContext::GenerationContext(Script& script, const ASTNode& node) :
+ska::bytecode::GenerationContext::GenerationContext(Script& script, const ASTNode& node, std::size_t scopeLevel) :
 	m_script(&script),
-	m_pointer(&node) {
+	m_pointer(&node),
+	m_scopeLevel(scopeLevel) {
 }

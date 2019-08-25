@@ -7,7 +7,7 @@
 
 namespace ska {
 	namespace bytecode {
-		static GenerationOutput CommonGenerate(Generator& generator, GenerationContext& context) {
+		static GenerationOutput CommonGenerate(GenerationContext& context) {
 			auto result = context.script().querySymbolOrValue(context.pointer());
 			return { std::move(result) };
 		}
@@ -15,9 +15,9 @@ namespace ska {
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::UNARY>::generate(OperateOn node, GenerationContext& context) {
-	return CommonGenerate(m_generator, context);
+	return CommonGenerate(context);
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::LITERAL>::generate(OperateOn node, GenerationContext& context) {
-	return CommonGenerate(m_generator, context);
+	return CommonGenerate(context);
 }

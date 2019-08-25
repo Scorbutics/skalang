@@ -6,7 +6,7 @@
 #include "Generator/Value/BytecodeScript.h"
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::IMPORT>::generate(OperateOn node, GenerationContext& context) {
-	auto importGroup = m_generator.generate({ context.script(), node.GetScriptPathNode() });
+	auto importGroup = generateNext({ context.script(), node.GetScriptPathNode(), context.scope() + 1 });
 	importGroup.push(Instruction { Command::SCRIPT, context.script().queryNextRegister(), importGroup.value() });
 	return importGroup;
 }

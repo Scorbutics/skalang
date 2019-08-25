@@ -15,15 +15,18 @@ namespace ska {
 
 	namespace bytecode {
 		class Script;
+		class GeneratorOperatorBase;
 
 		class Generator {
 			using OperatorGenerator = std::vector<std::unique_ptr<GeneratorOperatorUnit>>;
+			friend class GeneratorOperatorBase;
 		public:
 			Generator(const ReservedKeywordsPool& reserved);
 			~Generator() = default;
 
 			GenerationOutput generate(GenerationContext node);
 		private:
+			GenerationOutput generatePart(GenerationContext node);
 			GenerationOutput& postProcessing(Script& script, GenerationOutput& generated);
 			OperatorGenerator build();
 

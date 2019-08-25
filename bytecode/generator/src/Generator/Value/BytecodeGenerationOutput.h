@@ -4,24 +4,31 @@
 #include "NodeValue/Operator.h"
 #include "NodeValue/Type.h"
 #include "BytecodeInstruction.h"
+#include "BytecodeSymbolInfo.h"
 
 namespace ska {
 	namespace bytecode {
 		using InstructionPack = std::vector<Instruction>;
-
+		
 		std::ostream& operator<<(std::ostream& stream, const InstructionPack&);
 
 		class GenerationOutput {
 		public:
-			GenerationOutput(Instruction instruction) :
-				m_pack(InstructionPack { std::move(instruction) }) {
+			GenerationOutput(Instruction instruction, SymbolInfo symbol = {}) :
+				m_pack(InstructionPack { std::move(instruction) }),
+				m_symbolsPack{ SymbolInfoPack{ std::move(symbol) } } {
 				m_value = packAsValue();
+				
 			}
 
+			GenerationOutput() = default;
+
+			/*
 			GenerationOutput(InstructionPack pack) :
 				m_pack(std::move(pack)) {
 				m_value = packAsValue();
 			}
+			*/
 
 			GenerationOutput(Value value) :
 				m_value(std::move(value)) {
@@ -43,8 +50,7 @@ namespace ska {
 			auto begin() { return m_pack.begin(); }
 			auto end() { return m_pack.end(); }
 
-			template <class It>
-			auto erase(It it) { return m_pack.erase(it); }
+			const auto& symbols() { return m_symbolsPack; }
 
 			Value value() const {	return m_value.empty() ? packAsValue() : m_value;	}
 
@@ -57,6 +63,7 @@ namespace ska {
 			Value packAsValue() const;
 			 InstructionPack m_pack;
 			 Value m_value;
+			 SymbolInfoPack m_symbolsPack;
 		};
 
 		std::ostream& operator<<(std::ostream& stream, const GenerationOutput&);

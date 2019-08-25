@@ -67,9 +67,8 @@ TEST_CASE("[BytecodeGenerator] Empty function only void") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP_REL, "2"},
-		{ska::bytecode::Command::LABEL, "L0"},
-		{ska::bytecode::Command::END, "V0", "L0" }
+		{ska::bytecode::Command::JUMP_REL, "1"},
+		{ska::bytecode::Command::END, "V0", "-2" }
 	});
 }
 
@@ -78,10 +77,9 @@ TEST_CASE("[BytecodeGenerator] Empty function with 1 parameter") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP_REL, "3"},
-		{ska::bytecode::Command::LABEL, "L0"},
+		{ska::bytecode::Command::JUMP_REL, "2"},
 		{ska::bytecode::Command::POP, "V0"},
-		{ska::bytecode::Command::END, "V1", "L0"}
+		{ska::bytecode::Command::END, "V1", "-3"}
 	});
 }
 
@@ -90,11 +88,10 @@ TEST_CASE("[BytecodeGenerator] Empty function with 4 parameters (> 3)") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP_REL, "4"},
-		{ska::bytecode::Command::LABEL, "L0"},
+		{ska::bytecode::Command::JUMP_REL, "3"},
 		{ska::bytecode::Command::POP, "V0", "V1", "V2"},
 		{ska::bytecode::Command::POP, "V3" },
-		{ska::bytecode::Command::END, "V4", "L0"}
+		{ska::bytecode::Command::END, "V4", "-4"}
 	});
 }
 
@@ -103,9 +100,8 @@ TEST_CASE("[BytecodeGenerator] Basic function with 1 return type") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP_REL, "2"},
-		{ska::bytecode::Command::LABEL, "L0"},
-		{ska::bytecode::Command::END, "V0", "L0", "0" }
+		{ska::bytecode::Command::JUMP_REL, "1"},
+		{ska::bytecode::Command::END, "V0", "-2", "0" }
 	});
 }
 
@@ -114,10 +110,9 @@ TEST_CASE("[BytecodeGenerator] Basic function with 1 parameter 1 return type") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP_REL, "3"},
-		{ska::bytecode::Command::LABEL, "L0"},
+		{ska::bytecode::Command::JUMP_REL, "2"},
 		{ska::bytecode::Command::POP, "V0"},
-		{ska::bytecode::Command::END, "V1", "L0", "0" }
+		{ska::bytecode::Command::END, "V1", "-3", "0" }
 	});
 }
 
@@ -126,12 +121,11 @@ TEST_CASE("[BytecodeGenerator] Function with 1 parameter and some computing insi
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP_REL, "5"},
-		{ska::bytecode::Command::LABEL, "L0"},
+		{ska::bytecode::Command::JUMP_REL, "4"},
 		{ska::bytecode::Command::POP, "V0"},
 		{ska::bytecode::Command::ADD_I, "R0", "V0", "3"},
 		{ska::bytecode::Command::MOV, "V1", "R0"},
-		{ska::bytecode::Command::END, "V2", "L0", "V1" }
+		{ska::bytecode::Command::END, "V2", "-5", "V1" }
 	});
 }
 
@@ -154,23 +148,21 @@ TEST_CASE("[BytecodeGenerator] Custom object creation") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP_REL, "15"},
-		{ska::bytecode::Command::LABEL, "L0"},
+		{ska::bytecode::Command::JUMP_REL, "13"},
 		{ska::bytecode::Command::MOV, "V0", "1"},
 		{ska::bytecode::Command::MOV, "V1", "V0"},
 		{ska::bytecode::Command::PUSH, "V1"},
-		{ska::bytecode::Command::JUMP_REL, "7"},
-		{ska::bytecode::Command::LABEL, "L1"},
+		{ska::bytecode::Command::JUMP_REL, "6"},
 		{ska::bytecode::Command::POP, "V2"},
 		{ska::bytecode::Command::CONV_I_STR, "R0", "V0"},
 		{ska::bytecode::Command::ADD_STR, "R0", "R0", "V2"},
 		{ska::bytecode::Command::ADD_STR, "R1", "lol", "R0"},
 		{ska::bytecode::Command::MOV, "V3", "R1"},
-		{ska::bytecode::Command::END, "V4", "L1", "V3"},
+		{ska::bytecode::Command::END, "V4", "-7", "V3"},
 		{ska::bytecode::Command::PUSH, "V4"},
 		{ska::bytecode::Command::POP_IN_VAR, "R2", "2"},
-		{ska::bytecode::Command::END, "V5", "L0", "R2"},
-		{ska::bytecode::Command::JUMP_ABS, "V5"},
+		{ska::bytecode::Command::END, "V5", "-14", "R2"},
+		{ska::bytecode::Command::JUMP_ABS, "1"},
 		{ska::bytecode::Command::POP, "R3"},
 		{ska::bytecode::Command::MOV, "V6", "R3"}
 	});

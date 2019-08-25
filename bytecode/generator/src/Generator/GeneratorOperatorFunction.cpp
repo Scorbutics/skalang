@@ -63,14 +63,18 @@ namespace ska {
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	LOG_DEBUG << "Generating prototype : ";
-	auto valueGroup = m_generator.generate({ context.script(), node.GetFunctionPrototype() });
+	auto valueGroup = generateNext({ context.script(), node.GetFunctionPrototype(), context.scope() });
 	LOG_DEBUG << "Generating body : ";
-	valueGroup.push(m_generator.generate({ context.script(), node.GetFunctionBody() }));
+	valueGroup.push(generateNext({ context.script(), node.GetFunctionBody(), context.scope() + 1 }));
 
 	LOG_DEBUG << "Generated " << valueGroup << " with value " << valueGroup.value();
 
 	const auto isVoidReturningFunction = node.GetFunctionPrototype().type().value().compound().back() == ExpressionType::VOID;
-	valueGroup.push(Instruction{ Command::END, context.script().querySymbolOrValue(node.GetFunction()), valueGroup.name(), isVoidReturningFunction ? Value{} : valueGroup.value() });
+	valueGroup.push(Instruction{ 
+		Command::END, 
+		context.script().querySymbolOrValue(node.GetFunction()),
+		Value { -static_cast<long>(valueGroup.size()) - 2 }, 
+		isVoidReturningFunction ? Value{} : valueGroup.value() });
 
 	LOG_DEBUG << "\tPrototype and Body : " << valueGroup;
 	auto fullFunction = AddRelativeJumpInstruction(std::move(valueGroup));
@@ -78,18 +82,18 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
-	auto result = GenerationOutput { Instruction { Command::LABEL, context.script().queryLabel(node.GetFunction())}};
-	LOG_DEBUG << "\tLabel : " << result;
-	ApplyNOperations(context.script(), node, Command::POP, result, node.GetParameterSize());
+	auto result = GenerationOutput{ /*Instruction { Command::LABEL, context.script().queryLabel(node.GetFunction())} */ };
+	//LOG_DEBUG << "\tLabel : " << result;
+	ApplyNOperations<Command::POP>(result, context.script(), SymbolInfo{ context.scope(), node.GetFunction().name() }, node, node.GetParameterSize());
 	LOG_DEBUG << "\tLabel and Parameters : " << result;
 	return result;
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>::generate(OperateOn node, GenerationContext& context) {
 	auto callInstruction = Instruction { Command::JUMP_ABS, context.script().querySymbolOrValue(node.GetFunctionNameNode()) };
-	auto result = GenerationOutput{ InstructionPack {} };
+	auto result = GenerationOutput{ };
 
-	ApplyNOperations(context.script(), node, Command::PUSH, result, node.GetFunctionParameterSize());
+	ApplyNOperations<Command::PUSH>(result, context.script(), {}, node, node.GetFunctionParameterSize());
 	LOG_DEBUG << result;
 	result.push(std::move(callInstruction));
 	result.push(Instruction{ Command::POP, context.script().queryNextRegister()});

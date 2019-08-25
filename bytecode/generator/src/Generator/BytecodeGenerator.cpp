@@ -53,9 +53,13 @@ ska::bytecode::Generator::Generator(const ReservedKeywordsPool& reserved) :
 	m_operatorGenerator(build()) {
 }
 
-ska::bytecode::GenerationOutput ska::bytecode::Generator::generate(GenerationContext node) {
+ska::bytecode::GenerationOutput ska::bytecode::Generator::generatePart(GenerationContext node) {
 	auto& builder = m_operatorGenerator[static_cast<std::size_t>(node.pointer().op())];
 	assert(builder != nullptr);
-	auto generated = builder->generate(node);
+	return builder->generate(node);
+}
+
+ska::bytecode::GenerationOutput ska::bytecode::Generator::generate(GenerationContext node) {
+	auto generated = generatePart(node);
 	return postProcessing(node.script(), generated);
 }
