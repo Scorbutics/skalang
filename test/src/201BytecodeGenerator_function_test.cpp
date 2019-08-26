@@ -81,7 +81,7 @@ TEST_CASE("[BytecodeGenerator] Empty function with 1 parameter") {
 		{ska::bytecode::Command::JUMP_REL, "2"},
 		{ska::bytecode::Command::POP, "V0"},
 		{ska::bytecode::Command::RET},
-		{ska::bytecode::Command::END, "V1", "-2"}
+		{ska::bytecode::Command::END, "V1", "-3"}
 	});
 }
 

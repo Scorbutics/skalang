@@ -52,7 +52,7 @@ namespace ska {
 			}
 
 			void jumpRelative(long value) {
-				executionPointer += (value - 1);
+				executionPointer += value;
 			}
 
 			std::size_t getRelativeInstruction(long relativeValue) const {
@@ -116,7 +116,7 @@ namespace ska {
 						memory.push_back(std::forward<T>(src));
 						return;
 					} else {
-						memory.resize(index);
+						memory.resize(index + 1);
 					}
 				}
 				memory[index] = std::forward<T>(src);
