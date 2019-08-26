@@ -47,13 +47,9 @@ namespace ska {
 				return static_cast<long>(executionPointer);
 			}
 
-			void jumpAbsolute(std::size_t value) {
-				executionPointer = value - 1;
-			}
-
-			void jumpRelative(long value) {
-				executionPointer += value;
-			}
+			void jumpAbsolute(std::size_t value);
+			void jumpRelative(long value);
+			void jumpReturn();
 
 			std::size_t getRelativeInstruction(long relativeValue) const {
 				return executionPointer + relativeValue;
@@ -128,6 +124,7 @@ namespace ska {
 			PlainMemoryTable variables;
 			PlainMemoryTable registers;
 			PlainMemoryTable stack;
+			PlainMemoryTable stackExecution;
 			PlainMemoryTable labels;
 		};
 	}
