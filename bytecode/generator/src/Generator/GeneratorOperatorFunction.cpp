@@ -70,14 +70,14 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	LOG_DEBUG << "Generated " << valueGroup << " with value " << valueGroup.value();
 
 	const auto isVoidReturningFunction = node.GetFunctionPrototype().type().value().compound().back() == ExpressionType::VOID;
-	valueGroup.push(Instruction{ 
-		Command::END, 
-		context.script().querySymbolOrValue(node.GetFunction()),
-		Value { -static_cast<long>(valueGroup.size()) - 2 }, 
-		isVoidReturningFunction ? Value{} : valueGroup.value() });
+	valueGroup.push(Instruction{ Command::RET, isVoidReturningFunction ? Value{} : valueGroup.value() });
 
 	LOG_DEBUG << "\tPrototype and Body : " << valueGroup;
 	auto fullFunction = AddRelativeJumpInstruction(std::move(valueGroup));
+	fullFunction.push(Instruction{
+		Command::END,
+		context.script().querySymbolOrValue(node.GetFunction()),
+		Value { -static_cast<long>(fullFunction.size()) }});
 	return fullFunction;
 }
 

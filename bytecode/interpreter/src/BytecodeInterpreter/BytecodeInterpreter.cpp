@@ -27,6 +27,7 @@
 #include "Units/InterpreterCommandPushFArr.h"
 #include "Units/InterpreterCommandPushBArr.h"
 #include "Units/InterpreterCommandLabel.h"
+#include "Units/InterpreterCommandRet.h"
 #include "Units/InterpreterCommandEnd.h"
 #include "Units/InterpreterCommandPush.h"
 #include "Units/InterpreterCommandPop.h"
@@ -82,6 +83,7 @@ ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build
 	InterpreterCommandDeclare<Command::TEST_NEQ>(*this, result);
 
 	InterpreterCommandDeclare<Command::LABEL>(*this, result);
+	InterpreterCommandDeclare<Command::RET>(*this, result);
 	InterpreterCommandDeclare<Command::END>(*this, result);
 	InterpreterCommandDeclare<Command::PUSH>(*this, result);
 	InterpreterCommandDeclare<Command::POP>(*this, result);

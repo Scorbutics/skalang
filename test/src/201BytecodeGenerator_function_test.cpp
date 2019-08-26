@@ -68,6 +68,7 @@ TEST_CASE("[BytecodeGenerator] Empty function only void") {
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP_REL, "1"},
+		{ska::bytecode::Command::RET},
 		{ska::bytecode::Command::END, "V0", "-2" }
 	});
 }
@@ -79,7 +80,8 @@ TEST_CASE("[BytecodeGenerator] Empty function with 1 parameter") {
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP_REL, "2"},
 		{ska::bytecode::Command::POP, "V0"},
-		{ska::bytecode::Command::END, "V1", "-3"}
+		{ska::bytecode::Command::RET},
+		{ska::bytecode::Command::END, "V1", "-2"}
 	});
 }
 
@@ -91,6 +93,7 @@ TEST_CASE("[BytecodeGenerator] Empty function with 4 parameters (> 3)") {
 		{ska::bytecode::Command::JUMP_REL, "3"},
 		{ska::bytecode::Command::POP, "V0", "V1", "V2"},
 		{ska::bytecode::Command::POP, "V3" },
+		{ska::bytecode::Command::RET},
 		{ska::bytecode::Command::END, "V4", "-4"}
 	});
 }
@@ -101,7 +104,8 @@ TEST_CASE("[BytecodeGenerator] Basic function with 1 return type") {
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP_REL, "1"},
-		{ska::bytecode::Command::END, "V0", "-2", "0" }
+		{ska::bytecode::Command::RET, "0"},
+		{ska::bytecode::Command::END, "V0", "-2" }
 	});
 }
 
@@ -112,7 +116,8 @@ TEST_CASE("[BytecodeGenerator] Basic function with 1 parameter 1 return type") {
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP_REL, "2"},
 		{ska::bytecode::Command::POP, "V0"},
-		{ska::bytecode::Command::END, "V1", "-3", "0" }
+		{ska::bytecode::Command::RET, "0"},
+		{ska::bytecode::Command::END, "V1", "-3" }
 	});
 }
 
@@ -125,7 +130,8 @@ TEST_CASE("[BytecodeGenerator] Function with 1 parameter and some computing insi
 		{ska::bytecode::Command::POP, "V0"},
 		{ska::bytecode::Command::ADD_I, "R0", "V0", "3"},
 		{ska::bytecode::Command::MOV, "V1", "R0"},
-		{ska::bytecode::Command::END, "V2", "-5", "V1" }
+		{ska::bytecode::Command::RET, "V1"},
+		{ska::bytecode::Command::END, "V2", "-5" }
 	});
 }
 
@@ -148,7 +154,7 @@ TEST_CASE("[BytecodeGenerator] Custom object creation") {
 	auto res = data.generator->generate(astPtr);
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP_REL, "13"},
+		{ska::bytecode::Command::JUMP_REL, "14"},
 		{ska::bytecode::Command::MOV, "V0", "1"},
 		{ska::bytecode::Command::MOV, "V1", "V0"},
 		{ska::bytecode::Command::PUSH, "V1"},
@@ -158,10 +164,12 @@ TEST_CASE("[BytecodeGenerator] Custom object creation") {
 		{ska::bytecode::Command::ADD_STR, "R0", "R0", "V2"},
 		{ska::bytecode::Command::ADD_STR, "R1", "lol", "R0"},
 		{ska::bytecode::Command::MOV, "V3", "R1"},
-		{ska::bytecode::Command::END, "V4", "-7", "V3"},
+		{ska::bytecode::Command::RET, "V3"},
+		{ska::bytecode::Command::END, "V4", "-7"},
 		{ska::bytecode::Command::PUSH, "V4"},
 		{ska::bytecode::Command::POP_IN_VAR, "R2", "2"},
-		{ska::bytecode::Command::END, "V5", "-14", "R2"},
+		{ska::bytecode::Command::RET, "R2"},
+		{ska::bytecode::Command::END, "V5", "-15"},
 		{ska::bytecode::Command::JUMP_ABS, "1"},
 		{ska::bytecode::Command::POP, "R3"},
 		{ska::bytecode::Command::MOV, "V6", "R3"}

@@ -12,7 +12,7 @@ void ska::bytecode::LabelReplacer::process(GenerationOutput& generated) {
 	for (auto instruction = generated.begin(); instruction != generated.end(); instruction++) {
 		switch (instruction->command()) {
 		case Command::END: {
-			const auto functionStartRelativeInstruction = instruction->left().as<long>() + 2;
+			const auto functionStartRelativeInstruction = instruction->left().as<long>() + 1;
 			const auto variableRefIndex = std::get<std::size_t>(instruction->dest().as<VariableRef>());
 			const auto instructionIndex = std::distance(generated.begin(), instruction);
 			insertLabel(container, variableRefIndex, functionStartRelativeInstruction + instructionIndex);
