@@ -19,8 +19,11 @@ ska::bytecode::Value::Value(const ASTNode& node) :
     case ExpressionType::VOID:
       type = ValueType::EMPTY;
     break;
-    default:
-      throw std::runtime_error("unsupported conversion");
+    default: {
+      auto ss = std::stringstream {};
+      ss << "unsupported conversion of node type \"" << node.type().value() << "\"";
+      throw std::runtime_error(ss.str());
+    }
   }
 }
 
