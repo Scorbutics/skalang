@@ -1,3 +1,4 @@
+#include <iostream>
 #include <doctest.h>
 #include <tuple>
 #include "Config/LoggerConfigLang.h"
@@ -120,7 +121,7 @@ TEST_CASE("[BytecodeInterpreter] Introducing block sub-variable") {
 TEST_CASE("[BytecodeInterpreter] Custom object creation") {
 	constexpr auto progStr =
 		"var toto = function() : var {"
-			"var priv_test = 1;"
+			"var priv_test = 123;"
 			"return {"
 				"test : priv_test,"
 				"say : function(more : string) : string {"
@@ -130,10 +131,13 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation") {
 			"};"
 		"};"
 		"var test = toto();"
-		"test.test;";
+		"";
 
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(script);
 	auto res = data.interpreter->interpret(gen);
-	CHECK(res.nodeval<long>() == 5);
+	auto array = res.nodeval<ska::bytecode::NodeValueArray>();
+	std::cout << "toto " << array->size() << " " << (*array)[0].convertString() << std::endl;
+	auto firstCellValue = (*array)[0].nodeval<long>();
+	CHECK(firstCellValue == 123);
 }
