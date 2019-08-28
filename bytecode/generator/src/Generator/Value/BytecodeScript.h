@@ -20,6 +20,7 @@ namespace ska {
 			UniqueSymbolGetterBase(char symbol) : m_symbol(symbol) {}
 
 			std::pair<Value, bool> query(const ASTNode& node);
+			std::pair<Value, bool> query(const Symbol& symbol);
 
 			SymbolUIDContainer m_container;
 			std::size_t m_count = 0;
@@ -53,6 +54,7 @@ namespace ska {
 
 			Register queryNextRegister();
 			Value querySymbolOrValue(const ASTNode& node);
+			Value querySymbol(const Symbol& symbol);
 			Value queryLabel(const ASTNode& node);
 
 			~Script() override = default;

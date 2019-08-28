@@ -26,6 +26,10 @@ ska::bytecode::Value ska::bytecode::Script::querySymbolOrValue(const ASTNode& no
 	/*}*/
 }
 
+ska::bytecode::Value ska::bytecode::Script::querySymbol(const Symbol& symbol) {
+	return VariableGetter::query(symbol).first;
+}
+
 ska::bytecode::Value ska::bytecode::Script::queryLabel(const ASTNode& node) {
 	auto [ref, isNew] = LabelGetter::query(node);
 	return ref;
@@ -37,16 +41,20 @@ std::pair<ska::bytecode::Value, bool> ska::bytecode::UniqueSymbolGetterBase::que
 		return std::make_pair(Value { node }, false);
 	}
 
+	return query(*node.symbol());
+}
+
+std::pair<ska::bytecode::Value, bool> ska::bytecode::UniqueSymbolGetterBase::query(const Symbol& symbol) {
 	bool isNew = false;
-	auto varCount = m_container.find(node.symbol());
+	auto varCount = m_container.find(&symbol);
 	if (varCount == m_container.end()) {
-		varCount = m_container.emplace(node.symbol(), m_count++).first;
+		varCount = m_container.emplace(&symbol, m_count++).first;
 		isNew = true;
 	}
 	auto ss = std::stringstream{};
 	ss << m_symbol << varCount->second;
 
-	SLOG(ska::LogLevel::Debug) << "Querying symbol node " << node.name() << " with value " << ss.str();
+	SLOG(ska::LogLevel::Debug) << "Querying symbol node " << symbol.getName() << " with value " << ss.str();
 
 	return std::make_pair(Value { VariableRef{ varCount->second }, m_symbol == 'V' ? ValueType::VAR : ValueType::LBL }, isNew);
 }

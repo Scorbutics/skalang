@@ -90,6 +90,7 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>::generate(OperateOn node, GenerationContext& context) {
+	//TODO support arbitrary function-expression call
 	auto callInstruction = Instruction { Command::JUMP_ABS, context.script().querySymbolOrValue(node.GetFunctionNameNode()) };
 	auto result = GenerationOutput{ };
 

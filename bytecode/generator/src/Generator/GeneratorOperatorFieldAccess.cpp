@@ -9,12 +9,21 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Oper
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>)
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>::generate(OperateOn node, GenerationContext& context) {
-	auto objectPath = generateNext({context.script(), node.GetObjectNameNode(), context.scope() });
-	auto fieldResult = generateNext({context.script(), node.GetFieldNameNode(), context.scope() });
+	const auto typeObject = node.GetObjectType();
+	const auto& fieldName = node.GetFieldNameNode().name();
+	const auto* symbolField = typeObject[fieldName];
+	if (symbolField == nullptr || !typeObject.hasSymbol()) {
+		auto ss = std::stringstream{};
+		ss << "trying to access to an undeclared field : \"" << fieldName << "\" of \"" << node.GetObjectNameNode().name() << "\"";
+        throw std::runtime_error(ss.str());
+	}
 
-	LOG_DEBUG << "Accessing field " << fieldResult << " of object " << objectPath;
+	auto fieldValue = context.script().querySymbol(*symbolField);
 
-	//objectPath.push(std::move(fieldResult));
+	LOG_DEBUG << "Accessing field " << fieldValue << " of object " << node.GetObjectNameNode().name();
 
-	return fieldResult;
+	//auto indexValue = context.script().fieldIndex(fieldValue);
+
+	//return Instruction { Command::ARR_ACCESS, std::move(objectValue), std::move(indexValue) };
+	return fieldValue;
 }
