@@ -1,8 +1,12 @@
+#include "Config/LoggerConfigLang.h"
 #include <string>
 #include "NodeValue/AST.h"
 #include "GeneratorOperatorUserDefinedObject.h"
 #include "BytecodeCommand.h"
 #include "Generator/Value/BytecodeScript.h"
+
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::USER_DEFINED_OBJECT>);
+#define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::GeneratorOperator<ska::Operator::USER_DEFINED_OBJECT>)
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::USER_DEFINED_OBJECT>::generate(OperateOn node, GenerationContext& context) {
 	auto objectResult = GenerationOutput{ };
@@ -17,6 +21,10 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	}
 
 	//context.script().storeFieldsUserDefined(std::move(fields));
+
+	objectResult.addReferences(std::move(fields));
+
+	LOG_INFO << "Creating user defined object : " << objectResult;
 
 	return objectResult;
 }

@@ -23,13 +23,6 @@ namespace ska {
 
 			GenerationOutput() = default;
 
-			/*
-			GenerationOutput(InstructionPack pack) :
-				m_pack(std::move(pack)) {
-				m_value = packAsValue();
-			}
-			*/
-
 			GenerationOutput(Value value) :
 				m_value(std::move(value)) {
 			}
@@ -56,6 +49,13 @@ namespace ska {
 
 			const Instruction& operator[](std::size_t index) const { return m_pack[index]; }
 			Instruction& operator[](std::size_t index) { return m_pack[index]; }
+
+			void addReferences(std::vector<Value> fields) {
+				if(m_value.empty()) { m_value = packAsValue(); }
+				for(auto& field : fields) {
+					m_value.addReference(std::get<std::size_t>(field.as<VariableRef>()));
+				}
+			}
 
 		private:
 			friend std::ostream& operator<<(std::ostream& stream, const GenerationOutput&);

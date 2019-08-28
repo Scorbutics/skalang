@@ -88,7 +88,7 @@ namespace ska {
 			}
 
 			PlainMemoryTable* selectMemory(const Value& dest) {
-				switch(dest.type) {
+				switch(dest.type()) {
 					case ValueType::PURE:
 					default:
 						return nullptr;

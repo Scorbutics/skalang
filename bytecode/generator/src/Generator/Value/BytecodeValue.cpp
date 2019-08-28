@@ -2,22 +2,22 @@
 #include "NodeValue/AST.h"
 
 ska::bytecode::Value::Value(const ASTNode& node) :
-  type(ValueType::PURE) {
+  m_type(ValueType::PURE) {
   switch(node.type().value().type()) {
     case ExpressionType::BOOLEAN:
-      content = node.name() == "true";
+      m_content = node.name() == "true";
     break;
     case ExpressionType::FLOAT:
-      content = std::stod(node.name());
+      m_content = std::stod(node.name());
     break;
     case ExpressionType::INT:
-      content = std::stol(node.name());
+      m_content = std::stol(node.name());
     break;
     case ExpressionType::STRING:
-      content = std::make_shared<std::string>(node.name());
+      m_content = std::make_shared<std::string>(node.name());
     break;
     case ExpressionType::VOID:
-      type = ValueType::EMPTY;
+      m_type = ValueType::EMPTY;
     break;
     default: {
       auto ss = std::stringstream {};
@@ -27,13 +27,27 @@ ska::bytecode::Value::Value(const ASTNode& node) :
   }
 }
 
+std::string ska::bytecode::Value::referencesToString() const {
+  if(ref != nullptr && !ref->empty()) {
+    auto ss = std::stringstream {};
+    ss << " [";
+    for(const auto& [key, value] : *ref) {
+      ss << " V" << key << " : " << value;
+    }
+    ss << " ]";
+
+    return ss.str();
+  }
+  return "";
+}
+
 std::string ska::bytecode::Value::toString() const {
   if(empty()) {
     return "";
   }
 
-  if(std::holds_alternative<StringShared>(content)) {
-    return *std::get<StringShared>(content);
+  if(std::holds_alternative<StringShared>(m_content)) {
+    return *std::get<StringShared>(m_content);
   }
 
   auto output = std::string {};
@@ -44,21 +58,27 @@ std::string ska::bytecode::Value::toString() const {
 	} else if constexpr (!std::is_same_v<StringShared, TypeT>) {
       output = std::to_string(value);
     }
-  }, content);
+  }, m_content);
 
-  switch(type) {
+
+  switch(m_type) {
     case ValueType::VAR:
-    return "V" + output;
+    output = "V" + output;
+    break;
 
     case ValueType::REG:
-    return "R" + output;
+    output = "R" + output;
+    break;
 
     case ValueType::LBL:
-    return "L" + output;
+    output = "L" + output;
+    break;
 
     default:
     break;
   }
+
+  output += referencesToString();
 
   return output;
 }

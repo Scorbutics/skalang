@@ -1,6 +1,8 @@
 #pragma once
 #include <variant>
+#include <memory>
 #include <tuple>
+#include <unordered_map>
 #include "NodeValue/Type.h"
 #include "Generator/BytecodeCommand.h"
 #include "NodeValue/StringShared.h"
@@ -33,6 +35,8 @@ namespace ska {
 
 	namespace bytecode {
 		using VariableRef = std::tuple<std::size_t>;
+		using VariableRefIndexMap = std::unordered_map<std::size_t, std::size_t>;
+		using InstanceReferences = std::shared_ptr<VariableRefIndexMap>;
 		using ValueVariant = std::variant<VariableRef, long, bool, double, StringShared>;
 
 		enum class ValueType {
@@ -49,25 +53,38 @@ namespace ska {
 			Value(const ASTNode& node);
 
 			Value(ValueVariant var, ValueType type = ValueType::PURE) :
-				content(std::move(var)),
-				type(type){
+				m_content(std::move(var)),
+				m_type(type){
 			}
 
-			ValueVariant content;
-			ValueType type = ValueType::EMPTY;
-
-			bool empty() const {
-				return type == ValueType::EMPTY;
-			}
+			bool empty() const { return m_type == ValueType::EMPTY; }
+			const auto& content() const { return m_content; }
+			const auto type() const { return m_type; }
 
 			std::string toString() const;
+			std::string referencesToString() const;
 
 			template <class T>
-			T& as() { return std::get<T>(content); }
+			T& as() { return std::get<T>(m_content); }
 
 			template <class T>
-			const T& as() const { return std::get<T>(content); }
+			const T& as() const { return std::get<T>(m_content); }
 
+			const VariableRefIndexMap& references() const {
+				return *ref;
+			}
+
+			void addReference(std::size_t indexReference) {
+				if(ref == nullptr) {
+					ref = std::make_shared<VariableRefIndexMap>();
+				}
+				ref->emplace(indexReference, ref->size());
+			}
+
+		private:
+			ValueVariant m_content;
+			ValueType m_type = ValueType::EMPTY;
+			InstanceReferences ref;
 		};
 
 		using Register = Value;
