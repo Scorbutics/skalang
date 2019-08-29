@@ -26,8 +26,8 @@ std::ostream& ska::bytecode::operator<<(std::ostream& stream, const GenerationOu
 		}
 	} else {
 		stream << output.m_pack << " ";
-		//stream << output.m_symbolsPack;
-		stream << output.m_value.referencesToString();
+		stream << output.m_symbolsPack;
+		//stream << output.m_value.referencesToString();
 	}
 	return stream;
 }

@@ -27,20 +27,6 @@ ska::bytecode::Value::Value(const ASTNode& node) :
   }
 }
 
-std::string ska::bytecode::Value::referencesToString() const {
-  if(ref != nullptr && !ref->empty()) {
-    auto ss = std::stringstream {};
-    ss << " [";
-    for(const auto& [key, value] : *ref) {
-      ss << " V" << key << " : " << value;
-    }
-    ss << " ]";
-
-    return ss.str();
-  }
-  return "";
-}
-
 std::string ska::bytecode::Value::toString() const {
   if(empty()) {
     return "";
@@ -77,8 +63,6 @@ std::string ska::bytecode::Value::toString() const {
     default:
     break;
   }
-
-  output += referencesToString();
 
   return output;
 }

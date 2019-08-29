@@ -47,6 +47,7 @@ std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode
 }
 
 ska::bytecode::GenerationOutput& ska::bytecode::Generator::postProcessing(Script& script, GenerationOutput& generated) {
+	m_objectFieldAccessReplacer.process(generated);
 	m_labelReplacer.process(generated);
 	return generated;
 }

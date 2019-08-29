@@ -13,8 +13,7 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 
 	if(node.GetValue().type() == ExpressionType::OBJECT) {
 		auto registerV = context.script().queryNextRegister();
-		//registerV.setReferencesFrom(objectResult);
-		objectResult.push(Instruction { Command::POP_IN_VAR, registerV, Value { static_cast<long>(node.GetValue().size()) } });
+		objectResult.push({ Instruction { Command::POP_IN_VAR, registerV, Value { static_cast<long>(node.GetValue().size()) } }});
 	}
 
 	LOG_DEBUG << "Returning : " << objectResult ;

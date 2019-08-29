@@ -7,7 +7,7 @@
 #include "NodeValue/ASTNodePtr.h"
 #include "BytecodeGenerationContext.h"
 #include "LabelReplacer.h"
-#include "SymbolInfoAdder.h"
+#include "ObjectFieldAccessReplacer.h"
 
 namespace ska {
 	struct ReservedKeywordsPool;
@@ -32,7 +32,7 @@ namespace ska {
 
 			OperatorGenerator m_operatorGenerator;
 			LabelReplacer m_labelReplacer;
-			SymbolInfoAdder m_symbolInfoAdder;
+			ObjectFieldAccessReplacer m_objectFieldAccessReplacer;
 		};
 	}
 }
