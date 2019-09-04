@@ -12,15 +12,14 @@ namespace ska {
 		static GenerationOutput CommonGenerate(Generator& generator, const ASTNode& dest, const ska::ASTNode& node, GenerationContext& context) {
 			auto valueGroup = generator.generateNext({ context.script(), node, context.scope() });
 			if((dest.symbol() != node.symbol() || node.symbol() == nullptr) && !valueGroup.empty()) {
-				/*LOG_DEBUG << "Storage instruction for type " << node.type().value() << " is " << node.type().value().symbolType();
-				const auto type = valueGroup.value().toString();
-				if(!type.empty() && type[0] == 'L') {
-					LOG_DEBUG << "Label";
-					valueGroup.push(InstructionPack{ Instruction { Command::LABEL_AS_REF, context.script().queryVariableOrValue(dest), valueGroup.value() } });
-				} else {
-					LOG_DEBUG << "Variable or register";*/
-				valueGroup.push({ Instruction { Command::MOV, context.script().querySymbolOrValue(dest), valueGroup.value() }, SymbolInfo{ context.scope(), dest.name() } });
-				/*}*/
+				auto info = SymbolInfo {};
+				if(node.symbol() != nullptr) {
+					auto tmpInfo = context.script().getSymbolInfo(*node.symbol());
+					if(tmpInfo != nullptr) {
+						info = *tmpInfo;
+					}
+				}
+				valueGroup.push({ Instruction { Command::MOV, context.script().querySymbolOrValue(dest), valueGroup.value() }, SymbolInfo{ context.scope(), dest.name(), info.references } });
 			}
 			return valueGroup;
 		}

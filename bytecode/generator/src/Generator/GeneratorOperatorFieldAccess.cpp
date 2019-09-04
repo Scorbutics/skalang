@@ -19,11 +19,23 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	}
 
 	auto fieldValue = context.script().querySymbol(*symbolField);
-
 	LOG_DEBUG << "Accessing field " << fieldValue << " of object " << node.GetObjectNameNode().name();
 
-	//auto indexValue = context.script().fieldIndex(fieldValue);
+	//const auto* fieldReferences = context.script().getSymbolInfo(*symbolField);
 
-	//return Instruction { Command::ARR_ACCESS, std::move(objectValue), std::move(indexValue) };
-	return fieldValue;
+	auto objectValue = generateNext({ context.script(), node.GetObjectNameNode(), context.scope()});
+	if(objectValue.symbols().empty()) {
+		throw std::runtime_error("invalid bytecode : the dereferenced object has no symbol");
+	}
+	const auto objectFieldReferences = objectValue.symbols().back().references;
+	if(objectFieldReferences == nullptr || objectFieldReferences->empty()) {
+		throw std::runtime_error("invalid bytecode : the dereferenced object has no fields references");
+	}
+
+	const auto fieldRefIndex = (*objectFieldReferences).at(std::get<std::size_t>(fieldValue.as<VariableRef>()));
+
+	LOG_DEBUG << "This field has index " << fieldRefIndex << " in the object";
+
+	objectValue.push({ Instruction { Command::ARR_ACCESS, context.script().queryNextRegister(), objectValue.value(), Value{static_cast<long>(fieldRefIndex)} }});
+	return objectValue;
 }

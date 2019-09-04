@@ -72,10 +72,34 @@ namespace ska {
 			const T& as() const { return std::get<T>(m_content); }
 
 		private:
+			friend bool operator==(const Value& lhs, const Value& rhs);
+
 			ValueVariant m_content;
 			ValueType m_type = ValueType::EMPTY;
 		};
 
 		using Register = Value;
+
+		bool operator==(const Value& lhs, const Value& rhs);
 	}
+
+
+}
+
+namespace std {
+	template<>
+	struct hash<ska::bytecode::VariableRef> {
+		size_t operator()(const ska::bytecode::VariableRef & x) const {
+			return hash<std::size_t>()(std::get<std::size_t>(x));
+		}
+	};
+
+	template<>
+	struct hash<ska::bytecode::Value> {
+		size_t operator()(const ska::bytecode::Value & x) const {
+			const size_t h1 = hash<std::string>()(x.toString());
+    	const size_t h2 = hash<std::size_t>()(static_cast<std::size_t>(x.type()));
+    	return h1 ^ (h2 << 1);
+		}
+	};
 }

@@ -1,22 +1,24 @@
 #include "BytecodeSymbolInfo.h"
 
 std::ostream& ska::bytecode::operator<<(std::ostream& stream, const SymbolInfo& symbol) {
-	stream << symbol.name;
+	if(symbol.name != nullptr) {
+		stream << *symbol.name;
+	}
 	return stream;
 }
 
 std::ostream& ska::bytecode::operator<<(std::ostream& stream, const SymbolInfoPack& symbols) {
 	for(const auto& c : symbols) {
-		if(!c.name.empty()) {
+		if(c.name != nullptr && !c.name->empty()) {
 			stream << c << " ";
 		}
+		stream << " [";
 		if(c.references != nullptr) {
-			stream << " [";
 			for(const auto& [key, value] : *c.references) {
 				stream << " " << key << " : " << value;
 			}
-			stream << " ]";
 		}
+		stream << " ]";
 	}
 	return stream;
 }

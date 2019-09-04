@@ -9,7 +9,7 @@
 namespace ska {
 	namespace bytecode {
 		using InstructionPack = std::vector<Instruction>;
-		
+
 		std::ostream& operator<<(std::ostream& stream, const InstructionPack&);
 
 		class GenerationOutput {
@@ -18,13 +18,13 @@ namespace ska {
 				m_pack(InstructionPack { std::move(instruction) }),
 				m_symbolsPack{ SymbolInfoPack{ std::move(symbol) } } {
 				m_value = packAsValue();
-				
 			}
 
 			GenerationOutput() = default;
 
-			GenerationOutput(Value value) :
-				m_value(std::move(value)) {
+			GenerationOutput(Value value, SymbolInfo symbol = {}) :
+				m_value(std::move(value)),
+				m_symbolsPack{ SymbolInfoPack{ std::move(symbol) } } {
 			}
 
 			void push(GenerationOutput value);
@@ -43,7 +43,7 @@ namespace ska {
 			auto begin() { return m_pack.begin(); }
 			auto end() { return m_pack.end(); }
 
-			const auto& symbols() { return m_symbolsPack; }
+			const auto& symbols() const { return m_symbolsPack; }
 
 			Value value() const {	return m_value.empty() ? packAsValue() : m_value;	}
 

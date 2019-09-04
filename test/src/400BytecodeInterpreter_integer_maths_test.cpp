@@ -131,7 +131,7 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation") {
 			"};"
 		"};"
 		"var test = toto();"
-		"";
+		"test.test;";
 
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(script);

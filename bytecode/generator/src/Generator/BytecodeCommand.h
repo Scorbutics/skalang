@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include <ostream>
 
 namespace ska {
 	namespace bytecode {
@@ -100,10 +101,15 @@ namespace ska {
 			"TEST_L",
 			"TEST_LE",
 			"NOP",
-			"UNUSED_Last_Length"
+			""
 		};
 
 		static_assert(sizeof(CommandSTR) / sizeof(CommandSTR[0]) == (static_cast<std::size_t>(Command::UNUSED_Last_Length) + 1));
+
+		static inline std::ostream& operator<<(std::ostream& stream, const Command& cmd) {
+			stream << CommandSTR[static_cast<std::size_t>(cmd)];
+			return stream;
+		}
 
 	}
 }

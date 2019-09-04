@@ -69,15 +69,23 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 
 	LOG_DEBUG << "Generated " << valueGroup << " with value " << valueGroup.value();
 
-	const auto isVoidReturningFunction = node.GetFunctionPrototype().type().value().compound().back() == ExpressionType::VOID;
-	valueGroup.push(Instruction{ Command::RET, isVoidReturningFunction ? Value{} : valueGroup.value() });
+	const auto returningFunctionType = node.GetFunctionPrototype().type().value().compound().back();
+	const auto isVoidReturningFunction = returningFunctionType == ExpressionType::VOID;
+	valueGroup.push({ Instruction{ Command::RET, isVoidReturningFunction ? Value{} : valueGroup.value() }, valueGroup.symbols().empty() ? SymbolInfo{} : valueGroup.symbols().back()});
 
 	LOG_DEBUG << "\tPrototype and Body : " << valueGroup;
 	auto fullFunction = AddRelativeJumpInstruction(std::move(valueGroup));
-	fullFunction.push(Instruction{
+	fullFunction.push({ Instruction{
 		Command::END,
 		context.script().querySymbolOrValue(node.GetFunction()),
-		Value { -static_cast<long>(fullFunction.size()) }});
+		Value { -static_cast<long>(fullFunction.size()) }},
+		fullFunction.symbols().back()
+	});
+
+	if(returningFunctionType == ExpressionType::OBJECT) {
+		// Associates field references (fullFunction.symbols().back()) to the pure unique symbol (*node.GetFunction().symbol())
+		context.script().setSymbolInfo(node.GetFunction(), fullFunction.symbols().back());
+	}
 	return fullFunction;
 }
 
@@ -96,7 +104,10 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 
 	ApplyNOperations<Command::PUSH>(result, context.script(), {}, node, node.GetFunctionParameterSize());
 	LOG_DEBUG << result;
-	result.push(std::move(callInstruction));
+
+	const auto* functionReturnValueSymbolInfo = context.script().getSymbolInfo(*node.GetFunctionNameNode().symbol());
+
+	result.push({std::move(callInstruction), functionReturnValueSymbolInfo == nullptr ? SymbolInfo{} : *functionReturnValueSymbolInfo });
 	result.push(Instruction{ Command::POP, context.script().queryNextRegister()});
 	return result;
 }

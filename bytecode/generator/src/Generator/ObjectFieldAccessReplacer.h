@@ -9,11 +9,11 @@ namespace ska {
 		class Instruction;
 		class Value;
 
+		using ValueWatcher = std::unordered_set<Value>;
+
 		class ObjectFieldAccessReplacer {
 		public:
 			void process(GenerationOutput& generated);
-		private:
-			void markFields(std::unordered_set<std::size_t>& valuesToWatch, const Value& valueToWatch, FieldsReferences fields);
 		};
   }
 }

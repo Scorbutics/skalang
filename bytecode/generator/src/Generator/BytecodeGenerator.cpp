@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "BytecodeGenerator.h"
 
 #include "NodeValue/Operator.h"
@@ -18,6 +19,9 @@
 #include "GeneratorOperatorFieldAccess.h"
 
 #include "GeneratorDeclarer.h"
+
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Generator);
+#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Generator)
 
 std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode::Generator::build() {
 	auto result = std::vector<std::unique_ptr<GeneratorOperatorUnit>> {};
@@ -47,7 +51,7 @@ std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode
 }
 
 ska::bytecode::GenerationOutput& ska::bytecode::Generator::postProcessing(Script& script, GenerationOutput& generated) {
-	m_objectFieldAccessReplacer.process(generated);
+	//m_objectFieldAccessReplacer.process(generated);
 	m_labelReplacer.process(generated);
 	return generated;
 }
@@ -57,7 +61,9 @@ ska::bytecode::Generator::Generator(const ReservedKeywordsPool& reserved) :
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::Generator::generatePart(GenerationContext node) {
-	auto& builder = m_operatorGenerator[static_cast<std::size_t>(node.pointer().op())];
+	const auto& operatorNode = node.pointer().op();
+	LOG_DEBUG << "%12cAccessing operator " << operatorNode;
+	auto& builder = m_operatorGenerator[static_cast<std::size_t>(operatorNode)];
 	assert(builder != nullptr);
 	return builder->generate(node);
 }

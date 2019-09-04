@@ -3,6 +3,7 @@
 #include <memory>
 #include <unordered_map>
 #include <ostream>
+#include "NodeValue/StringShared.h"
 
 namespace ska {
 	namespace bytecode {
@@ -10,18 +11,23 @@ namespace ska {
 		using FieldsReferences = std::shared_ptr<FieldsReferencesRaw>;
 
 		struct SymbolInfo {
-			std::string name;
+			StringShared name;
 			FieldsReferences references;
 
 			SymbolInfo(std::size_t scopeIndex, std::string name) :
-				name(scopeIndex == 1 ? std::move(name) : "")
+				name(std::make_shared<std::string>(scopeIndex == 1 ? std::move(name) : ""))
 				{}
 			SymbolInfo(FieldsReferences refs) :
 				references(std::move(refs)) {}
 
+			SymbolInfo(std::size_t scopeIndex, std::string name, FieldsReferences refs) :
+				SymbolInfo(scopeIndex, name) {
+				references = std::move(refs);
+			}
+
 			SymbolInfo() = default;
 
-			bool empty() const { return name.empty(); }
+			bool empty() const { return name == nullptr || name->empty(); }
 		};
 
 		using SymbolInfoPack = std::vector<SymbolInfo>;

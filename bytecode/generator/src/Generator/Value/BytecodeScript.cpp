@@ -35,6 +35,21 @@ ska::bytecode::Value ska::bytecode::Script::queryLabel(const ASTNode& node) {
 	return ref;
 }
 
+void ska::bytecode::Script::setSymbolInfo(const ASTNode& node, SymbolInfo info) {
+	if (node.symbol() == nullptr) {
+		throw std::runtime_error("Cannot set symbol information for a node without symbol : " + node.name());
+	}
+
+	m_symbolInfo.emplace(node.symbol(), std::move(info));
+}
+
+const ska::bytecode::SymbolInfo* ska::bytecode::Script::getSymbolInfo(const Symbol& symbol) const {
+	if(m_symbolInfo.find(&symbol) == m_symbolInfo.end()) {
+		return nullptr;
+	}
+	return &m_symbolInfo.at(&symbol);
+}
+
 std::pair<ska::bytecode::Value, bool> ska::bytecode::UniqueSymbolGetterBase::query(const ASTNode& node) {
 	if (node.symbol() == nullptr) {
 		SLOG(ska::LogLevel::Debug) << "Querying symbol node with value " << node.name();
