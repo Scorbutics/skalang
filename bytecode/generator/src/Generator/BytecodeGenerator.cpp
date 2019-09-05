@@ -62,7 +62,7 @@ ska::bytecode::Generator::Generator(const ReservedKeywordsPool& reserved) :
 
 ska::bytecode::GenerationOutput ska::bytecode::Generator::generatePart(GenerationContext node) {
 	const auto& operatorNode = node.pointer().op();
-	LOG_DEBUG << "%12cAccessing operator " << operatorNode;
+	LOG_DEBUG << "Accessing operator " << operatorNode;
 	auto& builder = m_operatorGenerator[static_cast<std::size_t>(operatorNode)];
 	assert(builder != nullptr);
 	return builder->generate(node);

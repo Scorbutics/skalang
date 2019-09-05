@@ -15,16 +15,14 @@ namespace ska {
 		class GenerationOutput {
 		public:
 			GenerationOutput(Instruction instruction, SymbolInfo symbol = {}) :
-				m_pack(InstructionPack { std::move(instruction) }),
-				m_symbolsPack{ SymbolInfoPack{ std::move(symbol) } } {
+				m_pack(InstructionPack { std::move(instruction) }) {
 				m_value = packAsValue();
 			}
 
 			GenerationOutput() = default;
 
-			GenerationOutput(Value value, SymbolInfo symbol = {}) :
-				m_value(std::move(value)),
-				m_symbolsPack{ SymbolInfoPack{ std::move(symbol) } } {
+			GenerationOutput(Value value) :
+				m_value(std::move(value)) {
 			}
 
 			void push(GenerationOutput value);
@@ -43,8 +41,6 @@ namespace ska {
 			auto begin() { return m_pack.begin(); }
 			auto end() { return m_pack.end(); }
 
-			const auto& symbols() const { return m_symbolsPack; }
-
 			Value value() const {	return m_value.empty() ? packAsValue() : m_value;	}
 
 			const Instruction& operator[](std::size_t index) const { return m_pack[index]; }
@@ -56,7 +52,6 @@ namespace ska {
 			Value packAsValue() const;
 			 InstructionPack m_pack;
 			 Value m_value;
-			 SymbolInfoPack m_symbolsPack;
 		};
 
 		std::ostream& operator<<(std::ostream& stream, const GenerationOutput&);

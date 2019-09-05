@@ -37,7 +37,7 @@ namespace ska {
 
 			void pop(NodeValueArrayRaw& dest, long count) {
 				for(auto i = 0; i < count && stack.size() > 0; i++) {
-					dest.push_back(stack.back());
+					dest.push_front(stack.back());
 					stack.pop_back();
 				}
 			}

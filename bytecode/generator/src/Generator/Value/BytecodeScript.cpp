@@ -50,6 +50,13 @@ const ska::bytecode::SymbolInfo* ska::bytecode::Script::getSymbolInfo(const Symb
 	return &m_symbolInfo.at(&symbol);
 }
 
+const ska::bytecode::SymbolInfo* ska::bytecode::Script::getSymbolInfo(const ASTNode& node) const {
+	if(node.symbol() == nullptr) {
+		return nullptr;
+	}
+	return getSymbolInfo(*node.symbol());
+}
+
 std::pair<ska::bytecode::Value, bool> ska::bytecode::UniqueSymbolGetterBase::query(const ASTNode& node) {
 	if (node.symbol() == nullptr) {
 		SLOG(ska::LogLevel::Debug) << "Querying symbol node with value " << node.name();

@@ -76,7 +76,7 @@ TEST_CASE("[BytecodeGenerator] Custom object creation") {
 void ska::bytecode::ObjectFieldAccessReplacer::process(GenerationOutput& generated) {
 	auto valuesToWatch = ValueWatcher{};
 
-	const auto& symbols = generated.symbols();
+	//const auto& symbols = generated.symbols();
 
 	auto expectedNextCommands = std::deque<Command>{};
 
@@ -109,6 +109,7 @@ void ska::bytecode::ObjectFieldAccessReplacer::process(GenerationOutput& generat
 			case Command::END: {
 				// Handles END : Tracks object reference creation (class-like factory method)
 				const auto instructionIndex = std::distance(generated.begin(), instruction);
+				/*
 				const auto& fieldsInObject = symbols[instructionIndex].references;
 				LOG_INFO << "END at instruction " << instructionIndex << " with fields object : ";
 				if(fieldsInObject == nullptr) {
@@ -120,6 +121,7 @@ void ska::bytecode::ObjectFieldAccessReplacer::process(GenerationOutput& generat
 
 				objectFieldsMap = fieldsInObject;
 				valuesToWatch.emplace(instruction->dest());
+				*/
 			} break;
 
 			case Command::POP:

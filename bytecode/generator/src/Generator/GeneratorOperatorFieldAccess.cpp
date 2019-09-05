@@ -19,22 +19,23 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	}
 
 	auto fieldValue = context.script().querySymbol(*symbolField);
-	LOG_DEBUG << "Accessing field " << fieldValue << " of object " << node.GetObjectNameNode().name();
-
-	//const auto* fieldReferences = context.script().getSymbolInfo(*symbolField);
+	LOG_DEBUG << "Accessing field " << fieldValue << " of object " << node.GetObjectNameNode();
 
 	auto objectValue = generateNext({ context.script(), node.GetObjectNameNode(), context.scope()});
-	if(objectValue.symbols().empty()) {
-		throw std::runtime_error("invalid bytecode : the dereferenced object has no symbol");
+	const auto* objectSymbolInfo = context.script().getSymbolInfo(*symbolField);
+	if(objectSymbolInfo == nullptr) {
+		auto ss = std::stringstream { };
+		ss << "invalid bytecode : the dereferenced object \"" << node.GetObjectNameNode() << "\" is not registered";
+		throw std::runtime_error(ss.str());
 	}
-	const auto objectFieldReferences = objectValue.symbols().back().references;
+	const auto objectFieldReferences = objectSymbolInfo->references;
 	if(objectFieldReferences == nullptr || objectFieldReferences->empty()) {
 		throw std::runtime_error("invalid bytecode : the dereferenced object has no fields references");
 	}
 
 	const auto fieldRefIndex = (*objectFieldReferences).at(std::get<std::size_t>(fieldValue.as<VariableRef>()));
 
-	LOG_DEBUG << "This field has index " << fieldRefIndex << " in the object";
+	LOG_DEBUG << "%23c%04cThis field has index " << fieldRefIndex << " in the object%16c";
 
 	objectValue.push({ Instruction { Command::ARR_ACCESS, context.script().queryNextRegister(), objectValue.value(), Value{static_cast<long>(fieldRefIndex)} }});
 	return objectValue;

@@ -13,19 +13,8 @@ namespace ska {
 	namespace bytecode {
 		static GenerationOutput CommonGenerate(GenerationContext& context) {
 			const auto& node = context.pointer();
-			auto info = SymbolInfo {};
-			if(node.symbol() != nullptr) {
-				auto tmpInfo = context.script().getSymbolInfo(*node.symbol());
-				if(tmpInfo != nullptr) {
-					info = *tmpInfo;
-				}
-				LOG_DEBUG << "Symbol info for \"" << node.symbol()->getName() << "\" node : " << info;
-			} else {
-				LOG_DEBUG << "No symbol info";
-			}
-
 			auto result = context.script().querySymbolOrValue(node);
-			return { std::move(result), std::move(info) };
+			return { std::move(result) };
 		}
 	}
 }

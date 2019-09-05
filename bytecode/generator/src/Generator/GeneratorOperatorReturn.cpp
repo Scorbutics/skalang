@@ -5,7 +5,7 @@
 #include "BytecodeCommand.h"
 #include "Generator/Value/BytecodeScript.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::RETURN>);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::RETURN>);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::RETURN>)
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::RETURN>::generate(OperateOn node, GenerationContext& context) {
@@ -13,7 +13,7 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 
 	if(node.GetValue().type() == ExpressionType::OBJECT) {
 		auto registerV = context.script().queryNextRegister();
-		objectResult.push({ Instruction { Command::POP_IN_VAR, registerV, Value { static_cast<long>(node.GetValue().size()) } }, objectResult.symbols().back()});
+		objectResult.push(Instruction { Command::POP_IN_VAR, registerV, Value { static_cast<long>(node.GetValue().size()) } });
 	}
 
 	LOG_DEBUG << "Returning : " << objectResult ;

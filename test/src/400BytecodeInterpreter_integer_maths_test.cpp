@@ -136,8 +136,28 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation") {
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(script);
 	auto res = data.interpreter->interpret(gen);
-	auto array = res.nodeval<ska::bytecode::NodeValueArray>();
-	std::cout << "toto " << array->size() << " " << (*array)[0].convertString() << std::endl;
-	auto firstCellValue = (*array)[0].nodeval<long>();
+	auto firstCellValue = res.nodeval<long>();
 	CHECK(firstCellValue == 123);
+}
+
+TEST_CASE("[BytecodeInterpreter] Custom object creation2") {
+	constexpr auto progStr =
+		"var toto = function() : var {"
+			"var priv_test = 123;"
+			"return {"
+				"test : priv_test,"
+				"say : function(more : string) : string {"
+					"var s = \"lol\" + priv_test + more;"
+					"return s;"
+				"}"
+			"};"
+		"};"
+		"var test = toto();"
+		"test.say(\"titi\");";
+
+	auto [script, data] = Interpret(progStr);
+	auto gen = data.generator->generate(script);
+	auto res = data.interpreter->interpret(gen);
+	auto firstCellValue = res.nodeval<ska::StringShared>();
+	CHECK(*firstCellValue == "lol123titi");
 }

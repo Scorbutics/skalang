@@ -61,6 +61,7 @@ namespace ska {
 
 			void setSymbolInfo(const ASTNode& node, SymbolInfo info);
 			const SymbolInfo* getSymbolInfo(const Symbol& symbol) const;
+			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
 
 			~Script() override = default;
 

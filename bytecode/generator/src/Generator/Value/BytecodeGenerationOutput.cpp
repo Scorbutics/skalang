@@ -16,7 +16,6 @@ void ska::bytecode::GenerationOutput::push(GenerationOutput value) {
 	} else {
 		m_value = value.m_value;
 	}
-	m_symbolsPack.insert(m_symbolsPack.end(), std::make_move_iterator(value.m_symbolsPack.begin()), std::make_move_iterator(value.m_symbolsPack.end()));
 }
 
 std::ostream& ska::bytecode::operator<<(std::ostream& stream, const GenerationOutput& output) {

@@ -4,9 +4,9 @@
 #include "Generator/Value/BytecodeScript.h"
 #include "Generator/ComputingOperations/BytecodeNLengthOperations.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>);
 
-#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>)
+#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>) << "%01c"
 
 /*
 
@@ -62,38 +62,52 @@ namespace ska {
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
-	LOG_DEBUG << "Generating prototype : ";
+	LOG_DEBUG << "Generating prototype of \"" << node.GetFunctionName() << "\"...";
 	auto valueGroup = generateNext({ context.script(), node.GetFunctionPrototype(), context.scope() });
-	LOG_DEBUG << "Generating body : ";
+	LOG_DEBUG << "Generating body...";
 	valueGroup.push(generateNext({ context.script(), node.GetFunctionBody(), context.scope() + 1 }));
 
-	LOG_DEBUG << "Generated " << valueGroup << " with value " << valueGroup.value();
+	LOG_DEBUG << "\nGenerated " << valueGroup << " with value " << valueGroup.value();
 
 	const auto returningFunctionType = node.GetFunctionPrototype().type().value().compound().back();
-	const auto isVoidReturningFunction = returningFunctionType == ExpressionType::VOID;
-	valueGroup.push({ Instruction{ Command::RET, isVoidReturningFunction ? Value{} : valueGroup.value() }, valueGroup.symbols().empty() ? SymbolInfo{} : valueGroup.symbols().back()});
 
-	LOG_DEBUG << "\tPrototype and Body : " << valueGroup;
+	auto& bodyNode = node.GetFunctionBody();
+	if(bodyNode.size() > 0) {
+		auto& returnNode = bodyNode[bodyNode.size() - 1];
+		if(returnNode.size() > 0) {
+			if(returningFunctionType == ExpressionType::OBJECT) {
+				assert(returnNode[0].size() > 0);
+
+				auto& firstField = returnNode[0][0];
+				const auto* infos = context.script().getSymbolInfo(firstField);
+				if(infos != nullptr) {
+					LOG_DEBUG << "Symbol info detected for current function " << *infos << " setted as " << node.GetFunction();
+					context.script().setSymbolInfo(node.GetFunction(), *infos);
+				} else {
+					LOG_DEBUG << "No Symbol info for node \"" << firstField.name() << "\"";
+				}
+			} else {
+				LOG_DEBUG << "Returned symbol is \"" << returnNode[0].name() << "\"";
+			}
+		}
+	}
+
+	const auto isVoidReturningFunction = returningFunctionType == ExpressionType::VOID;
+	valueGroup.push(Instruction{ Command::RET, isVoidReturningFunction ? Value{} : valueGroup.value() });
+
 	auto fullFunction = AddRelativeJumpInstruction(std::move(valueGroup));
-	fullFunction.push({ Instruction{
+	fullFunction.push(Instruction{
 		Command::END,
 		context.script().querySymbolOrValue(node.GetFunction()),
-		Value { -static_cast<long>(fullFunction.size()) }},
-		fullFunction.symbols().back()
-	});
+		Value { -static_cast<long>(fullFunction.size()) }});
 
-	if(returningFunctionType == ExpressionType::OBJECT) {
-		// Associates field references (fullFunction.symbols().back()) to the pure unique symbol (*node.GetFunction().symbol())
-		context.script().setSymbolInfo(node.GetFunction(), fullFunction.symbols().back());
-	}
 	return fullFunction;
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
-	auto result = GenerationOutput{ /*Instruction { Command::LABEL, context.script().queryLabel(node.GetFunction())} */ };
-	//LOG_DEBUG << "\tLabel : " << result;
+	auto result = GenerationOutput{ };
 	ApplyNOperations<Command::POP>(result, context.script(), SymbolInfo{ context.scope(), node.GetFunction().name() }, node, node.GetParameterSize());
-	LOG_DEBUG << "\tLabel and Parameters : " << result;
+	LOG_DEBUG << "\tParameters : " << result;
 	return result;
 }
 
