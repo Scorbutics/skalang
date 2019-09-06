@@ -245,9 +245,11 @@ TEST_CASE("[Interpreter]") {
 				"var lvalFunc219 = function(toto: lvalFunc218) : lvalFunc218() {"
 				"	toto();"
 				"};"
-				"var callback = function() {};"
+				"var testOut = 1234;"
+				"var callback = function() { testOut = 789; };"
 				"lvalFunc219(callback);", data);
-			data.interpreter->script(astPtr);
+			auto res = data.interpreter->script(astPtr);
+			CHECK(res.nodeval<int>() == 789);
 		}
 
 		SUBCASE("for with empty statement in if") {
