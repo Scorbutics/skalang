@@ -113,8 +113,8 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>::generate(OperateOn node, GenerationContext& context) {
 	auto preCallValue = generateNext({context.script(), node.GetFunctionNameNode(), context.scope()});
-	LOG_DEBUG << "Function call : "<< node.GetFunctionNameNode().type().value();
-	const auto* functionReferencedSymbol = node.GetFunctionNameNode().type().value().symbol();
+	LOG_DEBUG << "Function call : "<< node.GetFunctionType();
+	const auto* functionReferencedSymbol = node.GetFunctionType().symbol();
 	assert(functionReferencedSymbol != nullptr);
 	auto symbolValue = context.script().querySymbol(*functionReferencedSymbol);
 	LOG_DEBUG << " Call referenced as symbol : "<< symbolValue;
@@ -125,6 +125,8 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	LOG_DEBUG << result;
 
 	result.push(std::move(callInstruction));
-	result.push(Instruction{ Command::POP, context.script().queryNextRegister()});
+	if(node.GetFunctionType().compound().back() != ExpressionType::VOID) {
+		result.push(Instruction{ Command::POP, context.script().queryNextRegister()});
+	}
 	return result;
 }

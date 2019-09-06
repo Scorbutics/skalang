@@ -2,7 +2,7 @@
 #include "LabelReplacer.h"
 #include "Value/BytecodeGenerationOutput.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::LabelReplacer);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::LabelReplacer);
 
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::LabelReplacer)
 

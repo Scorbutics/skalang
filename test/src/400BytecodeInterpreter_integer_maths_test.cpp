@@ -187,3 +187,20 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation 3 (double field function
 	auto firstCellValue = res.nodeval<ska::StringShared>();
 	CHECK(*firstCellValue == "lol123titi4");
 }
+
+TEST_CASE("[BytecodeInterpreter] using a function as a parameter") {
+	constexpr auto progStr =
+		"var bi_193 = function() : var {"
+		"return { test : 14 };"
+		"};"
+		"var bi_209 = function(toto: bi_193) : bi_193() {"
+		"return toto();"
+		"};"
+		"var object = bi_209(bi_193);"
+		"object.test;";
+	auto [script, data] = Interpret(progStr);
+	auto gen = data.generator->generate(script);
+	auto res = data.interpreter->interpret(gen);
+	auto firstCellValue = res.nodeval<long>();
+	CHECK(firstCellValue == 14);
+}

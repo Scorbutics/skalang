@@ -35,7 +35,7 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 
 	const auto fieldRefIndex = objectFieldReferences->at(std::get<std::size_t>(fieldValue.as<VariableRef>()));
 
-	LOG_DEBUG << "%23c%04cThis field has index " << fieldRefIndex << " in the object%16c";
+	LOG_DEBUG << "This field has index " << fieldRefIndex << " in the object";
 
 	objectValue.push({ Instruction { Command::ARR_ACCESS, context.script().queryNextRegister(), objectValue.value(), Value{static_cast<long>(fieldRefIndex)} }});
 	return objectValue;
