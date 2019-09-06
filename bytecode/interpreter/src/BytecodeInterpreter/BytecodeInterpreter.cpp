@@ -45,6 +45,7 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Interpreter);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Interpreter)
+#define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Interpreter)
 
 ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build() {
 	auto result = CommandInterpreter {};
@@ -106,6 +107,7 @@ ska::bytecode::ExecutionOutput ska::bytecode::Interpreter::interpret(ExecutionCo
 	auto lastValue = Value{};
 	for(auto continueExecution = !node.empty(); continueExecution; continueExecution = node.incInstruction()) {
 		auto& instruction = node.currentInstruction();
+		LOG_INFO << "Interpreting " << instruction;
 		auto& builder = m_commandInterpreter[static_cast<std::size_t>(instruction.command())];
 		assert(builder != nullptr);
 		auto result = builder->interpret(node);

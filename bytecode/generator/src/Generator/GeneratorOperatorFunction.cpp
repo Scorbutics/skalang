@@ -106,22 +106,25 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	auto result = GenerationOutput{ };
-	ApplyNOperations<Command::POP>(result, context.script(), SymbolInfo{ context.scope(), node.GetFunction().name() }, node, node.GetParameterSize());
+	ApplyNOperations<Command::POP>(result, context.script(), node, node.GetParameterSize());
 	LOG_DEBUG << "\tParameters : " << result;
 	return result;
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>::generate(OperateOn node, GenerationContext& context) {
-	//TODO support arbitrary function-expression call
-	auto callInstruction = Instruction { Command::JUMP_ABS, context.script().querySymbolOrValue(node.GetFunctionNameNode()) };
-	auto result = GenerationOutput{ };
+	auto preCallValue = generateNext({context.script(), node.GetFunctionNameNode(), context.scope()});
+	LOG_DEBUG << "Function call : "<< node.GetFunctionNameNode().type().value();
+	const auto* functionReferencedSymbol = node.GetFunctionNameNode().type().value().symbol();
+	assert(functionReferencedSymbol != nullptr);
+	auto symbolValue = context.script().querySymbol(*functionReferencedSymbol);
+	LOG_DEBUG << " Call referenced as symbol : "<< symbolValue;
+	auto callInstruction = Instruction { Command::JUMP_ABS, std::move(symbolValue) };
+	auto result = std::move(preCallValue);
 
-	ApplyNOperations<Command::PUSH>(result, context.script(), {}, node, node.GetFunctionParameterSize());
+	ApplyNOperations<Command::PUSH>(result, context.script(), node, node.GetFunctionParameterSize());
 	LOG_DEBUG << result;
 
-	const auto* functionReturnValueSymbolInfo = context.script().getSymbolInfo(*node.GetFunctionNameNode().symbol());
-
-	result.push({std::move(callInstruction), functionReturnValueSymbolInfo == nullptr ? SymbolInfo{} : *functionReturnValueSymbolInfo });
+	result.push(std::move(callInstruction));
 	result.push(Instruction{ Command::POP, context.script().queryNextRegister()});
 	return result;
 }

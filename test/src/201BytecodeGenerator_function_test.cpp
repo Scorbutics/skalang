@@ -175,3 +175,100 @@ TEST_CASE("[BytecodeGenerator] Custom object creation") {
 		{ska::bytecode::Command::MOV, "V6", "R3"}
 	});
 }
+
+TEST_CASE("[BytecodeGenerator] Custom object creation2") {
+	constexpr auto progStr =
+		"var toto = function() : var {"
+			"var priv_test = 123;"
+			"return {"
+				"test : priv_test,"
+				"say : function(more : string) : string {"
+					"var s = \"lol\" + priv_test + more;"
+					"return s;"
+				"}"
+			"};"
+		"};"
+		"var test = toto();"
+		"test.say(\"titi\");";
+
+	auto [script, data] = ASTFromInputBytecodeGenerator(progStr);
+	auto res = data.generator->generate(script);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::JUMP_REL, "14"},
+		{ska::bytecode::Command::MOV, "V0", "123"},
+		{ska::bytecode::Command::MOV, "V1", "V0"},
+		{ska::bytecode::Command::PUSH, "V1"},
+		{ska::bytecode::Command::JUMP_REL, "6"},
+		{ska::bytecode::Command::POP, "V2"},
+		{ska::bytecode::Command::CONV_I_STR, "R0", "V0"},
+		{ska::bytecode::Command::ADD_STR, "R0", "R0", "V2"},
+		{ska::bytecode::Command::ADD_STR, "R1", "lol", "R0"},
+		{ska::bytecode::Command::MOV, "V3", "R1"},
+		{ska::bytecode::Command::RET, "V3"},
+		{ska::bytecode::Command::END, "V4", "-7"},
+		{ska::bytecode::Command::PUSH, "V4"},
+		{ska::bytecode::Command::POP_IN_VAR, "R2", "2"},
+		{ska::bytecode::Command::RET, "R2"},
+		{ska::bytecode::Command::END, "V5", "-15"},
+		{ska::bytecode::Command::JUMP_ABS, "1"},
+		{ska::bytecode::Command::POP, "R3"},
+		{ska::bytecode::Command::MOV, "V6", "R3"},
+		{ska::bytecode::Command::ARR_ACCESS, "R4", "V6", "1"},
+		{ska::bytecode::Command::PUSH, "titi"},
+		{ska::bytecode::Command::JUMP_ABS, "5"},
+		{ska::bytecode::Command::POP, "R5"}
+	});
+}
+
+// We have to check that calling a function several times stills refer to the same
+// JUMP_ABS instruction
+TEST_CASE("[BytecodeInterpreter] Custom object creation 3 (double field function call)") {
+	constexpr auto progStr =
+		"var toto = function() : var {"
+			"var priv_test = 123;"
+			"return {"
+				"test : priv_test,"
+				"say : function(more : string) : string {"
+					"var s = \"lol\" + priv_test + more;"
+					"return s;"
+				"}"
+			"};"
+		"};"
+		"var test = toto();"
+		"test.say(\"titi\");"
+		"test.say(\"titi4\");";
+
+	auto [script, data] = ASTFromInputBytecodeGenerator(progStr);
+	auto res = data.generator->generate(script);
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::JUMP_REL, "14"},
+		{ska::bytecode::Command::MOV, "V0", "123"},
+		{ska::bytecode::Command::MOV, "V1", "V0"},
+		{ska::bytecode::Command::PUSH, "V1"},
+		{ska::bytecode::Command::JUMP_REL, "6"},
+		{ska::bytecode::Command::POP, "V2"},
+		{ska::bytecode::Command::CONV_I_STR, "R0", "V0"},
+		{ska::bytecode::Command::ADD_STR, "R0", "R0", "V2"},
+		{ska::bytecode::Command::ADD_STR, "R1", "lol", "R0"},
+		{ska::bytecode::Command::MOV, "V3", "R1"},
+		{ska::bytecode::Command::RET, "V3"},
+		{ska::bytecode::Command::END, "V4", "-7"},
+		{ska::bytecode::Command::PUSH, "V4"},
+		{ska::bytecode::Command::POP_IN_VAR, "R2", "2"},
+		{ska::bytecode::Command::RET, "R2"},
+		{ska::bytecode::Command::END, "V5", "-15"},
+		{ska::bytecode::Command::JUMP_ABS, "1"},
+		{ska::bytecode::Command::POP, "R3"},
+		{ska::bytecode::Command::MOV, "V6", "R3"},
+		{ska::bytecode::Command::ARR_ACCESS, "R4", "V6", "1"},
+		{ska::bytecode::Command::PUSH, "titi"},
+		{ska::bytecode::Command::JUMP_ABS, "5"},
+		{ska::bytecode::Command::POP, "R5"},
+		{ska::bytecode::Command::ARR_ACCESS, "R6", "V6", "1"},
+		{ska::bytecode::Command::PUSH, "titi4"},
+		{ska::bytecode::Command::JUMP_ABS, "5"},
+		{ska::bytecode::Command::POP, "R7"}
+	});
+}

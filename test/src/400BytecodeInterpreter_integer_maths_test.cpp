@@ -118,7 +118,7 @@ TEST_CASE("[BytecodeInterpreter] Introducing block sub-variable") {
 	CHECK(res.nodeval<long>() == 5);
 }
 
-TEST_CASE("[BytecodeInterpreter] Custom object creation") {
+TEST_CASE("[BytecodeInterpreter] Custom object creation (field access)") {
 	constexpr auto progStr =
 		"var toto = function() : var {"
 			"var priv_test = 123;"
@@ -140,7 +140,7 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation") {
 	CHECK(firstCellValue == 123);
 }
 
-TEST_CASE("[BytecodeInterpreter] Custom object creation2") {
+TEST_CASE("[BytecodeInterpreter] Custom object creation 2 (field function call)") {
 	constexpr auto progStr =
 		"var toto = function() : var {"
 			"var priv_test = 123;"
@@ -153,11 +153,37 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation2") {
 			"};"
 		"};"
 		"var test = toto();"
-		"test.say(\"titi\");";
+		"test.say(\"titi\");"
+		"test.say(\"titi4\");";
 
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(script);
 	auto res = data.interpreter->interpret(gen);
 	auto firstCellValue = res.nodeval<ska::StringShared>();
-	CHECK(*firstCellValue == "lol123titi");
+	CHECK(*firstCellValue == "lol123titi4");
+}
+
+// We have to check that calling a function several times with different parameters
+// still refers to the same function and the resulting value is different
+TEST_CASE("[BytecodeInterpreter] Custom object creation 3 (double field function call)") {
+	constexpr auto progStr =
+		"var toto = function() : var {"
+			"var priv_test = 123;"
+			"return {"
+				"test : priv_test,"
+				"say : function(more : string) : string {"
+					"var s = \"lol\" + priv_test + more;"
+					"return s;"
+				"}"
+			"};"
+		"};"
+		"var test = toto();"
+		"test.say(\"titi\");"
+		"test.say(\"titi4\");";
+
+	auto [script, data] = Interpret(progStr);
+	auto gen = data.generator->generate(script);
+	auto res = data.interpreter->interpret(gen);
+	auto firstCellValue = res.nodeval<ska::StringShared>();
+	CHECK(*firstCellValue == "lol123titi4");
 }

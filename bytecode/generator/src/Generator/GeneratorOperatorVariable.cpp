@@ -12,14 +12,7 @@ namespace ska {
 		static GenerationOutput CommonGenerate(Generator& generator, const ASTNode& dest, const ska::ASTNode& node, GenerationContext& context) {
 			auto valueGroup = generator.generateNext({ context.script(), node, context.scope() });
 			if((dest.symbol() != node.symbol() || node.symbol() == nullptr) && !valueGroup.empty()) {
-				auto info = SymbolInfo {};
-				if(node.symbol() != nullptr) {
-					auto tmpInfo = context.script().getSymbolInfo(*node.symbol());
-					if(tmpInfo != nullptr) {
-						info = *tmpInfo;
-					}
-				}
-				valueGroup.push({ Instruction { Command::MOV, context.script().querySymbolOrValue(dest), valueGroup.value() }, SymbolInfo{ context.scope(), dest.name(), info.references } });
+				valueGroup.push(Instruction { Command::MOV, context.script().querySymbolOrValue(dest), valueGroup.value() });
 			}
 			return valueGroup;
 		}

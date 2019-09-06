@@ -110,6 +110,7 @@ namespace ska {
 		}
 
 		const Symbol* operator[](const std::string& fieldName) const;
+		const Symbol* symbol() const { return m_symbol; }
 
 	private:
 		friend class TypeCrosser;

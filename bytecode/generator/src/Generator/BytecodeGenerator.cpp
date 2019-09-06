@@ -20,8 +20,9 @@
 
 #include "GeneratorDeclarer.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Generator);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::Generator);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Generator)
+#define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Generator)
 
 std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode::Generator::build() {
 	auto result = std::vector<std::unique_ptr<GeneratorOperatorUnit>> {};
@@ -70,5 +71,9 @@ ska::bytecode::GenerationOutput ska::bytecode::Generator::generatePart(Generatio
 
 ska::bytecode::GenerationOutput ska::bytecode::Generator::generate(GenerationContext node) {
 	auto generated = generatePart(node);
-	return postProcessing(node.script(), generated);
+	auto out = postProcessing(node.script(), generated);
+
+	LOG_INFO << "Final generation " << out;
+
+	return out;
 }

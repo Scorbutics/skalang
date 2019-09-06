@@ -33,7 +33,7 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 		throw std::runtime_error("invalid bytecode : the dereferenced object has no fields references");
 	}
 
-	const auto fieldRefIndex = (*objectFieldReferences).at(std::get<std::size_t>(fieldValue.as<VariableRef>()));
+	const auto fieldRefIndex = objectFieldReferences->at(std::get<std::size_t>(fieldValue.as<VariableRef>()));
 
 	LOG_DEBUG << "%23c%04cThis field has index " << fieldRefIndex << " in the object%16c";
 

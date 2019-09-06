@@ -14,7 +14,7 @@ namespace ska {
 
 		class GenerationOutput {
 		public:
-			GenerationOutput(Instruction instruction, SymbolInfo symbol = {}) :
+			GenerationOutput(Instruction instruction) :
 				m_pack(InstructionPack { std::move(instruction) }) {
 				m_value = packAsValue();
 			}
