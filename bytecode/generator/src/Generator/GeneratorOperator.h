@@ -1,7 +1,6 @@
 #pragma once
 
 #include "NodeValue/Operator.h"
-#include "BytecodeGenerator.h"
 #include "GeneratorOperatorUnit.h"
 #include "BytecodeGenerationContext.h"
 

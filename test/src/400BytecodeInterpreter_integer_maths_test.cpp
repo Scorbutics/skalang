@@ -204,3 +204,33 @@ TEST_CASE("[BytecodeInterpreter] using a function as a parameter") {
 	auto firstCellValue = res.nodeval<long>();
 	CHECK(firstCellValue == 14);
 }
+
+TEST_CASE("[BytecodeInterpreter] down scope function variable access") {
+	constexpr auto progStr =
+		"var testValue = 0;"
+		"var callback = function() { testValue = 1; };"
+		"callback();"
+		"var out = testValue;";
+	auto [script, data] = Interpret(progStr);
+	auto gen = data.generator->generate(script);
+	auto res = data.interpreter->interpret(gen);
+	auto firstCellValue = res.nodeval<long>();
+	CHECK(firstCellValue == 1);
+}
+
+TEST_CASE("[BytecodeInterpreter] using a callback function as a parameter without using the source type (function type compatibility)") {
+	constexpr auto progStr =
+		"var lvalFunc218 = function() {};"
+		"var lvalFunc219 = function(toto: lvalFunc218) : lvalFunc218() {"
+		" toto();"
+		"};"
+		"var testValue = 1234;"
+		"var callback = function() { testValue = 789; };"
+		"lvalFunc219(callback);"
+		"var out = testValue;";
+	auto [script, data] = Interpret(progStr);
+	auto gen = data.generator->generate(script);
+	auto res = data.interpreter->interpret(gen);
+	auto firstCellValue = res.nodeval<long>();
+	CHECK(firstCellValue == 789);
+}

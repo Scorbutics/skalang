@@ -244,7 +244,21 @@ TEST_CASE("[SemanticTypeChecker]") {
 			SUBCASE("code after return : no effect") {
 				ASTFromInputSemanticTC(scriptCache, "var testReturn148 = function() : int { return 2543; var test = 2; };", data);
 			}
-        }
+
+			SUBCASE("void function return assignment") {
+				constexpr auto progStr =
+					"var callback = function() { };"
+					"var object = callback();";
+
+				try {
+					ASTFromInputSemanticTC(scriptCache, progStr, data);
+					CHECK(false);
+				} catch (std::exception& e) {
+					CHECK(std::string{e.what()}.find("The symbol \"object\" cannot be declared as a void type") != std::string::npos);
+				}
+			}
+
+		}
 
 		SUBCASE("Conditions") {
 			SUBCASE("bad type : not a bool") {

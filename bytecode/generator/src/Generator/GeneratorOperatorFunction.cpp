@@ -74,7 +74,7 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	auto& bodyNode = node.GetFunctionBody();
 	if(bodyNode.size() > 0) {
 		auto& returnNode = bodyNode[bodyNode.size() - 1];
-		if(returnNode.size() > 0) {
+		if(returnNode.size() > 0 && returningFunctionType != ExpressionType::VOID) {
 			if(returningFunctionType == ExpressionType::OBJECT) {
 				assert(returnNode[0].size() > 0);
 
@@ -122,11 +122,13 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 	auto result = std::move(preCallValue);
 
 	ApplyNOperations<Command::PUSH>(result, context.script(), node, node.GetFunctionParameterSize());
-	LOG_DEBUG << result;
+	LOG_DEBUG << " PUSH result : " << result;
 
 	result.push(std::move(callInstruction));
 	if(node.GetFunctionType().compound().back() != ExpressionType::VOID) {
 		result.push(Instruction{ Command::POP, context.script().queryNextRegister()});
 	}
+
+	LOG_DEBUG << "Output : " << result;
 	return result;
 }

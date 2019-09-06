@@ -14,6 +14,7 @@ namespace ska {
 		static GenerationOutput CommonGenerate(GenerationContext& context) {
 			const auto& node = context.pointer();
 			auto result = context.script().querySymbolOrValue(node);
+			LOG_DEBUG << "Generating unary : " << result;
 			return { std::move(result) };
 		}
 	}

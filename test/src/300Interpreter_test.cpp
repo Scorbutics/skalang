@@ -243,10 +243,10 @@ TEST_CASE("[Interpreter]") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter(
 				"var lvalFunc218 = function() {};"
 				"var lvalFunc219 = function(toto: lvalFunc218) : lvalFunc218() {"
-				"return toto();"
+				"	toto();"
 				"};"
 				"var callback = function() {};"
-				"var object = lvalFunc219(callback);", data);
+				"lvalFunc219(callback);", data);
 			data.interpreter->script(astPtr);
 		}
 
