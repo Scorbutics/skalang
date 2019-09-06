@@ -218,6 +218,7 @@ TEST_CASE("[BytecodeInterpreter] down scope function variable access") {
 	CHECK(firstCellValue == 1);
 }
 
+// For performance reasons (and the fact that this is not a dynamic language) I think this should be not supported ( => compile error)
 TEST_CASE("[BytecodeInterpreter] using a callback function as a parameter without using the source type (function type compatibility)") {
 	constexpr auto progStr =
 		"var lvalFunc218 = function() {};"
