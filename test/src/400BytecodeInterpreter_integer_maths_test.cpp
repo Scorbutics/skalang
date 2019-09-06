@@ -218,6 +218,22 @@ TEST_CASE("[BytecodeInterpreter] down scope function variable access") {
 	CHECK(firstCellValue == 1);
 }
 
+TEST_CASE("[BytecodeInterpreter] using a callback function as a parameter") {
+	constexpr auto progStr =
+		"var testValue = 1234;"
+		"var callback = function() { testValue = 789; };"
+		"var lvalFunc219 = function(toto: callback) {"
+		" toto();"
+		"};"
+		"lvalFunc219(callback);"
+		"var out = testValue;";
+	auto [script, data] = Interpret(progStr);
+	auto gen = data.generator->generate(script);
+	auto res = data.interpreter->interpret(gen);
+	auto firstCellValue = res.nodeval<long>();
+	CHECK(firstCellValue == 789);
+}
+
 // For performance reasons (and the fact that this is not a dynamic language) I think this should be not supported ( => compile error)
 TEST_CASE("[BytecodeInterpreter] using a callback function as a parameter without using the source type (function type compatibility)") {
 	constexpr auto progStr =
