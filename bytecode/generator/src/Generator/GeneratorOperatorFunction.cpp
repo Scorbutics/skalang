@@ -113,12 +113,14 @@ ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::
 
 ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>::generate(OperateOn node, GenerationContext& context) {
 	auto preCallValue = generateNext({context.script(), node.GetFunctionNameNode(), context.scope()});
-	LOG_DEBUG << "Function call : "<< node.GetFunctionType();
+	LOG_DEBUG << "Function call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
+	/*
 	const auto* functionReferencedSymbol = node.GetFunctionType().symbol();
 	assert(functionReferencedSymbol != nullptr);
 	auto symbolValue = context.script().querySymbol(*functionReferencedSymbol);
 	LOG_DEBUG << " Call referenced as symbol : "<< symbolValue;
-	auto callInstruction = Instruction { Command::JUMP_ABS, std::move(symbolValue) };
+	*/
+	auto callInstruction = Instruction { Command::JUMP_ABS, std::move(preCallValue.value()) };
 	auto result = std::move(preCallValue);
 
 	ApplyNOperations<Command::PUSH>(result, context.script(), node, node.GetFunctionParameterSize());

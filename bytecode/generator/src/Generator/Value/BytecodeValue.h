@@ -50,6 +50,14 @@ namespace ska {
 		};
 
 		struct Value {
+			
+			template<typename T, typename VARIANT_T>
+			struct isVariantMember;
+
+			template<typename T, typename... ALL_T>
+			struct isVariantMember<T, std::variant<ALL_T...>>
+				: public std::disjunction<std::is_same<T, ALL_T>...> {};
+			
 			Value() = default;
 
 			Value(const ASTNode& node);
@@ -70,6 +78,11 @@ namespace ska {
 
 			template <class T>
 			const T& as() const { return std::get<T>(m_content); }
+
+			template <class Converted>
+			static constexpr bool is_member_of_values() {
+				return isVariantMember<Converted, ValueVariant>::value;
+			}
 
 		private:
 			friend bool operator==(const Value& lhs, const Value& rhs);

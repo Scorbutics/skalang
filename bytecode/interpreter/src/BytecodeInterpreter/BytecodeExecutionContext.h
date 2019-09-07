@@ -66,8 +66,10 @@ namespace ska {
 				if(memory == nullptr) {
 					if constexpr (NodeValue::is_container_of_values<T>()) {
 						throw std::runtime_error("invalid get cell value usage by querying a variable container without a valid value provided");
-					} else {
+					} else if constexpr (Value::is_member_of_values<T>()) {
 						return v.as<T>();
+					} else {
+						return T{};
 					}
 				}
 				return (*memory)[std::get<std::size_t>(v.as<VariableRef>())].nodeval<T>();

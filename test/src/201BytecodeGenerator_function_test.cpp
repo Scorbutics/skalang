@@ -170,7 +170,7 @@ TEST_CASE("[BytecodeGenerator] Custom object creation") {
 		{ska::bytecode::Command::POP_IN_VAR, "R2", "2"},
 		{ska::bytecode::Command::RET, "R2"},
 		{ska::bytecode::Command::END, "V5", "-15"},
-		{ska::bytecode::Command::JUMP_ABS, "1"},
+		{ska::bytecode::Command::JUMP_ABS, "V5"},
 		{ska::bytecode::Command::POP, "R3"},
 		{ska::bytecode::Command::MOV, "V6", "R3"}
 	});
@@ -211,12 +211,12 @@ TEST_CASE("[BytecodeGenerator] Custom object creation2") {
 		{ska::bytecode::Command::POP_IN_VAR, "R2", "2"},
 		{ska::bytecode::Command::RET, "R2"},
 		{ska::bytecode::Command::END, "V5", "-15"},
-		{ska::bytecode::Command::JUMP_ABS, "1"},
+		{ska::bytecode::Command::JUMP_ABS, "V5"},
 		{ska::bytecode::Command::POP, "R3"},
 		{ska::bytecode::Command::MOV, "V6", "R3"},
 		{ska::bytecode::Command::ARR_ACCESS, "R4", "V6", "1"},
 		{ska::bytecode::Command::PUSH, "titi"},
-		{ska::bytecode::Command::JUMP_ABS, "5"},
+		{ska::bytecode::Command::JUMP_ABS, "R4"},
 		{ska::bytecode::Command::POP, "R5"}
 	});
 }
@@ -259,16 +259,16 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation 3 (double field function
 		{ska::bytecode::Command::POP_IN_VAR, "R2", "2"},
 		{ska::bytecode::Command::RET, "R2"},
 		{ska::bytecode::Command::END, "V5", "-15"},
-		{ska::bytecode::Command::JUMP_ABS, "1"},
+		{ska::bytecode::Command::JUMP_ABS, "V5"},
 		{ska::bytecode::Command::POP, "R3"},
 		{ska::bytecode::Command::MOV, "V6", "R3"},
 		{ska::bytecode::Command::ARR_ACCESS, "R4", "V6", "1"},
 		{ska::bytecode::Command::PUSH, "titi"},
-		{ska::bytecode::Command::JUMP_ABS, "5"},
+		{ska::bytecode::Command::JUMP_ABS, "R4"},
 		{ska::bytecode::Command::POP, "R5"},
 		{ska::bytecode::Command::ARR_ACCESS, "R6", "V6", "1"},
 		{ska::bytecode::Command::PUSH, "titi4"},
-		{ska::bytecode::Command::JUMP_ABS, "5"},
+		{ska::bytecode::Command::JUMP_ABS, "R6"},
 		{ska::bytecode::Command::POP, "R7"}
 	});
 }
