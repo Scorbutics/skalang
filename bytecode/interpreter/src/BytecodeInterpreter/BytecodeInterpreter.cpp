@@ -120,9 +120,9 @@ ska::bytecode::ExecutionOutput ska::bytecode::Interpreter::interpret(ExecutionCo
 	return lastValue.empty() ? ExecutionOutput{} : node.getCell(lastValue);
 }
 
-ska::bytecode::ExecutionOutput ska::bytecode::Interpreter::interpret(GenerationOutput& instructions) {
+ska::bytecode::ExecutionOutput ska::bytecode::Interpreter::interpret(std::string fullScriptName, GenerationOutput& instructions) {
 	LOG_DEBUG << "Interpreting " << instructions;
 
-	auto context = ExecutionContext { instructions };
+	auto context = ExecutionContext {m_scripts, std::move(fullScriptName), instructions };
 	return interpret(context);
 }

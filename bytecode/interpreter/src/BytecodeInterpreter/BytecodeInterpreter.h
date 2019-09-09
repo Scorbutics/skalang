@@ -21,10 +21,11 @@ namespace ska {
 			~Interpreter() = default;
 
 			ExecutionOutput interpret(ExecutionContext& node);
-			ExecutionOutput interpret(GenerationOutput& script);
+			ExecutionOutput interpret(std::string fullScriptName, GenerationOutput& script);
 		private:
 			CommandInterpreter build();
 			CommandInterpreter m_commandInterpreter;
+			ScriptExecutionContainer m_scripts;
 		};
 	}
 }

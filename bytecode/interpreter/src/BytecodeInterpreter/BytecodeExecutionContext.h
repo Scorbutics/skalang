@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cassert>
-#include <memory>
 #include "Generator/Value/BytecodeValue.h"
 #include "Value/TokenVariant.h"
 #include "BytecodeScriptExecution.h"
@@ -10,11 +9,10 @@ namespace ska {
 	namespace bytecode {
 
 		class ExecutionContext {
-			using ScriptExecutionContainer = std::vector<std::unique_ptr<ScriptExecution>>;
 		public:
-			ExecutionContext(GenerationOutput& instructions) {
-				m_scripts.push_back(std::make_unique<ScriptExecution>(instructions));
-				m_current = &*m_scripts.back();
+			ExecutionContext(ScriptExecutionContainer& container, std::string fullScriptName, GenerationOutput& instructions) :
+				m_container(container) {
+				m_current = getScript(fullScriptName, instructions);
 			}
 
 			ExecutionContext(const ExecutionContext&) = delete;
@@ -57,7 +55,8 @@ namespace ska {
 			}
 
 		private:
-			ScriptExecutionContainer m_scripts;
+			ScriptExecution* getScript(const std::string& fullScriptName, GenerationOutput& instructions);
+			ScriptExecutionContainer& m_container;
 			ScriptExecution* m_current = nullptr;
 		};
 	}

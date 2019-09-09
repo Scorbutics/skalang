@@ -1,4 +1,6 @@
 #pragma once
+#include <memory>
+#include <unordered_map>
 #include "Value/PlainMemoryTable.h"
 #include "Value/InstructionMemoryTable.h"
 #include "Generator/Value/BytecodeGenerationOutput.h"
@@ -6,8 +8,9 @@
 namespace ska {
 	namespace bytecode {
 		struct ScriptExecution {
-			ScriptExecution(GenerationOutput& instructions) :
-				instructions(instructions) {
+			ScriptExecution(std::string fullName, GenerationOutput& instructions) :
+				instructions(instructions),
+				fullName(fullName) {
 			}
 
 			ScriptExecution(const ScriptExecution&) = delete;
@@ -106,6 +109,7 @@ namespace ska {
 				memory[index] = std::forward<T>(src);
 			}
 
+			std::string fullName;
 			GenerationOutput& instructions;
 			std::size_t executionPointer = 0;
 
@@ -114,5 +118,7 @@ namespace ska {
 			PlainMemoryTable stack;
 			PlainMemoryTable callstack;
 		};
+
+		using ScriptExecutionContainer = std::unordered_map<std::string, std::unique_ptr<ScriptExecution>>;
 	}
 }
