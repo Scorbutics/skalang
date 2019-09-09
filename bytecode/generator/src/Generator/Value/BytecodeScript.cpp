@@ -78,5 +78,5 @@ std::pair<ska::bytecode::Value, bool> ska::bytecode::UniqueSymbolGetterBase::que
 
 	SLOG(ska::LogLevel::Debug) << "Querying symbol node " << symbol.getName() << " with value " << ss.str();
 
-	return std::make_pair(Value { VariableRef{ varCount->second }, m_symbol == 'V' ? ValueType::VAR : ValueType::LBL }, isNew);
+	return std::make_pair(Value { VariableRef{ varCount->second }, ValueType::VAR}, isNew);
 }

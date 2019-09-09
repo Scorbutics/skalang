@@ -42,11 +42,6 @@ namespace ska {
 				}
 			}
 
-			long markLabel() {
-				labels.push_back(executionPointer);
-				return static_cast<long>(executionPointer);
-			}
-
 			void jumpAbsolute(std::size_t value);
 			void jumpRelative(long value);
 			void jumpReturn();
@@ -96,9 +91,6 @@ namespace ska {
 						return nullptr;
 					case ValueType::REG:
 						return &registers;
-					case ValueType::LBL:
-						return &labels;
-					break;
 					case ValueType::VAR:
 						return &variables;
 					case ValueType::EMPTY:
@@ -126,8 +118,7 @@ namespace ska {
 			PlainMemoryTable variables;
 			PlainMemoryTable registers;
 			PlainMemoryTable stack;
-			PlainMemoryTable stackExecution;
-			PlainMemoryTable labels;
+			PlainMemoryTable callstack;
 		};
 	}
 }

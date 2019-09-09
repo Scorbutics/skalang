@@ -56,10 +56,6 @@ std::string ska::bytecode::Value::toString() const {
     output = "R" + output;
     break;
 
-    case ValueType::LBL:
-    output = "L" + output;
-    break;
-
     default:
     break;
   }

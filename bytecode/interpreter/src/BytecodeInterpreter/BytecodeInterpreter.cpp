@@ -26,7 +26,6 @@
 #include "Units/InterpreterCommandTestNeq.h"
 #include "Units/InterpreterCommandPushFArr.h"
 #include "Units/InterpreterCommandPushBArr.h"
-#include "Units/InterpreterCommandLabel.h"
 #include "Units/InterpreterCommandRet.h"
 #include "Units/InterpreterCommandEnd.h"
 #include "Units/InterpreterCommandPush.h"
@@ -40,9 +39,10 @@
 #include "Units/InterpreterCommandConvDStr.h"
 #include "Units/InterpreterCommandConvIStr.h"
 #include "Units/InterpreterCommandArrAccess.h"
+#include "Units/InterpreterCommandScript.h"
 #include "InterpreterDeclarer.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Interpreter);
+SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::Interpreter);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Interpreter)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Interpreter)
@@ -84,7 +84,6 @@ ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build
 	InterpreterCommandDeclare<Command::TEST_LE>(*this, result);
 	InterpreterCommandDeclare<Command::TEST_NEQ>(*this, result);
 
-	InterpreterCommandDeclare<Command::LABEL>(*this, result);
 	InterpreterCommandDeclare<Command::RET>(*this, result);
 	InterpreterCommandDeclare<Command::END>(*this, result);
 	InterpreterCommandDeclare<Command::PUSH>(*this, result);
@@ -95,6 +94,7 @@ ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build
 	InterpreterCommandDeclare<Command::JUMP_REL>(*this, result);
 
 	InterpreterCommandDeclare<Command::ARR_ACCESS>(*this, result);
+	InterpreterCommandDeclare<Command::SCRIPT>(*this, result);
 
 	return result;
 }

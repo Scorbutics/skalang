@@ -45,7 +45,6 @@ namespace ska {
 			PURE,
 			VAR,
 			REG,
-			LBL,
 			EMPTY
 		};
 

@@ -22,13 +22,13 @@ ska::bytecode::NodeValue ska::bytecode::ExecutionContext::getCell(const Value& v
 }
 
 void ska::bytecode::ExecutionContext::jumpReturn() {
-	assert(!stackExecution.empty());
-	executionPointer = stackExecution.back().nodeval<std::size_t>();
-	stackExecution.pop_back();
+	assert(!callstack.empty());
+	executionPointer = callstack.back().nodeval<std::size_t>();
+	callstack.pop_back();
 }
 
 void ska::bytecode::ExecutionContext::jumpAbsolute(std::size_t value) {
-	stackExecution.push_back(TokenVariant{ executionPointer });
+	callstack.push_back(TokenVariant{ executionPointer });
 	executionPointer = value - 1;
 }
 
