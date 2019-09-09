@@ -51,7 +51,7 @@ std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode
 	return result;
 }
 
-ska::bytecode::GenerationOutput& ska::bytecode::Generator::postProcessing(Script& script, GenerationOutput& generated) {
+ska::bytecode::GenerationOutput& ska::bytecode::Generator::postProcessing(ScriptGeneration& script, GenerationOutput& generated) {
 	return generated;
 }
 

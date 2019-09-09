@@ -12,7 +12,7 @@ namespace ska {
 	class TypeCrosser;
 
 	namespace bytecode {
-		class Script;
+		class ScriptGeneration;
 		class GeneratorOperatorBase;
 
 		class Generator {
@@ -25,7 +25,7 @@ namespace ska {
 			GenerationOutput generate(GenerationContext node);
 		private:
 			GenerationOutput generatePart(GenerationContext node);
-			GenerationOutput& postProcessing(Script& script, GenerationOutput& generated);
+			GenerationOutput& postProcessing(ScriptGeneration& script, GenerationOutput& generated);
 			OperatorGenerator build();
 
 			OperatorGenerator m_operatorGenerator;

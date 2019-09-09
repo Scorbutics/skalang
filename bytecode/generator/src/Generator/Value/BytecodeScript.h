@@ -37,33 +37,30 @@ namespace ska {
 			~UniqueSymbolGetter() override = default;
 		};
 
-		class Script :
+		class ScriptGeneration :
 			public MovableNonCopyable,
-			private UniqueSymbolGetter<'V'>,
-			private UniqueSymbolGetter<'L'> {
+			private UniqueSymbolGetter<'V'> {
 
 			using LabelContainer = std::vector<std::size_t>;
-			using LabelGetter = UniqueSymbolGetter<'L'>;
 			using VariableGetter = UniqueSymbolGetter<'V'>;
 			using SymbolInfosContainer = std::unordered_map<const Symbol*, SymbolInfo>;
 		public:
-			Script(ska::ScriptAST& script);
+			ScriptGeneration(ska::ScriptAST& script);
 
-			Script(Script&&) = default;
-			Script& operator=(Script&&) = default;
+			ScriptGeneration(ScriptGeneration&&) = default;
+			ScriptGeneration& operator=(ScriptGeneration&&) = default;
 
 			ska::ScriptAST program() { return ska::ScriptAST{ *m_script }; }
 
 			Register queryNextRegister();
 			Value querySymbolOrValue(const ASTNode& node);
 			Value querySymbol(const Symbol& symbol);
-			Value queryLabel(const ASTNode& node);
 
 			void setSymbolInfo(const ASTNode& node, SymbolInfo info);
 			const SymbolInfo* getSymbolInfo(const Symbol& symbol) const;
 			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
 
-			~Script() override = default;
+			~ScriptGeneration() override = default;
 
 		private:
 			SymbolInfosContainer m_symbolInfo;

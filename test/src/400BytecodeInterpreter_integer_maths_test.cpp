@@ -35,11 +35,11 @@ static void ASTFromInputBytecodeInterpreterNoParse(const std::string& input, Byt
 	data.interpreter = std::make_unique<ska::bytecode::Interpreter>(reservedKeywords);
 }
 
-static std::pair<ska::bytecode::Script, BytecodeInterpreterDataTestContainer> Interpret(const std::string& input) {
+static std::pair<ska::bytecode::ScriptGeneration, BytecodeInterpreterDataTestContainer> Interpret(const std::string& input) {
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(input, data);
 	readerI->parse(*data.parser);
-	return std::make_pair<ska::bytecode::Script, BytecodeInterpreterDataTestContainer>(ska::bytecode::Script{ *readerI }, std::move(data));
+	return std::make_pair<ska::bytecode::ScriptGeneration, BytecodeInterpreterDataTestContainer>(ska::bytecode::ScriptGeneration{ *readerI }, std::move(data));
 }
 
 struct BytecodePart {

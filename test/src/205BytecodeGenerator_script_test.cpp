@@ -36,10 +36,10 @@ static BytecodeGeneratorDataTestContainer ASTFromInputBytecodeGeneratorNoParse(c
 	return data;
 }
 
-static std::pair<ska::bytecode::Script, BytecodeGeneratorDataTestContainer> ASTFromInputBytecodeGenerator(const std::string& input) {
+static std::pair<ska::bytecode::ScriptGeneration, BytecodeGeneratorDataTestContainer> ASTFromInputBytecodeGenerator(const std::string& input) {
 	auto data = ASTFromInputBytecodeGeneratorNoParse(input);
 	readerI->parse(*data.parser);
-	return std::make_pair<ska::bytecode::Script, BytecodeGeneratorDataTestContainer>(ska::bytecode::Script{ *readerI }, std::move(data));
+	return std::make_pair<ska::bytecode::ScriptGeneration, BytecodeGeneratorDataTestContainer>(ska::bytecode::ScriptGeneration{ *readerI }, std::move(data));
 }
 
 struct BytecodePart {
