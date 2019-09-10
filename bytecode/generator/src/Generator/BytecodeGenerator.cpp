@@ -51,7 +51,7 @@ std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode
 	return result;
 }
 
-ska::bytecode::ScriptGenerationOutput& ska::bytecode::Generator::postProcessing(ScriptGeneration& script, ScriptGenerationOutput& generated) {
+ska::bytecode::GenerationOutput& ska::bytecode::Generator::postProcessing(ScriptGenerationService& script, GenerationOutput& generated) {
 	return generated;
 }
 
@@ -67,11 +67,12 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::Generator::generatePart(Gen
 	return builder->generate(node);
 }
 
-ska::bytecode::ScriptGenerationOutput ska::bytecode::Generator::generate(GenerationContext node) {
-	auto generated = generatePart(node);
-	auto out = postProcessing(node.script(), generated);
+ska::bytecode::GenerationOutput ska::bytecode::Generator::generate(ScriptGenerationService script) {
+	auto container = GenerationOutput { std::move(script) };
+	container.push_back(generatePart(GenerationContext{ container }));
+	auto& out = postProcessing(container.backService(), container);
 
-	LOG_INFO << "Final generation " << out;
+	LOG_INFO << "Final generation " << out.back();
 
-	return out;
+	return std::move(out);
 }

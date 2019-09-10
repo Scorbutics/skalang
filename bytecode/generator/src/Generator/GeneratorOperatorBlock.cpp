@@ -10,7 +10,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Oper
 ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::BLOCK>::generate(OperateOn node, GenerationContext& context) {
 	auto group = ScriptGenerationOutput{ };
 	for (const auto& child : node) {
-		auto childCellGroup = generateNext({ context.script(), *child, context.scope() + 1});
+		auto childCellGroup = generateNext({ context, *child, 1});
 		group.push(std::move(childCellGroup));
 	}
 

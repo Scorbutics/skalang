@@ -33,11 +33,11 @@ static void ASTFromInputBytecodeGeneratorNoParse(const std::string& input, Bytec
 	data.generator = std::make_unique<ska::bytecode::Generator>(reservedKeywords);
 }
 
-static std::pair<ska::bytecode::ScriptGeneration, BytecodeGeneratorDataTestContainer> ASTFromInputBytecodeGenerator(const std::string& input) {
+static std::pair<ska::bytecode::ScriptGenerationService, BytecodeGeneratorDataTestContainer> ASTFromInputBytecodeGenerator(const std::string& input) {
 	auto data = BytecodeGeneratorDataTestContainer{};
 	ASTFromInputBytecodeGeneratorNoParse(input, data);
 	readerI->parse(*data.parser);
-	return std::make_pair<ska::bytecode::ScriptGeneration, BytecodeGeneratorDataTestContainer>(ska::bytecode::ScriptGeneration{ *readerI }, std::move(data));
+	return std::make_pair<ska::bytecode::ScriptGenerationService, BytecodeGeneratorDataTestContainer>(ska::bytecode::ScriptGenerationService{ *readerI }, std::move(data));
 }
 
 struct BytecodePart {
@@ -47,10 +47,11 @@ struct BytecodePart {
 	std::string right;
 };
 
-static void BytecodeCompare(const ska::bytecode::ScriptGenerationOutput& result, std::vector<BytecodePart> expected) {
+static void BytecodeCompare(const ska::bytecode::GenerationOutput& result, std::vector<BytecodePart> expected) {
 	auto index = std::size_t {0};
-	CHECK(result.size() == expected.size());
-	for(const auto& r : result) {
+	const auto& scriptResult = result.back();
+	CHECK(scriptResult.size() == expected.size());
+	for(const auto& r : scriptResult) {
 		const auto equality =
 			index < expected.size() &&
 			r.command() == expected[index].command &&
@@ -66,7 +67,7 @@ using namespace ska::bytecode;
 
 TEST_CASE("[BytecodeGenerator] empty if") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("if( true ) {}");
-	auto res = data.generator->generate(astPtr);
+	auto res = data.generator->generate(std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ Command::JUMP_NIF, "1", "0" }
@@ -75,7 +76,7 @@ TEST_CASE("[BytecodeGenerator] empty if") {
 
 TEST_CASE("[BytecodeGenerator] if with body") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("if( true ) { var toto = 5; }");
-	auto res = data.generator->generate(astPtr);
+	auto res = data.generator->generate(std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ Command::JUMP_NIF, "1", "1" },
@@ -85,7 +86,7 @@ TEST_CASE("[BytecodeGenerator] if with body") {
 
 TEST_CASE("[BytecodeGenerator] if else with body") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("if( 3 > 2 ) { var toto = 1 + 3; } else { var toto = 4 + 2 + 1; var tt = toto; } var tete = 444;");
-	auto res = data.generator->generate(astPtr);
+	auto res = data.generator->generate(std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ Command::SUB_I, "R0", "3", "2" },
@@ -105,7 +106,7 @@ TEST_CASE("[BytecodeGenerator] if else with body") {
 
 TEST_CASE("[BytecodeGenerator] empty for") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("for(;;) {}");
-	auto res = data.generator->generate(astPtr);
+	auto res = data.generator->generate(std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ Command::JUMP_REL, "-1" }
@@ -114,7 +115,7 @@ TEST_CASE("[BytecodeGenerator] empty for") {
 
 TEST_CASE("[BytecodeGenerator] for without body") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("for(var i = 0; i < 10; i = i + 1);");
-	auto res = data.generator->generate(astPtr);
+	auto res = data.generator->generate(std::move(astPtr));
 
 	BytecodeCompare(res, {
 		// Initialization part
@@ -136,7 +137,7 @@ TEST_CASE("[BytecodeGenerator] for without body") {
 
 TEST_CASE("[BytecodeGenerator] for with body") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("for(var i = 0; i < 10; i = i + 1) { var toto = 123; toto + i; } var test = 1234;");
-	auto res = data.generator->generate(astPtr);
+	auto res = data.generator->generate(std::move(astPtr));
 
 	BytecodeCompare(res, {
 		// Initialization part

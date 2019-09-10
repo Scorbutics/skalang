@@ -29,7 +29,7 @@ namespace ska {
 			if(node.size() == 0) {
 				return context.script().querySymbolOrValue(node);
 			}
-			return generator.generateNext({ context.script(), node, context.scope() });
+			return generator.generateNext({ context, node });
 		}
 	}
 }

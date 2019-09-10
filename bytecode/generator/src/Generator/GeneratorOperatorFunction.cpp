@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include <string>
 #include "GeneratorOperatorFunction.h"
 #include "BytecodeCommand.h"
@@ -63,9 +64,9 @@ namespace ska {
 
 ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	LOG_DEBUG << "Generating prototype of \"" << node.GetFunctionName() << "\"...";
-	auto valueGroup = generateNext({ context.script(), node.GetFunctionPrototype(), context.scope() });
+	auto valueGroup = generateNext({ context, node.GetFunctionPrototype() });
 	LOG_DEBUG << "Generating body...";
-	valueGroup.push(generateNext({ context.script(), node.GetFunctionBody(), context.scope() + 1 }));
+	valueGroup.push(generateNext({ context, node.GetFunctionBody(), 1 }));
 
 	LOG_DEBUG << "\nGenerated " << valueGroup << " with value " << valueGroup.value();
 
@@ -112,7 +113,7 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
 }
 
 ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>::generate(OperateOn node, GenerationContext& context) {
-	auto preCallValue = generateNext({context.script(), node.GetFunctionNameNode(), context.scope()});
+	auto preCallValue = generateNext({context, node.GetFunctionNameNode()});
 	LOG_DEBUG << "Function call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
 	/*
 	const auto* functionReferencedSymbol = node.GetFunctionType().symbol();

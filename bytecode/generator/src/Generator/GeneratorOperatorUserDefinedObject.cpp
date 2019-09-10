@@ -16,7 +16,7 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
 	auto fields = std::make_shared<FieldsReferencesRaw>();;
 
 	for(auto& field: node) {
-		auto valueGroup = generateNext({ context.script(), *field, context.scope() + 1 });
+		auto valueGroup = generateNext({ context, *field, 1 });
 		fields->emplace(std::get<std::size_t>(valueGroup.value().as<VariableRef>()), fields->size());
 
 		auto symbolInfo = SymbolInfo { fields };

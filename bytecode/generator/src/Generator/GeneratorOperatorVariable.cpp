@@ -10,7 +10,7 @@ namespace ska {
 	namespace bytecode {
 		template <class Generator>
 		static ScriptGenerationOutput CommonGenerate(Generator& generator, const ASTNode& dest, const ska::ASTNode& node, GenerationContext& context) {
-			auto valueGroup = generator.generateNext({ context.script(), node, context.scope() });
+			auto valueGroup = generator.generateNext({ context, node });
 			if((dest.symbol() != node.symbol() || node.symbol() == nullptr) && !valueGroup.empty()) {
 				LOG_DEBUG << "Creating MOV instruction with value " << valueGroup;
 				valueGroup.push(Instruction { Command::MOV, context.script().querySymbolOrValue(dest), valueGroup.value() });

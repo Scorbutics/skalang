@@ -50,8 +50,8 @@ namespace ska {
 			friend std::ostream& operator<<(std::ostream& stream, const ScriptGenerationOutput&);
 
 			Value packAsValue() const;
-			 InstructionPack m_pack;
-			 Value m_value;
+			InstructionPack m_pack;
+			Value m_value;
 		};
 
 		std::ostream& operator<<(std::ostream& stream, const ScriptGenerationOutput&);

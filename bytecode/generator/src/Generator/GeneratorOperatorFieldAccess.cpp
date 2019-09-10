@@ -21,7 +21,7 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
 	auto fieldValue = context.script().querySymbol(*symbolField);
 	LOG_DEBUG << "Accessing field " << fieldValue << " of object " << node.GetObjectNameNode();
 
-	auto objectValue = generateNext({ context.script(), node.GetObjectNameNode(), context.scope()});
+	auto objectValue = generateNext({ context, node.GetObjectNameNode()});
 	const auto* objectSymbolInfo = context.script().getSymbolInfo(*symbolField);
 	if(objectSymbolInfo == nullptr) {
 		auto ss = std::stringstream { };

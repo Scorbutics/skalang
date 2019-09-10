@@ -6,13 +6,14 @@
 #include "NodeValue/Operator.h"
 #include "NodeValue/ASTNodePtr.h"
 #include "BytecodeGenerationContext.h"
+#include "Value/BytecodeGenerationOutput.h"
+#include "Value/BytecodeScript.h"
 
 namespace ska {
 	struct ReservedKeywordsPool;
 	class TypeCrosser;
 
 	namespace bytecode {
-		class ScriptGeneration;
 		class GeneratorOperatorBase;
 
 		class Generator {
@@ -22,10 +23,10 @@ namespace ska {
 			Generator(const ReservedKeywordsPool& reserved);
 			~Generator() = default;
 
-			ScriptGenerationOutput generate(GenerationContext node);
+			GenerationOutput generate(ScriptGenerationService script);
 		private:
 			ScriptGenerationOutput generatePart(GenerationContext node);
-			ScriptGenerationOutput& postProcessing(ScriptGeneration& script, ScriptGenerationOutput& generated);
+			GenerationOutput& postProcessing(ScriptGenerationService& script, GenerationOutput& generated);
 			OperatorGenerator build();
 
 			OperatorGenerator m_operatorGenerator;
