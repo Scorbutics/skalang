@@ -72,7 +72,7 @@ TEST_CASE("[BytecodeGenerator] import ") {
 	auto res = data.generator->generate(std::move(astPtr));
 
 	BytecodeCompare(res, {
-		{ Command::SCRIPT, "R0", ska::ScriptNameDeduce("main", SKALANG_TEST_DIR "/src/resources/play") },
+		{ Command::SCRIPT, "R0", "0" },
 		{ Command::MOV, "V0", "R0" }
 	});
 }

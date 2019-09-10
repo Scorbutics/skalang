@@ -1,5 +1,6 @@
 #pragma once
 #include <cassert>
+#include <tuple>
 #include "Value/BytecodeValue.h"
 
 namespace ska {
@@ -11,6 +12,7 @@ namespace ska {
 		public:
 			explicit GenerationContext(GenerationOutput& output);
 			GenerationContext(GenerationContext& old);
+			GenerationContext(GenerationContext& old, ScriptGenerationService script);
 
 			GenerationContext(GenerationContext&& mv) = default;
 			GenerationContext& operator=(GenerationContext&& mv) = default;
@@ -20,9 +22,13 @@ namespace ska {
 			const ASTNode& pointer() const { assert(m_pointer != nullptr); return *m_pointer; }
 			ScriptGenerationService& script() { assert(m_script != nullptr); return *m_script; }
 			auto scope() const { return m_scopeLevel; }
+
+			std::pair<std::size_t, ScriptGenerationService*> script(const std::string& fullScriptName);
+
 		private:
 			GenerationOutput& m_generated;
 			ScriptGenerationService* m_script {};
+			std::size_t m_scriptIndex = 0;
 			const ASTNode* m_pointer {};
 			std::size_t m_scopeLevel = 0;
 		};

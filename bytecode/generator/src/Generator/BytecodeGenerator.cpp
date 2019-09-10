@@ -68,11 +68,13 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::Generator::generatePart(Gen
 }
 
 ska::bytecode::GenerationOutput ska::bytecode::Generator::generate(ScriptGenerationService script) {
-	auto container = GenerationOutput { std::move(script) };
-	container.push_back(generatePart(GenerationContext{ container }));
-	auto& out = postProcessing(container.backService(), container);
+	auto container = GenerationOutput { };
+	auto index = container.push(std::move(script));
+	auto& service = container.backService();
+	container.setOut(index, generatePart(GenerationContext{ container }));
+	auto& out = postProcessing(service, container);
 
-	LOG_INFO << "Final generation " << out.back();
+	LOG_INFO << "Final generation " << out.back() << " for script " << service.program().name();
 
 	return std::move(out);
 }

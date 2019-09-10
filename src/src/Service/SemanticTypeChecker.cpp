@@ -14,7 +14,7 @@
 #include "Operation/OperationTypeArrayDeclaration.h"
 #include "Operation/OperationTypeReturn.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::SemanticTypeChecker)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SemanticTypeChecker)
 
 ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser, const TypeCrosser& typeCrosser) :
 		subobserver_priority_queue<VarTokenEvent>(std::bind(&SemanticTypeChecker::matchVariable, this, std::placeholders::_1), parser, 9),
