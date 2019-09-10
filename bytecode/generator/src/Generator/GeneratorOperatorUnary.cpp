@@ -11,7 +11,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Oper
 
 namespace ska {
 	namespace bytecode {
-		static GenerationOutput CommonGenerate(GenerationContext& context) {
+		static ScriptGenerationOutput CommonGenerate(GenerationContext& context) {
 			const auto& node = context.pointer();
 			auto result = context.script().querySymbolOrValue(node);
 			LOG_DEBUG << "Generating unary : " << result;
@@ -20,10 +20,10 @@ namespace ska {
 	}
 }
 
-ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::UNARY>::generate(OperateOn node, GenerationContext& context) {
+ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::UNARY>::generate(OperateOn node, GenerationContext& context) {
 	return CommonGenerate(context);
 }
 
-ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::LITERAL>::generate(OperateOn node, GenerationContext& context) {
+ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::LITERAL>::generate(OperateOn node, GenerationContext& context) {
 	return CommonGenerate(context);
 }

@@ -176,7 +176,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Error, ska::bytecode::TypeConversionData);
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::TypeConversionData)
 #define LOG_ERROR SLOG_STATIC(ska::LogLevel::Error, ska::bytecode::TypeConversionData)
 
-ska::bytecode::GenerationOutput ska::bytecode::TypeConversionBinary(LogicalOperator logicalOperator, const TypedValueRef& node1, const TypedValueRef& node2, const TypedValueRef& destination) {
+ska::bytecode::ScriptGenerationOutput ska::bytecode::TypeConversionBinary(LogicalOperator logicalOperator, const TypedValueRef& node1, const TypedValueRef& node2, const TypedValueRef& destination) {
 	LOG_DEBUG << "Binary operation for nodes " << node1.value.toString() << " and " << node2.value.toString() << " with types " << node1.type  << " and " << node2.type;
 	const auto& selectedNode = ConvertWhich(destination.type, node1, node2);
 	const auto reverseOrder = &selectedNode == &node2;
@@ -194,7 +194,7 @@ ska::bytecode::GenerationOutput ska::bytecode::TypeConversionBinary(LogicalOpera
 	auto& container = result.container;
 	switch (result.type) {
 		case OperationType::SPLIT: {
-			auto group = GenerationOutput{ { Instruction {container[0], destination.value, selectedNode.value} } };
+			auto group = ScriptGenerationOutput{ { Instruction {container[0], destination.value, selectedNode.value} } };
 			group.push(Instruction{ container[1], destination.value, reverseOrder ? node1.value : destination.value, reverseOrder ? destination.value : node2.value });
 			LOG_INFO << "Conversion detected : " << group;
 			return group;
@@ -202,7 +202,7 @@ ska::bytecode::GenerationOutput ska::bytecode::TypeConversionBinary(LogicalOpera
 		case OperationType::FULL_FIRST:
 		default: {
 			//LOG_DEBUG << "Command output : " << CommandSTR[static_cast<std::size_t>(container[0])];
-			auto group = GenerationOutput{ { Instruction{ container[0], destination.value, node1.value, node2.value } } };
+			auto group = ScriptGenerationOutput{ { Instruction{ container[0], destination.value, node1.value, node2.value } } };
 			if (container.size() > 1) {
 				group.push(Instruction{ container[1], destination.value, destination.value });
 			}

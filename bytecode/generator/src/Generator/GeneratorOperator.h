@@ -19,8 +19,8 @@ namespace ska {
 		using OperateOn = OperationType<OperatorType>;\
 	public:\
 		using GeneratorOperatorBase::GeneratorOperatorBase;\
-		GenerationOutput generate(GenerationContext& node) override final {\
+		ScriptGenerationOutput generate(GenerationContext& node) override final {\
 			return generate(OperateOn{node.pointer()}, node);\
 		}\
-		GenerationOutput generate(OperateOn node, GenerationContext& context);\
+		ScriptGenerationOutput generate(OperateOn node, GenerationContext& context);\
 	};

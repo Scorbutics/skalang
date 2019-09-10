@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Value/BytecodeGenerationOutput.h"
+#include "Value/BytecodeScriptGenerationOutput.h"
 
 namespace ska {
 	namespace bytecode {
@@ -9,7 +9,7 @@ namespace ska {
 
 		class GeneratorOperatorUnit {
 		public:
-			virtual GenerationOutput generate(GenerationContext& node) = 0;
+			virtual ScriptGenerationOutput generate(GenerationContext& node) = 0;
 		};
 
 		class GeneratorOperatorBase :
@@ -18,7 +18,7 @@ namespace ska {
 			GeneratorOperatorBase(Generator& generator) :
 				m_generator(generator) {}
 
-			GenerationOutput generateNext(GenerationContext node);
+			ScriptGenerationOutput generateNext(GenerationContext node);
 
 		private:
 			Generator& m_generator;

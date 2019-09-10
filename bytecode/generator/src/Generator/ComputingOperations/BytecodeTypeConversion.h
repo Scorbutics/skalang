@@ -1,6 +1,6 @@
 #pragma once
 #include "Generator/Value/BytecodeInstruction.h"
-#include "Generator/Value/BytecodeGenerationOutput.h"
+#include "Generator/Value/BytecodeScriptGenerationOutput.h"
 #include "NodeValue/LogicalOperator.h"
 #include "NodeValue/ExpressionType.h"
 
@@ -14,6 +14,6 @@ namespace ska {
 			const Value value;
 		};
 
-		GenerationOutput TypeConversionBinary(LogicalOperator logicalOperator, const TypedValueRef& node1, const TypedValueRef& node2, const TypedValueRef& destination);
+		ScriptGenerationOutput TypeConversionBinary(LogicalOperator logicalOperator, const TypedValueRef& node1, const TypedValueRef& node2, const TypedValueRef& destination);
 	}
 }

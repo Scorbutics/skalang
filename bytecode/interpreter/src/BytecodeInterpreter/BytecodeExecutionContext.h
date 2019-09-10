@@ -10,7 +10,7 @@ namespace ska {
 
 		class ExecutionContext {
 		public:
-			ExecutionContext(ScriptExecutionContainer& container, std::string fullScriptName, GenerationOutput& instructions) :
+			ExecutionContext(ScriptExecutionContainer& container, std::string fullScriptName, ScriptGenerationOutput& instructions) :
 				m_container(container) {
 				m_current = getScript(fullScriptName, instructions);
 			}
@@ -55,7 +55,7 @@ namespace ska {
 			}
 
 		private:
-			ScriptExecution* getScript(const std::string& fullScriptName, GenerationOutput& instructions);
+			ScriptExecution* getScript(const std::string& fullScriptName, ScriptGenerationOutput& instructions);
 			ScriptExecutionContainer& m_container;
 			ScriptExecution* m_current = nullptr;
 		};

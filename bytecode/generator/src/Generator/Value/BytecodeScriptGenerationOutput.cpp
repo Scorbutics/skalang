@@ -1,5 +1,5 @@
 #include "Config/LoggerConfigLang.h"
-#include "BytecodeGenerationOutput.h"
+#include "BytecodeScriptGenerationOutput.h"
 
 std::ostream& ska::bytecode::operator<<(std::ostream& stream, const InstructionPack& group) {
 	for(const auto& c : group) {
@@ -8,7 +8,7 @@ std::ostream& ska::bytecode::operator<<(std::ostream& stream, const InstructionP
 	return stream;
 }
 
-void ska::bytecode::GenerationOutput::push(GenerationOutput value) {
+void ska::bytecode::ScriptGenerationOutput::push(ScriptGenerationOutput value) {
 	const auto wasEmpty = value.m_pack.empty();
 	if(!wasEmpty) {
 		m_pack.insert(m_pack.end(), std::make_move_iterator(value.m_pack.begin()), std::make_move_iterator(value.m_pack.end()));
@@ -18,7 +18,7 @@ void ska::bytecode::GenerationOutput::push(GenerationOutput value) {
 	}
 }
 
-std::ostream& ska::bytecode::operator<<(std::ostream& stream, const GenerationOutput& output) {
+std::ostream& ska::bytecode::operator<<(std::ostream& stream, const ScriptGenerationOutput& output) {
 	if(output.m_pack.empty()) {
 		if(!output.m_value.empty()) {
 			stream << output.m_value.toString();
@@ -30,7 +30,7 @@ std::ostream& ska::bytecode::operator<<(std::ostream& stream, const GenerationOu
 	return stream;
 }
 
-ska::bytecode::Value ska::bytecode::GenerationOutput::packAsValue() const {
+ska::bytecode::Value ska::bytecode::ScriptGenerationOutput::packAsValue() const {
 	if(m_pack.empty()) {
 		return {};
 	}

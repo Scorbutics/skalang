@@ -12,20 +12,20 @@ namespace ska {
 
 		std::ostream& operator<<(std::ostream& stream, const InstructionPack&);
 
-		class GenerationOutput {
+		class ScriptGenerationOutput {
 		public:
-			GenerationOutput(Instruction instruction) :
+			ScriptGenerationOutput(Instruction instruction) :
 				m_pack(InstructionPack { std::move(instruction) }) {
 				m_value = packAsValue();
 			}
 
-			GenerationOutput() = default;
+			ScriptGenerationOutput() = default;
 
-			GenerationOutput(Value value) :
+			ScriptGenerationOutput(Value value) :
 				m_value(std::move(value)) {
 			}
 
-			void push(GenerationOutput value);
+			void push(ScriptGenerationOutput value);
 
 			bool empty() const {
 				return m_pack.empty() && m_value.empty();
@@ -47,13 +47,13 @@ namespace ska {
 			Instruction& operator[](std::size_t index) { return m_pack[index]; }
 
 		private:
-			friend std::ostream& operator<<(std::ostream& stream, const GenerationOutput&);
+			friend std::ostream& operator<<(std::ostream& stream, const ScriptGenerationOutput&);
 
 			Value packAsValue() const;
 			 InstructionPack m_pack;
 			 Value m_value;
 		};
 
-		std::ostream& operator<<(std::ostream& stream, const GenerationOutput&);
+		std::ostream& operator<<(std::ostream& stream, const ScriptGenerationOutput&);
 	}
 }

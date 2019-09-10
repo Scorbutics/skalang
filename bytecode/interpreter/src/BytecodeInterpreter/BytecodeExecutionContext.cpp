@@ -1,6 +1,6 @@
 #include "BytecodeExecutionContext.h"
 
-ska::bytecode::ScriptExecution* ska::bytecode::ExecutionContext::getScript(const std::string& fullScriptName, GenerationOutput& instructions) {
+ska::bytecode::ScriptExecution* ska::bytecode::ExecutionContext::getScript(const std::string& fullScriptName, ScriptGenerationOutput& instructions) {
 	if(m_container.find(fullScriptName) != m_container.end()) {
 		return m_container.at(fullScriptName).get();
 	}

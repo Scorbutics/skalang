@@ -3,12 +3,12 @@
 #include <unordered_map>
 #include "Value/PlainMemoryTable.h"
 #include "Value/InstructionMemoryTable.h"
-#include "Generator/Value/BytecodeGenerationOutput.h"
+#include "Generator/Value/BytecodeScriptGenerationOutput.h"
 
 namespace ska {
 	namespace bytecode {
 		struct ScriptExecution {
-			ScriptExecution(std::string fullName, GenerationOutput& instructions) :
+			ScriptExecution(std::string fullName, ScriptGenerationOutput& instructions) :
 				instructions(instructions),
 				fullName(fullName) {
 			}
@@ -110,7 +110,7 @@ namespace ska {
 			}
 
 			std::string fullName;
-			GenerationOutput& instructions;
+			ScriptGenerationOutput& instructions;
 			std::size_t executionPointer = 0;
 
 			PlainMemoryTable variables;

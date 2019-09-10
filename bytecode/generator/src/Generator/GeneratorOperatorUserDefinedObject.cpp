@@ -10,8 +10,8 @@ SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::GeneratorOperator<ska::Opera
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::GeneratorOperator<ska::Operator::USER_DEFINED_OBJECT>)
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::USER_DEFINED_OBJECT>)
 
-ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::USER_DEFINED_OBJECT>::generate(OperateOn node, GenerationContext& context) {
-	auto objectResult = GenerationOutput{ };
+ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::USER_DEFINED_OBJECT>::generate(OperateOn node, GenerationContext& context) {
+	auto objectResult = ScriptGenerationOutput{ };
 
 	auto fields = std::make_shared<FieldsReferencesRaw>();;
 

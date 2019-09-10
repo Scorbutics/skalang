@@ -11,7 +11,7 @@ namespace ska {
 	class TypeCrosser;
 
 	namespace bytecode {
-		class GenerationOutput;
+		class ScriptGenerationOutput;
 
 		class Interpreter {
 		public:
@@ -21,7 +21,7 @@ namespace ska {
 			~Interpreter() = default;
 
 			ExecutionOutput interpret(ExecutionContext& node);
-			ExecutionOutput interpret(std::string fullScriptName, GenerationOutput& script);
+			ExecutionOutput interpret(std::string fullScriptName, ScriptGenerationOutput& script);
 		private:
 			CommandInterpreter build();
 			CommandInterpreter m_commandInterpreter;

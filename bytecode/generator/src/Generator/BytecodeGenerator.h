@@ -22,10 +22,10 @@ namespace ska {
 			Generator(const ReservedKeywordsPool& reserved);
 			~Generator() = default;
 
-			GenerationOutput generate(GenerationContext node);
+			ScriptGenerationOutput generate(GenerationContext node);
 		private:
-			GenerationOutput generatePart(GenerationContext node);
-			GenerationOutput& postProcessing(ScriptGeneration& script, GenerationOutput& generated);
+			ScriptGenerationOutput generatePart(GenerationContext node);
+			ScriptGenerationOutput& postProcessing(ScriptGeneration& script, ScriptGenerationOutput& generated);
 			OperatorGenerator build();
 
 			OperatorGenerator m_operatorGenerator;

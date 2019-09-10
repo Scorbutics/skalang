@@ -7,8 +7,8 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Oper
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::BLOCK>)
 
-ska::bytecode::GenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::BLOCK>::generate(OperateOn node, GenerationContext& context) {
-	auto group = GenerationOutput{ };
+ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::BLOCK>::generate(OperateOn node, GenerationContext& context) {
+	auto group = ScriptGenerationOutput{ };
 	for (const auto& child : node) {
 		auto childCellGroup = generateNext({ context.script(), *child, context.scope() + 1});
 		group.push(std::move(childCellGroup));

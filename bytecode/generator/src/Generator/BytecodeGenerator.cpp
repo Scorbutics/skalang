@@ -51,7 +51,7 @@ std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode
 	return result;
 }
 
-ska::bytecode::GenerationOutput& ska::bytecode::Generator::postProcessing(ScriptGeneration& script, GenerationOutput& generated) {
+ska::bytecode::ScriptGenerationOutput& ska::bytecode::Generator::postProcessing(ScriptGeneration& script, ScriptGenerationOutput& generated) {
 	return generated;
 }
 
@@ -59,7 +59,7 @@ ska::bytecode::Generator::Generator(const ReservedKeywordsPool& reserved) :
 	m_operatorGenerator(build()) {
 }
 
-ska::bytecode::GenerationOutput ska::bytecode::Generator::generatePart(GenerationContext node) {
+ska::bytecode::ScriptGenerationOutput ska::bytecode::Generator::generatePart(GenerationContext node) {
 	const auto& operatorNode = node.pointer().op();
 	LOG_DEBUG << "Accessing operator " << operatorNode;
 	auto& builder = m_operatorGenerator[static_cast<std::size_t>(operatorNode)];
@@ -67,7 +67,7 @@ ska::bytecode::GenerationOutput ska::bytecode::Generator::generatePart(Generatio
 	return builder->generate(node);
 }
 
-ska::bytecode::GenerationOutput ska::bytecode::Generator::generate(GenerationContext node) {
+ska::bytecode::ScriptGenerationOutput ska::bytecode::Generator::generate(GenerationContext node) {
 	auto generated = generatePart(node);
 	auto out = postProcessing(node.script(), generated);
 
