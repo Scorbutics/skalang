@@ -7,27 +7,28 @@
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationOutput& output) :
 	m_generated(output),
-	m_script(&output.backService()),
+	m_script(nullptr),
 	m_scriptIndex(output.size() - 1),
 	m_pointer(&output.backService().program().rootNode()) {
 }
 
-static inline auto* ScriptFromOutput(ska::bytecode::GenerationOutput& output, ska::bytecode::ScriptGenerationService script, std::size_t& index) {
-	index = output.push(std::move(script));
-	return &output.backService();
+static inline ska::bytecode::ScriptGenerationService* ScriptFromOutput(ska::bytecode::GenerationOutput& output, ska::bytecode::ScriptGenerationService script) {
+	output.push(std::move(script));
+	return nullptr;
 }
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, ScriptGenerationService script) :
 	m_generated(old.m_generated),
-	m_script(ScriptFromOutput(m_generated, std::move(script), m_scriptIndex)),
-	m_pointer(&m_script->program().rootNode()) {
+	m_script(ScriptFromOutput(m_generated, std::move(script))),
+	m_scriptIndex(m_generated.size() - 1),
+	m_pointer(&m_generated.script(m_scriptIndex).program().rootNode()) {
 }
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old) :
 	m_generated(old.m_generated),
 	m_script(old.m_script),
 	m_scriptIndex(old.m_scriptIndex),
-	m_pointer(&old.m_script->program().rootNode()) {
+	m_pointer(&m_generated.script(m_scriptIndex).program().rootNode()) {
 }
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, const ASTNode& node, std::size_t scopeLevelOffset) :
@@ -36,6 +37,15 @@ ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, cons
 	m_scriptIndex(old.m_scriptIndex),
 	m_pointer(&node),
 	m_scopeLevel(old.m_scopeLevel + scopeLevelOffset) {
+}
+
+ska::bytecode::ScriptGenerationService& ska::bytecode::GenerationContext::script() { 
+	if (m_script == nullptr) { 
+		return m_generated.script(m_scriptIndex); 
+	} 
+
+	assert(m_script != nullptr); 
+	return *m_script; 
 }
 
 std::pair<std::size_t, ska::bytecode::ScriptGenerationService*> ska::bytecode::GenerationContext::script(const std::string& fullScriptName) {

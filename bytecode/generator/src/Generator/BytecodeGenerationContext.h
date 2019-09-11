@@ -21,7 +21,7 @@ namespace ska {
 			GenerationContext(GenerationContext& old, const ASTNode& node, std::size_t scopeLevelOffset = 0);
 
 			const ASTNode& pointer() const { assert(m_pointer != nullptr); return *m_pointer; }
-			ScriptGenerationService& script() { assert(m_script != nullptr); return *m_script; }
+			ScriptGenerationService& script();
 			auto scope() const { return m_scopeLevel; }
 
 			std::pair<std::size_t, ScriptGenerationService*> script(const std::string& fullScriptName);

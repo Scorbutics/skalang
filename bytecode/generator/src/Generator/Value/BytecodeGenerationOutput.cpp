@@ -39,6 +39,10 @@ std::pair<std::size_t, ska::bytecode::ScriptGenerationService*> ska::bytecode::G
   return std::make_pair(result->second, result->second < m_output.size() ? nullptr : &m_services[result->second]);
 }
 
+ska::bytecode::ScriptGenerationService& ska::bytecode::GenerationOutput::script(std::size_t index) {
+	return m_services[index];
+}
+
 void ska::bytecode::GenerationOutput::setSymbolInfo(const ASTNode& node, SymbolInfo info) {
 	if (node.symbol() == nullptr) {
 		throw std::runtime_error("Cannot set symbol information for a node without symbol : " + node.name());

@@ -40,6 +40,7 @@ namespace ska {
 			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
 
 			std::pair<std::size_t, ScriptGenerationService*> script(const std::string& fullScriptName);
+			ScriptGenerationService& script(std::size_t index);
 
 		private:
 			ScriptGenerationServiceContainer m_services;
