@@ -3,12 +3,12 @@
 #include <tuple>
 #include "Value/BytecodeValue.h"
 #include "Value/BytecodeSymbolInfo.h"
+#include "Value/BytecodeScript.h"
 
 namespace ska {
 	class ASTNode;
 	namespace bytecode {
 		class GenerationOutput;
-		class ScriptGenerationService;
 		class GenerationContext {
 		public:
 			explicit GenerationContext(GenerationOutput& output);

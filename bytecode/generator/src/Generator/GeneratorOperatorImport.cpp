@@ -4,7 +4,6 @@
 #include "GeneratorOperatorImport.h"
 #include "NodeValue/ScriptAST.h"
 #include "BytecodeCommand.h"
-#include "Generator/Value/BytecodeScript.h"
 
 using GeneratorOperatorCurrent = ska::bytecode::GeneratorOperator<ska::Operator::IMPORT>;
 
@@ -12,7 +11,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, GeneratorOperatorCurrent);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, GeneratorOperatorCurrent)
 
-ska::bytecode::ScriptGenerationOutput GeneratorOperatorCurrent::generate(OperateOn node, GenerationContext& context) {
+ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::IMPORT>::generate(OperateOn node, GenerationContext& context) {
 	auto importGroup = generateNext({ context, node.GetScriptPathNode(), 1 });
 	const auto& scriptImportedName = *importGroup.value().as<StringShared>();
 	auto [importedScriptIndex, importedScript] = context.script(scriptImportedName);
@@ -21,8 +20,8 @@ ska::bytecode::ScriptGenerationOutput GeneratorOperatorCurrent::generate(Operate
 		LOG_DEBUG << "%10cUnknown script " << scriptImportedName << ", generating it...";
 		auto scriptImported = context.script().program().useImport(scriptImportedName);
 		assert(scriptImported != nullptr);
-		auto scriptContext = GenerationContext{context, ScriptGenerationService{ *scriptImported }};
-		generateNext(scriptContext);
+		//auto scriptContext = GenerationContext{context, ScriptGenerationService{ *scriptImported }};
+		//generateNext(scriptContext);
 		LOG_DEBUG << "%10cGenerated script.";
 		std::tie(importedScriptIndex, importedScript) = context.script(scriptImportedName);
 	}
