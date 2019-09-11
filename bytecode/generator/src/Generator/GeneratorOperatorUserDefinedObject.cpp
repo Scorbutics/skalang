@@ -22,7 +22,7 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
 		auto symbolInfo = SymbolInfo { fields };
 		LOG_INFO << "Registering symbol info " << symbolInfo << " for field node " << *field;
 
-		context.script().setSymbolInfo(*field, std::move(symbolInfo));
+		context.setSymbolInfo(*field, std::move(symbolInfo));
 
 		valueGroup.push(Instruction { Command::PUSH, valueGroup.value() });
 		objectResult.push(std::move(valueGroup));

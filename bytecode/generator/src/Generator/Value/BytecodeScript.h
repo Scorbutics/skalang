@@ -6,7 +6,6 @@
 #include "Base/Values/MovableNonCopyable.h"
 #include "NodeValue/ScriptAST.h"
 #include "BytecodeValue.h"
-#include "BytecodeSymbolInfo.h"
 
 namespace ska {
 	class ASTNode;
@@ -43,7 +42,6 @@ namespace ska {
 
 			using LabelContainer = std::vector<std::size_t>;
 			using VariableGetter = UniqueSymbolGetter<'V'>;
-			using SymbolInfosContainer = std::unordered_map<const Symbol*, SymbolInfo>;
 		public:
 			ScriptGenerationService(ska::ScriptAST& script);
 
@@ -56,14 +54,9 @@ namespace ska {
 			Value querySymbolOrValue(const ASTNode& node);
 			Value querySymbol(const Symbol& symbol);
 
-			void setSymbolInfo(const ASTNode& node, SymbolInfo info);
-			const SymbolInfo* getSymbolInfo(const Symbol& symbol) const;
-			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
-
 			~ScriptGenerationService() override = default;
 
 		private:
-			SymbolInfosContainer m_symbolInfo;
 			std::size_t m_register = 0;
 			ska::ScriptHandleAST* m_script{};
 		};

@@ -4,8 +4,8 @@
 #include "BytecodeScript.h"
 #include "NodeValue/ScriptAST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::ScriptGenerationService);
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::UniqueSymbolGetterBase);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::ScriptGenerationService);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::UniqueSymbolGetterBase);
 
 ska::bytecode::ScriptGenerationService::ScriptGenerationService(ska::ScriptAST& script) :
 	m_script(script.handle()) {
@@ -28,27 +28,6 @@ ska::bytecode::Value ska::bytecode::ScriptGenerationService::querySymbolOrValue(
 
 ska::bytecode::Value ska::bytecode::ScriptGenerationService::querySymbol(const Symbol& symbol) {
 	return VariableGetter::query(symbol).first;
-}
-void ska::bytecode::ScriptGenerationService::setSymbolInfo(const ASTNode& node, SymbolInfo info) {
-	if (node.symbol() == nullptr) {
-		throw std::runtime_error("Cannot set symbol information for a node without symbol : " + node.name());
-	}
-
-	m_symbolInfo.emplace(node.symbol(), std::move(info));
-}
-
-const ska::bytecode::SymbolInfo* ska::bytecode::ScriptGenerationService::getSymbolInfo(const Symbol& symbol) const {
-	if(m_symbolInfo.find(&symbol) == m_symbolInfo.end()) {
-		return nullptr;
-	}
-	return &m_symbolInfo.at(&symbol);
-}
-
-const ska::bytecode::SymbolInfo* ska::bytecode::ScriptGenerationService::getSymbolInfo(const ASTNode& node) const {
-	if(node.symbol() == nullptr) {
-		return nullptr;
-	}
-	return getSymbolInfo(*node.symbol());
 }
 
 std::pair<ska::bytecode::Value, bool> ska::bytecode::UniqueSymbolGetterBase::query(const ASTNode& node) {

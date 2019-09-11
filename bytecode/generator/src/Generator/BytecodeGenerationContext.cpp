@@ -41,3 +41,7 @@ ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, cons
 std::pair<std::size_t, ska::bytecode::ScriptGenerationService*> ska::bytecode::GenerationContext::script(const std::string& fullScriptName) {
 	return m_generated.script(fullScriptName);
 }
+
+void ska::bytecode::GenerationContext::setSymbolInfo(const ASTNode& node, SymbolInfo info) { m_generated.setSymbolInfo(node, std::move(info)); }
+const ska::bytecode::SymbolInfo* ska::bytecode::GenerationContext::getSymbolInfo(const Symbol& symbol) const { return m_generated.getSymbolInfo(symbol); }
+const ska::bytecode::SymbolInfo* ska::bytecode::GenerationContext::getSymbolInfo(const ASTNode& node) const { return m_generated.getSymbolInfo(node); }

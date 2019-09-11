@@ -38,3 +38,25 @@ std::pair<std::size_t, ska::bytecode::ScriptGenerationService*> ska::bytecode::G
 
   return std::make_pair(result->second, result->second < m_output.size() ? nullptr : &m_services[result->second]);
 }
+
+void ska::bytecode::GenerationOutput::setSymbolInfo(const ASTNode& node, SymbolInfo info) {
+	if (node.symbol() == nullptr) {
+		throw std::runtime_error("Cannot set symbol information for a node without symbol : " + node.name());
+	}
+  SLOG(ska::LogLevel::Debug) << " Setting " << node.symbol()->getName();
+	m_symbolInfo.emplace(node.symbol(), std::move(info));
+}
+
+const ska::bytecode::SymbolInfo* ska::bytecode::GenerationOutput::getSymbolInfo(const Symbol& symbol) const {
+	if(m_symbolInfo.find(&symbol) == m_symbolInfo.end()) {
+		return nullptr;
+	}
+	return &m_symbolInfo.at(&symbol);
+}
+
+const ska::bytecode::SymbolInfo* ska::bytecode::GenerationOutput::getSymbolInfo(const ASTNode& node) const {
+	if(node.symbol() == nullptr) {
+		return nullptr;
+	}
+	return getSymbolInfo(*node.symbol());
+}

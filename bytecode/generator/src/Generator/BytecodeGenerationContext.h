@@ -2,6 +2,7 @@
 #include <cassert>
 #include <tuple>
 #include "Value/BytecodeValue.h"
+#include "Value/BytecodeSymbolInfo.h"
 
 namespace ska {
 	class ASTNode;
@@ -24,6 +25,10 @@ namespace ska {
 			auto scope() const { return m_scopeLevel; }
 
 			std::pair<std::size_t, ScriptGenerationService*> script(const std::string& fullScriptName);
+
+			void setSymbolInfo(const ASTNode& node, SymbolInfo info);
+			const SymbolInfo* getSymbolInfo(const Symbol& symbol) const;
+			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
 
 		private:
 			GenerationOutput& m_generated;

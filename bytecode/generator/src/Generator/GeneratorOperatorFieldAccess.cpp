@@ -22,7 +22,7 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
 	LOG_DEBUG << "Accessing field " << fieldValue << " of object " << node.GetObjectNameNode();
 
 	auto objectValue = generateNext({ context, node.GetObjectNameNode()});
-	const auto* objectSymbolInfo = context.script().getSymbolInfo(*symbolField);
+	const auto* objectSymbolInfo = context.getSymbolInfo(*symbolField);
 	if(objectSymbolInfo == nullptr) {
 		auto ss = std::stringstream { };
 		ss << "invalid bytecode : the dereferenced object \"" << node.GetObjectNameNode() << "\" is not registered";
