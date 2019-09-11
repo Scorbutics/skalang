@@ -72,27 +72,6 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
 
 	const auto returningFunctionType = node.GetFunctionPrototype().type().value().compound().back();
 
-	auto& bodyNode = node.GetFunctionBody();
-	if(bodyNode.size() > 0) {
-		auto& returnNode = bodyNode[bodyNode.size() - 1];
-		if(returnNode.size() > 0 && returningFunctionType != ExpressionType::VOID) {
-			if(returningFunctionType == ExpressionType::OBJECT) {
-				assert(returnNode[0].size() > 0);
-
-				auto& firstField = returnNode[0][0];
-				const auto* infos = context.script().getSymbolInfo(firstField);
-				if(infos != nullptr) {
-					LOG_DEBUG << "Symbol info detected for current function " << *infos << " setted as " << node.GetFunction();
-					context.script().setSymbolInfo(node.GetFunction(), *infos);
-				} else {
-					LOG_DEBUG << "No Symbol info for node \"" << firstField.name() << "\"";
-				}
-			} else {
-				LOG_DEBUG << "Returned symbol is \"" << returnNode[0].name() << "\"";
-			}
-		}
-	}
-
 	const auto isVoidReturningFunction = returningFunctionType == ExpressionType::VOID;
 	valueGroup.push(Instruction{ Command::RET, isVoidReturningFunction ? Value{} : valueGroup.value() });
 

@@ -7,15 +7,13 @@ const ska::Symbol* ska::Symbol::operator[](const std::string& fieldSymbolName) c
 		auto* scopedTable = std::get<ScopedSymbolTable*>(m_data);
 		assert(scopedTable != nullptr);
 
-		if (!scopedTable->children().empty()) {
-			for(const auto& innerSymbolTable : scopedTable->children()) {
-				if(!innerSymbolTable->children().empty()) {
-					const auto* lastInnerSymbolElement = innerSymbolTable->children().back().get();
-					assert(lastInnerSymbolElement != nullptr && (std::string{"symbol \""} + fieldSymbolName + "\" doesn't exists for element ").c_str());
-					const auto* result = (*lastInnerSymbolElement)[fieldSymbolName];
-					if(result != nullptr) {
-						return result;
-					}
+		for(const auto& innerSymbolTable : scopedTable->children()) {
+			if(!innerSymbolTable->children().empty()) {
+				const auto* lastInnerSymbolElement = innerSymbolTable->children().back().get();
+				assert(lastInnerSymbolElement != nullptr && (std::string{"symbol \""} + fieldSymbolName + "\" doesn't exists for element ").c_str());
+				const auto* result = (*lastInnerSymbolElement)[fieldSymbolName];
+				if(result != nullptr) {
+					return result;
 				}
 			}
 		}
