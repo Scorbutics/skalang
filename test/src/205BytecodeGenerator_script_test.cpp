@@ -72,7 +72,7 @@ TEST_CASE("[BytecodeGenerator] import ") {
 	auto res = data.generator->generate(std::move(astPtr));
 
 	BytecodeCompare(res, {
-		{ Command::SCRIPT, "R0", "0" },
+		{ Command::SCRIPT, "R0", "1" },
 		{ Command::MOV, "V0", "R0" }
 	});
 }
