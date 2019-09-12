@@ -19,5 +19,7 @@ namespace ska {
 		auto end() {
 			return node.end();
 		}
+
+		const auto& asNode() const { return node; }
 	};
 }

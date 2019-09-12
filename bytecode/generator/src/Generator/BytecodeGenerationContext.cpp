@@ -39,13 +39,13 @@ ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, cons
 	m_scopeLevel(old.m_scopeLevel + scopeLevelOffset) {
 }
 
-ska::bytecode::ScriptGenerationService& ska::bytecode::GenerationContext::script() { 
-	if (m_script == nullptr) { 
-		return m_generated.script(m_scriptIndex); 
-	} 
+ska::bytecode::ScriptGenerationService& ska::bytecode::GenerationContext::script() {
+	if (m_script == nullptr) {
+		return m_generated.script(m_scriptIndex);
+	}
 
-	assert(m_script != nullptr); 
-	return *m_script; 
+	assert(m_script != nullptr);
+	return *m_script;
 }
 
 std::pair<std::size_t, ska::bytecode::ScriptGenerationService*> ska::bytecode::GenerationContext::script(const std::string& fullScriptName) {
@@ -55,3 +55,5 @@ std::pair<std::size_t, ska::bytecode::ScriptGenerationService*> ska::bytecode::G
 void ska::bytecode::GenerationContext::setSymbolInfo(const ASTNode& node, SymbolInfo info) { m_generated.setSymbolInfo(node, std::move(info)); }
 const ska::bytecode::SymbolInfo* ska::bytecode::GenerationContext::getSymbolInfo(const Symbol& symbol) const { return m_generated.getSymbolInfo(symbol); }
 const ska::bytecode::SymbolInfo* ska::bytecode::GenerationContext::getSymbolInfo(const ASTNode& node) const { return m_generated.getSymbolInfo(node); }
+ska::bytecode::Value ska::bytecode::GenerationContext::querySymbolOrValue(const ASTNode& node) { return m_generated.querySymbolOrValue(node); }
+ska::bytecode::Value ska::bytecode::GenerationContext::querySymbol(const Symbol& symbol) { return m_generated.querySymbol(symbol); }

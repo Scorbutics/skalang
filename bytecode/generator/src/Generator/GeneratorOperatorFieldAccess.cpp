@@ -18,7 +18,7 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
         throw std::runtime_error(ss.str());
 	}
 
-	auto fieldValue = context.script().querySymbol(*symbolField);
+	auto fieldValue = context.querySymbol(*symbolField);
 	LOG_DEBUG << "Accessing field " << fieldValue << " of object " << node.GetObjectNameNode();
 
 	auto objectValue = generateNext({ context, node.GetObjectNameNode()});
@@ -33,10 +33,17 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
 		throw std::runtime_error("invalid bytecode : the dereferenced object has no fields references");
 	}
 
-	const auto fieldRefIndex = objectFieldReferences->at(std::get<std::size_t>(fieldValue.as<VariableRef>()));
+	const auto fieldVarReference = std::get<std::size_t>(fieldValue.as<VariableRef>());
+	LOG_DEBUG << "This field is " << fieldVarReference;
 
-	LOG_DEBUG << "This field has index " << fieldRefIndex << " in the object";
+	const auto fieldRefIndex = objectFieldReferences->find(fieldVarReference);
+	if(fieldRefIndex == objectFieldReferences->end()) {
+		throw std::runtime_error("invalid bytecode : the field \"" + fieldValue.toString()
+			+ "\" does not exist in object \"" + node.GetObjectNameNode().name() + "\" (" + objectValue.value().toString() + ")");
+	}
 
-	objectValue.push({ Instruction { Command::ARR_ACCESS, context.script().queryNextRegister(), objectValue.value(), Value{static_cast<long>(fieldRefIndex)} }});
+	LOG_DEBUG << "This field has index " << fieldRefIndex->second << " in the object";
+
+	objectValue.push({ Instruction { Command::ARR_ACCESS, context.script().queryNextRegister(), objectValue.value(), Value{static_cast<long>(fieldRefIndex->second)} }});
 	return objectValue;
 }

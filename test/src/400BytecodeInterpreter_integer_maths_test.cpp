@@ -250,3 +250,12 @@ TEST_CASE("[BytecodeInterpreter] using a callback function as a parameter withou
 	auto firstCellValue = res.nodeval<long>();
 	CHECK(firstCellValue == 789);
 }
+
+TEST_CASE("[BytecodeInterpreter] Outside script from file (import) and use") {
+	constexpr auto progStr = "var Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\";var player = Character184.build(\"Player\");var enemy = Character184.default; enemy.age;";
+	auto [script, data] = Interpret(progStr);
+	auto gen = data.generator->generate(std::move(script));
+	auto res = data.interpreter->interpret("main", gen);
+	auto cellValue = res.nodeval<long>();
+	CHECK(cellValue == 10);
+}

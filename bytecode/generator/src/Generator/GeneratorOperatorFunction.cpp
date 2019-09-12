@@ -78,7 +78,7 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
 	auto fullFunction = AddRelativeJumpInstruction(std::move(valueGroup));
 	fullFunction.push(Instruction{
 		Command::END,
-		context.script().querySymbolOrValue(node.GetFunction()),
+		context.querySymbolOrValue(node.GetFunction()),
 		Value { -static_cast<long>(fullFunction.size()) }});
 
 	return fullFunction;
@@ -86,7 +86,7 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
 
 ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	auto result = ScriptGenerationOutput{ };
-	ApplyNOperations<Command::POP>(result, context.script(), node, node.GetParameterSize());
+	ApplyNOperations<Command::POP>(result, context, node, node.GetParameterSize());
 	LOG_DEBUG << "\tParameters : " << result;
 	return result;
 }
@@ -98,7 +98,7 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
 	auto callInstruction = Instruction { Command::JUMP_ABS, std::move(preCallValue.value()) };
 	auto result = std::move(preCallValue);
 
-	ApplyNOperations<Command::PUSH>(result, context.script(), node, node.GetFunctionParameterSize());
+	ApplyNOperations<Command::PUSH>(result, context, node, node.GetFunctionParameterSize());
 	LOG_DEBUG << " PUSH result : " << result;
 
 	result.push(std::move(callInstruction));
