@@ -73,7 +73,7 @@ TEST_CASE("[BytecodeGenerator] import ") {
 
 	BytecodeCompare(res, {
 		{ Command::SCRIPT, "R0", "1" },
-		{ Command::MOV, "V0", "R0" }
+		{ Command::MOV, "V10", "R0" }
 	});
 }
 

@@ -28,3 +28,11 @@ std::pair<ska::bytecode::Value, bool> ska::bytecode::UniqueSymbolGetterBase::que
 
 	return std::make_pair(Value { VariableRef{ varCount->second }, ValueType::VAR}, isNew);
 }
+
+std::optional<ska::bytecode::Value> ska::bytecode::UniqueSymbolGetterBase::query(const Symbol& symbol) const {
+	auto varCount = m_container.find(&symbol);
+	if (varCount == m_container.end()) {
+		return {};
+	}
+	return Value{ VariableRef{ varCount->second }, ValueType::VAR };
+}

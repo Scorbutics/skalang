@@ -18,14 +18,13 @@ namespace ska {
 
 		class Generator {
 			using OperatorGenerator = std::vector<std::unique_ptr<GeneratorOperatorUnit>>;
-			friend class GeneratorOperatorBase;
 		public:
 			Generator(const ReservedKeywordsPool& reserved);
 			~Generator() = default;
 
 			GenerationOutput generate(ScriptGenerationService script);
-		private:
 			ScriptGenerationOutput generatePart(GenerationContext node);
+		private:
 			GenerationOutput& postProcessing(ScriptGenerationService& script, GenerationOutput& generated);
 			OperatorGenerator build();
 

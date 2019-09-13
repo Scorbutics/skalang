@@ -3,6 +3,7 @@
 
 #include "NodeValue/AST.h"
 #include "Generator/Value/BytecodeScript.h"
+#include "Generator/Value/BytecodeGenerationOutput.h"
 
 #include "Units/InterpreterCommandMov.h"
 #include "Units/InterpreterCommandAddI.h"
@@ -47,82 +48,80 @@ SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::Interpreter);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Interpreter)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Interpreter)
 
-ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build() {
+ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build(Generator& generator) {
 	auto result = CommandInterpreter {};
 	static constexpr auto maxCommandEnumIndex = static_cast<std::size_t>(Command::UNUSED_Last_Length);
 	result.resize(maxCommandEnumIndex);
 
-	InterpreterCommandDeclare<Command::MOV>(*this, result);
+	InterpreterCommandDeclare<Command::MOV>(*this, result, generator);
 
-	InterpreterCommandDeclare<Command::ADD_I>(*this, result);
-	InterpreterCommandDeclare<Command::SUB_I>(*this, result);
-	InterpreterCommandDeclare<Command::MUL_I>(*this, result);
-	InterpreterCommandDeclare<Command::DIV_I>(*this, result);
+	InterpreterCommandDeclare<Command::ADD_I>(*this, result, generator);
+	InterpreterCommandDeclare<Command::SUB_I>(*this, result, generator);
+	InterpreterCommandDeclare<Command::MUL_I>(*this, result, generator);
+	InterpreterCommandDeclare<Command::DIV_I>(*this, result, generator);
 
-	InterpreterCommandDeclare<Command::ADD_D>(*this, result);
-	InterpreterCommandDeclare<Command::SUB_D>(*this, result);
-	InterpreterCommandDeclare<Command::MUL_D>(*this, result);
-	InterpreterCommandDeclare<Command::DIV_D>(*this, result);
+	InterpreterCommandDeclare<Command::ADD_D>(*this, result, generator);
+	InterpreterCommandDeclare<Command::SUB_D>(*this, result, generator);
+	InterpreterCommandDeclare<Command::MUL_D>(*this, result, generator);
+	InterpreterCommandDeclare<Command::DIV_D>(*this, result, generator);
 
-	InterpreterCommandDeclare<Command::ADD_STR>(*this, result);
-	InterpreterCommandDeclare<Command::PUSH_ARR_ARR>(*this, result);
-	InterpreterCommandDeclare<Command::PUSH_F_ARR>(*this, result);
-	InterpreterCommandDeclare<Command::PUSH_B_ARR>(*this, result);
-	InterpreterCommandDeclare<Command::SUB_ARR>(*this, result);
+	InterpreterCommandDeclare<Command::ADD_STR>(*this, result, generator);
+	InterpreterCommandDeclare<Command::PUSH_ARR_ARR>(*this, result, generator);
+	InterpreterCommandDeclare<Command::PUSH_F_ARR>(*this, result, generator);
+	InterpreterCommandDeclare<Command::PUSH_B_ARR>(*this, result, generator);
+	InterpreterCommandDeclare<Command::SUB_ARR>(*this, result, generator);
 
-	InterpreterCommandDeclare<Command::CONV_D_I>(*this, result);
-	InterpreterCommandDeclare<Command::CONV_I_D>(*this, result);
-	InterpreterCommandDeclare<Command::CONV_I_STR>(*this, result);
-	InterpreterCommandDeclare<Command::CONV_D_STR>(*this, result);
+	InterpreterCommandDeclare<Command::CONV_D_I>(*this, result, generator);
+	InterpreterCommandDeclare<Command::CONV_I_D>(*this, result, generator);
+	InterpreterCommandDeclare<Command::CONV_I_STR>(*this, result, generator);
+	InterpreterCommandDeclare<Command::CONV_D_STR>(*this, result, generator);
 
-	InterpreterCommandDeclare<Command::CMP_STR>(*this, result);
-	InterpreterCommandDeclare<Command::CMP_ARR>(*this, result);
-	InterpreterCommandDeclare<Command::TEST_EQ>(*this, result);
-	InterpreterCommandDeclare<Command::TEST_G>(*this, result);
-	InterpreterCommandDeclare<Command::TEST_GE>(*this, result);
-	InterpreterCommandDeclare<Command::TEST_L>(*this, result);
-	InterpreterCommandDeclare<Command::TEST_LE>(*this, result);
-	InterpreterCommandDeclare<Command::TEST_NEQ>(*this, result);
+	InterpreterCommandDeclare<Command::CMP_STR>(*this, result, generator);
+	InterpreterCommandDeclare<Command::CMP_ARR>(*this, result, generator);
+	InterpreterCommandDeclare<Command::TEST_EQ>(*this, result, generator);
+	InterpreterCommandDeclare<Command::TEST_G>(*this, result, generator);
+	InterpreterCommandDeclare<Command::TEST_GE>(*this, result, generator);
+	InterpreterCommandDeclare<Command::TEST_L>(*this, result, generator);
+	InterpreterCommandDeclare<Command::TEST_LE>(*this, result, generator);
+	InterpreterCommandDeclare<Command::TEST_NEQ>(*this, result, generator);
 
-	InterpreterCommandDeclare<Command::RET>(*this, result);
-	InterpreterCommandDeclare<Command::END>(*this, result);
-	InterpreterCommandDeclare<Command::PUSH>(*this, result);
-	InterpreterCommandDeclare<Command::POP>(*this, result);
-	InterpreterCommandDeclare<Command::POP_IN_ARR>(*this, result);
-	InterpreterCommandDeclare<Command::POP_IN_VAR>(*this, result);
-	InterpreterCommandDeclare<Command::JUMP_ABS>(*this, result);
-	InterpreterCommandDeclare<Command::JUMP_REL>(*this, result);
+	InterpreterCommandDeclare<Command::RET>(*this, result, generator);
+	InterpreterCommandDeclare<Command::END>(*this, result, generator);
+	InterpreterCommandDeclare<Command::PUSH>(*this, result, generator);
+	InterpreterCommandDeclare<Command::POP>(*this, result, generator);
+	InterpreterCommandDeclare<Command::POP_IN_ARR>(*this, result, generator);
+	InterpreterCommandDeclare<Command::POP_IN_VAR>(*this, result, generator);
+	InterpreterCommandDeclare<Command::JUMP_ABS>(*this, result, generator);
+	InterpreterCommandDeclare<Command::JUMP_REL>(*this, result, generator);
 
-	InterpreterCommandDeclare<Command::ARR_ACCESS>(*this, result);
-	InterpreterCommandDeclare<Command::SCRIPT>(*this, result);
+	InterpreterCommandDeclare<Command::ARR_ACCESS>(*this, result, generator);
+	InterpreterCommandDeclare<Command::SCRIPT>(*this, result, generator);
 
 	return result;
 }
 
-ska::bytecode::Interpreter::Interpreter(const ReservedKeywordsPool& reserved) :
-	m_commandInterpreter(build()) {
+ska::bytecode::Interpreter::Interpreter(Generator& generator, const ReservedKeywordsPool& reserved) :
+	m_commandInterpreter(build(generator)) {
 }
 
-ska::bytecode::ExecutionOutput ska::bytecode::Interpreter::interpret(ExecutionContext& node) {
-	auto lastValue = Value{};
+void ska::bytecode::Interpreter::interpret(ExecutionContext& node) {
 	for(auto continueExecution = !node.empty(); continueExecution; continueExecution = node.incInstruction()) {
 		auto& instruction = node.currentInstruction();
 		LOG_INFO << "Interpreting " << instruction;
 		auto& builder = m_commandInterpreter[static_cast<std::size_t>(instruction.command())];
 		assert(builder != nullptr);
-		auto result = builder->interpret(node);
-		if(!result.empty()) {
-			lastValue = instruction.dest();
-			node.set(instruction.dest(), std::move(result));
+		auto nodeValue = builder->interpret(node);
+		if (!nodeValue.empty()) {
+			node.set(instruction.dest(), std::move(nodeValue));
 		}
 	}
-
-	return lastValue.empty() ? ExecutionOutput{} : node.getCell(lastValue);
 }
 
-ska::bytecode::ExecutionOutput ska::bytecode::Interpreter::interpret(std::string fullScriptName, GenerationOutput& instructions) {
+ska::bytecode::ExecutionOutput ska::bytecode::Interpreter::interpret(std::size_t scriptIndex, GenerationOutput& instructions) {
 	LOG_DEBUG << "Interpreting " << instructions;
 
-	auto context = ExecutionContext {m_scripts, std::move(fullScriptName), instructions };
-	return interpret(context);
+	auto output = ska::bytecode::ExecutionOutput{};
+	auto context = ExecutionContext {output, scriptIndex, instructions };
+	interpret(context);
+	return output;
 }

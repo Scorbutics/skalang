@@ -1,3 +1,4 @@
+#include <queue>
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeGenerationOutput.h"
 
@@ -71,4 +72,46 @@ ska::bytecode::Value ska::bytecode::GenerationOutput::querySymbolOrValue(const A
 
 ska::bytecode::Value ska::bytecode::GenerationOutput::querySymbol(const Symbol& symbol) {
 	return VariableGetter::query(symbol).first;
+}
+
+namespace ska {
+	namespace bytecode {
+		struct SymbolWithInfo {
+			const Symbol* symbol = nullptr;
+			const SymbolInfo* info = nullptr;
+		};
+		
+		bool operator<(const SymbolWithInfo& lhs, const SymbolWithInfo& rhs) {
+			return lhs.info->priority > rhs.info->priority;
+		}
+		
+	}
+}
+
+std::vector<ska::bytecode::Value> ska::bytecode::GenerationOutput::generateExportedSymbols(std::size_t scriptIndex) const {
+	auto result = std::vector<Value> {};
+	
+	auto temporarySortedScriptSymbols = std::priority_queue<SymbolWithInfo>{};
+	for (const auto& data : m_symbolInfo) {
+		if (data.second.exported && data.second.script == scriptIndex) {
+			temporarySortedScriptSymbols.push(SymbolWithInfo{ data.first, &data.second });
+		}
+	}
+
+	if (temporarySortedScriptSymbols.empty()) {
+		return {};
+	}
+
+	result.reserve(temporarySortedScriptSymbols.size());
+
+	while(!temporarySortedScriptSymbols.empty()) {
+		const auto& symbolWithInfo = temporarySortedScriptSymbols.top();
+		auto value = VariableGetter::query(*symbolWithInfo.symbol);
+		if (value.has_value()) {
+			result.push_back(std::move(value.value()));
+		}
+		temporarySortedScriptSymbols.pop();
+	}
+
+	return result;
 }

@@ -18,11 +18,11 @@ namespace ska {
 		public InterpreterCommandBase {\
 	public:\
 		using InterpreterCommandBase::InterpreterCommandBase;\
-		ExecutionOutput interpret(ExecutionContext& context) override final {\
+		ScriptExecutionOutput interpret(ExecutionContext& context) override final {\
 			return interpret(context, context.currentInstruction().left(), context.currentInstruction().right());\
 		}\
-		ExecutionOutput interpret(ExecutionContext& context, Value& left, Value& right);\
+		ScriptExecutionOutput interpret(ExecutionContext& context, const Value& left, const Value& right);\
 	};
 
 #define SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(CommandType)\
-	ska::bytecode::ExecutionOutput ska::bytecode::InterpreterCommand<ska::bytecode::Command::CommandType>::interpret
+	ska::bytecode::ScriptExecutionOutput ska::bytecode::InterpreterCommand<ska::bytecode::Command::CommandType>::interpret

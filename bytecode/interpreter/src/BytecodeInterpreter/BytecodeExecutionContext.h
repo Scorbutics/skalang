@@ -3,17 +3,20 @@
 #include <cassert>
 #include "Generator/Value/BytecodeValue.h"
 #include "Value/TokenVariant.h"
-#include "BytecodeScriptExecution.h"
+#include "BytecodeInterpreter/Value/BytecodeExecutionOutput.h"
+#include "BytecodeInterpreter/Value/ScriptExecutionOutput.h"
 
 namespace ska {
 	namespace bytecode {
+
 		class GenerationOutput;
+		class Generator;
 		class ExecutionContext {
 		public:
-			ExecutionContext(ScriptExecutionContainer& container, std::string fullScriptName, GenerationOutput& instructions) :
-				m_container(container) {
-				m_current = getScript(fullScriptName, instructions);
-			}
+			ExecutionContext(ExecutionOutput& container, std::size_t scriptIndex, GenerationOutput& instructions);
+
+			ExecutionContext(ExecutionContext& old, std::size_t scriptIndex) :
+				ExecutionContext(old.m_container, scriptIndex, old.m_bytecode) { }
 
 			ExecutionContext(const ExecutionContext&) = delete;
 			ExecutionContext& operator=(const ExecutionContext&) = delete;
@@ -21,15 +24,14 @@ namespace ska {
 			bool empty() const { return m_current->size() == 0; }
 
 			const Instruction& currentInstruction() const { return m_current->currentInstruction(); }
-			Instruction& currentInstruction() { return m_current->currentInstruction(); }
 
 			bool incInstruction() { return m_current->incInstruction(); }
 
-			NodeValue getCell(const Value& v) { return m_current->getCell(v); }
+			NodeValue getCell(const Value& v) const { return m_current->getCell(v); }
 
-			void pop(NodeValue& dest) { m_current->pop(dest); }
+			void pop(NodeValue& dest) { m_container.pop(dest); }
 
-			void pop(NodeValueArrayRaw& dest, long count) { m_current->pop(dest, count);}
+			void pop(NodeValueArrayRaw& dest, long count) { m_container.pop(dest, count); }
 
 			void jumpAbsolute(std::size_t value) { m_current->jumpAbsolute(value); }
 			void jumpRelative(long value) { m_current->jumpRelative(value); }
@@ -41,7 +43,7 @@ namespace ska {
 
 			template <class ... Items>
 			void push(Items&& ... items) {
-				m_current->push(std::forward<Items>(items)...);
+				m_container.push(std::forward<Items>(items)...);
 			}
 
 			template <class T>
@@ -53,10 +55,14 @@ namespace ska {
 			void set(const Value& dest, T&& src) {
 				m_current->set(dest, std::forward<T>(src));
 			}
+		
+			ScriptExecutionOutput generateExportedVariables(std::size_t scriptIndex) const;
+
+			const ScriptGenerationOutput& generateIfNeeded(Generator& generator, std::size_t scriptIndex);
 
 		private:
-			ScriptExecution* getScript(const std::string& fullScriptName, GenerationOutput& instructions);
-			ScriptExecutionContainer& m_container;
+			ExecutionOutput& m_container;
+			GenerationOutput& m_bytecode;
 			ScriptExecution* m_current = nullptr;
 		};
 	}

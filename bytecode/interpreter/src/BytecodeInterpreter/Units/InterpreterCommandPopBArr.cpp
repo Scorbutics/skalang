@@ -1,6 +1,6 @@
 #include "InterpreterCommandPopBArr.h"
 
-SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(POP_B_ARR)(ExecutionContext& context, Value& left, Value& right) {
+SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(POP_B_ARR)(ExecutionContext& context, const Value& left, const Value& right) {
   auto numberToPop = context.get<long>(right);
 	auto container = context.get<NodeValueArray>(left);
 

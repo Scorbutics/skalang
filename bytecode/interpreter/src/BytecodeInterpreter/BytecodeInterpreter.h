@@ -11,21 +11,21 @@ namespace ska {
 	class TypeCrosser;
 
 	namespace bytecode {
+		class Generator;
 		class GenerationOutput;
 
 		class Interpreter {
 		public:
 			using CommandInterpreter = std::vector<std::unique_ptr<InterpreterCommandUnit>>;
 
-			Interpreter(const ReservedKeywordsPool& reserved);
+			Interpreter(Generator& generator, const ReservedKeywordsPool& reserved);
 			~Interpreter() = default;
 
-			ExecutionOutput interpret(ExecutionContext& node);
-			ExecutionOutput interpret(std::string fullScriptName, GenerationOutput& scripts);
+			void interpret(ExecutionContext& node);
+			ExecutionOutput interpret(std::size_t scriptIndex, GenerationOutput& scripts);
 		private:
-			CommandInterpreter build();
+			CommandInterpreter build(Generator&);
 			CommandInterpreter m_commandInterpreter;
-			ScriptExecutionContainer m_scripts;
 		};
 	}
 }

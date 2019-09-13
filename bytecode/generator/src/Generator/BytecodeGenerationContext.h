@@ -11,7 +11,7 @@ namespace ska {
 		class GenerationOutput;
 		class GenerationContext {
 		public:
-			explicit GenerationContext(GenerationOutput& output);
+			explicit GenerationContext(GenerationOutput& output, std::size_t scriptIndex = std::numeric_limits<std::size_t>::max());
 			GenerationContext(GenerationContext& old);
 			GenerationContext(GenerationContext& old, ScriptGenerationService script);
 
@@ -31,6 +31,8 @@ namespace ska {
 			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
 			Value querySymbolOrValue(const ASTNode& node);
 			Value querySymbol(const Symbol& symbol);
+
+			const auto scriptIndex() const { return m_scriptIndex; }
 
 		private:
 			GenerationOutput& m_generated;

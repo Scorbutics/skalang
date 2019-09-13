@@ -1,24 +1,27 @@
 #pragma once
 
-#include "Value/ExecutionOutput.h"
+#include "Value/ScriptExecutionOutput.h"
 
 namespace ska {
 	namespace bytecode {
 		class Interpreter;
+		class Generator;
 		class ExecutionContext;
 
 		class InterpreterCommandUnit {
 		public:
-			virtual ExecutionOutput interpret(ExecutionContext& node) = 0;
+			virtual ScriptExecutionOutput interpret(ExecutionContext& node) = 0;
 		};
 
 		class InterpreterCommandBase :
 			public InterpreterCommandUnit {
 		public:
-			InterpreterCommandBase(Interpreter& interpreter) :
-				m_interpreter(interpreter) {}
+			InterpreterCommandBase(Interpreter& interpreter, Generator& generator) :
+				m_interpreter(interpreter),
+				m_generator(generator) {}
 		protected:
 			Interpreter& m_interpreter;
+			Generator& m_generator;
 		};
 	}
 }

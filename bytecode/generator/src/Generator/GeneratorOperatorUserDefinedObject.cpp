@@ -13,19 +13,22 @@ SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::GeneratorOperator<ska::Opera
 ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::USER_DEFINED_OBJECT>::generate(OperateOn node, GenerationContext& context) {
 	auto objectResult = ScriptGenerationOutput{ };
 
-	auto fields = std::make_shared<FieldsReferencesRaw>();;
+	auto fields = std::make_shared<FieldsReferencesRaw>();
 
+	std::size_t childIndex = 0;
 	for(auto& field: node) {
 		auto valueGroup = generateNext({ context, *field, 1 });
 		fields->emplace(std::get<std::size_t>(valueGroup.value().as<VariableRef>()), fields->size());
 
-		auto symbolInfo = SymbolInfo { fields };
+		auto symbolInfo = SymbolInfo { fields, context.scriptIndex() };
+		symbolInfo.priority = childIndex;
 		LOG_INFO << "Registering symbol info " << symbolInfo << " for field node " << *field;
 
 		context.setSymbolInfo(*field, std::move(symbolInfo));
 
 		valueGroup.push(Instruction { Command::PUSH, valueGroup.value() });
 		objectResult.push(std::move(valueGroup));
+		childIndex++;
 	}
 
 	LOG_INFO << "Creating user defined object ";

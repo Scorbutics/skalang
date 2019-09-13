@@ -3,39 +3,29 @@
 #include <unordered_map>
 #include "Value/PlainMemoryTable.h"
 #include "Value/InstructionMemoryTable.h"
-#include "Generator/Value/BytecodeScriptGenerationOutput.h"
+#include "Generator/Value/BytecodeGenerationOutput.h"
 
 namespace ska {
 	namespace bytecode {
-		struct ScriptExecution {
-			ScriptExecution(std::string fullName, ScriptGenerationOutput& instructions) :
+		class ExecutionOutput;
+		class ScriptExecution {
+		public:
+			ScriptExecution(ExecutionOutput& execution, const GenerationOutput& instructions, std::size_t scriptIndex) :
 				instructions(instructions),
-				fullName(fullName) {
+				execution(execution),
+				scriptIndex(scriptIndex) {
 			}
 
 			ScriptExecution(const ScriptExecution&) = delete;
 			ScriptExecution& operator=(const ScriptExecution&) = delete;
 
-			const Instruction& currentInstruction() const { assert(executionPointer < instructions.size()); return instructions[executionPointer]; }
-			Instruction& currentInstruction() { assert(executionPointer < instructions.size()); return instructions[executionPointer]; }
+			const Instruction& currentInstruction() const { assert(executionPointer < instructions.generated()[scriptIndex].size()); return instructions.generated()[scriptIndex][executionPointer]; }
 
 			bool incInstruction() {
-				return ++executionPointer < instructions.size();
+				return ++executionPointer < instructions.generated()[scriptIndex].size();
 			}
 
-			NodeValue getCell(const Value& v);
-
-			void pop(NodeValue& dest) {
-				dest = stack.back();
-				stack.pop_back();
-			}
-
-			void pop(NodeValueArrayRaw& dest, long count) {
-				for(auto i = 0; i < count && stack.size() > 0; i++) {
-					dest.push_front(stack.back());
-					stack.pop_back();
-				}
-			}
+			NodeValue getCell(const Value& v) const;
 
 			void jumpAbsolute(std::size_t value);
 			void jumpRelative(long value);
@@ -45,15 +35,10 @@ namespace ska {
 				return executionPointer + relativeValue;
 			}
 
-			auto size() const { return instructions.size(); }
-
-			template <class ... Items>
-			void push(Items&& ... items) {
-				(pushIfNotEmpty(std::forward<decltype(items)>(items)), ...);
-			}
+			auto size() const { return instructions.generated()[scriptIndex].size(); }
 
 			template <class T>
-			T get(const Value& v) {
+			T get(const Value& v) const {
 				auto* memory = selectMemory(v);
 				if(memory == nullptr) {
 					if constexpr (NodeValue::is_container_of_values<T>()) {
@@ -75,23 +60,21 @@ namespace ska {
 			}
 
 		private:
-			void pushIfNotEmpty(NodeValue value) {
-				if(!value.empty()) {
-					stack.push_back(std::move(value));
-				}
-			}
+			PlainMemoryTable* selectMemory(const Value& dest);
+			const PlainMemoryTable* selectMemory(const Value& dest) const;
 
-			PlainMemoryTable* selectMemory(const Value& dest) {
-				switch(dest.type()) {
-					case ValueType::PURE:
-					default:
-						return nullptr;
-					case ValueType::REG:
-						return &registers;
-					case ValueType::VAR:
-						return &variables;
-					case ValueType::EMPTY:
-						throw std::runtime_error("cannot select empty variable relative memory");
+			template<class IN, class OUT>
+			static OUT SelectMemoryHelper(IN& self, const Value& dest) {
+				switch (dest.type()) {
+				case ValueType::PURE:
+				default:
+					return nullptr;
+				case ValueType::REG:
+					return &self.registers;
+				case ValueType::VAR:
+					return &self.execution.variables;
+				case ValueType::EMPTY:
+					throw std::runtime_error("cannot select empty variable relative memory");
 				}
 			}
 
@@ -109,16 +92,12 @@ namespace ska {
 				memory[index] = std::forward<T>(src);
 			}
 
-			std::string fullName;
-			ScriptGenerationOutput& instructions;
+			const GenerationOutput& instructions;
+			ExecutionOutput& execution;
+			std::size_t scriptIndex = 0;
 			std::size_t executionPointer = 0;
 
-			PlainMemoryTable variables;
 			PlainMemoryTable registers;
-			PlainMemoryTable stack;
-			PlainMemoryTable callstack;
 		};
-
-		using ScriptExecutionContainer = std::unordered_map<std::string, std::unique_ptr<ScriptExecution>>;
 	}
 }

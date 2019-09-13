@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <tuple>
+#include <optional>
 #include "BytecodeValue.h"
 
 namespace ska {
@@ -16,7 +17,8 @@ namespace ska {
 
 			std::pair<Value, bool> query(const ASTNode& node);
 			std::pair<Value, bool> query(const Symbol& symbol);
-
+			std::optional<Value> query(const Symbol& symbol) const;
+				
 			SymbolUIDContainer m_container;
 			std::size_t m_count = 0;
 			char m_symbol = '_';

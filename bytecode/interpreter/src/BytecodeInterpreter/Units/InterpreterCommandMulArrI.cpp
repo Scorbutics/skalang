@@ -1,6 +1,6 @@
 #include "InterpreterCommandMulArrI.h"
 
-SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(MUL_ARR_I)(ExecutionContext& context, Value& left, Value& right) {
+SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(MUL_ARR_I)(ExecutionContext& context, const Value& left, const Value& right) {
   auto container = context.get<NodeValueArray>(left);
   if(container->empty()) {
 	  return container;

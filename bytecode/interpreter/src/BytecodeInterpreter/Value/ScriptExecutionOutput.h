@@ -4,6 +4,6 @@
 
 namespace ska {
   namespace bytecode {
-    using ExecutionOutput = NodeValue;
+    using ScriptExecutionOutput = NodeValue;
   }
 }

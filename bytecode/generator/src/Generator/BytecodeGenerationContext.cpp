@@ -5,10 +5,10 @@
 #include "Generator/Value/BytecodeGenerationOutput.h"
 #include "NodeValue/ScriptAST.h"
 
-ska::bytecode::GenerationContext::GenerationContext(GenerationOutput& output) :
+ska::bytecode::GenerationContext::GenerationContext(GenerationOutput& output, std::size_t scriptIndex) :
 	m_generated(output),
 	m_script(nullptr),
-	m_scriptIndex(output.size() - 1),
+	m_scriptIndex((scriptIndex == std::numeric_limits<std::size_t>::max()) ? output.size() - 1 : scriptIndex),
 	m_pointer(&output.backService().program().rootNode()) {
 }
 
