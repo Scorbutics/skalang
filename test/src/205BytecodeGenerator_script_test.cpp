@@ -77,6 +77,12 @@ TEST_CASE("[BytecodeGenerator] import ") {
 	});
 }
 
+TEST_CASE("[BytecodeGenerator] Outside script from file (import) and use") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\";var player = Character184.build(\"Player\");var enemy = Character184.default; enemy.age;");
+	auto res = data.generator->generate(std::move(astPtr));
+	//CHECK(res.nodeval<int>() == 10);
+}
+
 TEST_CASE("[BytecodeGenerator] C++ 1 script-function binding") {
 	/*auto [astPtr, data] = ASTFromInputBytecodeGenerator("var User77 = import \"bind:binding\"; User77.funcTest(14, \"titito\");");
 	auto res = data.generator->generate(std::move(astPtr));
