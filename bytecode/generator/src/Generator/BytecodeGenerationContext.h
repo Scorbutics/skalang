@@ -29,6 +29,8 @@ namespace ska {
 			void setSymbolInfo(const ASTNode& node, SymbolInfo info);
 			const SymbolInfo* getSymbolInfo(const Symbol& symbol) const;
 			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
+			Value querySymbolOrValue(const ASTNode& node);
+			Value querySymbol(const Symbol& symbol);
 
 		private:
 			GenerationOutput& m_generated;

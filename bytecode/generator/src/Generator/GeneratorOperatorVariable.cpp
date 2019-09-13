@@ -13,7 +13,7 @@ namespace ska {
 			auto valueGroup = generator.generateNext({ context, node });
 			if((dest.symbol() != node.symbol() || node.symbol() == nullptr) && !valueGroup.empty()) {
 				LOG_DEBUG << "Creating MOV instruction with value " << valueGroup;
-				valueGroup.push(Instruction { Command::MOV, context.script().querySymbolOrValue(dest), valueGroup.value() });
+				valueGroup.push(Instruction { Command::MOV, context.querySymbolOrValue(dest), valueGroup.value() });
 				LOG_DEBUG << "\tin value " << valueGroup.value();
 			}
 			return valueGroup;

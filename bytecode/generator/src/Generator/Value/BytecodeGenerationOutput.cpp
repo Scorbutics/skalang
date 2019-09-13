@@ -64,3 +64,11 @@ const ska::bytecode::SymbolInfo* ska::bytecode::GenerationOutput::getSymbolInfo(
 	}
 	return getSymbolInfo(*node.symbol());
 }
+
+ska::bytecode::Value ska::bytecode::GenerationOutput::querySymbolOrValue(const ASTNode& node) {
+  return VariableGetter::query(node).first;
+}
+
+ska::bytecode::Value ska::bytecode::GenerationOutput::querySymbol(const Symbol& symbol) {
+	return VariableGetter::query(symbol).first;
+}

@@ -2,12 +2,12 @@
 #include <limits>
 #include "Generator/BytecodeCommand.h"
 #include "Generator/Value/BytecodeScript.h"
-#include "Generator/Value/BytecodeScriptGenerationOutput.h"
+#include "Generator/BytecodeGenerationContext.h"
 
 namespace ska {
   namespace bytecode {
     template <Command command, class NodeIterable, size_t Modulo = 3>
-		void ApplyNOperations(ScriptGenerationOutput& output, ScriptGenerationService& script, NodeIterable&& node,  std::size_t maxSize = std::numeric_limits<std::size_t>::max()) {
+		void ApplyNOperations(ScriptGenerationOutput& output, GenerationContext& script, NodeIterable&& node,  std::size_t maxSize = std::numeric_limits<std::size_t>::max()) {
 			auto temporaryContainer = std::vector<Value> {};
 
 			std::size_t index = 0u;
