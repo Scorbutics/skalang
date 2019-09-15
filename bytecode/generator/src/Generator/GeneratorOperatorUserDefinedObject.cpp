@@ -18,7 +18,7 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
 	std::size_t childIndex = 0;
 	for(auto& field: node) {
 		auto valueGroup = generateNext({ context, *field, 1 });
-		fields->emplace(std::get<std::size_t>(valueGroup.value().as<VariableRef>()), fields->size());
+		fields->emplace(valueGroup.value().as<VariableRef>().variable, fields->size());
 
 		auto symbolInfo = SymbolInfo { fields, context.scriptIndex() };
 		symbolInfo.priority = childIndex;

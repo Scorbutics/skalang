@@ -9,6 +9,6 @@
 
 namespace ska {
 	namespace bytecode {
-		using TokenVariant = std::variant<std::size_t, bool, long, double, StringShared, ObjectMemory, BridgeMemory>;
+		using TokenVariant = std::variant<ScriptVariableRef, bool, long, double, StringShared, ObjectMemory, BridgeMemory>;
 	}
 }

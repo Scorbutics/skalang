@@ -29,10 +29,9 @@ namespace ska {
 
 			void jumpAbsolute(std::size_t value);
 			void jumpRelative(long value);
-			void jumpReturn();
 
-			std::size_t getRelativeInstruction(long relativeValue) const {
-				return executionPointer + relativeValue;
+			ScriptVariableRef getRelativeInstruction(long relativeValue) const {
+				return ScriptVariableRef{ executionPointer + relativeValue, scriptIndex };
 			}
 
 			auto size() const { return instructions.generated()[scriptIndex].size(); }
@@ -49,7 +48,7 @@ namespace ska {
 						return T{};
 					}
 				}
-				return (*memory)[std::get<std::size_t>(v.as<VariableRef>())].nodeval<T>();
+				return (*memory)[v.as<VariableRef>().variable].nodeval<T>();
 			}
 
 			template <class T>
@@ -59,6 +58,8 @@ namespace ska {
 				push(*memory, dest, std::forward<T>(src));
 			}
 
+			auto index() const { return scriptIndex; }
+			ScriptVariableRef snapshot() const { return ScriptVariableRef{ executionPointer, scriptIndex }; }
 		private:
 			PlainMemoryTable* selectMemory(const Value& dest);
 			const PlainMemoryTable* selectMemory(const Value& dest) const;
@@ -80,7 +81,7 @@ namespace ska {
 
 			template <class T>
 			void push(PlainMemoryTable& memory, const Value& dest, T&& src) {
-				auto index = std::get<std::size_t>(dest.as<VariableRef>());
+				auto index = dest.as<VariableRef>().variable;
 				if(index >= memory.size()) {
 					if(index == memory.size()) {
 						memory.push_back(std::forward<T>(src));
@@ -94,7 +95,7 @@ namespace ska {
 
 			const GenerationOutput& instructions;
 			ExecutionOutput& execution;
-			std::size_t scriptIndex = 0;
+			const std::size_t scriptIndex = 0;
 			std::size_t executionPointer = 0;
 
 			PlainMemoryTable registers;

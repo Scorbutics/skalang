@@ -16,7 +16,7 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
 	for (const auto& child : node) {
 		auto childCellGroup = generateNext({ context, *child, 1});
 		if(child->symbol() != nullptr && childCellGroup.value().type() == ValueType::VAR) {
-			fields->emplace(std::get<std::size_t>(childCellGroup.value().as<VariableRef>()), fields->size());
+			fields->emplace(childCellGroup.value().as<VariableRef>().variable, fields->size());
 
 			auto symbolInfo = SymbolInfo { fields, context.scriptIndex() };
 			if (context.scope() == 0) {

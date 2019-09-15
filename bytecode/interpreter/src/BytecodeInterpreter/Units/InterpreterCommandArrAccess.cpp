@@ -6,7 +6,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::InterpreterCommand<ska::byte
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::InterpreterCommand<ska::bytecode::Command::ARR_ACCESS>)
 
 SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(ARR_ACCESS)(ExecutionContext& context, const Value& left, const Value& right) {
-  const auto& index = context.get<long>(right);
+  const auto index = context.get<long>(right);
   const auto& array = (*context.get<NodeValueArray>(left));
   LOG_INFO << "[Accessing cell at index " << index << "/" << array.size() << " of object " << left << "]";
 

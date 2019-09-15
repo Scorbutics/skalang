@@ -34,7 +34,15 @@ namespace ska {
 	class ASTNode;
 
 	namespace bytecode {
-		using VariableRef = std::tuple<std::size_t>;
+		struct VariableRef {			
+			std::size_t variable = 0;
+		};
+
+		struct ScriptVariableRef {
+			std::size_t variable = 0;
+			std::size_t script = 0;
+		};
+
 		/*
 		using VariableRefIndexMap = std::unordered_map<std::size_t, std::size_t>;
 		using InstanceReferences = std::shared_ptr<VariableRefIndexMap>;
@@ -93,6 +101,13 @@ namespace ska {
 		using Register = Value;
 
 		bool operator==(const Value& lhs, const Value& rhs);
+		bool operator==(const VariableRef& lhs, const VariableRef& rhs);
+		bool operator==(const ScriptVariableRef& lhs, const ScriptVariableRef& rhs);
+
+		inline std::ostream& operator<<(std::ostream& stream, const ScriptVariableRef& var) {
+			stream << var.variable;
+			return stream;
+		}
 	}
 
 
@@ -100,9 +115,18 @@ namespace ska {
 
 namespace std {
 	template<>
+	struct hash<ska::bytecode::ScriptVariableRef> {
+		size_t operator()(const ska::bytecode::ScriptVariableRef & x) const {
+			const size_t h1 = hash<std::size_t>()(x.script);
+			const size_t h2 = hash<std::size_t>()(x.variable);
+			return h1 ^ (h2 << 1);
+		}
+	};
+
+	template<>
 	struct hash<ska::bytecode::VariableRef> {
-		size_t operator()(const ska::bytecode::VariableRef & x) const {
-			return hash<std::size_t>()(std::get<std::size_t>(x));
+		size_t operator()(const ska::bytecode::VariableRef& x) const {
+			return hash<std::size_t>()(x.variable);
 		}
 	};
 
@@ -110,8 +134,8 @@ namespace std {
 	struct hash<ska::bytecode::Value> {
 		size_t operator()(const ska::bytecode::Value & x) const {
 			const size_t h1 = hash<std::string>()(x.toString());
-    	const size_t h2 = hash<std::size_t>()(static_cast<std::size_t>(x.type()));
-    	return h1 ^ (h2 << 1);
+    		const size_t h2 = hash<std::size_t>()(static_cast<std::size_t>(x.type()));
+    		return h1 ^ (h2 << 1);
 		}
 	};
 }

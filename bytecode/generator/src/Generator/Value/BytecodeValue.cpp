@@ -40,7 +40,7 @@ std::string ska::bytecode::Value::toString() const {
   std::visit([&output](const auto& value) {
     using TypeT = std::decay_t<decltype(value)>;
 	if constexpr (std::is_same_v<VariableRef, TypeT>) {
-		output = std::to_string(std::get<std::size_t>(value));
+		output = std::to_string(value.variable) /*+ ":" + std::to_string(value.script)*/;
 	} else if constexpr (!std::is_same_v<StringShared, TypeT>) {
       output = std::to_string(value);
     }
@@ -64,5 +64,13 @@ std::string ska::bytecode::Value::toString() const {
 }
 
 bool ska::bytecode::operator==(const Value& lhs, const Value& rhs) {
-  return lhs.m_content == rhs.m_content && lhs.m_type == rhs.m_type;
+	return lhs.m_content == rhs.m_content && lhs.m_type == rhs.m_type;
+}
+
+bool ska::bytecode::operator==(const ScriptVariableRef& lhs, const ScriptVariableRef& rhs) {
+	return lhs.script == rhs.script && lhs.variable == rhs.variable;
+}
+
+bool ska::bytecode::operator==(const VariableRef& lhs, const VariableRef& rhs) {
+	return lhs.variable == rhs.variable;
 }

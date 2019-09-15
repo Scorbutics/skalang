@@ -46,11 +46,13 @@ namespace ska {
 			}
 
 			NodeValue(NodeValueArray arg) :
-				m_variant(arg) {
+				m_variant(arg),
+				m_emptyVariant(false) {
 			}
 
 			NodeValue(NodeValueMap arg) :
-				m_variant(arg) {
+				m_variant(arg),
+				m_emptyVariant(false) {
 			}
 
 			NodeValue(NodeValue&&) noexcept = default;

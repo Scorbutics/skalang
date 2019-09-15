@@ -18,6 +18,8 @@ namespace ska {
 			ExecutionContext(ExecutionContext& old, std::size_t scriptIndex) :
 				ExecutionContext(old.m_container, scriptIndex, old.m_bytecode) { }
 
+			ExecutionContext(ExecutionContext&&) noexcept = default;
+			ExecutionContext& operator=(ExecutionContext&&) = default;
 			ExecutionContext(const ExecutionContext&) = delete;
 			ExecutionContext& operator=(const ExecutionContext&) = delete;
 
@@ -33,11 +35,11 @@ namespace ska {
 
 			void pop(NodeValueArrayRaw& dest, long count) { m_container.pop(dest, count); }
 
-			void jumpAbsolute(std::size_t value) { m_current->jumpAbsolute(value); }
+			void jumpAbsolute(ScriptVariableRef value);
 			void jumpRelative(long value) { m_current->jumpRelative(value); }
-			void jumpReturn() { m_current->jumpReturn(); }
+			void jumpReturn();
 
-			std::size_t getRelativeInstruction(long relativeValue) const {
+			ScriptVariableRef getRelativeInstruction(long relativeValue) const {
 				return m_current->getRelativeInstruction(relativeValue);
 			}
 
@@ -61,6 +63,8 @@ namespace ska {
 			const ScriptGenerationOutput& generateIfNeeded(Generator& generator, std::size_t scriptIndex);
 
 		private:
+			ScriptVariableRef getReturn();
+			ExecutionContext getContext(ScriptVariableRef value);
 			ExecutionOutput& m_container;
 			GenerationOutput& m_bytecode;
 			ScriptExecution* m_current = nullptr;

@@ -20,18 +20,11 @@ ska::bytecode::NodeValue ska::bytecode::ScriptExecution::getCell(const Value& v)
 		}, v.content());
 		return output;
 	}
-	return (*memory)[std::get<std::size_t>(v.as<VariableRef>())];
-}
-
-void ska::bytecode::ScriptExecution::jumpReturn() {
-	assert(!execution.callstack.empty());
-	executionPointer = execution.callstack.back().nodeval<std::size_t>();
-	execution.callstack.pop_back();
+	return (*memory)[v.as<VariableRef>().variable];
 }
 
 void ska::bytecode::ScriptExecution::jumpAbsolute(std::size_t value) {
-	execution.callstack.push_back(TokenVariant{ executionPointer });
-	executionPointer = value - 1;
+	executionPointer = value;
 }
 
 void ska::bytecode::ScriptExecution::jumpRelative(long value) {

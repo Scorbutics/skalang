@@ -16,8 +16,10 @@
 			numeric = arg;
 		} else if constexpr (std::is_same<T, bool>::value) {
 			numeric = arg ? 1.0 : 0.0;
-		} else if constexpr (std::is_same<T, std::size_t>::value) {
-			numeric = arg;
+		} else if constexpr (std::is_same<T, VariableRef>::value) {
+			numeric = arg.variable;
+		} else if constexpr (std::is_same<T, ScriptVariableRef>::value) {
+			numeric = arg.variable;
 		} else if constexpr (std::is_same<T, StringShared>::value) {
 			try {
 				numeric = std::stod(*arg);
@@ -35,24 +37,28 @@
 
 std::string ska::bytecode::NodeValue::convertString() const {
 	auto result = std::string{};
-	const auto& valueVariant = std::get<TokenVariant>(m_variant);
-	std::visit([&result](auto && arg) {
-		using T = std::decay_t<decltype(arg)>;
+	if(std::holds_alternative<TokenVariant>(m_variant)) {
+		const auto& valueVariant = std::get<TokenVariant>(m_variant);
+		std::visit([&result](auto && arg) {
+			using T = std::decay_t<decltype(arg)>;
 
-		if constexpr (std::is_same<T, long>::value) {
-			result = std::to_string(arg);
-		} else if constexpr (std::is_same<T, double>::value) {
-			result = std::to_string(arg);
-		} else if constexpr (std::is_same<T, std::size_t>::value) {
-			result = std::to_string(arg);
-		} else if constexpr (std::is_same<T, bool>::value) {
-			result = arg ? "true" : "false";
-		} else if constexpr (std::is_same<T, StringShared>::value) {
-			result = *arg;
-		} else {
-			throw std::runtime_error("cannot convert the node value to a string format");
-		}
-	}, valueVariant);
+			if constexpr (std::is_same<T, long>::value) {
+				result = std::to_string(arg);
+			} else if constexpr (std::is_same<T, double>::value) {
+				result = std::to_string(arg);
+			} else if constexpr (std::is_same<T, VariableRef>::value) {
+				result = std::to_string(arg.variable);
+			} else if constexpr (std::is_same<T, ScriptVariableRef>::value) {
+				result = std::to_string(arg.variable);
+			} else if constexpr (std::is_same<T, bool>::value) {
+				result = arg ? "true" : "false";
+			} else if constexpr (std::is_same<T, StringShared>::value) {
+				result = *arg;
+			} else {
+				throw std::runtime_error("cannot convert the node value to a string format");
+			}
+		}, valueVariant);
+	}
 	return result;
 }
 

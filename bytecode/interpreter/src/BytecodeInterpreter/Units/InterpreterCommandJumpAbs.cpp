@@ -8,8 +8,8 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, InterpreterCommand);
 
 SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(JUMP_ABS)(ExecutionContext& context, const Value& left, const Value& right) {
 	const auto& jumpValue = context.currentInstruction().dest();
-	const auto instructionIndex = context.get<std::size_t>(jumpValue);
-	LOG_DEBUG << "Jumping (absolute) to instruction index " << instructionIndex;
+	const auto instructionIndex = context.get<ScriptVariableRef>(jumpValue);
+	LOG_DEBUG << "Jumping (absolute) to instruction index " << instructionIndex << " in script " << instructionIndex.script;
 	context.jumpAbsolute(instructionIndex);
 	return {};
 }
