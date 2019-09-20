@@ -10,7 +10,6 @@ namespace ska {
 		public:
 			using ScriptExecutionContainer = std::vector<std::unique_ptr<ScriptExecution>>;
 
-			PlainMemoryTable variables;
 			PlainMemoryTable callstack;
 
 			void pop(NodeValue& dest) {
@@ -33,9 +32,20 @@ namespace ska {
 				return scripts[scriptIndex].get();
 			}
 
+			const ScriptExecution* script(std::size_t scriptIndex) const {
+				if (scriptIndex >= scripts.size()) {
+					return nullptr;
+				}
+				return scripts[scriptIndex].get();
+			}
+
 			template <class ... Items>
 			void push(Items&& ... items) {
 				(pushIfNotEmpty(std::forward<decltype(items)>(items)), ...);
+			}
+
+			NodeValue variable(std::size_t scriptIndex) const {
+				return scripts[scriptIndex]->lastVariable();
 			}
 
 		private:

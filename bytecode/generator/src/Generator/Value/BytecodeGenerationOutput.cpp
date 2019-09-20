@@ -1,4 +1,3 @@
-#include <queue>
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeGenerationOutput.h"
 
@@ -48,8 +47,12 @@ void ska::bytecode::GenerationOutput::setSymbolInfo(const ASTNode& node, SymbolI
 	if (node.symbol() == nullptr) {
 		throw std::runtime_error("Cannot set symbol information for a node without symbol : " + node.name());
 	}
-  SLOG(ska::LogLevel::Debug) << " Setting " << node.symbol()->getName();
-	m_symbolInfo.emplace(node.symbol(), std::move(info));
+	return setSymbolInfo(*node.symbol(), std::move(info));
+}
+
+void ska::bytecode::GenerationOutput::setSymbolInfo(const Symbol& symbol, SymbolInfo info) {
+	SLOG(ska::LogLevel::Debug) << " Setting " << symbol.getName();
+	m_symbolInfo[&symbol] = std::move(info);
 }
 
 const ska::bytecode::SymbolInfo* ska::bytecode::GenerationOutput::getSymbolInfo(const Symbol& symbol) const {
@@ -66,30 +69,7 @@ const ska::bytecode::SymbolInfo* ska::bytecode::GenerationOutput::getSymbolInfo(
 	return getSymbolInfo(*node.symbol());
 }
 
-ska::bytecode::Value ska::bytecode::GenerationOutput::querySymbolOrValue(const ASTNode& node) {
-  return VariableGetter::query(node).first;
-}
-
-ska::bytecode::Value ska::bytecode::GenerationOutput::querySymbol(const Symbol& symbol) {
-	return VariableGetter::query(symbol).first;
-}
-
-namespace ska {
-	namespace bytecode {
-		struct SymbolWithInfo {
-			const Symbol* symbol = nullptr;
-			const SymbolInfo* info = nullptr;
-		};
-		
-		bool operator<(const SymbolWithInfo& lhs, const SymbolWithInfo& rhs) {
-			return lhs.info->priority > rhs.info->priority;
-		}
-		
-	}
-}
-
 std::vector<ska::bytecode::Value> ska::bytecode::GenerationOutput::generateExportedSymbols(std::size_t scriptIndex) const {
-	auto result = std::vector<Value> {};
 	
 	auto temporarySortedScriptSymbols = std::priority_queue<SymbolWithInfo>{};
 	for (const auto& data : m_symbolInfo) {
@@ -102,16 +82,5 @@ std::vector<ska::bytecode::Value> ska::bytecode::GenerationOutput::generateExpor
 		return {};
 	}
 
-	result.reserve(temporarySortedScriptSymbols.size());
-
-	while(!temporarySortedScriptSymbols.empty()) {
-		const auto& symbolWithInfo = temporarySortedScriptSymbols.top();
-		auto value = VariableGetter::query(*symbolWithInfo.symbol);
-		if (value.has_value()) {
-			result.push_back(std::move(value.value()));
-		}
-		temporarySortedScriptSymbols.pop();
-	}
-
-	return result;
+	return m_services[scriptIndex].generateExportedSymbols(std::move(temporarySortedScriptSymbols));
 }

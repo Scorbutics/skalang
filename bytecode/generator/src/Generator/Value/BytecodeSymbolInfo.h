@@ -4,10 +4,11 @@
 #include <unordered_map>
 #include <ostream>
 #include "NodeValue/StringShared.h"
+#include "BytecodeScriptVariableRef.h"
 
 namespace ska {
 	namespace bytecode {
-		using FieldsReferencesRaw = std::unordered_map<std::size_t, std::size_t>;
+		using FieldsReferencesRaw = std::unordered_map<ScriptVariableRef, std::size_t>;
 		using FieldsReferences = std::shared_ptr<FieldsReferencesRaw>;
 
 		struct SymbolInfo {

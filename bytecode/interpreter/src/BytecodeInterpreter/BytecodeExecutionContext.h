@@ -29,7 +29,7 @@ namespace ska {
 
 			bool incInstruction() { return m_current->incInstruction(); }
 
-			NodeValue getCell(const Value& v) const { return m_current->getCell(v); }
+			NodeValue getCell(const Value& v) const { return scriptFromValue(v)->getCell(v); }
 
 			void pop(NodeValue& dest) { m_container.pop(dest); }
 
@@ -50,12 +50,15 @@ namespace ska {
 
 			template <class T>
 			T get(const Value& v) {
-				return m_current->get<T>(v);
+				return scriptFromValue(v)->get<T>(v);
 			}
+
+			ScriptExecution* scriptFromValue(const Value& v);
+			const ScriptExecution* scriptFromValue(const Value& v) const;
 
 			template <class T>
 			void set(const Value& dest, T&& src) {
-				m_current->set(dest, std::forward<T>(src));
+				scriptFromValue(dest)->set(dest, std::forward<T>(src));
 			}
 		
 			ScriptExecutionOutput generateExportedVariables(std::size_t scriptIndex) const;

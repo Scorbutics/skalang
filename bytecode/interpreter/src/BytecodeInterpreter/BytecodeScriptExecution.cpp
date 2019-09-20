@@ -11,7 +11,7 @@ ska::bytecode::NodeValue ska::bytecode::ScriptExecution::getCell(const Value& v)
 		auto output = NodeValue{};
 		std::visit([&](const auto& content) {
 			using TypeT = std::decay_t<decltype(content)>;
-			if constexpr (std::is_same_v<VariableRef, TypeT>) {
+			if constexpr (std::is_same_v<ScriptVariableRef, TypeT>) {
 				throw std::runtime_error("invalid cell");
 			}
 			else {
@@ -20,7 +20,7 @@ ska::bytecode::NodeValue ska::bytecode::ScriptExecution::getCell(const Value& v)
 		}, v.content());
 		return output;
 	}
-	return (*memory)[v.as<VariableRef>().variable];
+	return (*memory)[v.as<ScriptVariableRef>().variable];
 }
 
 void ska::bytecode::ScriptExecution::jumpAbsolute(std::size_t value) {

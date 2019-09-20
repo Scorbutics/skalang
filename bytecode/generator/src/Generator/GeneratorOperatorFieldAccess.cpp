@@ -18,7 +18,7 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
         throw std::runtime_error(ss.str());
 	}
 
-	auto fieldValue = context.querySymbol(*symbolField);
+	auto fieldValue = context.getSymbol(*symbolField).value();
 	LOG_DEBUG << "Accessing field " << fieldValue << " of object " << node.GetObjectNameNode();
 
 	auto objectValue = generateNext({ context, node.GetObjectNameNode()});
@@ -33,8 +33,8 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
 		throw std::runtime_error("invalid bytecode : the dereferenced object has no fields references");
 	}
 
-	const auto fieldVarReference = fieldValue.as<VariableRef>().variable;
-	LOG_DEBUG << "This field is " << fieldVarReference;
+	const auto fieldVarReference = fieldValue.as<ScriptVariableRef>();
+	LOG_DEBUG << "This field is " << fieldVarReference.variable << " in script index " << fieldVarReference.script;
 
 	const auto fieldRefIndex = objectFieldReferences->find(fieldVarReference);
 	if(fieldRefIndex == objectFieldReferences->end()) {

@@ -39,7 +39,7 @@ std::string ska::bytecode::Value::toString() const {
   auto output = std::string {};
   std::visit([&output](const auto& value) {
     using TypeT = std::decay_t<decltype(value)>;
-	if constexpr (std::is_same_v<VariableRef, TypeT>) {
+	if constexpr (std::is_same_v<ScriptVariableRef, TypeT>) {
 		output = std::to_string(value.variable) /*+ ":" + std::to_string(value.script)*/;
 	} else if constexpr (!std::is_same_v<StringShared, TypeT>) {
       output = std::to_string(value);

@@ -7,7 +7,7 @@ std::ostream& ska::bytecode::operator<<(std::ostream& stream, const SymbolInfo& 
 	stream << " [";
 	if(symbol.references != nullptr) {
 		for(const auto& [key, value] : *symbol.references) {
-			stream << " " << key << " : " << value;
+			stream << " " << key.script << "|" << key.variable << " : " << value << ", ";
 		}
 	}
 	stream << " ]";

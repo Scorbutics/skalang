@@ -39,7 +39,7 @@ static std::pair<ska::bytecode::ScriptGenerationService, BytecodeInterpreterData
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(input, data);
 	readerI->parse(*data.parser);
-	return std::make_pair<ska::bytecode::ScriptGenerationService, BytecodeInterpreterDataTestContainer>(ska::bytecode::ScriptGenerationService{ *readerI }, std::move(data));
+	return std::make_pair<ska::bytecode::ScriptGenerationService, BytecodeInterpreterDataTestContainer>(ska::bytecode::ScriptGenerationService{0, *readerI }, std::move(data));
 }
 
 struct BytecodePart {
@@ -58,63 +58,63 @@ TEST_CASE("[BytecodeInterpreter] literal alone") {
 TEST_CASE("[BytecodeInterpreter] var declaration") {
 	auto [script, data] = Interpret("var toto = 4;");
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	CHECK(res.nodeval<long>() == 4);
 }
 
 TEST_CASE("[BytecodeInterpreter] var declaration from var") {
 	auto [script, data] = Interpret("var toto = 4; var titi = toto;");
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	CHECK(res.nodeval<long>() == 4);
 }
 
 TEST_CASE("[BytecodeInterpreter] Basic Maths linear") {
 	auto [script, data] = Interpret("var t = 3 + 4 - 1;");
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	CHECK(res.nodeval<long>() == 6);
 }
 
 TEST_CASE("[BytecodeInterpreter] Basic Maths 1 left subpart") {
 	auto [script, data] = Interpret("var t = (3 + 4) * 2;");
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	CHECK(res.nodeval<long>() == 14);
 }
 
 TEST_CASE("[BytecodeInterpreter] Basic Maths 1 right subpart") {
 	auto [script, data] = Interpret("var t = 2 * (3 + 4);");
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	CHECK(res.nodeval<long>() == 14);
 }
 
 TEST_CASE("[BytecodeInterpreter] Basic Maths subparts") {
 	auto [script, data] = Interpret("var t = (3 + 4) * (1 + 2);");
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	CHECK(res.nodeval<long>() == 21);
 }
 
 TEST_CASE("[BytecodeInterpreter] Basic Maths with var") {
 	auto [script, data] = Interpret("var toto = 4; var t = (toto * 5) + 2 * (3 + 4 - 1 / 4) + 1 + 9;");
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	CHECK(res.nodeval<long>() == 44);
 }
 
 TEST_CASE("[BytecodeInterpreter] var expression declaration") {
   auto [script, data] = Interpret("var result = 7 + 3;");
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	CHECK(res.nodeval<long>() == 10);
 }
 
 TEST_CASE("[BytecodeInterpreter] Introducing block sub-variable") {
 	auto [script, data] = Interpret("var toto = 4; { var toto = 5; toto + 1; } var t = toto + 1;");
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	CHECK(res.nodeval<long>() == 5);
 }
 
@@ -135,7 +135,7 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation (field access)") {
 
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	auto firstCellValue = res.nodeval<long>();
 	CHECK(firstCellValue == 123);
 }
@@ -158,7 +158,7 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation 2 (field function call)"
 
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	auto firstCellValue = res.nodeval<ska::StringShared>();
 	CHECK(*firstCellValue == "lol123titi4");
 }
@@ -183,7 +183,7 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation 3 (double field function
 
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	auto firstCellValue = res.nodeval<ska::StringShared>();
 	CHECK(*firstCellValue == "lol123titi4");
 }
@@ -200,7 +200,7 @@ TEST_CASE("[BytecodeInterpreter] using a function as a parameter") {
 		"var t = object.test;";
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	auto firstCellValue = res.nodeval<long>();
 	CHECK(firstCellValue == 14);
 }
@@ -213,7 +213,7 @@ TEST_CASE("[BytecodeInterpreter] down scope function variable access") {
 		"var out = testValue;";
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	auto firstCellValue = res.nodeval<long>();
 	CHECK(firstCellValue == 1);
 }
@@ -229,7 +229,7 @@ TEST_CASE("[BytecodeInterpreter] using a callback function as a parameter") {
 		"var out = testValue;";
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	auto firstCellValue = res.nodeval<long>();
 	CHECK(firstCellValue == 789);
 }
@@ -246,16 +246,20 @@ TEST_CASE("[BytecodeInterpreter] using a callback function as a parameter withou
 		"var out = testValue;";
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	auto firstCellValue = res.nodeval<long>();
 	CHECK(firstCellValue == 789);
 }
 
 TEST_CASE("[BytecodeInterpreter] Outside script from file (import) and use") {
-	constexpr auto progStr = "var Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\";var player = Character184.build(\"Player\");var enemy = Character184.default; var t = enemy.age;";
+	constexpr auto progStr = 
+		"var Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
+		"var player = Character184.build(\"Player\");"
+		"var enemy = Character184.default;"
+		"var t = enemy.age;";
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen).variables.back();
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
 	auto cellValue = res.nodeval<long>();
 	CHECK(cellValue == 10);
 }

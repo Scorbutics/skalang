@@ -39,7 +39,7 @@ static BytecodeGeneratorDataTestContainer ASTFromInputBytecodeGeneratorNoParse(c
 static std::pair<ska::bytecode::ScriptGenerationService, BytecodeGeneratorDataTestContainer> ASTFromInputBytecodeGenerator(const std::string& input) {
 	auto data = ASTFromInputBytecodeGeneratorNoParse(input);
 	readerI->parse(*data.parser);
-	return std::make_pair<ska::bytecode::ScriptGenerationService, BytecodeGeneratorDataTestContainer>(ska::bytecode::ScriptGenerationService{ *readerI }, std::move(data));
+	return std::make_pair<ska::bytecode::ScriptGenerationService, BytecodeGeneratorDataTestContainer>(ska::bytecode::ScriptGenerationService{0, *readerI }, std::move(data));
 }
 
 struct BytecodePart {
@@ -73,12 +73,15 @@ TEST_CASE("[BytecodeGenerator] import ") {
 
 	BytecodeCompare(res, {
 		{ Command::SCRIPT, "R0", "1" },
-		{ Command::MOV, "V10", "R0" }
+		{ Command::MOV, "V0", "R0" }
 	});
 }
 
 TEST_CASE("[BytecodeGenerator] Outside script from file (import) and use") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\";var player = Character184.build(\"Player\");var enemy = Character184.default; enemy.age;");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator(
+		"var Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
+		"var player = Character184.build(\"Player\");"
+		"var enemy = Character184.default; enemy.age;");
 	auto res = data.generator->generate(std::move(astPtr));
 	//CHECK(res.nodeval<int>() == 10);
 }

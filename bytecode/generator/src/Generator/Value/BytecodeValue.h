@@ -6,6 +6,8 @@
 #include "NodeValue/Type.h"
 #include "Generator/BytecodeCommand.h"
 #include "NodeValue/StringShared.h"
+#include "BytecodeScriptVariableRef.h"
+
 /*
 Opcode : enum value (MOV, SUB, ADD, MUL, DIV...)
 
@@ -34,20 +36,12 @@ namespace ska {
 	class ASTNode;
 
 	namespace bytecode {
-		struct VariableRef {			
-			std::size_t variable = 0;
-		};
-
-		struct ScriptVariableRef {
-			std::size_t variable = 0;
-			std::size_t script = 0;
-		};
 
 		/*
 		using VariableRefIndexMap = std::unordered_map<std::size_t, std::size_t>;
 		using InstanceReferences = std::shared_ptr<VariableRefIndexMap>;
 		*/
-		using ValueVariant = std::variant<VariableRef, long, bool, double, StringShared>;
+		using ValueVariant = std::variant<ScriptVariableRef, long, bool, double, StringShared>;
 
 		enum class ValueType {
 			PURE,

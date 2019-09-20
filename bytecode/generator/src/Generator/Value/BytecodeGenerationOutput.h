@@ -4,7 +4,6 @@
 #include "BytecodeScriptGenerationOutput.h"
 #include "BytecodeScript.h"
 #include "BytecodeSymbolInfo.h"
-#include "UniqueSymbolGetter.h"
 
 namespace ska {
 	class Symbol;
@@ -14,10 +13,8 @@ namespace ska {
 		using ScriptGenerationServiceContainer = std::vector<ScriptGenerationService>;
 		using ScriptGenerationNameToIndexMap = std::unordered_map<std::string, std::size_t>;
 
-		class GenerationOutput :
-			private UniqueSymbolGetter<'V'> {
+		class GenerationOutput {
 			using SymbolInfosContainer = std::unordered_map<const Symbol*, SymbolInfo>;
-			using VariableGetter = UniqueSymbolGetter<'V'>;
 		public:
 			GenerationOutput() = default;
 
@@ -39,10 +36,9 @@ namespace ska {
 			const auto& back() const { return m_output.back(); }
 
 			void setSymbolInfo(const ASTNode& node, SymbolInfo info);
+			void setSymbolInfo(const Symbol& symbol, SymbolInfo info);
 			const SymbolInfo* getSymbolInfo(const Symbol& symbol) const;
 			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
-			Value querySymbolOrValue(const ASTNode& node);
-			Value querySymbol(const Symbol& symbol);
 
 			std::pair<std::size_t, ScriptGenerationService*> script(const std::string& fullScriptName);
 			ScriptGenerationService& script(std::size_t index);

@@ -15,9 +15,9 @@ namespace ska {
 		protected:
 			UniqueSymbolGetterBase(char symbol) : m_symbol(symbol) {}
 
-			std::pair<Value, bool> query(const ASTNode& node);
-			std::pair<Value, bool> query(const Symbol& symbol);
-			std::optional<Value> query(const Symbol& symbol) const;
+			std::pair<Value, bool> query(std::size_t script, const ASTNode& node);
+			std::pair<Value, bool> query(std::size_t script, const Symbol& symbol);
+			std::optional<Value> get(std::size_t script, const Symbol& symbol) const;
 				
 			SymbolUIDContainer m_container;
 			std::size_t m_count = 0;

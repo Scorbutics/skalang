@@ -117,11 +117,11 @@ void ska::bytecode::Interpreter::interpret(ExecutionContext& node) {
 	}
 }
 
-ska::bytecode::ExecutionOutput ska::bytecode::Interpreter::interpret(std::size_t scriptIndex, GenerationOutput& instructions) {
+std::unique_ptr<ska::bytecode::ExecutionOutput> ska::bytecode::Interpreter::interpret(std::size_t scriptIndex, GenerationOutput& instructions) {
 	LOG_DEBUG << "Interpreting " << instructions;
 
-	auto output = ska::bytecode::ExecutionOutput{};
-	auto context = ExecutionContext {output, scriptIndex, instructions };
+	auto output = std::make_unique<ska::bytecode::ExecutionOutput>();
+	auto context = ExecutionContext {*output, scriptIndex, instructions };
 	interpret(context);
 	return output;
 }

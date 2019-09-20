@@ -48,7 +48,7 @@ namespace ska {
 						return T{};
 					}
 				}
-				return (*memory)[v.as<VariableRef>().variable].nodeval<T>();
+				return (*memory)[v.as<ScriptVariableRef>().variable].nodeval<T>();
 			}
 
 			template <class T>
@@ -60,6 +60,9 @@ namespace ska {
 
 			auto index() const { return scriptIndex; }
 			ScriptVariableRef snapshot() const { return ScriptVariableRef{ executionPointer, scriptIndex }; }
+
+			NodeValue lastVariable() const { return variables.back(); }
+
 		private:
 			PlainMemoryTable* selectMemory(const Value& dest);
 			const PlainMemoryTable* selectMemory(const Value& dest) const;
@@ -73,7 +76,7 @@ namespace ska {
 				case ValueType::REG:
 					return &self.registers;
 				case ValueType::VAR:
-					return &self.execution.variables;
+					return &self.variables;
 				case ValueType::EMPTY:
 					throw std::runtime_error("cannot select empty variable relative memory");
 				}
@@ -81,7 +84,7 @@ namespace ska {
 
 			template <class T>
 			void push(PlainMemoryTable& memory, const Value& dest, T&& src) {
-				auto index = dest.as<VariableRef>().variable;
+				auto index = dest.as<ScriptVariableRef>().variable;
 				if(index >= memory.size()) {
 					if(index == memory.size()) {
 						memory.push_back(std::forward<T>(src));
@@ -99,6 +102,7 @@ namespace ska {
 			std::size_t executionPointer = 0;
 
 			PlainMemoryTable registers;
+			PlainMemoryTable variables;
 		};
 	}
 }

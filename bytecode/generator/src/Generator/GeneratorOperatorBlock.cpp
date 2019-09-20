@@ -10,13 +10,14 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Oper
 ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::BLOCK>::generate(OperateOn node, GenerationContext& context) {
 	auto group = ScriptGenerationOutput{ };
 
-	auto fields = std::make_shared<FieldsReferencesRaw>();;
+	auto fields = std::make_shared<FieldsReferencesRaw>();
 
 	std::size_t childIndex = 0;
 	for (const auto& child : node) {
 		auto childCellGroup = generateNext({ context, *child, 1});
 		if(child->symbol() != nullptr && childCellGroup.value().type() == ValueType::VAR) {
-			fields->emplace(childCellGroup.value().as<VariableRef>().variable, fields->size());
+			auto fieldRef = childCellGroup.value().as<ScriptVariableRef>();
+			fields->emplace(std::move(fieldRef), fields->size());
 
 			auto symbolInfo = SymbolInfo { fields, context.scriptIndex() };
 			if (context.scope() == 0) {
