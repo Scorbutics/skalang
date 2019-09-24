@@ -69,7 +69,7 @@ using namespace ska::bytecode;
 
 TEST_CASE("[BytecodeGenerator] import ") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var Player = import \"" SKALANG_TEST_DIR "/src/resources/play\";");
-	auto res = data.generator->generate(std::move(astPtr));
+	auto res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ Command::SCRIPT, "R0", "1" },
@@ -82,7 +82,7 @@ TEST_CASE("[BytecodeGenerator] Outside script from file (import) and use") {
 		"var Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
 		"var player = Character184.build(\"Player\");"
 		"var enemy = Character184.default; enemy.age;");
-	auto res = data.generator->generate(std::move(astPtr));
+	auto res = data.generator->generate(data.storage, std::move(astPtr));
 	//CHECK(res.nodeval<int>() == 10);
 }
 

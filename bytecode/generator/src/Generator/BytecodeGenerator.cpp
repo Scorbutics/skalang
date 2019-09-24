@@ -67,8 +67,8 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::Generator::generatePart(Gen
 	return builder->generate(node);
 }
 
-ska::bytecode::GenerationOutput ska::bytecode::Generator::generate(ScriptGenerationService script) {
-	auto container = GenerationOutput { };
+ska::bytecode::GenerationOutput ska::bytecode::Generator::generate(BytecodeStorage& storage, ScriptGenerationService script) {
+	auto container = GenerationOutput { storage };
 	auto index = container.push(std::move(script));
 	auto service = container.backService().program().name();
 	container.setOut(index, generatePart(GenerationContext{ container }));
