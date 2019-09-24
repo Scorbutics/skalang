@@ -23,7 +23,7 @@ namespace ska {
 			ExecutionContext(const ExecutionContext&) = delete;
 			ExecutionContext& operator=(const ExecutionContext&) = delete;
 
-			bool empty() const { return m_current->size() == 0; }
+			bool idle() const { return m_current->idle(); }
 
 			const Instruction& currentInstruction() const { return m_current->currentInstruction(); }
 
@@ -61,7 +61,7 @@ namespace ska {
 				scriptFromValue(dest)->set(dest, std::forward<T>(src));
 			}
 		
-			ScriptExecutionOutput generateExportedVariables(std::size_t scriptIndex) const;
+			ScriptExecutionOutput generateExportedVariables(std::size_t scriptIndex);
 
 			const ScriptGenerationOutput& generateIfNeeded(Generator& generator, std::size_t scriptIndex);
 

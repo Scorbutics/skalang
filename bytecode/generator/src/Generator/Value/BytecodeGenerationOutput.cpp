@@ -73,17 +73,18 @@ const ska::bytecode::SymbolInfo* ska::bytecode::GenerationOutput::getSymbolInfo(
 	return getSymbolInfo(*node.symbol());
 }
 
-std::vector<ska::bytecode::Value> ska::bytecode::GenerationOutput::generateExportedSymbols(std::size_t scriptIndex) const {
-	auto temporarySortedScriptSymbols = std::priority_queue<SymbolWithInfo>{};
-	for (const auto& data : m_symbolInfo) {
-		if (data.second.exported && data.second.script == scriptIndex) {
-			temporarySortedScriptSymbols.push(SymbolWithInfo{ data.first, &data.second });
+const std::vector<ska::bytecode::Value>& ska::bytecode::GenerationOutput::generateExportedSymbols(std::size_t scriptIndex) const {
+	if (m_storage.output[scriptIndex].exportedSymbols().empty()) {
+		auto temporarySortedScriptSymbols = std::priority_queue<SymbolWithInfo>{};
+		for (const auto& data : m_symbolInfo) {
+			if (data.second.exported && data.second.script == scriptIndex) {
+				temporarySortedScriptSymbols.push(SymbolWithInfo{ data.first, &data.second });
+			}
+		}
+
+		if (!temporarySortedScriptSymbols.empty()) {
+			m_storage.output[scriptIndex].setExportedSymbols(m_storage.services[scriptIndex].generateExportedSymbols(std::move(temporarySortedScriptSymbols)));
 		}
 	}
-
-	if (temporarySortedScriptSymbols.empty()) {
-		return {};
-	}
-
-	return m_storage.services[scriptIndex].generateExportedSymbols(std::move(temporarySortedScriptSymbols));
+	return m_storage.output[scriptIndex].exportedSymbols();
 }

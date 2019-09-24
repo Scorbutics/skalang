@@ -19,7 +19,10 @@ namespace ska {
 			ScriptExecution(const ScriptExecution&) = delete;
 			ScriptExecution& operator=(const ScriptExecution&) = delete;
 
-			const Instruction& currentInstruction() const { assert(executionPointer < instructions.generated()[scriptIndex].size()); return instructions.generated()[scriptIndex][executionPointer]; }
+			const Instruction& currentInstruction() const {
+				assert(executionPointer < instructions.generated()[scriptIndex].size());
+				return instructions.generated()[scriptIndex][executionPointer];
+			}
 
 			bool incInstruction() {
 				return ++executionPointer < instructions.generated()[scriptIndex].size();
@@ -35,6 +38,7 @@ namespace ska {
 			}
 
 			auto size() const { return instructions.generated()[scriptIndex].size(); }
+			bool idle() const { return executionPointer >= instructions.generated()[scriptIndex].size(); }
 
 			template <class T>
 			T get(const Value& v) const {
@@ -61,7 +65,10 @@ namespace ska {
 			auto index() const { return scriptIndex; }
 			ScriptVariableRef snapshot() const { return ScriptVariableRef{ executionPointer, scriptIndex }; }
 
-			NodeValue lastVariable() const { return variables.back(); }
+			NodeValue lastVariable() const { assert(!variables.empty()); return variables.back(); }
+
+			const NodeValueArray* exports() const { return m_exportsSection != nullptr ? &m_exportsSection : nullptr; }
+			void setExportsSection(NodeValueArray exportsSection) { m_exportsSection = std::move(exportsSection); }
 
 		private:
 			PlainMemoryTable* selectMemory(const Value& dest);
@@ -101,6 +108,7 @@ namespace ska {
 			const std::size_t scriptIndex = 0;
 			std::size_t executionPointer = 0;
 
+			NodeValueArray m_exportsSection;
 			PlainMemoryTable registers;
 			PlainMemoryTable variables;
 		};

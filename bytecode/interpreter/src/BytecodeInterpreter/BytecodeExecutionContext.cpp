@@ -16,13 +16,20 @@ ska::bytecode::ExecutionContext::ExecutionContext(ExecutionOutput& container, st
 	}
 }
 
-ska::bytecode::ScriptExecutionOutput ska::bytecode::ExecutionContext::generateExportedVariables(std::size_t scriptIndex) const {
-	auto result = std::make_shared<NodeValueArrayRaw>();
-	const auto exportedSymbolsVariables = m_bytecode.generateExportedSymbols(scriptIndex);
-	for (const auto& variable : exportedSymbolsVariables) {
-		result->push_back(getCell(variable));
+ska::bytecode::ScriptExecutionOutput ska::bytecode::ExecutionContext::generateExportedVariables(std::size_t scriptIndex) {
+	auto* scriptExecution = m_container.script(scriptIndex);
+	assert(scriptExecution != nullptr);
+	auto symbols = !scriptExecution->idle() ? scriptExecution->exports() : nullptr;
+	if(symbols != nullptr) {
+		auto result = std::make_shared<NodeValueArrayRaw>();
+		const auto& exportedSymbolsVariables = m_bytecode.generateExportedSymbols(scriptIndex);
+		for (const auto& variable : exportedSymbolsVariables) {
+			result->push_back(getCell(variable));
+		}
+		scriptExecution->setExportsSection(result);
+		return result;
 	}
-	return result;
+	return symbols;
 }
 
 const ska::bytecode::ScriptGenerationOutput& ska::bytecode::ExecutionContext::generateIfNeeded(Generator& generator, std::size_t scriptIndex) {

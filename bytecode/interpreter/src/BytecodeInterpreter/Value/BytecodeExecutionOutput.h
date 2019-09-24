@@ -39,6 +39,13 @@ namespace ska {
 				return scripts[scriptIndex].get();
 			}
 
+			ScriptExecution* script(std::size_t scriptIndex) {
+				if (scriptIndex >= scripts.size()) {
+					return nullptr;
+				}
+				return scripts[scriptIndex].get();
+			}
+
 			template <class ... Items>
 			void push(Items&& ... items) {
 				(pushIfNotEmpty(std::forward<decltype(items)>(items)), ...);

@@ -40,7 +40,7 @@ namespace ska {
 			std::pair<std::size_t, ScriptGenerationService*> script(const std::string& fullScriptName);
 			ScriptGenerationService& script(std::size_t index);
 
-			std::vector<Value> generateExportedSymbols(std::size_t scriptIndex) const;
+			const std::vector<Value>& generateExportedSymbols(std::size_t scriptIndex) const;
 
 		private:
 			BytecodeStorage& m_storage;

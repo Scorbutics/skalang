@@ -46,10 +46,15 @@ namespace ska {
 			const Instruction& operator[](std::size_t index) const { return m_pack[index]; }
 			Instruction& operator[](std::size_t index) { return m_pack[index]; }
 
+			const std::vector<Value>& exportedSymbols() const { return m_exports; }
+			void setExportedSymbols(std::vector<Value> symbols) { m_exports = std::move(symbols); };
+
 		private:
 			friend std::ostream& operator<<(std::ostream& stream, const ScriptGenerationOutput&);
 
 			Value packAsValue() const;
+
+			std::vector<Value> m_exports;
 			InstructionPack m_pack;
 			Value m_value;
 		};

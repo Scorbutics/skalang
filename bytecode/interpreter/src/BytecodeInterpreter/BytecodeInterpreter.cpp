@@ -105,7 +105,7 @@ ska::bytecode::Interpreter::Interpreter(Generator& generator, const ReservedKeyw
 }
 
 void ska::bytecode::Interpreter::interpret(ExecutionContext& node) {
-	for(auto continueExecution = !node.empty(); continueExecution; continueExecution = node.incInstruction()) {
+	for(auto continueExecution = !node.idle(); continueExecution; continueExecution = node.incInstruction()) {
 		auto& instruction = node.currentInstruction();
 		LOG_INFO << "Interpreting " << instruction;
 		auto& builder = m_commandInterpreter[static_cast<std::size_t>(instruction.command())];
