@@ -95,35 +95,13 @@ namespace ska {
 		using Register = Value;
 
 		bool operator==(const Value& lhs, const Value& rhs);
-		bool operator==(const VariableRef& lhs, const VariableRef& rhs);
-		bool operator==(const ScriptVariableRef& lhs, const ScriptVariableRef& rhs);
 
-		inline std::ostream& operator<<(std::ostream& stream, const ScriptVariableRef& var) {
-			stream << var.variable;
-			return stream;
-		}
 	}
 
 
 }
 
 namespace std {
-	template<>
-	struct hash<ska::bytecode::ScriptVariableRef> {
-		size_t operator()(const ska::bytecode::ScriptVariableRef & x) const {
-			const size_t h1 = hash<std::size_t>()(x.script);
-			const size_t h2 = hash<std::size_t>()(x.variable);
-			return h1 ^ (h2 << 1);
-		}
-	};
-
-	template<>
-	struct hash<ska::bytecode::VariableRef> {
-		size_t operator()(const ska::bytecode::VariableRef& x) const {
-			return hash<std::size_t>()(x.variable);
-		}
-	};
-
 	template<>
 	struct hash<ska::bytecode::Value> {
 		size_t operator()(const ska::bytecode::Value & x) const {

@@ -66,11 +66,3 @@ std::string ska::bytecode::Value::toString() const {
 bool ska::bytecode::operator==(const Value& lhs, const Value& rhs) {
 	return lhs.m_content == rhs.m_content && lhs.m_type == rhs.m_type;
 }
-
-bool ska::bytecode::operator==(const ScriptVariableRef& lhs, const ScriptVariableRef& rhs) {
-	return lhs.script == rhs.script && lhs.variable == rhs.variable;
-}
-
-bool ska::bytecode::operator==(const VariableRef& lhs, const VariableRef& rhs) {
-	return lhs.variable == rhs.variable;
-}

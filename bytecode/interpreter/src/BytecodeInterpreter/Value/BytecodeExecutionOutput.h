@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include <vector>
-#include "BytecodeScriptExecution.h"
+#include "BytecodeInterpreter/BytecodeScriptExecution.h"
 
 namespace ska {
 	namespace bytecode {
