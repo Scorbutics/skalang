@@ -263,3 +263,13 @@ TEST_CASE("[BytecodeInterpreter] Outside script from file (import) and use") {
 	auto cellValue = res.nodeval<long>();
 	CHECK(cellValue == 10);
 }
+
+
+TEST_CASE("[BytecodeInterpreter] Use 2x same script : ensure we do not try to recompile neither rerun it") {
+	constexpr auto progStr =
+		"var Character270 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
+		"var Character272 = import \"" SKALANG_TEST_DIR "/src/resources/character\";";
+	auto [script, data] = Interpret(progStr);
+	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
+}
