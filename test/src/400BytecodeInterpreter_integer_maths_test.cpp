@@ -270,8 +270,24 @@ TEST_CASE("[BytecodeInterpreter] Use 2x same script : ensure we do not try to re
 		"var Character270 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
 		"var Character272 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
 		"Character270.default.age;"
-		"Character272.default.age;";
+		"var t = Character272.default.age;";
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(data.storage, std::move(script));
 	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
+	auto cellValue = res.nodeval<long>();
+	CHECK(cellValue == 10);
+}
+
+
+TEST_CASE("[BytecodeInterpreter] Use 2x same script and modifying a value in first import var : should modify also value in second import var") {
+	constexpr auto progStr =
+		"var Character270 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
+		"var Character272 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
+		"Character270.default.age = 123;"
+		"var t = Character272.default.age;";
+	auto [script, data] = Interpret(progStr);
+	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto res = data.interpreter->interpret(gen.script("main").first,gen)->variable(0);
+	auto cellValue = res.nodeval<long>();
+	CHECK(cellValue == 123);
 }
