@@ -5,7 +5,6 @@ SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(SCRIPT)(ExecutionContext& context, 
 	const auto importedScriptIndex = cell.as<ScriptVariableRef>().variable;
 	context.generateIfNeeded(m_generator, importedScriptIndex);
 	auto importedScriptExecutionContext = ExecutionContext {context, importedScriptIndex};
-	//context.
 	m_interpreter.interpret(importedScriptExecutionContext);
 	return importedScriptExecutionContext.generateExportedVariables(importedScriptIndex);
 }

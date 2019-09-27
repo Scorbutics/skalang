@@ -75,9 +75,11 @@ const ska::bytecode::SymbolInfo* ska::bytecode::GenerationOutput::getSymbolInfo(
 
 const std::vector<ska::bytecode::Value>& ska::bytecode::GenerationOutput::generateExportedSymbols(std::size_t scriptIndex) const {
 	if (m_storage.output[scriptIndex].exportedSymbols().empty()) {
+		SLOG(ska::LogLevel::Info) << "%11cGenerating exported symbols for script \"" << scriptIndex << "\"";
 		auto temporarySortedScriptSymbols = std::priority_queue<SymbolWithInfo>{};
 		for (const auto& data : m_symbolInfo) {
 			if (data.second.exported && data.second.script == scriptIndex) {
+				SLOG(ska::LogLevel::Info) << "%11c\tFound symbol " << data.first->getName() << " with info " << data.second;
 				temporarySortedScriptSymbols.push(SymbolWithInfo{ data.first, &data.second });
 			}
 		}
@@ -85,6 +87,8 @@ const std::vector<ska::bytecode::Value>& ska::bytecode::GenerationOutput::genera
 		if (!temporarySortedScriptSymbols.empty()) {
 			m_storage.output[scriptIndex].setExportedSymbols(m_storage.services[scriptIndex].generateExportedSymbols(std::move(temporarySortedScriptSymbols)));
 		}
+	} else {
+		SLOG(ska::LogLevel::Info) << "%11cNo generation of exported symbols for script \"" << scriptIndex << "\" required";
 	}
 	return m_storage.output[scriptIndex].exportedSymbols();
 }

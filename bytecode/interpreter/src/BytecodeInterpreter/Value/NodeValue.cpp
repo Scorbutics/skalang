@@ -49,7 +49,7 @@ std::string ska::bytecode::NodeValue::convertString() const {
 			} else if constexpr (std::is_same<T, VariableRef>::value) {
 				result = std::to_string(arg.variable);
 			} else if constexpr (std::is_same<T, ScriptVariableRef>::value) {
-				result = std::to_string(arg.variable);
+				result = std::to_string(arg.script) + ":" + std::to_string(arg.variable);
 			} else if constexpr (std::is_same<T, bool>::value) {
 				result = arg ? "true" : "false";
 			} else if constexpr (std::is_same<T, StringShared>::value) {

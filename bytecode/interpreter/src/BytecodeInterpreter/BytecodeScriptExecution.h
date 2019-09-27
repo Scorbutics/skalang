@@ -67,7 +67,7 @@ namespace ska {
 
 			NodeValue lastVariable() const { assert(!variables.empty()); return variables.back(); }
 
-			const NodeValueArray* exports() const { return m_exportsSection != nullptr ? &m_exportsSection : nullptr; }
+			const NodeValueArray& exports() const { return m_exportsSection; }
 			void setExportsSection(NodeValueArray exportsSection) { m_exportsSection = std::move(exportsSection); }
 
 		private:

@@ -12,9 +12,10 @@ ska::bytecode::NodeValue ska::bytecode::ScriptExecution::getCell(const Value& v)
 		std::visit([&](const auto& content) {
 			using TypeT = std::decay_t<decltype(content)>;
 			if constexpr (std::is_same_v<ScriptVariableRef, TypeT>) {
-				throw std::runtime_error("invalid cell");
-			}
-			else {
+				auto ss = std::stringstream{};
+				ss << "invalid cell : memory type " << v.type();
+				throw std::runtime_error(ss.str());
+			} else {
 				output = content;
 			}
 		}, v.content());

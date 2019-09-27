@@ -50,8 +50,19 @@ namespace ska {
 			EMPTY
 		};
 
+		static constexpr const char* ValueTypeSTR[] = {
+			"PURE",
+			"VAR",
+			"REG",
+			""
+		};
+
+		static inline std::ostream& operator<<(std::ostream& stream, const ValueType& val) {
+			stream << ValueTypeSTR[static_cast<std::size_t>(val)];
+			return stream;
+		}
+
 		struct Value {
-			
 			template<typename T, typename VARIANT_T>
 			struct isVariantMember;
 
