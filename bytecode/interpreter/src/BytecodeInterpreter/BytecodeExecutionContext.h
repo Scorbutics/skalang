@@ -5,6 +5,7 @@
 #include "Value/TokenVariant.h"
 #include "BytecodeInterpreter/Value/BytecodeExecutionOutput.h"
 #include "BytecodeInterpreter/Value/ScriptExecutionOutput.h"
+#include "BytecodeScriptExecution.h"
 
 namespace ska {
 	namespace bytecode {
@@ -29,7 +30,7 @@ namespace ska {
 
 			bool incInstruction() { return m_current->incInstruction(); }
 
-			NodeValue getCell(const Value& v) const { return scriptFromValue(v)->getCell(v); }
+			NodeValue getCell(const Value& v) const { return scriptFromValue(v).getCell(v); }
 
 			void pop(NodeValue& dest) { m_container.pop(dest); }
 
@@ -50,17 +51,17 @@ namespace ska {
 
 			template <class T>
 			T get(const Value& v) {
-				return scriptFromValue(v)->get<T>(v);
+				return scriptFromValue(v).get<T>(v);
 			}
 
-			ScriptExecution* scriptFromValue(const Value& v);
-			const ScriptExecution* scriptFromValue(const Value& v) const;
+			ScriptExecution& scriptFromValue(const Value& v);
+			const ScriptExecution& scriptFromValue(const Value& v) const;
 
 			template <class T>
 			void set(const Value& dest, T&& src) {
-				scriptFromValue(dest)->set(dest, std::forward<T>(src));
+				scriptFromValue(dest).set(dest, std::forward<T>(src));
 			}
-		
+
 			ScriptExecutionOutput generateExportedVariables(std::size_t scriptIndex);
 
 			const ScriptGenerationOutput& generateIfNeeded(Generator& generator, std::size_t scriptIndex);
