@@ -273,3 +273,21 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation 3 (double field function
 		{ska::bytecode::Command::POP, "R7"}
 	});
 }
+
+TEST_CASE("[BytecodeGenerator] Field access affectation") {
+	constexpr auto progStr =
+		"var toto = function() : var {"
+			"var priv_test = 123;"
+			"return {"
+				"test : priv_test,"
+				"say : function(more : string) : string {"
+					"var s = \"lol\" + priv_test + more;"
+					"return s;"
+				"}"
+			"};"
+		"};"
+		"var t = toto();"
+		"t.test = 1122;";
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
+	auto gen = data.generator->generate(data.storage, std::move(astPtr));
+}

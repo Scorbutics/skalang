@@ -10,13 +10,18 @@ namespace ska {
 	namespace bytecode {
 		template <class Generator>
 		static ScriptGenerationOutput CommonGenerate(Generator& generator, const ASTNode& dest, const ska::ASTNode& node, GenerationContext& context) {
-			auto valueGroup = generator.generateNext({ context, node });
-			if((dest.symbol() != node.symbol() || node.symbol() == nullptr) && !valueGroup.empty()) {
-				LOG_DEBUG << "Creating MOV instruction with value " << valueGroup;
-				valueGroup.push(Instruction { Command::MOV, context.querySymbolOrValue(dest), valueGroup.value() });
-				LOG_DEBUG << "\tin value " << valueGroup.value();
+			auto finalGroup = generator.generateNext({ context, node });
+			auto valueDestination = finalGroup.value();
+			if((dest.symbol() != node.symbol() || node.symbol() == nullptr) && !finalGroup.empty()) {
+				LOG_DEBUG << "Creating MOV instruction with value " << finalGroup;
+				auto variable = dest.symbol() != nullptr ? ScriptGenerationOutput{context.querySymbolOrValue(dest)} : generator.generateNext({ context, dest });
+				auto variableDestination = variable.value();
+
+				finalGroup.push(std::move(variable));
+				finalGroup.push(Instruction { Command::MOV, variableDestination, valueDestination });
+				LOG_DEBUG << "\tin value " << valueDestination;
 			}
-			return valueGroup;
+			return finalGroup;
 		}
 	}
 }

@@ -43,7 +43,7 @@
 #include "Units/InterpreterCommandScript.h"
 #include "InterpreterDeclarer.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::Interpreter);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Interpreter);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Interpreter)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Interpreter)
@@ -112,14 +112,13 @@ void ska::bytecode::Interpreter::interpret(ExecutionContext& node) {
 		assert(builder != nullptr);
 		auto nodeValue = builder->interpret(node);
 		if (!nodeValue.empty()) {
+			LOG_DEBUG << "Setting " << nodeValue.convertString() << " for " << instruction.dest();
 			node.set(instruction.dest(), std::move(nodeValue));
 		}
 	}
 }
 
 std::unique_ptr<ska::bytecode::ExecutionOutput> ska::bytecode::Interpreter::interpret(std::size_t scriptIndex, GenerationOutput& instructions) {
-	LOG_DEBUG << "Interpreting " << instructions;
-
 	auto output = std::make_unique<ska::bytecode::ExecutionOutput>();
 	auto context = ExecutionContext {*output, scriptIndex, instructions };
 	interpret(context);

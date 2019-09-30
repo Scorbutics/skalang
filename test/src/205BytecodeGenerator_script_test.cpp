@@ -86,6 +86,16 @@ TEST_CASE("[BytecodeGenerator] Outside script from file (import) and use") {
 	//CHECK(res.nodeval<int>() == 10);
 }
 
+TEST_CASE("[BytecodeGenerator] Use 2x same script and modifying a value in first import var : should modify also value in second import var") {
+	constexpr auto progStr =
+		"var Character91 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
+		"var Character92 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
+		"Character91.default.age = 123;"
+		"var t = Character92.default.age;";
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
+	auto gen = data.generator->generate(data.storage, std::move(astPtr));
+}
+
 TEST_CASE("[BytecodeGenerator] C++ 1 script-function binding") {
 	/*auto [astPtr, data] = ASTFromInputBytecodeGenerator("var User77 = import \"bind:binding\"; User77.funcTest(14, \"titito\");");
 	auto res = data.generator->generate(std::move(astPtr));
