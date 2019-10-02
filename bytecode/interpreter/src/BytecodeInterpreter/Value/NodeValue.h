@@ -59,14 +59,16 @@ namespace ska {
 
 			NodeValue(NodeValue&&) noexcept = default;
 
-			NodeValue& operator=(NodeValue&& arg) {
+			NodeValue& operator=(NodeValue&& arg) noexcept {
 				transferValueToOwned(std::move(arg.m_variant));
 				m_emptyVariant = arg.m_emptyVariant;
+				return *this;
 			}
 
 			NodeValue& operator=(const NodeValue& arg) {
 				transferValueToOwned(arg.m_variant);
 				m_emptyVariant = arg.m_emptyVariant;
+				return *this;
 			}
 
 			NodeValue(const NodeValue&) = default;

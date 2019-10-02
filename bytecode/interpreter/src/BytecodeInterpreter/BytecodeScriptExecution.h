@@ -65,7 +65,10 @@ namespace ska {
 			auto index() const { return scriptIndex; }
 			ScriptVariableRef snapshot() const { return ScriptVariableRef{ executionPointer, scriptIndex }; }
 
-			NodeValue lastVariable() const { assert(!variables.empty()); return variables.back(); }
+			NodeValue lastVariable() const { 
+				assert(!variables.empty()); 
+				return variables.back();
+			}
 
 			const NodeValueArray& exports() const { return m_exportsSection; }
 			void setExportsSection(NodeValueArray exportsSection) { m_exportsSection = std::move(exportsSection); }
