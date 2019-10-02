@@ -14,11 +14,13 @@
 namespace ska {
 	namespace bytecode {
 		class ExecutionContext;
+		class NodeValue;
 
 		using NodeValueVariant_ = std::variant<
 			TokenVariant,
 			NodeValueArray,
-			NodeValueMap
+			NodeValueMap,
+			NodeValue*
 		>;
 
 		namespace detail {
@@ -38,10 +40,10 @@ namespace ska {
 
 			template <class Arg>
 			NodeValue(Arg&& arg) {
-				if constexpr(std::is_same_v<NodeValue, std::decay_t<Arg>>) {
+				if constexpr(std::is_same_v<NodeValue, std::remove_const_t<std::remove_reference_t<Arg>>>) {
 					*this = std::forward<Arg>(arg);
 				} else {
-					m_variant = std::forward<Arg>(arg);
+					transferValueToOwned(std::forward<Arg>(arg));
 				}
 			}
 
@@ -57,9 +59,17 @@ namespace ska {
 
 			NodeValue(NodeValue&&) noexcept = default;
 
-			NodeValue& operator=(NodeValue&&) noexcept = default;
+			NodeValue& operator=(NodeValue&& arg) {
+				transferValueToOwned(std::move(arg.m_variant));
+				m_emptyVariant = arg.m_emptyVariant;
+			}
+
+			NodeValue& operator=(const NodeValue& arg) {
+				transferValueToOwned(arg.m_variant);
+				m_emptyVariant = arg.m_emptyVariant;
+			}
+
 			NodeValue(const NodeValue&) = default;
-			NodeValue& operator=(const NodeValue&) = default;
 			~NodeValue() = default;
 
 			template<class T> auto& as() { return std::get<T>(m_variant); }
@@ -76,18 +86,30 @@ namespace ska {
 
 			template <class Converted>
 			Converted& nodeval() {
+				if(std::holds_alternative<NodeValue*>(m_variant)) {
+					SLOG(LogLevel::Debug) << "Reference";
+					return std::get<NodeValue*>(m_variant)->nodeval <Converted>();
+				}
 				if constexpr(detail::isVariantMember<Converted, TokenVariant>::value) {
+					SLOG(LogLevel::Debug) << "Pure value \"" << convertString() << "\"";
 					return std::get<Converted>(std::get<TokenVariant>(m_variant));
 				} else {
+					SLOG(LogLevel::Debug) << "Direct value";
 					return std::get<Converted>(m_variant);
 				}
 			}
 
 			template <class Converted>
 			const Converted& nodeval() const {
+				if(std::holds_alternative<NodeValue*>(m_variant)) {
+					SLOG(LogLevel::Debug) << "Reference";
+					return std::get<NodeValue*>(m_variant)->nodeval <Converted>();
+				}
 				if constexpr(detail::isVariantMember<Converted, TokenVariant>::value) {
+					SLOG(LogLevel::Debug) << "Pure value \"" << convertString() << "\"";
 					return std::get<Converted>(std::get<TokenVariant>(m_variant));
 				} else {
+					SLOG(LogLevel::Debug) << "Direct value";
 					return std::get<Converted>(m_variant);
 				}
 			}
@@ -95,6 +117,9 @@ namespace ska {
 			friend bool operator==(const NodeValue& lhs, const NodeValue& rhs);
 
 		private:
+			void transferValueToOwned(NodeValueVariant_ arg);
+			static bool isReference(const NodeValueVariant_& arg);
+
 			NodeValueVariant_ m_variant;
 			bool m_emptyVariant = false;
 		};

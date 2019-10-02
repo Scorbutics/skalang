@@ -4,8 +4,13 @@
 #include "NodeValue.h"
 #include "NodeValue/StringShared.h"
 
- double ska::bytecode::NodeValue::convertNumeric() const {
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::NodeValue);
+
+double ska::bytecode::NodeValue::convertNumeric() const {
 	double numeric = 0.0;
+	if(std::holds_alternative<NodeValue*>(m_variant)) {
+		return std::get<NodeValue*>(m_variant)->convertNumeric();
+	}
 	const auto& valueVariant = std::get<TokenVariant>(m_variant);
 	std::visit([&numeric](auto && arg){
 		using T = std::decay_t<decltype(arg)>;
@@ -37,6 +42,9 @@
 
 std::string ska::bytecode::NodeValue::convertString() const {
 	auto result = std::string{};
+	if(std::holds_alternative<NodeValue*>(m_variant)) {
+		return std::get<NodeValue*>(m_variant)->convertString();
+	}
 	if(std::holds_alternative<TokenVariant>(m_variant)) {
 		const auto& valueVariant = std::get<TokenVariant>(m_variant);
 		std::visit([&result](auto && arg) {
@@ -60,6 +68,21 @@ std::string ska::bytecode::NodeValue::convertString() const {
 		}, valueVariant);
 	}
 	return result;
+}
+
+void ska::bytecode::NodeValue::transferValueToOwned(NodeValueVariant_ arg) {
+	if(isReference(m_variant)) {
+		SLOG(LogLevel::Debug) << "%10cReference detected, reassigning refered value";
+		auto& referedObject = *std::get<NodeValue*>(m_variant);
+		referedObject = arg;
+	} else {
+		m_variant = std::move(arg);
+		SLOG(LogLevel::Debug) << "%10cAssigning direct value " << convertString();
+	}
+}
+
+bool ska::bytecode::NodeValue::isReference(const NodeValueVariant_& arg) {
+	return std::holds_alternative<NodeValue*>(arg);
 }
 
 namespace ska {
