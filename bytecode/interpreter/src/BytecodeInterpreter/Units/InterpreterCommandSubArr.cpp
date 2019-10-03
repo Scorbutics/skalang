@@ -1,8 +1,14 @@
+#include "Config/LoggerConfigLang.h"
 #include "InterpreterCommandSubArr.h"
 
+using InterpreterCommand = ska::bytecode::InterpreterCommand<ska::bytecode::Command::SUB_ARR>;
+
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, InterpreterCommand);
+#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, InterpreterCommand)
+
 SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(SUB_ARR)(ExecutionContext& context, const Value& left, const Value& right) {
-  auto& leftSide = *context.get<NodeValueArray>(left);
-	auto& rightSide = *context.get<NodeValueArray>(right);
+  auto leftSide = *context.get<NodeValueArray>(left);
+	auto rightSide = *context.get<NodeValueArray>(right);
 
   if(rightSide.empty()) {
     return context.get<NodeValueArray>(left);
@@ -29,9 +35,13 @@ SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(SUB_ARR)(ExecutionContext& context,
     lastVal = firstVal;
   }
 
-  auto container = context.get<NodeValueArray>(left);
-  for(std::size_t i = 0; i < leftSide.size(); i = (i >= firstVal && i <= lastVal) ? lastVal + 1 : i + 1 ) {
-    container->push_back(leftSide[i]);
+  LOG_DEBUG << "Range to delete : from " << firstVal << " to " << lastVal << " on an array of " << leftSide.size() << " elements";
+
+  auto container = std::make_shared<NodeValueArrayRaw>();
+  for(std::size_t i = 0; i < leftSide.size(); i++) {
+    if (i < firstVal || i > lastVal) {
+      container->push_back(leftSide[i]);
+    }
   }
 	return container;
 
