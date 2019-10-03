@@ -5,8 +5,8 @@
 
 ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::ARRAY_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	auto result = ScriptGenerationOutput{ };
-	ApplyNOperations<Command::PUSH>(result, context, node);
-	result.push(Instruction { Command::POP_IN_ARR, context.script().queryNextRegister() });
+	auto totalPushedElements = ApplyNOperations<Command::PUSH>(result, context, node);
+	result.push(Instruction { Command::POP_IN_ARR, context.script().queryNextRegister(), Value { static_cast<long>(totalPushedElements) } });
 	return result;
 }
 

@@ -98,9 +98,9 @@ TEST_CASE("[BytecodeGenerator] conditional arrays") {
 	auto res = data.generator->generate(data.storage, std::move(astPtr));
 	BytecodeCompare(res, {
 		{Command::PUSH, "4"},
-		{Command::POP_IN_ARR, "R0"},
+		{Command::POP_IN_ARR, "R0", "1"},
 		{Command::PUSH, "1"},
-		{Command::POP_IN_ARR, "R1"},
+		{Command::POP_IN_ARR, "R1", "1"},
 		{Command::CMP_ARR, "R2", "R0", "R1"},
 		{Command::TEST_EQ, "R2", "R2"}
 	});

@@ -106,7 +106,7 @@ TEST_CASE("[BytecodeGenerator] type conversion + int => array (back)") {
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::PUSH, "7", "12", "25"},
-		{ska::bytecode::Command::POP_IN_ARR, "R0"},
+		{ska::bytecode::Command::POP_IN_ARR, "R0", "3"},
 		{ska::bytecode::Command::PUSH_B_ARR, "R1", "R0", "3"},
 		{ska::bytecode::Command::MOV, "V0", "R1"}
 	});
@@ -118,7 +118,7 @@ TEST_CASE("[BytecodeGenerator] type conversion + int => array (front)") {
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::PUSH, "7", "12", "25"},
-		{ska::bytecode::Command::POP_IN_ARR, "R0"},
+		{ska::bytecode::Command::POP_IN_ARR, "R0", "3"},
 		{ska::bytecode::Command::PUSH_F_ARR, "R1", "3", "R0"},
 		{ska::bytecode::Command::MOV, "V0", "R1"}
 	});

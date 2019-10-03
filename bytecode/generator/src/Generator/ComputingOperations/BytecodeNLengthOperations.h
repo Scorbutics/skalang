@@ -7,7 +7,7 @@
 namespace ska {
   namespace bytecode {
     template <Command command, class NodeIterable, size_t Modulo = 3>
-		void ApplyNOperations(ScriptGenerationOutput& output, GenerationContext& script, NodeIterable&& node,  std::size_t maxSize = std::numeric_limits<std::size_t>::max()) {
+		std::size_t ApplyNOperations(ScriptGenerationOutput& output, GenerationContext& script, NodeIterable&& node,  std::size_t maxSize = std::numeric_limits<std::size_t>::max()) {
 			auto temporaryContainer = std::vector<Value> {};
 
 			std::size_t index = 0u;
@@ -25,6 +25,7 @@ namespace ska {
 			if (!temporaryContainer.empty()) {
 				output.push(Instruction{ command, std::move(temporaryContainer)});
 			}
+			return index;
 		}
   }
 }

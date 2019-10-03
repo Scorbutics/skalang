@@ -89,7 +89,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion array") {
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::PUSH, "3"},
-		{ska::bytecode::Command::POP_IN_ARR, "R0"},
+		{ska::bytecode::Command::POP_IN_ARR, "R0", "1"},
 		{ska::bytecode::Command::MOV, "V0", "R0"}
 	});
 }
@@ -100,9 +100,9 @@ TEST_CASE("[BytecodeGenerator] no type conversion array + array") {
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::PUSH, "3"},
-		{ska::bytecode::Command::POP_IN_ARR, "R0"},
+		{ska::bytecode::Command::POP_IN_ARR, "R0", "1"},
 		{ska::bytecode::Command::PUSH, "7", "12", "25"},
-		{ska::bytecode::Command::POP_IN_ARR, "R1"},
+		{ska::bytecode::Command::POP_IN_ARR, "R1", "3"},
 		{ska::bytecode::Command::PUSH_ARR_ARR, "R2", "R0", "R1"},
 		{ska::bytecode::Command::MOV, "V0", "R2"}
 	});
@@ -134,9 +134,9 @@ TEST_CASE("[BytecodeGenerator] no type conversion array - array") {
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::PUSH, "11", "4", "9"},
-		{ska::bytecode::Command::POP_IN_ARR, "R0"},
+		{ska::bytecode::Command::POP_IN_ARR, "R0", "3"},
 		{ska::bytecode::Command::PUSH, "1", "2"},
-		{ska::bytecode::Command::POP_IN_ARR, "R1"},
+		{ska::bytecode::Command::POP_IN_ARR, "R1", "2"},
 		{ska::bytecode::Command::SUB_ARR, "R2", "R0", "R1"},
 		{ska::bytecode::Command::MOV, "V0", "R2"}
 	});
