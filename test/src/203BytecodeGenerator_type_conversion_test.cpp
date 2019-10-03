@@ -75,11 +75,11 @@ TEST_CASE("[BytecodeGenerator] type conversion + int => string") {
 }
 
 /*
-//TODO : conversion unsupported atm
+// TODO: Unsupported atm (Unable to use operator "+" on types "float" and "string")
 
 TEST_CASE("[BytecodeGenerator] type conversion + float => string") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 7.0 + \"3\";");
-	auto res = data.generator->generate(std::move(astPtr));
+	auto res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::CONV_D_STR, "R1", "7.0"},

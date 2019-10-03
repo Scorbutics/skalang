@@ -56,13 +56,12 @@ TEST_CASE("[BytecodeInterpreter] type conversion + int => string") {
 
 TEST_CASE("[BytecodeInterpreter] type conversion + float => string") {
 	static constexpr auto progStr = "var result = 7.0 + \"3\";";
-	auto res = data.generator->generate(std::move(astPtr));
-
-	BytecodeCompare(res, {
-		{ska::bytecode::Command::CONV_D_STR, "R1", "7.0"},
-		{ska::bytecode::Command::ADD_STR, "R0", "R1", "3"},
-		{ska::bytecode::Command::MOV, "V0", "R0"}
-	});
+	auto [script, data] = Interpret(progStr);
+	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
+	auto res = interpreted->variable(0);
+	auto firstCellValue = res.nodeval<ska::StringShared>();
+  CHECK(*firstCellValue == "7.03");
 }
 */
 
