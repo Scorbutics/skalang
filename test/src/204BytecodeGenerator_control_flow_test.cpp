@@ -70,7 +70,7 @@ TEST_CASE("[BytecodeGenerator] empty if") {
 	auto res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
-		{ Command::JUMP_NIF, "1", "0" }
+		{ Command::JUMP_NIF, "0", "1" }
 	});
 }
 
@@ -91,7 +91,7 @@ TEST_CASE("[BytecodeGenerator] if else with body") {
 	BytecodeCompare(res, {
 		{ Command::SUB_I, "R0", "3", "2" },
 		{ Command::TEST_G, "R0", "R0" },
-		{ Command::JUMP_NIF, "R0", "3" },
+		{ Command::JUMP_NIF, "3", "R0" },
 		{ Command::ADD_I, "R1", "1", "3" },
 		{ Command::MOV, "V0", "R1" },
 		{ Command::JUMP_REL, "4" },
@@ -124,7 +124,7 @@ TEST_CASE("[BytecodeGenerator] for without body") {
 		// Check part
 		{ Command::SUB_I, "R0", "V0", "10" },
 		{ Command::TEST_L, "R0", "R0" },
-		{ Command::JUMP_NIF, "R0", "3" },
+		{ Command::JUMP_NIF, "3", "R0" },
 		
 		// Body part
 		
@@ -146,7 +146,7 @@ TEST_CASE("[BytecodeGenerator] for with body") {
 		// Check part
 		{ Command::SUB_I, "R0", "V0", "10" },
 		{ Command::TEST_L, "R0", "R0" },
-		{ Command::JUMP_NIF, "R0", "5" },
+		{ Command::JUMP_NIF, "5", "R0" },
 		
 		// Body part
 		{ Command::MOV, "V1", "123" },

@@ -138,3 +138,33 @@ TEST_CASE("[BytecodeInterpreter] conditional arrays") {
 	auto cellValue = res.nodeval<bool>();
   CHECK(cellValue == false);
 }
+
+TEST_CASE("[BytecodeInterpreter] if : if body") {
+	static constexpr auto progStr =
+	"var t = false;"
+	"if ([18] == [18]) {"
+	"t = true;"
+	"}";
+	auto [script, data] = Interpret(progStr);
+	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
+	auto res = interpreted->variable(0);
+	auto cellValue = res.nodeval<bool>();
+  CHECK(cellValue == true);
+}
+
+TEST_CASE("[BytecodeInterpreter] if : else body") {
+	static constexpr auto progStr =
+	"var t = 0;"
+	"if ([18] == [1124]) {"
+	"t = 1;"
+	"} else {"
+	"t = 2;"
+	"}";
+	auto [script, data] = Interpret(progStr);
+	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
+	auto res = interpreted->variable(0);
+	auto cellValue = res.nodeval<long>();
+  CHECK(cellValue == 2);
+}

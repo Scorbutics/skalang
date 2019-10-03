@@ -41,6 +41,7 @@
 #include "Units/InterpreterCommandConvIStr.h"
 #include "Units/InterpreterCommandArrAccess.h"
 #include "Units/InterpreterCommandScript.h"
+#include "Units/InterpreterCommandJumpNif.h"
 #include "InterpreterDeclarer.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::Interpreter);
@@ -93,6 +94,7 @@ ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build
 	InterpreterCommandDeclare<Command::POP_IN_VAR>(*this, result, generator);
 	InterpreterCommandDeclare<Command::JUMP_ABS>(*this, result, generator);
 	InterpreterCommandDeclare<Command::JUMP_REL>(*this, result, generator);
+	InterpreterCommandDeclare<Command::JUMP_NIF>(*this, result, generator);
 
 	InterpreterCommandDeclare<Command::ARR_ACCESS>(*this, result, generator);
 	InterpreterCommandDeclare<Command::SCRIPT>(*this, result, generator);
