@@ -41,25 +41,12 @@ static std::pair<ska::bytecode::ScriptGenerationService, BytecodeInterpreterData
 	return std::make_pair<ska::bytecode::ScriptGenerationService, BytecodeInterpreterDataTestContainer>(ska::bytecode::ScriptGenerationService{0, *readerI }, std::move(data));
 }
 
-struct BytecodePart {
-	ska::bytecode::Command command;
-	std::string dest;
-	std::string left;
-	std::string right;
-};
-
-TEST_CASE("[BytecodeInterpreter] equal int (false)") {
-	static constexpr auto progStr = "var t = 4 == 1;";
-	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
-	auto res = interpreted->variable(0);
-	auto cellValue = res.nodeval<bool>();
-  CHECK(cellValue == false);
-}
-
-TEST_CASE("[BytecodeInterpreter] equal int (true)") {
-	static constexpr auto progStr = "var t = 41 == 41;";
+TEST_CASE("[BytecodeInterpreter] if : if body") {
+	static constexpr auto progStr =
+	"var t = false;"
+	"if ([18] == [18]) {"
+	"t = true;"
+	"}";
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
@@ -68,73 +55,38 @@ TEST_CASE("[BytecodeInterpreter] equal int (true)") {
   CHECK(cellValue == true);
 }
 
-TEST_CASE("[BytecodeInterpreter] conditional strings") {
-	static constexpr auto progStr = "var t = \"4\" == \"1\";";
+TEST_CASE("[BytecodeInterpreter] if : else body") {
+	static constexpr auto progStr =
+	"var t = 0;"
+	"if ([18] == [1124]) {"
+	"t = 1;"
+	"} else {"
+	"t = 2;"
+	"}";
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
 	auto res = interpreted->variable(0);
-	auto cellValue = res.nodeval<bool>();
-  CHECK(cellValue == false);
-
+	auto cellValue = res.nodeval<long>();
+  CHECK(cellValue == 2);
 }
 
-TEST_CASE("[BytecodeInterpreter] different") {
-	static constexpr auto progStr = "var t = 3 != 1;";
+TEST_CASE("[BytecodeInterpreter] for without body") {
+	static constexpr auto progStr = "for(var i = 0; i < 10; i = i + 1);";
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
 	auto res = interpreted->variable(0);
-	auto cellValue = res.nodeval<bool>();
-  CHECK(cellValue == true);
+	auto cellValue = res.nodeval<long>();
+  CHECK(cellValue == 10);
 }
 
-TEST_CASE("[BytecodeInterpreter] greater than") {
-	static constexpr auto progStr = "var t = 3 > 1;";
+TEST_CASE("[BytecodeInterpreter] for with body") {
+	static constexpr auto progStr = "var toto = 123; for(var i = 0; i < 10; i = i + 1) { toto = toto + i * 2; } var test = toto;";
 	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
 	auto res = interpreted->variable(0);
-	auto cellValue = res.nodeval<bool>();
-  CHECK(cellValue == true);
-}
-
-TEST_CASE("[BytecodeInterpreter] greater than or equal") {
-	static constexpr auto progStr = "var t = 3 >= 1;";
-	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
-	auto res = interpreted->variable(0);
-	auto cellValue = res.nodeval<bool>();
-  CHECK(cellValue == true);
-}
-
-TEST_CASE("[BytecodeInterpreter] lesser than") {
-	static constexpr auto progStr = "var t = 3 < 1;";
-	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
-	auto res = interpreted->variable(0);
-	auto cellValue = res.nodeval<bool>();
-  CHECK(cellValue == false);
-}
-
-TEST_CASE("[BytecodeInterpreter] lesser than or equal") {
-	static constexpr auto progStr = "var t = 3 <= 1;";
-	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
-	auto res = interpreted->variable(0);
-	auto cellValue = res.nodeval<bool>();
-  CHECK(cellValue == false);
-}
-
-TEST_CASE("[BytecodeInterpreter] conditional arrays") {
-	static constexpr auto progStr = "var t = [4] == [1];";
-	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
-	auto res = interpreted->variable(0);
-	auto cellValue = res.nodeval<bool>();
-  CHECK(cellValue == false);
+	auto cellValue = res.nodeval<long>();
+  CHECK(cellValue == 213);
 }
