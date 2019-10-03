@@ -88,30 +88,17 @@ namespace ska {
 
 			template <class Converted>
 			Converted& nodeval() {
-				if(std::holds_alternative<NodeValue*>(m_variant)) {
-					SLOG(LogLevel::Debug) << "Reference";
-					return std::get<NodeValue*>(m_variant)->nodeval <Converted>();
-				}
-				if constexpr(detail::isVariantMember<Converted, TokenVariant>::value) {
-					SLOG(LogLevel::Debug) << "Pure value \"" << convertString() << "\"";
-					return std::get<Converted>(std::get<TokenVariant>(m_variant));
-				} else {
-					SLOG(LogLevel::Debug) << "Direct value";
-					return std::get<Converted>(m_variant);
-				}
+				return const_cast<Converted&>(static_cast<const NodeValue&>(*this).nodeval<Converted>());
 			}
 
 			template <class Converted>
 			const Converted& nodeval() const {
 				if(std::holds_alternative<NodeValue*>(m_variant)) {
-					SLOG(LogLevel::Debug) << "Reference";
 					return std::get<NodeValue*>(m_variant)->nodeval <Converted>();
 				}
 				if constexpr(detail::isVariantMember<Converted, TokenVariant>::value) {
-					SLOG(LogLevel::Debug) << "Pure value \"" << convertString() << "\"";
 					return std::get<Converted>(std::get<TokenVariant>(m_variant));
 				} else {
-					SLOG(LogLevel::Debug) << "Direct value";
 					return std::get<Converted>(m_variant);
 				}
 			}
