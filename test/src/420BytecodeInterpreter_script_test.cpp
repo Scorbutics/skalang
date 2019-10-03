@@ -1,4 +1,3 @@
-#include <iostream>
 #include <doctest.h>
 #include <tuple>
 #include "Config/LoggerConfigLang.h"
@@ -49,80 +48,58 @@ struct BytecodePart {
 	std::string right;
 };
 
-TEST_CASE("[BytecodeInterpreter] literal alone") {
-	auto [script, data] = Interpret("4;");
-	auto gen = data.generator->generate(data.storage, std::move(script));
-	auto res = data.interpreter->interpret(gen.script("main").first,gen);
-}
-
-TEST_CASE("[BytecodeInterpreter] var declaration") {
-	auto [script, data] = Interpret("var toto = 4;");
-	auto gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
-	auto res = interpreted->variable(0);
-	CHECK(res.nodeval<long>() == 4);
-}
-
-TEST_CASE("[BytecodeInterpreter] var declaration from var") {
-	auto [script, data] = Interpret("var toto = 4; var titi = toto;");
+TEST_CASE("[BytecodeInterpreter] Outside script from file (import) and use") {
+	constexpr auto progStr = 
+		"var Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
+		"var player = Character184.build(\"Player\");"
+		"var enemy = Character184.default;"
+		"var t = enemy.age;";
+	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
 	auto res = interpreted->variable(0);
-	CHECK(res.nodeval<long>() == 4);
+	auto cellValue = res.nodeval<long>();
+	CHECK(cellValue == 10);
 }
 
-TEST_CASE("[BytecodeInterpreter] Basic Maths linear") {
-	auto [script, data] = Interpret("var t = 3 + 4 - 1;");
+TEST_CASE("[BytecodeInterpreter] Outside script from file (import) - edit - and use") {
+	constexpr auto progStr = 
+		"var Character260 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
+		"var enemy = Character260.default;"
+		"enemy.age = 99;"
+		"var t = enemy.age;";
+	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
 	auto res = interpreted->variable(0);
-	CHECK(res.nodeval<long>() == 6);
+	auto cellValue = res.nodeval<long>();
+	CHECK(cellValue == 99);
 }
 
-TEST_CASE("[BytecodeInterpreter] Basic Maths 1 left subpart") {
-	auto [script, data] = Interpret("var t = (3 + 4) * 2;");
+TEST_CASE("[BytecodeInterpreter] Use 2x same script : ensure we do not try to recompile neither rerun it") {
+	constexpr auto progStr =
+		"var Character270 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
+		"var Character272 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
+		"Character270.default.age;"
+		"var t = Character272.default.age;";
+	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
 	auto res = interpreted->variable(0);
-	CHECK(res.nodeval<long>() == 14);
+	auto cellValue = res.nodeval<long>();
+	CHECK(cellValue == 10);
 }
 
-TEST_CASE("[BytecodeInterpreter] Basic Maths 1 right subpart") {
-	auto [script, data] = Interpret("var t = 2 * (3 + 4);");
+TEST_CASE("[BytecodeInterpreter] Use 2x same script and modifying a value in first import var : should modify also value in second import var") {
+	constexpr auto progStr =
+		"var Character284 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
+		"var Character285 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
+		"Character284.default.age = 123;"
+		"var t = Character285.default.age;";
+	auto [script, data] = Interpret(progStr);
 	auto gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
 	auto res = interpreted->variable(0);
-	CHECK(res.nodeval<long>() == 14);
-}
-
-TEST_CASE("[BytecodeInterpreter] Basic Maths subparts") {
-	auto [script, data] = Interpret("var t = (3 + 4) * (1 + 2);");
-	auto gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
-	auto res = interpreted->variable(0);
-	CHECK(res.nodeval<long>() == 21);
-}
-
-TEST_CASE("[BytecodeInterpreter] Basic Maths with var") {
-	auto [script, data] = Interpret("var toto = 4; var t = (toto * 5) + 2 * (3 + 4 - 1 / 4) + 1 + 9;");
-	auto gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
-	auto res = interpreted->variable(0);
-	CHECK(res.nodeval<long>() == 44);
-}
-
-TEST_CASE("[BytecodeInterpreter] var expression declaration") {
-  auto [script, data] = Interpret("var result = 7 + 3;");
-	auto gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
-	auto res = interpreted->variable(0);
-	CHECK(res.nodeval<long>() == 10);
-}
-
-TEST_CASE("[BytecodeInterpreter] Introducing block sub-variable") {
-	auto [script, data] = Interpret("var toto = 4; { var toto = 5; toto + 1; } var t = toto + 1;");
-	auto gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
-	auto res = interpreted->variable(0);
-	CHECK(res.nodeval<long>() == 5);
+	auto cellValue = res.nodeval<long>();
+	CHECK(cellValue == 123);
 }
