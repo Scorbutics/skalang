@@ -1,7 +1,7 @@
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeGenerationOutput.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GenerationOutput);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GenerationOutput);
 
 ska::bytecode::GenerationOutput::GenerationOutput(BytecodeStorage& storage) :
 	m_storage(storage) {

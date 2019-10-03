@@ -4,7 +4,7 @@
 #include "NodeValue.h"
 #include "NodeValue/StringShared.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::NodeValue);
+SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::NodeValue);
 
 double ska::bytecode::NodeValue::convertNumeric() const {
 	double numeric = 0.0;
