@@ -15,7 +15,7 @@
 
 auto readerSTC = std::unique_ptr<ska::ScriptAST>{};
 
-static ska::ScriptAST ASTFromInputSemanticTC(std::unordered_map<std::string, ska::ScriptHandleASTPtr>& scriptCache, const std::string& input, DataTestContainer& data) {
+static ska::ScriptAST ASTFromInputSemanticTC(ska::ScriptCacheAST& scriptCache, const std::string& input, DataTestContainer& data) {
 
 	auto tokenizer = ska::Tokenizer { data.reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
@@ -31,7 +31,7 @@ static ska::ScriptAST ASTFromInputSemanticTC(std::unordered_map<std::string, ska
 
 TEST_CASE("[SymbolTableUpdater] update node symbol") {
 	DataTestContainer data;
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
+	auto scriptCache = ska::ScriptCacheAST{};
 
 	auto astPtr = ASTFromInputSemanticTC(scriptCache, "var i = 0; var titi = \"llllll\"; { var toto = 2; var i = titi; }", data);
 
@@ -55,7 +55,7 @@ TEST_CASE("[SymbolTableUpdater] update node symbol") {
 
 TEST_CASE("[SymbolTableUpdater] function declaration") {
 	DataTestContainer data;
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
+	auto scriptCache = ska::ScriptCacheAST{};
 
 	auto astPtr = ASTFromInputSemanticTC(scriptCache, "var toto = function() {};", data);
 
@@ -71,7 +71,7 @@ TEST_CASE("[SymbolTableUpdater] function declaration") {
 
 TEST_CASE("[SemanticTypeChecker]") {
     DataTestContainer data;
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
+	auto scriptCache = ska::ScriptCacheAST{};
 
 	SUBCASE("OK") {
         SUBCASE("boolean") {

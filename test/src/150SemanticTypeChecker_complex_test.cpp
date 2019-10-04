@@ -11,7 +11,7 @@
 #include "NodeValue/ScriptAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
-ska::ScriptAST ASTFromInputSemanticComplexTC(std::unordered_map<std::string, ska::ScriptHandleASTPtr>& scriptCache, const std::string& input, DataTestContainer& data) {
+ska::ScriptAST ASTFromInputSemanticComplexTC(ska::ScriptCacheAST& scriptCache, const std::string& input, DataTestContainer& data) {
 	const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
@@ -28,7 +28,7 @@ ska::ScriptAST ASTFromInputSemanticComplexTC(std::unordered_map<std::string, ska
 
 TEST_CASE("[SemanticTypeChecker Complex]") {
 	DataTestContainer data;
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
+	auto scriptCache = ska::ScriptCacheAST{};
 
 	SUBCASE("constructor with function field accessed through variable") {
 		ASTFromInputSemanticComplexTC(scriptCache,

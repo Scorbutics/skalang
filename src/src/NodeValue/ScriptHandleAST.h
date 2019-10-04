@@ -6,14 +6,9 @@
 #include "Service/TokenReader.h"
 #include "Token.h"
 
-
 namespace ska {
 	class ScriptAST;
-	
-	struct ScriptHandleAST;
-	using ScriptHandleASTPtr = std::unique_ptr<ScriptHandleAST>;
-	using ScriptCacheAST = std::unordered_map<std::string, ScriptHandleASTPtr>;
-
+	struct ScriptCacheAST;
 	struct ScriptHandleAST {
 	
 	public:

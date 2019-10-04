@@ -8,7 +8,7 @@
 #include "NodeValue/ScriptAST.h"
 
 auto reader = std::unique_ptr<ska::ScriptAST>{};
-ska::ScriptAST ASTFromInput(std::unordered_map<std::string, ska::ScriptHandleASTPtr>& scriptCache, const std::string& input, DataTestContainer& data) {
+ska::ScriptAST ASTFromInput(ska::ScriptCacheAST& scriptCache, const std::string& input, DataTestContainer& data) {
 	auto tokenizer = ska::Tokenizer { data.reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
 	reader = std::make_unique<ska::ScriptAST>(scriptCache, "main", tokens);
@@ -19,7 +19,7 @@ ska::ScriptAST ASTFromInput(std::unordered_map<std::string, ska::ScriptHandleAST
 
 TEST_CASE("test") {
     DataTestContainer data;
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
+	auto scriptCache = ska::ScriptCacheAST{};
 
     auto astPtr = ASTFromInput(scriptCache, "var i = 0; var titi = \"llllll\"; { var toto = 2; var i = 9; }", data);
     auto& table = reader->symbols();
@@ -46,7 +46,7 @@ TEST_CASE("Matching") {
 	
 	SUBCASE("Matching OK") {
         DataTestContainer data;
-		auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
+		auto scriptCache = ska::ScriptCacheAST{};
         SUBCASE("Overriding into subscope") {
 			auto astPtr = ASTFromInput(scriptCache, "var i = 0; i = 123; { i = 9; }", data);
 			auto& table = reader->symbols();
@@ -78,7 +78,7 @@ TEST_CASE("Matching") {
 
 	SUBCASE("Matching failed") {
 		DataTestContainer data;
-		auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
+		auto scriptCache = ska::ScriptCacheAST{};
         {
 			SUBCASE("Because of unknown symbol") {
 				try {

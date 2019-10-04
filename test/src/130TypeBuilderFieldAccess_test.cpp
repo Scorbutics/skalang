@@ -7,7 +7,7 @@
 
 TEST_CASE("[TypeBuilderFieldAccess]") {
 	DataTestContainer data;
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
+	auto scriptCache = ska::ScriptCacheAST{};
 	auto script = TypeBuilderTestCommonBuildAST(scriptCache, "var Factory = function() : var { var pdv = 0; return { pdv : pdv }; }; var obj = Factory(); obj.pdv;", data);
 	script.parse(*data.parser);
 

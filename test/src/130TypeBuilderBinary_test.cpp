@@ -8,7 +8,7 @@
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
 TEST_CASE("[TypeBuilderBinary]") {
-	auto scriptCache = std::unordered_map<std::string, ska::ScriptHandleASTPtr>{};
+	auto scriptCache = ska::ScriptCacheAST{};
 	DataTestContainer data;
 	auto script = TypeBuilderTestCommonBuildAST(scriptCache, "", data, false);
 	script.parse(*data.parser);

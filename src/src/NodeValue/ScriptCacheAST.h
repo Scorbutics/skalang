@@ -1,8 +1,10 @@
 #pragma once
-#include <string>
-#include <unordered_map>
+
 #include "ScriptHandleAST.h"
+#include "ScriptCacheBase.h"
 
 namespace ska {
-	using ScriptCacheAST = std::unordered_map<std::string, ScriptHandleASTPtr>;
+	struct ScriptCacheAST :
+		public ScriptCacheBase<ScriptHandleAST> {
+	};
 }

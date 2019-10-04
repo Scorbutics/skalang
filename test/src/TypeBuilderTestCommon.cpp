@@ -5,7 +5,7 @@
 #include "Service/SymbolTable.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
-ska::ScriptAST TypeBuilderTestCommonBuildAST(std::unordered_map<std::string, ska::ScriptHandleASTPtr>& scriptCache, const std::string& input, DataTestContainer& data, bool buildType) {
+ska::ScriptAST TypeBuilderTestCommonBuildAST(ska::ScriptCacheAST& scriptCache, const std::string& input, DataTestContainer& data, bool buildType) {
 	auto tokenizer = ska::Tokenizer{ data.reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
 	auto reader = ska::ScriptAST{scriptCache, "main", tokens };
