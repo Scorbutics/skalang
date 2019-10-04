@@ -13,7 +13,7 @@ namespace ska {
 		ExecutionContext() = default;
 		explicit ExecutionContext(ScriptHandle& program);
 		explicit ExecutionContext(Script& program);
-		ExecutionContext(Script& program, ASTNode& node);
+		ExecutionContext(Script& program, ASTNode& node, MemoryTablePtr memory = nullptr);
 
 		ASTNode& pointer() { assert(m_pointer != nullptr); return *m_pointer; }
 		ScriptHandle& program() { assert(m_program != nullptr); return *m_program; }

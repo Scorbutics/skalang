@@ -6,7 +6,7 @@
 #include "NodeValue/Type.h"
 #include "Generator/BytecodeCommand.h"
 #include "NodeValue/StringShared.h"
-#include "BytecodeScriptVariableRef.h"
+#include "Interpreter/Value/ScriptVariableRef.h"
 
 /*
 Opcode : enum value (MOV, SUB, ADD, MUL, DIV...)

@@ -2,6 +2,7 @@
 #include "NodeXValue.h"
 
 namespace ska {
+	class Script;
 	class NodeCell {
 	public:
 		NodeCell();
@@ -11,7 +12,7 @@ namespace ska {
 		NodeLValue asLvalue();
 		NodeRValue asRvalue();
 
-		NodeCell operator()(const std::string& key);
+		NodeCell operator()(Script& parent, const std::string& key);
 
 		NodeCell(NodeCell&&) noexcept = default;
 		NodeCell& operator=(NodeCell&&) noexcept = default;

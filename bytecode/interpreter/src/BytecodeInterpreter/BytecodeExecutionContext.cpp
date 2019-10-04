@@ -52,7 +52,7 @@ void ska::bytecode::ExecutionContext::jumpAbsolute(ScriptVariableRef value) {
 	m_current->jumpAbsolute(value.variable - 1);
 }
 
-ska::bytecode::ScriptVariableRef ska::bytecode::ExecutionContext::getReturn() {
+ska::ScriptVariableRef ska::bytecode::ExecutionContext::getReturn() {
 	assert(!m_container.callstack.empty());
 	auto scriptVariableRef = m_container.callstack.back().nodeval<ScriptVariableRef>();
 	m_container.callstack.pop_back();

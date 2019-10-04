@@ -68,6 +68,9 @@ namespace ska {
 			return (*m_handle->m_currentMemory)(key);
 		}
 
+		MemoryTable& downMemory() { return m_handle->downMemory(); }
+		const MemoryTable& downMemory() const { return m_handle->downMemory(); }
+
 		template <class T>
 		auto emplaceMemory(const std::string& key, T&& value) {
 			return m_handle->m_currentMemory->emplace(key, std::forward<T>(value));
@@ -82,11 +85,23 @@ namespace ska {
 		SymbolTable& symbols() { return m_ast.symbols(); }
 		const SymbolTable& symbols() const { return m_ast.symbols(); }
 
+		std::size_t pushFunction(ASTNode& function) {
+			return m_handle->pushFunction(function);
+		}
+
+		auto* getFunction(std::size_t functionId) {
+			return m_handle->getFunction(functionId);
+		}
+
+		std::size_t id() const {
+			return m_ast.id();
+		}
+
 	private:
 		void memoryFromBridge(const ASTNode& declaredAstBlock, std::vector<BridgeMemory> bindings);
 		static ScriptHandle* buildHandle(ScriptCache& cache, ScriptHandleAST& handleAST, const std::string& name, bool& inCache);
 
-        ScriptHandle* m_handle = nullptr;
+		ScriptHandle* m_handle = nullptr;
 		ScriptCache& m_cache;
 		bool m_inCache = false;
 

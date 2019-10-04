@@ -2,7 +2,10 @@
 #include "NodeCell.h"
 #include "NodeValue/ObjectMemory.h"
 #include "Interpreter/Value/ScriptHandle.h"
+#include "Interpreter/Value/Script.h"
 #include "Interpreter/MemoryTable.h"
+
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::NodeCell)
 
 ska::NodeCell ska::NodeCell::build(MemoryLValue& memoryField) {
 	if (isLvalue()) {
@@ -11,7 +14,7 @@ ska::NodeCell ska::NodeCell::build(MemoryLValue& memoryField) {
 	return NodeRValue{ std::move(*memoryField.first), std::move(memoryField.second) };
 }
 
-ska::NodeCell ska::NodeCell::operator()(const std::string& key) {
+ska::NodeCell ska::NodeCell::operator()(Script& parent, const std::string& key) {
 	auto& val = isLvalue() ? *std::get<NodeValue*>(m_variant) : std::get<NodeValue>(m_variant);
 	auto& variant = val.as<TokenVariant>();
 	const auto isObject = std::holds_alternative<ObjectMemory>(variant);
@@ -22,8 +25,10 @@ ska::NodeCell ska::NodeCell::operator()(const std::string& key) {
 		return build(memoryField);
 	}
 	
-	auto& scriptZone = std::get<ExecutionContext>(variant);
-	auto& memoryScript = scriptZone.program().downMemory();
+	auto& scriptZoneId = std::get<ScriptVariableRef>(variant);
+	SLOG(LogLevel::Debug) << "accessing script " << scriptZoneId.script << " for retrieving object named " << key;
+	auto scriptZone = parent.useImport(scriptZoneId.script);
+	auto& memoryScript = scriptZone->downMemory();
 	auto memoryField = (memoryScript)(key);
 	return build(memoryField);
 }

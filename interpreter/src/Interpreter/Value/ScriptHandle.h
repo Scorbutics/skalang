@@ -13,6 +13,11 @@ namespace ska {
 	struct ScriptHandle;
 	using ScriptHandlePtr = std::unique_ptr<ScriptHandle>;
 	struct ScriptCache;
+	struct FunctionContext {
+		ASTNode* node;
+		MemoryTablePtr memory;
+	};
+
 	struct ScriptHandle {
 	
 	public:
@@ -24,10 +29,22 @@ namespace ska {
 
 		auto& rootNode() { return m_handleAst.rootNode(); }
 
+		std::size_t pushFunction(ASTNode& function) {
+			auto index = m_registeredFunctions.size();
+			m_registeredFunctions.push_back({ &function, m_currentMemory });
+			return index;
+		}
+
+		auto* getFunction(std::size_t functionId) {
+			assert(m_registeredFunctions.size() > functionId);
+			return &m_registeredFunctions[functionId];
+		}
+
 	private:
 		ScriptHandle(ScriptCache& cache, ScriptHandleAST& astHandle);
 		friend class Script;
 		
+		std::vector<FunctionContext> m_registeredFunctions;
 		ScriptCache& m_cache;	
 		MemoryTablePtr m_memory;
 		MemoryTablePtr m_currentMemory;

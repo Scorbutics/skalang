@@ -28,12 +28,24 @@ namespace ska {
 		}
 
 		void emplace(std::string scriptName, ScriptTHandlePtr script) {
-			const auto emplacedItem = namedMapCache.emplace(std::move(scriptName), cache.size());
+			const auto wantedScriptId = cache.size();
+			const auto emplacedItem = namedMapCache.emplace(std::move(scriptName), wantedScriptId);
 			if(emplacedItem.second) {
 				cache.push_back(std::move(script));
 			} else {
-				throw std::runtime_error("unable to emplace script cause it was already registered");
+				cache[emplacedItem.first->second] = std::move(script);
 			}
+		}
+
+		std::size_t id(const std::string& scriptName) {
+			if(namedMapCache.find(scriptName) == namedMapCache.end()) {
+				const auto wantedScriptId = cache.size();
+				namedMapCache.emplace(scriptName, wantedScriptId);
+				cache.push_back(nullptr);
+				return wantedScriptId;
+				
+			}
+			return namedMapCache.at(scriptName);
 		}
 
 		void clear() {

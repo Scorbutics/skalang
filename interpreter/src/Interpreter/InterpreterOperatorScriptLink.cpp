@@ -13,5 +13,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::SCRIPT_LINK>::interpret(Op
 		throw std::runtime_error("unable to find the linked script \"" + node.GetObject().name() + "\" registered in the current symbol table");
 	}
 	auto script = node.parent.useImport(scriptLinkCellData->getName());
-	return NodeRValue{ ExecutionContext{ *script }, nullptr };
+	return NodeRValue{ ScriptVariableRef{ std::numeric_limits<std::size_t>::max(), script->id() }, nullptr };
 }

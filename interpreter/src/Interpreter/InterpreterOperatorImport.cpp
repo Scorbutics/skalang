@@ -13,5 +13,5 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::IMPORT>::interpret(Operate
 	auto scriptExecutionContext = ExecutionContext{ *boundScript->handle() };
 	m_interpreter.interpret(scriptExecutionContext);
 	SLOG_STATIC(ska::LogLevel::Info, ska::InterpreterOperator<ska::Operator::IMPORT>) << "Script loading";
-	return NodeRValue{ scriptExecutionContext, nullptr };
+	return NodeRValue{ ScriptVariableRef{ std::numeric_limits<std::size_t>::max(), boundScript->id() }, nullptr };
 }

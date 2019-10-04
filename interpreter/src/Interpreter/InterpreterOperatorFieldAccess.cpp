@@ -7,5 +7,5 @@
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::FIELD_ACCESS>::interpret(OperateOn node) {
 	auto object = m_interpreter.interpret({ node.parent, node.GetObject() });
-	return object(node.GetFieldName());
+	return object(node.parent, node.GetFieldName());
 }

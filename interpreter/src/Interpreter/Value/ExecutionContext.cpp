@@ -14,9 +14,9 @@ ska::ExecutionContext::ExecutionContext(Script& program) :
 	m_currentMemory(program.handle()->currentMemory()) {
 }
 
-ska::ExecutionContext::ExecutionContext(Script& program, ASTNode& node) : 
+ska::ExecutionContext::ExecutionContext(Script& program, ASTNode& node, MemoryTablePtr memory) :
 	m_program(program.handle()),
 	m_pointer(&node),
-	m_currentMemory(program.handle()->currentMemory()) {
+	m_currentMemory(memory == nullptr ? program.handle()->currentMemory() : memory) {
 }
 

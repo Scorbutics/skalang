@@ -57,10 +57,12 @@ namespace ska {
 
 		bool isBridged() const { return m_handle != nullptr && m_handle->m_bridged; }
 
+		std::size_t id() const { return m_handle->id(); }
+
 	private:
 		void astFromBridge(std::vector<ASTNodePtr> bindings);
 
-        ScriptHandleAST* m_handle = nullptr;
+		ScriptHandleAST* m_handle = nullptr;
 		ScriptCacheAST* m_cache;
 		bool m_inCache = false;
 	};

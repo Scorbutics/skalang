@@ -2,11 +2,11 @@
 #include <variant>
 #include <memory>
 
-#include "ExecutionContext.h"
 #include "BridgeMemory.h"
 #include "NodeValue/ObjectMemory.h"
 #include "NodeValue/StringShared.h"
+#include "Interpreter/Value/ScriptVariableRef.h"
 
 namespace ska {
-	using TokenVariant = std::variant<std::size_t, bool, int, double, StringShared, ExecutionContext, ObjectMemory, BridgeMemory>;
+	using TokenVariant = std::variant<ScriptVariableRef, bool, int, double, StringShared, ObjectMemory, BridgeMemory>;
 }

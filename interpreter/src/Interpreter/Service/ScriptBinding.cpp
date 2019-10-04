@@ -54,16 +54,20 @@ void ska::ScriptBridge::import(StatementParser& parser, Interpreter& interpreter
 
 ska::NodeValue ska::ScriptBridge::callFunction(Interpreter& interpreter, std::string importName, std::string functionName, std::vector<ska::NodeValue> parametersValues) {
 	auto import = m_script.findInMemoryTree(importName);
-	auto importedScript = import.first->nodeval<ska::ExecutionContext>();
-	auto functionToCallMemory = importedScript.program().downMemory()(functionName);
-	auto& functionToExecute = functionToCallMemory.first->nodeval<ska::ExecutionContext>();
+	const auto importedScriptId = import.first->nodeval<ska::ScriptVariableRef>();
+	auto importedScript = m_script.useImport(importedScriptId.script);
+	auto functionToCallMemory = importedScript->downMemory()(functionName);
+	auto& functionToExecute = functionToCallMemory.first->nodeval<ska::ScriptVariableRef>();
 
-	auto operateOnFunction = ska::Operation<ska::Operator::FUNCTION_DECLARATION>(functionToExecute);
+	auto* stored = importedScript->getFunction(functionToExecute.variable);
+	auto contextToExecute = ExecutionContext{ *importedScript, *stored->node, stored->memory };
+
+	auto operateOnFunction = ska::Operation<ska::Operator::FUNCTION_DECLARATION>(contextToExecute);
 	return ska::InterpreterOperationFunctionCallScriptWithParams(m_script, interpreter, functionToCallMemory.second, operateOnFunction, std::move(parametersValues)).asRvalue().object;
 }
 
 ska::MemoryLValue ska::ScriptBridge::accessMemory(std::string importName, std::string field) {
-	auto& em = m_script.findInMemoryTree(importName).first->nodeval<ska::ExecutionContext>();
-	auto& emScriptMemory = em.program().downMemory();
-	return (emScriptMemory)(field);
+	auto& emId = m_script.findInMemoryTree(importName).first->nodeval<ska::ScriptVariableRef>();
+	auto em = m_script.useImport(emId.script);
+	return em->downMemory()(field);
 }
