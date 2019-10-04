@@ -10,14 +10,19 @@ namespace ska {
 		using ScriptTHandlePtr = std::unique_ptr<ScriptT>;
 	public:
 		auto find(const std::string& scriptName) { return namedMapCache.find(scriptName); }
+		auto* find(std::size_t index) const { return index < cache.size() ? cache[index].get() : nullptr; }
 
 		auto begin() { return namedMapCache.begin(); }
 		auto end() { return namedMapCache.end(); }
 
 		auto& at(const std::string& scriptName) {
 			const auto index = namedMapCache.at(scriptName);
+			return at(index);
+		}
+
+		auto& at(std::size_t index) {
 			if (index >= cache.size()) {
-				throw std::runtime_error("bad script index for script name \"" + scriptName + "\"");
+				throw std::runtime_error("bad script index \"" + std::to_string(index) + "\"");
 			}
 			return cache[index];
 		}

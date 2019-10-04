@@ -65,6 +65,10 @@ ska::ScriptPtr ska::Script::useImport(const std::string& name) {
 	return existsInCache(name) ? std::make_unique<Script>(m_cache, name, std::vector<Token>{}) : nullptr;
 }
 
+ska::ScriptPtr ska::Script::useImport(std::size_t index) {
+	return existsInCache(index) ? std::make_unique<Script>(*m_cache.cache.at(index)) : nullptr;
+}
+
 ska::ScriptPtr ska::Script::createImport(const std::string& name) {
 	return std::make_unique<Script>( m_cache, m_ast, name );
 }

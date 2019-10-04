@@ -28,11 +28,16 @@ namespace ska {
 			return m_cache.cache.find(name) != m_cache.cache.end();
 		}
 
+		bool existsInCache(std::size_t index) const {
+			return m_cache.cache.find(index) != nullptr;
+		}
+
 		ASTNode& fromBridge(std::vector<BridgeMemory> bindings);
 
 		const auto& handle() const { return m_handle; }
 
 		ScriptPtr useImport(const std::string& name);
+		ScriptPtr useImport(std::size_t index);
 		ScriptPtr createImport(const std::string& name);
 
 		auto pushNestedMemory(bool pop) {
