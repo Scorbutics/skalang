@@ -5,8 +5,8 @@
 #include "BridgeMemory.h"
 #include "NodeValue/ObjectMemory.h"
 #include "NodeValue/StringShared.h"
-#include "Interpreter/Value/ScriptVariableRef.h"
+#include "ScriptVariableRef.h"
 
 namespace ska {
-	using TokenVariant = std::variant<ScriptVariableRef, bool, int, double, StringShared, ObjectMemory, BridgeMemory>;
+	using TokenVariant = std::variant<ScriptVariableRef, bool, long, double, StringShared, ObjectMemory, BridgeMemory>;
 }

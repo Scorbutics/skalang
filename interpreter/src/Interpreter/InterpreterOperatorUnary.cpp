@@ -8,7 +8,7 @@ namespace ska {
 	NodeValue InterpreterOperatorConvertValue(ExpressionType type, const TokenVariant& value) {
         switch(type) {
 		case ExpressionType::INT:
-            return std::holds_alternative<int>(value) ? value : std::stoi(*std::get<StringShared>(value));
+            return std::holds_alternative<long>(value) ? value : std::stol(*std::get<StringShared>(value));
 		case ExpressionType::FLOAT:
             return std::holds_alternative<double>(value) ? value : std::stof(*std::get<StringShared>(value));
 		case ExpressionType::BOOLEAN:

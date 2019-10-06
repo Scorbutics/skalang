@@ -84,31 +84,31 @@ TEST_CASE("[Interpreter Script]") {
 	SUBCASE("Outside script from file (import) and use") {
 		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\";var player = Character184.build(\"Player\");var enemy = Character184.default; enemy.age;", data);
 		auto res = data.interpreter->script(astPtr);
-		CHECK(res.nodeval<int>() == 10);
+		CHECK(res.nodeval<long>() == 10);
 	}
 
 	SUBCASE("Outside script from file (import) used by another script, and use") {
 		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var CharacterUser190 = import \"" SKALANG_TEST_DIR "/src/resources/character_user\"; CharacterUser190.player.age;", data);
 		auto res = data.interpreter->script(astPtr);
-		CHECK(res.nodeval<int>() == 10);
+		CHECK(res.nodeval<long>() == 10);
 	}
 	
 	SUBCASE("Outside script from file (import) used by another script, and use") {
 		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var CharacterUser196 = import \"" SKALANG_TEST_DIR "/src/resources/character_user\"; CharacterUser196.player.age;", data);
 		auto res = data.interpreter->script(astPtr);
-		CHECK(res.nodeval<int>() == 10);
+		CHECK(res.nodeval<long>() == 10);
 	}
 
 	SUBCASE("Custom script starter") {
 		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Custom202 = import \"" SKALANG_TEST_DIR "/src/resources/custom\"; Custom202.totalAge;", data);
 		auto res = data.interpreter->script(astPtr);
-		CHECK(res.nodeval<int>() == 30);
+		CHECK(res.nodeval<long>() == 30);
 	}
 
 	SUBCASE("2 outside scripts from file (import)") {
 		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var CharacterUser208 = import \"" SKALANG_TEST_DIR "/src/resources/character_user\"; CharacterUser208.player.age = 3; var CharacterUser2 = import \"" SKALANG_TEST_DIR "/src/resources/character_user\"; CharacterUser2.player.age;", data);
 		auto res = data.interpreter->script(astPtr);
-		CHECK(res.nodeval<int>() == 3);
+		CHECK(res.nodeval<long>() == 3);
 	}
 
 	SUBCASE("2 outside scripts imported with different memory contexts") {
@@ -120,8 +120,8 @@ TEST_CASE("[Interpreter Script]") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse("var User218 = import \"bind:binding\"; User218.funcTest(14, \"titito\");", data);
 		auto test = 0;
 		auto testStr = std::string{ "" };
-		auto function = std::function<int(int, ska::StringShared)>(
-			[&](int toto, ska::StringShared titi) -> int {
+		auto function = std::function<long(long, ska::StringShared)>(
+			[&](long toto, ska::StringShared titi) -> long {
 			test = toto;
 			testStr = std::move(*titi);
 			return 0;
@@ -140,17 +140,17 @@ TEST_CASE("[Interpreter Script]") {
 
 	SUBCASE("C++ several script-function binding") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse("var User239 = import \"bind:binding239\"; User239.funcTest(14); User239.funcTest2(\"titito\");", data);
-		auto test = 0;
+		auto test = 0l;
 		auto testStr = std::string{ "" };
 
-		auto function1 = std::function<int(int)>([&](int toto) -> int {
+		auto function1 = std::function<long(long)>([&](long toto) -> long {
 			test = toto;
-			return 0;
+			return 0l;
 		});
-		auto function2 = std::function<int(ska::StringShared)>(
-			[&](ska::StringShared titi) -> int {
+		auto function2 = std::function<long(ska::StringShared)>(
+			[&](ska::StringShared titi) -> long {
 			testStr = std::move(*titi);
-			return 0;
+			return 0l;
 		});
 
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding239", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
@@ -174,7 +174,7 @@ TEST_CASE("[Interpreter Script]") {
 		std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<ska::StringShared>();
 			auto result = ska::MemoryTable::create();
-			result->emplace("id", 1234);
+			result->emplace("id", 1234L);
 			result->emplace("name", std::move(mem));
 			return ska::NodeValue{ std::move(result) };
 		}));
@@ -187,7 +187,7 @@ TEST_CASE("[Interpreter Script]") {
 			auto mem = params[0].nodeval<ska::ObjectMemory>();
 			auto* idMap = (*mem)("id").first;
 			auto* nameMap = (*mem)("name").first;
-			test = idMap->nodeval<int>();
+			test = idMap->nodeval<long>();
 			name = nameMap->nodeval<ska::StringShared>();
 			return ska::NodeValue{};
 		}));
@@ -212,7 +212,7 @@ TEST_CASE("[Interpreter Script]") {
 		std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<ska::StringShared>();
 			auto result = ska::MemoryTable::create();
-			result->emplace("id", 1234);
+			result->emplace("id", 1234L);
 			result->emplace("name", std::move(mem));
 			return ska::NodeValue{ std::move(result) };
 		}));
@@ -237,7 +237,7 @@ TEST_CASE("[Interpreter Script]") {
 		std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<ska::StringShared>();
 			auto result = ska::MemoryTable::create();
-			result->emplace("id", 1234);
+			result->emplace("id", 1234L);
 			result->emplace("name", std::move(mem));
 			return ska::NodeValue{ std::move(result) };
 		}));
@@ -265,7 +265,7 @@ TEST_CASE("[Interpreter Script]") {
 		std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<ska::StringShared>();
 			auto result = ska::MemoryTable::create();
-			result->emplace("id", 1234);
+			result->emplace("id", 1234L);
 			result->emplace("name", std::move(mem));
 			return ska::NodeValue{ std::move(result) };
 		}));
@@ -293,7 +293,7 @@ TEST_CASE("[Interpreter Script]") {
 		std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<ska::StringShared>();
 			auto result = ska::MemoryTable::create();
-			result->emplace("id", 1234);
+			result->emplace("id", 1234L);
 			result->emplace("name", std::move(mem));
 			return ska::NodeValue{ std::move(result) };
 		}));
@@ -360,7 +360,7 @@ TEST_CASE("[Interpreter Script]") {
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, "binding279", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		scriptBinding.bindGenericFunction("funcTest", {"int", "void"}, 
 		std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
-			test = params[0].nodeval<int>();
+			test = params[0].nodeval<long>();
 			return ska::NodeValue{};
 		}));
 		scriptBinding.buildFunctions();

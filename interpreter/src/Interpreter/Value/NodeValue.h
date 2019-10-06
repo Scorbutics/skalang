@@ -7,7 +7,7 @@
 #include <type_traits>
 #include <memory>
 
-#include "TokenVariant.h"
+#include "Runtime/Value/TokenVariant.h"
 #include "NodeValue/NodeValueArray.h"
 #include "NodeValue/NodeValueMap.h"
 #include "Interpreter/MemoryTablePtr.h"

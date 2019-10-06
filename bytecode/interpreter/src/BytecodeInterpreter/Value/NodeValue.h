@@ -7,13 +7,12 @@
 #include <type_traits>
 #include <memory>
 
-#include "TokenVariant.h"
+#include "Runtime/Value/TokenVariant.h"
 #include "NodeValueArray.h"
 #include "NodeValueMap.h"
 
 namespace ska {
 	namespace bytecode {
-		class ExecutionContext;
 		class NodeValue;
 
 		using NodeValueVariant_ = std::variant<

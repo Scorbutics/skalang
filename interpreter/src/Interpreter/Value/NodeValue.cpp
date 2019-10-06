@@ -8,7 +8,7 @@
 	std::visit([&numeric](auto && arg){
 		using T = std::decay_t<decltype(arg)>;
 
-		if constexpr (std::is_same<T, int>::value) {
+		if constexpr (std::is_same<T, long>::value) {
 			numeric = static_cast<double>(arg);
 		} else if constexpr (std::is_same<T, double>::value) {
 			numeric = arg;
@@ -35,7 +35,7 @@ std::string ska::NodeValue::convertString() const {
 	std::visit([&result](auto && arg) {
 		using T = std::decay_t<decltype(arg)>;
 
-		if constexpr (std::is_same<T, int>::value) {
+		if constexpr (std::is_same<T, long>::value) {
 			result = std::to_string(arg);
 		} else if constexpr (std::is_same<T, double>::value) {
 			result = std::to_string(arg);

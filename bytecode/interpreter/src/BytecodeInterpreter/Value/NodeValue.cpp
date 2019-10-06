@@ -1,5 +1,5 @@
 #include "Config/LoggerConfigLang.h"
-#include "TokenVariant.h"
+#include "Runtime/Value/TokenVariant.h"
 #include "BytecodeInterpreter/BytecodeExecutionContext.h"
 #include "NodeValue.h"
 #include "NodeValue/StringShared.h"

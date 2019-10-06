@@ -74,6 +74,8 @@ namespace ska {
 				ss.push_back("string");
 			} else if constexpr (std::is_same<T, int>()) {
 				ss.push_back("int");
+			} else if constexpr (std::is_same<T, long>()) {
+				ss.push_back("int");
 			} else if constexpr (std::is_same<T, std::size_t>()) {
 				ss.push_back("int");
 			} else if constexpr (std::is_same<T, float>()) {

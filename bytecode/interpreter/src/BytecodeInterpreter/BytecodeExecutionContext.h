@@ -2,7 +2,7 @@
 
 #include <cassert>
 #include "Generator/Value/BytecodeValue.h"
-#include "Value/TokenVariant.h"
+#include "Runtime/Value/TokenVariant.h"
 #include "BytecodeInterpreter/Value/BytecodeExecutionOutput.h"
 #include "BytecodeInterpreter/Value/ScriptExecutionOutput.h"
 #include "BytecodeScriptExecution.h"

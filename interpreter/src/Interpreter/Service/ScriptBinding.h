@@ -5,8 +5,8 @@
 #include <unordered_map>
 
 #include "Container/sorted_observable.h"
-#include "Interpreter/Value/BridgeFunction.h"
-#include "Interpreter/Value/BridgeMemory.h"
+#include "Runtime/Value/BridgeFunction.h"
+#include "Runtime/Value/BridgeMemory.h"
 #include "Service/BindingFactory.h"
 #include "Event/VarTokenEvent.h"
 #include "Interpreter/Value/Script.h"
@@ -90,6 +90,8 @@ namespace ska {
 			if constexpr (std::is_same<T, StringShared>()) {
 				return std::make_shared<std::string>(v.convertString());
 			} else if constexpr (std::is_same<T, int>()) {
+				return static_cast<T>(v.convertNumeric());
+			} else if constexpr (std::is_same<T, long>()) {
 				return static_cast<T>(v.convertNumeric());
 			} else if constexpr (std::is_same<T, std::size_t>()) {
 				return static_cast<T>(v.convertNumeric());

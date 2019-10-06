@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <ostream>
 #include "NodeValue/StringShared.h"
-#include "Interpreter/Value/ScriptVariableRef.h"
+#include "Runtime/Value/ScriptVariableRef.h"
 
 namespace ska {
 	namespace bytecode {
