@@ -4,6 +4,7 @@
 #include "ScriptASTPtr.h"
 #include "ScriptHandleAST.h"
 #include "ScriptCacheAST.h"
+#include "Runtime/Value/BridgeMemory.h"
 
 namespace ska {
 	class StatementParser;
@@ -38,7 +39,7 @@ namespace ska {
 		ScriptASTPtr subParse(StatementParser& parser, const std::string& name, std::ifstream& file);
 		ScriptASTPtr useImport(const std::string& name);
 
-		ASTNode& fromBridge(std::vector<ASTNodePtr> bindings);
+		ASTNode& fromBridge(std::vector<BridgeMemory>& bindings);
 
 		const auto& handle() const { return m_handle; }
 
@@ -48,10 +49,12 @@ namespace ska {
 		const std::string& name() const { return m_handle->name(); }
 
 		auto& rootNode() {
+			assert(m_handle->m_ast != nullptr);
 			return *m_handle->m_ast;
 		}
 
 		const auto& rootNode() const {
+			assert(m_handle->m_ast != nullptr);
 			return *m_handle->m_ast;
 		}
 

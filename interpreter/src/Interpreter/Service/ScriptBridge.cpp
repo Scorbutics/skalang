@@ -1,10 +1,6 @@
 #include "Config/LoggerConfigLang.h"
-#include "ScriptBinding.h"
-#include "Service/ASTFactory.h"
-#include "Service/SymbolTable.h"
+#include "ScriptBridge.h"
 #include "Interpreter/Value/Script.h"
-#include "Service/TypeBuilder/TypeBuilder.h"
-#include "Service/SymbolTableUpdater.h"
 #include "Service/ScriptNameBuilder.h"
 
 #include "Interpreter/InterpreterOperatorFunctionCall.h"
@@ -17,39 +13,19 @@ ska::ScriptBridge::ScriptBridge(
 	TypeBuilder& typeBuilder,
 	SymbolTableUpdater& symbolTypeUpdater,
 	const ReservedKeywordsPool& reserved) :
-	m_typeBuilder(typeBuilder),
-	m_symbolTypeUpdater(symbolTypeUpdater),
-	m_functionBinder(typeBuilder, symbolTypeUpdater, reserved),
+	ScriptBinding(cache.astCache, scriptName, typeBuilder, symbolTypeUpdater, reserved),
 	m_name(ScriptNameDeduce("", "bind:" + scriptName)),
 	m_script(cache, m_name, std::vector<Token>{}),
 	m_cache(cache) {
-	observable_priority_queue<VarTokenEvent>::addObserver(m_typeBuilder);
-	observable_priority_queue<VarTokenEvent>::addObserver(m_symbolTypeUpdater);
-	observable_priority_queue<VarTokenEvent>::addObserver(m_script.symbols());
-}
-
-ska::ScriptBridge::~ScriptBridge() {
-	observable_priority_queue<VarTokenEvent>::removeObserver(m_typeBuilder);
-	observable_priority_queue<VarTokenEvent>::removeObserver(m_symbolTypeUpdater);
-	observable_priority_queue<VarTokenEvent>::removeObserver(m_script.symbols());
 }
 
 void ska::ScriptBridge::buildFunctions() {
-	assert(!m_bindings.empty() && "Bridge is empty");
-	auto& scriptAst = m_script.fromBridge( std::move(m_bindings));
-	
-	for (auto& functionVarDeclaration : scriptAst) {
-		auto event = VarTokenEvent::Make<VarTokenEventType::VARIABLE_DECLARATION>(*functionVarDeclaration, m_script.astScript());
-		observable_priority_queue<VarTokenEvent>::notifyObservers(event);
-	}
-
-	m_bindings = { };
+	ScriptBinding::buildFunctions(m_script);
 }
 
 void ska::ScriptBridge::import(StatementParser& parser, Interpreter& interpreter, std::vector<std::pair<std::string, std::string>> imports) {
-	auto importBlock = m_functionBinder.import(parser, m_script.astScript(), std::move(imports));
-	interpreter.interpret({ m_script, *importBlock});
-	m_imports.push_back(std::move(importBlock));
+	auto& importBlock = ScriptBinding::import(parser, std::move(imports));
+	interpreter.interpret({ m_script, importBlock});
 }
 
 ska::NodeValue ska::ScriptBridge::callFunction(Interpreter& interpreter, std::string importName, std::string functionName, std::vector<ska::NodeValue> parametersValues) {

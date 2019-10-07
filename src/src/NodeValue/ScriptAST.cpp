@@ -3,6 +3,7 @@
 #include "ScriptAST.h"
 #include "Service/StatementParser.h"
 #include "Service/ASTFactory.h"
+#include "Runtime/Value/BridgeFunction.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptAST)
 
@@ -64,8 +65,15 @@ void ska::ScriptAST::parse(StatementParser& parser, bool listen) {
 }
 
 
-ska::ASTNode& ska::ScriptAST::fromBridge(std::vector<ASTNodePtr> bindings) {
-	astFromBridge(std::move(bindings));
+ska::ASTNode& ska::ScriptAST::fromBridge(std::vector<BridgeMemory>& bindings) {
+	auto bindingsAST = std::vector<ASTNodePtr>{};
+	if (!bindings.empty()) {
+		bindingsAST.reserve(bindings.size());
+		std::transform(bindings.begin(), bindings.end(), std::back_inserter(bindingsAST), [](auto& el) {
+			return std::move(el->node);
+		});
+	}
+	astFromBridge(std::move(bindingsAST));
 	return *m_handle->m_ast;
 }
 

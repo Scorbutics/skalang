@@ -30,7 +30,8 @@ ska::ScriptHandle* ska::Script::buildHandle(ScriptCache& cache, ScriptHandleAST&
 	return cache.cache.at(name).get();
 }
 
-void ska::Script::memoryFromBridge(const ASTNode& declaredAstBlock, std::vector<BridgeMemory> bindings) {
+void ska::Script::memoryFromBridge(std::vector<BridgeMemory> bindings) {
+	const ASTNode& declaredAstBlock = m_ast.rootNode();
 	assert(declaredAstBlock.size() == bindings.size() && "Cannot create memory from this ast");
 
 	//steal already existing first child content into the current scope
@@ -45,20 +46,6 @@ void ska::Script::memoryFromBridge(const ASTNode& declaredAstBlock, std::vector<
 		index++;
 	}
 	lock.release();
-}
-
-ska::ASTNode& ska::Script::fromBridge(std::vector<BridgeMemory> bindings) {
-	
-	auto bindingsAST = std::vector<ASTNodePtr>{};
-	if (!bindings.empty()) {
-		bindingsAST.reserve(bindings.size());
-		std::transform(bindings.begin(), bindings.end(), std::back_inserter(bindingsAST), [](auto& el) {
-			return std::move(el->node);
-		});
-	}
-	m_ast.fromBridge(std::move(bindingsAST));
-	memoryFromBridge(m_ast.rootNode(), std::move(bindings));
-	return m_ast.rootNode();
 }
 
 ska::ScriptPtr ska::Script::useImport(const std::string& name) {

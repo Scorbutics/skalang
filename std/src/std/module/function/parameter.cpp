@@ -3,7 +3,7 @@
 
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
-#include "Interpreter/Service/ScriptBinding.h"
+#include "Interpreter/Service/ScriptBridge.h"
 #include "Interpreter/Value/Script.h"
 
 ska::lang::ParameterModule::ParameterModule(ModuleConfiguration& config, const std::vector<NodeValue>& parameterValues) :

@@ -32,7 +32,7 @@ namespace ska {
 			return m_cache.cache.find(index) != nullptr;
 		}
 
-		ASTNode& fromBridge(std::vector<BridgeMemory> bindings);
+		void memoryFromBridge(std::vector<BridgeMemory> bindings);
 
 		const auto& handle() const { return m_handle; }
 
@@ -98,7 +98,6 @@ namespace ska {
 		}
 
 	private:
-		void memoryFromBridge(const ASTNode& declaredAstBlock, std::vector<BridgeMemory> bindings);
 		static ScriptHandle* buildHandle(ScriptCache& cache, ScriptHandleAST& handleAST, const std::string& name, bool& inCache);
 
 		ScriptHandle* m_handle = nullptr;

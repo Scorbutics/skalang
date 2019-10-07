@@ -6,7 +6,7 @@
 #include "Config/LoggerConfigLang.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
-#include "Interpreter/Service/ScriptBinding.h"
+#include "Interpreter/Service/ScriptBridge.h"
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/ScriptCache.h"
 #include "Service/StatementParser.h"

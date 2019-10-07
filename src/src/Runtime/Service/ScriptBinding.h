@@ -1,4 +1,5 @@
 #pragma once
+
 #include <functional>
 #include <cassert>
 #include <vector>
@@ -7,47 +8,60 @@
 #include "Container/sorted_observable.h"
 #include "Runtime/Value/BridgeFunction.h"
 #include "Runtime/Value/BridgeMemory.h"
-#include "Service/BindingFactory.h"
+#include "BindingFactory.h"
 #include "Event/VarTokenEvent.h"
-#include "Interpreter/Value/Script.h"
-#include "Interpreter/ScriptCache.h"
+#include "NodeValue/ScriptCacheAST.h"
+#include "NodeValue/ScriptAST.h"
+#include "Runtime/Value/NodeValue.h"
+
+namespace ska {
+	class ScriptBinding;
+}
+
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptBinding);
 
 namespace ska {
 	class SymbolTable;
 	class StatementParser;
-	class Interpreter;
 
-	class ScriptBridge :
+	class ScriptBinding :
         protected observable_priority_queue<VarTokenEvent> {
 	public:
-		ScriptBridge(
-			ScriptCache& cache,
+		ScriptBinding (
+      ScriptCacheAST& cache,
 			std::string scriptName,
 			TypeBuilder& typeBuilder,
 			SymbolTableUpdater& symbolTypeUpdater,
 			const ReservedKeywordsPool& reserved);
 
-		virtual ~ScriptBridge();
-
-		void buildFunctions();
+		virtual ~ScriptBinding();
 
 		template <class ReturnType, class ... ParameterTypes>
 		void bindFunction(const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
-			assert(m_scriptMemoryNode == nullptr);
-			m_bindings.push_back(bindFunction_<ReturnType, ParameterTypes...>(m_script.astScript(), functionName, std::move(f)));
+			m_bindings.push_back(bindFunction_<ReturnType, ParameterTypes...>(m_script, functionName, std::move(f)));
 		}
 
 		void bindGenericFunction(const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
-			assert(m_scriptMemoryNode == nullptr);
-			m_bindings.push_back(bindGenericFunction_(m_script.astScript(), functionName, std::move(typeNames), std::move(f)));
+			m_bindings.push_back(bindGenericFunction_(m_script, functionName, std::move(typeNames), std::move(f)));
 		}
 
-		void import(StatementParser& parser, Interpreter& interpreter, std::vector<std::pair<std::string, std::string>> imports);
+	protected:
+		template <class RuntimeScript>
+		void buildFunctions(RuntimeScript& script) {
+      SLOG(LogLevel::Info) << "Building script " << script.astScript().name() << " ( " << m_script.name() << ") from bridge";
 
-		MemoryTablePtr createMemory() { return m_script.createMemory(); }
+			assert(!m_bindings.empty() && "Bridge is empty");
+      assert(script.astScript().id() == m_script.id());
 
-		NodeValue callFunction(Interpreter& interpreter, std::string importName, std::string functionName, std::vector<ska::NodeValue> parametersValues);
-		MemoryLValue accessMemory(std::string importName, std::string field);
+			auto& scriptAstNode = m_script.fromBridge(m_bindings);
+      registerAST(scriptAstNode);
+
+			script.memoryFromBridge(std::move(m_bindings));
+
+      m_bindings = { };
+    }
+
+		ASTNode& import(StatementParser& parser, std::vector<std::pair<std::string, std::string>> imports);
 
 	private:
 		template <class ReturnType, class ... ParameterTypes>
@@ -106,13 +120,14 @@ namespace ska {
 			}
 		}
 
+    void registerAST(ASTNode& scriptAst);
+
 		TypeBuilder& m_typeBuilder;
 		SymbolTableUpdater& m_symbolTypeUpdater;
 		BindingFactory m_functionBinder;
 		std::string m_name;
-		Script m_script;
-		ASTNodePtr m_scriptMemoryNode;
-		ScriptCache& m_cache;
+    ScriptAST m_script;
+		ScriptCacheAST& m_cache;
 
 		std::vector<ASTNodePtr> m_imports;
 		std::vector<BridgeMemory> m_bindings;
