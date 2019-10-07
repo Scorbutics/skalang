@@ -5,7 +5,7 @@
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/MemoryTable.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::NodeCell)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::NodeCell)
 
 ska::NodeCell ska::NodeCell::build(MemoryLValue& memoryField) {
 	if (isLvalue()) {

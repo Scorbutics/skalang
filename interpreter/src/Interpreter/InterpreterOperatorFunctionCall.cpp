@@ -4,7 +4,7 @@
 #include "InterpreterOperatorFunctionCall.h"
 #include "Interpreter/Value/Script.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>)
 
 namespace ska {
@@ -90,6 +90,8 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>::interpret(
 	auto& functionValue = inMemoryFunctionZone.object.as<TokenVariant>();
 	if (std::holds_alternative<ScriptVariableRef>(functionValue)) {
 		assert(inMemoryFunctionZone.memory != nullptr);
+		LOG_DEBUG << "Detected a script function";
+
 		auto targetScriptId = inMemoryFunctionZone.object.nodeval<ScriptVariableRef>();
 		auto targetScript = node.parent.useImport(targetScriptId.script);
 		if(targetScript == nullptr) {
@@ -102,6 +104,7 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>::interpret(
 		auto operateOnFunction = Operation<Operator::FUNCTION_DECLARATION>(functionExecutionContext);
 		return InterpreterOperationFunctionCallScript(m_interpreter, functionExecutionContext.memory(), operateOnFunction, node);
 	} else {
+		LOG_DEBUG << "Detected a native function";
 		assert(std::holds_alternative<BridgeMemory>(functionValue));
 		auto bridgeCall = inMemoryFunctionZone.object.nodeval<BridgeMemory>();
 		assert(bridgeCall != nullptr);

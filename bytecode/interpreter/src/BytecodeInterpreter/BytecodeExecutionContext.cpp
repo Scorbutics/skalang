@@ -4,7 +4,7 @@
 #include "BytecodeExecutionContext.h"
 #include "Generator/Value/BytecodeGenerationOutput.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::ExecutionContext);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::ExecutionContext);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::ExecutionContext)
 
 ska::bytecode::ExecutionContext::ExecutionContext(ExecutionOutput& container, std::size_t scriptIndex, GenerationOutput& instructions) :

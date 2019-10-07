@@ -85,7 +85,7 @@ TEST_CASE("[Interpreter]") {
 			auto res = data.interpreter->script(astPtr);
 			CHECK((*res.nodeval<ska::StringShared>() == "titito"));
 		}
-		
+
 		SUBCASE("Var reaffected string with number") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 2 + \"ti\"; toto;", data);
 			auto res = data.interpreter->script(astPtr);
@@ -104,11 +104,11 @@ TEST_CASE("[Interpreter]") {
 			CHECK(res.nodeval<long>() == 12);
 		}
 
-        SUBCASE("If block true") {
-            auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 1; if(toto + 1 == 2) { toto = 123; } toto;", data);
+		SUBCASE("If block true") {
+			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 1; if(toto + 1 == 2) { toto = 123; } toto;", data);
 			auto res = data.interpreter->script(astPtr);
 			CHECK(res.nodeval<long>() == 123);
-        }
+		}
 
 		SUBCASE("If block false") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 1; if(toto + 1 == 12) { toto = 123; } toto;", data);

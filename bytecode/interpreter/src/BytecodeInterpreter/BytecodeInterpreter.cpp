@@ -44,7 +44,7 @@
 #include "Units/InterpreterCommandJumpNif.h"
 #include "InterpreterDeclarer.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::Interpreter);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::Interpreter);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Interpreter)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Interpreter)

@@ -3,7 +3,7 @@
 #include "NodeValue.h"
 #include "StringShared.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::NodeValue);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::NodeValue);
 
 double ska::NodeValue::convertNumeric() const {
 	double numeric = 0.0;
