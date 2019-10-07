@@ -10,6 +10,8 @@ C:/DevFast/skalang/src/skalang.dir/RelWithDebInfo/Symbol.obj
 C:/DevFast/skalang/src/skalang.dir/RelWithDebInfo/Type.obj
 C:/DevFast/skalang/src/skalang.dir/RelWithDebInfo/TypeFromNative.obj
 C:/DevFast/skalang/src/skalang.dir/RelWithDebInfo/OperationTypeType.obj
+C:/DevFast/skalang/src/skalang.dir/RelWithDebInfo/NodeValue.obj
+C:/DevFast/skalang/src/skalang.dir/RelWithDebInfo/ScriptVariableRef.obj
 C:/DevFast/skalang/src/skalang.dir/RelWithDebInfo/BindingFactory.obj
 C:/DevFast/skalang/src/skalang.dir/RelWithDebInfo/ExpressionParser.obj
 C:/DevFast/skalang/src/skalang.dir/RelWithDebInfo/MatcherArray.obj

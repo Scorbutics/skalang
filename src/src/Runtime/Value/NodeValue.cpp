@@ -1,12 +1,11 @@
 #include "Config/LoggerConfigLang.h"
 #include "Runtime/Value/TokenVariant.h"
-#include "BytecodeInterpreter/BytecodeExecutionContext.h"
 #include "NodeValue.h"
-#include "NodeValue/StringShared.h"
+#include "StringShared.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::NodeValue);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::NodeValue);
 
-double ska::bytecode::NodeValue::convertNumeric() const {
+double ska::NodeValue::convertNumeric() const {
 	double numeric = 0.0;
 	if(std::holds_alternative<NodeValue*>(m_variant)) {
 		return std::get<NodeValue*>(m_variant)->convertNumeric();
@@ -17,6 +16,8 @@ double ska::bytecode::NodeValue::convertNumeric() const {
 
 		if constexpr (std::is_same<T, long>::value) {
 			numeric = static_cast<double>(arg);
+		} else if constexpr (std::is_same<T, int>::value) {
+			numeric = arg;
 		} else if constexpr (std::is_same<T, double>::value) {
 			numeric = arg;
 		} else if constexpr (std::is_same<T, bool>::value) {
@@ -40,7 +41,7 @@ double ska::bytecode::NodeValue::convertNumeric() const {
 	return numeric;
 }
 
-std::string ska::bytecode::NodeValue::convertString() const {
+std::string ska::NodeValue::convertString() const {
 	auto result = std::string{};
 	if(std::holds_alternative<NodeValue*>(m_variant)) {
 		return std::get<NodeValue*>(m_variant)->convertString();
@@ -52,6 +53,8 @@ std::string ska::bytecode::NodeValue::convertString() const {
 
 			if constexpr (std::is_same<T, long>::value) {
 				result = std::to_string(arg);
+			} else if constexpr (std::is_same<T, int>::value) {
+				result = std::to_string(arg);
 			} else if constexpr (std::is_same<T, double>::value) {
 				result = std::to_string(arg);
 			} else if constexpr (std::is_same<T, VariableRef>::value) {
@@ -62,6 +65,8 @@ std::string ska::bytecode::NodeValue::convertString() const {
 				result = arg ? "true" : "false";
 			} else if constexpr (std::is_same<T, StringShared>::value) {
 				result = *arg;
+			} else if constexpr (std::is_same_v<T, ObjectMemory> || std::is_same_v<T, BridgeMemory>) {
+				result = "__complex memory object__";
 			} else {
 				throw std::runtime_error("cannot convert the node value to a string format");
 			}
@@ -70,25 +75,28 @@ std::string ska::bytecode::NodeValue::convertString() const {
 	return result;
 }
 
-void ska::bytecode::NodeValue::transferValueToOwned(NodeValueVariant_ arg) {
+void ska::NodeValue::transferValueToOwned(NodeValueVariant_ arg) {
 	if(isReference(m_variant)) {
-		SLOG(LogLevel::Debug) << "%10cReference detected, reassigning refered value";
+		SLOG(LogLevel::Debug) << "%11cReference detected, reassigning refered value";
 		auto& referedObject = *std::get<NodeValue*>(m_variant);
 		referedObject = arg;
 	} else {
+		if(isReference(arg) && std::get<NodeValue*>(arg) == this) {
+			SLOG(LogLevel::Error) << "a value ref cannot refer to itself. Aborting assignation.";
+			return;
+		}
 		m_variant = std::move(arg);
+
 		SLOG(LogLevel::Debug) << "%10cAssigning direct value " << convertString();
 	}
 }
 
-bool ska::bytecode::NodeValue::isReference(const NodeValueVariant_& arg) {
+bool ska::NodeValue::isReference(const NodeValueVariant_& arg) {
 	return std::holds_alternative<NodeValue*>(arg);
 }
 
 namespace ska {
-	namespace bytecode {
-		bool operator==(const NodeValue& lhs, const NodeValue& rhs) {
-			return lhs.m_variant == rhs.m_variant;
-		}
+	bool operator==(const NodeValue& lhs, const NodeValue& rhs) {
+		return lhs.m_variant == rhs.m_variant;
 	}
 }

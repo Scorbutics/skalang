@@ -4,7 +4,7 @@
 #include <unordered_map>
 
 #include "NodeValue/ASTNodePtr.h"
-#include "NodeValue/StringShared.h"
+#include "Runtime/Value/StringShared.h"
 #include "Base/Patterns/Observable.h"
 #include "Base/Meta/TupleUtils.h"
 #include "Event/VarTokenEvent.h"

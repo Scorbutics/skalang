@@ -2,8 +2,8 @@
 
 #include <string>
 #include "Type.h"
-#include "NodeValueArray.h"
-#include "StringShared.h"
+#include "Runtime/Value/NodeValueArray.h"
+#include "Runtime/Value/StringShared.h"
 
 namespace ska {
 	template<class T>

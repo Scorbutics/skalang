@@ -82,7 +82,7 @@ TEST_CASE("[BytecodeInterpreter] type conversion + int => array (back)") {
 	auto gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
 	auto res = interpreted->variable(0);
-	auto firstCellValue = res.nodeval<ska::bytecode::NodeValueArray>();
+	auto firstCellValue = res.nodeval<ska::NodeValueArray>();
   CHECK(firstCellValue->size() == 4);
 	CHECK((*firstCellValue)[0].nodeval<long>() == 7);
   CHECK((*firstCellValue)[1].nodeval<long>() == 12);
@@ -96,7 +96,7 @@ TEST_CASE("[BytecodeInterpreter] type conversion + int => array (front)") {
 	auto gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
 	auto res = interpreted->variable(0);
-	auto firstCellValue = res.nodeval<ska::bytecode::NodeValueArray>();
+	auto firstCellValue = res.nodeval<ska::NodeValueArray>();
 	CHECK(firstCellValue->size() == 4);
 	CHECK((*firstCellValue)[0].nodeval<long>() == 3);
   CHECK((*firstCellValue)[1].nodeval<long>() == 7);

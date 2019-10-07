@@ -14,8 +14,8 @@
 #include "Interpreter/Service/ScriptBinding.h"
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/ScriptCache.h"
-#include "NodeValue/ObjectMemory.h"
-#include "NodeValue/StringShared.h"
+#include "Runtime/Value/ObjectMemory.h"
+#include "Runtime/Value/StringShared.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
 const auto reservedKeywordsS = ska::ReservedKeywordsPool{};
@@ -66,7 +66,7 @@ TEST_CASE("[Interpreter Script]") {
 			auto getTotoMemory = scriptBindingDataClass.accessMemory("Binding1", "getToto");
 			assert(getTotoMemory.first != nullptr);
 			auto mem = scriptBindingDataClass.createMemory();
-			mem->emplace("getToto", getTotoMemory.first->clone());
+			mem->emplace("getToto", getTotoMemory.first);
 			return ska::NodeValue{ std::move(mem) };
 		}));
 		scriptBindingDataClass.buildFunctions();

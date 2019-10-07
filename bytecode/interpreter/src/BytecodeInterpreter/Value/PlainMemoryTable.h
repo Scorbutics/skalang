@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "NodeValue.h"
+#include "Runtime/Value/NodeValue.h"
 
 namespace ska {
   namespace bytecode {

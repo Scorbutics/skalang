@@ -67,8 +67,8 @@ TEST_CASE("[BytecodeInterpreter] no type conversion array") {
 	auto gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
 	auto res = interpreted->variable(0);
-	auto firstCellValue = res.nodeval<ska::bytecode::NodeValueArray>();
-	CHECK((*firstCellValue)[0].nodeval<long>() == 3);
+	auto firstCellValue = res.nodeval<ska::NodeValueArray>();
+	CHECK((*firstCellValue)[0].nodeval<long>() == 3L);
 }
 
 TEST_CASE("[BytecodeInterpreter] no type conversion array + array") {
@@ -77,12 +77,12 @@ TEST_CASE("[BytecodeInterpreter] no type conversion array + array") {
 	auto gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
 	auto res = interpreted->variable(0);
-	auto firstCellValue = res.nodeval<ska::bytecode::NodeValueArray>();
+	auto firstCellValue = res.nodeval<ska::NodeValueArray>();
   CHECK(firstCellValue->size() == 4);
-  CHECK((*firstCellValue)[0].nodeval<long>() == 3);
-  CHECK((*firstCellValue)[1].nodeval<long>() == 7);
-  CHECK((*firstCellValue)[2].nodeval<long>() == 12);
-  CHECK((*firstCellValue)[3].nodeval<long>() == 25);
+  CHECK((*firstCellValue)[0].nodeval<long>() == 3L);
+  CHECK((*firstCellValue)[1].nodeval<long>() == 7L);
+  CHECK((*firstCellValue)[2].nodeval<long>() == 12L);
+  CHECK((*firstCellValue)[3].nodeval<long>() == 25L);
 }
 
 TEST_CASE("[BytecodeInterpreter] no type conversion int - int") {
@@ -111,9 +111,9 @@ TEST_CASE("[BytecodeInterpreter] no type conversion array - array") {
 	auto gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.script("main").first, gen);
 	auto res = interpreted->variable(0);
-	auto firstCellValue = res.nodeval<ska::bytecode::NodeValueArray>();
+	auto firstCellValue = res.nodeval<ska::NodeValueArray>();
   CHECK(firstCellValue->size() == 1);
-  CHECK((*firstCellValue)[0].nodeval<long>() == 11);
+  CHECK((*firstCellValue)[0].nodeval<long>() == 11L);
 }
 
 TEST_CASE("[BytecodeInterpreter] no type conversion int * int") {

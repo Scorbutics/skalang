@@ -3,8 +3,8 @@
 #include <memory>
 
 #include "BridgeMemory.h"
-#include "NodeValue/ObjectMemory.h"
-#include "NodeValue/StringShared.h"
+#include "ObjectMemory.h"
+#include "StringShared.h"
 #include "ScriptVariableRef.h"
 
 namespace ska {

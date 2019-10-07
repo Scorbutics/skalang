@@ -3,7 +3,7 @@
 #include <memory>
 #include <unordered_map>
 #include <ostream>
-#include "NodeValue/StringShared.h"
+#include "Runtime/Value/StringShared.h"
 #include "Runtime/Value/ScriptVariableRef.h"
 
 namespace ska {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "NodeValue/Type.h"
-#include "NodeValue.h"
+#include "Runtime/Value/NodeValue.h"
 
 namespace ska {
 	struct TypedNodeValue {

@@ -1,6 +1,6 @@
 #pragma once
 #include "Interpreter/MemoryTablePtr.h"
-#include "NodeValue.h"
+#include "Runtime/Value/NodeValue.h"
 
 namespace ska {
 	

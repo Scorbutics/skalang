@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-#include "Interpreter/Value/NodeValue.h"
+#include "Runtime/Value/NodeValue.h"
 
 #include "std/module.h"
 

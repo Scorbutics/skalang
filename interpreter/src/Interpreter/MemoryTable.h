@@ -5,7 +5,7 @@
 #include <memory>
 #include <unordered_map>
 
-#include "Interpreter/Value/NodeValue.h"
+#include "Runtime/Value/NodeValue.h"
 #include "Interpreter/MemoryTablePtr.h"
 
 namespace ska {

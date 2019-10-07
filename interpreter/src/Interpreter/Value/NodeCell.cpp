@@ -1,6 +1,6 @@
 #include "Config/LoggerConfigLang.h"
 #include "NodeCell.h"
-#include "NodeValue/ObjectMemory.h"
+#include "Runtime/Value/ObjectMemory.h"
 #include "Interpreter/Value/ScriptHandle.h"
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/MemoryTable.h"
@@ -56,7 +56,7 @@ ska::NodeLValue ska::NodeCell::asLvalue() {
 ska::NodeRValue ska::NodeCell::asRvalue() {
 	if (isLvalue()) {
 		//Keeps a copy of the value stored in the nodecell when it's an lvalue to allow later reuse
-		auto newValue = std::get<NodeValue*>(m_variant)->clone();
+		auto newValue = std::get<NodeValue*>(m_variant);
 		return NodeRValue{
 			std::move(newValue),
 			m_memory

@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include "NodeValue/Type.h"
 #include "Generator/BytecodeCommand.h"
-#include "NodeValue/StringShared.h"
+#include "Runtime/Value/StringShared.h"
 #include "Runtime/Value/ScriptVariableRef.h"
 
 /*
