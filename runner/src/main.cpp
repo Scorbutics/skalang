@@ -6,7 +6,7 @@
 #include "Config/LoggerConfigLang.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
-#include "Interpreter/Service/ScriptBridge.h"
+#include "Interpreter/Service/ScriptProxy.h"
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/ScriptCache.h"
 #include "Service/StatementParser.h"
@@ -23,7 +23,7 @@
 #include "std/module/function/parameter.h"
 
 ska::Script SmashAndDashSpecific(ska::lang::ModuleConfiguration& module, const std::string& scriptName) {
-	auto scriptEmBinding = ska::ScriptBridge{ module.scriptCache, "em_lib", module.typeBuilder, module.symbolTableUpdater, module.reservedKeywords };
+	auto scriptEmBinding = ska::ScriptBridge{ module.scriptCache, module.scriptCache.astCache, "em_lib", module.typeBuilder, module.symbolTableUpdater, module.reservedKeywords };
 		scriptEmBinding.bindFunction("setInputMovePower", std::function<void(int, int)>([](int characterId, int value) {
 			std::cout << "move power for " << characterId << " is now " << value << std::endl;
 		}));
@@ -36,7 +36,7 @@ ska::Script SmashAndDashSpecific(ska::lang::ModuleConfiguration& module, const s
 		}));
 		scriptEmBinding.buildFunctions();
 
-		auto scriptCharacterCommands = ska::ScriptBridge{ module.scriptCache, "character_commands_lib", module.typeBuilder, module.symbolTableUpdater, module.reservedKeywords };
+		auto scriptCharacterCommands = ska::ScriptBridge{ module.scriptCache, module.scriptCache.astCache, "character_commands_lib", module.typeBuilder, module.symbolTableUpdater, module.reservedKeywords };
 		scriptCharacterCommands.bindFunction("jump", std::function<void(int)>([](int index) {
 			std::cout << "jump ! " << index << std::endl;
 		}));
@@ -45,13 +45,14 @@ ska::Script SmashAndDashSpecific(ska::lang::ModuleConfiguration& module, const s
 		}));
 		scriptCharacterCommands.buildFunctions();
 
-		auto scriptCharacterBinding = ska::ScriptBridge{ module.scriptCache, "character_generator", module.typeBuilder, module.symbolTableUpdater, module.reservedKeywords };
+		auto scriptCharacterBinding = ska::ScriptBridge{ module.scriptCache, module.scriptCache.astCache, "character_generator", module.typeBuilder, module.symbolTableUpdater, module.reservedKeywords };
+		auto scriptCharacterProxy = ska::ScriptProxy { scriptCharacterBinding };
 		scriptCharacterBinding.import(module.parser, module.interpreter, { {"Character", "character"} });
 		scriptCharacterBinding.bindGenericFunction("Gen", { "Character::Fcty" },
 		std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto parametersValues = std::vector<ska::NodeValue>{};
 			parametersValues.push_back("toto");
-			return scriptCharacterBinding.callFunction(module.interpreter, "Character", "Fcty", std::move(parametersValues));
+			return scriptCharacterProxy.callFunction(module.interpreter, "Character", "Fcty", std::move(parametersValues));
 		}));
 		scriptCharacterBinding.buildFunctions();
 

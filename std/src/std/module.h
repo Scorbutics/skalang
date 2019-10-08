@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Interpreter/ScriptCache.h"
-#include "Interpreter/Service/ScriptBridge.h"
+#include "Interpreter/Service/ScriptProxy.h"
 
 namespace ska {
     class TypeBuilder;

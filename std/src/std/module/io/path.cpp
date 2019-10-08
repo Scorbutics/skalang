@@ -5,14 +5,16 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
 #include "Interpreter/Value/Script.h"
+#include "Interpreter/Interpreter.h"
 #include "Base/IO/Files/FileUtils.h"
 
 ska::lang::IOPathModule::IOPathModule(ModuleConfiguration& config) :
-	Module {config, "std.native.io.path"} {
+	Module {config, "std.native.io.path"},
+	m_proxy { m_bridge } {
 	m_bridge.import(config.parser, config.interpreter, { {"Path", "std:std.io.path"} });
 	m_bridge.bindGenericFunction("Build", { "string", "Path::Fcty()" },
     	std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> buildParams) -> ska::NodeValue {
-		auto path = m_bridge.callFunction(config.interpreter, "Path", "Fcty", std::move(buildParams));
+		auto path = m_proxy.callFunction(config.interpreter, "Path", "Fcty", std::move(buildParams));
 		auto& memPath = path.nodeval<ska::ObjectMemory>();
 
 		//Query input parameters

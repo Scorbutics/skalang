@@ -11,21 +11,13 @@
 namespace ska {
 	class Interpreter;
 
-	class ScriptBridge :
-        public ScriptBinding {
+	using ScriptBridge = ska::ScriptBinding<ska::Script, ska::ScriptCache>;
+
+	class ScriptProxy {
 	public:
-		ScriptBridge(
-			ScriptCache& cache,
-			std::string scriptName,
-			TypeBuilder& typeBuilder,
-			SymbolTableUpdater& symbolTypeUpdater,
-			const ReservedKeywordsPool& reserved);
+		ScriptProxy(ScriptBridge& binding);
 
-		virtual ~ScriptBridge() = default;
-
-		void buildFunctions();
-
-		void import(StatementParser& parser, Interpreter& interpreter, std::vector<std::pair<std::string, std::string>> imports);
+		virtual ~ScriptProxy() = default;
 
 		MemoryTablePtr createMemory() { return m_script.createMemory(); }
 
@@ -33,8 +25,7 @@ namespace ska {
 		MemoryLValue accessMemory(std::string importName, std::string field);
 
 	private:
-		std::string m_name;
+		ScriptBridge& m_binding;
 		Script m_script;
-		ScriptCache& m_cache;
 	};
 }

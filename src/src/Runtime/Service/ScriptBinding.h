@@ -15,26 +15,26 @@
 #include "Runtime/Value/NodeValue.h"
 
 namespace ska {
-	class ScriptBinding;
+	class ScriptBindingBase;
 }
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptBinding);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptBindingBase);
 
 namespace ska {
 	class SymbolTable;
 	class StatementParser;
 
-	class ScriptBinding :
+	class ScriptBindingBase :
         protected observable_priority_queue<VarTokenEvent> {
 	public:
-		ScriptBinding (
+		ScriptBindingBase (
       ScriptCacheAST& cache,
 			std::string scriptName,
 			TypeBuilder& typeBuilder,
 			SymbolTableUpdater& symbolTypeUpdater,
 			const ReservedKeywordsPool& reserved);
 
-		virtual ~ScriptBinding();
+		virtual ~ScriptBindingBase();
 
 		template <class ReturnType, class ... ParameterTypes>
 		void bindFunction(const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
@@ -45,7 +45,11 @@ namespace ska {
 			m_bindings.push_back(bindGenericFunction_(m_script, functionName, std::move(typeNames), std::move(f)));
 		}
 
+		const auto& name() const { return m_script.name(); }
+
 	protected:
+		ASTNode& import(StatementParser& parser, std::vector<std::pair<std::string, std::string>> imports);
+
 		template <class RuntimeScript>
 		void buildFunctions(RuntimeScript& script) {
       SLOG(LogLevel::Info) << "Building script " << script.astScript().name() << " ( " << m_script.name() << ") from bridge";
@@ -61,7 +65,6 @@ namespace ska {
       m_bindings = { };
     }
 
-		ASTNode& import(StatementParser& parser, std::vector<std::pair<std::string, std::string>> imports);
 
 	private:
 		template <class ReturnType, class ... ParameterTypes>
@@ -131,5 +134,34 @@ namespace ska {
 
 		std::vector<ASTNodePtr> m_imports;
 		std::vector<BridgeMemory> m_bindings;
+	};
+
+	template <class Script, class ScriptCache>
+	class ScriptBinding : public ScriptBindingBase {
+	public:
+		ScriptBinding(ScriptCache& cache,
+			ScriptCacheAST& astCache,
+			std::string scriptName,
+			TypeBuilder& typeBuilder,
+			SymbolTableUpdater& symbolTypeUpdater,
+			const ReservedKeywordsPool& reserved) :
+			ScriptBindingBase(astCache, scriptName, typeBuilder, symbolTypeUpdater, reserved),
+			m_script(cache, ScriptBindingBase::name(), std::vector<Token>{}) {
+		}
+
+		void buildFunctions() {
+			ScriptBindingBase::buildFunctions(m_script);
+		}
+
+		auto& script() { return m_script; }
+
+		template <class Interpreter>
+		void import(StatementParser& parser, Interpreter& interpreter, std::vector<std::pair<std::string, std::string>> imports) {
+			auto& importBlock = ScriptBindingBase::import(parser, std::move(imports));
+			interpreter.interpret({ m_script, importBlock});
+		}
+
+	private:
+		Script m_script;
 	};
 }

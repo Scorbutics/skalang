@@ -6,7 +6,7 @@
 #include "Service/SymbolTableUpdater.h"
 #include "Service/ScriptNameBuilder.h"
 
-ska::ScriptBinding::ScriptBinding(
+ska::ScriptBindingBase::ScriptBindingBase(
   ScriptCacheAST& cache,
 	std::string scriptName,
 	TypeBuilder& typeBuilder,
@@ -23,20 +23,20 @@ ska::ScriptBinding::ScriptBinding(
 	observable_priority_queue<VarTokenEvent>::addObserver(m_script.symbols());
 }
 
-ska::ScriptBinding::~ScriptBinding() {
+ska::ScriptBindingBase::~ScriptBindingBase() {
 	observable_priority_queue<VarTokenEvent>::removeObserver(m_typeBuilder);
 	observable_priority_queue<VarTokenEvent>::removeObserver(m_symbolTypeUpdater);
 	observable_priority_queue<VarTokenEvent>::removeObserver(m_script.symbols());
 }
 
-void ska::ScriptBinding::registerAST(ASTNode& scriptAst) {
+void ska::ScriptBindingBase::registerAST(ASTNode& scriptAst) {
   for (auto& functionVarDeclaration : scriptAst) {
 		auto event = VarTokenEvent::Make<VarTokenEventType::VARIABLE_DECLARATION>(*functionVarDeclaration, m_script);
 		observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 	}
 }
 
-ska::ASTNode& ska::ScriptBinding::import(StatementParser& parser, std::vector<std::pair<std::string, std::string>> imports) {
+ska::ASTNode& ska::ScriptBindingBase::import(StatementParser& parser, std::vector<std::pair<std::string, std::string>> imports) {
 	auto importBlock = m_functionBinder.import(parser, m_script, std::move(imports));
 	m_imports.push_back(std::move(importBlock));
   return *m_imports.back().get();

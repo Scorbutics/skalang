@@ -1,7 +1,7 @@
 #pragma once
 
 #include "std/module.h"
-#include "Interpreter/Service/ScriptBridge.h"
+#include "Interpreter/Service/ScriptProxy.h"
 
 namespace ska {
     namespace lang {

@@ -3,16 +3,17 @@
 
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
-#include "Interpreter/Service/ScriptBridge.h"
 #include "Interpreter/Value/Script.h"
+#include "Interpreter/Interpreter.h"
 
 ska::lang::ParameterModule::ParameterModule(ModuleConfiguration& config, const std::vector<NodeValue>& parameterValues) :
     Module { config, "std.native.parameter" },
-    m_parameters(parameterValues) {
+    m_parameters(parameterValues),
+    m_proxy { m_bridge } {
     m_bridge.import(config.parser, config.interpreter, { {"Parameters", "std:std.function.parameters"} });
     m_bridge.bindGenericFunction("Gen", { "string", "Parameters::Fcty" },
     std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
-        auto result = m_bridge.createMemory();
+        auto result = m_proxy.createMemory();
         result->emplace("asInt", std::make_unique<ska::BridgeFunction>(
             std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) {
             const auto index = params[0].nodeval<long>();
