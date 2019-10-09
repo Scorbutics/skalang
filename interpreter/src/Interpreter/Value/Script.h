@@ -32,7 +32,7 @@ namespace ska {
 			return m_cache.cache.find(index) != nullptr;
 		}
 
-		void memoryFromBridge(std::vector<BridgeMemory> bindings);
+		void memoryFromBridge(std::vector<BridgeFunctionPtr> bindings);
 
 		const auto& handle() const { return m_handle; }
 

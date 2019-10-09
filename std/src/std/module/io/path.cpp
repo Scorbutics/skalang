@@ -11,8 +11,8 @@
 ska::lang::IOPathModule::IOPathModule(ModuleConfiguration& config) :
 	Module {config, "std.native.io.path"},
 	m_proxy { m_bridge } {
-	m_bridge.import(config.parser, config.interpreter, { {"Path", "std:std.io.path"} });
-	m_bridge.bindGenericFunction("Build", { "string", "Path::Fcty()" },
+	auto importPath = m_bridge.import(config.parser, config.interpreter, {"Path", "std:std.io.path"});
+	m_bridge.bindGenericFunction("Build", { "string", importPath.typeName("Fcty()") },
     	std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> buildParams) -> ska::NodeValue {
 		auto path = m_proxy.callFunction(config.interpreter, "Path", "Fcty", std::move(buildParams));
 		auto& memPath = path.nodeval<ska::ObjectMemory>();

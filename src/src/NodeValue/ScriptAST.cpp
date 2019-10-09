@@ -65,7 +65,7 @@ void ska::ScriptAST::parse(StatementParser& parser, bool listen) {
 }
 
 
-ska::ASTNode& ska::ScriptAST::fromBridge(std::vector<BridgeMemory>& bindings) {
+ska::ASTNode& ska::ScriptAST::fromBridge(std::vector<BridgeFunctionPtr>& bindings) {
 	auto bindingsAST = std::vector<ASTNodePtr>{};
 	if (!bindings.empty()) {
 		bindingsAST.reserve(bindings.size());

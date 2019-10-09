@@ -47,7 +47,7 @@ ska::Script SmashAndDashSpecific(ska::lang::ModuleConfiguration& module, const s
 
 		auto scriptCharacterBinding = ska::ScriptBridge{ module.scriptCache, module.scriptCache.astCache, "character_generator", module.typeBuilder, module.symbolTableUpdater, module.reservedKeywords };
 		auto scriptCharacterProxy = ska::ScriptProxy { scriptCharacterBinding };
-		scriptCharacterBinding.import(module.parser, module.interpreter, { {"Character", "character"} });
+		scriptCharacterBinding.import(module.parser, module.interpreter, {"Character", "character"});
 		scriptCharacterBinding.bindGenericFunction("Gen", { "Character::Fcty" },
 		std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto parametersValues = std::vector<ska::NodeValue>{};

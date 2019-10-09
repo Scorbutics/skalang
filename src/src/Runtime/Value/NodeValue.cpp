@@ -65,7 +65,7 @@ std::string ska::NodeValue::convertString() const {
 				result = arg ? "true" : "false";
 			} else if constexpr (std::is_same<T, StringShared>::value) {
 				result = *arg;
-			} else if constexpr (std::is_same_v<T, ObjectMemory> || std::is_same_v<T, BridgeMemory>) {
+			} else if constexpr (std::is_same_v<T, ObjectMemory> || std::is_same_v<T, BridgeFunctionPtr>) {
 				result = "__complex memory object__";
 			} else {
 				throw std::runtime_error("cannot convert the node value to a string format");

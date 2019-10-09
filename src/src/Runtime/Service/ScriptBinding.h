@@ -48,7 +48,7 @@ namespace ska {
 		const auto& name() const { return m_script.name(); }
 
 	protected:
-		ASTNode& import(StatementParser& parser, std::vector<std::pair<std::string, std::string>> imports);
+		BridgeImport import(StatementParser& parser, std::pair<std::string, std::string> import);
 
 		template <class RuntimeScript>
 		void buildFunctions(RuntimeScript& script) {
@@ -68,14 +68,14 @@ namespace ska {
 
 	private:
 		template <class ReturnType, class ... ParameterTypes>
-		BridgeMemory bindFunction_(ScriptAST& script, const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
+		BridgeFunctionPtr bindFunction_(ScriptAST& script, const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
 			auto result = makeScriptSideBridge(std::move(f));
 			auto typeNames = m_functionBinder.template buildTypes<ParameterTypes..., ReturnType>();
 			result->node = m_functionBinder.bindSymbol(script, functionName, std::move(typeNames));
 			return result;
 		}
 
-		BridgeMemory bindGenericFunction_(ScriptAST& script, const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
+		BridgeFunctionPtr bindGenericFunction_(ScriptAST& script, const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
 			auto result = std::make_unique<BridgeFunction>(std::move(f));
 			result->node = m_functionBinder.bindSymbol(script, functionName, std::move(typeNames));
 			return result;
@@ -87,7 +87,7 @@ namespace ska {
 		}
 
 		template <class ReturnType, class ... ParameterTypes>
-		BridgeMemory makeScriptSideBridge(std::function<ReturnType(ParameterTypes...)> f) {
+		BridgeFunctionPtr makeScriptSideBridge(std::function<ReturnType(ParameterTypes...)> f) {
 			auto lambdaWrapped = [f, this](std::vector<NodeValue> v) {
 				if constexpr(std::is_same_v<ReturnType, void>) {
 					callNativeFromScript(std::move(f), v, std::make_index_sequence<sizeof ...(ParameterTypes)>());
@@ -133,7 +133,7 @@ namespace ska {
 		ScriptCacheAST& m_cache;
 
 		std::vector<ASTNodePtr> m_imports;
-		std::vector<BridgeMemory> m_bindings;
+		std::vector<BridgeFunctionPtr> m_bindings;
 	};
 
 	template <class Script, class ScriptCache>
@@ -155,10 +155,12 @@ namespace ska {
 
 		auto& script() { return m_script; }
 
+		
 		template <class Interpreter>
-		void import(StatementParser& parser, Interpreter& interpreter, std::vector<std::pair<std::string, std::string>> imports) {
-			auto& importBlock = ScriptBindingBase::import(parser, std::move(imports));
-			interpreter.interpret({ m_script, importBlock});
+		BridgeImport import(StatementParser& parser, Interpreter& interpreter, std::pair<std::string, std::string> import) {
+			auto importRef = ScriptBindingBase::import(parser, std::move(import));
+			interpreter.interpret({ m_script, *importRef.node });
+			return importRef;
 		}
 
 	private:

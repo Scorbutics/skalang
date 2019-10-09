@@ -11,8 +11,8 @@
 ska::lang::IOFileModule::IOFileModule(ModuleConfiguration& config) :
 	Module {config, "std.native.io.file"},
 	m_proxy { m_bridge } {
-	m_bridge.import(config.parser, config.interpreter, { {"File", "std:std.io.file"} });
-	m_bridge.bindGenericFunction("Open", { "string", "File::Fcty()" },
+	auto importFile = m_bridge.import(config.parser, config.interpreter, {"File", "std:std.io.file"});
+	m_bridge.bindGenericFunction("Open", { "string", importFile.typeName("Fcty()") },
     	std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 		auto file = m_proxy.callFunction(config.interpreter, "File", "Fcty", std::move(params));
 		auto& memFile = file.nodeval<ska::ObjectMemory>();

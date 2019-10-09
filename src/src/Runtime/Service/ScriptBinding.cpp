@@ -36,8 +36,8 @@ void ska::ScriptBindingBase::registerAST(ASTNode& scriptAst) {
 	}
 }
 
-ska::ASTNode& ska::ScriptBindingBase::import(StatementParser& parser, std::vector<std::pair<std::string, std::string>> imports) {
-	auto importBlock = m_functionBinder.import(parser, m_script, std::move(imports));
-	m_imports.push_back(std::move(importBlock));
-  return *m_imports.back().get();
+ska::BridgeImport ska::ScriptBindingBase::import(StatementParser& parser, std::pair<std::string, std::string> import) {
+	auto importBridge = m_functionBinder.import(parser, m_script, std::move(import));
+	m_imports.push_back(ASTFactory::MakeNode<Operator::BLOCK>(std::move(importBridge.node)));
+  return { m_imports.back().get(), importBridge.script };
 }

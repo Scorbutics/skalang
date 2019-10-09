@@ -105,8 +105,8 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::FUNCTION_CALL>::interpret(
 		return InterpreterOperationFunctionCallScript(m_interpreter, functionExecutionContext.memory(), operateOnFunction, node);
 	} else {
 		LOG_DEBUG << "Detected a native function";
-		assert(std::holds_alternative<BridgeMemory>(functionValue));
-		auto bridgeCall = inMemoryFunctionZone.object.nodeval<BridgeMemory>();
+		assert(std::holds_alternative<BridgeFunctionPtr>(functionValue));
+		auto bridgeCall = inMemoryFunctionZone.object.nodeval<BridgeFunctionPtr>();
 		assert(bridgeCall != nullptr);
 		auto operateOnFunction = Operation<Operator::FUNCTION_DECLARATION>(executionContext);
 		return InterpreterOperationFunctionCallBridge(m_interpreter, *bridgeCall, operateOnFunction, node);

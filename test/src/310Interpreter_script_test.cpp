@@ -63,13 +63,14 @@ TEST_CASE("[Interpreter Script]") {
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, scriptCacheIS.astCache, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		auto scriptProxy = ska::ScriptProxy { scriptBindingDataClass };
-		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Test293", "" SKALANG_TEST_DIR "/src/resources/test293"}, {"Binding1", "bind:binding1_lib"} });
+		auto importBinding = scriptBindingDataClass.import(*data.parser, *data.interpreter,{"Binding1", "bind:binding1_lib"});
+		auto importTest = scriptBindingDataClass.import(*data.parser, *data.interpreter, {"Test293", "" SKALANG_TEST_DIR "/src/resources/test293"});
 		scriptBindingDataClass.bindGenericFunction("run", { "Test293::Fcty()" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto getTotoMemory = scriptProxy.accessMemory("Binding1", "getToto");
 			assert(getTotoMemory.first != nullptr);
-			auto mem = scriptProxy.createMemory();
-			mem->emplace("getToto", getTotoMemory.first);
-			return ska::NodeValue{ std::move(mem) };
+			auto mem = scriptProxy.createMemory(ska::Type {});
+			mem.replace("getToto", getTotoMemory.first);
+			return ska::NodeValue{ std::move(mem.memory) };
 		}));
 		scriptBindingDataClass.buildFunctions();
 
@@ -183,7 +184,7 @@ TEST_CASE("[Interpreter Script]") {
 		scriptBindingDataClass.buildFunctions();
 
 		auto scriptBinding = ska::ScriptBridge{ scriptCacheIS, scriptCacheIS.astCache, "binding295", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
-		scriptBinding.import(*data.parser, *data.interpreter, { { "DataClassScript", "bind:dataclass_script" } });
+		scriptBinding.import(*data.parser, *data.interpreter, { "DataClassScript", "bind:dataclass_script" });
 		scriptBinding.bindGenericFunction("funcTest", { "DataClassScript::DataClass()", "void" }, 
 		std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto mem = params[0].nodeval<ska::ObjectMemory>();
@@ -318,8 +319,8 @@ TEST_CASE("[Interpreter Script]") {
 
 		auto scriptBindingDataClass = ska::ScriptBridge{ scriptCacheIS, scriptCacheIS.astCache, "dataclass_script", *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywordsS };
 		auto scriptProxy = ska::ScriptProxy { scriptBindingDataClass };
-		scriptBindingDataClass.import(*data.parser, *data.interpreter, { {"Character", "" SKALANG_TEST_DIR "/src/resources/character"} });
-		scriptBindingDataClass.bindGenericFunction("run", { "Character::build()" }, 
+		auto importCharacter = scriptBindingDataClass.import(*data.parser, *data.interpreter, {"Character", "" SKALANG_TEST_DIR "/src/resources/character"});
+		scriptBindingDataClass.bindGenericFunction("run", { importCharacter.typeName("build()") },
 		std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> p) -> ska::NodeValue {
 			auto params = std::vector<ska::NodeValue>{};
 			params.push_back(std::make_shared<std::string>("babar"));

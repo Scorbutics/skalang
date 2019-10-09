@@ -15,6 +15,7 @@
 #include "Container/sorted_observable.h"
 
 #include "Service/Matcher/MatcherType.h"
+#include "Runtime/Value/BridgeImport.h"
 
 namespace ska {
 	class SymbolTable;
@@ -52,7 +53,7 @@ namespace ska {
 		BindingFactory(TypeBuilder& typeBuilder, SymbolTableUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
 		virtual ~BindingFactory();
 
-		ASTNodePtr import(StatementParser& parser, ScriptAST& script, std::vector<std::pair<std::string, std::string>> imports);
+		BridgeImportRaw import(StatementParser& parser, ScriptAST& script, std::pair<std::string, std::string> import);
 
 		template<class ... Types>
 		std::vector<std::string> buildTypes() {

@@ -40,5 +40,8 @@ ska::MemoryLValue ska::ScriptProxy::accessMemory(std::string importName, std::st
 	}
 	auto& emId = found->nodeval<ska::ScriptVariableRef>();
 	auto em = m_script.useImport(emId.script);
+	if (em == nullptr) {
+		throw std::runtime_error("unable to find import \"" + importName + "\" queried in script \"" + m_script.name() + "\"");
+	}
 	return em->downMemory()(field);
 }

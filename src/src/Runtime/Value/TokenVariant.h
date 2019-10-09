@@ -8,5 +8,5 @@
 #include "ScriptVariableRef.h"
 
 namespace ska {
-	using TokenVariant = std::variant<ScriptVariableRef, bool, long, double, StringShared, ObjectMemory, BridgeMemory>;
+	using TokenVariant = std::variant<ScriptVariableRef, bool, long, double, StringShared, ObjectMemory, BridgeFunctionPtr>;
 }
