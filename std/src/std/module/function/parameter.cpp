@@ -13,7 +13,7 @@ ska::lang::ParameterModule::ParameterModule(ModuleConfiguration& config, const s
     auto parametersImport = m_bridge.import(config.parser, config.interpreter, {"Parameters", "std:std.function.parameters"});
     m_bridge.bindGenericFunction("Gen", { "string", parametersImport.typeName("Fcty") },
     std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
-        auto result = m_proxy.createMemory(parametersImport.type("Fcty"));
+        auto result = m_proxy.createMemory(parametersImport);
         result.replace("asInt", std::make_unique<ska::BridgeFunction>(
             std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) {
             const auto index = params[0].nodeval<long>();

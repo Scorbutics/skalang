@@ -26,5 +26,9 @@ namespace ska {
       assert(!nodeName.name().empty());
       return nodeName.name() + "::" + field;
     }
+
+    const auto& symbols() const {
+      return script->symbols();
+    }
   };
 }

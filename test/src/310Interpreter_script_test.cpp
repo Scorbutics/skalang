@@ -68,7 +68,7 @@ TEST_CASE("[Interpreter Script]") {
 		scriptBindingDataClass.bindGenericFunction("run", { "Test293::Fcty()" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto getTotoMemory = scriptProxy.accessMemory("Binding1", "getToto");
 			assert(getTotoMemory.first != nullptr);
-			auto mem = scriptProxy.createMemory(ska::Type {});
+			auto mem = scriptProxy.createMemory(importBinding);
 			mem.replace("getToto", getTotoMemory.first);
 			return ska::NodeValue{ std::move(mem.memory) };
 		}));
