@@ -19,7 +19,8 @@ namespace ska {
 
 		virtual ~ScriptProxy() = default;
 
-		BridgeMemory<MemoryTablePtr> createMemory(BridgeImport& import) { return { m_script.createMemory(), import.symbols() }; }
+		BridgeMemory<MemoryTablePtr> createMemory(const BridgeImport& import) { return { m_script.createMemory(), import.symbols() }; }
+		BridgeMemory<MemoryTablePtr> createMemory(const Symbol& symbol) { return { m_script.createMemory(), symbol }; }
 
 		NodeValue callFunction(Interpreter& interpreter, std::string importName, std::string functionName, std::vector<ska::NodeValue> parametersValues);
 		MemoryLValue accessMemory(std::string importName, std::string field);
