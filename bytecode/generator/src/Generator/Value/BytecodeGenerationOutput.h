@@ -20,9 +20,8 @@ namespace ska {
 			void setOut(std::size_t index, ScriptGenerationOutput scriptOutput);
 
 			GenerationOutput(const GenerationOutput&) = delete;
-			GenerationOutput& operator=(const GenerationOutput&) = delete;
 			GenerationOutput(GenerationOutput&&) = default;
-			GenerationOutput& operator=(GenerationOutput&&) = default;
+			GenerationOutput& operator=(const GenerationOutput&) = delete;
 			~GenerationOutput() = default;
 
 			auto size() const { return m_storage.services.size(); }

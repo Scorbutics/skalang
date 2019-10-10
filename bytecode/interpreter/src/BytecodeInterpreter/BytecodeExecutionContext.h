@@ -20,7 +20,6 @@ namespace ska {
 				ExecutionContext(old.m_container, scriptIndex, old.m_bytecode) { }
 
 			ExecutionContext(ExecutionContext&&) noexcept = default;
-			ExecutionContext& operator=(ExecutionContext&&) = default;
 			ExecutionContext(const ExecutionContext&) = delete;
 			ExecutionContext& operator=(const ExecutionContext&) = delete;
 

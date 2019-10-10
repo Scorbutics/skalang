@@ -53,11 +53,6 @@ namespace ska {
 			return Type{ symbol, t };
 		}
 
-		template<ExpressionType t>
-		static Type MakeCustom(const std::string symbol) {
-			static_assert(isNamed(t));
-			return Type{ symbol, t };
-		}
 
 		Type() = default;
 		Type(Type&& t) noexcept = default;

@@ -11,6 +11,7 @@ namespace ska {
 	class InterpreterOperatorUnit {
 	public:
 		virtual NodeCell interpret(ExecutionContext& node) = 0;
+		virtual ~InterpreterOperatorUnit() = default;
 	};
 
 	class InterpreterOperatorBase :

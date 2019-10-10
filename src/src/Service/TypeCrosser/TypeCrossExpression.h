@@ -17,6 +17,8 @@ namespace ska {
 	class TypeCrosser : 
 		public TypeCross {
 	public:
+		static constexpr auto TypeCrossMapSize = static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length);
+		using TypeCrossMap = std::array<TypeCrossPtr, TypeCrossMapSize>;
 		TypeCrosser() = default;
 		TypeCrosser(const TypeCrosser&) = delete;
 		TypeCrosser(TypeCrosser&&) = delete;
@@ -26,8 +28,6 @@ namespace ska {
 
 		Type cross(const std::string& op, const Type& type1, const Type& type2) const override final;
 	private:
-		static constexpr auto TypeCrossMapSize = static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length);
-		using TypeCrossMap = std::array<TypeCrossPtr, TypeCrossMapSize>;
 		
 		static TypeCrossMap BuildTypeCrossMap();
 		

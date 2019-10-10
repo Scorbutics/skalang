@@ -11,6 +11,7 @@ namespace ska {
 		class InterpreterCommandUnit {
 		public:
 			virtual ScriptExecutionOutput interpret(ExecutionContext& node) = 0;
+			virtual ~InterpreterCommandUnit() = default;
 		};
 
 		class InterpreterCommandBase :

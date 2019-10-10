@@ -9,6 +9,7 @@ namespace ska {
     class TypeBuildUnit {
     public:
         virtual Type build(const ScriptAST&, const ASTNode&) = 0;
+    	virtual ~TypeBuildUnit() = default;
     };
 
 }

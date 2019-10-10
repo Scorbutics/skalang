@@ -16,7 +16,6 @@ namespace ska {
 			GenerationContext(GenerationContext& old, ScriptGenerationService script);
 
 			GenerationContext(GenerationContext&& mv) = default;
-			GenerationContext& operator=(GenerationContext&& mv) = default;
 
 			GenerationContext(GenerationContext& old, const ASTNode& node, std::size_t scopeLevelOffset = 0);
 

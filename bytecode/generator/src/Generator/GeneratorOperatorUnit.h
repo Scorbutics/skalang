@@ -10,6 +10,7 @@ namespace ska {
 		class GeneratorOperatorUnit {
 		public:
 			virtual ScriptGenerationOutput generate(GenerationContext& node) = 0;
+			virtual ~GeneratorOperatorUnit() = default;
 		};
 
 		class GeneratorOperatorBase :
@@ -17,6 +18,7 @@ namespace ska {
 		public:
 			GeneratorOperatorBase(Generator& generator) :
 				m_generator(generator) {}
+
 
 			ScriptGenerationOutput generateNext(GenerationContext node);
 
