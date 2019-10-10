@@ -36,11 +36,6 @@ namespace ska {
 	class ASTNode;
 
 	namespace bytecode {
-
-		/*
-		using VariableRefIndexMap = std::unordered_map<std::size_t, std::size_t>;
-		using InstanceReferences = std::shared_ptr<VariableRefIndexMap>;
-		*/
 		using ValueVariant = std::variant<ScriptVariableRef, long, bool, double, StringShared>;
 
 		enum class ValueType {
