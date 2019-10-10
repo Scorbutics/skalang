@@ -41,6 +41,13 @@ static ska::bytecode::ScriptGenerationService BasicProgramScriptStarter(ska::lan
 	return ska::bytecode::ScriptGenerationService{ 0, executor};
 }
 
+static ska::lang::ParameterModule BasicParameterModuleBuilder(ska::lang::ModuleConfiguration& module, std::vector<ska::NodeValue>& parameters, int argc, char* argv[]) {
+	for(auto i = 2; i < argc; i++) {
+		parameters.push_back(std::make_shared<std::string>(argv[i]));
+	}
+
+	return ska::lang::ParameterModule(module, parameters);
+}
 
 int main(int argc, char* argv[]) {
 	if (argc <= 1) {
@@ -76,6 +83,7 @@ int main(int argc, char* argv[]) {
 
 		auto parameterValues = std::vector<ska::NodeValue>{};
 		
+		auto parameterModule = BasicParameterModuleBuilder(moduleConfiguration, parameterValues, argc, argv);
 		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
 		auto gen = generator.generate(storage, std::move(script));
 		auto interpreted = interpreter.interpret(gen.script("main").first, gen);
