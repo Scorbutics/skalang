@@ -1,0 +1,89 @@
+#include <iostream>
+#include <fstream>
+#include <tuple>
+#include "Config/LoggerConfigLang.h"
+#include "Service/ReservedKeywordsPool.h"
+#include "Service/Tokenizer.h"
+#include "Service/StatementParser.h"
+#include "Service/SemanticTypeChecker.h"
+#include "Service/TypeBuilder/TypeBuilder.h"
+#include "Service/TypeBuilder/TypeBuildUnit.h"
+#include "NodeValue/ScriptAST.h"
+#include "NodeValue/ScriptCacheAST.h"
+#include "Service/TypeCrosser/TypeCrossExpression.h"
+#include "Generator/Value/BytecodeScript.h"
+#include "Generator/BytecodeGenerator.h"
+#include "Generator/Value/BytecodeStorage.h"
+#include "Service/SymbolTableUpdater.h"
+
+#include "BytecodeInterpreter/BytecodeInterpreter.h"
+
+#include "Interpreter/Interpreter.h"
+
+#include "std/module/io/log.h"
+#include "std/module/io/path.h"
+#include "std/module/function/parameter.h"
+
+// Bytecode Services
+static std::unique_ptr<ska::bytecode::Generator> generator;
+static std::unique_ptr<ska::bytecode::Interpreter> interpreter;
+
+static ska::bytecode::ScriptGenerationService BasicProgramScriptStarter(ska::lang::ModuleConfiguration& module, char* argv[]) {
+	auto scriptFileName = std::string{ argv[1] };
+	auto scriptName = scriptFileName.substr(0, scriptFileName.find_last_of('.'));
+
+	const auto scriptStarter = "var Script = import \"wd:" + scriptName + "\";"
+	"var ParametersGenerator = import \"bind:std.native.parameter\";"
+	"Script.run(ParametersGenerator.Gen(\"" + scriptName + "\"));";
+
+	auto executor = ska::ScriptAST{ module.scriptCache.astCache, "main", ska::Tokenizer{ module.reservedKeywords, scriptStarter}.tokenize() };
+	executor.parse(module.parser);
+	return ska::bytecode::ScriptGenerationService{ 0, executor};
+}
+
+
+int main(int argc, char* argv[]) {
+	if (argc <= 1) {
+		std::cout << "No file name entered. Exiting..." << std::endl;
+		return -1;
+	}
+
+	auto inputFile = std::ifstream{ std::string{argv[1]} };
+	if(inputFile.fail()) {
+		std::cout << "File not found : \"" << argv[1] << std::endl;
+        	return -1;
+	}
+  
+	const auto reservedKeywords = ska::ReservedKeywordsPool{};
+	auto typeCrosser = ska::TypeCrosser{};
+	auto parser = ska::StatementParser {reservedKeywords};
+	auto typeBuilder = ska::TypeBuilder {parser, typeCrosser };
+	auto symbolsTypeUpdater = ska::SymbolTableUpdater {parser};
+	auto typeChecker = ska::SemanticTypeChecker {parser, typeCrosser };
+	
+	auto scriptCache = ska::ScriptCache{};
+	auto oldInterpreter = ska::Interpreter {reservedKeywords, typeCrosser };
+	
+	auto storage = ska::bytecode::BytecodeStorage {};
+	auto generator = ska::bytecode::Generator{ reservedKeywords };
+	auto interpreter = ska::bytecode::Interpreter { generator, reservedKeywords };
+
+	auto moduleConfiguration = ska::lang::ModuleConfiguration {scriptCache, typeBuilder, symbolsTypeUpdater, reservedKeywords, parser, oldInterpreter};
+
+	try {
+		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);
+		auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
+
+		auto parameterValues = std::vector<ska::NodeValue>{};
+		
+		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
+		auto gen = generator.generate(storage, std::move(script));
+		auto interpreted = interpreter.interpret(gen.script("main").first, gen);
+	} catch (std::exception& e) {
+		std::cerr << "Error : " << e.what() << std::endl;
+		return -1;
+	}
+
+	return 0;
+}
+

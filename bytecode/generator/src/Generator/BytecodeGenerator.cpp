@@ -70,11 +70,10 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::Generator::generatePart(Gen
 ska::bytecode::GenerationOutput ska::bytecode::Generator::generate(BytecodeStorage& storage, ScriptGenerationService script) {
 	auto container = GenerationOutput { storage };
 	auto index = container.push(std::move(script));
-	auto service = container.backService().program().name();
+	auto serviceName = container.backService().program().name();
 	container.setOut(index, generatePart(GenerationContext{ container }));
-	auto& out = container; //postProcessing(service, container);
 
-	LOG_INFO << "Final generation " << out.back() << " for script " << service;
+	LOG_INFO << "Final generation " << container.back() << " for script " << serviceName;
 
-	return std::move(out);
+	return container;
 }

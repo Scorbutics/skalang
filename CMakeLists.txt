@@ -18,6 +18,7 @@ set(SKALANG_STD_DIR ${CMAKE_CURRENT_SOURCE_DIR}/std)
 set(SKALANG_INTERPRETER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/interpreter)
 set(SKALANG_BYTECODE_GEN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bytecode/generator)
 set(SKALANG_BYTECODE_INT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bytecode/interpreter)
+set(SKALANG_BYTECODE_RUN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bytecode/runner)
 
 include_directories(${SKA_BASE_DIR})
 include_directories(${SKA_LOG_DIR})
@@ -34,3 +35,5 @@ add_subdirectory(${SKALANG_INTERPRETER_DIR})
 add_subdirectory(${SKALANG_STD_DIR})
 add_subdirectory(${SKALANG_TEST_DIR})
 add_subdirectory(${SKALANG_RUNNER_DIR})
+add_subdirectory(${SKALANG_BYTECODE_RUN_DIR})
+
