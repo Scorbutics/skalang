@@ -17,10 +17,11 @@
 #include "GeneratorOperatorUserDefinedObject.h"
 #include "GeneratorOperatorImport.h"
 #include "GeneratorOperatorFieldAccess.h"
+#include "GeneratorOperatorScriptLink.h"
 
 #include "GeneratorDeclarer.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::Generator);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Generator);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Generator)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Generator)
 
@@ -47,6 +48,7 @@ std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode
 	GeneratorOperatorDeclare<ska::Operator::USER_DEFINED_OBJECT>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::FIELD_ACCESS>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::IMPORT>(*this, result);
+	GeneratorOperatorDeclare<ska::Operator::SCRIPT_LINK>(*this, result);
 
 	return result;
 }

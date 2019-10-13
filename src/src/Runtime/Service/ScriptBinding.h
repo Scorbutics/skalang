@@ -18,7 +18,7 @@ namespace ska {
 	class ScriptBindingBase;
 }
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptBindingBase);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ScriptBindingBase);
 
 namespace ska {
 	class SymbolTable;
