@@ -13,11 +13,11 @@ std::size_t ska::bytecode::GenerationOutput::push(ScriptGenerationService servic
 
   SLOG(ska::LogLevel::Debug) << "Getting script generation service for script named \"" << scriptName << "\" at index \"" << index << "\"";
 
-  const auto& [element, isInserted] = m_mapping.emplace(scriptName, index);
-  if (!isInserted) {
+  const auto& newElementInserted = m_storage.emplace(scriptName, Storage{ std::move(service) });;
+  if (!newElementInserted && !m_storage.back().output.empty()) {
     throw std::runtime_error("Double insertion of the same script in generation output");
   }
-  m_storage.emplace(scriptName, Storage{ std::move(service) });
+
   return index;
 }
 
@@ -27,8 +27,8 @@ void ska::bytecode::GenerationOutput::setOut(std::size_t index, ScriptGeneration
 }
 
 std::pair<std::size_t, ska::bytecode::ScriptGenerationService*> ska::bytecode::GenerationOutput::script(const std::string& fullScriptName) {
-  auto result = m_mapping.find(fullScriptName);
-  if(result == m_mapping.end()) {
+  auto result = m_storage.find(fullScriptName);
+  if(result == m_storage.end()) {
     SLOG(ska::LogLevel::Debug) << "No mapping found for script \"" << fullScriptName << "\"";
     return std::make_pair(std::numeric_limits<std::size_t>::max(), nullptr);
   }

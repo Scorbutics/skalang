@@ -54,13 +54,15 @@ namespace ska {
 			return cache[index];
 		}
 
-		void emplace(std::string scriptName, ScriptT script) {
+		bool emplace(std::string scriptName, ScriptT script) {
 			const auto wantedScriptId = namedMapCache.size();
 			const auto emplacedItem = namedMapCache.emplace(std::move(scriptName), wantedScriptId);
 			if(emplacedItem.second) {
 				pushCache(wantedScriptId, std::move(script));
+				return false;
 			} else {
 				pushCache(emplacedItem.first->second, std::move(script));
+				return true;
 			}
 		}
 

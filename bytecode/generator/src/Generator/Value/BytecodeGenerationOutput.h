@@ -45,7 +45,6 @@ namespace ska {
 
 		private:
 			ScriptStorage& m_storage;
-			ScriptGenerationNameToIndexMap m_mapping;
 			SymbolInfosContainer m_symbolInfo;
 		};
 	}
