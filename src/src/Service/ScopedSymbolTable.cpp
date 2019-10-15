@@ -1,5 +1,5 @@
 #include "ScopedSymbolTable.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScopedSymbolTable)
 
@@ -29,7 +29,7 @@ ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
     return s;
 }
 
-ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, const Script& script) {
+ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, const ScriptAST& script) {
 	return emplace(Symbol{ name, script.handle() });
 }
 

@@ -4,7 +4,7 @@
 
 namespace ska {
 	struct ReservedKeywordsPool;
-	class Script;
+	class ScriptAST;
 	class StatementParser;
 
 	class ASTNode;
@@ -16,7 +16,7 @@ namespace ska {
 		MatcherIfElse(const ReservedKeywordsPool& pool, StatementParser& parser) :
 			m_reservedKeywordsPool(pool), m_parser(parser) {}
 	
-		ASTNodePtr match(Script& input);
+		ASTNodePtr match(ScriptAST& input);
 	
 	private:
 		const ReservedKeywordsPool& m_reservedKeywordsPool;

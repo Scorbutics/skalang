@@ -10,7 +10,7 @@ namespace ska {
         EQUAL,
 		EQUALITY,
         CONDITION,
-        NOT_CONDITION,
+		INEQUALITY,
         NOT,
         ADDITION_EQUAL,
         SUBSTRACT_EQUAL,
@@ -21,7 +21,8 @@ namespace ska {
 		GREATER_OR_EQUAL,
 		GREATER,
         AND,
-        OR
+        OR,
+        UNUSED_Last_Length
     };
 
     static const auto LogicalOperatorMap = std::unordered_map<std::string, LogicalOperator>{
@@ -33,9 +34,9 @@ namespace ska {
         {"==", LogicalOperator::EQUALITY},
 		{"<=", LogicalOperator::LESSER_OR_EQUAL},
 		{">=", LogicalOperator::GREATER_OR_EQUAL},
-		{"<", LogicalOperator::LESSER},
-		{">", LogicalOperator::GREATER},
-        {"!=", LogicalOperator::NOT_CONDITION},
+		{"<",  LogicalOperator::LESSER},
+		{">",  LogicalOperator::GREATER},
+        {"!=", LogicalOperator::INEQUALITY},
         {"!",  LogicalOperator::NOT},
         {"+=", LogicalOperator::ADDITION_EQUAL},
         {"-=", LogicalOperator::SUBSTRACT_EQUAL},

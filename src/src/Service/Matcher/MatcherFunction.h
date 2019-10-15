@@ -6,7 +6,7 @@
 
 namespace ska {
 	struct ReservedKeywordsPool;
-	class Script;
+	class ScriptAST;
 	class StatementParser;
 
 	class ASTNode;
@@ -18,14 +18,14 @@ namespace ska {
 		MatcherFunction(const ReservedKeywordsPool& pool, StatementParser& parser) :
 			m_reservedKeywordsPool(pool), m_parser(parser), m_matcherType(pool) {}
 	
-		ASTNodePtr matchCall(Script& input, ASTNodePtr identifierFunctionName);
-		ASTNodePtr matchDeclaration(Script& input);
+		ASTNodePtr matchCall(ScriptAST& input, ASTNodePtr identifierFunctionName);
+		ASTNodePtr matchDeclaration(ScriptAST& input);
 	
 	private:
-		ASTNodePtr matchDeclarationBody(Script& input);
-		std::vector<ASTNodePtr> fillDeclarationParameters(Script& input);
-		ASTNodePtr matchDeclarationReturnType(Script& input);
-		ASTNodePtr matchDeclarationParameter(Script& input);
+		ASTNodePtr matchDeclarationBody(ScriptAST& input);
+		std::vector<ASTNodePtr> fillDeclarationParameters(ScriptAST& input);
+		ASTNodePtr matchDeclarationReturnType(ScriptAST& input);
+		ASTNodePtr matchDeclarationParameter(ScriptAST& input);
 
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		StatementParser& m_parser;

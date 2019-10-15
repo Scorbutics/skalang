@@ -3,6 +3,7 @@ project(skalang_std)
 include_directories(${SKA_BASE_DIR})
 include_directories(src)
 include_directories(${SKALANG_SRC_DIR}/src)
+include_directories(${SKALANG_INTERPRETER_DIR}/src)
 
 link_directories(../lib)
 
@@ -18,5 +19,5 @@ add_definitions(-DSKALANG_STD_DIR="${SKALANG_STD_DIR}")
 add_library(skalang_std ${SOURCES})
 
 find_package(Threads REQUIRED)
-target_link_libraries(skalang_std skalang skalog skabase Threads::Threads)
+target_link_libraries(skalang_std atomic skalang skalang_interpreter skalog skabase Threads::Threads)
 target_include_directories(skalang_std PUBLIC ../external/skabase/src/src PUBLIC ../external/skalog/src/src)

@@ -6,8 +6,12 @@ var Fcty = function(characterId: int): var {
 	return {
         movePower: function(): int { return movePower_; },
         jumpPower: function(): int { return jumpPower_; },
-		setMovePower : function(movePow: int) { movePower_ = movePow; EntityManager.setInputMovePower(characterId, movePow); },
-		setJumpPower : function(jumpPow: int) { jumpPower_ = jumpPow; EntityManager.setInputJumpPower(characterId, jumpPow); },
+		setMovePower : function(movePow: int) { 
+            movePower_ = movePow; EntityManager.setInputMovePower(characterId, movePow); 
+        },
+		setJumpPower : function(jumpPow: int) { 
+            jumpPower_ = jumpPow; EntityManager.setInputJumpPower(characterId, jumpPow); 
+        },
 		remove : function() { EntityManager.removeInputComponent(characterId); },
 		restore : function() { EntityManager.restoreInputComponent(characterId, movePower_, jumpPower_); }
     };

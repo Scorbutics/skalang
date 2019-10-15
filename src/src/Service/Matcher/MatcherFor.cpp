@@ -7,33 +7,33 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
 #include "Service/ASTFactory.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherFor)
 
-ska::ASTNodePtr ska::MatcherFor::match(Script& input) {
+ska::ASTNodePtr ska::MatcherFor::match(ScriptAST& input) {
     auto emptyNode = ASTFactory::MakeEmptyNode();
     auto blockEventBegin = BlockTokenEvent { *emptyNode, BlockTokenEventType::START };
 	m_parser.observable_priority_queue<BlockTokenEvent>::notifyObservers(blockEventBegin);
 
-    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::FOR>());
-    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
+    input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::FOR>());
+    input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
 	SLOG(ska::LogLevel::Info) << "1st for loop expression (= statement)";
 
-    auto forNodeFirstExpression = input.optstatement(m_parser);
+	auto forNodeFirstExpression = input.optstatement(m_parser, Token {});
 
 	SLOG(ska::LogLevel::Info) << "2nd for loop expression";
 
     auto forNodeMidExpression = input.optexpr(m_parser, m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
-    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+    input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
 
 	SLOG(ska::LogLevel::Info) << "3rd for loop expression";
 
     auto forNodeLastExpression = input.optexpr(m_parser, m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
-    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
+    input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 
-    auto forNodeStatement = input.optstatement(m_parser);
+	auto forNodeStatement = input.optstatement(m_parser, Token {});
 	SLOG(ska::LogLevel::Info) << "end for loop statement";
 
     auto forNode = ASTFactory::MakeNode<Operator::FOR_LOOP>(

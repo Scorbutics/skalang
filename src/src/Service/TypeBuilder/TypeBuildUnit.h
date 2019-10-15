@@ -3,13 +3,13 @@
 #include "NodeValue/Type.h"
 
 namespace ska {
-	class Script;
+	class ScriptAST;
 	class ASTNode;
 
     class TypeBuildUnit {
     public:
-        virtual Type build(const Script&, const ASTNode&) = 0;
-	virtual ~TypeBuildUnit() = default;
+        virtual Type build(const ScriptAST&, const ASTNode&) = 0;
+    	virtual ~TypeBuildUnit() = default;
     };
 
 }

@@ -1,20 +1,20 @@
 #include "Config/LoggerConfigLang.h"
 #include "ScriptLinkTokenEvent.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
-ska::ScriptLinkTokenEvent::ScriptLinkTokenEvent(ASTNode& node, std::string scriptName, Script& scriptCaller) :
+ska::ScriptLinkTokenEvent::ScriptLinkTokenEvent(ASTNode& node, std::string scriptName, ScriptAST& scriptCaller) :
 	m_node(node), 
 	m_name(std::move(scriptName)),
 	m_scriptCaller(scriptCaller),
-	m_script(scriptCaller.subScript(m_name)) {
+	m_script(scriptCaller.useImport(m_name)) {
 	assert(m_node.op() == Operator::SCRIPT_LINK); 
 }
 
-ska::Script& ska::ScriptLinkTokenEvent::script() {
+ska::ScriptAST& ska::ScriptLinkTokenEvent::script() {
 	return m_scriptCaller;
 }
 
-const ska::Script& ska::ScriptLinkTokenEvent::script() const {
+const ska::ScriptAST& ska::ScriptLinkTokenEvent::script() const {
 	return m_scriptCaller;
 }
 

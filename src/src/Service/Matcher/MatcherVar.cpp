@@ -7,22 +7,22 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Event/BlockTokenEvent.h"
 #include "Service/ASTFactory.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherVar)
 
-ska::ASTNodePtr ska::MatcherVar::matchDeclaration(Script& input) {
+ska::ASTNodePtr ska::MatcherVar::matchDeclaration(ScriptAST& input) {
 	SLOG(ska::LogLevel::Info) << "variable declaration";
 
-	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>());
-	auto varNodeIdentifier = input.match(TokenType::IDENTIFIER);
-    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
+	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>());
+	auto varNodeIdentifier = input.reader().match(TokenType::IDENTIFIER);
+    input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
 
 	SLOG(ska::LogLevel::Info) << "equal sign matched, reading expression";
 
     auto varNodeExpression = input.expr(m_parser);
 
-    input.match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+    input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
 
 	SLOG(ska::LogLevel::Info) << "expression end with symbol ;";
 
@@ -34,8 +34,8 @@ ska::ASTNodePtr ska::MatcherVar::matchDeclaration(Script& input) {
     return varNode;
 }
 
-ska::ASTNodePtr ska::MatcherVar::matchAffectation(Script& input, ASTNodePtr varAffectedNode) {
-	input.match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
+ska::ASTNodePtr ska::MatcherVar::matchAffectation(ScriptAST& input, ASTNodePtr varAffectedNode) {
+	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
 	auto expressionNode = input.expr(m_parser);
 	if (expressionNode == nullptr) {
 		throw std::runtime_error("syntax error : Affectation incomplete : no expression");

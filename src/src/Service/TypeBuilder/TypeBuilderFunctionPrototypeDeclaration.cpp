@@ -3,9 +3,9 @@
 #include "TypeBuilderCalculatorDispatcher.h"
 #include "Service/SymbolTable.h"
 #include "NodeValue/AST.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
-#include "Operation/Type/OperationTypeType.h"
+#include "Operation/OperationTypeType.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
 
@@ -41,7 +41,7 @@ namespace ska {
 	}
 }
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::build(const Script& script, OperateOn node) {
+ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::build(const ScriptAST& script, OperateOn node) {
 	auto functionName = node.GetFunctionName();
     auto& symbols = script.symbols();
 	const auto* symbolFunction = symbols[functionName];

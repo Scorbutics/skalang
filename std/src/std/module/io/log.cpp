@@ -9,13 +9,13 @@
 
 ska::lang::IOLogModule::IOLogModule(ModuleConfiguration& config) :
 	Module {config, "std.native.io.log"} {
-	m_bridge.bindFunction("printInt", std::function<void(Script&, int)>([](Script&, int value) {
+	m_bridge.bindFunction("printInt", std::function<void(int)>([](int value) {
 		std::cout << value << std::endl;
 	}));
-	m_bridge.bindFunction("printString", std::function<void(Script&, ska::StringShared)>([](Script&, ska::StringShared value) {
+	m_bridge.bindFunction("printString", std::function<void(ska::StringShared)>([](ska::StringShared value) {
 		std::cout << *value << std::endl;
 	}));
-	m_bridge.bindFunction("wait", std::function<void(Script&, int)>([](Script&, int value) {
+	m_bridge.bindFunction("wait", std::function<void(int)>([](int value) {
 		//TODO
 		std::cout << "wait " << value << std::endl;
 	}));

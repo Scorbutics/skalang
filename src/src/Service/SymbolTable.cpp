@@ -4,9 +4,9 @@
 #include "SymbolTable.h"
 #include "Service/StatementParser.h"
 #include "Service/ASTFactory.h"
-#include "Operation/Type/OperationTypeScriptLink.h"
+#include "Operation/OperationTypeScriptLink.h"
 #include "Event/ScriptLinkTokenEvent.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTable)
 

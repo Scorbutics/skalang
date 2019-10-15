@@ -52,13 +52,8 @@ namespace ska {
 			static_assert(isNamed(t));
 			return Type{ symbol, t };
 		}
-/*
-		template<ExpressionType t>
-		static Type MakeCustom(const std::string symbol) {
-			static_assert(isNamed(t));
-			return Type{ symbol, t };
-		}
-*/
+
+
 		Type() = default;
 		Type(Type&& t) noexcept = default;
 		Type(const Type& t) = default;
@@ -110,6 +105,7 @@ namespace ska {
 		}
 
 		const Symbol* operator[](const std::string& fieldName) const;
+		const Symbol* symbol() const { return m_symbol; }
 
 	private:
 		friend class TypeCrosser;

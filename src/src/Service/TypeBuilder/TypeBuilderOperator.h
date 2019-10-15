@@ -2,7 +2,7 @@
 
 #include "NodeValue/Type.h"
 #include "TypeBuildUnit.h"
-#include "Operation/Type/OperationType.h"
+#include "Operation/OperationType.h"
 
 #define SKALANG_BUILDER_TYPE_OPERATOR_DEFINE(OperatorType)\
     template<>\
@@ -11,19 +11,19 @@
 	private:\
 		using OperateOn = OperationType<OperatorType>;\
 	public:\
-        Type build(const Script& script, const ASTNode& node) override final {\
+        Type build(const ScriptAST& script, const ASTNode& node) override final {\
 			return build(script, OperateOn{node});\
 		}\
-		Type build(const Script& script, OperateOn node);\
+		Type build(const ScriptAST& script, OperateOn node);\
     };
 
 namespace ska {
     class ASTNode;
-    class Script;
+    class ScriptAST;
 
     template <Operator O>
     struct TypeBuilderOperator : public TypeBuildUnit {
-        Type build(const Script& script, const ASTNode& node) override {
+        Type build(const ScriptAST& script, const ASTNode& node) override {
 			return Type{ };
         }
     };

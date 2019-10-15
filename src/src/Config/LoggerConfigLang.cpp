@@ -12,10 +12,11 @@ namespace ska {
 	namespace detail {
 		template<class T>
 		void UpdatePatterns(T& logger) {
-			logger.setPattern(ska::LogLevel::Debug, "%10c[%h:%m:%s:%T]%10c[Debug]%8c(%17F l.%4l) %10c%v");
-			logger.setPattern(ska::LogLevel::Info, "%10c[%h:%m:%s:%T]%11c[Info ]%8c(%17F l.%4l) %11c%v");
-			logger.setPattern(ska::LogLevel::Warn, "%10c[%h:%m:%s:%T]%14c[Warn ]%8c(%17F l.%4l) %14c%v");
-			logger.setPattern(ska::LogLevel::Error, "%10c[%h:%m:%s:%T]%12c[Error]%8c(%17F l.%4l) %12c%v");
+			logger.setPattern(ska::LogLevel::Debug, "%10c[D]%8c(%25F l.%3l) %07c%v");
+			logger.setPattern(ska::LogLevel::Info, "%11c[I]%8c(%25F l.%3l) %07c%v");
+			logger.setPattern(ska::LogLevel::Warn, "%14c[W]%8c(%25F l.%3l) %07c%v");
+			logger.setPattern(ska::LogLevel::Error, "%12c[E]%8c(%25F l.%3l) %07c%v");
+			logger.enableComplexLogging();
 		}
 	}
 }
@@ -25,13 +26,13 @@ ska::detail::SkaLangLogger ska::detail::BuildLangLogger(const char * filename) {
 	logger.get<0>().addOutputTarget(TypeBuilderLogFileOutput);
 	logger.get<1>().addOutputTarget(std::cout);
 
-    UpdatePatterns(logger.get<0>());
-    UpdatePatterns(logger.get<1>());
-    
-    ska::process::SignalHandlerAddAction([](int signalCode) {
-        detail::LangLogger().terminate();
-        TypeBuilderLogFileOutput.close();
-    });
-    
-    return logger;
+	UpdatePatterns(logger.get<0>());
+	UpdatePatterns(logger.get<1>());
+
+	ska::process::SignalHandlerAddAction([](int signalCode) {
+			detail::LangLogger().terminate();
+			TypeBuilderLogFileOutput.close();
+	});
+
+	return logger;
 }

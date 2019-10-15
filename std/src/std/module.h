@@ -1,12 +1,12 @@
 #pragma once
 
 #include "Interpreter/ScriptCache.h"
-#include "Interpreter/ScriptBinding.h"
+#include "Interpreter/Service/ScriptProxy.h"
 
 namespace ska {
     class TypeBuilder;
-    class SymbolTableTypeUpdater;
-    class ReservedKeywordsPool;
+    class SymbolTableUpdater;
+    struct ReservedKeywordsPool;
     class StatementParser;
     class Interpreter;
 
@@ -14,7 +14,7 @@ namespace ska {
         struct ModuleConfiguration {
             ScriptCache& scriptCache;
             TypeBuilder& typeBuilder;
-            SymbolTableTypeUpdater& symbolTableTypeUpdater;
+            SymbolTableUpdater& symbolTableUpdater;
             const ReservedKeywordsPool& reservedKeywords;
             StatementParser& parser;
             Interpreter& interpreter;

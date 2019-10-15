@@ -31,8 +31,8 @@ namespace ska {
 
 	template<class Operator, class Operand>
 	class expression_stack {
-		static std::unordered_map<char, int> BuildPriorityMap();
-		static std::unordered_map<char, int> PRIORITY_MAP;		
+		static std::unordered_map<std::string, int> BuildPriorityMap();
+		static std::unordered_map<std::string, int> PRIORITY_MAP;
 	public:
 		void push(Operator&& op) {
 			operators.push(std::forward<Operator>(op));
@@ -79,16 +79,16 @@ namespace ska {
 			return groupNode;
 		}
 
-		bool checkLessPriorityOperator(const char tokenOperatorChar) const {
-			const auto& topOperatorContent = (emptyOperator() || topOperator().name().empty()) ? '\0' : topOperator().name()[0];
-			if (PRIORITY_MAP.find(tokenOperatorChar) == PRIORITY_MAP.end()) {
+		bool checkLessPriorityOperator(const std::string& tokenOperator) const {
+			const std::string topOperatorContent = (emptyOperator() || topOperator().name().empty()) ? "" : topOperator().name();
+			if (PRIORITY_MAP.find(tokenOperator) == PRIORITY_MAP.end()) {
 				auto ss = std::stringstream{};
-				ss << "syntax error : bad operator : " << tokenOperatorChar;
+				ss << "syntax error : bad operator : " << tokenOperator;
 				throw std::runtime_error(ss.str());
 			}
 
 			return PRIORITY_MAP.find(topOperatorContent) != PRIORITY_MAP.end() &&
-				PRIORITY_MAP.at(tokenOperatorChar) < PRIORITY_MAP.at(topOperatorContent);
+				PRIORITY_MAP.at(tokenOperator) < PRIORITY_MAP.at(topOperatorContent);
 		}
 
 	private:
@@ -159,20 +159,29 @@ namespace ska {
 	};
 
 	template<class Operator, class Operand>
-	std::unordered_map<char, int> ska::expression_stack<Operator, Operand>::BuildPriorityMap() {
-		auto result = std::unordered_map<char, int>{};
+	std::unordered_map<std::string, int> ska::expression_stack<Operator, Operand>::BuildPriorityMap() {
+		auto result = std::unordered_map<std::string, int>{};
 
-		result.emplace('=', 50);
-		result.emplace('>', 50);
-		result.emplace('<', 50);
-		result.emplace('+', 100);
-		result.emplace('-', 100);
-		result.emplace('*', 200);
-		result.emplace('/', 200);
+		result.emplace("==", 40);
+		result.emplace("!=", 40);
+		result.emplace("<=", 40);
+		result.emplace(">=", 40);
+		result.emplace(">", 40);
+		result.emplace("<", 40);
+		result.emplace("=", 50);
+		result.emplace("-=", 50);
+		result.emplace("+=", 50);
+		result.emplace("*=", 50);
+		result.emplace("++", 100);
+		result.emplace("+", 100);
+		result.emplace("--", 100);
+		result.emplace("-", 100);
+		result.emplace("*", 200);
+		result.emplace("/", 200);
 
 		return result;
 	}
 	template<class Operator, class Operand>
-	std::unordered_map<char, int> ska::expression_stack<Operator, Operand>::PRIORITY_MAP = BuildPriorityMap();
+	std::unordered_map<std::string, int> ska::expression_stack<Operator, Operand>::PRIORITY_MAP = BuildPriorityMap();
 
 }

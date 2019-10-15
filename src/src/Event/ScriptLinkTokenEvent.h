@@ -1,22 +1,22 @@
 #pragma once
 #include <cassert>
 #include "NodeValue/Operator.h"
-#include "Interpreter/Value/ScriptPtr.h"
+#include "NodeValue/ScriptASTPtr.h"
 
 namespace ska {
 	class SymbolTable;
-	class Script;
+	class ScriptAST;
 	class ASTNode;
 
 	class ScriptLinkTokenEvent {
 	public:
-		ScriptLinkTokenEvent(ASTNode& node, std::string scriptName, Script& scriptCaller);
+		ScriptLinkTokenEvent(ASTNode& node, std::string scriptName, ScriptAST& scriptCaller);
 
-		Script& script();
-		const Script& script() const;
+		ScriptAST& script();
+		const ScriptAST& script() const;
 
-		Script* bound() { return m_script.get(); }
-		const Script* bound() const { return m_script.get(); }
+		ScriptAST* bound() { return m_script.get(); }
+		const ScriptAST* bound() const { return m_script.get(); }
 
 		ASTNode& rootNode();
 		const ASTNode& rootNode() const;
@@ -28,7 +28,7 @@ namespace ska {
 	private:
 		ASTNode& m_node;
 		std::string m_name;
-		Script& m_scriptCaller;
-		ScriptPtr m_script;		
+		ScriptAST& m_scriptCaller;
+		ScriptASTPtr m_script;		
 	};
 }

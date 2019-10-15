@@ -1,21 +1,19 @@
 #include "NodeValue/Symbol.h"
 #include "Service/ScopedSymbolTable.h"
-#include "Interpreter/Value/Script.h"
+#include "NodeValue/ScriptAST.h"
 
 const ska::Symbol* ska::Symbol::operator[](const std::string& fieldSymbolName) const {
 	if(std::holds_alternative<ScopedSymbolTable*>(m_data)) {
 		auto* scopedTable = std::get<ScopedSymbolTable*>(m_data);
 		assert(scopedTable != nullptr);
 
-		if (!scopedTable->children().empty()) {
-			for(const auto& innerSymbolTable : scopedTable->children()) {
-				if(!innerSymbolTable->children().empty()) {
-					const auto* lastInnerSymbolElement = innerSymbolTable->children().back().get();
-					assert(lastInnerSymbolElement != nullptr && (std::string{"symbol \""} + fieldSymbolName + "\" doesn't exists for element ").c_str());
-					const auto* result = (*lastInnerSymbolElement)[fieldSymbolName];
-					if(result != nullptr) {
-						return result;
-					}
+		for(const auto& innerSymbolTable : scopedTable->children()) {
+			if(!innerSymbolTable->children().empty()) {
+				const auto* lastInnerSymbolElement = innerSymbolTable->children().back().get();
+				assert(lastInnerSymbolElement != nullptr && (std::string{"symbol \""} + fieldSymbolName + "\" doesn't exists for element ").c_str());
+				const auto* result = (*lastInnerSymbolElement)[fieldSymbolName];
+				if(result != nullptr) {
+					return result;
 				}
 			}
 		}
@@ -24,8 +22,8 @@ const ska::Symbol* ska::Symbol::operator[](const std::string& fieldSymbolName) c
 		return nullptr;
 	}
 
-	assert(std::holds_alternative<const ScriptHandle*>(m_data));
-	auto* script = std::get<const ScriptHandle*>(m_data);
+	assert(std::holds_alternative<const ScriptHandleAST*>(m_data));
+	auto* script = std::get<const ScriptHandleAST*>(m_data);
 	assert(script != nullptr);
 
 	SLOG(ska::LogLevel::Debug) << "Looking for " << fieldSymbolName << " in the targetted script";
@@ -51,7 +49,7 @@ bool ska::Symbol::operator==(const Symbol& sym) const {
 	
 	const auto compareData = (std::holds_alternative<ScopedSymbolTable*>(m_data) ?
 		std::holds_alternative<ScopedSymbolTable*>(sym.m_data) && std::get<ScopedSymbolTable*>(sym.m_data) == std::get<ScopedSymbolTable*>(m_data) :
-		std::holds_alternative<const ScriptHandle*>(sym.m_data) && std::get<const ScriptHandle*>(sym.m_data) == std::get<const ScriptHandle*>(m_data));
+		std::holds_alternative<const ScriptHandleAST*>(sym.m_data) && std::get<const ScriptHandleAST*>(sym.m_data) == std::get<const ScriptHandleAST*>(m_data));
 
 	return m_name == sym.m_name && /*
 		m_category== sym.m_category */

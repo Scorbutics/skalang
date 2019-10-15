@@ -7,7 +7,7 @@
 
 namespace ska {
 	struct ReservedKeywordsPool;
-	class Script;
+	class ScriptAST;
 	class StatementParser;
 
 	class ASTNode;
@@ -21,11 +21,11 @@ namespace ska {
 			m_reservedKeywordsPool(pool), m_parser(parser) {}
 		
 		[[nodiscard]]
-		ASTNodePtr match(Script& input, ExpressionStack& operands, char token, bool isDoingOperation);
+		ASTNodePtr match(ScriptAST& input, ExpressionStack& operands, char token, bool isDoingOperation);
 	
 	private:
-		ASTNodePtr matchUse(Script& input, ASTNodePtr identifierArrayAffected);
-		ASTNodePtr matchDeclaration(Script& input);
+		ASTNodePtr matchUse(ScriptAST& input, ASTNodePtr identifierArrayAffected);
+		ASTNodePtr matchDeclaration(ScriptAST& input);
 
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		StatementParser& m_parser;
