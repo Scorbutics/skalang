@@ -15,7 +15,7 @@ namespace ska {
 
 	namespace bytecode {
 		class GeneratorOperatorBase;
-		struct BytecodeStorage;
+		struct ScriptStorage;
 
 		class Generator {
 			using OperatorGenerator = std::vector<std::unique_ptr<GeneratorOperatorUnit>>;
@@ -23,7 +23,7 @@ namespace ska {
 			Generator(const ReservedKeywordsPool& reserved);
 			~Generator() = default;
 
-			GenerationOutput generate(BytecodeStorage& storage, ScriptGenerationService script);
+			GenerationOutput generate(ScriptStorage& storage, ScriptGenerationService script);
 			ScriptGenerationOutput generatePart(GenerationContext node);
 		private:
 			GenerationOutput& postProcessing(ScriptGenerationService& script, GenerationOutput& generated);

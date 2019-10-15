@@ -7,7 +7,7 @@ namespace ska {
     using ScriptGenerationOutputContainer = std::vector<ScriptGenerationOutput>;
 		using ScriptGenerationServiceContainer = std::vector<ScriptGenerationService>;
 
-    struct BytecodeStorage {
+    struct ScriptStorage {
       ScriptGenerationServiceContainer services;
 			ScriptGenerationOutputContainer output;
     };

@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
-#include "BytecodeStorage.h"
+#include "BytecodeScriptStorage.h"
 #include "BytecodeSymbolInfo.h"
 
 namespace ska {
@@ -13,7 +13,7 @@ namespace ska {
 		class GenerationOutput {
 			using SymbolInfosContainer = std::unordered_map<const Symbol*, SymbolInfo>;
 		public:
-			GenerationOutput(BytecodeStorage& storage);
+			GenerationOutput(ScriptStorage& storage);
 
 			std::size_t push(ScriptGenerationService service);
 
@@ -42,7 +42,7 @@ namespace ska {
 			const std::vector<Value>& generateExportedSymbols(std::size_t scriptIndex) const;
 
 		private:
-			BytecodeStorage& m_storage;
+			ScriptStorage& m_storage;
 			ScriptGenerationNameToIndexMap m_mapping;
 			SymbolInfosContainer m_symbolInfo;
 		};

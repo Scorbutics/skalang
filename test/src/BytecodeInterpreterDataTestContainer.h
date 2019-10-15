@@ -10,7 +10,7 @@
 #include "Service/ReservedKeywordsPool.h"
 
 #include "Generator/BytecodeGenerator.h"
-#include "Generator/Value/BytecodeStorage.h"
+#include "Generator/Value/BytecodeScriptStorage.h"
 
 #include "BytecodeInterpreter/BytecodeInterpreter.h"
 
@@ -29,5 +29,5 @@ struct BytecodeInterpreterDataTestContainer {
     TypeBuilderPtr typeBuilder;
 	SymbolTableUpdaterPtr symbolsTypeUpdater;
     BytecodeInterpreterPtr interpreter;
-    ska::bytecode::BytecodeStorage storage;
+    ska::bytecode::ScriptStorage storage;
 };
