@@ -13,11 +13,12 @@ std::size_t ska::bytecode::GenerationOutput::push(ScriptGenerationService servic
 
   SLOG(ska::LogLevel::Debug) << "Getting script generation service for script named \"" << scriptName << "\" at index \"" << index << "\"";
 
-  const auto& newElementInserted = m_storage.emplace(scriptName, Storage{ std::move(service) });;
-  if (!newElementInserted && !m_storage.back().output.empty()) {
+	auto elementAlreadyPresent = m_storage.find(scriptName);
+	auto wasElementPresent = elementAlreadyPresent != m_storage.end();
+  if (wasElementPresent && m_storage[elementAlreadyPresent->second] != nullptr && !m_storage[elementAlreadyPresent->second]->output.empty()) {
     throw std::runtime_error("Double insertion of the same script in generation output");
   }
-
+	m_storage.emplace(scriptName, Storage{ std::move(service) });
   return index;
 }
 
