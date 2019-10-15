@@ -8,6 +8,7 @@
 #include "BytecodeGenerationContext.h"
 #include "Value/BytecodeGenerationOutput.h"
 #include "Value/BytecodeScript.h"
+#include "Value/BytecodeScriptStorage.h"
 
 namespace ska {
 	struct ReservedKeywordsPool;
@@ -15,7 +16,6 @@ namespace ska {
 
 	namespace bytecode {
 		class GeneratorOperatorBase;
-		struct ScriptStorage;
 
 		class Generator {
 			using OperatorGenerator = std::vector<std::unique_ptr<GeneratorOperatorUnit>>;

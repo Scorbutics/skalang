@@ -24,12 +24,14 @@ namespace ska {
 			GenerationOutput& operator=(const GenerationOutput&) = delete;
 			~GenerationOutput() = default;
 
-			auto size() const { return m_storage.services.size(); }
+			auto size() const { return m_storage.size(); }
 
-			auto& backService() { return m_storage.services.back(); }
-			const auto& generated() const { return m_storage.output; }
-			auto& back() { return m_storage.output.back(); }
-			const auto& back() const { return m_storage.output.back(); }
+			const auto& generated(std::size_t index) const { return m_storage[index]->output; }
+			bool isGenerated(std::size_t index) const { return m_storage[index] != nullptr && !m_storage[index]->output.empty();}
+
+			auto& backService() { return m_storage.back().service; }
+			auto& back() { return m_storage.back().output; }
+			const auto& back() const { return m_storage.back().output; }
 
 			void setSymbolInfo(const ASTNode& node, SymbolInfo info);
 			void setSymbolInfo(const Symbol& symbol, SymbolInfo info);

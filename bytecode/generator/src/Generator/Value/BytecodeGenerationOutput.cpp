@@ -8,24 +8,22 @@ ska::bytecode::GenerationOutput::GenerationOutput(ScriptStorage& storage) :
 }
 
 std::size_t ska::bytecode::GenerationOutput::push(ScriptGenerationService service) {
-  const auto index =  m_storage.services.size();
+  const auto index =  m_storage.size();
   auto scriptName = service.program().name();
 
   SLOG(ska::LogLevel::Debug) << "Getting script generation service for script named \"" << scriptName << "\" at index \"" << index << "\"";
 
-  const auto& [element, isInserted] = m_mapping.emplace(std::move(scriptName), index);
+  const auto& [element, isInserted] = m_mapping.emplace(scriptName, index);
   if (!isInserted) {
     throw std::runtime_error("Double insertion of the same script in generation output");
   }
-  m_storage.services.emplace_back(std::move(service));
+  m_storage.emplace(scriptName, Storage{ std::move(service) });
   return index;
 }
 
 void ska::bytecode::GenerationOutput::setOut(std::size_t index, ScriptGenerationOutput scriptOutput) {
-  if(index >= m_storage.output.size()) {
-    m_storage.output.resize(index + 1);
-  }
-  m_storage.output[index] = std::move(scriptOutput);
+  m_storage.resizeIfTooSmall(index + 1);
+  m_storage[index]->output = std::move(scriptOutput);
 }
 
 std::pair<std::size_t, ska::bytecode::ScriptGenerationService*> ska::bytecode::GenerationOutput::script(const std::string& fullScriptName) {
@@ -34,17 +32,17 @@ std::pair<std::size_t, ska::bytecode::ScriptGenerationService*> ska::bytecode::G
     SLOG(ska::LogLevel::Debug) << "No mapping found for script \"" << fullScriptName << "\"";
     return std::make_pair(std::numeric_limits<std::size_t>::max(), nullptr);
   }
-  assert(m_storage.services.size() > result->second);
-
-  if(result->second < m_storage.output.size()) {
+  assert(m_storage.size() > result->second);
+	const auto isScriptAlreadyGenerated = !m_storage[result->second]->output.empty();
+  if(isScriptAlreadyGenerated) {
     SLOG(ska::LogLevel::Debug) << "Script \"" << fullScriptName << "\" was already generated.";
   }
 
-  return std::make_pair(result->second, result->second < m_storage.output.size() ? nullptr : &m_storage.services[result->second]);
+  return std::make_pair(result->second, isScriptAlreadyGenerated ? nullptr : &m_storage[result->second]->service);
 }
 
 ska::bytecode::ScriptGenerationService& ska::bytecode::GenerationOutput::script(std::size_t index) {
-	return m_storage.services[index];
+	return m_storage[index]->service;
 }
 
 void ska::bytecode::GenerationOutput::setSymbolInfo(const ASTNode& node, SymbolInfo info) {
@@ -74,7 +72,7 @@ const ska::bytecode::SymbolInfo* ska::bytecode::GenerationOutput::getSymbolInfo(
 }
 
 const std::vector<ska::bytecode::Value>& ska::bytecode::GenerationOutput::generateExportedSymbols(std::size_t scriptIndex) const {
-	if (m_storage.output[scriptIndex].exportedSymbols().empty()) {
+	if (m_storage[scriptIndex]->output.exportedSymbols().empty()) {
 		SLOG(ska::LogLevel::Info) << "%11cGenerating exported symbols for script \"" << scriptIndex << "\"";
 		auto temporarySortedScriptSymbols = std::priority_queue<SymbolWithInfo>{};
 		for (const auto& data : m_symbolInfo) {
@@ -85,10 +83,10 @@ const std::vector<ska::bytecode::Value>& ska::bytecode::GenerationOutput::genera
 		}
 
 		if (!temporarySortedScriptSymbols.empty()) {
-			m_storage.output[scriptIndex].setExportedSymbols(m_storage.services[scriptIndex].generateExportedSymbols(std::move(temporarySortedScriptSymbols)));
+			m_storage[scriptIndex]->output.setExportedSymbols(m_storage[scriptIndex]->service.generateExportedSymbols(std::move(temporarySortedScriptSymbols)));
 		}
 	} else {
 		SLOG(ska::LogLevel::Info) << "%11cNo generation of exported symbols for script \"" << scriptIndex << "\" required";
 	}
-	return m_storage.output[scriptIndex].exportedSymbols();
+	return m_storage[scriptIndex]->output.exportedSymbols();
 }

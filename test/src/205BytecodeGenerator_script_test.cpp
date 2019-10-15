@@ -51,7 +51,8 @@ struct BytecodePart {
 
 static void BytecodeCompare(const ska::bytecode::GenerationOutput& result, std::vector<BytecodePart> expected) {
 	auto index = std::size_t {0};
-	const auto& scriptResult = result.back();
+	// main script is always of id "0"
+	const auto& scriptResult = result.generated(0);
 	CHECK(scriptResult.size() == expected.size());
 	for(const auto& r : scriptResult) {
 		const auto equality =
@@ -70,7 +71,7 @@ using namespace ska::bytecode;
 TEST_CASE("[BytecodeGenerator] import ") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var Player = import \"" SKALANG_TEST_DIR "/src/resources/play\";");
 	auto res = data.generator->generate(data.storage, std::move(astPtr));
-
+	CHECK(res.size() == 3);
 	BytecodeCompare(res, {
 		{ Command::SCRIPT, "R0", "1" },
 		{ Command::MOV, "V0", "R0" }

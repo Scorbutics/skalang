@@ -11,7 +11,7 @@ ska::bytecode::ExecutionContext::ExecutionContext(ExecutionOutput& container, st
 	m_container(container),
 	m_bytecode(instructions),
 	m_current(container.script(scriptIndex, instructions)) {
-	if (instructions.generated().size() <= scriptIndex) {
+	if (!instructions.isGenerated(scriptIndex)) {
 		throw std::runtime_error("you must compile a script to bytecode before trying to execute it.");
 	}
 }
@@ -34,15 +34,15 @@ ska::bytecode::ScriptExecutionOutput ska::bytecode::ExecutionContext::generateEx
 }
 
 const ska::bytecode::ScriptGenerationOutput& ska::bytecode::ExecutionContext::generateIfNeeded(Generator& generator, std::size_t scriptIndex) {
-	if (m_bytecode.generated().size() <= scriptIndex) {
+	if (!m_bytecode.isGenerated(scriptIndex)) {
 		auto importedScriptContext = GenerationContext{ m_bytecode, scriptIndex };
 		m_bytecode.setOut(scriptIndex, generator.generatePart(importedScriptContext));
 	}
-	return m_bytecode.generated()[scriptIndex];
+	return m_bytecode.generated(scriptIndex);
 }
 
 ska::bytecode::ExecutionContext ska::bytecode::ExecutionContext::getContext(ScriptVariableRef value) {
-	return ExecutionContext{ *this, value.script };	
+	return ExecutionContext{ *this, value.script };
 }
 
 void ska::bytecode::ExecutionContext::jumpAbsolute(ScriptVariableRef value) {
