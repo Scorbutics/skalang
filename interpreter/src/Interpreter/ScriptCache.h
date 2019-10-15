@@ -8,6 +8,6 @@
 namespace ska {
 	struct ScriptCache {
 		ScriptCacheAST astCache;
-		ScriptCacheBase<ScriptHandle> cache;
+		ScriptCacheBase<std::unique_ptr<ScriptHandle>> cache;
 	};
 }

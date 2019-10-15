@@ -7,7 +7,6 @@
 namespace ska {
 	template <class ScriptT>
 	struct ScriptCacheBase {
-		using ScriptTHandlePtr = std::unique_ptr<ScriptT>;
 	public:
 		auto find(const std::string& scriptName) { return namedMapCache.find(scriptName); }
 		auto* find(std::size_t index) const { return index < cache.size() ? cache[index].get() : nullptr; }
@@ -27,7 +26,7 @@ namespace ska {
 			return cache[index];
 		}
 
-		void emplace(std::string scriptName, ScriptTHandlePtr script) {
+		void emplace(std::string scriptName, ScriptT script) {
 			const auto wantedScriptId = cache.size();
 			const auto emplacedItem = namedMapCache.emplace(std::move(scriptName), wantedScriptId);
 			if(emplacedItem.second) {
@@ -43,7 +42,6 @@ namespace ska {
 				namedMapCache.emplace(scriptName, wantedScriptId);
 				cache.push_back(nullptr);
 				return wantedScriptId;
-				
 			}
 			return namedMapCache.at(scriptName);
 		}
@@ -55,6 +53,6 @@ namespace ska {
 
 	private:
 		std::unordered_map<std::string, std::size_t> namedMapCache;
-		std::vector<ScriptTHandlePtr> cache;
+		std::vector<ScriptT> cache;
 	};
 }

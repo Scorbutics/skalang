@@ -5,6 +5,6 @@
 
 namespace ska {
 	struct ScriptCacheAST :
-		public ScriptCacheBase<ScriptHandleAST> {
+		public ScriptCacheBase<std::unique_ptr<ScriptHandleAST>> {
 	};
 }
