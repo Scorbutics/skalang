@@ -8,7 +8,7 @@
 #include "BytecodeGenerationContext.h"
 #include "Value/BytecodeGenerationOutput.h"
 #include "Value/BytecodeScript.h"
-#include "Value/BytecodeScriptStorage.h"
+#include "Value/BytecodeScriptCache.h"
 
 namespace ska {
 	struct ReservedKeywordsPool;
@@ -23,7 +23,7 @@ namespace ska {
 			Generator(const ReservedKeywordsPool& reserved);
 			~Generator() = default;
 
-			GenerationOutput generate(ScriptStorage& storage, ScriptGenerationService script);
+			GenerationOutput generate(ScriptCache& storage, ScriptGenerationService script);
 			ScriptGenerationOutput generatePart(GenerationContext node);
 		private:
 			GenerationOutput& postProcessing(ScriptGenerationService& script, GenerationOutput& generated);

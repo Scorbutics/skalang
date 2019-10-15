@@ -13,7 +13,7 @@
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 #include "Generator/Value/BytecodeScript.h"
 #include "Generator/BytecodeGenerator.h"
-#include "Generator/Value/BytecodeScriptStorage.h"
+#include "Generator/Value/BytecodeScriptCache.h"
 #include "Service/SymbolTableUpdater.h"
 
 #include "BytecodeInterpreter/BytecodeInterpreter.h"
@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
 	auto scriptCache = ska::ScriptCache{};
 	auto oldInterpreter = ska::Interpreter {reservedKeywords, typeCrosser };
 	
-	auto storage = ska::bytecode::ScriptStorage {};
+	auto storage = ska::bytecode::ScriptCache {};
 	auto generator = ska::bytecode::Generator{ reservedKeywords };
 	auto interpreter = ska::bytecode::Interpreter { generator, reservedKeywords };
 

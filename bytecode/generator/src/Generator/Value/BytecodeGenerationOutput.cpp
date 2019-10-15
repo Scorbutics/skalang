@@ -3,7 +3,7 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GenerationOutput);
 
-ska::bytecode::GenerationOutput::GenerationOutput(ScriptStorage& storage) :
+ska::bytecode::GenerationOutput::GenerationOutput(ScriptCache& storage) :
 	m_storage(storage) {
 }
 
