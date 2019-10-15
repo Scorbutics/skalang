@@ -20,5 +20,10 @@ add_definitions(-DSKALANG_RUNNER_DIR="${SKALANG_RUNNER_DIR}")
 add_executable(skalang_runner ${SOURCES})
 
 find_package(Threads REQUIRED)
-target_link_libraries(skalang_runner atomic skalang_std skalang_interpreter skalang skalog skabase Threads::Threads)
+
+set(LIBS skalang_std skalang_interpreter skalang skalog skabase Threads::Threads)
+IF(UNIX)
+    set(LIBS atomic ${LIBS})
+ENDIF(UNIX)
+target_link_libraries(skalang_runner ${LIBS})
 target_include_directories(skalang_runner PUBLIC ../external/skabase/src/src PUBLIC ../external/skalog/src/src)
