@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Interpreter/ScriptCache.h"
-#include "Interpreter/Service/ScriptProxy.h"
+#include "Runtime/Service/ScriptBinding.h"
+#include "Runtime/Value/InterpreterTypes.h"
 
 namespace ska {
     class TypeBuilder;
@@ -11,8 +11,10 @@ namespace ska {
     class Interpreter;
 
     namespace lang {
+        template <class Interpreter>
         struct ModuleConfiguration {
-            ScriptCache& scriptCache;
+            ScriptCacheAST& scriptAstCache;
+            typename InterpreterTypes<Interpreter>::ScriptCache& scriptCache;
             TypeBuilder& typeBuilder;
             SymbolTableUpdater& symbolTableUpdater;
             const ReservedKeywordsPool& reservedKeywords;
@@ -20,11 +22,17 @@ namespace ska {
             Interpreter& interpreter;
         };
 
+        template <class Interpreter>
         class Module {
         public:
-            Module(ModuleConfiguration& config, std::string moduleName);    
+            Module(ModuleConfiguration<Interpreter>& config, std::string moduleName):
+                m_bridge{ config.scriptCache, config.scriptAstCache, std::move(moduleName), config.typeBuilder, config.symbolTableUpdater, config.reservedKeywords } {
+            }
+
             virtual ~Module() = default;
+
         protected:
+            using ScriptBridge = ScriptBinding<typename InterpreterTypes<Interpreter>::Script, typename InterpreterTypes<Interpreter>::ScriptCache>;
             ScriptBridge m_bridge;
         };
     }

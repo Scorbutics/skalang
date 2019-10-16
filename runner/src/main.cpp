@@ -18,11 +18,12 @@
 #include "Interpreter/Interpreter.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
+#include "Runtime/Value/InterpreterTypes.h"
 #include "std/module/io/log.h"
 #include "std/module/io/path.h"
 #include "std/module/function/parameter.h"
 
-ska::Script SmashAndDashSpecific(ska::lang::ModuleConfiguration& module, const std::string& scriptName) {
+ska::Script SmashAndDashSpecific(ska::lang::ModuleConfiguration<ska::Interpreter>& module, const std::string& scriptName) {
 	auto scriptEmBinding = ska::ScriptBridge{ module.scriptCache, module.scriptCache.astCache, "em_lib", module.typeBuilder, module.symbolTableUpdater, module.reservedKeywords };
 		scriptEmBinding.bindFunction("setInputMovePower", std::function<void(int, int)>([](int characterId, int value) {
 			std::cout << "move power for " << characterId << " is now " << value << std::endl;
@@ -66,7 +67,7 @@ ska::Script SmashAndDashSpecific(ska::lang::ModuleConfiguration& module, const s
 }
 
 namespace ska {
-	ska::lang::ParameterModule BasicParameterModuleBuilder(ska::lang::ModuleConfiguration& module, std::vector<ska::NodeValue>& parameters, int argc, char* argv[]) {
+	ska::lang::ParameterModule<ska::Interpreter> BasicParameterModuleBuilder(ska::lang::ModuleConfiguration<ska::Interpreter>& module, std::vector<ska::NodeValue>& parameters, int argc, char* argv[]) {
 		for(auto i = 2; i < argc; i++) {
 			parameters.push_back(std::make_shared<std::string>(argv[i]));
 		}
@@ -74,7 +75,7 @@ namespace ska {
 		return ska::lang::ParameterModule(module, parameters);
 	}
 
-	ska::Script BasicProgramScriptStarter(ska::lang::ModuleConfiguration& module, char* argv[]) {
+	ska::Script BasicProgramScriptStarter(ska::lang::ModuleConfiguration<ska::Interpreter>& module, char* argv[]) {
 		auto scriptFileName = std::string{argv[1]};
 		auto scriptName = scriptFileName.substr(0, scriptFileName.find_last_of('.'));
 
@@ -107,7 +108,7 @@ int main(int argc, char* argv[]) {
 	auto typeChecker = ska::SemanticTypeChecker {parser, typeCrosser };
 	auto interpreter = ska::Interpreter {reservedKeywords, typeCrosser };
 
-	auto moduleConfiguration = ska::lang::ModuleConfiguration {scriptCache, typeBuilder, symbolsTypeUpdater, reservedKeywords, parser, interpreter};
+	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::Interpreter> {scriptCache.astCache, scriptCache, typeBuilder, symbolsTypeUpdater, reservedKeywords, parser, interpreter};
 
 	try {
 

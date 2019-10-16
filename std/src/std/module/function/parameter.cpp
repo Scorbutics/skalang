@@ -6,6 +6,7 @@
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/Interpreter.h"
 
+/*
 ska::lang::ParameterModule::ParameterModule(ModuleConfiguration& config, const std::vector<NodeValue>& parameterValues) :
     Module { config, "std.native.parameter" },
     m_parameters(parameterValues),
@@ -33,3 +34,4 @@ ska::lang::ParameterModule::ParameterModule(ModuleConfiguration& config, const s
     m_bridge.buildFunctions();
 }
 
+*/

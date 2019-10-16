@@ -7,7 +7,7 @@
 #include "Service/Tokenizer.h"
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/Interpreter.h"
-
+/*
 ska::lang::IOFileModule::IOFileModule(ModuleConfiguration& config) :
 	Module {config, "std.native.io.file"},
 	m_proxy { m_bridge } {
@@ -25,3 +25,4 @@ ska::lang::IOFileModule::IOFileModule(ModuleConfiguration& config) :
 	m_bridge.buildFunctions();
 }
 
+*/

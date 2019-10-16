@@ -14,6 +14,11 @@ namespace ska {
 		class Generator;
 		class GenerationOutput;
 
+		struct InterpretationPart {
+			Storage& script;
+			ASTNode& node;
+		};
+
 		class Interpreter {
 		public:
 			using CommandInterpreter = std::vector<std::unique_ptr<InterpreterCommandUnit>>;
@@ -22,6 +27,7 @@ namespace ska {
 			~Interpreter() = default;
 
 			void interpret(ExecutionContext& node);
+			void interpret(InterpretationPart target){}
 			std::unique_ptr<ExecutionOutput> interpret(std::size_t scriptIndex, GenerationOutput& scripts);
 		private:
 			CommandInterpreter build(Generator&);

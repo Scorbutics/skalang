@@ -19,6 +19,7 @@
 #include "BytecodeInterpreter/BytecodeInterpreter.h"
 
 #include "Interpreter/Interpreter.h"
+#include "Runtime/Value/InterpreterTypes.h"
 
 #include "std/module/io/log.h"
 #include "std/module/io/path.h"
@@ -28,7 +29,7 @@
 static std::unique_ptr<ska::bytecode::Generator> generator;
 static std::unique_ptr<ska::bytecode::Interpreter> interpreter;
 
-static ska::bytecode::ScriptGenerationService BasicProgramScriptStarter(ska::lang::ModuleConfiguration& module, char* argv[]) {
+static ska::bytecode::ScriptGenerationService BasicProgramScriptStarter(ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>& module, char* argv[]) {
 	auto scriptFileName = std::string{ argv[1] };
 	auto scriptName = scriptFileName.substr(0, scriptFileName.find_last_of('.'));
 
@@ -36,12 +37,12 @@ static ska::bytecode::ScriptGenerationService BasicProgramScriptStarter(ska::lan
 	"var ParametersGenerator = import \"bind:std.native.parameter\";"
 	"Script.run(ParametersGenerator.Gen(\"" + scriptName + "\"));";
 
-	auto executor = ska::ScriptAST{ module.scriptCache.astCache, "main", ska::Tokenizer{ module.reservedKeywords, scriptStarter}.tokenize() };
+	auto executor = ska::ScriptAST{ module.scriptAstCache, "main", ska::Tokenizer{ module.reservedKeywords, scriptStarter}.tokenize() };
 	executor.parse(module.parser);
 	return ska::bytecode::ScriptGenerationService{ 0, executor};
 }
 
-static ska::lang::ParameterModule BasicParameterModuleBuilder(ska::lang::ModuleConfiguration& module, std::vector<ska::NodeValue>& parameters, int argc, char* argv[]) {
+static ska::lang::ParameterModule<ska::bytecode::Interpreter> BasicParameterModuleBuilder(ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>& module, std::vector<ska::NodeValue>& parameters, int argc, char* argv[]) {
 	for(auto i = 2; i < argc; i++) {
 		parameters.push_back(std::make_shared<std::string>(argv[i]));
 	}
@@ -75,7 +76,7 @@ int main(int argc, char* argv[]) {
 	auto generator = ska::bytecode::Generator{ reservedKeywords };
 	auto interpreter = ska::bytecode::Interpreter { generator, reservedKeywords };
 
-	auto moduleConfiguration = ska::lang::ModuleConfiguration {scriptCache, typeBuilder, symbolsTypeUpdater, reservedKeywords, parser, oldInterpreter};
+	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { scriptCache.astCache, storage, typeBuilder, symbolsTypeUpdater, reservedKeywords, parser, interpreter};
 
 	try {
 		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);

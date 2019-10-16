@@ -7,7 +7,8 @@ namespace ska {
 
   namespace bytecode {
     class Interpreter;
-    class ScriptGenerationService;
+    struct Storage;
+    struct ScriptCache;
   }
 
   template <class Interpreter>
@@ -16,8 +17,12 @@ namespace ska {
   template <>
   struct InterpreterTypes<ska::Interpreter> {
     using Script = ska::Script;
+    using ScriptCache = ska::ScriptCache;
   };
 
   template <>
-  struct InterpreterTypes<ska::Interpreter>;
+  struct InterpreterTypes<ska::bytecode::Interpreter> {
+    using Script = ska::bytecode::Storage;
+    using ScriptCache = ska::bytecode::ScriptCache;
+  };
 }

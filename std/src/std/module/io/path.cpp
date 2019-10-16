@@ -7,7 +7,7 @@
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/Interpreter.h"
 #include "Base/IO/Files/FileUtils.h"
-
+/*
 ska::lang::IOPathModule::IOPathModule(ModuleConfiguration& config) :
 	Module {config, "std.native.io.path"},
 	m_proxy { m_bridge } {
@@ -33,3 +33,4 @@ ska::lang::IOPathModule::IOPathModule(ModuleConfiguration& config) :
 	m_bridge.buildFunctions();
 }
 
+*/

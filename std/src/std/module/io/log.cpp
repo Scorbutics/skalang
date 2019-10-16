@@ -6,7 +6,7 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
 #include "Interpreter/Value/Script.h"
-
+/*
 ska::lang::IOLogModule::IOLogModule(ModuleConfiguration& config) :
 	Module {config, "std.native.io.log"} {
 	m_bridge.bindFunction("printInt", std::function<void(int)>([](int value) {
@@ -22,3 +22,4 @@ ska::lang::IOLogModule::IOLogModule(ModuleConfiguration& config) :
 	m_bridge.buildFunctions();
 }
 
+*/

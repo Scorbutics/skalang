@@ -4,11 +4,10 @@
 
 namespace ska {
   namespace bytecode {
-    struct Storage {
-      ScriptGenerationService service;
-      ScriptGenerationOutput output;
-    };
+    struct Storage;
 
-    using ScriptCache = ScriptCacheBase<Storage>;
+    struct ScriptCache : public ScriptCacheBase<Storage> {
+      ScriptCacheAST astCache;
+    };
   }
 }
