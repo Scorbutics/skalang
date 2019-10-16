@@ -8,6 +8,7 @@
 **.a
 **/skalog_bench
 **/skalang_runner
+**/skalang_bytecode_*
 **/skalang_test
 **.sln
 CMakeCache.txt
