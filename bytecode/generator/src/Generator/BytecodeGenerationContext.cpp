@@ -1,7 +1,7 @@
 #include "Config/LoggerConfigLang.h"
 #include "NodeValue/AST.h"
 #include "BytecodeGenerationContext.h"
-#include "Generator/Value/BytecodeScript.h"
+#include "Generator/Value/BytecodeScriptGenerationService.h"
 #include "Generator/Value/BytecodeGenerationOutput.h"
 #include "NodeValue/ScriptAST.h"
 

@@ -3,7 +3,7 @@
 
 #include "NodeValue/Operator.h"
 #include "NodeValue/AST.h"
-#include "Generator/Value/BytecodeScript.h"
+#include "Generator/Value/BytecodeScriptGenerationService.h"
 
 #include "GeneratorOperatorBlock.h"
 #include "GeneratorOperatorUnary.h"

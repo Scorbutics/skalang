@@ -1,7 +1,7 @@
 #include <string>
 #include "GeneratorOperatorVariable.h"
 #include "BytecodeCommand.h"
-#include "Generator/Value/BytecodeScript.h"
+#include "Generator/Value/BytecodeScriptGenerationService.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_DECLARATION>);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_DECLARATION>)

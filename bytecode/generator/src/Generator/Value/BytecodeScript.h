@@ -1,57 +1,32 @@
 #pragma once
-#include <queue>
-#include <string>
-#include <optional>
-#include <unordered_map>
 
-#include "Base/Values/MovableNonCopyable.h"
-#include "NodeValue/ScriptAST.h"
-#include "BytecodeValue.h"
-#include "UniqueSymbolGetter.h"
-#include "BytecodeSymbolInfo.h"
+#include "BytecodeScriptCache.h"
 
 namespace ska {
 	namespace bytecode {
-		struct SymbolWithInfo {
-			const Symbol* symbol = nullptr;
-			const SymbolInfo* info = nullptr;
-		};
 
-		static inline bool operator<(const SymbolWithInfo& lhs, const SymbolWithInfo& rhs) {
-			return lhs.info->priority > rhs.info->priority;
-		}
+		struct Script {
+			Script() = default;
+			Script(ScriptGenerationService service) : service(std::move(service)) {}
+			Script(ScriptCache& scriptCache, const std::string& fullName, std::vector<Token> tokens);
+			Script(ScriptCache& scriptCache, ScriptAST& scriptAST, const std::string& fullName);
 
-	}
-}
+			Script(const Script&) = delete;
+			Script(Script&&) = default;
 
-namespace ska {
-	class ASTNode;
-	namespace bytecode {
-		class ScriptGenerationService :
-			public MovableNonCopyable,
-			private UniqueSymbolGetter<'V'>{
-			using VariableGetter = UniqueSymbolGetter<'V'>;
-		public:
-			ScriptGenerationService() = default;
-			ScriptGenerationService(std::size_t scriptIndex, ska::ScriptAST& script);
+			Script& operator=(const Script&) = delete;
+			Script& operator=(Script&&) = default;
 
-			ScriptGenerationService(ScriptGenerationService&&) = default;
-			ScriptGenerationService& operator=(ScriptGenerationService&&) = default;
+			ScriptAST& astScript();
+			void memoryFromBridge(std::vector<BridgeFunctionPtr> bindings);
 
-			ska::ScriptAST program() { return ska::ScriptAST{ *m_script }; }
+			~Script() = default;
 
-			Register queryNextRegister();
-			Value querySymbolOrValue(const ASTNode& node);
-			Value querySymbol(const Symbol& symbol);
-			std::optional<Value> getSymbol(const Symbol& symbol) const;
-			std::vector<Value> generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const;
-
-			~ScriptGenerationService() override = default;
-
+			ScriptGenerationService service;
+			ScriptGenerationOutput output;
 		private:
-			std::size_t m_index = std::numeric_limits<std::size_t>::max();
-			std::size_t m_register = 0;
-			ska::ScriptHandleAST* m_script{};
+			std::optional<ScriptAST> m_ast;
 		};
+
 	}
 }

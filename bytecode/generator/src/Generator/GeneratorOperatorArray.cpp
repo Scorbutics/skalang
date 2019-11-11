@@ -1,6 +1,6 @@
 #include <string>
 #include "GeneratorOperatorArray.h"
-#include "Generator/Value/BytecodeScript.h"
+#include "Generator/Value/BytecodeScriptGenerationService.h"
 #include "Generator/ComputingOperations/BytecodeNLengthOperations.h"
 
 ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::ARRAY_DECLARATION>::generate(OperateOn node, GenerationContext& context) {

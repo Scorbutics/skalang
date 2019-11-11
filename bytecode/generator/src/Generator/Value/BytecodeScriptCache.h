@@ -1,6 +1,6 @@
 #pragma once
 #include "BytecodeScriptGenerationOutput.h"
-#include "BytecodeScript.h"
+#include "BytecodeScriptGenerationService.h"
 
 namespace ska {
   namespace bytecode {

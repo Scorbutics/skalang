@@ -7,7 +7,7 @@
 #include "NodeValue/ASTNodePtr.h"
 #include "BytecodeGenerationContext.h"
 #include "Value/BytecodeGenerationOutput.h"
-#include "Value/BytecodeScript.h"
+#include "Value/BytecodeScriptGenerationService.h"
 #include "Value/BytecodeScriptCache.h"
 
 namespace ska {

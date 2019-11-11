@@ -16,8 +16,10 @@ namespace ska {
 				scriptIndex(scriptIndex) {
 			}
 
+			ScriptExecution(ScriptExecution&&) = default;
 			ScriptExecution(const ScriptExecution&) = delete;
 			ScriptExecution& operator=(const ScriptExecution&) = delete;
+			ScriptExecution& operator=(ScriptExecution&&) = default;
 
 			const Instruction& currentInstruction() const {
 				assert(executionPointer < instructions.generated(scriptIndex).size());

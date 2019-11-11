@@ -11,7 +11,7 @@
 #include "NodeValue/ScriptAST.h"
 #include "NodeValue/ScriptCacheAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
-#include "Generator/Value/BytecodeScript.h"
+#include "Generator/Value/BytecodeScriptGenerationService.h"
 
 static const auto reservedKeywords = ska::ReservedKeywordsPool{};
 static auto tokenizer = std::unique_ptr<ska::Tokenizer>{};

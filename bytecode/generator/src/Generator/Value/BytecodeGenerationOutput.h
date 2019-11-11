@@ -2,7 +2,7 @@
 #include <vector>
 #include <unordered_map>
 #include "BytecodeScriptCache.h"
-#include "BytecodeStorage.h"
+#include "BytecodeScriptGenerationService.h"
 #include "BytecodeSymbolInfo.h"
 
 namespace ska {

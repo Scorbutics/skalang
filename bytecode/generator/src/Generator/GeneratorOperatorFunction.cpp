@@ -2,7 +2,7 @@
 #include <string>
 #include "GeneratorOperatorFunction.h"
 #include "BytecodeCommand.h"
-#include "Generator/Value/BytecodeScript.h"
+#include "Generator/Value/BytecodeScriptGenerationService.h"
 #include "Generator/ComputingOperations/BytecodeNLengthOperations.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>);

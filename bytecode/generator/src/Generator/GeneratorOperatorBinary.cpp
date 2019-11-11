@@ -2,7 +2,7 @@
 #include "Base/SkaConstants.h"
 #include "NodeValue/AST.h"
 #include "GeneratorOperatorBinary.h"
-#include "Generator/Value/BytecodeScript.h"
+#include "Generator/Value/BytecodeScriptGenerationService.h"
 #include "ComputingOperations/BytecodeTypeConversion.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::BINARY>);

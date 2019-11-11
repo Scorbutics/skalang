@@ -1,7 +1,7 @@
 #pragma once
 #include <limits>
 #include "Generator/BytecodeCommand.h"
-#include "Generator/Value/BytecodeScript.h"
+#include "Generator/Value/BytecodeScriptGenerationService.h"
 #include "Generator/BytecodeGenerationContext.h"
 
 namespace ska {

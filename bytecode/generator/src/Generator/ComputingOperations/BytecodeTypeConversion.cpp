@@ -1,6 +1,6 @@
 #include "NodeValue/AST.h"
 #include "BytecodeTypeConversion.h"
-#include "Generator/Value/BytecodeScript.h"
+#include "Generator/Value/BytecodeScriptGenerationService.h"
 #include "NodeValue/Type.h"
 
 namespace ska {

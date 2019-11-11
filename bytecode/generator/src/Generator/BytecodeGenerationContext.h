@@ -3,7 +3,7 @@
 #include <tuple>
 #include "Value/BytecodeValue.h"
 #include "Value/BytecodeSymbolInfo.h"
-#include "Value/BytecodeScript.h"
+#include "Value/BytecodeScriptGenerationService.h"
 
 namespace ska {
 	class ASTNode;

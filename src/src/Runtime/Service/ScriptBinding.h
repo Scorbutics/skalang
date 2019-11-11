@@ -129,7 +129,7 @@ namespace ska {
 		SymbolTableUpdater& m_symbolTypeUpdater;
 		BindingFactory m_functionBinder;
 		std::string m_name;
-    ScriptAST m_script;
+		ScriptAST m_script;
 		ScriptCacheAST& m_cache;
 
 		std::vector<ASTNodePtr> m_imports;

@@ -3,7 +3,7 @@
 #include "NodeValue/AST.h"
 #include "GeneratorOperatorUserDefinedObject.h"
 #include "BytecodeCommand.h"
-#include "Generator/Value/BytecodeScript.h"
+#include "Generator/Value/BytecodeScriptGenerationService.h"
 #include "Generator/Value/BytecodeSymbolInfo.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::USER_DEFINED_OBJECT>);

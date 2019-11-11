@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 #include "Runtime/Service/ScriptBinding.h"
-#include "Generator/Value/BytecodeStorage.h"
+#include "Generator/Value/BytecodeScript.h"
 
 namespace ska {
 	namespace bytecode {

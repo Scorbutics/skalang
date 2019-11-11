@@ -3,7 +3,7 @@
 #include "GeneratorOperatorFor.h"
 #include "NodeValue/ScriptAST.h"
 #include "BytecodeCommand.h"
-#include "Generator/Value/BytecodeScript.h"
+#include "Generator/Value/BytecodeScriptGenerationService.h"
 
 ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FOR_LOOP>::generate(OperateOn node, GenerationContext& context) {
 

@@ -2,7 +2,7 @@
 #include "BytecodeInterpreter.h"
 
 #include "NodeValue/AST.h"
-#include "Generator/Value/BytecodeScript.h"
+#include "Generator/Value/BytecodeScriptGenerationService.h"
 #include "Generator/Value/BytecodeGenerationOutput.h"
 
 #include "Units/InterpreterCommandMov.h"
