@@ -12,7 +12,7 @@ namespace ska {
 	class Script;
 	struct ScriptHandle;
 	using ScriptHandlePtr = std::unique_ptr<ScriptHandle>;
-	struct ScriptCache;
+	class ScriptCache;
 	struct FunctionContext {
 		ASTNode* node;
 		MemoryTablePtr memory;

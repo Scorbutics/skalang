@@ -6,7 +6,8 @@
 #include "NodeValue/ScriptCacheAST.h"
 
 namespace ska {
-	struct ScriptCache {
+	class ScriptCache {
+	public:
 		ScriptCacheAST astCache;
 		ScriptCacheBase<std::unique_ptr<ScriptHandle>> cache;
 	};
