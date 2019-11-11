@@ -14,7 +14,7 @@ namespace ska {
 		class GenerationOutput {
 			using SymbolInfosContainer = std::unordered_map<const Symbol*, SymbolInfo>;
 		public:
-			GenerationOutput(ScriptCache& storage);
+			GenerationOutput(ScriptCache& cache);
 
 			std::size_t push(ScriptGenerationService service);
 
@@ -25,14 +25,14 @@ namespace ska {
 			GenerationOutput& operator=(const GenerationOutput&) = delete;
 			~GenerationOutput() = default;
 
-			auto size() const { return m_storage.size(); }
+			auto size() const { return m_cache.size(); }
 
-			const auto& generated(std::size_t index) const { return m_storage[index]->output; }
-			bool isGenerated(std::size_t index) const { return m_storage[index] != nullptr && !m_storage[index]->output.empty();}
+			const auto& generated(std::size_t index) const { return m_cache[index]->output; }
+			bool isGenerated(std::size_t index) const { return m_cache[index] != nullptr && !m_cache[index]->output.empty();}
 
-			auto& backService() { return m_storage.back().service; }
-			auto& back() { return m_storage.back().output; }
-			const auto& back() const { return m_storage.back().output; }
+			auto& backService() { return m_cache.back().service; }
+			auto& back() { return m_cache.back().output; }
+			const auto& back() const { return m_cache.back().output; }
 
 			void setSymbolInfo(const ASTNode& node, SymbolInfo info);
 			void setSymbolInfo(const Symbol& symbol, SymbolInfo info);
@@ -45,7 +45,7 @@ namespace ska {
 			const std::vector<Value>& generateExportedSymbols(std::size_t scriptIndex) const;
 
 		private:
-			ScriptCache& m_storage;
+			ScriptCache& m_cache;
 			SymbolInfosContainer m_symbolInfo;
 		};
 	}

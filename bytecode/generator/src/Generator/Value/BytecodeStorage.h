@@ -3,30 +3,30 @@
 #include "BytecodeScriptCache.h"
 
 namespace ska {
-  namespace bytecode {
+	namespace bytecode {
 
-    struct Storage {
-      Storage() = default;
-      Storage(ScriptGenerationService service) : service(std::move(service)) {}
-      Storage(ScriptCache& scriptCache, const std::string& fullName, std::vector<Token> tokens);
-      Storage(ScriptCache& scriptCache, ScriptAST& scriptAST, const std::string& fullName);
+		struct Script {
+			Script() = default;
+			Script(ScriptGenerationService service) : service(std::move(service)) {}
+			Script(ScriptCache& scriptCache, const std::string& fullName, std::vector<Token> tokens);
+			Script(ScriptCache& scriptCache, ScriptAST& scriptAST, const std::string& fullName);
 
-      Storage(const Storage&) = delete;
-      Storage(Storage&&) = default;
+			Script(const Script&) = delete;
+			Script(Script&&) = default;
 
-      Storage& operator=(const Storage&) = delete;
-      Storage& operator=(Storage&&) = default;
+			Script& operator=(const Script&) = delete;
+			Script& operator=(Script&&) = default;
 
-      ScriptAST& astScript();
-      void memoryFromBridge(std::vector<BridgeFunctionPtr> bindings);
+			ScriptAST& astScript();
+			void memoryFromBridge(std::vector<BridgeFunctionPtr> bindings);
 
-      ~Storage() = default;
+			~Script() = default;
 
-      ScriptGenerationService service;
-      ScriptGenerationOutput output;
-    private:
-      std::optional<ScriptAST> m_ast;
-    };
+			ScriptGenerationService service;
+			ScriptGenerationOutput output;
+		private:
+			std::optional<ScriptAST> m_ast;
+		};
 
-  }
+	}
 }

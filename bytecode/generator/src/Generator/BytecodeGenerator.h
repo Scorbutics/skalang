@@ -23,7 +23,7 @@ namespace ska {
 			Generator(const ReservedKeywordsPool& reserved);
 			~Generator() = default;
 
-			GenerationOutput generate(ScriptCache& storage, ScriptGenerationService script);
+			GenerationOutput generate(ScriptCache& cache, ScriptGenerationService script);
 			ScriptGenerationOutput generatePart(GenerationContext node);
 		private:
 			GenerationOutput& postProcessing(ScriptGenerationService& script, GenerationOutput& generated);

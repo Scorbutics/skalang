@@ -69,14 +69,13 @@ int main(int argc, char* argv[]) {
 	auto symbolsTypeUpdater = ska::SymbolTableUpdater {parser};
 	auto typeChecker = ska::SemanticTypeChecker {parser, typeCrosser };
 	
-	auto scriptCache = ska::ScriptCache{};
 	auto oldInterpreter = ska::Interpreter {reservedKeywords, typeCrosser };
 	
-	auto storage = ska::bytecode::ScriptCache {};
+	auto mainCache = ska::bytecode::ScriptCache {};
 	auto generator = ska::bytecode::Generator{ reservedKeywords };
 	auto interpreter = ska::bytecode::Interpreter { generator, reservedKeywords };
 
-	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { scriptCache.astCache, storage, typeBuilder, symbolsTypeUpdater, reservedKeywords, parser, interpreter};
+	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { mainCache.astCache, mainCache, typeBuilder, symbolsTypeUpdater, reservedKeywords, parser, interpreter};
 
 	try {
 		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);
@@ -86,7 +85,7 @@ int main(int argc, char* argv[]) {
 		
 		auto parameterModule = BasicParameterModuleBuilder(moduleConfiguration, parameterValues, argc, argv);
 		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
-		auto gen = generator.generate(storage, std::move(script));
+		auto gen = generator.generate(mainCache, std::move(script));
 		auto interpreted = interpreter.interpret(gen.script("main").first, gen);
 	} catch (std::exception& e) {
 		std::cerr << "Error : " << e.what() << std::endl;
