@@ -18,7 +18,7 @@ std::size_t ska::bytecode::GenerationOutput::push(ScriptGenerationService servic
   if (wasElementPresent && m_cache[elementAlreadyPresent->second] != nullptr && !m_cache[elementAlreadyPresent->second]->output.empty()) {
     throw std::runtime_error("Double insertion of the same script in generation output");
   }
-  m_cache.emplace(scriptName, Script{ std::move(service) });
+  m_cache.emplace(scriptName, ScriptGen{ std::move(service) });
   return index;
 }
 

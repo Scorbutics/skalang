@@ -27,7 +27,7 @@ namespace ska {
 
             ~IOFileModule() override = default;
         private:
-            ScriptProxy m_proxy;
+            ScriptProxy<Interpreter> m_proxy;
         };
     }
 }

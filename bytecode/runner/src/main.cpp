@@ -11,7 +11,7 @@
 #include "NodeValue/ScriptAST.h"
 #include "NodeValue/ScriptCacheAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
-#include "Generator/Value/BytecodeScriptGenerationService.h"
+#include "BytecodeInterpreter/BytecodeScript.h"
 #include "Generator/BytecodeGenerator.h"
 #include "Generator/Value/BytecodeScriptCache.h"
 #include "Service/SymbolTableUpdater.h"

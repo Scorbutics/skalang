@@ -2,12 +2,13 @@
 #include <vector>
 #include <unordered_map>
 #include "BytecodeScriptCache.h"
-#include "BytecodeScriptGenerationService.h"
+#include "BytecodeScriptGen.h"
 #include "BytecodeSymbolInfo.h"
 
 namespace ska {
 	class Symbol;
 	class ASTNode;
+
 	namespace bytecode {
 		using ScriptGenerationNameToIndexMap = std::unordered_map<std::string, std::size_t>;
 

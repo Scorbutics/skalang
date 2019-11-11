@@ -15,7 +15,7 @@ namespace ska {
 		class GenerationOutput;
 
 		struct InterpretationPart {
-			Script& script;
+			ScriptGen& script;
 			ASTNode& node;
 		};
 

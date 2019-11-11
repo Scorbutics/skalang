@@ -4,9 +4,9 @@
 
 namespace ska {
   namespace bytecode {
-    struct Script;
+    struct ScriptGen;
 
-    struct ScriptCache : public ScriptCacheBase<Script> {
+    struct ScriptCache : public ScriptCacheBase<ScriptGen> {
       ScriptCacheAST astCache;
     };
   }
