@@ -4,16 +4,9 @@
 #include <string>
 #include <unordered_map>
 
+#include "Service/IsSmartPtr.h"
+
 namespace ska {
-
-	template <class T>
-	struct is_smart_ptr : std::false_type {};
-
-	template <class T>
-	struct is_smart_ptr<std::unique_ptr<T>> : std::true_type {};
-
-	template <class T>
-	struct is_smart_ptr<std::shared_ptr<T>> : std::true_type {};
 
 	template <class ScriptT>
 	struct ScriptCacheBase {
