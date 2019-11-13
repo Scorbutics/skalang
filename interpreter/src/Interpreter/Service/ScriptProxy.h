@@ -44,10 +44,10 @@ namespace ska {
 			if (import.first == nullptr) {
 				throw std::runtime_error("unable to find import \"" + importName + "\" queried in script \"" + m_script.name() + "\"");
 			}
-			const auto importedScriptId = import.first->nodeval<ska::ScriptVariableRef>();
+			const auto importedScriptId = import.first->template nodeval<ska::ScriptVariableRef>();
 			auto importedScript = m_script.useImport(importedScriptId.script);
 			auto functionToCallMemory = importedScript->downMemory()(functionName);
-			auto& functionToExecute = functionToCallMemory.first->nodeval<ska::ScriptVariableRef>();
+			auto& functionToExecute = functionToCallMemory.first->template nodeval<ska::ScriptVariableRef>();
 
 			auto* stored = importedScript->getFunction(functionToExecute.variable);
 			auto contextToExecute = ExecutionContext{ *importedScript, *stored->node, stored->memory };
@@ -62,7 +62,7 @@ namespace ska {
 			if (found == nullptr) {
 				throw std::runtime_error("unable to find import \"" + importName + "\" queried in script \"" + m_script.name() + "\"");
 			}
-			auto& emId = found->nodeval<ska::ScriptVariableRef>();
+			auto& emId = found->template nodeval<ska::ScriptVariableRef>();
 			auto em = m_script.useImport(emId.script);
 			if (em == nullptr) {
 				throw std::runtime_error("unable to find import \"" + importName + "\" queried in script \"" + m_script.name() + "\"");
