@@ -2,7 +2,7 @@
 #include "BytecodeInterpreter.h"
 
 #include "NodeValue/AST.h"
-#include "Generator/Value/BytecodeScriptGenerationService.h"
+#include "BytecodeScript.h"
 #include "Generator/Value/BytecodeGenerationOutput.h"
 
 #include "Units/InterpreterCommandMov.h"
@@ -118,6 +118,13 @@ void ska::bytecode::Interpreter::interpret(ExecutionContext& node) {
 			node.set(instruction.dest(), std::move(nodeValue));
 		}
 	}
+}
+
+void ska::bytecode::Interpreter::interpret(InterpretationPart target) {
+	/*
+	auto output = std::make_unique<ska::bytecode::ExecutionOutput>();
+	auto context = ExecutionContext {*output, ..., ... };
+	*/
 }
 
 std::unique_ptr<ska::bytecode::ExecutionOutput> ska::bytecode::Interpreter::interpret(std::size_t scriptIndex, GenerationOutput& instructions) {

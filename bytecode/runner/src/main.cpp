@@ -15,7 +15,7 @@
 #include "Generator/BytecodeGenerator.h"
 #include "Generator/Value/BytecodeScriptCache.h"
 #include "Service/SymbolTableUpdater.h"
-
+#include "BytecodeInterpreter/Value/BytecodeInterpreterTypes.h"
 #include "BytecodeInterpreter/BytecodeInterpreter.h"
 
 #include "Interpreter/Interpreter.h"

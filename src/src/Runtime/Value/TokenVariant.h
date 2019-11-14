@@ -2,7 +2,7 @@
 #include <variant>
 #include <memory>
 
-#include "BridgeMemory.h"
+#include "BridgeFunction.h"
 #include "ObjectMemory.h"
 #include "StringShared.h"
 #include "ScriptVariableRef.h"

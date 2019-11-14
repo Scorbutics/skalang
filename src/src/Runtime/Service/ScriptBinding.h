@@ -7,7 +7,6 @@
 
 #include "Container/sorted_observable.h"
 #include "Runtime/Value/BridgeFunction.h"
-#include "Runtime/Value/BridgeMemory.h"
 #include "BindingFactory.h"
 #include "Event/VarTokenEvent.h"
 #include "NodeValue/ScriptCacheAST.h"

@@ -13,9 +13,10 @@ namespace ska {
 	namespace bytecode {
 		class Generator;
 		class GenerationOutput;
+		class Script;
 
 		struct InterpretationPart {
-			ScriptGen& script;
+			Script& script;
 			ASTNode& node;
 		};
 
@@ -27,7 +28,7 @@ namespace ska {
 			~Interpreter() = default;
 
 			void interpret(ExecutionContext& node);
-			void interpret(InterpretationPart target){}
+			void interpret(InterpretationPart target);
 			std::unique_ptr<ExecutionOutput> interpret(std::size_t scriptIndex, GenerationOutput& scripts);
 		private:
 			CommandInterpreter build(Generator&);

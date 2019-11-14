@@ -2,11 +2,11 @@
 #include <vector>
 
 #include "Runtime/Value/NodeValue.h"
-#include "Interpreter/Service/ScriptProxy.h"
+#include "Runtime/Service/ScriptProxy.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
-#include "Interpreter/Value/Script.h"
-#include "Interpreter/Interpreter.h"
+//#include "Interpreter/Value/Script.h"
+//#include "Interpreter/Interpreter.h"
 
 #include "std/module.h"
 
@@ -23,24 +23,24 @@ namespace ska {
 
                 Module<Interpreter>::m_bridge.bindGenericFunction("Gen", { "string", parametersImport.typeName("Fcty") },
 					BridgeFunction::Callback ([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
-                    
+
 					auto result = m_proxy.createMemory(parametersImport);
-                    result.replace("asInt", std::make_unique<ska::BridgeFunction>(
-                        std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) {
+                    result.push("asInt", std::make_unique<ska::BridgeFunction>(
+                        BridgeFunction::Callback([&](std::vector<ska::NodeValue> params) {
                         const std::size_t index = params[0].nodeval<long>();
                         return m_parameters.size() > index ? static_cast<long>(m_parameters[index].convertNumeric()) : -1;
                     })));
-                    result.replace("asString", std::make_unique<ska::BridgeFunction>(
-                        std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) {
+                    result.push("asString", std::make_unique<ska::BridgeFunction>(
+                        BridgeFunction::Callback([&](std::vector<ska::NodeValue> params) {
                         const std::size_t index = params[0].nodeval<long>();
                         return std::make_shared<std::string>(std::move(m_parameters.size() > index ? m_parameters[index].convertString() : ""));
                     })));
-                    result.replace("size", std::make_unique<ska::BridgeFunction>(
-                        std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) {
+                    result.push("size", std::make_unique<ska::BridgeFunction>(
+                        BridgeFunction::Callback([&](std::vector<ska::NodeValue> params) {
                         return static_cast<long>(m_parameters.size());
                     })));
 
-                    return result.memory;
+                    return result.value();
                 }));
                 Module<Interpreter>::m_bridge.buildFunctions();
             }

@@ -11,7 +11,8 @@
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
-#include "Interpreter/Service/ScriptProxy.h"
+#include "Interpreter/Value/DirectInterpreterTypes.h"
+#include "Runtime/Service/ScriptProxy.h"
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/ScriptCache.h"
 #include "Runtime/Value/ObjectMemory.h"
@@ -67,10 +68,17 @@ TEST_CASE("[Interpreter Script]") {
 		auto importTest = scriptBindingDataClass.import(*data.parser, *data.interpreter, {"Test293", "" SKALANG_TEST_DIR "/src/resources/test293"});
 		scriptBindingDataClass.bindGenericFunction("run", { "Test293::Fcty()" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto getTotoMemory = scriptProxy.accessMemory("Binding1", "getToto");
+
+			/*
+			TODO !!!
+
 			assert(getTotoMemory.first != nullptr);
 			auto mem = scriptProxy.createMemory(importBinding);
 			mem.replace("getToto", getTotoMemory.first);
 			return ska::NodeValue{ std::move(mem.memory) };
+			*/
+
+			return getTotoMemory;
 		}));
 		scriptBindingDataClass.buildFunctions();
 

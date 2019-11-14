@@ -20,6 +20,9 @@ namespace ska {
 			Script& operator=(const Script&) = delete;
 			Script& operator=(Script&&) = default;
 
+			ScriptGen& generation() { return m_generation; }
+			ScriptExecution& execution() { return m_execution; }
+
 		private:
 			ScriptGen m_generation;
 			ScriptExecution m_execution;

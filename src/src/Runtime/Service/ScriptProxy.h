@@ -4,16 +4,14 @@
 #include <vector>
 #include <unordered_map>
 
-#include "Runtime/Service/ScriptBinding.h"
-#include "Interpreter/ScriptCache.h"
-#include "Interpreter/Value/Script.h"
+#include "ScriptBinding.h"
 #include "Runtime/Value/InterpreterTypes.h"
 #include "Service/ScriptNameBuilder.h"
-
-#include "Interpreter/InterpreterOperatorFunctionCall.h"
+#include "Runtime/Value/BridgeMemory.h"
+//#include "Interpreter/InterpreterOperatorFunctionCall.h"
 
 namespace ska {
-	
+
 	template <class Interpreter>
 	using ScriptBridge = ska::ScriptBinding<
 		typename InterpreterTypes<Interpreter>::Script,
@@ -35,8 +33,17 @@ namespace ska {
 
 		virtual ~ScriptProxy() = default;
 
-		BridgeMemory<Memory> createMemory(const BridgeImport& import) { return { m_script.createMemory(), import.symbols() }; }
-		BridgeMemory<Memory> createMemory(const Symbol& symbol) { return { m_script.createMemory(), symbol }; }
+		BridgeMemory<Interpreter> createMemory(const BridgeImport& import) {
+			auto mem = typename InterpreterTypes<Interpreter>::Memory { m_script.createMemory() };
+			return { std::move(mem), import.symbols() };
+			//return m_script.createMemory();
+		}
+
+		BridgeMemory<Interpreter> createMemory(const Symbol& symbol) {
+			auto mem = typename InterpreterTypes<Interpreter>::Memory { m_script.createMemory() };
+			return { std::move(mem), symbol };
+			//return m_script.createMemory();
+		}
 
 		NodeValue callFunction(Interpreter& interpreter, std::string importName, std::string functionName, std::vector<ska::NodeValue> parametersValues) {
 			SLOG(LogLevel::Info) << "Looking for import \"" << importName << "\" in script \"" << m_script.name() << "\"";
@@ -48,15 +55,19 @@ namespace ska {
 			auto importedScript = m_script.useImport(importedScriptId.script);
 			auto functionToCallMemory = importedScript->downMemory()(functionName);
 			auto& functionToExecute = functionToCallMemory.first->template nodeval<ska::ScriptVariableRef>();
-
+/*
+			TODO !!!
 			auto* stored = importedScript->getFunction(functionToExecute.variable);
 			auto contextToExecute = ExecutionContext{ *importedScript, *stored->node, stored->memory };
 
 			auto operateOnFunction = ska::Operation<ska::Operator::FUNCTION_DECLARATION>(contextToExecute);
 			return ska::InterpreterOperationFunctionCallScriptWithParams(m_script, interpreter, functionToCallMemory.second, operateOnFunction, std::move(parametersValues)).asRvalue().object;
+
+*/
+			return NodeValue {};
 		}
 
-		MemoryLValue accessMemory(std::string importName, std::string field) {
+		NodeValue accessMemory(std::string importName, std::string field) {
 			SLOG(LogLevel::Info) << "Looking for import \"" << importName << "\" in script \"" << m_script.name() << "\"";
 			auto found = m_script.findInMemoryTree(importName).first;
 			if (found == nullptr) {
@@ -67,7 +78,9 @@ namespace ska {
 			if (em == nullptr) {
 				throw std::runtime_error("unable to find import \"" + importName + "\" queried in script \"" + m_script.name() + "\"");
 			}
-			return em->downMemory()(field);
+			//TODO !!!
+			//return em->downMemory()(field);
+			return NodeValue {};
 		}
 
 	private:
