@@ -7,6 +7,7 @@ namespace ska {
 
 		class Script {
 		public:
+			Script(ScriptCache& cache, const std::string& fullName, std::vector<ska::Token> tokens) {}
 			Script(ScriptGen generation, ScriptExecution execution) :
 				m_generation(std::move(generation)),
 				m_execution(std::move(execution)) {

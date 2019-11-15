@@ -2,42 +2,61 @@
 #include <unordered_map>
 #include <iterator>
 #include <vector>
-
+#include "Service/IsSmartPtr.h"
 namespace ska {
 
   template <template <class T> class Container, class Key, class Value>
   class container_mapped {
+  using ContainerRef = typename std::conditional_t<
+    std::is_pointer_v<Container<Value>> || ska::is_smart_ptr<Container<Value>>::value,
+    std::remove_pointer_t<typename ska::remove_smart_ptr<Container<Value>>::type>&,
+    Container<Value>&
+  >;
+
   public:
-    container_mapped(Container<Value>&& origin) : m_container(std::forward<Container<Value>>(origin)) {}
-    container_mapped() = default;
+    container_mapped(Container<Value>&& origin) :
+    m_container(std::forward<Container<Value>>(origin)),
+    m_containerRef(getContainerRef()) {}
+
+    container_mapped() :
+      m_containerRef(getContainerRef()) {}
+
     ~container_mapped() = default;
+
+    ContainerRef& getContainerRef() {
+      if constexpr (std::is_pointer_v<Container<Value>> || ska::is_smart_ptr<Container<Value>>::value) {
+        return *m_container;
+      } else {
+        return m_container;
+      }
+    }
 
     void emplace(Key&& key, Value&& value) {
       auto index = m_map.size();
       const auto [insertedIt, insertionHappened] = m_map.emplace(std::forward<Key>(key), index);
       index = std::distance(m_map.begin(), insertedIt);
 
-      if (index >= m_container.size()) {
-        if (index == m_container.size() + 1) {
-          m_container.push_back(std::forward<Value>(value));
+      if (index >= m_containerRef.size()) {
+        if (index == m_containerRef.size() + 1) {
+          m_containerRef.push_back(std::forward<Value>(value));
           return;
         } else {
-          m_container.resize(index + 1);
+          m_containerRef.resize(index + 1);
         }
       }
-      m_container[index] = std::forward<Value>(value);
+      m_containerRef[index] = std::forward<Value>(value);
     }
 
     Value& operator[](const Key& key) {
       const auto index = m_map.at(key);
-      assert(index < m_container.size());
-      return m_container[index];
+      assert(index < m_containerRef.size());
+      return m_containerRef[index];
     }
 
     const Value& operator[](const Key& key) const {
       const auto index = m_map.at(key);
-      assert(index < m_container.size());
-      return m_container[index];
+      assert(index < m_containerRef.size());
+      return m_containerRef[index];
     }
 
     const Container<Value>& underlying() const {
@@ -47,6 +66,7 @@ namespace ska {
   private:
     std::unordered_map<Key, std::size_t> m_map;
     Container<Value> m_container;
+    ContainerRef m_containerRef;
   };
 
 }

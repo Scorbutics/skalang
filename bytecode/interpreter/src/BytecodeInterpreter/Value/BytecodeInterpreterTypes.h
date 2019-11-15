@@ -13,12 +13,29 @@ namespace ska {
 
     class RuntimeMemory  {
     public:
-      RuntimeMemory(NodeValueArray table) : m_container(table) {}
+      static auto buildFromVector(PlainMemoryTable table) {
+        auto result = std::make_shared<std::deque<NodeValue>>();
+        std::move(
+            std::begin(table),
+            std::end(table),
+            std::back_inserter(*result)
+        );
+        return result;
+      }
+
+      RuntimeMemory(PlainMemoryTable table) : m_container(buildFromVector(std::move(table))) {}
+      RuntimeMemory(NodeValueArray table) : m_container(std::move(table)) {}
       ~RuntimeMemory() = default;
 
       NodeValue value() const {
         return m_container.underlying();
       }
+
+      template <class Value>
+      void emplace(const std::string& field, Value&& value) {
+        m_container.emplace(field, std::forward<Value>(value));
+      }
+
     private:
       container_mapped<SharedDeque, std::string, NodeValue> m_container;
     };
