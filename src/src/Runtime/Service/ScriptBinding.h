@@ -75,7 +75,7 @@ namespace ska {
 		}
 
 		BridgeFunctionPtr bindGenericFunction_(ScriptAST& script, const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
-			auto result = std::make_unique<BridgeFunction>(std::move(f));
+			auto result = std::make_shared<BridgeFunction>(std::move(f));
 			result->node = m_functionBinder.bindSymbol(script, functionName, std::move(typeNames));
 			return result;
 		}
@@ -96,7 +96,7 @@ namespace ska {
 				}
 			};
 
-			return std::make_unique<BridgeFunction>(static_cast<decltype(BridgeFunction::function)> (std::move(lambdaWrapped)));
+			return std::make_shared<BridgeFunction>(static_cast<decltype(BridgeFunction::function)> (std::move(lambdaWrapped)));
 		}
 
 		template <class T, std::size_t Id>

@@ -31,9 +31,10 @@ namespace ska {
       }
     }
 
-    void emplace(Key&& key, Value&& value) {
+    template <class KeyT, class ValueT>
+    void emplace(KeyT&& key, ValueT&& value) {
       auto index = m_map.size();
-      const auto [insertedIt, insertionHappened] = m_map.emplace(std::forward<Key>(key), index);
+      const auto [insertedIt, insertionHappened] = m_map.emplace(std::forward<KeyT>(key), index);
       index = std::distance(m_map.begin(), insertedIt);
 
       if (index >= m_containerRef.size()) {

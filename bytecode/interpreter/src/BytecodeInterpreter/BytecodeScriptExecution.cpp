@@ -1,5 +1,5 @@
 #include "BytecodeScriptExecution.h"
-#include "BytecodeInterpreter/Value/BytecodeExecutionOutput.h"
+#include "BytecodeInterpreter/Value/BytecodeExecutor.h"
 
 ska::NodeValue ska::bytecode::ScriptExecution::getCell(const Value& v) const {
 	if (v.empty()) {

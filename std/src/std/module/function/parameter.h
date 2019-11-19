@@ -25,17 +25,17 @@ namespace ska {
 					BridgeFunction::Callback ([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 
 					auto result = m_proxy.createMemory(parametersImport);
-                    result.push("asInt", std::make_unique<ska::BridgeFunction>(
+                    result.push("asInt", std::make_shared<ska::BridgeFunction>(
                         BridgeFunction::Callback([&](std::vector<ska::NodeValue> params) {
                         const std::size_t index = params[0].nodeval<long>();
                         return m_parameters.size() > index ? static_cast<long>(m_parameters[index].convertNumeric()) : -1;
                     })));
-                    result.push("asString", std::make_unique<ska::BridgeFunction>(
+                    result.push("asString", std::make_shared<ska::BridgeFunction>(
                         BridgeFunction::Callback([&](std::vector<ska::NodeValue> params) {
                         const std::size_t index = params[0].nodeval<long>();
                         return std::make_shared<std::string>(std::move(m_parameters.size() > index ? m_parameters[index].convertString() : ""));
                     })));
-                    result.push("size", std::make_unique<ska::BridgeFunction>(
+                    result.push("size", std::make_shared<ska::BridgeFunction>(
                         BridgeFunction::Callback([&](std::vector<ska::NodeValue> params) {
                         return static_cast<long>(m_parameters.size());
                     })));

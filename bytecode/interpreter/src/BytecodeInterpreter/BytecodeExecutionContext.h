@@ -3,7 +3,7 @@
 #include <cassert>
 #include "Generator/Value/BytecodeValue.h"
 #include "Runtime/Value/TokenVariant.h"
-#include "BytecodeInterpreter/Value/BytecodeExecutionOutput.h"
+#include "BytecodeInterpreter/Value/BytecodeExecutor.h"
 #include "BytecodeInterpreter/Value/ScriptExecutionOutput.h"
 #include "BytecodeScriptExecution.h"
 
@@ -14,7 +14,7 @@ namespace ska {
 		class Generator;
 		class ExecutionContext {
 		public:
-			ExecutionContext(ExecutionOutput& container, std::size_t scriptIndex, GenerationOutput& instructions);
+			ExecutionContext(Executor& container, std::size_t scriptIndex, GenerationOutput& instructions);
 
 			ExecutionContext(ExecutionContext& old, std::size_t scriptIndex) :
 				ExecutionContext(old.m_container, scriptIndex, old.m_bytecode) { }
@@ -68,7 +68,7 @@ namespace ska {
 		private:
 			ScriptVariableRef getReturn();
 			ExecutionContext getContext(ScriptVariableRef value);
-			ExecutionOutput& m_container;
+			Executor& m_container;
 			GenerationOutput& m_bytecode;
 			ScriptExecution* m_current = nullptr;
 		};

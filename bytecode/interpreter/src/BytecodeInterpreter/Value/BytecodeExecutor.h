@@ -6,7 +6,7 @@
 namespace ska {
 	namespace bytecode {
 		class ScriptGenerationOutput;
-		class ExecutionOutput {
+		class Executor {
 		public:
 			using ScriptExecutionContainer = std::vector<std::unique_ptr<ScriptExecution>>;
 

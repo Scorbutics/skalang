@@ -122,13 +122,13 @@ void ska::bytecode::Interpreter::interpret(ExecutionContext& node) {
 
 void ska::bytecode::Interpreter::interpret(InterpretationPart target) {
 	/*
-	auto output = std::make_unique<ska::bytecode::ExecutionOutput>();
+	auto output = std::make_unique<ska::bytecode::Executor>();
 	auto context = ExecutionContext {*output, ..., ... };
 	*/
 }
 
-std::unique_ptr<ska::bytecode::ExecutionOutput> ska::bytecode::Interpreter::interpret(std::size_t scriptIndex, GenerationOutput& instructions) {
-	auto output = std::make_unique<ska::bytecode::ExecutionOutput>();
+std::unique_ptr<ska::bytecode::Executor> ska::bytecode::Interpreter::interpret(std::size_t scriptIndex, GenerationOutput& instructions) {
+	auto output = std::make_unique<ska::bytecode::Executor>();
 	auto context = ExecutionContext {*output, scriptIndex, instructions };
 	interpret(context);
 	return output;

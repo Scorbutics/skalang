@@ -8,7 +8,6 @@
 #include "NodeValue/ScriptAST.h"
 
 namespace ska {
-	class StatementParser;
 
     class Script {
 	public:

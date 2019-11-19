@@ -47,6 +47,9 @@ namespace ska {
 
 		NodeValue callFunction(Interpreter& interpreter, std::string importName, std::string functionName, std::vector<ska::NodeValue> parametersValues) {
 			SLOG(LogLevel::Info) << "Looking for import \"" << importName << "\" in script \"" << m_script.name() << "\"";
+/*
+			TODO !!!
+
 			auto import = m_script.findInMemoryTree(importName);
 			if (import.first == nullptr) {
 				throw std::runtime_error("unable to find import \"" + importName + "\" queried in script \"" + m_script.name() + "\"");
@@ -55,8 +58,7 @@ namespace ska {
 			auto importedScript = m_script.useImport(importedScriptId.script);
 			auto functionToCallMemory = importedScript->downMemory()(functionName);
 			auto& functionToExecute = functionToCallMemory.first->template nodeval<ska::ScriptVariableRef>();
-/*
-			TODO !!!
+
 			auto* stored = importedScript->getFunction(functionToExecute.variable);
 			auto contextToExecute = ExecutionContext{ *importedScript, *stored->node, stored->memory };
 
