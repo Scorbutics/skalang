@@ -34,15 +34,13 @@ namespace ska {
 		virtual ~ScriptProxy() = default;
 
 		BridgeMemory<Interpreter> createMemory(const BridgeImport& import) {
-			auto mem = typename InterpreterTypes<Interpreter>::Memory { m_script.createMemory() };
+			auto mem = Memory { m_script.createMemory() };
 			return { std::move(mem), import.symbols() };
-			//return m_script.createMemory();
 		}
 
 		BridgeMemory<Interpreter> createMemory(const Symbol& symbol) {
-			auto mem = typename InterpreterTypes<Interpreter>::Memory { m_script.createMemory() };
+			auto mem = Memory { m_script.createMemory() };
 			return { std::move(mem), symbol };
-			//return m_script.createMemory();
 		}
 
 		NodeValue callFunction(Interpreter& interpreter, std::string importName, std::string functionName, std::vector<ska::NodeValue> parametersValues) {
