@@ -123,6 +123,12 @@ namespace ska {
 			EnqueueConverterItem<OperationType::SPLIT, Command::CONV_D_STR, Command::ADD_STR>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::FLOAT, ExpressionType::STRING);
 			EnqueueConverterItem<OperationType::SPLIT, Command::CONV_I_D, Command::ADD_D>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::INT, ExpressionType::FLOAT);
 			EnqueueConverterItemPack<OperationType::FULL_FIRST, CommandPackOr<Command::PUSH_F_ARR, Command::PUSH_B_ARR>>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::INT, ExpressionType::ARRAY);
+			EnqueueConverterItemPack<OperationType::FULL_FIRST, CommandPackOr<Command::PUSH_F_ARR, Command::PUSH_B_ARR>>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::STRING, ExpressionType::ARRAY);
+			EnqueueConverterItemPack<OperationType::FULL_FIRST, CommandPackOr<Command::PUSH_F_ARR, Command::PUSH_B_ARR>>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::FLOAT, ExpressionType::ARRAY);
+			EnqueueConverterItemPack<OperationType::FULL_FIRST, CommandPackOr<Command::PUSH_F_ARR, Command::PUSH_B_ARR>>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::BOOLEAN, ExpressionType::ARRAY);
+			EnqueueConverterItemPack<OperationType::FULL_FIRST, CommandPackOr<Command::PUSH_F_ARR, Command::PUSH_B_ARR>>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::ARRAY, ExpressionType::ARRAY);
+			EnqueueConverterItemPack<OperationType::FULL_FIRST, CommandPackOr<Command::PUSH_F_ARR, Command::PUSH_B_ARR>>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::FUNCTION, ExpressionType::ARRAY);
+			EnqueueConverterItemPack<OperationType::FULL_FIRST, CommandPackOr<Command::PUSH_F_ARR, Command::PUSH_B_ARR>>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::OBJECT, ExpressionType::ARRAY);
 
 			EnqueueConverterItem<OperationType::SPLIT, Command::CONV_I_D, Command::SUB_D>::enqueue(result, LogicalOperator::SUBSTRACT, ExpressionType::INT, ExpressionType::FLOAT);
 			EnqueueConverterItemPack<OperationType::FULL_FIRST, CommandPackOr<Command::POP_F_ARR, Command::POP_B_ARR>>::enqueue(result, LogicalOperator::SUBSTRACT, ExpressionType::INT, ExpressionType::ARRAY);
