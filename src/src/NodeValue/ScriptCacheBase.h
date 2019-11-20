@@ -15,17 +15,17 @@ namespace ska {
 
 		auto* operator[](std::size_t index) {
 			if constexpr (is_smart_ptr<ScriptT>::value) {
-				return index < cache.size() ? cache[index].get() : nullptr;
+				return index < cache.size() ? cache[index]->get() : nullptr;
 			} else {
-				return index < cache.size() ? &cache[index] : nullptr;
+				return index < cache.size() ? cache[index].get() : nullptr;
 			}
 		}
 
 		const auto* operator[](std::size_t index) const {
 			if constexpr (is_smart_ptr<ScriptT>::value) {
-				return index < cache.size() ? cache[index].get() : nullptr;
+				return index < cache.size() ? cache[index]->get() : nullptr;
 			} else {
-				return index < cache.size() ? &cache[index] : nullptr;
+				return index < cache.size() ? cache[index].get() : nullptr;
 			}
 		}
 
@@ -33,7 +33,7 @@ namespace ska {
 		auto end() { return namedMapCache.end(); }
 
 		auto size() const { return cache.size(); }
-		auto& back() { return cache.back(); }
+		auto& back() { return *cache.back(); }
 
 		auto& at(const std::string& scriptName) {
 			const auto index = namedMapCache.at(scriptName);
@@ -41,10 +41,10 @@ namespace ska {
 		}
 
 		auto& at(std::size_t index) {
-			if (index >= cache.size()) {
+			if (index >= cache.size() || cache[index] == nullptr) {
 				throw std::runtime_error("bad script index \"" + std::to_string(index) + "\"");
 			}
-			return cache[index];
+			return *cache[index];
 		}
 
 		bool emplace(std::string scriptName, ScriptT script) {
@@ -85,9 +85,9 @@ namespace ska {
 			if(index >= cache.size()) {
 				cache.resize(index + 1);
 			}
-			cache[index] = std::move(script);
+			cache[index] = std::make_unique<ScriptT>(std::move(script));
 		}
 		std::unordered_map<std::string, std::size_t> namedMapCache;
-		std::vector<ScriptT> cache;
+		std::vector<std::unique_ptr<ScriptT>> cache;
 	};
 }

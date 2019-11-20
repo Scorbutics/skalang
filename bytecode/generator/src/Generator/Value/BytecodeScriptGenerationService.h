@@ -38,7 +38,7 @@ namespace ska {
 			ScriptGenerationService(ScriptGenerationService&&) = default;
 			ScriptGenerationService& operator=(ScriptGenerationService&&) = default;
 
-			ska::ScriptAST program() { return ska::ScriptAST{ *m_script }; }
+			ska::ScriptAST program() const { return ska::ScriptAST{ *m_script }; }
 
 			Register queryNextRegister();
 			Value querySymbolOrValue(const ASTNode& node);

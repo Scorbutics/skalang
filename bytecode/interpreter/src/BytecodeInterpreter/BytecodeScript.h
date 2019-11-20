@@ -1,6 +1,7 @@
 #pragma once
 #include "Generator/Value/BytecodeScriptGen.h"
 #include "BytecodeInterpreter/Value/BytecodeExecutor.h"
+#include "BytecodeInterpreter/Value/BytecodeInterpreterTypes.h"
 
 namespace ska {
 	namespace bytecode {
@@ -12,14 +13,20 @@ namespace ska {
 		public:
 			Script(ScriptCache& cache, const std::string& fullName, std::vector<ska::Token> tokens) :
 				m_cache(cache),
-				m_generation { GenerationOutput { m_cache } },
 				m_serviceGen(m_cache, fullName, std::move(tokens)) {}
 
-			void generate(Generator& generator);
+			void generate(Generator& generator) {
+				m_serviceGen.generate(generator);
+			}
+
 			std::unique_ptr<Executor> execute(Interpreter& interpreter);
 
-			PlainMemoryTable createMemory() { return {}; }
-			std::string name() const { return m_generation.back().name().toString(); }
+			PlainMemoryTable createMemory() {
+				//TODO !!!
+				return {};
+			}
+
+			std::string name() const { return astScript().name(); }
 
 			Script(Script&&) = default;
 			Script(const Script&) = delete;
@@ -27,16 +34,18 @@ namespace ska {
 			Script& operator=(Script&&) = default;
 
 			ScriptAST& astScript() { return m_serviceGen.astScript(); }
-			void memoryFromBridge(std::vector<BridgeFunctionPtr> bindings) { return m_serviceGen.memoryFromBridge(std::move(bindings)); }
+			const ScriptAST& astScript() const { return m_serviceGen.astScript(); }
 
-			//ScriptGen& generation() { return m_generation; }
-			//ScriptExecution& execution() { return m_execution; }
+			void memoryFromBridge(Interpreter& interpreter, std::vector<BridgeFunctionPtr> bindings);
+
+			RuntimeMemory memoryField(const std::string& symbol);
+
+			Value getSymbol(const Symbol& symbol) const;
 
 		private:
-			bool m_generated = false;
-			unsigned int m_id = std::numeric_limits<unsigned int>::max();
+			Value findBytecodeMemoryFromSymbol(const Symbol& symbol) const;
+			const Symbol& findSymbolFromString(const std::string& key) const;
 			ScriptCache& m_cache;
-			GenerationOutput m_generation;
 			ScriptGen m_serviceGen;
 			ScriptExecution* m_execution;
 		};

@@ -9,6 +9,8 @@
 
 namespace ska {
 
+	class Interpreter;
+
     class Script {
 	public:
 		Script(ScriptHandle& handle) :
@@ -30,7 +32,7 @@ namespace ska {
 			return m_cache.cache[index] != nullptr;
 		}
 
-		void memoryFromBridge(std::vector<BridgeFunctionPtr> bindings);
+		void memoryFromBridge(Interpreter&, std::vector<BridgeFunctionPtr> bindings);
 
 		const auto& handle() const { return m_handle; }
 
@@ -58,7 +60,7 @@ namespace ska {
 			return MemoryTable::create(m_handle->m_currentMemory);
 		}
 
-		auto findInMemoryTree(const std::string& key) {
+		auto memoryField(const std::string& key) {
 			return (*m_handle->m_currentMemory)[key];
 		}
 

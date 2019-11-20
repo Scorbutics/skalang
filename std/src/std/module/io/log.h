@@ -19,7 +19,7 @@ namespace ska {
                     //TODO
                     std::cout << "wait " << value << std::endl;
                 }));
-                Module<Interpreter>::m_bridge.buildFunctions();
+                Module<Interpreter>::m_bridge.buildFunctions(config.interpreter);
             }
             ~IOLogModule() override = default;
         };

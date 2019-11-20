@@ -42,7 +42,7 @@ namespace ska {
 
                     return result.value();
                 }));
-                Module<Interpreter>::m_bridge.buildFunctions();
+                Module<Interpreter>::m_bridge.buildFunctions(config.interpreter);
             }
 
             ~ParameterModule() override = default;

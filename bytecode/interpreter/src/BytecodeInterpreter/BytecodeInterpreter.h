@@ -29,9 +29,11 @@ namespace ska {
 
 			void interpret(ExecutionContext& node);
 			void interpret(InterpretationPart target);
+			Generator& generator() { return m_generator; }
 			std::unique_ptr<Executor> interpret(std::size_t scriptIndex, GenerationOutput& scripts);
 		private:
 			CommandInterpreter build(Generator&);
+			Generator& m_generator;
 			CommandInterpreter m_commandInterpreter;
 		};
 	}

@@ -103,6 +103,7 @@ ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build
 }
 
 ska::bytecode::Interpreter::Interpreter(Generator& generator, const ReservedKeywordsPool& reserved) :
+	m_generator(generator),
 	m_commandInterpreter(build(generator)) {
 }
 

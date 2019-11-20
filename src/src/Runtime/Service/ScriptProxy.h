@@ -45,13 +45,19 @@ namespace ska {
 
 		NodeValue callFunction(Interpreter& interpreter, std::string importName, std::string functionName, std::vector<ska::NodeValue> parametersValues) {
 			SLOG(LogLevel::Info) << "Looking for import \"" << importName << "\" in script \"" << m_script.name() << "\"";
-/*
-			TODO !!!
 
-			auto import = m_script.findInMemoryTree(importName);
-			if (import.first == nullptr) {
-				throw std::runtime_error("unable to find import \"" + importName + "\" queried in script \"" + m_script.name() + "\"");
-			}
+/*
+			Memory& importVar = m_script.memoryField(importName);
+
+	TODO !!!
+
+			auto importedScript = m_script.useImport(importVar);
+			Memory& functionToCallMemory = importedScript.memoryField(functionName);
+			return functionToCallMemory.execute();
+*/
+		/*
+			OLD
+
 			const auto importedScriptId = import.first->template nodeval<ska::ScriptVariableRef>();
 			auto importedScript = m_script.useImport(importedScriptId.script);
 			auto functionToCallMemory = importedScript->downMemory()(functionName);
@@ -62,14 +68,13 @@ namespace ska {
 
 			auto operateOnFunction = ska::Operation<ska::Operator::FUNCTION_DECLARATION>(contextToExecute);
 			return ska::InterpreterOperationFunctionCallScriptWithParams(m_script, interpreter, functionToCallMemory.second, operateOnFunction, std::move(parametersValues)).asRvalue().object;
-
-*/
+			*/
 			return NodeValue {};
 		}
 
 		NodeValue accessMemory(std::string importName, std::string field) {
 			SLOG(LogLevel::Info) << "Looking for import \"" << importName << "\" in script \"" << m_script.name() << "\"";
-			auto found = m_script.findInMemoryTree(importName).first;
+			auto found = m_script.memoryField(importName).first;
 			if (found == nullptr) {
 				throw std::runtime_error("unable to find import \"" + importName + "\" queried in script \"" + m_script.name() + "\"");
 			}

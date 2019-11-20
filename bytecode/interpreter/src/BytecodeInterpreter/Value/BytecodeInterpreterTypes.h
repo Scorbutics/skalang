@@ -23,6 +23,7 @@ namespace ska {
         return result;
       }
 
+      RuntimeMemory(Value root) {}
       RuntimeMemory(PlainMemoryTable table) : m_container(buildFromVector(std::move(table))) {}
       RuntimeMemory(NodeValueArray table) : m_container(std::move(table)) {}
       ~RuntimeMemory() = default;
@@ -35,6 +36,8 @@ namespace ska {
       void emplace(const std::string& field, Value&& value) {
         m_container.emplace(field, std::forward<Value>(value));
       }
+
+
 
     private:
       container_mapped<SharedDeque, std::string, NodeValue> m_container;

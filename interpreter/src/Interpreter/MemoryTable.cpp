@@ -13,7 +13,7 @@ ska::MemoryTablePtr& ska::MemoryTable::internalPushNested() {
 }
 
 void ska::MemoryTable::internalEndNested() {
-	//TODO : devrait être systématiquement un "popNested" sauf pour le cas d'un block type "root script" ?
+	//TODO FIXME : devrait être systématiquement un "popNested" sauf pour le cas d'un block type "root script" ?
 	
 	/*
 	if(!isOrphan()) {

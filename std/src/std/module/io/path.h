@@ -35,7 +35,7 @@ namespace ska {
                     */
                     return ska::NodeValue{ /*std::move(memPath)*/ };
                 }));
-                Module<Interpreter>::m_bridge.buildFunctions();
+                Module<Interpreter>::m_bridge.buildFunctions(config.interpreter);
             }
             ~IOPathModule() override = default;
         private:

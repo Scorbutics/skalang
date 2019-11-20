@@ -12,6 +12,7 @@
 #include "NodeValue/ScriptCacheAST.h"
 #include "NodeValue/ScriptAST.h"
 #include "Runtime/Value/NodeValue.h"
+#include "Runtime/Value/InterpreterTypes.h"
 
 namespace ska {
 	class ScriptBindingBase;
@@ -49,8 +50,8 @@ namespace ska {
 	protected:
 		BridgeImport import(StatementParser& parser, std::pair<std::string, std::string> import);
 
-		template <class RuntimeScript>
-		void buildFunctions(RuntimeScript& script) {
+		template <class Interpreter>
+		void buildFunctions(Interpreter& interpreter, typename InterpreterTypes<Interpreter>::Script& script) {
       SLOG(LogLevel::Info) << "Building script " << script.astScript().name() << " ( " << m_script.name() << ") from bridge";
 
 			assert(!m_bindings.empty() && "Bridge is empty");
@@ -59,7 +60,7 @@ namespace ska {
 			auto& scriptAstNode = m_script.fromBridge(m_bindings);
       registerAST(scriptAstNode);
 
-			script.memoryFromBridge(std::move(m_bindings));
+			script.memoryFromBridge(interpreter, std::move(m_bindings));
 
       m_bindings = { };
     }
@@ -148,8 +149,9 @@ namespace ska {
 			m_script(cache, ScriptBindingBase::name(), std::vector<Token>{}) {
 		}
 
-		void buildFunctions() {
-			ScriptBindingBase::buildFunctions(m_script);
+		template <class Interpreter>
+		void buildFunctions(Interpreter& interpreter) {
+			ScriptBindingBase::buildFunctions(interpreter, m_script);
 		}
 
 		auto& script() { return m_script; }

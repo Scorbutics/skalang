@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "BytecodeScriptExecution.h"
 #include "BytecodeInterpreter/Value/BytecodeExecutor.h"
 

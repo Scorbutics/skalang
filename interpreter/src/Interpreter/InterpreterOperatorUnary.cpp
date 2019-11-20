@@ -21,7 +21,7 @@ namespace ska {
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::UNARY>::interpret(OperateOn node) {
 	assert(!node.GetValue().empty());
-	auto nodeValue = node.parent.findInMemoryTree(node.GetValue());
+	auto nodeValue = node.parent.memoryField(node.GetValue());
 	if(nodeValue.first == nullptr) {
 		throw std::runtime_error("unable to find symbol \"" + node.GetValue() + "\" in memory of current script \"" + node.parent.name() + "\"");
 	}

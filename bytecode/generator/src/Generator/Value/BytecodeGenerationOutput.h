@@ -1,15 +1,16 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
-#include "BytecodeScriptCache.h"
-#include "BytecodeScriptGen.h"
 #include "BytecodeSymbolInfo.h"
+#include "BytecodeScriptGenerationService.h"
+#include "BytecodeScriptGenerationOutput.h"
 
 namespace ska {
 	class Symbol;
 	class ASTNode;
 
 	namespace bytecode {
+		struct ScriptCache;
 		using ScriptGenerationNameToIndexMap = std::unordered_map<std::string, std::size_t>;
 
 		class GenerationOutput {
@@ -24,16 +25,17 @@ namespace ska {
 			GenerationOutput(const GenerationOutput&) = delete;
 			GenerationOutput(GenerationOutput&&) = default;
 			GenerationOutput& operator=(const GenerationOutput&) = delete;
+			GenerationOutput& operator=(GenerationOutput&&) = default;
 			~GenerationOutput() = default;
 
-			auto size() const { return m_cache.size(); }
+			std::size_t size() const;
 
-			const auto& generated(std::size_t index) const { return m_cache[index]->output; }
-			bool isGenerated(std::size_t index) const { return m_cache[index] != nullptr && !m_cache[index]->output.empty();}
+			const ScriptGenerationOutput& generated(std::size_t index) const;
+			bool isGenerated(std::size_t index) const;
 
-			auto& backService() { return m_cache.back().service; }
-			auto& back() { return m_cache.back().output; }
-			const auto& back() const { return m_cache.back().output; }
+			ScriptGenerationService& backService();
+			ScriptGenerationOutput& back();
+			const ScriptGenerationOutput& back() const;
 
 			void setSymbolInfo(const ASTNode& node, SymbolInfo info);
 			void setSymbolInfo(const Symbol& symbol, SymbolInfo info);
@@ -42,11 +44,12 @@ namespace ska {
 
 			std::pair<std::size_t, ScriptGenerationService*> script(const std::string& fullScriptName);
 			ScriptGenerationService& script(std::size_t index);
+			const ScriptGenerationService& script(std::size_t index) const;
 
 			const std::vector<Value>& generateExportedSymbols(std::size_t scriptIndex) const;
 
 		private:
-			ScriptCache& m_cache;
+			ScriptCache* m_cache = nullptr;
 			SymbolInfosContainer m_symbolInfo;
 		};
 	}
