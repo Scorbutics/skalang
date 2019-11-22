@@ -66,16 +66,20 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::Generator::generatePart(Gen
 	LOG_DEBUG << "Generating " << operatorNode << " " << node.pointer();
 	auto& builder = m_operatorGenerator[static_cast<std::size_t>(operatorNode)];
 	assert(builder != nullptr);
-	return builder->generate(node);
+	return { node.script(), builder->generate(node) };
 }
 
-ska::bytecode::GenerationOutput ska::bytecode::Generator::generate(ScriptCache& cache, ScriptGenerationService script) {
-	auto container = GenerationOutput { cache };
-	auto index = container.push(std::move(script));
-	auto serviceName = container.backService().program().name();
-	container.setOut(index, generatePart(GenerationContext{ container }));
+void ska::bytecode::Generator::generate(ScriptCache& cache, ScriptGenerationService script) {
+	auto container = GenerationOutput {};
+	auto scriptGenName = script.name();
+	auto index = cache.genCache.emplace(scriptGenName, std::move(script));
+	return generate(cache, index);
+}
 
-	LOG_INFO << "Final generation " << container.back() << " for script " << serviceName;
+void ska::bytecode::Generator::generate(ScriptCache& cache, std::size_t scriptIndex) {
+	auto container = GenerationOutput {};
+	auto& scriptGenService = cache.genCache.at(scriptIndex);
+	container.emplace(scriptGenService.name(), generatePart(GenerationContext{ container }));
 
-	return container;
+	LOG_INFO << "Final generation " << container.back() << " for script " << scriptGenService.name();
 }

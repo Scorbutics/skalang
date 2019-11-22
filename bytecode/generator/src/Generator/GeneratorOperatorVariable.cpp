@@ -9,12 +9,12 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::O
 namespace ska {
 	namespace bytecode {
 		template <class Generator>
-		static ScriptGenerationOutput CommonGenerate(Generator& generator, const ASTNode& dest, const ska::ASTNode& node, GenerationContext& context) {
+		static InstructionOutput CommonGenerate(Generator& generator, const ASTNode& dest, const ska::ASTNode& node, GenerationContext& context) {
 			auto finalGroup = generator.generateNext({ context, node });
 			auto valueDestination = finalGroup.value();
 			if((dest.symbol() != node.symbol() || node.symbol() == nullptr) && !finalGroup.empty()) {
 				LOG_DEBUG << "Creating MOV instruction with value " << finalGroup;
-				auto variable = dest.symbol() != nullptr ? ScriptGenerationOutput{context.querySymbolOrValue(dest)} : generator.generateNext({ context, dest });
+				auto variable = dest.symbol() != nullptr ? InstructionOutput{context.querySymbolOrValue(dest)} : generator.generateNext({ context, dest });
 				auto variableDestination = variable.value();
 
 				finalGroup.push(std::move(variable));
@@ -26,10 +26,10 @@ namespace ska {
 	}
 }
 
-ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_AFFECTATION>::generate(OperateOn node, GenerationContext& context) {
+ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_AFFECTATION>::generate(OperateOn node, GenerationContext& context) {
 	return CommonGenerate(*this, node.GetVariableNameNode(), node.GetVariableValueNode(), context);
 }
 
-ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
+ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	return CommonGenerate(*this, node.GetVariableNameNode(), node.GetVariableValueNode(), context);
 }

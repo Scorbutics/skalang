@@ -14,26 +14,19 @@ namespace ska {
 		auto find(const std::string& scriptName) { return namedMapCache.find(scriptName); }
 
 		auto* operator[](std::size_t index) {
-			if constexpr (is_smart_ptr<ScriptT>::value) {
-				return index < cache.size() ? cache[index]->get() : nullptr;
-			} else {
-				return index < cache.size() ? cache[index].get() : nullptr;
-			}
+			return index < cache.size() ? cache[index].get() : nullptr;
 		}
 
 		const auto* operator[](std::size_t index) const {
-			if constexpr (is_smart_ptr<ScriptT>::value) {
-				return index < cache.size() ? cache[index]->get() : nullptr;
-			} else {
-				return index < cache.size() ? cache[index].get() : nullptr;
-			}
+			return index < cache.size() ? cache[index].get() : nullptr;
 		}
 
 		auto begin() { return namedMapCache.begin(); }
 		auto end() { return namedMapCache.end(); }
 
 		auto size() const { return cache.size(); }
-		auto& back() { return *cache.back(); }
+		auto& back() { if(cache.back() == nullptr) { throw std::runtime_error("null back script"); } return *cache.back(); }
+		const auto& back() const { if(cache.back() == nullptr) { throw std::runtime_error("null back script"); } return *cache.back(); }
 
 		auto& at(const std::string& scriptName) {
 			const auto index = namedMapCache.at(scriptName);
@@ -81,13 +74,20 @@ namespace ska {
 		}
 
 	private:
-		void pushCache(std::size_t index, ScriptT script) {
+		using ScriptTPtr = std::conditional_t<is_smart_ptr<ScriptT>::value, ScriptT, std::unique_ptr<ScriptT>>;
+		using ScriptContainer = std::vector<ScriptTPtr>;
+
+		void pushCache(std::size_t index, ScriptTPtr script) {
 			if(index >= cache.size()) {
 				cache.resize(index + 1);
 			}
-			cache[index] = std::make_unique<ScriptT>(std::move(script));
+			if constexpr (is_smart_ptr<ScriptT>::value) {
+				cache[index] = std::move(script);
+			} else {
+				cache[index] = std::make_unique<ScriptT>(std::move(script));
+			}
 		}
 		std::unordered_map<std::string, std::size_t> namedMapCache;
-		std::vector<std::unique_ptr<ScriptT>> cache;
+		ScriptContainer cache;
 	};
 }

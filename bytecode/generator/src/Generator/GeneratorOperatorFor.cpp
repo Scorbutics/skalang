@@ -5,7 +5,7 @@
 #include "BytecodeCommand.h"
 #include "Generator/Value/BytecodeScriptGenerationService.h"
 
-ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FOR_LOOP>::generate(OperateOn node, GenerationContext& context) {
+ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FOR_LOOP>::generate(OperateOn node, GenerationContext& context) {
 
 	auto initGroup = generateNext({ context, node.GetInitialization() });
 

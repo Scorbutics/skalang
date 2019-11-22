@@ -52,9 +52,9 @@ POP_IN_VAR V3, 2
 
 namespace ska {
 	namespace bytecode {
-		static ScriptGenerationOutput AddRelativeJumpInstruction(ScriptGenerationOutput output) {
+		static InstructionOutput AddRelativeJumpInstruction(InstructionOutput output) {
 			auto jumpInstruction = Instruction { Command::JUMP_REL, Value { static_cast<long>(output.size()) }};
-			auto result = ScriptGenerationOutput{ std::move(jumpInstruction) };
+			auto result = InstructionOutput{ std::move(jumpInstruction) };
 			result.push(std::move(output));
 			return result;
 		}
@@ -62,7 +62,7 @@ namespace ska {
 	}
 }
 
-ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
+ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	LOG_DEBUG << "Generating prototype of \"" << node.GetFunctionName() << "\"...";
 	auto valueGroup = generateNext({ context, node.GetFunctionPrototype() });
 	LOG_DEBUG << "Generating body...";
@@ -84,14 +84,14 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
 	return fullFunction;
 }
 
-ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
-	auto result = ScriptGenerationOutput{ };
+ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
+	auto result = InstructionOutput{ };
 	ApplyNOperations<Command::POP>(result, context, node, node.GetParameterSize());
 	LOG_DEBUG << "\tParameters : " << result;
 	return result;
 }
 
-ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>::generate(OperateOn node, GenerationContext& context) {
+ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>::generate(OperateOn node, GenerationContext& context) {
 	auto preCallValue = generateNext({context, node.GetFunctionNameNode()});
 	LOG_DEBUG << "Function call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
 

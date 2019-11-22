@@ -5,7 +5,7 @@
 #include "BytecodeCommand.h"
 #include "Generator/Value/BytecodeScriptGenerationService.h"
 
-ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::IF>::generate(OperateOn node, GenerationContext& context) {
+ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::IF>::generate(OperateOn node, GenerationContext& context) {
 	auto conditionGroup = generateNext({ context, node.GetCondition() });
 	auto ifGroup = generateNext({ context, node.GetIfStatement(), 1 });
 	conditionGroup.push(Instruction{ Command::JUMP_NIF, Value { static_cast<long>(ifGroup.size()) }, conditionGroup.value() });
@@ -13,7 +13,7 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Oper
 	return conditionGroup;
 }
 
-ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::IF_ELSE>::generate(OperateOn node, GenerationContext& context) {
+ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::IF_ELSE>::generate(OperateOn node, GenerationContext& context) {
 	auto conditionGroup = generateNext({ context, node.GetCondition() });
 	auto ifGroup = generateNext({ context, node.GetIfStatement(), 1 });
 	auto elseGroup = generateNext({ context, node.GetElseStatement(), 1 });

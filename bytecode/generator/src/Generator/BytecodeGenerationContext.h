@@ -4,11 +4,11 @@
 #include "Value/BytecodeValue.h"
 #include "Value/BytecodeSymbolInfo.h"
 #include "Value/BytecodeScriptGenerationService.h"
+#include "Value/BytecodeGenerationOutput.h"
 
 namespace ska {
 	class ASTNode;
 	namespace bytecode {
-		class GenerationOutput;
 		class GenerationContext {
 		public:
 			explicit GenerationContext(GenerationOutput& output, std::size_t scriptIndex = std::numeric_limits<std::size_t>::max());
@@ -39,9 +39,8 @@ namespace ska {
 		private:
 			ScriptGenerationService& scriptOfSymbol(const Symbol& symbol);
 			const ScriptGenerationService& scriptOfSymbol(const Symbol& symbol) const;
-			
+
 			GenerationOutput& m_generated;
-			ScriptGenerationService* m_script {};
 			std::size_t m_scriptIndex = 0;
 			const ASTNode* m_pointer {};
 			std::size_t m_scopeLevel = 0;

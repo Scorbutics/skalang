@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BytecodeScriptCache.h"
+#include "BytecodeGenerationOutput.h"
 
 namespace ska {
 	namespace bytecode {
@@ -24,8 +24,8 @@ namespace ska {
 
 			auto id() const { return m_id; }
 			void generate(Generator& generator);
-			const ScriptGenerationOutput& generated() const { assert(m_generated); return m_cache.output.generated(m_id); }
-			GenerationOutput& wholeGenerated() { assert(m_generated); return m_cache.output; }
+			const ScriptGenerationOutput& generated() const { assert(m_generated); return m_cache.at(m_id); }
+			GenerationOutput& wholeGenerated() { assert(m_generated); return m_cache; }
 
 			~ScriptGen() = default;
 

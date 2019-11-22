@@ -4,13 +4,13 @@
 #include "Generator/BytecodeGenerator.h"
 
 ska::bytecode::ScriptGenerationService& ska::bytecode::ScriptGen::AddScript(ska::bytecode::ScriptCache& cache, std::vector<ska::Token> tokens, const std::string& name) {
-	auto ast = ska::ScriptAST { cache.astCache, name, std::move(tokens)};
+	auto ast = ska::ScriptAST { cache.genCache.astCache, name, std::move(tokens)};
   if (cache.find(name) == cache.end()) {
 		auto holder = ska::bytecode::ScriptGenerationService{ cache.id(name), ast };
     //auto handle = ska::bytecode::ScriptGen{ cache, std::move(holder) };
-		cache.emplace(name, { std::move(holder) });
+		cache.genCache.emplace(name, { std::move(holder) });
 	}
-	return cache.at(name).generation;
+	return cache.genCache.at(name);
 }
 
 std::optional<ska::bytecode::Value> ska::bytecode::ScriptGen::getSymbol(const Symbol& symbol) const {
@@ -18,7 +18,7 @@ std::optional<ska::bytecode::Value> ska::bytecode::ScriptGen::getSymbol(const Sy
 }
 
 ska::bytecode::ScriptGen::ScriptGen(ScriptCache& scriptCache, std::size_t scriptIndex) :
-  m_cache(scriptCache), m_service(m_cache.at(scriptIndex).generation) {
+  m_cache(scriptCache), m_service(m_cache.genCache.at(scriptIndex)) {
   m_id = scriptIndex;
   m_ast = m_service.program();
 }
@@ -30,7 +30,7 @@ ska::bytecode::ScriptGen::ScriptGen(ScriptCache& scriptCache, const std::string&
 }
 
 ska::bytecode::ScriptGen::ScriptGen(ScriptCache& scriptCache, ScriptAST& scriptAST, const std::string& fullName) :
-  m_cache(scriptCache), m_service(scriptCache.at(fullName).generation) {
+  m_cache(scriptCache), m_service(scriptCache.genCache.at(fullName)) {
   m_id = m_cache.id(m_service.program().name());
   m_ast = m_service.program();
 }
@@ -49,8 +49,8 @@ void ska::bytecode::ScriptGen::generate(Generator& generator) {
   }
 
   //TODO simplifier tout ça
-  auto genContext = GenerationContext { m_cache.output, m_id };
-  m_cache.output.setOut(m_id, generator.generatePart(genContext));
+  auto genContext = GenerationContext { m_cache, m_id };
+  generator.generate(m_cache, m_id);
 
   m_generated = true;
 }

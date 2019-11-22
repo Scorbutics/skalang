@@ -11,7 +11,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::O
 
 namespace ska {
 	namespace bytecode {
-		static ScriptGenerationOutput GenerateMathematicBinaryExpression(std::string logicalOperator, const TypedValueRef& dest, const TypedValueRef& left, const TypedValueRef& right) {
+		static InstructionOutput GenerateMathematicBinaryExpression(std::string logicalOperator, const TypedValueRef& dest, const TypedValueRef& left, const TypedValueRef& right) {
 			assert(!logicalOperator.empty());
 			auto operatorIt = LogicalOperatorMap.find(logicalOperator);
 			if(operatorIt != LogicalOperatorMap.end()) {
@@ -25,7 +25,7 @@ namespace ska {
 			throw std::runtime_error("Unhandled operator " + logicalOperator);
 		}
 
-		static ScriptGenerationOutput GenerateInstructionValue(GeneratorOperator<ska::Operator::BINARY>& generator, GenerationContext& context, const ASTNode& parent, const ASTNode& node) {
+		static InstructionOutput GenerateInstructionValue(GeneratorOperator<ska::Operator::BINARY>& generator, GenerationContext& context, const ASTNode& parent, const ASTNode& node) {
 			if(node.size() == 0) {
 				return context.querySymbolOrValue(node);
 			}
@@ -34,9 +34,9 @@ namespace ska {
 	}
 }
 
-ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::BINARY>::generate(OperateOn node, GenerationContext& context) {
+ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::BINARY>::generate(OperateOn node, GenerationContext& context) {
 	auto children = std::vector<const ASTNode*> { &node.GetFirstNode(), &node.GetSecondNode() };
-	auto groups = std::vector<ScriptGenerationOutput>{};
+	auto groups = std::vector<InstructionOutput>{};
 
 	for(const auto* child : children) {
 		auto group = GenerateInstructionValue(*this, context, node.asNode(), *child);

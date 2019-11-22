@@ -13,7 +13,7 @@
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 #include "BytecodeInterpreter/BytecodeScript.h"
 #include "Generator/BytecodeGenerator.h"
-#include "Generator/Value/BytecodeScriptCache.h"
+#include "Generator/Value/BytecodeGenScriptCache.h"
 #include "Service/SymbolTableUpdater.h"
 #include "BytecodeInterpreter/Value/BytecodeInterpreterTypes.h"
 #include "BytecodeInterpreter/BytecodeInterpreter.h"

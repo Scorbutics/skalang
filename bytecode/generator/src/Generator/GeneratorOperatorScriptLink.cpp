@@ -12,7 +12,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, GeneratorOperatorCurrent);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, GeneratorOperatorCurrent)
 
-ska::bytecode::ScriptGenerationOutput ska::bytecode::GeneratorOperator<ska::Operator::SCRIPT_LINK>::generate(OperateOn node, GenerationContext& context) {
+ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::SCRIPT_LINK>::generate(OperateOn node, GenerationContext& context) {
 	auto importGroup = generateNext({ context, node.GetValue(), 1 });
 	const auto& scriptImportedName = *importGroup.value().as<StringShared>();
 	auto [importedScriptIndex, importedScript] = context.script(scriptImportedName);

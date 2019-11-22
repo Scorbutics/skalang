@@ -17,7 +17,7 @@ ska::ScriptAST::ScriptAST(ScriptCacheAST& scriptCache, const std::string& name, 
 		SLOG(LogLevel::Info) << "Script AST " << name << " is already in cache";
 		m_inCache = true;
 	}
-	m_handle = m_cache->at(name).get();
+	m_handle = &m_cache->at(name);
 }
 
 ska::ScriptASTPtr ska::ScriptAST::useImport(const std::string& name) {

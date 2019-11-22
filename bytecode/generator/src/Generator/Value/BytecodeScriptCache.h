@@ -1,26 +1,33 @@
 #pragma once
-#include "BytecodeGenerationOutput.h"
 #include "BytecodeScriptGenerationOutput.h"
-#include "BytecodeScriptGenerationService.h"
+#include "Generator/Value/BytecodeScriptGenCache.h"
 
 namespace ska {
+  class Symbol;
+	class ASTNode;
   namespace bytecode {
     struct ScriptGenerationService;
 
-    struct ScriptCacheUnit {
-      ScriptGenerationService generation;
-      ScriptGenerationOutput execution;
-    };
+    class ScriptCache :
+      public ScriptCacheBase<ScriptGenerationOutput> {
+				using Parent = ScriptCacheBase<ScriptGenerationOutput>;
+    public:
+      using SymbolInfosContainer = std::unordered_map<const Symbol*, SymbolInfo>;
 
-    struct ScriptCache : public ScriptCacheBase<ScriptCacheUnit> {
-      ScriptCache() : output(*this) {}
-      ScriptCache(ScriptCache&&) = default;
-      ScriptCache(const ScriptCache&) = delete;
-      ScriptCache& operator=(ScriptCache&&) = default;
-      ScriptCache& operator=(const ScriptCache&) = delete;
-      ~ScriptCache() = default;
-      GenerationOutput output;
-      ScriptCacheAST astCache;
+			bool isGenerated(std::size_t index) const;
+
+			void setSymbolInfo(const ASTNode& node, SymbolInfo info);
+			void setSymbolInfo(const Symbol& symbol, SymbolInfo info);
+			const SymbolInfo* getSymbolInfo(const Symbol& symbol) const;
+			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
+
+
+			const std::vector<Value>& getExportedSymbols(std::size_t scriptIndex);
+
+      ScriptGenCache genCache;
+
+    private:
+      SymbolInfosContainer m_symbolInfo;
     };
   }
 }

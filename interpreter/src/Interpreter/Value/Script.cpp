@@ -14,7 +14,7 @@ ska::Script::Script(ScriptCache& scriptCache, const std::string& name, std::vect
 
 ska::Script::Script(ScriptCache& scriptCache, ScriptAST& parentScriptAST, const std::string& fullName) :
 	m_cache(scriptCache),
-	m_ast(*m_cache.astCache.at(fullName)) {
+	m_ast(m_cache.astCache.at(fullName)) {
 	m_handle = buildHandle(m_cache, *m_ast.handle(), fullName, m_inCache);
 }
 
@@ -27,7 +27,7 @@ ska::ScriptHandle* ska::Script::buildHandle(ScriptCache& cache, ScriptHandleAST&
 		SLOG_STATIC(LogLevel::Info, ska::Script) << "Script " << name << " is already in cache";
 		inCache = true;
 	}
-	return cache.cache.at(name).get();
+	return &cache.cache.at(name);
 }
 
 void ska::Script::memoryFromBridge(Interpreter&, std::vector<BridgeFunctionPtr> bindings) {
@@ -53,7 +53,7 @@ ska::ScriptPtr ska::Script::useImport(const std::string& name) {
 }
 
 ska::ScriptPtr ska::Script::useImport(std::size_t index) {
-	return existsInCache(index) ? std::make_unique<Script>(*m_cache.cache.at(index)) : nullptr;
+	return existsInCache(index) ? std::make_unique<Script>(m_cache.cache.at(index)) : nullptr;
 }
 
 ska::ScriptPtr ska::Script::createImport(const std::string& name) {

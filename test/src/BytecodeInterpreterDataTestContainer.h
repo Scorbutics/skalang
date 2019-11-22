@@ -10,7 +10,7 @@
 #include "Service/ReservedKeywordsPool.h"
 
 #include "Generator/BytecodeGenerator.h"
-#include "Generator/Value/BytecodeScriptCache.h"
+#include "BytecodeInterpreter/Value/BytecodeScriptCache.h"
 
 #include "BytecodeInterpreter/BytecodeInterpreter.h"
 

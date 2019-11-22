@@ -8,6 +8,7 @@
 #include "BytecodeGenerationContext.h"
 #include "Value/BytecodeGenerationOutput.h"
 #include "Value/BytecodeScriptGenerationService.h"
+#include "Value/BytecodeScriptGenerationOutput.h"
 #include "Value/BytecodeScriptCache.h"
 
 namespace ska {
@@ -23,7 +24,8 @@ namespace ska {
 			Generator(const ReservedKeywordsPool& reserved);
 			~Generator() = default;
 
-			GenerationOutput generate(ScriptCache& cache, ScriptGenerationService script);
+			void generate(ScriptCache& cache, ScriptGenerationService script);
+			void generate(ScriptCache& cache, std::size_t scriptIndex);
 			ScriptGenerationOutput generatePart(GenerationContext node);
 		private:
 			GenerationOutput& postProcessing(ScriptGenerationService& script, GenerationOutput& generated);

@@ -28,7 +28,7 @@ Instruction :
 
 
 
-ScriptGenerationOutput :
+InstructionOutput :
 	- std::vector<Instruction>
 */
 

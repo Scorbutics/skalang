@@ -9,7 +9,7 @@
 #include "Service/SymbolTableUpdater.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Generator/BytecodeGenerator.h"
-#include "Generator/Value/BytecodeScriptCache.h"
+#include "Generator/Value/BytecodeScriptGenCache.h"
 
 struct BytecodeGeneratorDataTestContainer {
     using ParserPtr = std::unique_ptr<ska::StatementParser>;
@@ -24,5 +24,5 @@ struct BytecodeGeneratorDataTestContainer {
     SemanticTypeCheckerPtr typeChecker;
     TypeBuilderPtr typeBuilder;
 	SymbolTableUpdaterPtr symbolsTypeUpdater;
-    ska::bytecode::ScriptCache storage;
+    ska::bytecode::ScriptGenCache storage;
 };
