@@ -30,7 +30,7 @@ namespace ska {
 				return ++executionPointer < instructions.generated(scriptIndex).size();
 			}
 
-			NodeValue getCell(const Value& v) const;
+			NodeValue getCell(const Operand& v) const;
 
 			void jumpAbsolute(std::size_t value);
 			void jumpRelative(long value);
@@ -43,12 +43,12 @@ namespace ska {
 			bool idle() const { return executionPointer >= instructions.generated(scriptIndex).size(); }
 
 			template <class T>
-			T get(const Value& v) const {
+			T get(const Operand& v) const {
 				auto* memory = selectMemory(v);
 				if(memory == nullptr) {
 					if constexpr (NodeValue::is_container_of_values<T>()) {
 						throw std::runtime_error("invalid get cell value usage by querying a variable container without a valid value provided");
-					} else if constexpr (Value::is_member_of_values<T>()) {
+					} else if constexpr (Operand::is_member_of_values<T>()) {
 						return v.as<T>();
 					} else {
 						return T{};
@@ -58,7 +58,7 @@ namespace ska {
 			}
 
 			template <class T>
-			void set(const Value& dest, T&& src) {
+			void set(const Operand& dest, T&& src) {
 				auto* memory = selectMemory(dest);
 				if(memory == nullptr) { throw std::runtime_error("invalid bytecode destination cell"); }
 				push(*memory, dest, std::forward<T>(src));
@@ -67,8 +67,8 @@ namespace ska {
 			auto index() const { return scriptIndex; }
 			ScriptVariableRef snapshot() const { return ScriptVariableRef{ executionPointer, scriptIndex }; }
 
-			NodeValue lastVariable() const { 
-				assert(!variables.empty()); 
+			NodeValue lastVariable() const {
+				assert(!variables.empty());
 				return variables.back();
 			}
 
@@ -76,26 +76,26 @@ namespace ska {
 			void setExportsSection(NodeValueArray exportsSection) { m_exportsSection = std::move(exportsSection); }
 
 		private:
-			PlainMemoryTable* selectMemory(const Value& dest);
-			const PlainMemoryTable* selectMemory(const Value& dest) const;
+			PlainMemoryTable* selectMemory(const Operand& dest);
+			const PlainMemoryTable* selectMemory(const Operand& dest) const;
 
 			template<class IN, class OUT>
-			static OUT SelectMemoryHelper(IN& self, const Value& dest) {
+			static OUT SelectMemoryHelper(IN& self, const Operand& dest) {
 				switch (dest.type()) {
-				case ValueType::PURE:
+				case OperandType::PURE:
 				default:
 					return nullptr;
-				case ValueType::REG:
+				case OperandType::REG:
 					return &self.registers;
-				case ValueType::VAR:
+				case OperandType::VAR:
 					return &self.variables;
-				case ValueType::EMPTY:
+				case OperandType::EMPTY:
 					throw std::runtime_error("cannot select empty variable relative memory");
 				}
 			}
 
 			template <class T>
-			void push(PlainMemoryTable& memory, const Value& dest, T&& src) {
+			void push(PlainMemoryTable& memory, const Operand& dest, T&& src) {
 				auto index = dest.as<ScriptVariableRef>().variable;
 				if(index >= memory.size()) {
 					if(index == memory.size()) {

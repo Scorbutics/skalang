@@ -32,8 +32,8 @@ namespace ska {
 			const Instruction& operator[](std::size_t index) const { return m_generated[index]; }
 			Instruction& operator[](std::size_t index) { return m_generated[index]; }
 
-			const std::vector<Value>& exportedSymbols() const { return m_exports; }
-			void setExportedSymbols(std::vector<Value> symbols) { m_exports = std::move(symbols); };
+			const std::vector<Operand>& exportedSymbols() const { return m_exports; }
+			void setExportedSymbols(std::vector<Operand> symbols) { m_exports = std::move(symbols); };
 
 			bool empty() const { return m_generated.empty(); }
 
@@ -41,9 +41,8 @@ namespace ska {
 			friend std::ostream& operator<<(std::ostream& stream, const ScriptGenerationOutput&);
 
 			void push(ScriptGenerationOutput output);
-			Value packAsValue() const;
 
-			std::vector<Value> m_exports;
+			std::vector<Operand> m_exports;
 			InstructionOutput m_generated;
 			ScriptGenerationService& m_origin;
 		};

@@ -68,7 +68,7 @@ void ska::bytecode::ExecutionContext::jumpReturn() {
 	m_current->jumpAbsolute(whereToGo.variable);
 }
 
-ska::bytecode::ScriptExecution& ska::bytecode::ExecutionContext::scriptFromValue(const Value& v) {
+ska::bytecode::ScriptExecution& ska::bytecode::ExecutionContext::scriptFromOperand(const Operand& v) {
 	if (std::holds_alternative<ScriptVariableRef>(v.content())) {
 		const auto scriptIndex = v.as<ScriptVariableRef>().script;
 		auto* result = m_out.script(scriptIndex, m_in);
@@ -80,7 +80,7 @@ ska::bytecode::ScriptExecution& ska::bytecode::ExecutionContext::scriptFromValue
 	return *m_current;
 }
 
-const ska::bytecode::ScriptExecution& ska::bytecode::ExecutionContext::scriptFromValue(const Value& v) const {
+const ska::bytecode::ScriptExecution& ska::bytecode::ExecutionContext::scriptFromOperand(const Operand& v) const {
 	if (std::holds_alternative<ScriptVariableRef>(v.content())) {
 		const auto scriptIndex = v.as<ScriptVariableRef>().script;
 		auto* result = m_out.script(scriptIndex);

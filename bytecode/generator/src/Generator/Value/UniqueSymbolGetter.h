@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <tuple>
 #include <optional>
-#include "BytecodeValue.h"
+#include "BytecodeOperand.h"
 
 namespace ska {
   namespace bytecode {
@@ -15,9 +15,9 @@ namespace ska {
 		protected:
 			UniqueSymbolGetterBase(char symbol) : m_symbol(symbol) {}
 
-			std::pair<Value, bool> query(std::size_t script, const ASTNode& node);
-			std::pair<Value, bool> query(std::size_t script, const Symbol& symbol);
-			std::optional<Value> get(std::size_t script, const Symbol& symbol) const;
+			std::pair<Operand, bool> query(std::size_t script, const ASTNode& node);
+			std::pair<Operand, bool> query(std::size_t script, const Symbol& symbol);
+			std::optional<Operand> get(std::size_t script, const Symbol& symbol) const;
 				
 			SymbolUIDContainer m_container;
 			std::size_t m_count = 0;

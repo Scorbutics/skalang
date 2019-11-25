@@ -142,7 +142,7 @@ namespace ska {
 			return result;
 		}
 
-		static const TypedValueRef& ConvertWhich(const Type& destinationType, const TypedValueRef& node1, const TypedValueRef& node2) {
+		static const TypedOperandRef& ConvertWhich(const Type& destinationType, const TypedOperandRef& node1, const TypedOperandRef& node2) {
 			if(destinationType != ExpressionType::BOOLEAN && node1.type != destinationType && node2.type != destinationType) {
 				throw std::runtime_error("unable to perform node conversion");
 			}
@@ -153,12 +153,12 @@ namespace ska {
 			return node1.type == destinationType ? node2 : node1;
 		}
 
-		static CommandList TypeConversion(LogicalOperator logicalOperator, const Type& valueType, const Type& value2Type, bool reverseOrder) {
+		static CommandList TypeConversion(LogicalOperator logicalOperator, const Type& operandType, const Type& operand2Type, bool reverseOrder) {
 			static TypeConvertToInstructionContainer typeConverter = BuildTypeConverter();
 
 			const auto operatorIndex = static_cast<std::size_t>(logicalOperator);
-			const auto nodeExpressionTypeIndex = static_cast<std::size_t>(valueType.type());
-			const auto resultExpressionTypeIndex = static_cast<std::size_t>(value2Type.type());
+			const auto nodeExpressionTypeIndex = static_cast<std::size_t>(operandType.type());
+			const auto resultExpressionTypeIndex = static_cast<std::size_t>(operand2Type.type());
 
 			const auto& converterCmd = typeConverter[operatorIndex][nodeExpressionTypeIndex][resultExpressionTypeIndex];
 			auto result = CommandList{ };
@@ -182,15 +182,15 @@ SKA_LOGC_CONFIG(ska::LogLevel::Error, ska::bytecode::TypeConversionData);
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::TypeConversionData)
 #define LOG_ERROR SLOG_STATIC(ska::LogLevel::Error, ska::bytecode::TypeConversionData)
 
-ska::bytecode::InstructionOutput ska::bytecode::TypeConversionBinary(LogicalOperator logicalOperator, const TypedValueRef& node1, const TypedValueRef& node2, const TypedValueRef& destination) {
-	LOG_DEBUG << "Binary operation for nodes " << node1.value.toString() << " and " << node2.value.toString() << " with types " << node1.type  << " and " << node2.type;
+ska::bytecode::InstructionOutput ska::bytecode::TypeConversionBinary(LogicalOperator logicalOperator, const TypedOperandRef& node1, const TypedOperandRef& node2, const TypedOperandRef& destination) {
+	LOG_DEBUG << "Binary operation for nodes " << node1.operand.toString() << " and " << node2.operand.toString() << " with types " << node1.type  << " and " << node2.type;
 	const auto& selectedNode = ConvertWhich(destination.type, node1, node2);
 	const auto reverseOrder = &selectedNode == &node2;
 	const auto& unselectedNode = reverseOrder ? node1 : node2;
 
 	auto result = TypeConversion(logicalOperator, selectedNode.type, unselectedNode.type, reverseOrder);
 	if(result.container.empty()) {
-		LOG_ERROR << "No command found for nodes " << node1.value.toString() << " and " << node2.value.toString() << " with types " << node1.type  << " and " << node2.type;
+		LOG_ERROR << "No command found for nodes " << node1.operand.toString() << " and " << node2.operand.toString() << " with types " << node1.type  << " and " << node2.type;
 		assert(false);
 		return { };
 	}
@@ -200,17 +200,17 @@ ska::bytecode::InstructionOutput ska::bytecode::TypeConversionBinary(LogicalOper
 	auto& container = result.container;
 	switch (result.type) {
 		case OperationType::SPLIT: {
-			auto group = InstructionOutput{ Instruction {container[0], destination.value, selectedNode.value} };
-			group.push(Instruction{ container[1], destination.value, reverseOrder ? node1.value : destination.value, reverseOrder ? destination.value : node2.value });
+			auto group = InstructionOutput{ Instruction {container[0], destination.operand, selectedNode.operand} };
+			group.push(Instruction{ container[1], destination.operand, reverseOrder ? node1.operand : destination.operand, reverseOrder ? destination.operand : node2.operand });
 			LOG_INFO << "Conversion detected : " << group;
 			return group;
 		}
 		case OperationType::FULL_FIRST:
 		default: {
 			//LOG_DEBUG << "Command output : " << CommandSTR[static_cast<std::size_t>(container[0])];
-			auto group = InstructionOutput{ Instruction{ container[0], destination.value, node1.value, node2.value } };
+			auto group = InstructionOutput{ Instruction{ container[0], destination.operand, node1.operand, node2.operand } };
 			if (container.size() > 1) {
-				group.push(Instruction{ container[1], destination.value, destination.value });
+				group.push(Instruction{ container[1], destination.operand, destination.operand });
 			}
 			LOG_INFO << "Conversion detected : " << group;
 			return group;

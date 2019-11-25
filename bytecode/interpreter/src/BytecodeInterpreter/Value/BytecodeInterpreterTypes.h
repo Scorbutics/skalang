@@ -23,7 +23,11 @@ namespace ska {
         return result;
       }
 
-      RuntimeMemory(Value root) {}
+      RuntimeMemory(Operand root) {
+        /*
+        TODO
+        */
+      }
       RuntimeMemory(PlainMemoryTable table) : m_container(buildFromVector(std::move(table))) {}
       RuntimeMemory(NodeValueArray table) : m_container(std::move(table)) {}
       ~RuntimeMemory() = default;
@@ -32,9 +36,9 @@ namespace ska {
         return m_container.underlying();
       }
 
-      template <class Value>
-      void emplace(const std::string& field, Value&& value) {
-        m_container.emplace(field, std::forward<Value>(value));
+      template <class Openrand>
+      void emplace(const std::string& field, Openrand&& value) {
+        m_container.emplace(field, std::forward<Openrand>(value));
       }
 
 

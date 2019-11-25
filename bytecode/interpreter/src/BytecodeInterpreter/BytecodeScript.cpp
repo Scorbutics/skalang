@@ -4,7 +4,7 @@
 #include "BytecodeInterpreter/BytecodeInterpreter.h"
 #include "Generator/BytecodeGenerator.h"
 
-ska::bytecode::Value ska::bytecode::Script::findBytecodeMemoryFromSymbol(const Symbol& symbol) const {
+ska::bytecode::Operand ska::bytecode::Script::findBytecodeMemoryFromSymbol(const Symbol& symbol) const {
   auto bytecodeSymbol = m_serviceGen.getSymbol(symbol);
   if (bytecodeSymbol.has_value()) {
     throw std::runtime_error("unable to find generated symbol \"" + symbol.getName() + "\" in script \"" + astScript().name() + "\"");

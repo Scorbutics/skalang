@@ -39,11 +39,11 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	const auto fieldRefIndex = objectFieldReferences->find(fieldVarReference);
 	if(fieldRefIndex == objectFieldReferences->end()) {
 		throw std::runtime_error("invalid bytecode : the field \"" + fieldValue.toString()
-			+ "\" does not exist in object \"" + node.GetObjectNameNode().name() + "\" (" + objectValue.value().toString() + ")");
+			+ "\" does not exist in object \"" + node.GetObjectNameNode().name() + "\" (" + objectValue.operand().toString() + ")");
 	}
 
 	LOG_DEBUG << "This field has index " << fieldRefIndex->second << " in the object";
 
-	objectValue.push({ Instruction { Command::ARR_ACCESS, context.script().queryNextRegister(), objectValue.value(), Value{static_cast<long>(fieldRefIndex->second)} }});
+	objectValue.push({ Instruction { Command::ARR_ACCESS, context.script().queryNextRegister(), objectValue.operand(), Operand {static_cast<long>(fieldRefIndex->second)} }});
 	return objectValue;
 }

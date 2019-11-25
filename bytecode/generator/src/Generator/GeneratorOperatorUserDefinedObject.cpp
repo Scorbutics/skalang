@@ -18,7 +18,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	std::size_t childIndex = 0;
 	for(auto& field: node) {
 		auto valueGroup = generateNext({ context, *field, 1 });
-		auto fieldRef = valueGroup.value().as<ScriptVariableRef>();
+		auto fieldRef = valueGroup.operand().as<ScriptVariableRef>();
 		fields->emplace(std::move(fieldRef), fields->size());
 
 		auto symbolInfo = SymbolInfo { fields, context.scriptIndex() };
@@ -27,7 +27,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 		context.setSymbolInfo(*field, std::move(symbolInfo));
 
-		valueGroup.push(Instruction { Command::PUSH, valueGroup.value() });
+		valueGroup.push(Instruction { Command::PUSH, valueGroup.operand() });
 		objectResult.push(std::move(valueGroup));
 		childIndex++;
 	}

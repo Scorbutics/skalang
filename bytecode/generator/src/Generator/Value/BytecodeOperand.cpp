@@ -1,11 +1,11 @@
 #include "Config/LoggerConfigLang.h"
-#include "BytecodeValue.h"
+#include "BytecodeOperand.h"
 #include "NodeValue/AST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::Value);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::Operand);
 
-ska::bytecode::Value::Value(const ASTNode& node) :
-	m_type(ValueType::PURE) {
+ska::bytecode::Operand::Operand(const ASTNode& node) :
+	m_type(OperandType::PURE) {
 
 	SLOG(LogLevel::Info) << "Converting \"" << node.name() << "\" to \"" << node.type().value() << "\"";
 
@@ -23,7 +23,7 @@ ska::bytecode::Value::Value(const ASTNode& node) :
 			m_content = std::make_shared<std::string>(node.name());
 			break;
 		case ExpressionType::VOID:
-			m_type = ValueType::EMPTY;
+			m_type = OperandType::EMPTY;
 		break;
 		default: {
 			auto ss = std::stringstream {};
@@ -33,7 +33,7 @@ ska::bytecode::Value::Value(const ASTNode& node) :
 	}
 }
 
-std::string ska::bytecode::Value::toString() const {
+std::string ska::bytecode::Operand::toString() const {
 	if(empty()) {
 		return "";
 	}
@@ -43,22 +43,22 @@ std::string ska::bytecode::Value::toString() const {
 	}
 
 	auto output = std::string {};
-	std::visit([&output](const auto& value) {
-		using TypeT = std::decay_t<decltype(value)>;
+	std::visit([&output](const auto& operand) {
+		using TypeT = std::decay_t<decltype(operand)>;
 		if constexpr (std::is_same_v<ScriptVariableRef, TypeT>) {
-			output = std::to_string(value.variable) /*+ ":" + std::to_string(value.script)*/;
+			output = std::to_string(operand.variable) /*+ ":" + std::to_string(operand.script)*/;
 		} else if constexpr (!std::is_same_v<StringShared, TypeT>) {
-			output = std::to_string(value);
+			output = std::to_string(operand);
 		}
 	}, m_content);
 
 
 	switch(m_type) {
-	case ValueType::VAR:
+	case OperandType::VAR:
 		output = "V" + output;
 		break;
 
-	case ValueType::REG:
+	case OperandType::REG:
 		output = "R" + output;
 		break;
 
@@ -69,6 +69,6 @@ std::string ska::bytecode::Value::toString() const {
 	return output;
 }
 
-bool ska::bytecode::operator==(const Value& lhs, const Value& rhs) {
+bool ska::bytecode::operator==(const Operand& lhs, const Operand& rhs) {
 	return lhs.m_content == rhs.m_content && lhs.m_type == rhs.m_type;
 }

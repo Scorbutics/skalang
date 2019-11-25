@@ -9,19 +9,19 @@
 #include "Runtime/Value/ScriptVariableRef.h"
 
 /*
-Opcode : enum value (MOV, SUB, ADD, MUL, DIV...)
+Opcode : enum (MOV, SUB, ADD, MUL, DIV...)
 
-Value :
+Operand :
 	- std::string
 	- Type
 
-Register : value
+Register : operand
 
 Instruction :
 	- opcode
-	- left value
-	- right value
-	- dest value
+	- left operand
+	- right operand
+	- dest operand
 	(- debug infos :
 		- line
 		- column) -> not for now...
@@ -36,28 +36,28 @@ namespace ska {
 	class ASTNode;
 
 	namespace bytecode {
-		using ValueVariant = std::variant<ScriptVariableRef, long, bool, double, StringShared>;
+		using OperandVariant = std::variant<ScriptVariableRef, long, bool, double, StringShared>;
 
-		enum class ValueType {
+		enum class OperandType {
 			PURE,
 			VAR,
 			REG,
 			EMPTY
 		};
 
-		static constexpr const char* ValueTypeSTR[] = {
+		static constexpr const char* OperandTypeSTR[] = {
 			"PURE",
 			"VAR",
 			"REG",
 			""
 		};
 
-		static inline std::ostream& operator<<(std::ostream& stream, const ValueType& val) {
-			stream << ValueTypeSTR[static_cast<std::size_t>(val)];
+		static inline std::ostream& operator<<(std::ostream& stream, const OperandType& val) {
+			stream << OperandTypeSTR[static_cast<std::size_t>(val)];
 			return stream;
 		}
 
-		struct Value {
+		struct Operand {
 			template<typename T, typename VARIANT_T>
 			struct isVariantMember;
 
@@ -65,16 +65,16 @@ namespace ska {
 			struct isVariantMember<T, std::variant<ALL_T...>>
 				: public std::disjunction<std::is_same<T, ALL_T>...> {};
 			
-			Value() = default;
+			Operand() = default;
 
-			Value(const ASTNode& node);
+			Operand(const ASTNode& node);
 
-			Value(ValueVariant var, ValueType type = ValueType::PURE) :
+			Operand(OperandVariant var, OperandType type = OperandType::PURE) :
 				m_content(std::move(var)),
 				m_type(type){
 			}
 
-			bool empty() const { return m_type == ValueType::EMPTY; }
+			bool empty() const { return m_type == OperandType::EMPTY; }
 			const auto& content() const { return m_content; }
 			const auto type() const { return m_type; }
 
@@ -88,19 +88,19 @@ namespace ska {
 
 			template <class Converted>
 			static constexpr bool is_member_of_values() {
-				return isVariantMember<Converted, ValueVariant>::value;
+				return isVariantMember<Converted, OperandVariant>::value;
 			}
 
 		private:
-			friend bool operator==(const Value& lhs, const Value& rhs);
+			friend bool operator==(const Operand& lhs, const Operand& rhs);
 
-			ValueVariant m_content;
-			ValueType m_type = ValueType::EMPTY;
+			OperandVariant m_content;
+			OperandType m_type = OperandType::EMPTY;
 		};
 
-		using Register = Value;
+		using Register = Operand;
 
-		bool operator==(const Value& lhs, const Value& rhs);
+		bool operator==(const Operand& lhs, const Operand& rhs);
 
 	}
 
@@ -109,8 +109,8 @@ namespace ska {
 
 namespace std {
 	template<>
-	struct hash<ska::bytecode::Value> {
-		size_t operator()(const ska::bytecode::Value & x) const {
+	struct hash<ska::bytecode::Operand> {
+		size_t operator()(const ska::bytecode::Operand & x) const {
 			const size_t h1 = hash<std::string>()(x.toString());
     		const size_t h2 = hash<std::size_t>()(static_cast<std::size_t>(x.type()));
     		return h1 ^ (h2 << 1);

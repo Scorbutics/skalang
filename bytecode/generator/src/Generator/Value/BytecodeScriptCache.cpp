@@ -30,8 +30,7 @@ const ska::bytecode::SymbolInfo* ska::bytecode::ScriptCache::getSymbolInfo(const
 	return getSymbolInfo(*node.symbol());
 }
 
-const std::vector<ska::bytecode::Value>& ska::bytecode::ScriptCache::getExportedSymbols(std::size_t scriptIndex) {
-	if ((*this)[scriptIndex]->exportedSymbols().empty()) {
+const std::vector<ska::bytecode::Operand>& ska::bytecode::ScriptCache::getExportedSymbols(std::size_t scriptIndex) {
 		SLOG(ska::LogLevel::Info) << "%11cGenerating exported symbols for script \"" << scriptIndex << "\"";
 		auto temporarySortedScriptSymbols = std::priority_queue<SymbolWithInfo>{};
 		for (const auto& data : m_symbolInfo) {

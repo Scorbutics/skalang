@@ -10,30 +10,30 @@ ska::bytecode::ScriptGenerationService::ScriptGenerationService(std::size_t scri
 }
 
 ska::bytecode::Register ska::bytecode::ScriptGenerationService::queryNextRegister() {
-	return { ScriptVariableRef { m_register++ }, ValueType::REG };
+	return { ScriptVariableRef { m_register++ }, OperandType::REG };
 }
 
-ska::bytecode::Value ska::bytecode::ScriptGenerationService::querySymbolOrValue(const ASTNode& node) {
+ska::bytecode::Operand ska::bytecode::ScriptGenerationService::querySymbolOrOperand(const ASTNode& node) {
 	return VariableGetter::query(m_index, node).first;
 }
 
-ska::bytecode::Value ska::bytecode::ScriptGenerationService::querySymbol(const Symbol& symbol) {
+ska::bytecode::Operand ska::bytecode::ScriptGenerationService::querySymbol(const Symbol& symbol) {
 	return VariableGetter::query(m_index, symbol).first;
 }
 
-std::optional<ska::bytecode::Value> ska::bytecode::ScriptGenerationService::getSymbol(const Symbol& symbol) const {
+std::optional<ska::bytecode::Operand> ska::bytecode::ScriptGenerationService::getSymbol(const Symbol& symbol) const {
 	return VariableGetter::get(m_index, symbol);
 }
 
-std::vector<ska::bytecode::Value> ska::bytecode::ScriptGenerationService::generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const {
-	auto result = std::vector<Value>{};
+std::vector<ska::bytecode::Operand> ska::bytecode::ScriptGenerationService::generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const {
+	auto result = std::vector<Operand>{};
 	result.reserve(symbolsInfo.size());
 
 	while (!symbolsInfo.empty()) {
 		const auto& symbolWithInfo = symbolsInfo.top();
-		auto value = VariableGetter::get(m_index, *symbolWithInfo.symbol);
-		if (value.has_value()) {
-			result.push_back(std::move(value.value()));
+		auto operand = VariableGetter::get(m_index, *symbolWithInfo.symbol);
+		if (operand.has_value()) {
+			result.push_back(std::move(operand.value()));
 		}
 		symbolsInfo.pop();
 	}

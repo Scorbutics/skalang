@@ -53,7 +53,7 @@ POP_IN_VAR V3, 2
 namespace ska {
 	namespace bytecode {
 		static InstructionOutput AddRelativeJumpInstruction(InstructionOutput output) {
-			auto jumpInstruction = Instruction { Command::JUMP_REL, Value { static_cast<long>(output.size()) }};
+			auto jumpInstruction = Instruction { Command::JUMP_REL, Operand { static_cast<long>(output.size()) }};
 			auto result = InstructionOutput{ std::move(jumpInstruction) };
 			result.push(std::move(output));
 			return result;
@@ -68,18 +68,18 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	LOG_DEBUG << "Generating body...";
 	valueGroup.push(generateNext({ context, node.GetFunctionBody(), 1 }));
 
-	LOG_DEBUG << "\nGenerated " << valueGroup << " with value " << valueGroup.value();
+	LOG_DEBUG << "\nGenerated " << valueGroup << " with value " << valueGroup.operand();
 
 	const auto returningFunctionType = node.GetFunctionPrototype().type().value().compound().back();
 
 	const auto isVoidReturningFunction = returningFunctionType == ExpressionType::VOID;
-	valueGroup.push(Instruction{ Command::RET, isVoidReturningFunction ? Value{} : valueGroup.value() });
+	valueGroup.push(Instruction{ Command::RET, isVoidReturningFunction ? Operand{} : valueGroup.operand() });
 
 	auto fullFunction = AddRelativeJumpInstruction(std::move(valueGroup));
 	fullFunction.push(Instruction{
 		Command::END,
-		context.querySymbolOrValue(node.GetFunction()),
-		Value { -static_cast<long>(fullFunction.size()) }});
+		context.querySymbolOrOperand(node.GetFunction()),
+		Operand { -static_cast<long>(fullFunction.size()) }});
 
 	return fullFunction;
 }
@@ -95,7 +95,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	auto preCallValue = generateNext({context, node.GetFunctionNameNode()});
 	LOG_DEBUG << "Function call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
 
-	auto callInstruction = Instruction { Command::JUMP_ABS, std::move(preCallValue.value()) };
+	auto callInstruction = Instruction { Command::JUMP_ABS, std::move(preCallValue.operand()) };
 	auto result = std::move(preCallValue);
 
 	ApplyNOperations<Command::PUSH>(result, context, node, node.GetFunctionParameterSize());

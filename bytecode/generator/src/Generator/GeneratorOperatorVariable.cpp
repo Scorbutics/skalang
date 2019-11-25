@@ -11,15 +11,15 @@ namespace ska {
 		template <class Generator>
 		static InstructionOutput CommonGenerate(Generator& generator, const ASTNode& dest, const ska::ASTNode& node, GenerationContext& context) {
 			auto finalGroup = generator.generateNext({ context, node });
-			auto valueDestination = finalGroup.value();
+			auto operandDestination = finalGroup.operand();
 			if((dest.symbol() != node.symbol() || node.symbol() == nullptr) && !finalGroup.empty()) {
-				LOG_DEBUG << "Creating MOV instruction with value " << finalGroup;
-				auto variable = dest.symbol() != nullptr ? InstructionOutput{context.querySymbolOrValue(dest)} : generator.generateNext({ context, dest });
-				auto variableDestination = variable.value();
+				LOG_DEBUG << "Creating MOV instruction with operand group " << finalGroup;
+				auto variable = dest.symbol() != nullptr ? InstructionOutput{context.querySymbolOrOperand(dest)} : generator.generateNext({ context, dest });
+				auto variableDestination = variable.operand();
 
 				finalGroup.push(std::move(variable));
-				finalGroup.push(Instruction { Command::MOV, variableDestination, valueDestination });
-				LOG_DEBUG << "\tin value " << valueDestination;
+				finalGroup.push(Instruction { Command::MOV, variableDestination, operandDestination });
+				LOG_DEBUG << "\tin operand " << operandDestination;
 			}
 			return finalGroup;
 		}

@@ -8,12 +8,12 @@ namespace ska {
 	struct Type;
 	namespace bytecode {
 		class Script;
-		struct TypedValueRef {
-			TypedValueRef(const Type& type, const Value value) : type(type), value(value) {}
+		struct TypedOperandRef {
+			TypedOperandRef(const Type& type, const Operand operand) : type(type), operand(operand) {}
 			const Type& type;
-			const Value value;
+			const Operand operand;
 		};
 
-		InstructionOutput TypeConversionBinary(LogicalOperator logicalOperator, const TypedValueRef& node1, const TypedValueRef& node2, const TypedValueRef& destination);
+		InstructionOutput TypeConversionBinary(LogicalOperator logicalOperator, const TypedOperandRef& node1, const TypedOperandRef& node2, const TypedOperandRef& destination);
 	}
 }

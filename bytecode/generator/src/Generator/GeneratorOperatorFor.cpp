@@ -13,10 +13,10 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	auto bodyGroup = generateNext({ context, node.GetStatement(), 1 });
 	auto incrementGroup = generateNext({ context, node.GetIncrement() });
 
-	if (!incrementGroup.value().empty()) {
-		conditionGroup.push(Instruction{ Command::JUMP_NIF, Value { static_cast<long>(bodyGroup.size() + incrementGroup.size() + 1) }, conditionGroup.value() });
+	if (!incrementGroup.operand().empty()) {
+		conditionGroup.push(Instruction{ Command::JUMP_NIF, Operand { static_cast<long>(bodyGroup.size() + incrementGroup.size() + 1) }, conditionGroup.operand() });
 	}
-	incrementGroup.push(Instruction{ Command::JUMP_REL, Value { - static_cast<long>(conditionGroup.size() + bodyGroup.size() + incrementGroup.size() + 1 ) } });
+	incrementGroup.push(Instruction{ Command::JUMP_REL, Operand { - static_cast<long>(conditionGroup.size() + bodyGroup.size() + incrementGroup.size() + 1 ) } });
 
 	initGroup.push(std::move(initGroup));
 	initGroup.push(std::move(conditionGroup));

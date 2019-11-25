@@ -14,7 +14,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, GeneratorOperatorCurrent);
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::SCRIPT_LINK>::generate(OperateOn node, GenerationContext& context) {
 	auto importGroup = generateNext({ context, node.GetValue(), 1 });
-	const auto& scriptImportedName = *importGroup.value().as<StringShared>();
+	const auto& scriptImportedName = *importGroup.operand().as<StringShared>();
 	auto [importedScriptIndex, importedScript] = context.script(scriptImportedName);
 
 	if(importedScript == nullptr && importedScriptIndex == std::numeric_limits<std::size_t>::max()) {
@@ -22,6 +22,6 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	}
 
 	assert(importedScriptIndex != std::numeric_limits<std::size_t>::max());
-	importGroup.push(Instruction { Command::SCRIPT, context.script().queryNextRegister(), Value{ ScriptVariableRef { importedScriptIndex, context.scriptIndex() } } });
+	importGroup.push(Instruction { Command::SCRIPT, context.script().queryNextRegister(), Operand { ScriptVariableRef { importedScriptIndex, context.scriptIndex() } } });
 	return importGroup;
 }

@@ -40,10 +40,10 @@ namespace ska {
 
 			RuntimeMemory memoryField(const std::string& symbol);
 
-			Value getSymbol(const Symbol& symbol) const;
+			Operand getSymbol(const Symbol& symbol) const;
 
 		private:
-			Value findBytecodeMemoryFromSymbol(const Symbol& symbol) const;
+			Operand findBytecodeMemoryFromSymbol(const Symbol& symbol) const;
 			const Symbol& findSymbolFromString(const std::string& key) const;
 			ScriptCache& m_cache;
 			ScriptGen m_serviceGen;

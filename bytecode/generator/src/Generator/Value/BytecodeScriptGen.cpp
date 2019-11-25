@@ -13,7 +13,7 @@ ska::bytecode::ScriptGenerationService& ska::bytecode::ScriptGen::AddScript(ska:
 	return cache.genCache.at(name);
 }
 
-std::optional<ska::bytecode::Value> ska::bytecode::ScriptGen::getSymbol(const Symbol& symbol) const {
+std::optional<ska::bytecode::Operand> ska::bytecode::ScriptGen::getSymbol(const Symbol& symbol) const {
   return m_service.getSymbol(symbol);
 }
 

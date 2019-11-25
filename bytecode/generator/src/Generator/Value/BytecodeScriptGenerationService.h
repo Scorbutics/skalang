@@ -6,7 +6,7 @@
 
 #include "Base/Values/MovableNonCopyable.h"
 #include "NodeValue/ScriptAST.h"
-#include "BytecodeValue.h"
+#include "BytecodeOperand.h"
 #include "UniqueSymbolGetter.h"
 #include "BytecodeSymbolInfo.h"
 
@@ -43,10 +43,10 @@ namespace ska {
 			const std::string& name() const { return m_script->name(); }
 
 			Register queryNextRegister();
-			Value querySymbolOrValue(const ASTNode& node);
-			Value querySymbol(const Symbol& symbol);
-			std::optional<Value> getSymbol(const Symbol& symbol) const;
-			std::vector<Value> generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const;
+			Operand querySymbolOrOperand(const ASTNode& node);
+			Operand querySymbol(const Symbol& symbol);
+			std::optional<Operand> getSymbol(const Symbol& symbol) const;
+			std::vector<Operand> generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const;
 
 			~ScriptGenerationService() override = default;
 

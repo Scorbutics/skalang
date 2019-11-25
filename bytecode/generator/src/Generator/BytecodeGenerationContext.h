@@ -1,7 +1,7 @@
 #pragma once
 #include <cassert>
 #include <tuple>
-#include "Value/BytecodeValue.h"
+#include "Value/BytecodeOperand.h"
 #include "Value/BytecodeSymbolInfo.h"
 #include "Value/BytecodeScriptGenerationService.h"
 #include "Value/BytecodeGenerationOutput.h"
@@ -30,9 +30,9 @@ namespace ska {
 			void setSymbolInfo(const ASTNode& node, SymbolInfo info);
 			const SymbolInfo* getSymbolInfo(const Symbol& symbol) const;
 			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
-			Value querySymbolOrValue(const ASTNode& node);
-			Value querySymbol(const Symbol& symbol);
-			std::optional<Value> getSymbol(const Symbol& symbol) const;
+			Operand querySymbolOrOperand(const ASTNode& node);
+			Operand querySymbol(const Symbol& symbol);
+			std::optional<Operand> getSymbol(const Symbol& symbol) const;
 
 			const auto scriptIndex() const { return m_scriptIndex; }
 

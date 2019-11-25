@@ -2,7 +2,7 @@
 #include "BytecodeScriptExecution.h"
 #include "BytecodeInterpreter/Value/BytecodeExecutor.h"
 
-ska::NodeValue ska::bytecode::ScriptExecution::getCell(const Value& v) const {
+ska::NodeValue ska::bytecode::ScriptExecution::getCell(const Operand& v) const {
 	if (v.empty()) {
 		return {};
 	}
@@ -33,10 +33,10 @@ void ska::bytecode::ScriptExecution::jumpRelative(long value) {
 	executionPointer += value;
 }
 
-ska::bytecode::PlainMemoryTable* ska::bytecode::ScriptExecution::selectMemory(const Value& dest) {
+ska::bytecode::PlainMemoryTable* ska::bytecode::ScriptExecution::selectMemory(const Operand& dest) {
 	return SelectMemoryHelper<decltype(*this), PlainMemoryTable*>(*this, dest);
 }
 
-const ska::bytecode::PlainMemoryTable* ska::bytecode::ScriptExecution::selectMemory(const Value& dest) const {
+const ska::bytecode::PlainMemoryTable* ska::bytecode::ScriptExecution::selectMemory(const Operand& dest) const {
 	return SelectMemoryHelper<decltype(*this), const PlainMemoryTable*>(*this, dest);
 }

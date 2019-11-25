@@ -1,6 +1,6 @@
 #include "InterpreterCommandMulStrI.h"
 
-SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(MUL_STR_I)(ExecutionContext& context, const Value& left, const Value& right) {
+SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(MUL_STR_I)(ExecutionContext& context, const Operand& left, const Operand& right) {
   auto container = context.get<StringShared>(left);
   if(container->empty()) {
 	  return container;

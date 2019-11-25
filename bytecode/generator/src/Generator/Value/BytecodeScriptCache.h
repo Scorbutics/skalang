@@ -22,7 +22,7 @@ namespace ska {
 			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
 
 
-			const std::vector<Value>& getExportedSymbols(std::size_t scriptIndex);
+			const std::vector<Operand>& getExportedSymbols(std::size_t scriptIndex);
 
       ScriptGenCache genCache;
 

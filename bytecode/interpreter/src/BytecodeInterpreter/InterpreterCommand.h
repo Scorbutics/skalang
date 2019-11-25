@@ -21,7 +21,7 @@ namespace ska {
 		ScriptExecutionOutput interpret(ExecutionContext& context) override final {\
 			return interpret(context, context.currentInstruction().left(), context.currentInstruction().right());\
 		}\
-		ScriptExecutionOutput interpret(ExecutionContext& context, const Value& left, const Value& right);\
+		ScriptExecutionOutput interpret(ExecutionContext& context, const Operand& left, const Operand& right);\
 	};
 
 #define SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(CommandType)\

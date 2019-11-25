@@ -20,7 +20,7 @@ namespace ska {
 			ScriptAST& astScript();
 			const ScriptAST& astScript() const;
 
-			std::optional<Value> getSymbol(const Symbol& symbol) const;
+			std::optional<Operand> getSymbol(const Symbol& symbol) const;
 
 			auto id() const { return m_id; }
 			void generate(Generator& generator);

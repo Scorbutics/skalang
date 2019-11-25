@@ -1,25 +1,25 @@
 #pragma once
 #include <variant>
 #include "NodeValue/Type.h"
-#include "Generator/Value/BytecodeValue.h"
+#include "Generator/Value/BytecodeOperand.h"
 
 namespace ska {
 	namespace bytecode {
 
 		class Instruction {
 		public:
-			Instruction(Command command, Value dest, Value left = {}, Value right = {}) :
+			Instruction(Command command, Operand dest, Operand left = {}, Operand right = {}) :
 				m_command(std::move(command)),
 				m_dest(std::move(dest)),
 				m_left(std::move(left)),
 				m_right(std::move(right)) {
 			}
 
-			Instruction(Command command, std::vector<Value> operands) :
+			Instruction(Command command, std::vector<Operand> operands) :
 				m_command(std::move(command)),
-				m_dest(operands.size() >= 1 ? std::move(operands[0]) : Value{}),
-				m_left(operands.size() >= 2 ? std::move(operands[1]) : Value{}),
-				m_right(operands.size() >= 3 ? std::move(operands[2]) : Value{}) {
+				m_dest(operands.size() >= 1 ? std::move(operands[0]) : Operand{}),
+				m_left(operands.size() >= 2 ? std::move(operands[1]) : Operand{}),
+				m_right(operands.size() >= 3 ? std::move(operands[2]) : Operand{}) {
 			}
 
 			Instruction() = default;
@@ -36,9 +36,9 @@ namespace ska {
 
 		private:
 			Command m_command = Command::NOP;
-			Value m_dest;
-			Value m_left;
-			Value m_right;
+			Operand m_dest;
+			Operand m_left;
+			Operand m_right;
 		};
 
 		std::ostream& operator<<(std::ostream& stream, const Instruction&);

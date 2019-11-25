@@ -13,7 +13,7 @@ namespace ska {
 	namespace bytecode {
 		static InstructionOutput CommonGenerate(GenerationContext& context) {
 			const auto& node = context.pointer();
-			auto result = context.querySymbolOrValue(node);
+			auto result = context.querySymbolOrOperand(node);
 			LOG_DEBUG << "Generating unary : " << result;
 			return { std::move(result) };
 		}
