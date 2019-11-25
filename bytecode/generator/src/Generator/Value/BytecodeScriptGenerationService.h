@@ -26,14 +26,17 @@ namespace ska {
 
 namespace ska {
 	class ASTNode;
+	class ScriptAST;
 	namespace bytecode {
+		class ScriptGenCache;
 		class ScriptGenerationService :
 			public MovableNonCopyable,
 			private UniqueSymbolGetter<'V'>{
 			using VariableGetter = UniqueSymbolGetter<'V'>;
 		public:
 			ScriptGenerationService() = default;
-			ScriptGenerationService(std::size_t scriptIndex, ska::ScriptAST& script);
+			ScriptGenerationService(std::size_t scriptIndex, ScriptAST& script);
+			ScriptGenerationService(ScriptGenCache& cache, const ScriptAST& script);
 
 			ScriptGenerationService(ScriptGenerationService&&) = default;
 			ScriptGenerationService& operator=(ScriptGenerationService&&) = default;

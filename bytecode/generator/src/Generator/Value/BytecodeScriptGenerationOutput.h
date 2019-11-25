@@ -18,13 +18,10 @@ namespace ska {
 		class ScriptGenerationOutput {
 			friend class InstructionOutput;
 		public:
-			ScriptGenerationOutput(ScriptGenerationService& origin, InstructionOutput instruction) :
+			ScriptGenerationOutput(std::size_t index, ScriptGenerationService& origin, InstructionOutput instruction = {}) :
+				m_index(index),
 				m_origin(origin),
 				m_generated(std::move(instruction)) {
-			}
-
-			ScriptGenerationOutput(ScriptGenerationService& origin) :
-				m_origin(origin) {
 			}
 
 			ScriptGenerationService& origin() { return m_origin; }
@@ -36,12 +33,18 @@ namespace ska {
 			void setExportedSymbols(std::vector<Operand> symbols) { m_exports = std::move(symbols); };
 
 			bool empty() const { return m_generated.empty(); }
+			std::size_t size() const { return m_generated.size(); }
+			std::size_t id() const { return m_index; }
+
+			auto begin() const { return m_generated.begin(); }
+			auto end() const { return m_generated.end(); }
 
 		private:
 			friend std::ostream& operator<<(std::ostream& stream, const ScriptGenerationOutput&);
 
 			void push(ScriptGenerationOutput output);
 
+			std::size_t m_index = std::numeric_limits<std::size_t>::max();
 			std::vector<Operand> m_exports;
 			InstructionOutput m_generated;
 			ScriptGenerationService& m_origin;

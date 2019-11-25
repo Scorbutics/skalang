@@ -1,16 +1,16 @@
 #pragma once
 
 #include <cassert>
-#include "Generator/Value/BytecodeValue.h"
+#include "Generator/Value/BytecodeOperand.h"
 #include "Runtime/Value/TokenVariant.h"
 #include "BytecodeInterpreter/Value/BytecodeExecutor.h"
 #include "BytecodeInterpreter/Value/ScriptExecutionOutput.h"
 #include "BytecodeScriptExecution.h"
+#include "Generator/Value/BytecodeGenerationOutput.h"
 
 namespace ska {
 	namespace bytecode {
 
-		class GenerationOutput;
 		class Generator;
 		class ExecutionContext {
 		public:
@@ -45,7 +45,7 @@ namespace ska {
 
 			template <class ... Items>
 			void push(Items&& ... items) {
-				m_container.push(std::forward<Items>(items)...);
+				m_out.push(std::forward<Items>(items)...);
 			}
 
 			template <class T>

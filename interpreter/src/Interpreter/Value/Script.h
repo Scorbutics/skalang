@@ -29,7 +29,7 @@ namespace ska {
 		}
 
 		bool existsInCache(std::size_t index) const {
-			return m_cache.cache[index] != nullptr;
+			return m_cache.cache.exist(index);
 		}
 
 		void memoryFromBridge(Interpreter&, std::vector<BridgeFunctionPtr> bindings);

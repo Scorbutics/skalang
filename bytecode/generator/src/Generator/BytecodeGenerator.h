@@ -14,6 +14,7 @@
 namespace ska {
 	struct ReservedKeywordsPool;
 	class TypeCrosser;
+	class ASTNode;
 
 	namespace bytecode {
 		class GeneratorOperatorBase;
@@ -24,9 +25,10 @@ namespace ska {
 			Generator(const ReservedKeywordsPool& reserved);
 			~Generator() = default;
 
-			void generate(ScriptCache& cache, ScriptGenerationService script);
-			void generate(ScriptCache& cache, std::size_t scriptIndex);
-			ScriptGenerationOutput generatePart(GenerationContext node);
+			const ScriptGenerationOutput& generate(ScriptCache& cache, ScriptGenerationService script);
+			const ScriptGenerationOutput& generate(ScriptCache& cache, std::size_t scriptIndex);
+			ScriptGenerationOutput generatePart(GenerationContext node, std::size_t wantedId = std::numeric_limits<std::size_t>::max());
+
 		private:
 			GenerationOutput& postProcessing(ScriptGenerationService& script, GenerationOutput& generated);
 			OperatorGenerator build();

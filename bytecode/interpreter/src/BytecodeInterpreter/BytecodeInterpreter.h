@@ -5,6 +5,7 @@
 #include "InterpreterCommandUnit.h"
 #include "NodeValue/ASTNodePtr.h"
 #include "BytecodeExecutionContext.h"
+#include "Generator/Value/BytecodeGenerationOutput.h"
 
 namespace ska {
 	struct ReservedKeywordsPool;
@@ -12,7 +13,6 @@ namespace ska {
 
 	namespace bytecode {
 		class Generator;
-		class GenerationOutput;
 		class Script;
 
 		struct InterpretationPart {

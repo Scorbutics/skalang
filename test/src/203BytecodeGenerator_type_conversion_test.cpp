@@ -2,6 +2,7 @@
 #include <tuple>
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeGeneratorDataTestContainer.h"
+#include "BytecodeCompare.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
 #include "Service/StatementParser.h"
@@ -38,29 +39,6 @@ static std::pair<ska::bytecode::ScriptGenerationService, BytecodeGeneratorDataTe
 	ASTFromInputBytecodeGeneratorNoParse(input, data);
 	readerI->parse(*data.parser);
 	return std::make_pair<ska::bytecode::ScriptGenerationService, BytecodeGeneratorDataTestContainer>(ska::bytecode::ScriptGenerationService{0, *readerI }, std::move(data));
-}
-
-struct BytecodePart {
-	ska::bytecode::Command command;
-	std::string dest;
-	std::string left;
-	std::string right;
-};
-
-static void BytecodeCompare(const ska::bytecode::GenerationOutput& result, std::vector<BytecodePart> expected) {
-	auto index = std::size_t {0};
-	auto& scriptGenerationOutput = result.back();
-	CHECK(scriptGenerationOutput.size() == expected.size());
-	for(const auto& r : scriptGenerationOutput) {
-		const auto equality =
-			index < expected.size() &&
-			r.command() == expected[index].command &&
-			r.dest().toString() == expected[index].dest &&
-			r.left().toString() == expected[index].left &&
-			r.right().toString() == expected[index].right;
-		CHECK(equality);
-		index++;
-	}
 }
 
 TEST_CASE("[BytecodeGenerator] type conversion + int => string") {

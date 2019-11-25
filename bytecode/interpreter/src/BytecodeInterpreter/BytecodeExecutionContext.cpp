@@ -37,9 +37,9 @@ const ska::bytecode::ScriptGenerationOutput& ska::bytecode::ExecutionContext::ge
 	if (!m_in.isGenerated(scriptIndex)) {
 		//TODO better handling of this... it's ugly.
 		auto importedScriptContext = GenerationContext{ m_in, scriptIndex };
-		m_in.setOut(scriptIndex, generator.generatePart(importedScriptContext));
+		m_in.set(scriptIndex, generator.generatePart(importedScriptContext));
 	}
-	return m_in.generated(scriptIndex);
+	return m_in[scriptIndex];
 }
 
 ska::bytecode::ExecutionContext ska::bytecode::ExecutionContext::getContext(ScriptVariableRef value) {

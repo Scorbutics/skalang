@@ -1,12 +1,22 @@
 #include <sstream>
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeScriptGenerationService.h"
+#include "BytecodeScriptGenCache.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::ScriptGenerationService);
 
 ska::bytecode::ScriptGenerationService::ScriptGenerationService(std::size_t scriptIndex, ska::ScriptAST& script) :
 	m_script(script.handle()),
 	m_index(scriptIndex) {
+}
+
+ska::bytecode::ScriptGenerationService::ScriptGenerationService(ScriptGenCache& cache, const ScriptAST& script) {
+	const auto& name = script.name();
+  if (cache.find(name) != cache.end()) {
+		throw std::runtime_error("the script \"" + name + "\" already exists");
+	}
+	m_script = script.handle();
+	m_index = cache.id(name);
 }
 
 ska::bytecode::Register ska::bytecode::ScriptGenerationService::queryNextRegister() {

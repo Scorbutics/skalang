@@ -22,12 +22,12 @@ namespace ska {
 			ScriptExecution& operator=(ScriptExecution&&) = default;
 
 			const Instruction& currentInstruction() const {
-				assert(executionPointer < instructions.generated(scriptIndex).size());
-				return instructions.generated(scriptIndex)[executionPointer];
+				assert(instructions.isGenerated(scriptIndex));
+				return instructions[scriptIndex][executionPointer];
 			}
 
 			bool incInstruction() {
-				return ++executionPointer < instructions.generated(scriptIndex).size();
+				return ++executionPointer < instructions[scriptIndex].size();
 			}
 
 			NodeValue getCell(const Operand& v) const;
@@ -39,8 +39,8 @@ namespace ska {
 				return ScriptVariableRef{ executionPointer + relativeValue, scriptIndex };
 			}
 
-			auto size() const { return instructions.generated(scriptIndex).size(); }
-			bool idle() const { return executionPointer >= instructions.generated(scriptIndex).size(); }
+			auto size() const { return instructions[scriptIndex].size(); }
+			bool idle() const { return executionPointer >= instructions[scriptIndex].size(); }
 
 			template <class T>
 			T get(const Operand& v) const {
