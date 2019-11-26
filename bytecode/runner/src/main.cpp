@@ -29,7 +29,7 @@
 static std::unique_ptr<ska::bytecode::Generator> generator;
 static std::unique_ptr<ska::bytecode::Interpreter> interpreter;
 
-static ska::bytecode::ScriptGenerationService BasicProgramScriptStarter(ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>& module, char* argv[]) {
+static ska::bytecode::ScriptGenerationHelper BasicProgramScriptStarter(ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>& module, char* argv[]) {
 	auto scriptFileName = std::string{ argv[1] };
 	auto scriptName = scriptFileName.substr(0, scriptFileName.find_last_of('.'));
 
@@ -39,7 +39,7 @@ static ska::bytecode::ScriptGenerationService BasicProgramScriptStarter(ska::lan
 
 	auto executor = ska::ScriptAST{ module.scriptAstCache, "main", ska::Tokenizer{ module.reservedKeywords, scriptStarter}.tokenize() };
 	executor.parse(module.parser);
-	return ska::bytecode::ScriptGenerationService{ 0, executor};
+	return ska::bytecode::ScriptGenerationHelper{ 0, executor};
 }
 
 static ska::lang::ParameterModule<ska::bytecode::Interpreter> BasicParameterModuleBuilder(ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>& module, std::vector<ska::NodeValue>& parameters, int argc, char* argv[]) {

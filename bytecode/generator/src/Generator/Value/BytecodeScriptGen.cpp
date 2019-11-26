@@ -3,10 +3,10 @@
 #include "Runtime/Value/NodeValue.h"
 #include "Generator/BytecodeGenerator.h"
 
-ska::bytecode::ScriptGenerationService& ska::bytecode::ScriptGen::AddScript(ska::bytecode::ScriptCache& cache, std::vector<ska::Token> tokens, const std::string& name) {
+ska::bytecode::ScriptGenerationHelper& ska::bytecode::ScriptGen::AddScript(ska::bytecode::ScriptCache& cache, std::vector<ska::Token> tokens, const std::string& name) {
 	auto ast = ska::ScriptAST { cache.genCache.astCache, name, std::move(tokens)};
   if (cache.genCache.find(name) == cache.genCache.end()) {
-		auto holder = ska::bytecode::ScriptGenerationService{ cache.genCache.id(name), ast };
+		auto holder = ska::bytecode::ScriptGenerationHelper{ cache.genCache.id(name), ast };
     //auto handle = ska::bytecode::ScriptGen{ cache, std::move(holder) };
 		cache.genCache.emplace(name, { std::move(holder) });
 	}

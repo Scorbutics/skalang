@@ -3,7 +3,7 @@
 
 #include "NodeValue/Operator.h"
 #include "NodeValue/AST.h"
-#include "Generator/Value/BytecodeScriptGenerationService.h"
+#include "Generator/Value/BytecodeScriptGenerationHelper.h"
 
 #include "GeneratorOperatorBlock.h"
 #include "GeneratorOperatorUnary.h"
@@ -53,7 +53,7 @@ std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode
 	return result;
 }
 
-ska::bytecode::GenerationOutput& ska::bytecode::Generator::postProcessing(ScriptGenerationService& script, GenerationOutput& generated) {
+ska::bytecode::GenerationOutput& ska::bytecode::Generator::postProcessing(ScriptGenerationHelper& script, GenerationOutput& generated) {
 	return generated;
 }
 
@@ -69,7 +69,7 @@ ska::bytecode::ScriptGenerationOutput ska::bytecode::Generator::generatePart(Gen
 	return { wantedId, node.script(), builder->generate(node) };
 }
 
-const ska::bytecode::ScriptGenerationOutput& ska::bytecode::Generator::generate(ScriptCache& cache, ScriptGenerationService script) {
+const ska::bytecode::ScriptGenerationOutput& ska::bytecode::Generator::generate(ScriptCache& cache, ScriptGenerationHelper script) {
 	auto scriptGenName = script.name();
 	auto index = cache.genCache.emplace(scriptGenName, std::move(script));
 	return generate(cache, index);

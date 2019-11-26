@@ -12,7 +12,7 @@
 #include "NodeValue/ScriptAST.h"
 #include "NodeValue/ScriptCacheAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
-#include "Generator/Value/BytecodeScriptGenerationService.h"
+#include "Generator/Value/BytecodeScriptGenerationHelper.h"
 
 static const auto reservedKeywords = ska::ReservedKeywordsPool{};
 static auto tokenizer = std::unique_ptr<ska::Tokenizer>{};
@@ -34,11 +34,11 @@ static void ASTFromInputBytecodeGeneratorNoParse(const std::string& input, Bytec
 	data.generator = std::make_unique<ska::bytecode::Generator>(reservedKeywords);
 }
 
-static std::pair<ska::bytecode::ScriptGenerationService, BytecodeGeneratorDataTestContainer> ASTFromInputBytecodeGenerator(const std::string& input) {
+static std::pair<ska::bytecode::ScriptGenerationHelper, BytecodeGeneratorDataTestContainer> ASTFromInputBytecodeGenerator(const std::string& input) {
 	auto data = BytecodeGeneratorDataTestContainer{};
 	ASTFromInputBytecodeGeneratorNoParse(input, data);
 	readerI->parse(*data.parser);
-	return std::make_pair<ska::bytecode::ScriptGenerationService, BytecodeGeneratorDataTestContainer>(ska::bytecode::ScriptGenerationService{0, *readerI }, std::move(data));
+	return std::make_pair<ska::bytecode::ScriptGenerationHelper, BytecodeGeneratorDataTestContainer>(ska::bytecode::ScriptGenerationHelper{0, *readerI }, std::move(data));
 }
 
 TEST_CASE("[BytecodeGenerator] no type conversion string + string") {

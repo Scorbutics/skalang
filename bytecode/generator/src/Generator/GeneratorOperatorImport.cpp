@@ -20,7 +20,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 		LOG_DEBUG << "%10cUnknown script " << scriptImportedName << ", generating it...";
 		auto scriptImported = context.script().program().useImport(scriptImportedName);
 		assert(scriptImported != nullptr);
-		auto scriptContext = GenerationContext{context, ScriptGenerationService{context.totalScripts() + 1, *scriptImported }};
+		auto scriptContext = GenerationContext{context, ScriptGenerationHelper{context.totalScripts() + 1, *scriptImported }};
 		generateNext(scriptContext);
 		LOG_DEBUG << "%10cGenerated script.";
 		std::tie(importedScriptIndex, importedScript) = context.script(scriptImportedName);

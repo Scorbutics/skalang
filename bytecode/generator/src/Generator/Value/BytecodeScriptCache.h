@@ -6,7 +6,7 @@ namespace ska {
   class Symbol;
 	class ASTNode;
   namespace bytecode {
-    struct ScriptGenerationService;
+    struct ScriptGenerationHelper;
 
     class ScriptCache :
       public ScriptCacheBase<ScriptGenerationOutput> {

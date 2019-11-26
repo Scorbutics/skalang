@@ -9,7 +9,7 @@
 
 namespace ska {
 	namespace bytecode {
-		class ScriptGenerationService;
+		class ScriptGenerationHelper;
 
 		using InstructionPack = std::vector<Instruction>;
 
@@ -18,13 +18,13 @@ namespace ska {
 		class ScriptGenerationOutput {
 			friend class InstructionOutput;
 		public:
-			ScriptGenerationOutput(std::size_t index, ScriptGenerationService& origin, InstructionOutput instruction = {}) :
+			ScriptGenerationOutput(std::size_t index, ScriptGenerationHelper& origin, InstructionOutput instruction = {}) :
 				m_index(index),
 				m_origin(origin),
 				m_generated(std::move(instruction)) {
 			}
 
-			ScriptGenerationService& origin() { return m_origin; }
+			ScriptGenerationHelper& origin() { return m_origin; }
 
 			const Instruction& operator[](std::size_t index) const { return m_generated[index]; }
 			Instruction& operator[](std::size_t index) { return m_generated[index]; }
@@ -47,7 +47,7 @@ namespace ska {
 			std::size_t m_index = std::numeric_limits<std::size_t>::max();
 			std::vector<Operand> m_exports;
 			InstructionOutput m_generated;
-			ScriptGenerationService& m_origin;
+			ScriptGenerationHelper& m_origin;
 		};
 
 		std::ostream& operator<<(std::ostream& stream, const ScriptGenerationOutput&);

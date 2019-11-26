@@ -3,7 +3,7 @@
 #include "GeneratorOperatorIf.h"
 #include "NodeValue/ScriptAST.h"
 #include "BytecodeCommand.h"
-#include "Generator/Value/BytecodeScriptGenerationService.h"
+#include "Generator/Value/BytecodeScriptGenerationHelper.h"
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::IF>::generate(OperateOn node, GenerationContext& context) {
 	auto conditionGroup = generateNext({ context, node.GetCondition() });

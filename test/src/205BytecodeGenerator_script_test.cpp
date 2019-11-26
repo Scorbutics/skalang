@@ -12,7 +12,7 @@
 #include "NodeValue/ScriptAST.h"
 #include "NodeValue/ScriptCacheAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
-#include "Generator/Value/BytecodeScriptGenerationService.h"
+#include "Generator/Value/BytecodeScriptGenerationHelper.h"
 #include "Service/ScriptNameBuilder.h"
 
 static const auto reservedKeywords = ska::ReservedKeywordsPool{};
@@ -37,10 +37,10 @@ static BytecodeGeneratorDataTestContainer ASTFromInputBytecodeGeneratorNoParse(c
 	return data;
 }
 
-static std::pair<ska::bytecode::ScriptGenerationService, BytecodeGeneratorDataTestContainer> ASTFromInputBytecodeGenerator(const std::string& input) {
+static std::pair<ska::bytecode::ScriptGenerationHelper, BytecodeGeneratorDataTestContainer> ASTFromInputBytecodeGenerator(const std::string& input) {
 	auto data = ASTFromInputBytecodeGeneratorNoParse(input);
 	readerI->parse(*data.parser);
-	return std::make_pair<ska::bytecode::ScriptGenerationService, BytecodeGeneratorDataTestContainer>(ska::bytecode::ScriptGenerationService{0, *readerI }, std::move(data));
+	return std::make_pair<ska::bytecode::ScriptGenerationHelper, BytecodeGeneratorDataTestContainer>(ska::bytecode::ScriptGenerationHelper{0, *readerI }, std::move(data));
 }
 
 using namespace ska::bytecode;
