@@ -24,7 +24,7 @@ namespace ska {
 
 			auto id() const { return m_id; }
 			void generate(Generator& generator);
-			const ScriptGenerationOutput& generated() const { assert(m_generated); return m_cache.at(m_id); }
+			const ScriptGeneration& generated() const { assert(m_generated); return m_cache.at(m_id); }
 			GenerationOutput& wholeGenerated() { assert(m_generated); return m_cache; }
 
 			~ScriptGen() = default;

@@ -1,6 +1,6 @@
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeInstructionOutput.h"
-#include "BytecodeScriptGenerationOutput.h"
+#include "BytecodeScriptGeneration.h"
 
 std::ostream& ska::bytecode::operator<<(std::ostream& stream, const InstructionPack& group) {
 	for(const auto& c : group) {
@@ -9,7 +9,7 @@ std::ostream& ska::bytecode::operator<<(std::ostream& stream, const InstructionP
 	return stream;
 }
 
-ska::bytecode::InstructionOutput::InstructionOutput(ScriptGenerationOutput script) :
+ska::bytecode::InstructionOutput::InstructionOutput(ScriptGeneration script) :
 	InstructionOutput(std::move(script.m_generated)) {
 }
 

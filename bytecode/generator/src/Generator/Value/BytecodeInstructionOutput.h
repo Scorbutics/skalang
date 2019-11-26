@@ -8,7 +8,7 @@
 
 namespace ska {
 	namespace bytecode {
-		class ScriptGenerationOutput;
+		class ScriptGeneration;
 
 		using InstructionPack = std::vector<Instruction>;
 
@@ -17,7 +17,7 @@ namespace ska {
 		class InstructionOutput {
 		public:
 
-			InstructionOutput(ScriptGenerationOutput script);
+			InstructionOutput(ScriptGeneration script);
 
 			InstructionOutput(Instruction instruction) :
 				m_pack(InstructionPack { std::move(instruction) }) {

@@ -15,10 +15,10 @@ namespace ska {
 
 		std::ostream& operator<<(std::ostream& stream, const InstructionPack&);
 
-		class ScriptGenerationOutput {
+		class ScriptGeneration {
 			friend class InstructionOutput;
 		public:
-			ScriptGenerationOutput(std::size_t index, ScriptGenerationHelper& origin, InstructionOutput instruction = {}) :
+			ScriptGeneration(std::size_t index, ScriptGenerationHelper& origin, InstructionOutput instruction = {}) :
 				m_index(index),
 				m_origin(origin),
 				m_generated(std::move(instruction)) {
@@ -40,9 +40,9 @@ namespace ska {
 			auto end() const { return m_generated.end(); }
 
 		private:
-			friend std::ostream& operator<<(std::ostream& stream, const ScriptGenerationOutput&);
+			friend std::ostream& operator<<(std::ostream& stream, const ScriptGeneration&);
 
-			void push(ScriptGenerationOutput output);
+			void push(ScriptGeneration output);
 
 			std::size_t m_index = std::numeric_limits<std::size_t>::max();
 			std::vector<Operand> m_exports;
@@ -50,6 +50,6 @@ namespace ska {
 			ScriptGenerationHelper& m_origin;
 		};
 
-		std::ostream& operator<<(std::ostream& stream, const ScriptGenerationOutput&);
+		std::ostream& operator<<(std::ostream& stream, const ScriptGeneration&);
 	}
 }

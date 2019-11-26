@@ -1,5 +1,5 @@
 #pragma once
-#include "BytecodeScriptGenerationOutput.h"
+#include "BytecodeScriptGeneration.h"
 #include "Generator/Value/BytecodeScriptGenCache.h"
 
 namespace ska {
@@ -9,8 +9,8 @@ namespace ska {
     struct ScriptGenerationHelper;
 
     class ScriptCache :
-      public ScriptCacheBase<ScriptGenerationOutput> {
-				using Parent = ScriptCacheBase<ScriptGenerationOutput>;
+      public ScriptCacheBase<ScriptGeneration> {
+				using Parent = ScriptCacheBase<ScriptGeneration>;
     public:
       using SymbolInfosContainer = std::unordered_map<const Symbol*, SymbolInfo>;
 

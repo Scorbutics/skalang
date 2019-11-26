@@ -5,7 +5,7 @@
 
 namespace ska {
   namespace bytecode {
-    class ScriptGenerationOutput;
+    class ScriptGeneration;
 
     struct BytecodePart {
       Command command;
@@ -16,4 +16,4 @@ namespace ska {
   }
 }
 
-void BytecodeCompare(const ska::bytecode::ScriptGenerationOutput& scriptGenerationOutput, std::vector<ska::bytecode::BytecodePart> expected);
+void BytecodeCompare(const ska::bytecode::ScriptGeneration& ScriptGeneration, std::vector<ska::bytecode::BytecodePart> expected);
