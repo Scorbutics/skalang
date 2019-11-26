@@ -13,7 +13,7 @@
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 #include "BytecodeInterpreter/BytecodeScript.h"
 #include "Generator/BytecodeGenerator.h"
-#include "Generator/Value/BytecodeScriptGenCache.h"
+#include "Generator/Value/BytecodeScriptCache.h"
 #include "Service/SymbolTableUpdater.h"
 #include "BytecodeInterpreter/Value/BytecodeInterpreterTypes.h"
 #include "BytecodeInterpreter/BytecodeInterpreter.h"
@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
 	auto generator = ska::bytecode::Generator{ reservedKeywords };
 	auto interpreter = ska::bytecode::Interpreter { generator, reservedKeywords };
 
-	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { mainCache.genCache.astCache, mainCache, typeBuilder, symbolsTypeUpdater, reservedKeywords, parser, interpreter};
+	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { mainCache.astCache, mainCache, typeBuilder, symbolsTypeUpdater, reservedKeywords, parser, interpreter};
 
 	try {
 		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);
@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
 		
 		auto parameterModule = BasicParameterModuleBuilder(moduleConfiguration, parameterValues, argc, argv);
 		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
-		auto gen = generator.generate(mainCache, std::move(script));
+		auto& gen = generator.generate(mainCache, std::move(script));
 		auto interpreted = interpreter.interpret(gen.id(), mainCache);
 	} catch (std::exception& e) {
 		std::cerr << "Error : " << e.what() << std::endl;

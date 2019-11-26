@@ -61,25 +61,25 @@ ska::bytecode::Generator::Generator(const ReservedKeywordsPool& reserved) :
 	m_operatorGenerator(build()) {
 }
 
-ska::bytecode::ScriptGeneration ska::bytecode::Generator::generatePart(GenerationContext node, std::size_t wantedId) {
+ska::bytecode::InstructionOutput ska::bytecode::Generator::generatePart(GenerationContext node) {
 	const auto& operatorNode = node.pointer().op();
 	LOG_DEBUG << "Generating " << operatorNode << " " << node.pointer();
 	auto& builder = m_operatorGenerator[static_cast<std::size_t>(operatorNode)];
 	assert(builder != nullptr);
-	return { wantedId, node.script(), builder->generate(node) };
+	return builder->generate(node);
 }
 
 const ska::bytecode::ScriptGeneration& ska::bytecode::Generator::generate(ScriptCache& cache, ScriptGenerationHelper script) {
 	auto scriptGenName = script.name();
-	auto index = cache.genCache.emplace(scriptGenName, std::move(script));
+	auto index = cache.emplace(scriptGenName, std::move(script));
 	return generate(cache, index);
 }
 
 const ska::bytecode::ScriptGeneration& ska::bytecode::Generator::generate(ScriptCache& cache, std::size_t scriptIndex) {
-	auto container = GenerationOutput {};
-	auto& scriptGenService = cache.genCache.at(scriptIndex);
-	container.emplace(scriptGenService.name(), generatePart(GenerationContext{ container }, container.id(scriptGenService.name())));
+	auto& scriptGen = cache.at(scriptIndex);
+	auto scriptName = scriptGen.name();
+	scriptGen.generate(cache, *this);
 
-	LOG_INFO << "Final generation " << container.back() << " for script " << scriptGenService.name();
-	return container.at(scriptGenService.name());
+	//LOG_INFO << "Final generation " << scriptGen << " for script " << scriptName;
+	return scriptGen;
 }

@@ -45,7 +45,7 @@ using namespace ska::bytecode;
 
 TEST_CASE("[BytecodeGenerator] empty if") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("if( true ) {}");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ Command::JUMP_NIF, "0", "1" }
@@ -54,7 +54,7 @@ TEST_CASE("[BytecodeGenerator] empty if") {
 
 TEST_CASE("[BytecodeGenerator] if with body") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("if( true ) { var toto = 5; }");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ Command::JUMP_NIF, "1", "1" },
@@ -64,7 +64,7 @@ TEST_CASE("[BytecodeGenerator] if with body") {
 
 TEST_CASE("[BytecodeGenerator] if else with body") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("if( 3 > 2 ) { var toto = 1 + 3; } else { var toto = 4 + 2 + 1; var tt = toto; } var tete = 444;");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ Command::SUB_I, "R0", "3", "2" },
@@ -84,7 +84,7 @@ TEST_CASE("[BytecodeGenerator] if else with body") {
 
 TEST_CASE("[BytecodeGenerator] empty for") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("for(;;) {}");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ Command::JUMP_REL, "-1" }
@@ -93,7 +93,7 @@ TEST_CASE("[BytecodeGenerator] empty for") {
 
 TEST_CASE("[BytecodeGenerator] for without body") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("for(var i = 0; i < 10; i = i + 1);");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		// Initialization part
@@ -115,7 +115,7 @@ TEST_CASE("[BytecodeGenerator] for without body") {
 
 TEST_CASE("[BytecodeGenerator] for with body") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("for(var i = 0; i < 10; i = i + 1) { var toto = 123; toto + i; } var test = 1234;");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		// Initialization part

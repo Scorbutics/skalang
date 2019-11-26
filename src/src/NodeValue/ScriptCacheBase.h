@@ -59,6 +59,13 @@ namespace ska {
 		}
 
 		template <class ScriptTLocal>
+		ScriptTLocal& emplaceNamed(ScriptTLocal script) {
+			auto name = script.name();
+			emplace(name, std::move(script));
+			return at(name);
+		}
+
+		template <class ScriptTLocal>
 		void set(std::size_t index, ScriptTLocal script) {
 			if (index >= cache.size()) {
 				throw std::runtime_error("unable to add a new script by using the index setter : use \"emplace\" first.");

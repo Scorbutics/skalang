@@ -1,13 +1,10 @@
 #pragma once
 #include "BytecodeScriptGeneration.h"
-#include "Generator/Value/BytecodeScriptGenCache.h"
-
+#include "NodeValue/ScriptCacheAST.h"
 namespace ska {
   class Symbol;
 	class ASTNode;
   namespace bytecode {
-    struct ScriptGenerationHelper;
-
     class ScriptCache :
       public ScriptCacheBase<ScriptGeneration> {
 				using Parent = ScriptCacheBase<ScriptGeneration>;
@@ -24,7 +21,7 @@ namespace ska {
 
 			const std::vector<Operand>& getExportedSymbols(std::size_t scriptIndex);
 
-      ScriptGenCache genCache;
+      ScriptCacheAST astCache;
 
     private:
       SymbolInfosContainer m_symbolInfo;

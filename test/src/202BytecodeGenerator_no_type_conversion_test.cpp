@@ -43,7 +43,7 @@ static std::pair<ska::bytecode::ScriptGenerationHelper, BytecodeGeneratorDataTes
 
 TEST_CASE("[BytecodeGenerator] no type conversion string + string") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = \"3\" + \"7\";");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::ADD_STR, "R0", "3", "7"},
@@ -53,7 +53,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion string + string") {
 
 TEST_CASE("[BytecodeGenerator] no type conversion float + float") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3.0 + 7.4;");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::ADD_D, "R0", "3.000000", "7.400000"},
@@ -63,7 +63,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion float + float") {
 
 TEST_CASE("[BytecodeGenerator] no type conversion array") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = [3];");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::PUSH, "3"},
@@ -74,7 +74,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion array") {
 
 TEST_CASE("[BytecodeGenerator] no type conversion array + array") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = [3] + [7, 12, 25];");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::PUSH, "3"},
@@ -88,7 +88,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion array + array") {
 
 TEST_CASE("[BytecodeGenerator] no type conversion int - int") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3 - 4;");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::SUB_I, "R0", "3", "4"},
@@ -98,7 +98,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion int - int") {
 
 TEST_CASE("[BytecodeGenerator] no type conversion float - float") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3.1 - 4.2;");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::SUB_D, "R0", "3.100000", "4.200000"},
@@ -108,7 +108,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion float - float") {
 
 TEST_CASE("[BytecodeGenerator] no type conversion array - array") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = [11, 4, 9] - [1, 2];");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::PUSH, "11", "4", "9"},
@@ -122,7 +122,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion array - array") {
 
 TEST_CASE("[BytecodeGenerator] no type conversion int * int") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3 * 4;");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::MUL_I, "R0", "3", "4"},
@@ -132,7 +132,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion int * int") {
 
 TEST_CASE("[BytecodeGenerator] no type conversion float * float") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3.0 * 4.4;");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::MUL_D, "R0", "3.000000", "4.400000"},
@@ -142,7 +142,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion float * float") {
 
 TEST_CASE("[BytecodeGenerator] no type conversion int / int") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3 / 4;");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::DIV_I, "R0", "3", "4"},
@@ -152,7 +152,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion int / int") {
 
 TEST_CASE("[BytecodeGenerator] no type conversion float / float") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3.0 / 4.4;");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::DIV_D, "R0", "3.000000", "4.400000"},

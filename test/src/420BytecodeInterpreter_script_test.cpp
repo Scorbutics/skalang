@@ -55,7 +55,7 @@ TEST_CASE("[BytecodeInterpreter] Outside script from file (import) and use") {
 		"var enemy = Character184.default;"
 		"var t = enemy.age;";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto cellValue = res.nodeval<long>();
@@ -69,7 +69,7 @@ TEST_CASE("[BytecodeInterpreter] Outside script from file (import) - edit - and 
 		"enemy.age = 99;"
 		"var t = enemy.age;";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto cellValue = res.nodeval<long>();
@@ -83,7 +83,7 @@ TEST_CASE("[BytecodeInterpreter] Use 2x same script : ensure we do not try to re
 		"Character270.default.age;"
 		"var t = Character272.default.age;";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto cellValue = res.nodeval<long>();
@@ -97,7 +97,7 @@ TEST_CASE("[BytecodeInterpreter] Use 2x same script and modifying a value in fir
 		"Character284.default.age = 123;"
 		"var t = Character285.default.age;";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto cellValue = res.nodeval<long>();

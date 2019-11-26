@@ -51,7 +51,7 @@ struct BytecodePart {
 TEST_CASE("[BytecodeInterpreter] equal int (false)") {
 	static constexpr auto progStr = "var t = 4 == 1;";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto cellValue = res.nodeval<bool>();
@@ -61,7 +61,7 @@ TEST_CASE("[BytecodeInterpreter] equal int (false)") {
 TEST_CASE("[BytecodeInterpreter] equal int (true)") {
 	static constexpr auto progStr = "var t = 41 == 41;";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto cellValue = res.nodeval<bool>();
@@ -71,7 +71,7 @@ TEST_CASE("[BytecodeInterpreter] equal int (true)") {
 TEST_CASE("[BytecodeInterpreter] conditional strings") {
 	static constexpr auto progStr = "var t = \"4\" == \"1\";";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto cellValue = res.nodeval<bool>();
@@ -82,7 +82,7 @@ TEST_CASE("[BytecodeInterpreter] conditional strings") {
 TEST_CASE("[BytecodeInterpreter] different") {
 	static constexpr auto progStr = "var t = 3 != 1;";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto cellValue = res.nodeval<bool>();
@@ -92,7 +92,7 @@ TEST_CASE("[BytecodeInterpreter] different") {
 TEST_CASE("[BytecodeInterpreter] greater than") {
 	static constexpr auto progStr = "var t = 3 > 1;";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto cellValue = res.nodeval<bool>();
@@ -102,7 +102,7 @@ TEST_CASE("[BytecodeInterpreter] greater than") {
 TEST_CASE("[BytecodeInterpreter] greater than or equal") {
 	static constexpr auto progStr = "var t = 3 >= 1;";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto cellValue = res.nodeval<bool>();
@@ -112,7 +112,7 @@ TEST_CASE("[BytecodeInterpreter] greater than or equal") {
 TEST_CASE("[BytecodeInterpreter] lesser than") {
 	static constexpr auto progStr = "var t = 3 < 1;";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto cellValue = res.nodeval<bool>();
@@ -122,7 +122,7 @@ TEST_CASE("[BytecodeInterpreter] lesser than") {
 TEST_CASE("[BytecodeInterpreter] lesser than or equal") {
 	static constexpr auto progStr = "var t = 3 <= 1;";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto cellValue = res.nodeval<bool>();
@@ -132,7 +132,7 @@ TEST_CASE("[BytecodeInterpreter] lesser than or equal") {
 TEST_CASE("[BytecodeInterpreter] conditional arrays") {
 	static constexpr auto progStr = "var t = [4] == [1];";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto cellValue = res.nodeval<bool>();

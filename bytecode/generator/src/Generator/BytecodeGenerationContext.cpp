@@ -5,16 +5,16 @@
 #include "Generator/Value/BytecodeGenerationOutput.h"
 #include "NodeValue/ScriptAST.h"
 
-ska::bytecode::GenerationContext::GenerationContext(GenerationOutput& output, std::size_t scriptIndex) :
+ska::bytecode::GenerationContext::GenerationContext(GenerationOutput& output, ScriptGenerationHelper script) :
 	m_generated(output),
-	m_scriptIndex((scriptIndex == std::numeric_limits<std::size_t>::max()) ? output.size() - 1 : scriptIndex),
-	m_pointer(&output.genCache.at(m_scriptIndex).rootASTNode()) {
+	m_script(m_generated.emplaceNamed( ScriptGeneration{ std::move(script) } )),
+	m_pointer(&m_script.rootASTNode()) {
 }
 
-static inline std::size_t ScriptFromOutput(ska::bytecode::GenerationOutput& output, ska::bytecode::ScriptGenerationHelper script) {
-	auto scriptName = script.name();
-	output.genCache.emplace(scriptName, std::move(script));
-	return output.genCache.id(scriptName);
+ska::bytecode::GenerationContext::GenerationContext(GenerationOutput& output, std::size_t scriptId) :
+	m_generated(output),
+	m_script(m_generated.at(scriptId)),
+	m_pointer(&m_script.rootASTNode()) {
 }
 
 std::size_t ska::bytecode::GenerationContext::totalScripts() const {
@@ -23,33 +23,33 @@ std::size_t ska::bytecode::GenerationContext::totalScripts() const {
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, ScriptGenerationHelper script) :
 	m_generated(old.m_generated),
-	m_scriptIndex(ScriptFromOutput(m_generated, std::move(script))),
-	m_pointer(&m_generated.genCache.at(m_scriptIndex).program().rootNode()) {
+	m_script(m_generated.emplaceNamed(ScriptGeneration { std::move(script) })),
+	m_pointer(&m_script.rootASTNode()) {
 }
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old) :
 	m_generated(old.m_generated),
-	m_scriptIndex(old.m_scriptIndex),
-	m_pointer(&m_generated.genCache.at(m_scriptIndex).program().rootNode()) {
+	m_script(old.m_script),
+	m_pointer(&m_script.rootASTNode()) {
 }
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, const ASTNode& node, std::size_t scopeLevelOffset) :
 	m_generated(old.m_generated),
-	m_scriptIndex(old.m_scriptIndex),
+	m_script(old.m_script),
 	m_pointer(&node),
 	m_scopeLevel(old.m_scopeLevel + scopeLevelOffset) {
 }
 
-ska::bytecode::ScriptGenerationHelper& ska::bytecode::GenerationContext::script() {
-	return m_generated.genCache.at(m_scriptIndex);
+ska::bytecode::ScriptGeneration& ska::bytecode::GenerationContext::script() {
+	return m_script;
 }
 
-const ska::bytecode::ScriptGenerationHelper& ska::bytecode::GenerationContext::script() const {
-	return m_generated.genCache.at(m_scriptIndex);
+const ska::bytecode::ScriptGeneration& ska::bytecode::GenerationContext::script() const {
+	return m_script;
 }
 
-std::pair<std::size_t, ska::bytecode::ScriptGenerationHelper*> ska::bytecode::GenerationContext::script(const std::string& fullScriptName) {
-	return std::make_pair(m_generated.genCache.id(fullScriptName), &m_generated.genCache.at(fullScriptName));
+std::pair<std::size_t, ska::bytecode::ScriptGeneration*> ska::bytecode::GenerationContext::script(const std::string& fullScriptName) {
+	return std::make_pair(m_generated.id(fullScriptName), &m_generated.at(fullScriptName));
 }
 
 void ska::bytecode::GenerationContext::setSymbolInfo(const ASTNode& node, SymbolInfo info) {
@@ -73,21 +73,21 @@ std::optional<ska::bytecode::Operand> ska::bytecode::GenerationContext::getSymbo
 	return scriptOfSymbol(symbol).getSymbol(symbol);
 }
 
-ska::bytecode::ScriptGenerationHelper& ska::bytecode::GenerationContext::scriptOfSymbol(const Symbol& symbol) {
+ska::bytecode::ScriptGeneration& ska::bytecode::GenerationContext::scriptOfSymbol(const Symbol& symbol) {
 	const auto* scriptIt = m_generated.getSymbolInfo(symbol);
 	if (scriptIt == nullptr) {
 		auto basicInfos = SymbolInfo{};
-		basicInfos.script = m_scriptIndex;
+		basicInfos.script = m_script.id();
 		m_generated.setSymbolInfo(symbol, std::move(basicInfos));
 		return script();
 	}
-	return m_generated.genCache.at(scriptIt->script);
+	return m_generated.at(scriptIt->script);
 }
 
-const ska::bytecode::ScriptGenerationHelper& ska::bytecode::GenerationContext::scriptOfSymbol(const Symbol& symbol) const {
+const ska::bytecode::ScriptGeneration& ska::bytecode::GenerationContext::scriptOfSymbol(const Symbol& symbol) const {
 	const auto* scriptIt = m_generated.getSymbolInfo(symbol);
 	if (scriptIt == nullptr) {
 		return script();
 	}
-	return m_generated.genCache.at(scriptIt->script);
+	return m_generated.at(scriptIt->script);
 }

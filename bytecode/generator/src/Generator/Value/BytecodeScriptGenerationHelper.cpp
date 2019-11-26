@@ -1,7 +1,8 @@
 #include <sstream>
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeScriptGenerationHelper.h"
-#include "BytecodeScriptGenCache.h"
+#include "NodeValue/ScriptAST.h"
+#include "BytecodeScriptCache.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::ScriptGenerationHelper);
 
@@ -10,13 +11,25 @@ ska::bytecode::ScriptGenerationHelper::ScriptGenerationHelper(std::size_t script
 	m_index(scriptIndex) {
 }
 
-ska::bytecode::ScriptGenerationHelper::ScriptGenerationHelper(ScriptGenCache& cache, const ScriptAST& script) {
+ska::bytecode::ScriptGenerationHelper::ScriptGenerationHelper(ScriptCache& cache, const ScriptAST& script) {
 	const auto& name = script.name();
   if (cache.find(name) != cache.end()) {
 		throw std::runtime_error("the script \"" + name + "\" already exists");
 	}
 	m_script = script.handle();
 	m_index = cache.id(name);
+}
+
+ska::ScriptAST ska::bytecode::ScriptGenerationHelper::program() const {
+	return ska::ScriptAST{ *m_script };
+}
+
+const ska::ASTNode& ska::bytecode::ScriptGenerationHelper::rootASTNode() const {
+	return m_script->rootNode();
+}
+
+const std::string& ska::bytecode::ScriptGenerationHelper::name() const {
+	return m_script->name();
 }
 
 ska::bytecode::Register ska::bytecode::ScriptGenerationHelper::queryNextRegister() {

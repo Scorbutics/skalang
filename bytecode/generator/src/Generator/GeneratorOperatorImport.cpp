@@ -18,7 +18,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	if(importedScript == nullptr && importedScriptIndex == std::numeric_limits<std::size_t>::max()) {
 		LOG_DEBUG << "%10cUnknown script " << scriptImportedName << ", generating it...";
-		auto scriptImported = context.script().program().useImport(scriptImportedName);
+		auto scriptImported = context.script().useImport(scriptImportedName);
 		assert(scriptImported != nullptr);
 		auto scriptContext = GenerationContext{context, ScriptGenerationHelper{context.totalScripts() + 1, *scriptImported }};
 		generateNext(scriptContext);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BytecodeGenerationOutput.h"
+#include "NodeValue/ScriptAST.h"
 
 namespace ska {
 	namespace bytecode {
@@ -30,8 +31,8 @@ namespace ska {
 			~ScriptGen() = default;
 
 		private:
-			static ScriptGenerationHelper& AddScript(ska::bytecode::ScriptCache& cache, std::vector<ska::Token> tokens, const std::string& name);
-			ScriptGenerationHelper& m_service;
+			static ScriptGeneration& AddScript(ska::bytecode::ScriptCache& cache, std::vector<ska::Token> tokens, const std::string& name);
+			ScriptGeneration& m_service;
 			unsigned int m_id = std::numeric_limits<unsigned int>::max();
 			bool m_generated = false;
 			ScriptCache& m_cache;

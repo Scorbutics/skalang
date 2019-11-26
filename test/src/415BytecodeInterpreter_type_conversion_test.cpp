@@ -44,7 +44,7 @@ static std::pair<ska::bytecode::ScriptGenerationHelper, BytecodeInterpreterDataT
 TEST_CASE("[BytecodeInterpreter] type conversion + int => string") {
 	static constexpr auto progStr = "var result = 7 + \"3\";";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<ska::StringShared>();
@@ -57,7 +57,7 @@ TEST_CASE("[BytecodeInterpreter] type conversion + int => string") {
 TEST_CASE("[BytecodeInterpreter] type conversion + float => string") {
 	static constexpr auto progStr = "var result = 7.0 + \"3\";";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<ska::StringShared>();
@@ -68,7 +68,7 @@ TEST_CASE("[BytecodeInterpreter] type conversion + float => string") {
 TEST_CASE("[BytecodeInterpreter] type conversion + int => float") {
 	static constexpr auto progStr = "var result = 7.0 + 3;";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<double>();
@@ -79,7 +79,7 @@ TEST_CASE("[BytecodeInterpreter] type conversion + int => float") {
 TEST_CASE("[BytecodeInterpreter] type conversion + int => array (back)") {
 	static constexpr auto progStr = "var result = [7, 12, 25] + 3;";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<ska::NodeValueArray>();
@@ -93,7 +93,7 @@ TEST_CASE("[BytecodeInterpreter] type conversion + int => array (back)") {
 TEST_CASE("[BytecodeInterpreter] type conversion + int => array (front)") {
 	static constexpr auto progStr = "var result = 3 + [7, 12, 25];";
 	auto [script, data] = Interpret(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(script));
+	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<ska::NodeValueArray>();

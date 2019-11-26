@@ -5,7 +5,6 @@
 #include <unordered_map>
 
 #include "Base/Values/MovableNonCopyable.h"
-#include "NodeValue/ScriptAST.h"
 #include "BytecodeOperand.h"
 #include "UniqueSymbolGetter.h"
 #include "BytecodeSymbolInfo.h"
@@ -27,23 +26,26 @@ namespace ska {
 namespace ska {
 	class ASTNode;
 	class ScriptAST;
+	class ScriptHandleAST;
+
 	namespace bytecode {
-		class ScriptGenCache;
+		class ScriptCache;
+
 		class ScriptGenerationHelper :
 			public MovableNonCopyable,
 			private UniqueSymbolGetter<'V'>{
 			using VariableGetter = UniqueSymbolGetter<'V'>;
 		public:
-			ScriptGenerationHelper() = default;
 			ScriptGenerationHelper(std::size_t scriptIndex, ScriptAST& script);
-			ScriptGenerationHelper(ScriptGenCache& cache, const ScriptAST& script);
+			ScriptGenerationHelper(ScriptCache& cache, const ScriptAST& script);
 
 			ScriptGenerationHelper(ScriptGenerationHelper&&) = default;
 			ScriptGenerationHelper& operator=(ScriptGenerationHelper&&) = default;
 
-			ska::ScriptAST program() const { return ska::ScriptAST{ *m_script }; }
-			const ASTNode& rootASTNode() const { return m_script->rootNode(); }
-			const std::string& name() const { return m_script->name(); }
+			ska::ScriptAST program() const;
+			const ASTNode& rootASTNode() const;
+			const std::string& name() const;
+			std::size_t id() const { return m_index; }
 
 			Register queryNextRegister();
 			Operand querySymbolOrOperand(const ASTNode& node);

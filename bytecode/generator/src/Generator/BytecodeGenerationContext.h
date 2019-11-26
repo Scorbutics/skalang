@@ -9,9 +9,11 @@
 namespace ska {
 	class ASTNode;
 	namespace bytecode {
+		class GeneratorOperatorUnit;
 		class GenerationContext {
 		public:
-			explicit GenerationContext(GenerationOutput& output, std::size_t scriptIndex = std::numeric_limits<std::size_t>::max());
+			GenerationContext(GenerationOutput& output, ScriptGenerationHelper script);
+			GenerationContext(GenerationOutput& output, std::size_t scriptId);
 			GenerationContext(GenerationContext& old);
 			GenerationContext(GenerationContext& old, ScriptGenerationHelper script);
 
@@ -20,11 +22,11 @@ namespace ska {
 			GenerationContext(GenerationContext& old, const ASTNode& node, std::size_t scopeLevelOffset = 0);
 
 			const ASTNode& pointer() const { assert(m_pointer != nullptr); return *m_pointer; }
-			ScriptGenerationHelper& script();
-			const ScriptGenerationHelper& script() const;
+			ScriptGeneration& script();
+			const ScriptGeneration& script() const;
 			auto scope() const { return m_scopeLevel; }
 
-			std::pair<std::size_t, ScriptGenerationHelper*> script(const std::string& fullScriptName);
+			std::pair<std::size_t, ScriptGeneration*> script(const std::string& fullScriptName);
 			std::size_t totalScripts() const;
 
 			void setSymbolInfo(const ASTNode& node, SymbolInfo info);
@@ -34,14 +36,14 @@ namespace ska {
 			Operand querySymbol(const Symbol& symbol);
 			std::optional<Operand> getSymbol(const Symbol& symbol) const;
 
-			const auto scriptIndex() const { return m_scriptIndex; }
+			const auto scriptIndex() const { return m_script.id(); }
 
 		private:
-			ScriptGenerationHelper& scriptOfSymbol(const Symbol& symbol);
-			const ScriptGenerationHelper& scriptOfSymbol(const Symbol& symbol) const;
+			ScriptGeneration& scriptOfSymbol(const Symbol& symbol);
+			const ScriptGeneration& scriptOfSymbol(const Symbol& symbol) const;
 
 			GenerationOutput& m_generated;
-			std::size_t m_scriptIndex = 0;
+			ScriptGeneration& m_script;
 			const ASTNode* m_pointer {};
 			std::size_t m_scopeLevel = 0;
 		};

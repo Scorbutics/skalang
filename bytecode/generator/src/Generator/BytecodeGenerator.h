@@ -27,7 +27,7 @@ namespace ska {
 
 			const ScriptGeneration& generate(ScriptCache& cache, ScriptGenerationHelper script);
 			const ScriptGeneration& generate(ScriptCache& cache, std::size_t scriptIndex);
-			ScriptGeneration generatePart(GenerationContext node, std::size_t wantedId = std::numeric_limits<std::size_t>::max());
+			InstructionOutput generatePart(GenerationContext node);
 
 		private:
 			GenerationOutput& postProcessing(ScriptGenerationHelper& script, GenerationOutput& generated);

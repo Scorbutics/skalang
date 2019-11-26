@@ -47,7 +47,7 @@ using namespace ska::bytecode;
 
 TEST_CASE("[BytecodeGenerator] import ") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var Player = import \"" SKALANG_TEST_DIR "/src/resources/play\";");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 	CHECK(res.size() == 3);
 	BytecodeCompare(res, {
 		{ Command::SCRIPT, "R0", "1" },
@@ -60,7 +60,7 @@ TEST_CASE("[BytecodeGenerator] Outside script from file (import) and use") {
 		"var Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
 		"var player = Character184.build(\"Player\");"
 		"var enemy = Character184.default; enemy.age;");
-	auto res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
 	//CHECK(res.nodeval<int>() == 10);
 }
 
@@ -71,12 +71,12 @@ TEST_CASE("[BytecodeGenerator] Use 2x same script and modifying a value in first
 		"Character91.default.age = 123;"
 		"var t = Character92.default.age;";
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
-	auto gen = data.generator->generate(data.storage, std::move(astPtr));
+	auto& gen = data.generator->generate(data.storage, std::move(astPtr));
 }
 
 TEST_CASE("[BytecodeGenerator] C++ 1 script-function binding") {
 	/*auto [astPtr, data] = ASTFromInputBytecodeGenerator("var User77 = import \"bind:binding\"; User77.funcTest(14, \"titito\");");
-	auto res = data.generator->generate(std::move(astPtr));
+	auto& res = data.generator->generate(std::move(astPtr));
 
 	BytecodeCompare(res, {
 	});*/
