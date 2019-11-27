@@ -4,6 +4,7 @@
 #include <optional>
 #include <unordered_map>
 
+#include "NodeValue/ScriptASTPtr.h"
 #include "Base/Values/MovableNonCopyable.h"
 #include "BytecodeOperand.h"
 #include "UniqueSymbolGetter.h"
@@ -47,6 +48,7 @@ namespace ska {
 			const std::string& name() const;
 			std::size_t id() const { return m_index; }
 
+			ska::ScriptASTPtr useImport(const std::string& scriptImported);
 			Register queryNextRegister();
 			Operand querySymbolOrOperand(const ASTNode& node);
 			Operand querySymbol(const Symbol& symbol);

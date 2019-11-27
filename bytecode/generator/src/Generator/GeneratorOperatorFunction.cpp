@@ -103,7 +103,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	result.push(std::move(callInstruction));
 	if(node.GetFunctionType().compound().back() != ExpressionType::VOID) {
-		result.push(Instruction{ Command::POP, context.script().queryNextRegister()});
+		result.push(Instruction{ Command::POP, context.queryNextRegister()});
 	}
 
 	LOG_DEBUG << "Output : " << result;

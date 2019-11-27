@@ -16,7 +16,3 @@ void ska::bytecode::ScriptGeneration::generate(ScriptCache& cache, Generator& ge
 	m_generated = generator.generatePart(context);
 }
 
-
-ska::ScriptASTPtr ska::bytecode::ScriptGeneration::useImport(const std::string& scriptImported) {
-	return m_origin.program().useImport(scriptImported);
-}

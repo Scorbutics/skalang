@@ -22,14 +22,15 @@ namespace ska {
 			GenerationContext(GenerationContext& old, const ASTNode& node, std::size_t scopeLevelOffset = 0);
 
 			const ASTNode& pointer() const { assert(m_pointer != nullptr); return *m_pointer; }
-			ScriptGeneration& script();
-			const ScriptGeneration& script() const;
+
 			auto scope() const { return m_scopeLevel; }
 
 			std::pair<std::size_t, ScriptGeneration*> script(const std::string& fullScriptName);
 			std::size_t totalScripts() const;
 
 			void setSymbolInfo(const ASTNode& node, SymbolInfo info);
+			Register queryNextRegister();
+			ScriptASTPtr useImport(const std::string& scriptImported);
 			const SymbolInfo* getSymbolInfo(const Symbol& symbol) const;
 			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
 			Operand querySymbolOrOperand(const ASTNode& node);
@@ -39,8 +40,10 @@ namespace ska {
 			const auto scriptIndex() const { return m_script.id(); }
 
 		private:
-			ScriptGeneration& scriptOfSymbol(const Symbol& symbol);
-			const ScriptGeneration& scriptOfSymbol(const Symbol& symbol) const;
+			ScriptGenerationHelper& helper();
+			const ScriptGenerationHelper& helper() const;
+			ScriptGenerationHelper& scriptOfSymbol(const Symbol& symbol);
+			const ScriptGenerationHelper& scriptOfSymbol(const Symbol& symbol) const;
 
 			GenerationOutput& m_generated;
 			ScriptGeneration& m_script;

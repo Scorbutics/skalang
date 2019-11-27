@@ -44,11 +44,7 @@ namespace ska {
 			//TODO lazy-optimize with exportedSymbols ?
 			std::vector<Operand> generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const { return m_origin.generateExportedSymbols(std::move(symbolsInfo)); }
 
-			ScriptASTPtr useImport(const std::string& scriptImported);
-			Operand querySymbolOrOperand(const ASTNode& node) { return m_origin.querySymbolOrOperand(node); }
-			Operand querySymbol(const Symbol& symbol) { return m_origin.querySymbol(symbol); }
-			std::optional<Operand> getSymbol(const Symbol& symbol) const { return m_origin.getSymbol(symbol); }
-			Register queryNextRegister() { return m_origin.queryNextRegister(); }
+			ScriptGenerationHelper& helper() { return m_origin; }
 
 			ScriptAST program() { return m_origin.program(); }
 			bool empty() const { return m_generated.empty(); }

@@ -14,7 +14,7 @@ ska::bytecode::ScriptGeneration& ska::bytecode::ScriptGen::AddScript(ska::byteco
 }
 
 std::optional<ska::bytecode::Operand> ska::bytecode::ScriptGen::getSymbol(const Symbol& symbol) const {
-  return m_service.getSymbol(symbol);
+  return m_service.helper().getSymbol(symbol);
 }
 
 ska::bytecode::ScriptGen::ScriptGen(ScriptCache& scriptCache, std::size_t scriptIndex) :

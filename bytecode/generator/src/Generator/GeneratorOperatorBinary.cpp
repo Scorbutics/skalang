@@ -44,7 +44,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 		LOG_DEBUG << "Binary : Value node child " << groups.back().operand().toString();
 	}
 
-	auto currentRegister = context.script().queryNextRegister();
+	auto currentRegister = context.queryNextRegister();
 
 	auto operationValue = GenerateMathematicBinaryExpression(
 		node.GetOperator(),

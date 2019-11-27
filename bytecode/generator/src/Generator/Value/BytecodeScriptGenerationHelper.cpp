@@ -63,3 +63,7 @@ std::vector<ska::bytecode::Operand> ska::bytecode::ScriptGenerationHelper::gener
 
 	return result;
 }
+
+ska::ScriptASTPtr ska::bytecode::ScriptGenerationHelper::useImport(const std::string& scriptImported) {
+	return program().useImport(scriptImported);
+}

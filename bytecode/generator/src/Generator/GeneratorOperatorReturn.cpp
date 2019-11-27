@@ -14,7 +14,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	LOG_DEBUG << "Returning " << node.GetValue().size() << " fields";
 
 	if(node.GetValue().op() == Operator::USER_DEFINED_OBJECT)  {
-		auto registerV = context.script().queryNextRegister();
+		auto registerV = context.queryNextRegister();
 		const auto numberOfItemsReturned = static_cast<long>(node.GetValue().size());
 		objectResult.push(Instruction { Command::POP_IN_VAR, registerV, Operand { numberOfItemsReturned } });
 	}

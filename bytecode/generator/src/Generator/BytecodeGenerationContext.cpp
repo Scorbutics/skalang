@@ -40,12 +40,16 @@ ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, cons
 	m_scopeLevel(old.m_scopeLevel + scopeLevelOffset) {
 }
 
-ska::bytecode::ScriptGeneration& ska::bytecode::GenerationContext::script() {
-	return m_script;
+ska::bytecode::ScriptGenerationHelper& ska::bytecode::GenerationContext::helper() {
+	return m_script.helper();
 }
 
-const ska::bytecode::ScriptGeneration& ska::bytecode::GenerationContext::script() const {
-	return m_script;
+const ska::bytecode::ScriptGenerationHelper& ska::bytecode::GenerationContext::helper() const {
+	return m_script.helper();
+}
+
+ska::bytecode::Register ska::bytecode::GenerationContext::queryNextRegister() {
+	return m_script.helper().queryNextRegister();
 }
 
 std::pair<std::size_t, ska::bytecode::ScriptGeneration*> ska::bytecode::GenerationContext::script(const std::string& fullScriptName) {
@@ -60,7 +64,7 @@ const ska::bytecode::SymbolInfo* ska::bytecode::GenerationContext::getSymbolInfo
 
 ska::bytecode::Operand ska::bytecode::GenerationContext::querySymbolOrOperand(const ASTNode& node) {
 	if (node.symbol() == nullptr) {
-		return script().querySymbolOrOperand(node);
+		return helper().querySymbolOrOperand(node);
 	}
 	return scriptOfSymbol(*node.symbol()).querySymbolOrOperand(node);
 }
@@ -73,21 +77,25 @@ std::optional<ska::bytecode::Operand> ska::bytecode::GenerationContext::getSymbo
 	return scriptOfSymbol(symbol).getSymbol(symbol);
 }
 
-ska::bytecode::ScriptGeneration& ska::bytecode::GenerationContext::scriptOfSymbol(const Symbol& symbol) {
+ska::bytecode::ScriptGenerationHelper& ska::bytecode::GenerationContext::scriptOfSymbol(const Symbol& symbol) {
 	const auto* scriptIt = m_generated.getSymbolInfo(symbol);
 	if (scriptIt == nullptr) {
 		auto basicInfos = SymbolInfo{};
 		basicInfos.script = m_script.id();
 		m_generated.setSymbolInfo(symbol, std::move(basicInfos));
-		return script();
+		return helper();
 	}
-	return m_generated.at(scriptIt->script);
+	return m_generated.at(scriptIt->script).helper();
 }
 
-const ska::bytecode::ScriptGeneration& ska::bytecode::GenerationContext::scriptOfSymbol(const Symbol& symbol) const {
+const ska::bytecode::ScriptGenerationHelper& ska::bytecode::GenerationContext::scriptOfSymbol(const Symbol& symbol) const {
 	const auto* scriptIt = m_generated.getSymbolInfo(symbol);
 	if (scriptIt == nullptr) {
-		return script();
+		return helper();
 	}
-	return m_generated.at(scriptIt->script);
+	return m_generated.at(scriptIt->script).helper();
+}
+
+ska::ScriptASTPtr ska::bytecode::GenerationContext::useImport(const std::string& scriptImported) {
+	return helper().useImport(scriptImported);
 }
