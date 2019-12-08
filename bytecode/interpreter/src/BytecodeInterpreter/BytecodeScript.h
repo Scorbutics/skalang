@@ -13,7 +13,7 @@ namespace ska {
 		public:
 			Script(ScriptCache& cache, const std::string& fullName, std::vector<ska::Token> tokens) :
 				m_cache(cache),
-				m_serviceGen(m_cache, std::move(tokens), fullName) {}
+				m_serviceGen(cache.emplaceNamed(ScriptGeneration{ m_cache, std::move(tokens), fullName }, true)) {}
 
 			void generate(Generator& generator) {
 				m_serviceGen.generate(m_cache, generator);
@@ -45,7 +45,7 @@ namespace ska {
 			Operand findBytecodeMemoryFromSymbol(const Symbol& symbol) const;
 			const Symbol& findSymbolFromString(const std::string& key) const;
 			ScriptCache& m_cache;
-			ScriptGeneration m_serviceGen;
+			ScriptGeneration& m_serviceGen;
 			ScriptExecution* m_execution = nullptr;
 		};
 	}

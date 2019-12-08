@@ -46,22 +46,22 @@ namespace ska {
 			return *cache[index];
 		}
 
-		bool emplace(std::string scriptName, ScriptT script) {
+		bool emplace(std::string scriptName, ScriptT script, bool force = false) {
 			const auto wantedScriptId = namedMapCache.size();
 			const auto emplacedItem = namedMapCache.emplace(std::move(scriptName), wantedScriptId);
 			if(emplacedItem.second) {
 				pushCache(wantedScriptId, std::move(script));
 				return false;
-			} else {
+			} else if (force) {
 				pushCache(emplacedItem.first->second, std::move(script));
-				return true;
 			}
+			return true;
 		}
 
 		template <class ScriptTLocal>
-		ScriptTLocal& emplaceNamed(ScriptTLocal script) {
+		ScriptTLocal& emplaceNamed(ScriptTLocal script, bool force = false) {
 			auto name = script.name();
-			emplace(name, std::move(script));
+			emplace(name, std::move(script), force);
 			return at(name);
 		}
 
