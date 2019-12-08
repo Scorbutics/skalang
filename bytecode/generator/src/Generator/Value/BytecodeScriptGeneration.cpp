@@ -26,7 +26,7 @@ std::ostream& ska::bytecode::operator<<(std::ostream& stream, const ScriptGenera
 }
 
 void ska::bytecode::ScriptGeneration::generate(ScriptCache& cache, Generator& generator) {
-	auto context = GenerationContext{ cache, m_origin.id() };
+	auto context = GenerationContext{ cache, m_origin.program() };
 	m_generated = generator.generatePart(context);
 }
 

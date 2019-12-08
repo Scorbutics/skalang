@@ -13,7 +13,7 @@ namespace ska {
 		class GenerationContext {
 		public:
 			GenerationContext(GenerationOutput& output, ScriptGenerationHelper script);
-			GenerationContext(GenerationOutput& output, std::size_t scriptId);
+			GenerationContext(GenerationOutput& output, const ScriptAST& scriptAst);
 			GenerationContext(GenerationContext& old);
 			GenerationContext(GenerationContext& old, ScriptGenerationHelper script);
 

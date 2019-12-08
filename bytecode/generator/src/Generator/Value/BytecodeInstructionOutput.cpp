@@ -24,11 +24,11 @@ void ska::bytecode::InstructionOutput::push(InstructionOutput operand) {
 }
 
 void ska::bytecode::InstructionOutput::push(Operand operand) {
-	push( {std::move(operand) });
+	push(InstructionOutput {std::move(operand) });
 }
 
 void ska::bytecode::InstructionOutput::push(Instruction operand) {
-	push( {std::move(operand) });
+	push(InstructionOutput {std::move(operand) });
 }
 
 std::ostream& ska::bytecode::operator<<(std::ostream& stream, const InstructionOutput& output) {

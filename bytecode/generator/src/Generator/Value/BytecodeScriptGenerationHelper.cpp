@@ -13,9 +13,10 @@ ska::bytecode::ScriptGenerationHelper::ScriptGenerationHelper(std::size_t script
 
 ska::bytecode::ScriptGenerationHelper::ScriptGenerationHelper(ScriptCache& cache, const ScriptAST& script) {
 	const auto& name = script.name();
-  if (cache.find(name) != cache.end()) {
+  /*if (cache.find(name) != cache.end()) {
 		throw std::runtime_error("the script \"" + name + "\" already exists");
 	}
+*/
 	m_script = script.handle();
 	m_index = cache.id(name);
 }
