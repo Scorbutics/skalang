@@ -25,6 +25,7 @@ ska::BindingFactory::BindingFactory(TypeBuilder& typeBuilder, SymbolTableUpdater
 	observable_priority_queue<FunctionTokenEvent>::addObserver(m_typeBuilder);
 	observable_priority_queue<ScriptLinkTokenEvent>::addObserver(m_typeBuilder);
 
+	observable_priority_queue<FunctionTokenEvent>::addObserver(m_symbolTypeUpdater);
 	observable_priority_queue<VarTokenEvent>::addObserver(m_symbolTypeUpdater);
 }
 
@@ -46,6 +47,7 @@ void ska::BindingFactory::internalUnlisten(SymbolTable& symbolTable) {
 
 ska::BindingFactory::~BindingFactory() {
 	observable_priority_queue<VarTokenEvent>::removeObserver(m_symbolTypeUpdater);
+	observable_priority_queue<FunctionTokenEvent>::removeObserver(m_symbolTypeUpdater);
 
 	observable_priority_queue<ScriptLinkTokenEvent>::removeObserver(m_typeBuilder);
 	observable_priority_queue<FunctionTokenEvent>::removeObserver(m_typeBuilder);
