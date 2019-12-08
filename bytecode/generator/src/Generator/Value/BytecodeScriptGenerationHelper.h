@@ -27,7 +27,7 @@ namespace ska {
 namespace ska {
 	class ASTNode;
 	class ScriptAST;
-	class ScriptHandleAST;
+	struct ScriptHandleAST;
 
 	namespace bytecode {
 		class ScriptCache;

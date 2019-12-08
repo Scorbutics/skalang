@@ -27,10 +27,10 @@ ska::bytecode::RuntimeMemory ska::bytecode::Script::memoryField(const std::strin
 }
 
 void ska::bytecode::Script::memoryFromBridge(Interpreter& interpreter, std::vector<BridgeFunctionPtr> bindings) {
-  m_serviceGen.generate(interpreter.generator());
+  m_serviceGen.generate(m_cache, interpreter.generator());
   execute(interpreter);
 }
 
 std::unique_ptr<ska::bytecode::Executor> ska::bytecode::Script::execute(Interpreter& interpreter) {
-  return interpreter.interpret(m_serviceGen.id(), m_serviceGen.wholeGenerated());
+  return interpreter.interpret(m_serviceGen.id(), m_cache);
 }

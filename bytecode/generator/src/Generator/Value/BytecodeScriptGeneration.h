@@ -22,10 +22,8 @@ namespace ska {
 		class ScriptGeneration {
 			friend class InstructionOutput;
 		public:
-			ScriptGeneration(ScriptGenerationHelper origin, InstructionOutput instruction = {}) :
-				m_origin(std::move(origin)),
-				m_generated(std::move(instruction)) {
-			}
+			ScriptGeneration(ScriptGenerationHelper origin, InstructionOutput instruction = {});
+			ScriptGeneration(ScriptCache& cache, std::vector<ska::Token> tokens, const std::string& name);
 
 			ScriptGeneration(ScriptGeneration&&) = default;
 			ScriptGeneration(const ScriptGeneration&) = delete;
@@ -43,10 +41,11 @@ namespace ska {
 
 			//TODO lazy-optimize with exportedSymbols ?
 			std::vector<Operand> generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const { return m_origin.generateExportedSymbols(std::move(symbolsInfo)); }
+			std::optional<Operand> getSymbol(const Symbol& symbol) const;
 
 			ScriptGenerationHelper& helper() { return m_origin; }
 
-			ScriptAST program() { return m_origin.program(); }
+			ScriptAST program() const { return m_origin.program(); }
 			bool empty() const { return m_generated.empty(); }
 			std::size_t size() const { return m_generated.size(); }
 			std::size_t id() const { return m_origin.id(); }
@@ -60,7 +59,7 @@ namespace ska {
 		private:
 			friend std::ostream& operator<<(std::ostream& stream, const ScriptGeneration&);
 
-			void push(ScriptGeneration output);
+			//void push(ScriptGeneration output);
 
 			ScriptGenerationHelper m_origin;
 			std::vector<Operand> m_exports;
