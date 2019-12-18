@@ -53,7 +53,7 @@ ska::bytecode::Register ska::bytecode::GenerationContext::queryNextRegister() {
 }
 
 std::pair<std::size_t, ska::bytecode::ScriptGeneration*> ska::bytecode::GenerationContext::script(const std::string& fullScriptName) {
-	return std::make_pair(m_generated.id(fullScriptName), &m_generated.at(fullScriptName));
+	return std::make_pair(m_generated.id(fullScriptName), m_generated.atOrNull(fullScriptName));
 }
 
 void ska::bytecode::GenerationContext::setSymbolInfo(const ASTNode& node, SymbolInfo info) {

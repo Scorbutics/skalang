@@ -1,7 +1,7 @@
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeScriptCache.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::ScriptCache);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::ScriptCache);
 
 
 void ska::bytecode::ScriptCache::setSymbolInfo(const ASTNode& node, SymbolInfo info) {
@@ -12,7 +12,7 @@ void ska::bytecode::ScriptCache::setSymbolInfo(const ASTNode& node, SymbolInfo i
 }
 
 void ska::bytecode::ScriptCache::setSymbolInfo(const Symbol& symbol, SymbolInfo info) {
-	SLOG(ska::LogLevel::Debug) << " Setting " << symbol.getName();
+	SLOG(ska::LogLevel::Debug) << " Setting " << symbol.getName() << " with key 0x" << &symbol;
 	m_symbolInfo[&symbol] = std::move(info);
 }
 

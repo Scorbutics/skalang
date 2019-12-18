@@ -34,6 +34,11 @@ namespace ska {
 			return index < cache.size() && cache[index] != nullptr;
 		}
 
+		auto* atOrNull(const std::string& scriptName) {
+			const auto it = namedMapCache.find(scriptName);
+			return it != namedMapCache.end() ? &at(it->second) : nullptr;
+		}
+
 		auto& at(const std::string& scriptName) {
 			const auto index = namedMapCache.at(scriptName);
 			return at(index);
@@ -52,7 +57,7 @@ namespace ska {
 			if(emplacedItem.second) {
 				pushCache(wantedScriptId, std::move(script));
 				return false;
-			} else if (force) {
+			} else if (force || !exist(emplacedItem.first->second)) {
 				pushCache(emplacedItem.first->second, std::move(script));
 			}
 			return true;
@@ -104,13 +109,12 @@ namespace ska {
 		using ScriptContainer = std::vector<ScriptTPtr>;
 
 		void pushCachePtr(std::size_t index, ScriptTPtr script) {
-			if(index >= cache.size()) {
-				cache.resize(index + 1);
-			}
+			resizeIfTooSmall(index + 1);
 			cache[index] = std::move(script);
 		}
 
 		void pushCache(std::size_t index, ScriptT script) {
+			resizeIfTooSmall(index + 1);
 			if constexpr(is_smart_ptr<ScriptT>::value) {
 				cache[index] = std::move(script);
 			} else {

@@ -63,7 +63,7 @@ ska::bytecode::Generator::Generator(const ReservedKeywordsPool& reserved) :
 
 ska::bytecode::InstructionOutput ska::bytecode::Generator::generatePart(GenerationContext node) {
 	const auto& operatorNode = node.pointer().op();
-	LOG_DEBUG << "Generating " << operatorNode << " " << node.pointer();
+	LOG_DEBUG << "[" << node.scriptName() << "] Generating " << operatorNode << " " << node.pointer();
 	auto& builder = m_operatorGenerator[static_cast<std::size_t>(operatorNode)];
 	assert(builder != nullptr);
 	return builder->generate(node);
@@ -71,7 +71,8 @@ ska::bytecode::InstructionOutput ska::bytecode::Generator::generatePart(Generati
 
 const ska::bytecode::ScriptGeneration& ska::bytecode::Generator::generate(ScriptCache& cache, ScriptGenerationHelper script) {
 	auto scriptGenName = script.name();
-	auto index = cache.emplace(scriptGenName, std::move(script));
+	auto index = script.id();
+	assert(cache.emplace(scriptGenName, std::move(script)));
 	return generate(cache, index);
 }
 

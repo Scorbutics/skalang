@@ -12,7 +12,7 @@ ska::ScriptAST::ScriptAST(ScriptCacheAST& scriptCache, const std::string& name, 
 	if(m_cache->find(name) == m_cache->end()) {
 		auto handle = std::unique_ptr<ScriptHandleAST>(new ScriptHandleAST{ *m_cache, std::move(input), startIndex, name });
 		SLOG(LogLevel::Info) << "Adding script AST " << name << " in cache";
-		m_cache->emplace(name, std::move(handle));
+		m_cache->emplace(name, std::move(handle), true);
 	} else {
 		SLOG(LogLevel::Info) << "Script AST " << name << " is already in cache";
 		m_inCache = true;

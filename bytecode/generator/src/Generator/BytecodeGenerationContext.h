@@ -38,6 +38,7 @@ namespace ska {
 			std::optional<Operand> getSymbol(const Symbol& symbol) const;
 
 			const auto scriptIndex() const { return m_script.id(); }
+			auto scriptName() const { return m_script.name(); }
 
 		private:
 			ScriptGenerationHelper& helper();

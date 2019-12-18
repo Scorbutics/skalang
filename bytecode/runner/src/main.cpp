@@ -33,13 +33,13 @@ static ska::bytecode::ScriptGenerationHelper BasicProgramScriptStarter(ska::lang
 	auto scriptFileName = std::string{ argv[1] };
 	auto scriptName = scriptFileName.substr(0, scriptFileName.find_last_of('.'));
 
-	const auto scriptStarter = "var Script = import \"wd:" + scriptName + "\";"
+	const auto scriptStarter = "var Script = import \"" + scriptName + "\";"
 	"var ParametersGenerator = import \"bind:std.native.parameter\";"
 	"Script.run(ParametersGenerator.Gen(\"" + scriptName + "\"));";
 
 	auto executor = ska::ScriptAST{ module.scriptAstCache, "main", ska::Tokenizer{ module.reservedKeywords, scriptStarter}.tokenize() };
 	executor.parse(module.parser);
-	return ska::bytecode::ScriptGenerationHelper{ 0, executor};
+	return ska::bytecode::ScriptGenerationHelper{ module.scriptCache, executor};
 }
 
 static ska::lang::ParameterModule<ska::bytecode::Interpreter> BasicParameterModuleBuilder(ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>& module, std::vector<ska::NodeValue>& parameters, int argc, char* argv[]) {
