@@ -8,7 +8,7 @@
 
 using GeneratorOperatorCurrent = ska::bytecode::GeneratorOperator<ska::Operator::SCRIPT_LINK>;
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, GeneratorOperatorCurrent);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, GeneratorOperatorCurrent);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, GeneratorOperatorCurrent)
 
