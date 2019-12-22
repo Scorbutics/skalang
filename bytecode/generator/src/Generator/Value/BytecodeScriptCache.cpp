@@ -12,14 +12,17 @@ void ska::bytecode::ScriptCache::setSymbolInfo(const ASTNode& node, SymbolInfo i
 }
 
 void ska::bytecode::ScriptCache::setSymbolInfo(const Symbol& symbol, SymbolInfo info) {
-	SLOG(ska::LogLevel::Debug) << " Setting " << symbol.getName() << " with key 0x" << &symbol;
+	SLOG(ska::LogLevel::Debug) << "[Cache " << this << "] Setting " << info << " (" << symbol.getName() << ") with key 0x" << &symbol;
 	m_symbolInfo[&symbol] = std::move(info);
 }
 
 const ska::bytecode::SymbolInfo* ska::bytecode::ScriptCache::getSymbolInfo(const Symbol& symbol) const {
+	SLOG(ska::LogLevel::Debug) << "[Cache " << this << "] Getting " << symbol.getName() << " with key 0x" << &symbol;
 	if(m_symbolInfo.find(&symbol) == m_symbolInfo.end()) {
+		SLOG(ska::LogLevel::Debug) << "\t NULL";
 		return nullptr;
 	}
+	SLOG(ska::LogLevel::Debug) << "\t NOT NULL";
 	return &m_symbolInfo.at(&symbol);
 }
 
