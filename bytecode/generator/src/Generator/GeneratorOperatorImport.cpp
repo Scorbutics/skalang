@@ -16,11 +16,11 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	const auto& scriptImportedName = *importGroup.operand().as<StringShared>();
 	auto [importedScriptIndex, importedScript] = context.script(scriptImportedName);
 
-	if(importedScript == nullptr && importedScriptIndex == std::numeric_limits<std::size_t>::max()) {
+	if(importedScript == nullptr /*&& importedScriptIndex == std::numeric_limits<std::size_t>::max()*/) {
 		LOG_DEBUG << "%10cUnknown script " << scriptImportedName << ", generating it...";
 		auto scriptImported = context.useImport(scriptImportedName);
 		assert(scriptImported != nullptr);
-		auto scriptContext = GenerationContext{context, ScriptGenerationHelper{context.totalScripts() + 1, *scriptImported }};
+		auto scriptContext = GenerationContext{context, ScriptGenerationHelper{importedScriptIndex, *scriptImported }};
 		generateNext(scriptContext);
 		LOG_DEBUG << "%10cGenerated script.";
 		std::tie(importedScriptIndex, importedScript) = context.script(scriptImportedName);
