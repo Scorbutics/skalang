@@ -117,6 +117,34 @@ TEST_CASE("[BytecodeGenerator] Custom object creation") {
 	});
 }
 
+TEST_CASE("[BytecodeGenerator] Use complex call inside function parameters") {
+	constexpr auto progStr =
+		"var titi = function() : var { return { test : \"tulululu\" }; };"
+		"var toto = function(arg1 : string) : void {};"
+		"toto(titi().test);";
+
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
+	auto& res = data.generator->generate(data.storage, std::move(astPtr));
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::JUMP_REL, "4"},
+		{ska::bytecode::Command::MOV, "V0", "tulululu"},
+		{ska::bytecode::Command::PUSH, "V0"},
+		{ska::bytecode::Command::POP_IN_VAR, "R0", "1"},
+		{ska::bytecode::Command::RET, "R0"},
+		{ska::bytecode::Command::END, "V1", "-5"},
+		{ska::bytecode::Command::JUMP_REL, "2"},
+		{ska::bytecode::Command::POP, "V2"},
+		{ska::bytecode::Command::RET },
+		{ska::bytecode::Command::END, "V3", "-3"},
+		{ska::bytecode::Command::JUMP_ABS, "V1"},
+		{ska::bytecode::Command::POP, "R1"},
+		{ska::bytecode::Command::ARR_ACCESS, "R2", "R1", "0"},
+		{ska::bytecode::Command::PUSH, "R2"},
+		{ska::bytecode::Command::JUMP_ABS, "V3"}
+	});
+}
+
 TEST_CASE("[BytecodeGenerator] Custom object creation2") {
 	constexpr auto progStr =
 		"var toto = function() : var {"
