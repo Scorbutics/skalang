@@ -12,20 +12,21 @@
 #include "std/module/io/path.h"
 
 static ska::bytecode::ScriptGenerationHelper Interpret(BytecodeInterpreterDataTestContainer& data, const std::string& input) {
-	ASTFromInputBytecodeInterpreterNoParse(input, data);
 	readerI->parse(*data.parser);
 	return ska::bytecode::ScriptGenerationHelper{data.storage, *readerI };
 }
 
 TEST_CASE("[BytecodeInterpreter] Binding std : path") {
-	auto data = BytecodeInterpreterDataTestContainer{};
-  auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { data.storage.astCache, data.storage, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords, *data.parser, *data.interpreter};
-  auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
-
   constexpr auto progStr =
   "var PathFcty = import \"bind:std.native.io.path\";"
   "var path = PathFcty.Build(\"" SKALANG_TEST_DIR "\");"
   "path.canonical();";
+
+	auto data = BytecodeInterpreterDataTestContainer{};
+	ASTFromInputBytecodeInterpreterNoParse(progStr, data);
+
+  auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { data.storage.astCache, data.storage, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords, *data.parser, *data.interpreter};
+  auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
 
 	auto script = Interpret(data, progStr);
 	auto& gen = data.generator->generate(data.storage, std::move(script));
