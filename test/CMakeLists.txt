@@ -24,3 +24,6 @@ target_link_libraries(skalang_test skalang skalang_std skalang_interpreter skala
 target_include_directories(skalang_test PUBLIC ../external/skalog/src/src)
 target_include_directories(skalang_test PUBLIC ../external/skabase/src/src)
 target_include_directories(skalang_test PUBLIC ../external/doctest)
+
+add_subdirectory(${SKALANG_INTERPRETER_TEST_DIR})
+add_subdirectory(${SKALANG_BYTECODE_TEST_DIR})
