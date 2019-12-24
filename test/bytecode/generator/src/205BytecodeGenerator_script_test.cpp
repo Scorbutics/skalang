@@ -8,7 +8,7 @@ using namespace ska::bytecode;
 TEST_CASE("[BytecodeGenerator] import ") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var Player = import \"" SKALANG_TEST_DIR "/src/resources/play\";");
 	auto& res = data.generator->generate(data.storage, std::move(astPtr));
-	CHECK(res.size() == 3);
+	CHECK(res.size() == 2);
 	BytecodeCompare(res, {
 		{ Command::SCRIPT, "R0", "1" },
 		{ Command::MOV, "V0", "R0" }

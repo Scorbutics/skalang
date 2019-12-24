@@ -43,7 +43,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion array + array") {
 		{ska::bytecode::Command::POP_IN_ARR, "R0", "1"},
 		{ska::bytecode::Command::PUSH, "7", "12", "25"},
 		{ska::bytecode::Command::POP_IN_ARR, "R1", "3"},
-		{ska::bytecode::Command::PUSH_ARR_ARR, "R2", "R0", "R1"},
+		{ska::bytecode::Command::PUSH_F_ARR, "R2", "R0", "R1"},
 		{ska::bytecode::Command::MOV, "V0", "R2"}
 	});
 }
