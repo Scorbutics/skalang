@@ -15,6 +15,7 @@ namespace ska {
 			GenerationContext(GenerationOutput& output, ScriptGenerationHelper script);
 			GenerationContext(GenerationOutput& output, const ScriptAST& scriptAst);
 			GenerationContext(GenerationContext& old);
+			GenerationContext(GenerationContext& old, const ScriptAST& scriptAst);
 			GenerationContext(GenerationContext& old, ScriptGenerationHelper script);
 
 			GenerationContext(GenerationContext&& mv) = default;

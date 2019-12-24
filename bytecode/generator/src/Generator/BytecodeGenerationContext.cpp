@@ -17,6 +17,12 @@ ska::bytecode::GenerationContext::GenerationContext(GenerationOutput& output, co
 	m_pointer(&m_script.rootASTNode()) {
 }
 
+ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, const ScriptAST& scriptAst) :
+	m_generated(old.m_generated),
+	m_script(m_generated.emplaceNamed(ScriptGeneration { ScriptGenerationHelper{m_generated, scriptAst} })),
+	m_pointer(&m_script.rootASTNode()) {
+}
+
 std::size_t ska::bytecode::GenerationContext::totalScripts() const {
 	return m_generated.size();
 }
