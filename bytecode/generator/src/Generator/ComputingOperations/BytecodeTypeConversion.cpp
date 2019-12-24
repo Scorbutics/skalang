@@ -126,7 +126,6 @@ namespace ska {
 			EnqueueConverterItemPack<OperationType::FULL_FIRST, CommandPackOr<Command::PUSH_F_ARR, Command::PUSH_B_ARR>>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::STRING, ExpressionType::ARRAY);
 			EnqueueConverterItemPack<OperationType::FULL_FIRST, CommandPackOr<Command::PUSH_F_ARR, Command::PUSH_B_ARR>>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::FLOAT, ExpressionType::ARRAY);
 			EnqueueConverterItemPack<OperationType::FULL_FIRST, CommandPackOr<Command::PUSH_F_ARR, Command::PUSH_B_ARR>>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::BOOLEAN, ExpressionType::ARRAY);
-			EnqueueConverterItemPack<OperationType::FULL_FIRST, CommandPackOr<Command::PUSH_F_ARR, Command::PUSH_B_ARR>>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::ARRAY, ExpressionType::ARRAY);
 			EnqueueConverterItemPack<OperationType::FULL_FIRST, CommandPackOr<Command::PUSH_F_ARR, Command::PUSH_B_ARR>>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::FUNCTION, ExpressionType::ARRAY);
 			EnqueueConverterItemPack<OperationType::FULL_FIRST, CommandPackOr<Command::PUSH_F_ARR, Command::PUSH_B_ARR>>::enqueue(result, LogicalOperator::ADDITION, ExpressionType::OBJECT, ExpressionType::ARRAY);
 
