@@ -1,27 +1,2 @@
-project(skalang_bytecode_test)
-
-include_directories(${SKALANG_SRC_DIR}/src)
-include_directories(${SKALANG_TEST_DIR}/src)
-include_directories(${SKALANG_STD_DIR}/src)
-include_directories(${SKALANG_INTERPRETER_DIR}/src)
-include_directories(${SKALANG_BYTECODE_GEN_DIR}/src)
-include_directories(${SKALANG_BYTECODE_INT_DIR}/src)
-
-link_directories(../../lib)
-
-#Unit Tests part
-file(GLOB_RECURSE SOURCES
-	src/*.h
-	src/*.cpp
-)
-
-string(REGEX REPLACE "[^;]*CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
-
-add_definitions(-DSKALANG_BYTECODE_TEST_DIR="${SKALANG_BYTECODE_TEST_DIR}")
-add_executable(skalang_bytecode_test ${SOURCES})
-
-find_package(Threads REQUIRED)
-target_link_libraries(skalang_bytecode_test skalang skalang_std skalang_interpreter skalang_bytecode_generator skalang_bytecode_interpreter skalog skabase Threads::Threads)
-target_include_directories(skalang_bytecode_test PUBLIC ../../external/skalog/src/src)
-target_include_directories(skalang_bytecode_test PUBLIC ../../external/skabase/src/src)
-target_include_directories(skalang_bytecode_test PUBLIC ../../external/doctest)
+add_subdirectory(${SKALANG_BYTECODE_TEST_DIR}/generator)
+add_subdirectory(${SKALANG_BYTECODE_TEST_DIR}/interpreter)
