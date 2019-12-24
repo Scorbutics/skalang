@@ -86,7 +86,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	auto result = InstructionOutput{ };
-	ApplyNOperations<Command::POP>(result, context, node, node.GetParameterSize());
+	applyGenerator(ApplyNOperations<Command::POP, OperateOn&>, result, context, node, node.GetParameterSize());
 	LOG_DEBUG << "\tParameters : " << result;
 	return result;
 }
@@ -98,7 +98,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	auto callInstruction = Instruction { Command::JUMP_ABS, std::move(preCallValue.operand()) };
 	auto result = std::move(preCallValue);
 
-	ApplyNOperations<Command::PUSH>(result, context, node, node.GetFunctionParameterSize());
+	applyGenerator(ApplyNOperations<Command::PUSH, OperateOn&>, result, context, node, node.GetFunctionParameterSize());
 	LOG_DEBUG << " PUSH result : " << result;
 
 	result.push(std::move(callInstruction));

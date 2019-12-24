@@ -33,3 +33,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	return CommonGenerate(*this, node.GetVariableNameNode(), node.GetVariableValueNode(), context);
 }
+
+ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::PARAMETER_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
+	return { context.querySymbolOrOperand(node.GetVariableNameNode()) };
+}

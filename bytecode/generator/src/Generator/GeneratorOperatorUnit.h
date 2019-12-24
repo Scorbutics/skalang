@@ -22,6 +22,11 @@ namespace ska {
 
 			InstructionOutput generateNext(GenerationContext node);
 
+			template <class Function, class ... Args>
+			decltype(auto) applyGenerator(Function f, Args&& ... args) {
+				return f(m_generator, std::forward<Args>(args)...);
+			}
+
 		private:
 			Generator& m_generator;
 		};

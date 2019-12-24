@@ -10,5 +10,6 @@ SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(POP_IN_ARR)(ExecutionContext& conte
 	auto result = std::make_shared<NodeValueArrayRaw>();
 	LOG_DEBUG << "Poping " << context.get<long>(left) << " elements from stack into a new array";
 	context.pop(*result, context.get<long>(left));
+	LOG_DEBUG << "Element poped : " << result;
 	return result;
 }
