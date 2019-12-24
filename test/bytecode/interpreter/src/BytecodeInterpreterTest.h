@@ -19,6 +19,10 @@ static auto readerI = std::unique_ptr<ska::ScriptAST>{};
 static auto scriptCacheI = ska::ScriptCacheAST{};
 static auto typeCrosserI = ska::TypeCrosser{};
 
+struct BytecodeInterpreterTest;
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, BytecodeInterpreterTest);
+#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, BytecodeInterpreterTest)
+
 static void ASTFromInputBytecodeInterpreterNoParse(const std::string& input, BytecodeInterpreterDataTestContainer& data) {
   tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);
   tokens = tokenizer->tokenize();

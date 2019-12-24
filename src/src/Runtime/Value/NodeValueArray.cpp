@@ -1,0 +1,8 @@
+#include "NodeValue.h"
+#include "NodeValueArray.h"
+
+std::ostream& ska::operator<<(std::ostream& stream, const NodeValueArray& nodeArray) {
+  for(const auto& val : *nodeArray) {
+    stream << val.convertString() << std::endl;
+  }
+}
