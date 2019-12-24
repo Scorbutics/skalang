@@ -1,5 +1,5 @@
 #pragma once
-
+#include <iostream>
 #include "std/module.h"
 #include "Runtime/Value/ObjectMemory.h"
 #include "Base/IO/Files/FileUtils.h"
@@ -18,7 +18,7 @@ namespace ska {
                 Module<Interpreter>::m_bridge.bindGenericFunction("Build", { "string", importPath.typeName("Fcty()") },
                     std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> buildParams) -> ska::NodeValue {
                     auto path = m_proxy.callFunction(config.interpreter, "Path", "Fcty", std::move(buildParams));
-					//std::cout << "LOLOILOL" << std::endl;
+					std::cout << "LOLOILOL" << std::endl;
                     /*
                     TODO
                     auto& memPath = path.template nodeval<Object>();
