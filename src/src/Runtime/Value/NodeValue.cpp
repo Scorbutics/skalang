@@ -43,6 +43,10 @@ double ska::NodeValue::convertNumeric() const {
 
 std::string ska::NodeValue::convertString() const {
 	auto result = std::string{};
+	if(empty()) {
+		return result;
+	}
+
 	if(std::holds_alternative<NodeValue*>(m_variant)) {
 		return std::get<NodeValue*>(m_variant)->convertString();
 	}
@@ -71,6 +75,8 @@ std::string ska::NodeValue::convertString() const {
 				throw std::runtime_error("cannot convert the node value to a string format");
 			}
 		}, valueVariant);
+	} else {
+		result = "__container__";
 	}
 	return result;
 }

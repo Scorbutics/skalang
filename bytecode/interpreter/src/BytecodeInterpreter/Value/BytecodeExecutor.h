@@ -18,6 +18,7 @@ namespace ska {
 			}
 
 			void pop(NodeValueArrayRaw& dest, long count) {
+				assert(stack.size() >= count);
 				for (auto i = 0; i < count && stack.size() > 0; i++) {
 					dest.push_front(stack.back());
 					stack.pop_back();
