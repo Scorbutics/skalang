@@ -8,7 +8,7 @@
 #include "Event/ScriptLinkTokenEvent.h"
 #include "NodeValue/ScriptAST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTable)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::SymbolTable)
 
 namespace ska::detail::symbol {
 	template <bool remove, class Event>
