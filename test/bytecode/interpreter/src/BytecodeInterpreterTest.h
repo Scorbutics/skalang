@@ -16,7 +16,6 @@ static const auto reservedKeywords = ska::ReservedKeywordsPool{};
 static auto tokenizer = std::unique_ptr<ska::Tokenizer>{};
 static std::vector<ska::Token> tokens;
 static auto readerI = std::unique_ptr<ska::ScriptAST>{};
-static auto scriptCacheI = ska::ScriptCacheAST{};
 static auto typeCrosserI = ska::TypeCrosser{};
 
 struct BytecodeInterpreterTest;
@@ -26,10 +25,9 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, BytecodeInterpreterTest);
 static void ASTFromInputBytecodeInterpreterNoParse(const std::string& input, BytecodeInterpreterDataTestContainer& data) {
   tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);
   tokens = tokenizer->tokenize();
-	scriptCacheI.clear();
-	readerI = std::make_unique<ska::ScriptAST>(scriptCacheI, "main", tokens);
+	readerI = std::make_unique<ska::ScriptAST>(data.storage.astCache, "main", tokens);
 
-  data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
+	data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosserI);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableUpdater>(*data.parser);
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, typeCrosserI);

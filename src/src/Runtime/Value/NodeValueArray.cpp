@@ -5,4 +5,5 @@ std::ostream& ska::operator<<(std::ostream& stream, const NodeValueArray& nodeAr
   for(const auto& val : *nodeArray) {
     stream << val.convertString() << std::endl;
   }
+  return stream;
 }
