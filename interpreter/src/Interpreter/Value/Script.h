@@ -32,7 +32,7 @@ namespace ska {
 			return m_cache.cache.exist(index);
 		}
 
-		void memoryFromBridge(Interpreter&, std::vector<BridgeFunctionPtr> bindings);
+		void memoryFromBridge(const ScriptAST& origin, Interpreter&, std::vector<BridgeFunctionPtr> bindings);
 
 		const auto& handle() const { return m_handle; }
 

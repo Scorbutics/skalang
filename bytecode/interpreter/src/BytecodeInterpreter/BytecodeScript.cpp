@@ -4,6 +4,9 @@
 #include "BytecodeInterpreter/BytecodeInterpreter.h"
 #include "Generator/BytecodeGenerator.h"
 
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Script);
+#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Script)
+
 ska::bytecode::Operand ska::bytecode::Script::findBytecodeMemoryFromSymbol(const Symbol& symbol) const {
   auto bytecodeSymbol = m_serviceGen.getSymbol(symbol);
   if (bytecodeSymbol.has_value()) {
@@ -26,9 +29,31 @@ ska::bytecode::RuntimeMemory ska::bytecode::Script::memoryField(const std::strin
   return RuntimeMemory { findBytecodeMemoryFromSymbol(symbolAst) };
 }
 
-void ska::bytecode::Script::memoryFromBridge(Interpreter& interpreter, std::vector<BridgeFunctionPtr> bindings) {
-  //TODO generate bindings !
-    m_serviceGen.generate(m_cache, interpreter.generator());
+void ska::bytecode::Script::memoryFromBridge(const ScriptAST& templateScriptAst, Interpreter& interpreter, std::vector<BridgeFunctionPtr> bindings) {
+  LOG_DEBUG << "%14cGenerating " << bindings.size() << " bindings for script " << m_serviceGen.name() << " linked to " << templateScriptAst.name();
+
+  auto templateScriptGenerationContext = GenerationContext{m_cache, templateScriptAst};
+
+  //TODO parameter : "Fcty"
+  const auto* symbol = templateScriptAst.symbols()["Fcty"];
+  //TODO exceptions instead of assertions
+  assert(symbol != nullptr && !symbol->getType().compound().empty());
+  const auto* subSymbol = symbol->getType().compound().back().symbol();
+  assert(subSymbol != nullptr);
+
+  auto symbolInfo = ska::bytecode::SymbolInfo{1, subSymbol->getName(), m_serviceGen.id() };
+  symbolInfo.binding = true;
+  m_cache.setSymbolInfo(*subSymbol, std::move(symbolInfo)),
+
+  LOG_DEBUG << " %14cConstructor sub-symbol type to bind : \"" << (*subSymbol).getType() << "\"";
+
+  /*auto templateGenerated = interpreter.generator().generatePart(std::move(templateScriptGenerationContext));
+  for(const auto& binding : templateGenerated) {
+    LOG_DEBUG << " %14cGenerated template instruction \"" << binding << "\"";
+  }*/
+  LOG_DEBUG << "%14cGenerated";
+  
+  m_serviceGen.generate(m_cache, interpreter.generator());
   execute(interpreter);
 }
 

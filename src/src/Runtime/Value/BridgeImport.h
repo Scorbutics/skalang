@@ -12,6 +12,7 @@ namespace ska {
   struct BridgeImport {
     ASTNode* node;
     ScriptHandleAST* script;
+    std::string constructorMethod;
 
     Type type(const std::string& field) const {
       const auto* symbol = script->symbols()[field];
@@ -21,10 +22,18 @@ namespace ska {
       return symbol->getType();
     }
 
+    Type constructor() const {
+      return type(constructorMethod);
+    }
+
     std::string typeName(const std::string& field) const {
-      auto& nodeName = (*node)[0];
+      const auto& nodeName = (*node)[0];
       assert(!nodeName.name().empty());
       return nodeName.name() + "::" + field;
+    }
+
+    std::string typeName() const {
+      return typeName(constructorMethod + "()");
     }
 
     const auto& symbols() const {

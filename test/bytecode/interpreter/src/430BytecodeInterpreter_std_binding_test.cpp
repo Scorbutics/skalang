@@ -16,10 +16,26 @@ static ska::bytecode::ScriptGenerationHelper Interpret(BytecodeInterpreterDataTe
 	return ska::bytecode::ScriptGenerationHelper{data.storage, *readerI };
 }
 
-TEST_CASE("[BytecodeInterpreter] Binding std : path") {
+TEST_CASE("[BytecodeInterpreter] Binding std : path import only") {
   constexpr auto progStr =
   "var PathFcty = import \"bind:std.native.io.path\";"
-  "var path = PathFcty.Build(\"" SKALANG_TEST_DIR "\");"
+  "var path = PathFcty.Fcty(\"" SKALANG_TEST_DIR "\");";
+
+	auto data = BytecodeInterpreterDataTestContainer{};
+	ASTFromInputBytecodeInterpreterNoParse(progStr, data);
+
+  auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { data.storage.astCache, data.storage, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords, *data.parser, *data.interpreter};
+  auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
+
+	auto script = Interpret(data, progStr);
+	auto& gen = data.generator->generate(data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
+}
+
+TEST_CASE("[BytecodeInterpreter] Binding std : path + bridge function call") {
+  constexpr auto progStr =
+  "var PathFcty = import \"bind:std.native.io.path\";"
+  "var path = PathFcty.Fcty(\"" SKALANG_TEST_DIR "\");"
   "path.canonical();";
 
 	auto data = BytecodeInterpreterDataTestContainer{};

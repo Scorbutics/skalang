@@ -11,10 +11,11 @@
 #include "BindingFactory.h"
 #include "Service/Matcher/MatcherImport.h"
 #include "NodeValue/ScriptAST.h"
+#include "Runtime/Value/BridgeImport.h"
 
 #include "Service/ScriptNameBuilder.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::BindingFactory)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::BindingFactory)
 
 ska::BindingFactory::BindingFactory(TypeBuilder& typeBuilder, SymbolTableUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved) :
 	m_reserved(reserved),
@@ -84,8 +85,30 @@ ska::BridgeImportRaw ska::BindingFactory::import(StatementParser& parser, Script
 	return { std::move(varNode), boundScript->handle() };
 }
 
-ska::ASTNodePtr ska::BindingFactory::bindSymbol(ScriptAST& script, const std::string& functionName, std::vector<std::string> typeNames) {
+ska::ASTNodePtr ska::BindingFactory::bindSymbol(ScriptAST& script, BridgeImport* context, const std::string& functionName, std::vector<std::string> typeNames) {
 	auto lock = BindingFactorySymbolTableLock{*this, script.symbols() };
+
+	// Handle the sub constructor case
+	if (context != nullptr) {
+		auto constructor = context->constructor();
+		const auto* functionToBind = constructor[functionName];
+		if (functionToBind == nullptr) {
+			auto ss = std::stringstream {};
+			ss << "unable to find function \"" << functionName << "\" in constructor to bind in script " << context->script->name();
+			ss << " (constructor type is \"" << constructor << "\")";
+			throw std::runtime_error(ss.str());
+		}
+		SLOG(LogLevel::Info) << " %15cRegistering constructor : " << constructor.symbol()->getName();
+		auto constructorTypeNames = std::vector<std::string>{};
+		for(const auto ct : constructor.compound()) {
+			std::stringstream ss;
+			ss << ct;
+			SLOG(LogLevel::Info) << " %15cconstructor type name : " << ct;
+			constructorTypeNames.push_back(ss.str());
+		}
+
+		bindSymbol(script, nullptr, constructor.symbol()->getName(), std::move(constructorTypeNames));
+	}
 
 	//Build the function
 	auto functionNameToken = Token{ functionName, TokenType::IDENTIFIER, {} };

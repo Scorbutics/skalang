@@ -13,10 +13,7 @@
 namespace ska {
 
 	template <class Interpreter>
-	using ScriptBridge = ska::ScriptBinding<
-		typename InterpreterTypes<Interpreter>::Script,
-		typename InterpreterTypes<Interpreter>::ScriptCache
-	>;
+	using ScriptBridge = ska::ScriptBinding<Interpreter>;
 
 	class ScriptProxyAST {
 		//TODO static & bytecode gen part of ScriptProxy here

@@ -63,7 +63,7 @@ namespace ska {
 			return ss;
 		}
 
-		ASTNodePtr bindSymbol(ScriptAST& script, const std::string& functionName, std::vector<std::string> typeNames);
+		ASTNodePtr bindSymbol(ScriptAST& script, BridgeImport* context, const std::string& functionName, std::vector<std::string> typeNames);
 
 	private:
 		void internalUnlisten(SymbolTable& symbolTable);

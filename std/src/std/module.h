@@ -1,39 +1,22 @@
 #pragma once
 
 #include "Runtime/Service/ScriptBinding.h"
-#include "Runtime/Value/InterpreterTypes.h"
+#include "Runtime/Value/ModuleConfiguration.h"
 
 namespace ska {
-    class TypeBuilder;
-    class SymbolTableUpdater;
-    struct ReservedKeywordsPool;
-    class StatementParser;
-    class Interpreter;
 
     namespace lang {
         template <class Interpreter>
-        struct ModuleConfiguration {
-            ScriptCacheAST& scriptAstCache;
-            typename InterpreterTypes<Interpreter>::ScriptCache& scriptCache;
-            TypeBuilder& typeBuilder;
-            SymbolTableUpdater& symbolTableUpdater;
-            const ReservedKeywordsPool& reservedKeywords;
-            StatementParser& parser;
-            Interpreter& interpreter;
-        };
-
-        template <class Interpreter>
         class Module {
         public:
-            Module(ModuleConfiguration<Interpreter>& config, std::string moduleName):
-                m_bridge{ config.scriptCache, config.scriptAstCache, std::move(moduleName), config.typeBuilder, config.symbolTableUpdater, config.reservedKeywords } {
+            Module(ModuleConfiguration<Interpreter>& config, std::string moduleName, std::string templateScriptName):
+                m_bridge{ config, std::move(moduleName), std::move(templateScriptName) } {
             }
 
             virtual ~Module() = default;
 
         protected:
-            using ScriptBridge = ScriptBinding<typename InterpreterTypes<Interpreter>::Script, typename InterpreterTypes<Interpreter>::ScriptCache>;
-            ScriptBridge m_bridge;
+            ScriptBinding<Interpreter> m_bridge;
         };
     }
 }

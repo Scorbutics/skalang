@@ -70,6 +70,7 @@ ska::ASTNode& ska::ScriptAST::fromBridge(std::vector<BridgeFunctionPtr>& binding
 	if (!bindings.empty()) {
 		bindingsAST.reserve(bindings.size());
 		std::transform(bindings.begin(), bindings.end(), std::back_inserter(bindingsAST), [](auto& el) {
+			el->nodeRef = el->node.get();
 			return std::move(el->node);
 		});
 	}

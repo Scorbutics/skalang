@@ -10,9 +10,11 @@
 #include "BindingFactory.h"
 #include "Event/VarTokenEvent.h"
 #include "NodeValue/ScriptCacheAST.h"
+#include "NodeValue/ScriptASTPtr.h"
 #include "NodeValue/ScriptAST.h"
 #include "Runtime/Value/NodeValue.h"
 #include "Runtime/Value/InterpreterTypes.h"
+#include "Runtime/Value/ModuleConfiguration.h"
 
 namespace ska {
 	class ScriptBindingBase;
@@ -28,8 +30,10 @@ namespace ska {
         protected observable_priority_queue<VarTokenEvent> {
 	public:
 		ScriptBindingBase (
+			StatementParser& parser,
       ScriptCacheAST& cache,
 			std::string scriptName,
+			std::string templateScriptName,
 			TypeBuilder& typeBuilder,
 			SymbolTableUpdater& symbolTypeUpdater,
 			const ReservedKeywordsPool& reserved);
@@ -45,10 +49,15 @@ namespace ska {
 			m_bindings.push_back(bindGenericFunction_(m_script, functionName, std::move(typeNames), std::move(f)));
 		}
 
+		void bindGenericFunction(BridgeImport& importTemplate, const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
+			m_bindings.push_back(bindGenericFunction_(m_script, importTemplate, functionName, std::move(typeNames), std::move(f)));
+		}
+
 		const auto& name() const { return m_script.name(); }
+		const std::string& templateName() const;
 
 	protected:
-		BridgeImport import(StatementParser& parser, std::pair<std::string, std::string> import);
+		BridgeImport import(std::string constructorMethod, StatementParser& parser, std::pair<std::string, std::string> import);
 
 		template <class Interpreter>
 		void buildFunctions(Interpreter& interpreter, typename InterpreterTypes<Interpreter>::Script& script) {
@@ -60,24 +69,32 @@ namespace ska {
 			auto& scriptAstNode = m_script.fromBridge(m_bindings);
       registerAST(scriptAstNode);
 
-			script.memoryFromBridge(interpreter, std::move(m_bindings));
+			assert(m_templateScript != nullptr && "Template script was not AST-generated");
+			script.memoryFromBridge(*m_templateScript, interpreter, std::move(m_bindings));
 
       m_bindings = { };
     }
 
+		void generateAst();
 
 	private:
 		template <class ReturnType, class ... ParameterTypes>
 		BridgeFunctionPtr bindFunction_(ScriptAST& script, const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
 			auto result = makeScriptSideBridge(std::move(f));
 			auto typeNames = m_functionBinder.template buildTypes<ParameterTypes..., ReturnType>();
-			result->node = m_functionBinder.bindSymbol(script, functionName, std::move(typeNames));
+			result->node = m_functionBinder.bindSymbol(script, nullptr, functionName, std::move(typeNames));
 			return result;
 		}
 
 		BridgeFunctionPtr bindGenericFunction_(ScriptAST& script, const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
 			auto result = std::make_shared<BridgeFunction>(std::move(f));
-			result->node = m_functionBinder.bindSymbol(script, functionName, std::move(typeNames));
+			result->node = m_functionBinder.bindSymbol(script, nullptr, functionName, std::move(typeNames));
+			return result;
+		}
+
+		BridgeFunctionPtr bindGenericFunction_(ScriptAST& script, BridgeImport& importTemplate, const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
+			auto result = std::make_shared<BridgeFunction>(std::move(f));
+			result->node = m_functionBinder.bindSymbol(script, &importTemplate, functionName, std::move(typeNames));
 			return result;
 		}
 
@@ -125,46 +142,66 @@ namespace ska {
 
     void registerAST(ASTNode& scriptAst);
 
+	protected:
+		StatementParser& m_parser;
+		ScriptASTPtr m_templateScript;
+
+	private:
 		TypeBuilder& m_typeBuilder;
 		SymbolTableUpdater& m_symbolTypeUpdater;
+		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		BindingFactory m_functionBinder;
 		std::string m_name;
+		std::string m_templateName;
 		ScriptAST m_script;
 		ScriptCacheAST& m_cache;
 
-		std::vector<ASTNodePtr> m_imports;
+		std::unordered_map<std::string, ASTNodePtr> m_imports;
 		std::vector<BridgeFunctionPtr> m_bindings;
 	};
 
-	template <class Script, class ScriptCache>
+	template <class Interpreter>
 	class ScriptBinding : public ScriptBindingBase {
+	using ScriptCache = typename InterpreterTypes<Interpreter>::ScriptCache;
+	using Script = typename InterpreterTypes<Interpreter>::Script;
+	using ModuleConfiguration = lang::ModuleConfiguration<Interpreter>;
 	public:
-		ScriptBinding(ScriptCache& cache,
-			ScriptCacheAST& astCache,
+		ScriptBinding(
+			ModuleConfiguration& moduleConf,
 			std::string scriptName,
-			TypeBuilder& typeBuilder,
-			SymbolTableUpdater& symbolTypeUpdater,
-			const ReservedKeywordsPool& reserved) :
-			ScriptBindingBase(astCache, scriptName, typeBuilder, symbolTypeUpdater, reserved),
-			m_script(cache, ScriptBindingBase::name(), std::vector<Token>{}) {
+			std::string templateScriptName) :
+			ScriptBindingBase(moduleConf.parser, moduleConf.scriptAstCache, scriptName, std::move(templateScriptName), moduleConf.typeBuilder, moduleConf.symbolTableUpdater, moduleConf.reservedKeywords),
+			m_interpreter(moduleConf.interpreter),
+			m_script(moduleConf.scriptCache, ScriptBindingBase::name(), std::vector<Token>{}) {
 		}
 
-		template <class Interpreter>
-		void buildFunctions(Interpreter& interpreter) {
-			ScriptBindingBase::buildFunctions(interpreter, m_script);
+		void buildFunctions() {
+			ScriptBindingBase::buildFunctions(m_interpreter, m_script);
+		}
+
+		ska::BridgeImport generateTemplate(std::string constructorMethod) {
+			auto result = import(std::move(constructorMethod), { "BASE", ScriptBindingBase::templateName() });
+			ScriptBindingBase::generateAst();
+			/*
+			bindGenericFunction("Fcty", { "void", m_templateScript->symbols()[""] }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> buildParams) -> ska::NodeValue {
+					auto memory = createMemory();
+				return ska::NodeValue{ std::move(memory) };
+			} );
+			ScriptBindingBase::buildFunctions(m_interpreter, m_script);
+			*/
+			return result;
 		}
 
 		auto& script() { return m_script; }
 
-		
-		template <class Interpreter>
-		BridgeImport import(StatementParser& parser, Interpreter& interpreter, std::pair<std::string, std::string> import) {
-			auto importRef = ScriptBindingBase::import(parser, std::move(import));
-			interpreter.interpret({ m_script, *importRef.node });
+		BridgeImport import(std::string constructorMethod, std::pair<std::string, std::string> import) {
+			auto importRef = ScriptBindingBase::import(std::move(constructorMethod), m_parser, std::move(import));
+			m_interpreter.interpret({ m_script, *importRef.node });
 			return importRef;
 		}
 
 	private:
 		Script m_script;
+		Interpreter& m_interpreter;
 	};
 }

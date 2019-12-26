@@ -16,10 +16,10 @@ namespace ska {
         class ParameterModule : public Module<Interpreter> {
         public:
             ParameterModule(ModuleConfiguration<Interpreter>& config, const std::vector<NodeValue>& parameterValues) :
-                Module<Interpreter> { config, "std.native.parameter" },
+                Module<Interpreter> { config, "std.native.parameter", "" },
 				m_proxy(Module<Interpreter>::m_bridge),
 				m_parameters(parameterValues) {
-                auto parametersImport = Module<Interpreter>::m_bridge.import(config.parser, config.interpreter, {"Parameters", "std:std.function.parameters"});
+                auto parametersImport = Module<Interpreter>::m_bridge.import("Fcty", {"Parameters", "std:std.function.parameters"});
 
                 Module<Interpreter>::m_bridge.bindGenericFunction("Gen", { "string", parametersImport.typeName("Fcty") },
 					BridgeFunction::Callback ([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
@@ -42,7 +42,7 @@ namespace ska {
 
                     return result.value();
                 }));
-                Module<Interpreter>::m_bridge.buildFunctions(config.interpreter);
+                Module<Interpreter>::m_bridge.buildFunctions();
             }
 
             ~ParameterModule() override = default;

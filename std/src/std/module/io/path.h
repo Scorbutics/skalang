@@ -12,31 +12,17 @@ namespace ska {
         using Object = typename InterpreterTypes<Interpreter>::Memory;
         public:
             IOPathModule(ModuleConfiguration<Interpreter>& config) :
-                Module<Interpreter> {config, "std.native.io.path"},
+                Module<Interpreter> { config, "std.native.io.path", "std:std.io.path" },
                 m_proxy { Module<Interpreter>::m_bridge }  {
-                auto importPath = Module<Interpreter>::m_bridge.import(config.parser, config.interpreter, {"Path", "std:std.io.path"});
-                Module<Interpreter>::m_bridge.bindGenericFunction("Build", { "string", importPath.typeName("Fcty()") },
-                    std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> buildParams) -> ska::NodeValue {
-                    auto path = m_proxy.callFunction(config.interpreter, "Path", "Fcty", std::move(buildParams));
-					std::cout << "LOLOILOL" << std::endl;
-                    /*
-                    TODO
-                    auto& memPath = path.template nodeval<Object>();
 
-                    //Query input parameters
-                    const auto* memberPathValue = memPath["path"];
-                    assert(memberPathValue != nullptr);
-                    auto pathStr = std::move(memberPathValue->template nodeval<StringShared>());
-
-                    //Build output object
-                    memPath->emplace("canonical", std::make_shared<ska::BridgeFunction>(
-                        std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&, pathStr(std::move(pathStr))](std::vector<ska::NodeValue> unused) {
-                        return std::make_shared<std::string>(std::move(FileUtils::getCanonicalPath(*pathStr)));
-                    })));
-                    */
-                    return ska::NodeValue{ /*std::move(memPath)*/ };
+                auto importTemplate = Module<Interpreter>::m_bridge.generateTemplate("Fcty");
+                Module<Interpreter>::m_bridge.bindGenericFunction(importTemplate, "canonical", { "void", "string" },
+                std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> buildParams) -> ska::NodeValue {
+                        std::cout << "LOULOULOULOU" << std::endl;
+                        return std::make_shared<std::string>(std::move(FileUtils::getCanonicalPath(/*importTemplate.template param<StringShared>(0) */ "")));
                 }));
-                Module<Interpreter>::m_bridge.buildFunctions(config.interpreter);
+
+                Module<Interpreter>::m_bridge.buildFunctions();
             }
             ~IOPathModule() override = default;
         private:

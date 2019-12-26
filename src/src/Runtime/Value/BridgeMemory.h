@@ -24,14 +24,6 @@ namespace ska {
 			setupReferenceMemory();
 		}
 
-		void setupReferenceMemory() {
-			if constexpr (is_smart_ptr<Object>::value || std::is_pointer_v<Object>) {
-				refMemory = &(*memory);
-			} else {
-				refMemory = &memory;
-			}
-		}
-
 		template <class Value>
 		void push(const std::string& field, Value&& obj) {
 			/*if(symbol != nullptr && (*symbol)[field] == nullptr || symbol == nullptr && (*symbols)[field] == nullptr) {
@@ -45,6 +37,13 @@ namespace ska {
 		}
 
 	private:
+		void setupReferenceMemory() {
+			if constexpr (is_smart_ptr<Object>::value || std::is_pointer_v<Object>) {
+				refMemory = &(*memory);
+			} else {
+				refMemory = &memory;
+			}
+		}
 		Object memory;
 		Object* refMemory = nullptr;
 
