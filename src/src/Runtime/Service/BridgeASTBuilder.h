@@ -11,11 +11,13 @@
 #include "Event/FunctionTokenEvent.h"
 #include "Event/BlockTokenEvent.h"
 #include "Event/ImportTokenEvent.h"
+#include "Event/ReturnTokenEvent.h"
 #include "Event/ScriptLinkTokenEvent.h"
 #include "Container/sorted_observable.h"
 
 #include "Service/Matcher/MatcherType.h"
 #include "Runtime/Value/BridgeImport.h"
+#include "BridgeFunctionData.h"
 
 namespace ska {
 	class SymbolTable;
@@ -24,34 +26,35 @@ namespace ska {
 	struct ReservedKeywordsPool;
 	class StatementParser;
 
-	class BindingFactory;
-	class BindingFactorySymbolTableLock {
+	class BridgeASTBuilder;
+	class BridgeASTBuilderSymbolTableLock {
 	public:
-		BindingFactorySymbolTableLock(BindingFactory& factory, SymbolTable& table);
-		BindingFactorySymbolTableLock(BindingFactorySymbolTableLock&&) noexcept;
-		BindingFactorySymbolTableLock(const BindingFactorySymbolTableLock&) = delete;
-		BindingFactorySymbolTableLock& operator=(BindingFactorySymbolTableLock&&) = delete;
-		BindingFactorySymbolTableLock& operator=(const BindingFactorySymbolTableLock&) = delete;
+		BridgeASTBuilderSymbolTableLock(BridgeASTBuilder& factory, SymbolTable& table);
+		BridgeASTBuilderSymbolTableLock(BridgeASTBuilderSymbolTableLock&&) noexcept;
+		BridgeASTBuilderSymbolTableLock(const BridgeASTBuilderSymbolTableLock&) = delete;
+		BridgeASTBuilderSymbolTableLock& operator=(BridgeASTBuilderSymbolTableLock&&) = delete;
+		BridgeASTBuilderSymbolTableLock& operator=(const BridgeASTBuilderSymbolTableLock&) = delete;
 
-		~BindingFactorySymbolTableLock();
+		~BridgeASTBuilderSymbolTableLock();
 		void release();
 	private:
-		BindingFactory& m_factory;
+		BridgeASTBuilder& m_factory;
 		SymbolTable& m_symbolTable;
 		bool m_freed = false;
 	};
 
 	//http://coliru.stacked-crooked.com/a/8efdf80ac4082e22
-	class BindingFactory :
+	class BridgeASTBuilder :
 		public observable_priority_queue<VarTokenEvent>,
 		public observable_priority_queue<FunctionTokenEvent>,
 		public observable_priority_queue<BlockTokenEvent>,
 		public observable_priority_queue<ScriptLinkTokenEvent>,
-		public observable_priority_queue<ImportTokenEvent> {
-		friend class BindingFactorySymbolTableLock;
+		public observable_priority_queue<ImportTokenEvent>,
+		public observable_priority_queue<ReturnTokenEvent> {
+		friend class BridgeASTBuilderSymbolTableLock;
 	public:
-		BindingFactory(TypeBuilder& typeBuilder, SymbolTableUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
-		virtual ~BindingFactory();
+		BridgeASTBuilder(TypeBuilder& typeBuilder, SymbolTableUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
+		virtual ~BridgeASTBuilder();
 
 		BridgeImportRaw import(StatementParser& parser, ScriptAST& script, std::pair<std::string, std::string> import);
 
@@ -63,15 +66,22 @@ namespace ska {
 			return ss;
 		}
 
-		ASTNodePtr bindFunction(ScriptAST& script, const std::string& functionName, std::vector<std::string> typeNames);
-		ASTNodePtr bindFunction(ScriptAST& script, const Type& fullTypeFunction);
+
+		ASTNodePtr makeFunction(ScriptAST& script, BridgeFunctionData data);
+
+		//ASTNodePtr makeFunction(ScriptAST& script, const std::string& functionName, std::vector<std::string> typeNames, BridgeConstructorData = {});
+		//ASTNodePtr makeFunction(ScriptAST& script, const Type& fullTypeFunction, BridgeConstructorData = {});
 
 	private:
+		ASTNodePtr makeFunctionPrototype(ScriptAST& script, const std::string& functionName, std::vector<std::string> typeNames);
+		ASTNodePtr makeFunctionPrototype(ScriptAST& script, const Type& fullTypeFunction);
+		ASTNodePtr makeFunctionDeclaration(ScriptAST& script, ASTNodePtr prototype, std::vector<BridgeField> fieldList);
 		ASTNodePtr makeFunctionParameterOrReturnType(ScriptAST& script, ASTNodePtr nodeType, std::size_t parameterIndex, std::size_t totalParameters);
 		ASTNodePtr makeFunctionName(ScriptAST& script, const std::string& name);
 		ASTNodePtr makeFunctionPrototype(ScriptAST& script, ASTNodePtr nameNode, std::vector<ASTNodePtr> parametersAndReturn);
-		ASTNodePtr makeFunctionDeclaration(ScriptAST& script, const std::string& functionName, ASTNodePtr prototype);
+		ASTNodePtr makeVariable(ScriptAST& script, const std::string& name, ASTNodePtr value);
 
+		ASTNodePtr makeCustomObjectReturn(ScriptAST& script, std::vector<BridgeField> fieldList);
 		std::vector<ASTNodePtr> makeFunctionInputOutput(ScriptAST& script, const std::vector<std::string>& typeNames);
 		std::vector<ASTNodePtr> makeFunctionInputOutput(ScriptAST& script, const Type& fullTypeFunction);
 
@@ -103,6 +113,7 @@ namespace ska {
 
 		ASTNodePtr createImport(StatementParser& parser, ScriptAST& script, Token scriptPathToken);
 
+		std::unordered_map<const SymbolTable*, int> m_symbolTableLockCounter;
 		TypeBuilder& m_typeBuilder;
 		SymbolTableUpdater& m_symbolTypeUpdater;
 		const ReservedKeywordsPool& m_reserved;

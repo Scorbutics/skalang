@@ -49,8 +49,8 @@ namespace ska {
 			m_bindings.push_back(bindGenericFunction_(m_script, functionName, std::move(typeNames), std::move(f)));
 		}
 
-		void bindGenericFunction(BridgeImport& importTemplate, const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
-			m_bindings.push_back(bindGenericFunction_(m_script, importTemplate, functionName, std::move(typeNames), std::move(f)));
+		void bindGenericFunction(const Type& fullFunctionType, decltype(BridgeFunction::function) f) {
+			m_bindings.push_back(bindGenericFunction_(m_script, fullFunctionType, std::move(f)));
 		}
 
 		const auto& name() const { return m_script.name(); }
@@ -70,7 +70,7 @@ namespace ska {
       registerAST(scriptAstNode);
 
 			assert(m_templateScript != nullptr && "Template script was not AST-generated");
-			script.memoryFromBridge(*m_templateScript, interpreter, std::move(m_bindings));
+			//script.memoryFromBridge(*m_templateScript, interpreter, std::move(m_bindings));
 
       m_bindings = { };
     }
@@ -82,19 +82,19 @@ namespace ska {
 		BridgeFunctionPtr bindFunction_(ScriptAST& script, const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
 			auto result = makeScriptSideBridge(std::move(f));
 			auto typeNames = m_functionBinder.template buildTypes<ParameterTypes..., ReturnType>();
-			result->node = m_functionBinder.bindSymbol(script, nullptr, functionName, std::move(typeNames));
+			result->node = m_functionBinder.bindFunction(script, functionName, std::move(typeNames));
 			return result;
 		}
 
 		BridgeFunctionPtr bindGenericFunction_(ScriptAST& script, const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
 			auto result = std::make_shared<BridgeFunction>(std::move(f));
-			result->node = m_functionBinder.bindSymbol(script, nullptr, functionName, std::move(typeNames));
+			result->node = m_functionBinder.bindFunction(script, functionName, std::move(typeNames));
 			return result;
 		}
 
-		BridgeFunctionPtr bindGenericFunction_(ScriptAST& script, BridgeImport& importTemplate, const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
+		BridgeFunctionPtr bindGenericFunction_(ScriptAST& script, const Type& fullFunctionType, decltype(BridgeFunction::function) f) {
 			auto result = std::make_shared<BridgeFunction>(std::move(f));
-			result->node = m_functionBinder.bindSymbol(script, &importTemplate, functionName, std::move(typeNames));
+			result->node = m_functionBinder.bindFunction(script, fullFunctionType);
 			return result;
 		}
 
