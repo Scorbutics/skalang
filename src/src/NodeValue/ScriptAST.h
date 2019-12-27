@@ -39,7 +39,7 @@ namespace ska {
 		ScriptASTPtr subParse(StatementParser& parser, const std::string& name, std::ifstream& file);
 		ScriptASTPtr useImport(const std::string& name);
 
-		ASTNode& fromBridge(std::vector<BridgeFunctionPtr>& bindings);
+		ASTNode& fromBridge(ASTNodePtr root);
 
 		const auto& handle() const { return m_handle; }
 
@@ -63,8 +63,6 @@ namespace ska {
 		std::size_t id() const { return m_handle->id(); }
 
 	private:
-		void astFromBridge(std::vector<ASTNodePtr> bindings);
-
 		ScriptHandleAST* m_handle = nullptr;
 		ScriptCacheAST* m_cache;
 		bool m_inCache = false;

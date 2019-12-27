@@ -22,7 +22,7 @@ namespace ska {
 
                     return ska::NodeValue{ /*std::move(memFile)*/ };
                 }));
-                Module<Interpreter>::m_bridge.buildFunctions();
+                Module<Interpreter>::m_bridge.buildFunctions({});
             }
 
             ~IOFileModule() override = default;

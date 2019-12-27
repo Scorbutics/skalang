@@ -21,7 +21,7 @@ namespace ska {
 		std::string GetTypeName() const;
 
 		bool IsArray() const  {
-			return !node[2].logicalEmpty();
+			return node.size() > 2 && !node[2].logicalEmpty();
 		}
 	};
 }

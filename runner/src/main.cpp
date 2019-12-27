@@ -25,6 +25,7 @@
 #include "std/module/function/parameter.h"
 
 ska::Script SmashAndDashSpecific(ska::lang::ModuleConfiguration<ska::Interpreter>& module, const std::string& scriptName) {
+#if 0
 	auto scriptEmBinding = ska::ScriptBridge<ska::Interpreter>{ module, "em_lib", ""};
 		scriptEmBinding.bindFunction("setInputMovePower", std::function<void(int, int)>([](int characterId, int value) {
 			std::cout << "move power for " << characterId << " is now " << value << std::endl;
@@ -57,7 +58,7 @@ ska::Script SmashAndDashSpecific(ska::lang::ModuleConfiguration<ska::Interpreter
 			return scriptCharacterProxy.callFunction(module.interpreter, "Character", "Fcty", std::move(parametersValues));
 		}));
 		scriptCharacterBinding.buildFunctions();
-
+#endif
 		auto executor = ska::Script{ module.scriptCache, "main", ska::Tokenizer{ module.reservedKeywords,
 		"var Script = import \"wd:" + scriptName + "\";"
 		"var CharacterGenerator = import \"bind:character_generator\";"

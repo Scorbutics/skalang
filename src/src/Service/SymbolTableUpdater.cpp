@@ -5,7 +5,7 @@
 #include "SymbolTableUpdater.h"
 #include "NodeValue/ScriptAST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTableUpdater)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::SymbolTableUpdater)
 
 ska::SymbolTableUpdater::SymbolTableUpdater(StatementParser& parser):
 	subobserver_priority_queue<VarTokenEvent>(std::bind(&SymbolTableUpdater::matchVariable, this, std::placeholders::_1), parser, 7),

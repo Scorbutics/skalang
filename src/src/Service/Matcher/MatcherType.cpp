@@ -6,7 +6,7 @@
 #include "Service/ASTFactory.h"
 #include "NodeValue/Symbol.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherType)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::MatcherType)
 
 ska::ASTNodePtr ska::MatcherType::match(TokenReader& input) {
 	const auto& typeDelimiterToken = m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>();
@@ -65,13 +65,19 @@ void ska::MatcherType::malformedType(const Type& input, const std::string& addit
 ska::ASTNodePtr ska::MatcherType::match(const Type& input) {
 	auto nodes = std::vector<ASTNodePtr> {};
 	if(Type::isBuiltIn(input)) {
-		auto token = Token { std::string{ExpressionTypeSTR[static_cast<std::size_t>(input.type())]}, TokenType::RESERVED, Cursor{-1}};
-		nodes.push_back(ASTFactory::MakeLogicalNode(token));
+		SLOG(LogLevel::Info) << "Type " << input << " is built-in";
+		const auto index = static_cast<std::size_t>(input.type());
+		SLOG(LogLevel::Debug) << " Index " << index;
+		auto typeStr = ExpressionTypeSTR[index];
+		auto tokenInfo = m_reservedKeywordsPool.pool.at(typeStr);
+		nodes.push_back(ASTFactory::MakeLogicalNode(tokenInfo.token));
 		nodes.push_back(ASTFactory::MakeEmptyNode());
 		nodes.push_back(ASTFactory::MakeEmptyNode());
+		SLOG(LogLevel::Info) << " Has token " << tokenInfo.token;
 	} else {
 		// ARRAY, VAR, FUNCTION (not built-ins !)
 
+		SLOG(LogLevel::Info) << "Type " << input << " is not built-in";
 		if(input.compound().size() > 2) {
 			malformedType(input);
 		}
@@ -83,7 +89,7 @@ ska::ASTNodePtr ska::MatcherType::match(const Type& input) {
 				}
 				nodes.push_back(match(input.compound()[0]));
 				nodes.push_back(ASTFactory::MakeEmptyNode());
-				nodes.push_back(ASTFactory::MakeLogicalNode(Token{ "", TokenType::ARRAY, Cursor{-1}}));
+				nodes.push_back(ASTFactory::MakeLogicalNode(Token{ "", TokenType::ARRAY, {}}));
 				break;
 			case ExpressionType::FUNCTION:
 			case ExpressionType::OBJECT: {
@@ -91,9 +97,10 @@ ska::ASTNodePtr ska::MatcherType::match(const Type& input) {
 				if (symbol == nullptr) {
 					malformedType(input, " : no symbol in a variable/function type");
 				}
-				auto token = Token { symbol->getName(), TokenType::IDENTIFIER, Cursor{-1}};
+				SLOG(LogLevel::Info) << "Type " << input << " is an object/function named " << symbol->getName();
+				auto token = Token { symbol->getName(), TokenType::IDENTIFIER, {}};
 				nodes.push_back(ASTFactory::MakeLogicalNode(std::move(token)));
-				nodes.push_back(ASTFactory::MakeEmptyNode());
+				nodes.push_back(input.type() == ExpressionType::OBJECT ? ASTFactory::MakeLogicalNode(Token { "", TokenType::RANGE, {}}) : ASTFactory::MakeEmptyNode());
 				nodes.push_back(ASTFactory::MakeEmptyNode());
 				} break;
 			default:

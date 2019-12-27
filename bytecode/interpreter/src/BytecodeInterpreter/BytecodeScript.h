@@ -35,7 +35,7 @@ namespace ska {
 
 			ScriptAST astScript() const { return m_serviceGen.program(); }
 
-			void memoryFromBridge(const ScriptAST& templateScriptAst, Interpreter& interpreter, std::vector<BridgeFunctionPtr> bindings);
+			void fromBridge(ASTNodePtr astRoot, Interpreter& interpreter);
 
 			RuntimeMemory memoryField(const std::string& symbol);
 

@@ -7,7 +7,7 @@
 
 #include "Operation/OperationTypeType.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
 
 namespace ska {
 	Type TypeBuilderFunctionPrototypeDeclarationDeduceReturnType(const ASTNode& node, const SymbolTable& symbolTable, const Symbol* symbolFunction) {
@@ -22,6 +22,11 @@ namespace ska {
 			const auto operateOnType = OperationType<Operator::TYPE>{node};
 			const auto* symbol = operateOnType.GetSymbol(symbolTable);
 			assert(symbol != nullptr);
+			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function symbol type deduced from type \""<<  symbol->getType() << "\"";
+			if(symbol->getType() == ExpressionType::VOID) {
+				return Type::MakeCustom<ExpressionType::OBJECT>(symbolFunction);
+			}
+			assert(!symbol->getType().compound().empty());
 			return symbol->getType().compound().back();
 
 			/*

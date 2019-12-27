@@ -4,18 +4,18 @@
 #include "Service/SymbolTable.h"
 #include "NodeValue/ScriptAST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::TYPE>)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::TYPE>)
 
 ska::Type ska::TypeBuilderOperator<ska::Operator::TYPE>::build(const ScriptAST& script, OperateOn node) {
 	auto result = Type{};
 	const auto isBuiltIn = node.IsBuiltIn();
     if (!isBuiltIn) {
 		const Symbol* symbolType = node.GetSymbol(script.symbols());
-		SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::TYPE>) << "Type-node looked \"" << (symbolType != nullptr ? symbolType->getType() : Type{}) << "\"";
-		if (symbolType == nullptr) {
+		if(symbolType != nullptr) {
+			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::TYPE>) << "Type-node looked \"" << symbolType->getType() << "\" for node \"" << node.GetName() << "\"";
+		} else {
 			throw std::runtime_error("undeclared custom type \"" + node.GetName() + "\" (when trying to look on token type \"" + node.GetTypeName() + "\")");
 		}
-		
 		result = node.IsObject() ? Type::MakeCustom<ExpressionType::OBJECT>(symbolType) : symbolType->getType();
    } else { 
 		assert(!node.IsObject());
@@ -28,5 +28,7 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::TYPE>::build(const ScriptAST& 
 		result = Type::MakeBuiltIn<ExpressionType::ARRAY>().add(result);
 	}
 		
+	SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::TYPE>) << "Resulting type : \"" << result << "\"";
+
 	return result;
 }

@@ -9,6 +9,7 @@ namespace ska {
         public:
             IOLogModule(ModuleConfiguration<Interpreter>& config) :
                 Module<Interpreter> {config, "std.native.io.log", ""} {
+                /*
                 Module<Interpreter>::m_bridge.bindFunction("printInt", std::function<void(int)>([](int value) {
                     std::cout << value << std::endl;
                 }));
@@ -19,7 +20,8 @@ namespace ska {
                     //TODO
                     std::cout << "wait " << value << std::endl;
                 }));
-                Module<Interpreter>::m_bridge.buildFunctions();
+                */
+                Module<Interpreter>::m_bridge.buildFunctions({});
             }
             ~IOLogModule() override = default;
         };

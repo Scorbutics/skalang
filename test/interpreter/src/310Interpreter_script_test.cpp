@@ -52,7 +52,7 @@ static ska::lang::ModuleConfiguration<ska::Interpreter> BuildModuleConfiguration
 
 TEST_CASE("[Interpreter Script]") {
 	DataTestContainer data;
-
+#if 0
 	SUBCASE("miniska -> C++ binding : using a miniska field from a C++ -> miniska binding") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
 			"var DataClassImp280 = import \"bind:dataclass_script\";"
@@ -73,7 +73,7 @@ TEST_CASE("[Interpreter Script]") {
 		auto scriptProxy = ska::ScriptProxy<ska::Interpreter> { scriptBindingDataClass };
 		auto importBinding = scriptBindingDataClass.import("", {"Binding1", "bind:binding1_lib"});
 		auto importTest = scriptBindingDataClass.import("", {"Test293", "" SKALANG_TEST_DIR "/src/resources/test293"});
-		scriptBindingDataClass.bindGenericFunction("run", { "Test293::Fcty()" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+		scriptBindingDataClass.bindFunction("run", { "Test293::Fcty()" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 			auto getTotoMemory = scriptProxy.accessMemory("Binding1", "getToto");
 
 			/*
@@ -94,7 +94,7 @@ TEST_CASE("[Interpreter Script]") {
 		CHECK(*result.nodeval<ska::StringShared>() == "tototo !");
 	}
 
-#if 0
+
 
 	SUBCASE("Outside script from file (import)") {
 		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Character179 = import \"" SKALANG_TEST_DIR "/src/resources/character\";", data);

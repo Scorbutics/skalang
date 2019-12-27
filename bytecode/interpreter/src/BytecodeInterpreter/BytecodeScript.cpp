@@ -29,9 +29,12 @@ ska::bytecode::RuntimeMemory ska::bytecode::Script::memoryField(const std::strin
   return RuntimeMemory { findBytecodeMemoryFromSymbol(symbolAst) };
 }
 
-void ska::bytecode::Script::memoryFromBridge(const ScriptAST& templateScriptAst, Interpreter& interpreter, std::vector<BridgeFunctionPtr> bindings) {
-  LOG_DEBUG << "%14cGenerating " << bindings.size() << " bindings for script " << m_serviceGen.name() << " linked to " << templateScriptAst.name();
+void ska::bytecode::Script::fromBridge(ASTNodePtr astRoot, Interpreter& interpreter) {
+  //LOG_DEBUG << "%14cGenerating " << bindings.size() << " bindings for script " << m_serviceGen.name();
 
+  m_serviceGen.fromBridge(std::move(astRoot));
+
+  /*
   auto templateScriptGenerationContext = GenerationContext{m_cache, templateScriptAst};
 
   //TODO parameter : "Fcty"
@@ -47,13 +50,9 @@ void ska::bytecode::Script::memoryFromBridge(const ScriptAST& templateScriptAst,
 
   LOG_DEBUG << " %14cConstructor sub-symbol type to bind : \"" << (*subSymbol).getType() << "\"";
 
-  /*auto templateGenerated = interpreter.generator().generatePart(std::move(templateScriptGenerationContext));
-  for(const auto& binding : templateGenerated) {
-    LOG_DEBUG << " %14cGenerated template instruction \"" << binding << "\"";
-  }*/
-  LOG_DEBUG << "%14cGenerated";
-  
   m_serviceGen.generate(m_cache, interpreter.generator());
+  */
+
   execute(interpreter);
 }
 

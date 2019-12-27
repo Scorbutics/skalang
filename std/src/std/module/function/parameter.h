@@ -19,6 +19,7 @@ namespace ska {
                 Module<Interpreter> { config, "std.native.parameter", "" },
 				m_proxy(Module<Interpreter>::m_bridge),
 				m_parameters(parameterValues) {
+                /*
                 auto parametersImport = Module<Interpreter>::m_bridge.import("Fcty", {"Parameters", "std:std.function.parameters"});
 
                 Module<Interpreter>::m_bridge.bindGenericFunction("Gen", { "string", parametersImport.typeName("Fcty") },
@@ -42,7 +43,8 @@ namespace ska {
 
                     return result.value();
                 }));
-                Module<Interpreter>::m_bridge.buildFunctions();
+                */
+                Module<Interpreter>::m_bridge.buildFunctions({});
             }
 
             ~ParameterModule() override = default;

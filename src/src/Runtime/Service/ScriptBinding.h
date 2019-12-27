@@ -7,7 +7,7 @@
 
 #include "Container/sorted_observable.h"
 #include "Runtime/Value/BridgeFunction.h"
-#include "BindingFactory.h"
+#include "BridgeASTBuilder.h"
 #include "Event/VarTokenEvent.h"
 #include "NodeValue/ScriptCacheAST.h"
 #include "NodeValue/ScriptASTPtr.h"
@@ -15,6 +15,7 @@
 #include "Runtime/Value/NodeValue.h"
 #include "Runtime/Value/InterpreterTypes.h"
 #include "Runtime/Value/ModuleConfiguration.h"
+#include "Runtime/Service/BridgeFunctionData.h"
 
 namespace ska {
 	class ScriptBindingBase;
@@ -40,18 +41,7 @@ namespace ska {
 
 		virtual ~ScriptBindingBase();
 
-		template <class ReturnType, class ... ParameterTypes>
-		void bindFunction(const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
-			m_bindings.push_back(bindFunction_<ReturnType, ParameterTypes...>(m_script, functionName, std::move(f)));
-		}
-
-		void bindGenericFunction(const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
-			m_bindings.push_back(bindGenericFunction_(m_script, functionName, std::move(typeNames), std::move(f)));
-		}
-
-		void bindGenericFunction(const Type& fullFunctionType, decltype(BridgeFunction::function) f) {
-			m_bindings.push_back(bindGenericFunction_(m_script, fullFunctionType, std::move(f)));
-		}
+		void bindFunction(Type functionType, decltype(BridgeFunction::function) f);
 
 		const auto& name() const { return m_script.name(); }
 		const std::string& templateName() const;
@@ -60,43 +50,19 @@ namespace ska {
 		BridgeImport import(std::string constructorMethod, StatementParser& parser, std::pair<std::string, std::string> import);
 
 		template <class Interpreter>
-		void buildFunctions(Interpreter& interpreter, typename InterpreterTypes<Interpreter>::Script& script) {
-      SLOG(LogLevel::Info) << "Building script " << script.astScript().name() << " ( " << m_script.name() << ") from bridge";
+		void buildFunctions(Interpreter& interpreter, typename InterpreterTypes<Interpreter>::Script& script, BridgeField constructor) {
+			auto astScript = script.astScript();
+			auto& scriptAstNode = buildFunctionsAST(astScript, std::move(constructor));
 
-			assert(!m_bindings.empty() && "Bridge is empty");
-      assert(script.astScript().id() == m_script.id());
+			//assert(m_templateScript != nullptr && "Template script was not AST-generated");
+			//script.fromBridge(*m_templateScript, interpreter, std::move(m_bindings));
 
-			auto& scriptAstNode = m_script.fromBridge(m_bindings);
-      registerAST(scriptAstNode);
-
-			assert(m_templateScript != nullptr && "Template script was not AST-generated");
-			//script.memoryFromBridge(*m_templateScript, interpreter, std::move(m_bindings));
-
-      m_bindings = { };
+      //m_bindings = {  };
     }
 
-		void generateAst();
-
 	private:
-		template <class ReturnType, class ... ParameterTypes>
-		BridgeFunctionPtr bindFunction_(ScriptAST& script, const std::string& functionName, std::function<ReturnType(ParameterTypes...)> f) {
-			auto result = makeScriptSideBridge(std::move(f));
-			auto typeNames = m_functionBinder.template buildTypes<ParameterTypes..., ReturnType>();
-			result->node = m_functionBinder.bindFunction(script, functionName, std::move(typeNames));
-			return result;
-		}
-
-		BridgeFunctionPtr bindGenericFunction_(ScriptAST& script, const std::string& functionName, std::vector<std::string> typeNames, decltype(BridgeFunction::function) f) {
-			auto result = std::make_shared<BridgeFunction>(std::move(f));
-			result->node = m_functionBinder.bindFunction(script, functionName, std::move(typeNames));
-			return result;
-		}
-
-		BridgeFunctionPtr bindGenericFunction_(ScriptAST& script, const Type& fullFunctionType, decltype(BridgeFunction::function) f) {
-			auto result = std::make_shared<BridgeFunction>(std::move(f));
-			result->node = m_functionBinder.bindFunction(script, fullFunctionType);
-			return result;
-		}
+		void queryAST();
+		ASTNode& buildFunctionsAST(ScriptAST& target, BridgeField constructor);
 
 		template <class ReturnType, class ... ParameterTypes, std::size_t... Idx>
 		auto callNativeFromScript(std::function<ReturnType(ParameterTypes...)> f, const std::vector<NodeValue>& v, std::index_sequence<Idx...>) {
@@ -140,7 +106,7 @@ namespace ska {
 			}
 		}
 
-    void registerAST(ASTNode& scriptAst);
+    //void registerAST(ASTNode& scriptAst);
 
 	protected:
 		StatementParser& m_parser;
@@ -150,14 +116,15 @@ namespace ska {
 		TypeBuilder& m_typeBuilder;
 		SymbolTableUpdater& m_symbolTypeUpdater;
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
-		BindingFactory m_functionBinder;
+		BridgeASTBuilder m_functionBuilder;
 		std::string m_name;
 		std::string m_templateName;
 		ScriptAST m_script;
 		ScriptCacheAST& m_cache;
 
 		std::unordered_map<std::string, ASTNodePtr> m_imports;
-		std::vector<BridgeFunctionPtr> m_bindings;
+		//std::vector<BridgeFunctionPtr> m_bindings;
+		std::vector<BridgeField> m_bindings;
 	};
 
 	template <class Interpreter>
@@ -175,24 +142,12 @@ namespace ska {
 			m_script(moduleConf.scriptCache, ScriptBindingBase::name(), std::vector<Token>{}) {
 		}
 
-		void buildFunctions() {
-			ScriptBindingBase::buildFunctions(m_interpreter, m_script);
-		}
-
-		ska::BridgeImport generateTemplate(std::string constructorMethod) {
-			auto result = import(std::move(constructorMethod), { "BASE", ScriptBindingBase::templateName() });
-			ScriptBindingBase::generateAst();
-			/*
-			bindGenericFunction("Fcty", { "void", m_templateScript->symbols()[""] }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> buildParams) -> ska::NodeValue {
-					auto memory = createMemory();
-				return ska::NodeValue{ std::move(memory) };
-			} );
-			ScriptBindingBase::buildFunctions(m_interpreter, m_script);
-			*/
-			return result;
+		void buildFunctions(BridgeField constructor) {
+			ScriptBindingBase::buildFunctions(m_interpreter, m_script, std::move(constructor));
 		}
 
 		auto& script() { return m_script; }
+		auto& templateScript() { return *m_templateScript; }
 
 		BridgeImport import(std::string constructorMethod, std::pair<std::string, std::string> import) {
 			auto importRef = ScriptBindingBase::import(std::move(constructorMethod), m_parser, std::move(import));

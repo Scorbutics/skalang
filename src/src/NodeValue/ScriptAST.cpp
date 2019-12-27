@@ -24,22 +24,13 @@ ska::ScriptASTPtr ska::ScriptAST::useImport(const std::string& name) {
 	return existsInCache(name) ? std::make_unique<ScriptAST>(*m_cache, name, std::vector<Token>{}) : nullptr;
 }
 
-void ska::ScriptAST::astFromBridge(std::vector<ASTNodePtr> bindings) {
+ska::ASTNode& ska::ScriptAST::fromBridge(ASTNodePtr astRoot) {
 	assert(m_handle->m_ast == nullptr && "Script built from a bridge must be empty");
 
-	auto functionListNodes = std::vector<ASTNodePtr>();
-	if (!bindings.empty()) {
-		functionListNodes.reserve(bindings.size());
-	}
 
-	for (auto& bridgeFunction : bindings) {
-		auto functionName = bridgeFunction->name();
-		auto functionVarDeclarationNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(Token{ functionName, TokenType::IDENTIFIER , {} }), std::move(bridgeFunction));
-		functionListNodes.push_back(std::move(functionVarDeclarationNode));
-	}
-
-	m_handle->m_ast = ASTFactory::MakeNode<Operator::BLOCK>(std::move(functionListNodes));
+	m_handle->m_ast = std::move(astRoot);
 	m_handle->m_bridged = true;
+	return *m_handle->m_ast;
 }
 
 ska::ScriptASTPtr ska::ScriptAST::subParse(StatementParser& parser, const std::string& name, std::ifstream& file) {
@@ -62,20 +53,6 @@ void ska::ScriptAST::parse(StatementParser& parser, bool listen) {
 	lock.release();
 	m_handle->m_ast = std::move(result);
 	return;
-}
-
-
-ska::ASTNode& ska::ScriptAST::fromBridge(std::vector<BridgeFunctionPtr>& bindings) {
-	auto bindingsAST = std::vector<ASTNodePtr>{};
-	if (!bindings.empty()) {
-		bindingsAST.reserve(bindings.size());
-		std::transform(bindings.begin(), bindings.end(), std::back_inserter(bindingsAST), [](auto& el) {
-			el->nodeRef = el->node.get();
-			return std::move(el->node);
-		});
-	}
-	astFromBridge(std::move(bindingsAST));
-	return *m_handle->m_ast;
 }
 
 ska::ASTNodePtr ska::ScriptAST::statement(StatementParser& parser) {
