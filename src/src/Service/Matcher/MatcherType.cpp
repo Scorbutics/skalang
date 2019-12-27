@@ -4,6 +4,7 @@
 #include "Service/TokenReader.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/ASTFactory.h"
+#include "NodeValue/Symbol.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherType)
 
@@ -51,6 +52,55 @@ ska::ASTNodePtr ska::MatcherType::match(TokenReader& input) {
 		nodes.push_back(ASTFactory::MakeEmptyNode());
 	}
 
+	assert(nodes.size() == 3);
+	return ASTFactory::MakeNode<Operator::TYPE>(std::move(nodes));
+}
+
+void ska::MatcherType::malformedType(const Type& input, const std::string& additionalMessage) {
+	auto ss = std::stringstream {};
+	ss << "malformed type : " << input << additionalMessage;
+	throw std::runtime_error(ss.str());
+}
+
+ska::ASTNodePtr ska::MatcherType::match(const Type& input) {
+	auto nodes = std::vector<ASTNodePtr> {};
+	if(Type::isBuiltIn(input)) {
+		auto token = Token { std::string{ExpressionTypeSTR[static_cast<std::size_t>(input.type())]}, TokenType::RESERVED, Cursor{-1}};
+		nodes.push_back(ASTFactory::MakeLogicalNode(token));
+		nodes.push_back(ASTFactory::MakeEmptyNode());
+		nodes.push_back(ASTFactory::MakeEmptyNode());
+	} else {
+		// ARRAY, VAR, FUNCTION (not built-ins !)
+
+		if(input.compound().size() > 2) {
+			malformedType(input);
+		}
+
+		switch(input.type()) {
+			case ExpressionType::ARRAY:
+				if(input.compound().size() != 1) {
+					malformedType(input, " : bad type size in array type (should be 1)");
+				}
+				nodes.push_back(match(input.compound()[0]));
+				nodes.push_back(ASTFactory::MakeEmptyNode());
+				nodes.push_back(ASTFactory::MakeLogicalNode(Token{ "", TokenType::ARRAY, Cursor{-1}}));
+				break;
+			case ExpressionType::FUNCTION:
+			case ExpressionType::OBJECT: {
+				auto* symbol = input.symbol();
+				if (symbol == nullptr) {
+					malformedType(input, " : no symbol in a variable/function type");
+				}
+				auto token = Token { symbol->getName(), TokenType::IDENTIFIER, Cursor{-1}};
+				nodes.push_back(ASTFactory::MakeLogicalNode(std::move(token)));
+				nodes.push_back(ASTFactory::MakeEmptyNode());
+				nodes.push_back(ASTFactory::MakeEmptyNode());
+				} break;
+			default:
+				malformedType(input);
+				break;
+		}
+	}
 	assert(nodes.size() == 3);
 	return ASTFactory::MakeNode<Operator::TYPE>(std::move(nodes));
 }

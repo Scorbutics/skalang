@@ -22,12 +22,20 @@ namespace ska {
 			return type == ExpressionType::INT || type == ExpressionType::FLOAT || type == ExpressionType::BOOLEAN;
 		}
 
-		static bool isNamed(Type type) {
+		static constexpr bool isBuiltIn(ExpressionType type) {
+			return isNumeric(type) || type == ExpressionType::STRING || type == ExpressionType::VOID;
+		}
+
+		static bool isNamed(const Type& type) {
 			return isNamed(type.m_type);
 		}
 
-		static bool isNumeric(Type type) {
+		static bool isNumeric(const Type& type) {
 			return isNumeric(type.m_type);
+		}
+
+		static bool isBuiltIn(const Type& type) {
+			return isBuiltIn(type.m_type);
 		}
 
 		static Type MakeBuiltInArray(ExpressionType t) {

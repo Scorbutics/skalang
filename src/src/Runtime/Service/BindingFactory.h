@@ -63,9 +63,18 @@ namespace ska {
 			return ss;
 		}
 
-		ASTNodePtr bindSymbol(ScriptAST& script, BridgeImport* context, const std::string& functionName, std::vector<std::string> typeNames);
+		ASTNodePtr bindFunction(ScriptAST& script, const std::string& functionName, std::vector<std::string> typeNames);
+		ASTNodePtr bindFunction(ScriptAST& script, const Type& fullTypeFunction);
 
 	private:
+		ASTNodePtr makeFunctionParameterOrReturnType(ScriptAST& script, ASTNodePtr nodeType, std::size_t parameterIndex, std::size_t totalParameters);
+		ASTNodePtr makeFunctionName(ScriptAST& script, const std::string& name);
+		ASTNodePtr makeFunctionPrototype(ScriptAST& script, ASTNodePtr nameNode, std::vector<ASTNodePtr> parametersAndReturn);
+		ASTNodePtr makeFunctionDeclaration(ScriptAST& script, const std::string& functionName, ASTNodePtr prototype);
+
+		std::vector<ASTNodePtr> makeFunctionInputOutput(ScriptAST& script, const std::vector<std::string>& typeNames);
+		std::vector<ASTNodePtr> makeFunctionInputOutput(ScriptAST& script, const Type& fullTypeFunction);
+
 		void internalUnlisten(SymbolTable& symbolTable);
 		void internalListen(SymbolTable& symbolTable);
 

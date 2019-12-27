@@ -85,69 +85,100 @@ ska::BridgeImportRaw ska::BindingFactory::import(StatementParser& parser, Script
 	return { std::move(varNode), boundScript->handle() };
 }
 
-ska::ASTNodePtr ska::BindingFactory::bindSymbol(ScriptAST& script, BridgeImport* context, const std::string& functionName, std::vector<std::string> typeNames) {
-	auto lock = BindingFactorySymbolTableLock{*this, script.symbols() };
+/*
 
-	// Handle the sub constructor case
-	if (context != nullptr) {
-		auto constructor = context->constructor();
-		const auto* functionToBind = constructor[functionName];
-		if (functionToBind == nullptr) {
-			auto ss = std::stringstream {};
-			ss << "unable to find function \"" << functionName << "\" in constructor to bind in script " << context->script->name();
-			ss << " (constructor type is \"" << constructor << "\")";
-			throw std::runtime_error(ss.str());
-		}
-		SLOG(LogLevel::Info) << " %15cRegistering constructor : " << constructor.symbol()->getName();
-		auto constructorTypeNames = std::vector<std::string>{};
-		for(const auto ct : constructor.compound()) {
-			std::stringstream ss;
-			ss << ct;
-			SLOG(LogLevel::Info) << " %15cconstructor type name : " << ct;
-			constructorTypeNames.push_back(ss.str());
-		}
+ska::ASTNodePtr ska::BindingFactory::bind(BridgeImport& context) {
+		// Handle the sub constructor case
+	auto constructor = context.constructor();
+	const auto* functionToBind = constructor[functionName];
+	if (functionToBind == nullptr) {
+		auto ss = std::stringstream {};
+		ss << "unable to find function \"" << functionName << "\" in constructor to bind in script " << context->script->name();
+		ss << " (constructor type is \"" << constructor << "\")";
+		throw std::runtime_error(ss.str());
+	}
+	SLOG(LogLevel::Info) << " %15cRegistering constructor : " << constructor.symbol()->getName();
+	return nullptr;
+}
 
-		bindSymbol(script, nullptr, constructor.symbol()->getName(), std::move(constructorTypeNames));
+*/
+
+ska::ASTNodePtr ska::BindingFactory::makeFunctionParameterOrReturnType(ScriptAST& script, ASTNodePtr nodeType, std::size_t parameterIndex, std::size_t totalParameters) {
+	if (totalParameters == parameterIndex) {
+		return nodeType;
 	}
 
-	//Build the function
-	auto functionNameToken = Token{ functionName, TokenType::IDENTIFIER, {} };
-
-	auto functionNameNode = ASTFactory::MakeLogicalNode(functionNameToken);
-	auto declarationEvent = FunctionTokenEvent{ *functionNameNode, FunctionTokenEventType::DECLARATION_NAME, script, functionNameToken.name() };
-	observable_priority_queue<FunctionTokenEvent>::notifyObservers(declarationEvent);
-
-	auto parameters = std::vector<ASTNodePtr>{};
 	auto ss = std::stringstream{};
+	ss << parameterIndex;
+	auto parameter = ASTFactory::MakeNode<Operator::PARAMETER_DECLARATION>(
+				Token{ ss.str(), TokenType::IDENTIFIER, Cursor{ parameterIndex, static_cast<ColumnIndex>(parameterIndex), static_cast<LineIndex>(1) } },
+				std::move(nodeType));
+	auto event = VarTokenEvent::MakeParameter(*parameter, (*parameter)[0], script);
+	observable_priority_queue<VarTokenEvent>::notifyObservers(event);
+	return parameter;
+}
+
+std::vector<ska::ASTNodePtr> ska::BindingFactory::makeFunctionInputOutput(ScriptAST& script, const std::vector<std::string>& typeNames) {
+	auto parametersAndReturn = std::vector<ASTNodePtr>{};
 	for (std::size_t index = 0u; index < typeNames.size(); index++) {
-		ss << index;
 		auto tokens = ska::Tokenizer{m_reserved, typeNames[index] }.tokenize();
 		auto reader = ska::TokenReader{std::move(tokens )};
 		auto t = m_matcherType.match(reader);
-		if (index == typeNames.size() - 1) {
-			parameters.push_back(std::move(t));
-		} else {
-			auto parameter = ASTFactory::MakeNode<Operator::PARAMETER_DECLARATION>(
-				Token{ ss.str(), TokenType::IDENTIFIER, Cursor{ index, static_cast<ColumnIndex>(index), static_cast<LineIndex>(1) } },
-				std::move(t));
-			auto event = VarTokenEvent::MakeParameter(*parameter, (*parameter)[0], script);
-			observable_priority_queue<VarTokenEvent>::notifyObservers(event);
-			parameters.push_back(std::move(parameter));
-		}
-		ss.clear();
+		parametersAndReturn.push_back(std::move(makeFunctionParameterOrReturnType(script, std::move(t), index, typeNames.size() - 1)));
 	}
+	return parametersAndReturn;
+}
 
-	auto bridgeFunction = ASTFactory::MakeNode<Operator::FUNCTION_PROTOTYPE_DECLARATION>(functionNameToken, std::move(parameters));
+std::vector<ska::ASTNodePtr> ska::BindingFactory::makeFunctionInputOutput(ScriptAST& script, const Type& fullTypeFunction) {
+	auto parametersAndReturn = std::vector<ASTNodePtr>{};
+	for (std::size_t index = 0u; index < fullTypeFunction.compound().size(); index++) {
+		auto& type = fullTypeFunction.compound()[index];
+		auto isReturnType = index == fullTypeFunction.compound().size() - 1;
+		auto t = m_matcherType.match(type);
+		parametersAndReturn.push_back(std::move(makeFunctionParameterOrReturnType(script, std::move(t), index, fullTypeFunction.compound().size() - 1)));
+	}
+	return parametersAndReturn;
+}
 
-	auto functionEvent = VarTokenEvent::MakeFunction(*bridgeFunction, script);
-	observable_priority_queue<VarTokenEvent>::notifyObservers(functionEvent);
+ska::ASTNodePtr ska::BindingFactory::makeFunctionName(ScriptAST& script, const std::string& name) {
+	auto functionNameNode = ASTFactory::MakeLogicalNode(Token{name, TokenType::IDENTIFIER, {}});
+	auto event = FunctionTokenEvent{ *functionNameNode, FunctionTokenEventType::DECLARATION_NAME, script, name };
+	observable_priority_queue<FunctionTokenEvent>::notifyObservers(event);
+	return functionNameNode;
+}
 
-	auto functionDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionNameToken, std::move(bridgeFunction), ASTFactory::MakeNode<Operator::BLOCK>());
+ska::ASTNodePtr ska::BindingFactory::makeFunctionPrototype(ScriptAST& script, ASTNodePtr nameNode, std::vector<ASTNodePtr> parametersAndReturn) {
+	auto functionPrototype = ASTFactory::MakeNode<Operator::FUNCTION_PROTOTYPE_DECLARATION>(Token { nameNode->name(), nameNode->tokenType(), {} }, std::move(parametersAndReturn));
+	auto event = VarTokenEvent::MakeFunction(*functionPrototype, script);
+	observable_priority_queue<VarTokenEvent>::notifyObservers(event);
+	return functionPrototype;
+}
 
-	auto statementEvent = FunctionTokenEvent{ *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, script, functionNameToken.name() };
-	observable_priority_queue<FunctionTokenEvent>::notifyObservers(statementEvent);
+ska::ASTNodePtr ska::BindingFactory::bindFunction(ScriptAST& script, const Type& fullTypeFunction) {
+	const auto* functionSymbol = fullTypeFunction.symbol();
+	assert(functionSymbol != nullptr && !functionSymbol->getName().empty());
 
+	auto functionNameNode = makeFunctionName(script, functionSymbol->getName());
+	auto parametersAndReturn = makeFunctionInputOutput(script, fullTypeFunction);
+	auto functionPrototype = makeFunctionPrototype(script, std::move(functionNameNode), std::move(parametersAndReturn));
+	return makeFunctionDeclaration(script, functionSymbol->getName(), std::move(functionPrototype));
+}
+
+ska::ASTNodePtr ska::BindingFactory::makeFunctionDeclaration(ScriptAST& script, const std::string& functionName, ASTNodePtr prototype) {
+	auto functionNameToken = Token { functionName, TokenType::IDENTIFIER, {} };
+	auto functionDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionNameToken, std::move(prototype), ASTFactory::MakeNode<Operator::BLOCK>());
+	auto event = FunctionTokenEvent{ *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, script, functionNameToken.name() };
+	observable_priority_queue<FunctionTokenEvent>::notifyObservers(event);
 	return functionDeclarationNode;
+}
+
+ska::ASTNodePtr ska::BindingFactory::bindFunction(ScriptAST& script, const std::string& functionName, std::vector<std::string> typeNames) {
+	auto lock = BindingFactorySymbolTableLock{*this, script.symbols() };
+
+	auto functionNameNode = makeFunctionName(script, functionName);
+	auto parametersAndReturn = makeFunctionInputOutput(script, typeNames);
+	auto functionPrototype = makeFunctionPrototype(script, std::move(functionNameNode), std::move(parametersAndReturn));
+	return makeFunctionDeclaration(script, functionName, std::move(functionPrototype));
 }
 
 

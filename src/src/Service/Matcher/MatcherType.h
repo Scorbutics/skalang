@@ -16,8 +16,11 @@ namespace ska {
 			m_reservedKeywordsPool(pool) {}
 	
 		ASTNodePtr match(TokenReader& input);
+		ASTNodePtr match(const Type& input);
 	
 	private:
+		static void malformedType(const Type& input, const std::string& additionalMessage = "");
+
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 	};
 }
