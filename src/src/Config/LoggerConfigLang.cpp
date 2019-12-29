@@ -12,10 +12,10 @@ namespace ska {
 	namespace detail {
 		template<class T>
 		void UpdatePatterns(T& logger) {
-			logger.setPattern(ska::LogLevel::Debug, "%10c[D]%8c(%25F l.%3l) %07c%v");
-			logger.setPattern(ska::LogLevel::Info, "%11c[I]%8c(%25F l.%3l) %07c%v");
-			logger.setPattern(ska::LogLevel::Warn, "%14c[W]%8c(%25F l.%3l) %07c%v");
-			logger.setPattern(ska::LogLevel::Error, "%12c[E]%8c(%25F l.%3l) %07c%v");
+			logger.setPattern(ska::LogLevel::Debug, "(%m:%s)%10c[D]%8c(%25F l.%3l) %07c%v");
+			logger.setPattern(ska::LogLevel::Info, "(%m:%s)%11c[I]%8c(%25F l.%3l) %07c%v");
+			logger.setPattern(ska::LogLevel::Warn, "(%m:%s)%14c[W]%8c(%25F l.%3l) %07c%v");
+			logger.setPattern(ska::LogLevel::Error, "(%m:%s)%12c[E]%8c(%25F l.%3l) %07c%v");
 			logger.enableComplexLogging();
 		}
 	}

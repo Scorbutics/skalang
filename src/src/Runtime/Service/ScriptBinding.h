@@ -55,9 +55,7 @@ namespace ska {
 			auto& scriptAstNode = buildFunctionsAST(astScript, std::move(constructor));
 
 			//assert(m_templateScript != nullptr && "Template script was not AST-generated");
-			//script.fromBridge(*m_templateScript, interpreter, std::move(m_bindings));
-
-      //m_bindings = {  };
+			script.fromBridge(nullptr, interpreter);
     }
 
 	private:

@@ -5,7 +5,7 @@
 namespace ska {
 	struct ReservedKeywordsPool;
 	class TokenReader;
-	class Type;
+	struct Type;
 
 	class ASTNode;
 	using ASTNodePtr = std::unique_ptr<ASTNode>;
