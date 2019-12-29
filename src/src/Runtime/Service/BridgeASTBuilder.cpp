@@ -200,7 +200,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionDeclaration(ScriptAST& script
 	SLOG(LogLevel::Info) << "Making function declaration " << functionName;
 	auto functionNameToken = Token { functionName, TokenType::IDENTIFIER, {} };
 	auto returnNode = makeCustomObjectReturn(script, std::move(fieldList));
-	auto functionDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionNameToken, std::move(prototype), ASTFactory::MakeNode<Operator::BLOCK>());
+	auto functionDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionNameToken, std::move(prototype), ASTFactory::MakeNode<Operator::BLOCK>(std::move(returnNode)));
 	auto event = FunctionTokenEvent{ *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, script, functionNameToken.name() };
 	observable_priority_queue<FunctionTokenEvent>::notifyObservers(event);
 	SLOG(LogLevel::Info) << " Function building finished \"" << functionName << "\"";
