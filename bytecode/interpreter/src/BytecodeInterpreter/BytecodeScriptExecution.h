@@ -27,6 +27,7 @@ namespace ska {
 			}
 
 			bool incInstruction() {
+				if (scriptIndex >= instructions.size()) { return false; }
 				return ++executionPointer < instructions[scriptIndex].size();
 			}
 
@@ -39,8 +40,15 @@ namespace ska {
 				return ScriptVariableRef{ executionPointer + relativeValue, scriptIndex };
 			}
 
-			auto size() const { assert(scriptIndex >= instructions.size()); return instructions[scriptIndex].size(); }
-			bool idle() const { assert(scriptIndex >= instructions.size()); return executionPointer >= instructions[scriptIndex].size(); }
+			auto size() const {
+				if (scriptIndex >= instructions.size()) { return static_cast<std::size_t> (0u); } 
+				return instructions[scriptIndex].size();
+			}
+
+			bool idle() const {
+				if (scriptIndex >= instructions.size()) { return true; }
+				return executionPointer >= instructions[scriptIndex].size();
+			}
 
 			template <class T>
 			T get(const Operand& v) const {

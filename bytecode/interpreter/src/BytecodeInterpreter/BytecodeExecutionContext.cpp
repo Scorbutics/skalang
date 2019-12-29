@@ -48,6 +48,7 @@ void ska::bytecode::ExecutionContext::jumpAbsolute(ScriptVariableRef value) {
 	auto context = getContext(value);
 	m_out.callstack.push_back(TokenVariant{ m_current->snapshot() });
 	m_current = context.m_current;
+	checkCurrentExecutionOrThrow();
 	m_current->jumpAbsolute(value.variable - 1);
 }
 
@@ -63,6 +64,7 @@ void ska::bytecode::ExecutionContext::jumpReturn() {
 	LOG_DEBUG << "Returning to instruction index " << whereToGo.variable << " in script " << whereToGo.script;
 	auto context = getContext(whereToGo);
 	m_current = context.m_current;
+	checkCurrentExecutionOrThrow();
 	m_current->jumpAbsolute(whereToGo.variable);
 }
 
@@ -75,6 +77,7 @@ ska::bytecode::ScriptExecution& ska::bytecode::ExecutionContext::scriptFromOpera
 		}
 		return *result;
 	}
+	checkCurrentExecutionOrThrow();
 	return *m_current;
 }
 
@@ -87,5 +90,6 @@ const ska::bytecode::ScriptExecution& ska::bytecode::ExecutionContext::scriptFro
 		}
 		return *result;
 	}
+	checkCurrentExecutionOrThrow();
 	return *m_current;
 }

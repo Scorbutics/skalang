@@ -32,27 +32,9 @@ ska::bytecode::RuntimeMemory ska::bytecode::Script::memoryField(const std::strin
 void ska::bytecode::Script::fromBridge(ASTNodePtr astRoot, Interpreter& interpreter) {
   LOG_DEBUG << "%14cGenerating bindings for script " << m_serviceGen.name();
 
-  //m_serviceGen.fromBridge(std::move(astRoot));
-
-  /*
-  auto templateScriptGenerationContext = GenerationContext{m_cache, templateScriptAst};
-
-  //TODO parameter : "Fcty"
-  const auto* symbol = templateScriptAst.symbols()["Fcty"];
-  //TODO exceptions instead of assertions
-  assert(symbol != nullptr && !symbol->getType().compound().empty());
-  const auto* subSymbol = symbol->getType().compound().back().symbol();
-  assert(subSymbol != nullptr);
-
-  auto symbolInfo = ska::bytecode::SymbolInfo{1, subSymbol->getName(), m_serviceGen.id() };
-  symbolInfo.binding = true;
-  m_cache.setSymbolInfo(*subSymbol, std::move(symbolInfo)),
-
-  LOG_DEBUG << " %14cConstructor sub-symbol type to bind : \"" << (*subSymbol).getType() << "\"";
-  */
   m_serviceGen.generate(m_cache, interpreter.generator());
-
-  execute(interpreter);
+  LOG_DEBUG << "%14cGeneration done for script " << m_serviceGen.name();
+  //execute(interpreter);
 }
 
 std::unique_ptr<ska::bytecode::Executor> ska::bytecode::Script::execute(Interpreter& interpreter) {

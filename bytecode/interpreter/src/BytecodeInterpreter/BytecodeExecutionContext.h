@@ -23,11 +23,14 @@ namespace ska {
 			ExecutionContext(const ExecutionContext&) = delete;
 			ExecutionContext& operator=(const ExecutionContext&) = delete;
 
-			bool idle() const { return m_current->idle(); }
+			bool idle() const { return m_current == nullptr ? true : m_current->idle(); }
 
-			const Instruction& currentInstruction() const { return m_current->currentInstruction(); }
+			const Instruction& currentInstruction() const {
+				checkCurrentExecutionOrThrow();
+				return m_current->currentInstruction();
+			}
 
-			bool incInstruction() { return m_current->incInstruction(); }
+			bool incInstruction() { return m_current == nullptr ? false : m_current->incInstruction(); }
 
 			NodeValue getCell(const Operand& v) const { return scriptFromOperand(v).getCell(v); }
 
@@ -36,10 +39,11 @@ namespace ska {
 			void pop(NodeValueArrayRaw& dest, long count) { m_out.pop(dest, count); }
 
 			void jumpAbsolute(ScriptVariableRef value);
-			void jumpRelative(long value) { m_current->jumpRelative(value); }
+			void jumpRelative(long value) { checkCurrentExecutionOrThrow(); m_current->jumpRelative(value); }
 			void jumpReturn();
 
 			ScriptVariableRef getRelativeInstruction(long relativeValue) const {
+				checkCurrentExecutionOrThrow();
 				return m_current->getRelativeInstruction(relativeValue);
 			}
 
@@ -66,6 +70,10 @@ namespace ska {
 			const ScriptGeneration& generateIfNeeded(Generator& generator, std::size_t scriptIndex);
 
 		private:
+			void checkCurrentExecutionOrThrow() const {
+				if (m_current == nullptr) { throw std::runtime_error("bad execution context"); }
+			}
+
 			ScriptVariableRef getReturn();
 			ExecutionContext getContext(ScriptVariableRef value);
 
