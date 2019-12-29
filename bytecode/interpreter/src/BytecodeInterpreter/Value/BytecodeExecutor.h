@@ -28,6 +28,9 @@ namespace ska {
 			ScriptExecution* script(std::size_t scriptIndex, const GenerationOutput& instructions) {
 				if (scriptIndex >= scripts.size()) {
 					scripts.resize(scriptIndex + 1);
+				}
+
+				if(scripts[scriptIndex] == nullptr) {
 					scripts[scriptIndex] = std::make_unique<ScriptExecution>(*this, instructions, scriptIndex);
 				}
 				return scripts[scriptIndex].get();
