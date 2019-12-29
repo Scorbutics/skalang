@@ -140,12 +140,6 @@ namespace ska {
 		auto& script() { return m_script; }
 		auto& templateScript() { return *m_templateScript; }
 
-		BridgeImport import(std::string constructorMethod, std::pair<std::string, std::string> import) {
-			auto importRef = ScriptBindingBase::import(std::move(constructorMethod), m_parser, std::move(import));
-			m_interpreter.interpret({ m_script, *importRef.node });
-			return importRef;
-		}
-
 	private:
 		Script m_script;
 		Interpreter& m_interpreter;

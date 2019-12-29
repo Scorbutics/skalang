@@ -11,7 +11,6 @@
 #include "BridgeASTBuilder.h"
 #include "Service/Matcher/MatcherImport.h"
 #include "NodeValue/ScriptAST.h"
-#include "Runtime/Value/BridgeImport.h"
 
 #include "Service/ScriptNameBuilder.h"
 
@@ -36,12 +35,15 @@ void ska::BridgeASTBuilder::internalListen(SymbolTable& symbolTable) {
 	auto& counter = m_symbolTableLockCounter.at(&symbolTable);
 	counter++;
 	SLOG(LogLevel::Debug) << "Lock counter " << counter;
-	observable_priority_queue<VarTokenEvent>::addObserver(symbolTable);
-	observable_priority_queue<ReturnTokenEvent>::addObserver(symbolTable);
-	observable_priority_queue<FunctionTokenEvent>::addObserver(symbolTable);
-	observable_priority_queue<BlockTokenEvent>::addObserver(symbolTable);
-	observable_priority_queue<ScriptLinkTokenEvent>::addObserver(symbolTable);
-	observable_priority_queue<ImportTokenEvent>::addObserver(symbolTable);
+	if (counter == 1) {
+		SLOG(LogLevel::Info) << "Registering symbol table " << &symbolTable;
+		observable_priority_queue<VarTokenEvent>::addObserver(symbolTable);
+		observable_priority_queue<ReturnTokenEvent>::addObserver(symbolTable);
+		observable_priority_queue<FunctionTokenEvent>::addObserver(symbolTable);
+		observable_priority_queue<BlockTokenEvent>::addObserver(symbolTable);
+		observable_priority_queue<ScriptLinkTokenEvent>::addObserver(symbolTable);
+		observable_priority_queue<ImportTokenEvent>::addObserver(symbolTable);
+	}
 }
 
 void ska::BridgeASTBuilder::internalUnlisten(SymbolTable& symbolTable) {
@@ -49,6 +51,7 @@ void ska::BridgeASTBuilder::internalUnlisten(SymbolTable& symbolTable) {
 	counter--;
 	SLOG(LogLevel::Debug) << "Lock counter " << counter;
 	if (counter <= 0) {
+		SLOG(LogLevel::Info) << "Releasing symbol table " << &symbolTable;
 		observable_priority_queue<ScriptLinkTokenEvent>::removeObserver(symbolTable);
 		observable_priority_queue<BlockTokenEvent>::removeObserver(symbolTable);
 		observable_priority_queue<FunctionTokenEvent>::removeObserver(symbolTable);
@@ -66,36 +69,6 @@ ska::BridgeASTBuilder::~BridgeASTBuilder() {
 	observable_priority_queue<FunctionTokenEvent>::removeObserver(m_typeBuilder);
 	observable_priority_queue<ReturnTokenEvent>::removeObserver(m_typeBuilder);
 	observable_priority_queue<VarTokenEvent>::removeObserver(m_typeBuilder);
-}
-
-ska::ASTNodePtr ska::BridgeASTBuilder::createImport(StatementParser& parser, ska::ScriptAST& input, Token scriptPathToken) {
-	return MatcherImport::createNewImport(parser, *this, *this, input, std::move(scriptPathToken));
-}
-
-ska::BridgeImportRaw ska::BridgeASTBuilder::import(StatementParser& parser, ScriptAST& parentScript, std::pair<std::string, std::string> import) {
-	auto lock = BridgeASTBuilderSymbolTableLock{ *this, parentScript.symbols() };
-
-	auto importClassNameFile = ScriptNameDeduce(parentScript.name(), import.second);
-	auto scriptLinkNode = ASTFactory::MakeNode<Operator::SCRIPT_LINK>(ASTFactory::MakeLogicalNode(Token{ importClassNameFile, TokenType::STRING, {} }, ASTFactory::MakeEmptyNode()));
-	auto scriptLinkEvent = ScriptLinkTokenEvent{ *scriptLinkNode, importClassNameFile, parentScript };
-	observable_priority_queue<ScriptLinkTokenEvent>::notifyObservers(scriptLinkEvent);
-
-	auto varNode = ASTNodePtr{};
-	if (scriptLinkNode->type() == ExpressionType::VOID) {
-		auto importNode = createImport(parser, parentScript, Token{ importClassNameFile, TokenType::STRING, {} });
-		varNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(Token{ std::move(import.first), TokenType::IDENTIFIER, {} }, std::move(importNode));
-	} else {
-		varNode = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(Token{ std::move(import.first), TokenType::IDENTIFIER, {} }, std::move(scriptLinkNode));
-	}
-
-	auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_DECLARATION>(*varNode, parentScript);
-	observable_priority_queue<VarTokenEvent>::notifyObservers(event);
-
-	lock.release();
-
-	auto boundScript = parentScript.useImport(importClassNameFile);
-	assert(boundScript != nullptr);
-	return { std::move(varNode), boundScript->handle() };
 }
 
 ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionParameterOrReturnType(ScriptAST& script, ASTNodePtr nodeType, std::size_t parameterIndex, std::size_t totalParameters) {
@@ -118,6 +91,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionParameterOrReturnType(ScriptA
 	return parameter;
 }
 
+//TODO Deprecated
 std::vector<ska::ASTNodePtr> ska::BridgeASTBuilder::makeFunctionInputOutput(ScriptAST& script, const std::vector<std::string>& typeNames) {
 	auto parametersAndReturn = std::vector<ASTNodePtr>{};
 	SLOG(LogLevel::Info) << "Making function parameters and return type (typeNames)";
@@ -173,7 +147,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeVariable(ScriptAST& script, const std
 	return variable;
 }
 
-ska::ASTNodePtr ska::BridgeASTBuilder::makeCustomObjectReturn(ScriptAST& script, std::vector<BridgeField> fieldList) {
+ska::ASTNodePtr ska::BridgeASTBuilder::makeCustomObjectReturn(ScriptAST& script, std::vector<BridgeField>& fieldList) {
 	auto lock = BridgeASTBuilderSymbolTableLock{*this, script.symbols() };
 	auto returnNode = ASTNodePtr {};
 	auto returnStartEvent = ReturnTokenEvent { script };
@@ -194,7 +168,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeCustomObjectReturn(ScriptAST& script,
 	return returnNode;
 }
 
-ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionDeclaration(ScriptAST& script, ASTNodePtr prototype, std::vector<BridgeField> fieldList) {
+ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionDeclaration(ScriptAST& script, ASTNodePtr prototype, std::vector<BridgeField>& fieldList) {
 	auto lock = BridgeASTBuilderSymbolTableLock{*this, script.symbols() };
 	const std::string& functionName = prototype->name();
 	SLOG(LogLevel::Info) << "Making function declaration " << functionName;

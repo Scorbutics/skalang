@@ -30,11 +30,6 @@ namespace ska {
 
 		virtual ~ScriptProxy() = default;
 
-		BridgeMemory<Interpreter> createMemory(const BridgeImport& import) {
-			auto mem = Memory { m_script.createMemory() };
-			return { std::move(mem), import.symbols() };
-		}
-
 		BridgeMemory<Interpreter> createMemory(const Symbol& symbol) {
 			auto mem = Memory { m_script.createMemory() };
 			return { std::move(mem), symbol };
