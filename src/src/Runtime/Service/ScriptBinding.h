@@ -16,18 +16,18 @@
 #include "Runtime/Service/BridgeFunction.h"
 
 namespace ska {
-	class ScriptBindingBase;
+	class ScriptBindingAST;
 }
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ScriptBindingBase);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ScriptBindingAST);
 
 namespace ska {
 	class SymbolTable;
 	class StatementParser;
 
-	class ScriptBindingBase {
+	class ScriptBindingAST {
 	public:
-		ScriptBindingBase (
+		ScriptBindingAST(
 			StatementParser& parser,
       ScriptCacheAST& cache,
 			std::string scriptName,
@@ -36,26 +36,17 @@ namespace ska {
 			SymbolTableUpdater& symbolTypeUpdater,
 			const ReservedKeywordsPool& reserved);
 
-		virtual ~ScriptBindingBase() = default;
+		virtual ~ScriptBindingAST() = default;
 
 		void bindFunction(Type functionType, decltype(NativeFunction::function) f);
 
-		const auto& name() const { return m_script.name(); }
+		std::size_t id() const { return m_scriptAst.id(); }
+		const auto& name() const { return m_scriptAst.name(); }
 		const std::string& templateName() const;
-
-	protected:
-
-		template <class Interpreter>
-		void buildFunctions(Interpreter& interpreter, typename InterpreterTypes<Interpreter>::Script& script, BridgeField constructor) {
-			auto& scriptAstNode = buildFunctionsAST(script.astScript(), std::move(constructor));
-
-			//assert(m_templateScript != nullptr && "Template script was not AST-generated");
-			script.fromBridge(nullptr, interpreter);
-    }
+		auto& templateScript() { return *m_templateScript; }
 
 	private:
 		void queryAST();
-		ASTNode& buildFunctionsAST(ScriptAST& target, BridgeField constructor);
 
 		template <class ReturnType, class ... ParameterTypes, std::size_t... Idx>
 		auto callNativeFromScript(std::function<ReturnType(ParameterTypes...)> f, const std::vector<NodeValue>& v, std::index_sequence<Idx...>) {
@@ -100,6 +91,7 @@ namespace ska {
 		}
 
 	protected:
+		ASTNodePtr buildFunctionsAST(BridgeField constructor);
 		StatementParser& m_parser;
 		ScriptASTPtr m_templateScript;
 
@@ -110,15 +102,15 @@ namespace ska {
 		BridgeASTBuilder m_functionBuilder;
 		std::string m_name;
 		std::string m_templateName;
-		ScriptAST m_script;
-		ScriptCacheAST& m_cache;
+		ScriptAST m_scriptAst;
+		ScriptCacheAST& m_cacheAst;
 
 		std::unordered_map<std::string, ASTNodePtr> m_imports;
 		std::vector<BridgeField> m_bindings;
 	};
 
 	template <class Interpreter>
-	class ScriptBinding : public ScriptBindingBase {
+	class ScriptBinding : public ScriptBindingAST {
 	using ScriptCache = typename InterpreterTypes<Interpreter>::ScriptCache;
 	using Script = typename InterpreterTypes<Interpreter>::Script;
 	using ModuleConfiguration = lang::ModuleConfiguration<Interpreter>;
@@ -127,17 +119,20 @@ namespace ska {
 			ModuleConfiguration& moduleConf,
 			std::string scriptName,
 			std::string templateScriptName) :
-			ScriptBindingBase(moduleConf.parser, moduleConf.scriptAstCache, scriptName, std::move(templateScriptName), moduleConf.typeBuilder, moduleConf.symbolTableUpdater, moduleConf.reservedKeywords),
+			ScriptBindingAST(moduleConf.parser, moduleConf.scriptAstCache, scriptName, std::move(templateScriptName), moduleConf.typeBuilder, moduleConf.symbolTableUpdater, moduleConf.reservedKeywords),
 			m_interpreter(moduleConf.interpreter),
-			m_script(moduleConf.scriptCache, ScriptBindingBase::name(), std::vector<Token>{}) {
-		}
-
-		void buildFunctions(BridgeField constructor) {
-			ScriptBindingBase::buildFunctions(m_interpreter, m_script, std::move(constructor));
+			m_script(moduleConf.scriptCache, ScriptBindingAST::name(), std::vector<Token>{}) {
+			if (ScriptBindingAST::id() != m_script.astScript().id()) {
+				throw std::runtime_error("script index coherence error while binding a script");
+			}
 		}
 
 		auto& script() { return m_script; }
-		auto& templateScript() { return *m_templateScript; }
+
+		void buildFunctions(BridgeField constructor) {
+			auto astRoot = ScriptBindingAST::buildFunctionsAST(std::move(constructor));
+			m_script.fromBridge(std::move(astRoot), m_interpreter);
+		}
 
 	private:
 		Script m_script;

@@ -44,7 +44,7 @@
 #include "Units/InterpreterCommandJumpNif.h"
 #include "InterpreterDeclarer.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Interpreter);
+SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::Interpreter);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Interpreter)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Interpreter)
@@ -110,7 +110,7 @@ ska::bytecode::Interpreter::Interpreter(Generator& generator, const ReservedKeyw
 void ska::bytecode::Interpreter::interpret(ExecutionContext& node) {
 	for(auto continueExecution = !node.idle(); continueExecution; continueExecution = node.incInstruction()) {
 		auto& instruction = node.currentInstruction();
-		LOG_INFO << "Interpreting " << instruction;
+		LOG_INFO << "[Script " << node.currentScriptId() << "] Interpreting " << instruction;
 		auto& builder = m_commandInterpreter[static_cast<std::size_t>(instruction.command())];
 		assert(builder != nullptr);
 		auto nodeValue = builder->interpret(node);

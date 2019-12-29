@@ -3,7 +3,7 @@
 
 using InterpreterCommand = ska::bytecode::InterpreterCommand<ska::bytecode::Command::JUMP_ABS>;
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, InterpreterCommand);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, InterpreterCommand);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, InterpreterCommand)
 
 SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(JUMP_ABS)(ExecutionContext& context, const Operand& left, const Operand& right) {

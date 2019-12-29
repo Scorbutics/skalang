@@ -55,7 +55,6 @@ namespace ska {
 			auto end() const { return m_generated.end(); }
 
 			void generate(ScriptCache& cache, Generator& generator);
-			void fromBridge(ASTNodePtr astRoot);
 
 		private:
 			friend std::ostream& operator<<(std::ostream& stream, const ScriptGeneration&);

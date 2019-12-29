@@ -10,6 +10,8 @@ namespace ska {
     using Callback = typename NativeFunction::Callback;
 
     BridgeField() = default;
+    ~BridgeField() = default;
+
     BridgeField(Type fullType) : type(std::move(fullType)) {
       assert(type.symbol() != nullptr && !type.symbol()->getName().empty());
     }
@@ -51,6 +53,8 @@ namespace ska {
     const std::string& name() const { return m_function.name(); }
     
     const Type& type() const { return m_function.type; }
+
+    const BridgeField::Callback& callback() const { return m_function.callback; }
 
   private:
     BridgeField m_function;

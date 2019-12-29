@@ -36,7 +36,7 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path + bridge function call") {
 	constexpr auto progStr =
 	"var PathFcty = import \"bind:std.native.io.path\";"
 	"var path = PathFcty.Fcty(\"" SKALANG_TEST_DIR "\");"
-	"path.canonical();";
+	"var last = path.canonical();";
 
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(progStr, data);
@@ -47,7 +47,8 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path + bridge function call") {
 	auto script = Interpret(data, progStr);
 	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
-	auto res = interpreted->variable(0);
-	auto cellValue = res.nodeval<long>();
-	CHECK(cellValue == 10);
+	auto res = interpreted->variable(gen.id());
+	std::cout << res.convertString();
+	auto cellValue = *res.nodeval<ska::StringShared>();
+	CHECK(cellValue == "");
 }

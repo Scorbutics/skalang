@@ -33,6 +33,10 @@ void ska::bytecode::ScriptExecution::jumpRelative(long value) {
 	executionPointer += value;
 }
 
+std::size_t ska::bytecode::ScriptExecution::id() const {
+	return scriptIndex;
+}
+
 ska::bytecode::PlainMemoryTable* ska::bytecode::ScriptExecution::selectMemory(const Operand& dest) {
 	return SelectMemoryHelper<decltype(*this), PlainMemoryTable*>(*this, dest);
 }

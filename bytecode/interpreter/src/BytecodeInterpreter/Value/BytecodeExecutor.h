@@ -31,7 +31,7 @@ namespace ska {
 				}
 
 				if(scripts[scriptIndex] == nullptr) {
-					scripts[scriptIndex] = std::make_unique<ScriptExecution>(*this, instructions, scriptIndex);
+					scripts[scriptIndex] = std::make_unique<ScriptExecution>(instructions, scriptIndex);
 				}
 				return scripts[scriptIndex].get();
 			}

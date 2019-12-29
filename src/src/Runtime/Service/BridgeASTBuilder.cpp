@@ -145,9 +145,8 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeVariable(ScriptAST& script, const std
 	return variable;
 }
 
-ska::ASTNodePtr ska::BridgeASTBuilder::makeCustomObjectReturn(ScriptAST& script, std::vector<BridgeFunction> fieldList) {
+ska::ASTNodePtr ska::BridgeASTBuilder::makeReturn(ScriptAST& script, std::vector<BridgeFunction> fieldList) {
 	auto lock = BridgeASTBuilderSymbolTableLock{*this, script.symbols() };
-	auto returnNode = ASTNodePtr {};
 	auto returnStartEvent = ReturnTokenEvent { script };
 	observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnStartEvent);
 
@@ -160,19 +159,33 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeCustomObjectReturn(ScriptAST& script,
 		returnFieldNodes.push_back(std::move(fieldVariable));
 	}
 
-	returnNode = ASTFactory::MakeNode<Operator::RETURN>(ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(returnFieldNodes)));
+	auto returnNode = ASTFactory::MakeNode<Operator::RETURN>(ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(returnFieldNodes)));
 	auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT> (*returnNode, script);
 	observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnEndEvent);
 	return returnNode;
 }
 
-ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionDeclaration(ScriptAST& script, ASTNodePtr prototype, std::vector<BridgeFunction> fieldList) {
+ska::ASTNodePtr ska::BridgeASTBuilder::makeBridgeBody(ScriptAST& script, const BridgeField::Callback& binding) {
+	//auto result = ASTFactory::MakeEmptyNode();
+	
+	return ASTFactory::MakeNode<Operator::RETURN>(ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>());
+}
+
+ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionDeclaration(ScriptAST& script, ASTNodePtr prototype, const BridgeFunction& data) {
 	auto lock = BridgeASTBuilderSymbolTableLock{*this, script.symbols() };
 	const std::string& functionName = prototype->name();
 	SLOG(LogLevel::Info) << " 6 - Making function declaration " << functionName;
-	auto functionNameToken = Token { functionName, TokenType::IDENTIFIER, {} };
-	auto returnNode = makeCustomObjectReturn(script, std::move(fieldList));
-	auto functionDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionNameToken, std::move(prototype), returnNode->size() == 0 ? ASTFactory::MakeEmptyNode() : ASTFactory::MakeNode<Operator::BLOCK>(std::move(returnNode)));
+	
+	auto bodyNode = ASTNodePtr {};
+	auto fieldList = data.makeFunctions();
+	if (!fieldList.empty()) {
+		bodyNode = ASTFactory::MakeNode<Operator::BLOCK>(makeReturn(script, std::move(fieldList)));
+	} else {
+		bodyNode = makeBridgeBody(script, data.callback());
+	}
+	auto functionNameToken = Token{ functionName, TokenType::IDENTIFIER, {} };
+	auto functionDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionNameToken, std::move(prototype), std::move(bodyNode));
+	
 	auto event = FunctionTokenEvent{ *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, script, functionNameToken.name() };
 	observable_priority_queue<FunctionTokenEvent>::notifyObservers(event);
 	SLOG(LogLevel::Info) << " Function building finished \"" << functionName << "\"";
@@ -201,15 +214,9 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionPrototype(ScriptAST& script, 
 }
 
 ska::ASTNodePtr ska::BridgeASTBuilder::makeFunction(ScriptAST& script, const BridgeFunction& data) {
-	auto prototype = ASTNodePtr{ nullptr };
 	SLOG(LogLevel::Info) << " 1 - Making function \"" << data.name() << "\"";
-//	if (!data.typeNames().empty()) {
-		//prototype = makeFunctionPrototype(script, data.name(), std::move(data.stealTypeNames()));
-	//} else {
-		prototype = makeFunctionPrototype(script, data.type());
-	//}
-	auto fields = data.makeFunctions();
-	auto functionDeclaration = makeFunctionDeclaration(script, std::move(prototype), fields);
+	auto prototype = makeFunctionPrototype(script, data.type());	
+	auto functionDeclaration = makeFunctionDeclaration(script, std::move(prototype), data);
 	return makeVariable(script, data.name(), std::move(functionDeclaration));
 }
 

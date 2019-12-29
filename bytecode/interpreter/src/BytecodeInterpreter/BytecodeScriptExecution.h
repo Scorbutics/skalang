@@ -7,12 +7,10 @@
 
 namespace ska {
 	namespace bytecode {
-		class Executor;
 		class ScriptExecution {
 		public:
-			ScriptExecution(Executor& execution, const GenerationOutput& instructions, std::size_t scriptIndex) :
+			ScriptExecution(const GenerationOutput& instructions, std::size_t scriptIndex) :
 				instructions(instructions),
-				execution(execution),
 				scriptIndex(scriptIndex) {
 			}
 
@@ -35,6 +33,8 @@ namespace ska {
 
 			void jumpAbsolute(std::size_t value);
 			void jumpRelative(long value);
+
+			std::size_t id() const;
 
 			ScriptVariableRef getRelativeInstruction(long relativeValue) const {
 				return ScriptVariableRef{ executionPointer + relativeValue, scriptIndex };
@@ -117,7 +117,6 @@ namespace ska {
 			}
 
 			const GenerationOutput& instructions;
-			Executor& execution;
 			const std::size_t scriptIndex = 0;
 			std::size_t executionPointer = 0;
 

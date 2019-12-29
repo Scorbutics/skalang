@@ -30,7 +30,9 @@ ska::bytecode::RuntimeMemory ska::bytecode::Script::memoryField(const std::strin
 }
 
 void ska::bytecode::Script::fromBridge(ASTNodePtr astRoot, Interpreter& interpreter) {
-  LOG_DEBUG << "%14cGenerating bindings for script " << m_serviceGen.name();
+    m_serviceGen.program().fromBridge(std::move(astRoot));
+
+    LOG_DEBUG << "%14cGenerating bindings for script " << m_serviceGen.name();
 
   m_serviceGen.generate(m_cache, interpreter.generator());
   LOG_DEBUG << "%14cGeneration done for script " << m_serviceGen.name();

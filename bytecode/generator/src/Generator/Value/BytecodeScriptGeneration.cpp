@@ -34,15 +34,3 @@ std::optional<ska::bytecode::Operand> ska::bytecode::ScriptGeneration::getSymbol
 	return m_origin.getSymbol(symbol);
 }
 
-void ska::bytecode::ScriptGeneration::fromBridge(ASTNodePtr astRoot) {
-	auto& rootNode = m_origin.program().fromBridge(std::move(astRoot));
-
-	//TODO : fill InstructionOutput
-
-	/*
-	for (auto& binding : bindings) {
-		m_generated.push(binding->function);
-	}
-	???
-	*/
-}
