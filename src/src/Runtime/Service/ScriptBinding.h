@@ -47,8 +47,7 @@ namespace ska {
 
 		template <class Interpreter>
 		void buildFunctions(Interpreter& interpreter, typename InterpreterTypes<Interpreter>::Script& script, BridgeField constructor) {
-			auto astScript = script.astScript();
-			auto& scriptAstNode = buildFunctionsAST(astScript, std::move(constructor));
+			auto& scriptAstNode = buildFunctionsAST(script.astScript(), std::move(constructor));
 
 			//assert(m_templateScript != nullptr && "Template script was not AST-generated");
 			script.fromBridge(nullptr, interpreter);

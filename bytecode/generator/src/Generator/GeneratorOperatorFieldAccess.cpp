@@ -31,17 +31,21 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	const auto* objectSymbolInfo = context.getSymbolInfo(*symbolField);
 	if(objectSymbolInfo == nullptr) {
 		auto ss = std::stringstream { };
-		ss << "invalid bytecode : the dereferenced object \"" << node.GetObjectNameNode() << "\" is not registered";
+		ss << "invalid bytecode : the dereferenced object \"" << node.GetObjectNameNode() << "\" is not registered in script ";
+		ss << context.scriptName();
 		throw std::runtime_error(ss.str());
 	}
 	const auto objectFieldReferences = objectSymbolInfo->references;
 	if(objectFieldReferences == nullptr || objectFieldReferences->empty()) {
-		throw std::runtime_error("invalid bytecode : the dereferenced object has no fields references");
+		auto ss = std::stringstream{};
+		ss << "invalid bytecode : the field \"" << symbolField->getName() << "\" in the dereferenced object \"" << node.GetObjectNameNode() << "\" has no fields references in script ";
+		ss << context.scriptName(objectSymbolInfo->script);
+		throw std::runtime_error(ss.str());
 	}
 
 	auto fieldValue = optFieldValue.value();
 	const auto fieldVarReference = fieldValue.as<ScriptVariableRef>();
-	LOG_DEBUG << "This field is " << fieldVarReference.variable << " in script index " << fieldVarReference.script;
+	LOG_DEBUG << "This field is " << fieldVarReference.variable << " in script " << context.scriptName(fieldVarReference.script);
 
 	const auto fieldRefIndex = objectFieldReferences->find(fieldVarReference);
 	if(fieldRefIndex == objectFieldReferences->end()) {

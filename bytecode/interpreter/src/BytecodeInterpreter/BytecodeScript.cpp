@@ -51,7 +51,6 @@ void ska::bytecode::Script::fromBridge(ASTNodePtr astRoot, Interpreter& interpre
   LOG_DEBUG << " %14cConstructor sub-symbol type to bind : \"" << (*subSymbol).getType() << "\"";
   */
   m_serviceGen.generate(m_cache, interpreter.generator());
-  
 
   execute(interpreter);
 }

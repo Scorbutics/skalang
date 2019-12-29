@@ -66,6 +66,6 @@ ska::ASTNode& ska::ScriptBindingBase::buildFunctionsAST(ScriptAST& target, Bridg
 	}
 	m_bindings = {};
 
-	auto astRoot = m_functionBuilder.makeFunction(m_script, std::move(constructor));
+	auto astRoot = ASTFactory::MakeNode<Operator::BLOCK>(m_functionBuilder.makeFunction(m_script, std::move(constructor)));
 	return m_script.fromBridge(std::move(astRoot));
 }

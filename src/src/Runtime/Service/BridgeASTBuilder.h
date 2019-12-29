@@ -55,20 +55,20 @@ namespace ska {
 		BridgeASTBuilder(TypeBuilder& typeBuilder, SymbolTableUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
 		virtual ~BridgeASTBuilder();
 
-		ASTNodePtr makeFunction(ScriptAST& script, BridgeFunction data);
+		ASTNodePtr makeFunction(ScriptAST& script, BridgeFunction& data);
 
 	private:
 		// TODO Deprecated
 		ASTNodePtr makeFunctionPrototype(ScriptAST& script, const std::string& functionName, std::vector<std::string> typeNames);
 
 		ASTNodePtr makeFunctionPrototype(ScriptAST& script, const Type& fullTypeFunction);
-		ASTNodePtr makeFunctionDeclaration(ScriptAST& script, ASTNodePtr prototype, std::vector<BridgeField>& fieldList);
+		ASTNodePtr makeFunctionDeclaration(ScriptAST& script, ASTNodePtr prototype, std::vector<BridgeFunction> fieldList);
 		ASTNodePtr makeFunctionParameterOrReturnType(ScriptAST& script, ASTNodePtr nodeType, std::size_t parameterIndex, std::size_t totalParameters);
 		ASTNodePtr makeFunctionName(ScriptAST& script, const std::string& name);
 		ASTNodePtr makeFunctionPrototype(ScriptAST& script, ASTNodePtr nameNode, std::vector<ASTNodePtr> parametersAndReturn);
 		ASTNodePtr makeVariable(ScriptAST& script, const std::string& name, ASTNodePtr value);
 
-		ASTNodePtr makeCustomObjectReturn(ScriptAST& script, std::vector<BridgeField>& fieldList);
+		ASTNodePtr makeCustomObjectReturn(ScriptAST& script, std::vector<BridgeFunction> fieldList);
 		
 		// TODO Deprecated
 		std::vector<ASTNodePtr> makeFunctionInputOutput(ScriptAST& script, const std::vector<std::string>& typeNames);

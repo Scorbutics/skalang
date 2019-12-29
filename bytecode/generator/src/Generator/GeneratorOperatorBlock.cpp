@@ -19,19 +19,17 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 			auto fieldRef = childCellGroup.operand().as<ScriptVariableRef>();
 			fields->emplace(std::move(fieldRef), fields->size());
 
-			auto symbolInfo = SymbolInfo { fields, context.scriptIndex() };
+			auto symbolInfo = SymbolInfo { context.scope() + 1, child->name(), fields, context.scriptIndex() };
 			if (context.scope() == 0) {
 				symbolInfo.exported = true;
 				symbolInfo.priority = childIndex;
 			}
-			LOG_INFO << "Registering symbol info " << symbolInfo << " for field node " << *child << " (this symbol is " << (context.scope() == 0 ? "exported" : "not exported") << ")";
+			LOG_INFO << "%12cRegistering symbol info " << symbolInfo << " for field node " << *child << " (this symbol is " << (context.scope() == 0 ? "exported" : "not exported") << ")";
 			context.setSymbolInfo(*child, std::move(symbolInfo));
 		}
 		group.push(std::move(childCellGroup));
 		childIndex++;
 	}
-
-	//context.setSymbolInfo(node.asNode(), SymbolInfo { fields });
 
 	LOG_DEBUG << group;
 

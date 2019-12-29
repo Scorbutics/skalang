@@ -7,6 +7,12 @@
 #include "Service/IsSmartPtr.h"
 
 namespace ska {
+	struct ScriptCacheBaseLog;
+}
+
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ScriptCacheBaseLog);
+
+namespace ska {
 
 	template <class ScriptT>
 	struct ScriptCacheBase {
@@ -55,9 +61,11 @@ namespace ska {
 			const auto wantedScriptId = namedMapCache.size();
 			const auto emplacedItem = namedMapCache.emplace(std::move(scriptName), wantedScriptId);
 			if(emplacedItem.second) {
+				SLOG_STATIC(LogLevel::Info, ScriptCacheBaseLog) << "Adding script " << emplacedItem.first->first << " at index " << emplacedItem.first->second;
 				pushCache(wantedScriptId, std::move(script));
 				return false;
 			} else if (force || !exist(emplacedItem.first->second)) {
+				SLOG_STATIC(LogLevel::Info, ScriptCacheBaseLog) << "Adding script " << emplacedItem.first->first << " at index " << emplacedItem.first->second;
 				pushCache(emplacedItem.first->second, std::move(script));
 			}
 			return true;

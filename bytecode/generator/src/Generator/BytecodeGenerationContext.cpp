@@ -105,3 +105,7 @@ const ska::bytecode::ScriptGenerationHelper& ska::bytecode::GenerationContext::s
 ska::ScriptASTPtr ska::bytecode::GenerationContext::useImport(const std::string& scriptImported) {
 	return helper().useImport(scriptImported);
 }
+
+const std::string ska::bytecode::GenerationContext::scriptName(std::size_t index) const {
+	return m_generated.at(index).name();
+}

@@ -39,8 +39,8 @@ namespace ska {
 				return ScriptVariableRef{ executionPointer + relativeValue, scriptIndex };
 			}
 
-			auto size() const { return instructions[scriptIndex].size(); }
-			bool idle() const { return executionPointer >= instructions[scriptIndex].size(); }
+			auto size() const { assert(scriptIndex >= instructions.size()); return instructions[scriptIndex].size(); }
+			bool idle() const { assert(scriptIndex >= instructions.size()); return executionPointer >= instructions[scriptIndex].size(); }
 
 			template <class T>
 			T get(const Operand& v) const {

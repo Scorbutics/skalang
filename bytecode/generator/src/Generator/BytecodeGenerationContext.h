@@ -40,6 +40,7 @@ namespace ska {
 
 			const auto scriptIndex() const { return m_script.id(); }
 			auto scriptName() const { return m_script.name(); }
+			const std::string scriptName(std::size_t index) const;
 
 		private:
 			ScriptGenerationHelper& helper();
