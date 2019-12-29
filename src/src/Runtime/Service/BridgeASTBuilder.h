@@ -55,7 +55,7 @@ namespace ska {
 		BridgeASTBuilder(TypeBuilder& typeBuilder, SymbolTableUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
 		virtual ~BridgeASTBuilder();
 
-		ASTNodePtr makeFunction(ScriptAST& script, BridgeFunction& data);
+		ASTNodePtr makeFunction(ScriptAST& script, const BridgeFunction& data);
 
 	private:
 		// TODO Deprecated

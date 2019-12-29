@@ -171,7 +171,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionDeclaration(ScriptAST& script
 	const std::string& functionName = prototype->name();
 	SLOG(LogLevel::Info) << " 6 - Making function declaration " << functionName;
 	auto functionNameToken = Token { functionName, TokenType::IDENTIFIER, {} };
-	auto returnNode = makeCustomObjectReturn(script, fieldList);
+	auto returnNode = makeCustomObjectReturn(script, std::move(fieldList));
 	auto functionDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionNameToken, std::move(prototype), returnNode->size() == 0 ? ASTFactory::MakeEmptyNode() : ASTFactory::MakeNode<Operator::BLOCK>(std::move(returnNode)));
 	auto event = FunctionTokenEvent{ *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, script, functionNameToken.name() };
 	observable_priority_queue<FunctionTokenEvent>::notifyObservers(event);
@@ -200,7 +200,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionPrototype(ScriptAST& script, 
 	return makeFunctionPrototype(script, std::move(functionNameNode), std::move(parametersAndReturn));
 }
 
-ska::ASTNodePtr ska::BridgeASTBuilder::makeFunction(ScriptAST& script, BridgeFunction& data) {
+ska::ASTNodePtr ska::BridgeASTBuilder::makeFunction(ScriptAST& script, const BridgeFunction& data) {
 	auto prototype = ASTNodePtr{ nullptr };
 	SLOG(LogLevel::Info) << " 1 - Making function \"" << data.name() << "\"";
 //	if (!data.typeNames().empty()) {
