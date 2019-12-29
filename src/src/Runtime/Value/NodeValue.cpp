@@ -64,12 +64,12 @@ std::string ska::NodeValue::convertString() const {
 			} else if constexpr (std::is_same<T, VariableRef>::value) {
 				result = std::to_string(arg.variable);
 			} else if constexpr (std::is_same<T, ScriptVariableRef>::value) {
-				result = std::to_string(arg.script) + ":" + std::to_string(arg.variable);
+				result = "__script " + std::to_string(arg.script) + ": variable ref " + std::to_string(arg.variable) + "__";
 			} else if constexpr (std::is_same<T, bool>::value) {
 				result = arg ? "true" : "false";
 			} else if constexpr (std::is_same<T, StringShared>::value) {
 				result = *arg;
-			} else if constexpr (std::is_same_v<T, ObjectMemory> || std::is_same_v<T, BridgeFunctionPtr>) {
+			} else if constexpr (std::is_same_v<T, ObjectMemory> || std::is_same_v<T, NativeFunctionPtr>) {
 				result = "__complex memory object__";
 			} else {
 				throw std::runtime_error("cannot convert the node value to a string format");

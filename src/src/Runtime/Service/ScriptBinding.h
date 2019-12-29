@@ -5,17 +5,15 @@
 #include <vector>
 #include <unordered_map>
 
-#include "Container/sorted_observable.h"
-#include "Runtime/Value/BridgeFunction.h"
+#include "Runtime/Value/NativeFunction.h"
 #include "BridgeASTBuilder.h"
-#include "Event/VarTokenEvent.h"
 #include "NodeValue/ScriptCacheAST.h"
 #include "NodeValue/ScriptASTPtr.h"
 #include "NodeValue/ScriptAST.h"
 #include "Runtime/Value/NodeValue.h"
 #include "Runtime/Value/InterpreterTypes.h"
 #include "Runtime/Value/ModuleConfiguration.h"
-#include "Runtime/Service/BridgeFunctionData.h"
+#include "Runtime/Service/BridgeFunction.h"
 
 namespace ska {
 	class ScriptBindingBase;
@@ -27,8 +25,7 @@ namespace ska {
 	class SymbolTable;
 	class StatementParser;
 
-	class ScriptBindingBase :
-        protected observable_priority_queue<VarTokenEvent> {
+	class ScriptBindingBase {
 	public:
 		ScriptBindingBase (
 			StatementParser& parser,
@@ -39,15 +36,14 @@ namespace ska {
 			SymbolTableUpdater& symbolTypeUpdater,
 			const ReservedKeywordsPool& reserved);
 
-		virtual ~ScriptBindingBase();
+		virtual ~ScriptBindingBase() = default;
 
-		void bindFunction(Type functionType, decltype(BridgeFunction::function) f);
+		void bindFunction(Type functionType, decltype(NativeFunction::function) f);
 
 		const auto& name() const { return m_script.name(); }
 		const std::string& templateName() const;
 
 	protected:
-		BridgeImport import(std::string constructorMethod, StatementParser& parser, std::pair<std::string, std::string> import);
 
 		template <class Interpreter>
 		void buildFunctions(Interpreter& interpreter, typename InterpreterTypes<Interpreter>::Script& script, BridgeField constructor) {
@@ -68,7 +64,7 @@ namespace ska {
 		}
 
 		template <class ReturnType, class ... ParameterTypes>
-		BridgeFunctionPtr makeScriptSideBridge(std::function<ReturnType(ParameterTypes...)> f) {
+		NativeFunctionPtr makeScriptSideBridge(std::function<ReturnType(ParameterTypes...)> f) {
 			auto lambdaWrapped = [f, this](std::vector<NodeValue> v) {
 				if constexpr(std::is_same_v<ReturnType, void>) {
 					callNativeFromScript(std::move(f), v, std::make_index_sequence<sizeof ...(ParameterTypes)>());
@@ -104,8 +100,6 @@ namespace ska {
 			}
 		}
 
-    //void registerAST(ASTNode& scriptAst);
-
 	protected:
 		StatementParser& m_parser;
 		ScriptASTPtr m_templateScript;
@@ -121,7 +115,6 @@ namespace ska {
 		ScriptCacheAST& m_cache;
 
 		std::unordered_map<std::string, ASTNodePtr> m_imports;
-		//std::vector<BridgeFunctionPtr> m_bindings;
 		std::vector<BridgeField> m_bindings;
 	};
 

@@ -38,7 +38,7 @@ namespace ska {
       m_bindingTarget.buildFunctions(BridgeField{m_templateLooker.constructor()});
     }
 
-    void bindField(std::string name, decltype(BridgeFunction::function) binding) {
+    void bindField(std::string name, decltype(NativeFunction::function) binding) {
       m_bindingTarget.bindFunction(m_templateLooker.field(name), std::move(binding));
     }
 

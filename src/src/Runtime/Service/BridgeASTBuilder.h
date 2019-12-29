@@ -17,7 +17,7 @@
 
 #include "Service/Matcher/MatcherType.h"
 #include "Runtime/Value/BridgeImport.h"
-#include "BridgeFunctionData.h"
+#include "BridgeFunction.h"
 
 namespace ska {
 	class SymbolTable;
@@ -67,7 +67,7 @@ namespace ska {
 		}
 
 
-		ASTNodePtr makeFunction(ScriptAST& script, BridgeFunctionData data);
+		ASTNodePtr makeFunction(ScriptAST& script, BridgeFunction data);
 
 		//ASTNodePtr makeFunction(ScriptAST& script, const std::string& functionName, std::vector<std::string> typeNames, BridgeConstructorData = {});
 		//ASTNodePtr makeFunction(ScriptAST& script, const Type& fullTypeFunction, BridgeConstructorData = {});

@@ -3,7 +3,7 @@
 #include "ScriptAST.h"
 #include "Service/StatementParser.h"
 #include "Service/ASTFactory.h"
-#include "Runtime/Value/BridgeFunction.h"
+#include "Runtime/Value/NativeFunction.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptAST)
 

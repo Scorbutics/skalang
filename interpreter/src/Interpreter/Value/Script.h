@@ -4,7 +4,7 @@
 #include "ScriptPtr.h"
 #include "ScriptHandle.h"
 #include "Interpreter/ScriptCache.h"
-#include "Runtime/Value/BridgeFunction.h"
+#include "Runtime/Value/NativeFunction.h"
 #include "NodeValue/ScriptAST.h"
 
 namespace ska {
@@ -32,7 +32,7 @@ namespace ska {
 			return m_cache.cache.exist(index);
 		}
 
-		void memoryFromBridge(const ScriptAST& origin, Interpreter&, std::vector<BridgeFunctionPtr> bindings);
+		void memoryFromBridge(const ScriptAST& origin, Interpreter&, std::vector<NativeFunctionPtr> bindings);
 
 		const auto& handle() const { return m_handle; }
 

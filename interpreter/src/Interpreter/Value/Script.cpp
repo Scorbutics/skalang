@@ -30,7 +30,7 @@ ska::ScriptHandle* ska::Script::buildHandle(ScriptCache& cache, ScriptHandleAST&
 	return &cache.cache.at(name);
 }
 
-void ska::Script::memoryFromBridge(const ScriptAST& origin, Interpreter&, std::vector<BridgeFunctionPtr> bindings) {
+void ska::Script::memoryFromBridge(const ScriptAST& origin, Interpreter&, std::vector<NativeFunctionPtr> bindings) {
 	const ASTNode& declaredAstBlock = m_ast.rootNode();
 	assert(declaredAstBlock.size() == bindings.size() && "Cannot create memory from this ast");
 

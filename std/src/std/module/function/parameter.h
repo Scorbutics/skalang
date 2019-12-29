@@ -23,21 +23,21 @@ namespace ska {
                 auto parametersImport = Module<Interpreter>::m_bridge.import("Fcty", {"Parameters", "std:std.function.parameters"});
 
                 Module<Interpreter>::m_bridge.bindGenericFunction("Gen", { "string", parametersImport.typeName("Fcty") },
-					BridgeFunction::Callback ([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+					NativeFunction::Callback ([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
 
 					auto result = m_proxy.createMemory(parametersImport);
-                    result.push("asInt", std::make_shared<ska::BridgeFunction>(
-                        BridgeFunction::Callback([&](std::vector<ska::NodeValue> params) {
+                    result.push("asInt", std::make_shared<ska::NativeFunction>(
+                        NativeFunction::Callback([&](std::vector<ska::NodeValue> params) {
                         const std::size_t index = params[0].nodeval<long>();
                         return m_parameters.size() > index ? static_cast<long>(m_parameters[index].convertNumeric()) : -1;
                     })));
-                    result.push("asString", std::make_shared<ska::BridgeFunction>(
-                        BridgeFunction::Callback([&](std::vector<ska::NodeValue> params) {
+                    result.push("asString", std::make_shared<ska::NativeFunction>(
+                        NativeFunction::Callback([&](std::vector<ska::NodeValue> params) {
                         const std::size_t index = params[0].nodeval<long>();
                         return std::make_shared<std::string>(std::move(m_parameters.size() > index ? m_parameters[index].convertString() : ""));
                     })));
-                    result.push("size", std::make_shared<ska::BridgeFunction>(
-                        BridgeFunction::Callback([&](std::vector<ska::NodeValue> params) {
+                    result.push("size", std::make_shared<ska::NativeFunction>(
+                        NativeFunction::Callback([&](std::vector<ska::NodeValue> params) {
                         return static_cast<long>(m_parameters.size());
                     })));
 

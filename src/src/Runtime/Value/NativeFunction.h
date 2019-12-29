@@ -6,15 +6,15 @@
 namespace ska {
 	class NodeValue;
 
-	struct BridgeFunction {
+	struct NativeFunction {
 		using Callback = std::function<NodeValue(std::vector<NodeValue>)>;
 
 		template <class F>
-		BridgeFunction(F&& callback) : function(std::forward<F>(callback)) {}
+		NativeFunction(F&& callback) : function(std::forward<F>(callback)) {}
 
 		Callback function;
 		ASTNodePtr node;
 		ASTNode* nodeRef {};
 	};
-	using BridgeFunctionPtr = std::shared_ptr<BridgeFunction>;
+	using NativeFunctionPtr = std::shared_ptr<NativeFunction>;
 }
