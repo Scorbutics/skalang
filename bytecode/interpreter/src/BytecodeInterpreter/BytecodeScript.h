@@ -2,6 +2,7 @@
 #include "Generator/Value/BytecodeScriptGeneration.h"
 #include "BytecodeInterpreter/Value/BytecodeExecutor.h"
 #include "BytecodeInterpreter/Value/BytecodeInterpreterTypes.h"
+#include "Runtime/Service/BridgeFunction.h"
 
 namespace ska {
 	namespace bytecode {
@@ -35,7 +36,7 @@ namespace ska {
 
 			ScriptAST astScript() const { return m_serviceGen.program(); }
 
-			void fromBridge(ASTNodePtr astRoot, Interpreter& interpreter);
+			void fromBridge(const BridgeFunction& constructor, ASTNodePtr astRoot, Interpreter& interpreter);
 
 			RuntimeMemory memoryField(const std::string& symbol);
 

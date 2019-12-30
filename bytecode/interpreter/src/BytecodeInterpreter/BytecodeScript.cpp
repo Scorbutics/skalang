@@ -29,13 +29,24 @@ ska::bytecode::RuntimeMemory ska::bytecode::Script::memoryField(const std::strin
   return RuntimeMemory { findBytecodeMemoryFromSymbol(symbolAst) };
 }
 
-void ska::bytecode::Script::fromBridge(ASTNodePtr astRoot, Interpreter& interpreter) {
+void ska::bytecode::Script::fromBridge(const BridgeFunction& constructor, ASTNodePtr astRoot, Interpreter& interpreter) {
     m_serviceGen.program().fromBridge(std::move(astRoot));
 
     LOG_DEBUG << "%14cGenerating bindings for script " << m_serviceGen.name();
 
+    /*
+    TODO C++ function link here
+
+    for (const auto& field : constructor.fields()) {
+        auto info = SymbolInfo {};
+        info.binding = field.callback;
+        m_cache.setSymbolInfo(, info);
+    }
+    */
+
   m_serviceGen.generate(m_cache, interpreter.generator());
   LOG_DEBUG << "%14cGeneration done for script " << m_serviceGen.name();
+
   //execute(interpreter);
 }
 

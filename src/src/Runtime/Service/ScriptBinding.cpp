@@ -53,17 +53,19 @@ void ska::ScriptBindingAST::queryAST() {
 	}
 }
 
-ska::ASTNodePtr ska::ScriptBindingAST::buildFunctionsAST(BridgeField constructorField) {
-	SLOG(LogLevel::Info) << "Building script " << m_scriptAst.name() << " from bridge";
-	SLOG(LogLevel::Info) << "Current constructor is : " << constructorField.name();
-
+ska::BridgeFunction ska::ScriptBindingAST::buildConstructorFromBindings(BridgeField constructorField) {
+	auto constructor = BridgeFunction { constructorField };
 	assert(!m_bindings.empty() && "Bridge is empty");
-
-	auto constructor = BridgeFunction{ std::move(constructorField) };
-	for(auto& binding : m_bindings) {
+	for (auto& binding : m_bindings) {
 		constructor.bindField(std::move(binding));
 	}
 	m_bindings = {};
+	return constructor;
+}
 
-	return ASTFactory::MakeNode<Operator::BLOCK>(m_functionBuilder.makeFunction(m_scriptAst, std::move(constructor)));
+ska::ASTNodePtr ska::ScriptBindingAST::buildFunctionsAST(const BridgeFunction& constructor) {
+	SLOG(LogLevel::Info) << "Building script " << m_scriptAst.name() << " from bridge";
+	SLOG(LogLevel::Info) << "Current constructor is : " << constructor.name();
+
+	return ASTFactory::MakeNode<Operator::BLOCK>(m_functionBuilder.makeFunction(m_scriptAst, constructor));
 }

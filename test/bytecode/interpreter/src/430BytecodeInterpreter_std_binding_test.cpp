@@ -48,7 +48,6 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path + bridge function call") {
 	auto& gen = data.generator->generate(data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
 	auto res = interpreted->variable(gen.id());
-	std::cout << res.convertString();
 	auto cellValue = *res.nodeval<ska::StringShared>();
 	CHECK(cellValue == "");
 }

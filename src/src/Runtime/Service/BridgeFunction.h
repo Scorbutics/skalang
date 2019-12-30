@@ -55,6 +55,7 @@ namespace ska {
     const Type& type() const { return m_function.type; }
 
     const BridgeField::Callback& callback() const { return m_function.callback; }
+    const std::vector<BridgeField>& fields() const { return m_fields; }
 
   private:
     BridgeField m_function;
