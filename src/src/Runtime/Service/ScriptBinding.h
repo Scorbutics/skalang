@@ -64,7 +64,7 @@ namespace ska {
 				}
 			};
 
-			return std::make_shared<BridgeFunction>(static_cast<decltype(BridgeFunction::function)> (std::move(lambdaWrapped)));
+			return std::make_shared<NativeFunction>(static_cast<decltype(NativeFunction::function)> (std::move(lambdaWrapped)));
 		}
 
 		template <class T, std::size_t Id>
