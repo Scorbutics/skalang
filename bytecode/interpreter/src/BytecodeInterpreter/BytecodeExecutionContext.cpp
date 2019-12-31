@@ -93,3 +93,7 @@ const ska::bytecode::ScriptExecution& ska::bytecode::ExecutionContext::scriptFro
 	checkCurrentExecutionOrThrow();
 	return *m_current;
 }
+
+const ska::NativeFunction& ska::bytecode::ExecutionContext::getBinding(std::size_t index) const {
+	return m_in.getBinding(index);
+}

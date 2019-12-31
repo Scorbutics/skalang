@@ -34,6 +34,7 @@
 #include "Units/InterpreterCommandPopInArr.h"
 #include "Units/InterpreterCommandPopInVar.h"
 #include "Units/InterpreterCommandJumpAbs.h"
+#include "Units/InterpreterCommandJumpBind.h"
 #include "Units/InterpreterCommandJumpRel.h"
 #include "Units/InterpreterCommandConvID.h"
 #include "Units/InterpreterCommandConvDI.h"
@@ -93,6 +94,7 @@ ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build
 	InterpreterCommandDeclare<Command::POP_IN_ARR>(*this, result, generator);
 	InterpreterCommandDeclare<Command::POP_IN_VAR>(*this, result, generator);
 	InterpreterCommandDeclare<Command::JUMP_ABS>(*this, result, generator);
+	InterpreterCommandDeclare<Command::BIND>(*this, result, generator);
 	InterpreterCommandDeclare<Command::JUMP_REL>(*this, result, generator);
 	InterpreterCommandDeclare<Command::JUMP_NIF>(*this, result, generator);
 

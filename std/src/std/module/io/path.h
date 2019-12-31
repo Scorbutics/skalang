@@ -18,8 +18,7 @@ namespace ska {
                 auto constructor = BridgeConstructor<Interpreter> { Module<Interpreter>::m_bridge, "Fcty" };
 
                 constructor.bindField("canonical", std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> buildParams) -> ska::NodeValue {
-                    std::cout << "LOULOULOULOU" << std::endl;
-                    return std::make_shared<std::string>(std::move(FileUtils::getCanonicalPath(/*importTemplate.template param<StringShared>(0) */ "")));
+                    return std::make_shared<std::string>(FileUtils::getCanonicalPath(/*importTemplate.template param<StringShared>(0) */ ""));
                 }));
 
                 constructor.generate();

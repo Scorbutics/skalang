@@ -74,6 +74,8 @@ namespace ska {
 
 			const ScriptGeneration& generateIfNeeded(Generator& generator, std::size_t scriptIndex);
 
+			const NativeFunction& getBinding(std::size_t index) const;
+
 		private:
 			void checkCurrentExecutionOrThrow() const {
 				if (m_current == nullptr) { throw std::runtime_error("bad execution context"); }

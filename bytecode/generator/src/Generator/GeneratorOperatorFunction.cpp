@@ -107,7 +107,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	auto callInstruction = Instruction {};
 	if (functionSymbolInfo != nullptr && functionSymbolInfo->binding != nullptr) {
-		callInstruction = Instruction { Command::JUMP_BIND, context.storeBinding(functionSymbolInfo->binding) };
+		callInstruction = Instruction{ Command::BIND, context.storeBinding(functionSymbolInfo->binding), Operand {static_cast<long>(node.GetFunctionParameterSize())} };
 	} else {
 		callInstruction = Instruction { Command::JUMP_ABS, std::move(preCallValue.operand()) };
 	}
