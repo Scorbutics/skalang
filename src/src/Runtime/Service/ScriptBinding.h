@@ -91,7 +91,8 @@ namespace ska {
 		}
 
 	protected:
-		ASTNodePtr buildFunctionsAST(BridgeField constructor);
+		ASTNodePtr buildFunctionsAST(const BridgeFunction& constructor);
+		BridgeFunction buildConstructorFromBindings(BridgeField constructorField);
 		StatementParser& m_parser;
 		ScriptASTPtr m_templateScript;
 
@@ -129,9 +130,10 @@ namespace ska {
 
 		auto& script() { return m_script; }
 
-		void buildFunctions(BridgeField constructor) {
-			auto astRoot = ScriptBindingAST::buildFunctionsAST(std::move(constructor));
-			m_script.fromBridge(std::move(astRoot), m_interpreter);
+		void buildFunctions(BridgeField constructorField) {
+			auto constructor = ScriptBindingAST::buildConstructorFromBindings(std::move(constructorField));
+			auto astRoot = ScriptBindingAST::buildFunctionsAST(constructor);
+			m_script.fromBridge(constructor, std::move(astRoot), m_interpreter);
 		}
 
 	private:
