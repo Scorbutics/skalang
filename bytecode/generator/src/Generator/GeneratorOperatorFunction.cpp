@@ -65,8 +65,15 @@ namespace ska {
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	LOG_DEBUG << "Generating prototype of \"" << node.GetFunctionName() << "\"...";
 	auto valueGroup = generateNext({ context, node.GetFunctionPrototype() });
+
 	LOG_DEBUG << "Generating body...";
-	valueGroup.push(generateNext({ context, node.GetFunctionBody(), 1 }));
+	const auto* functionSymbolInfo = context.getSymbolInfo(node.GetFunction());
+	LOG_DEBUG << "Function Call symbol info : " << (functionSymbolInfo == nullptr || functionSymbolInfo->binding == nullptr ? "none" : "with binding");
+	if (functionSymbolInfo == nullptr || functionSymbolInfo->binding == nullptr) {
+		valueGroup.push(generateNext({ context, node.GetFunctionBody(), 1 }));
+	} else {
+		//valueGroup.push(Instruction {});
+	}
 
 	LOG_DEBUG << "\nGenerated " << valueGroup << " with value " << valueGroup.operand();
 
@@ -95,7 +102,15 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	auto preCallValue = generateNext({context, node.GetFunctionNameNode()});
 	LOG_DEBUG << "Function call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
 
-	auto callInstruction = Instruction { Command::JUMP_ABS, std::move(preCallValue.operand()) };
+	const auto* functionSymbolInfo = context.getSymbolInfo(*node.GetFunctionNameNode().type().value().symbol());
+	LOG_DEBUG << "Function Call symbol info : " << (functionSymbolInfo == nullptr || functionSymbolInfo->binding == nullptr ? "none" : "with binding");
+
+	auto callInstruction = Instruction {};
+	if (functionSymbolInfo != nullptr && functionSymbolInfo->binding != nullptr) {
+		callInstruction = Instruction { Command::JUMP_BIND, context.storeBinding(functionSymbolInfo->binding) };
+	} else {
+		callInstruction = Instruction { Command::JUMP_ABS, std::move(preCallValue.operand()) };
+	}
 	auto result = std::move(preCallValue);
 
 	applyGenerator(ApplyNOperations<Command::PUSH, OperateOn&>, result, context, node, node.GetFunctionParameterSize());

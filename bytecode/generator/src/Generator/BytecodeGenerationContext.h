@@ -5,6 +5,7 @@
 #include "Value/BytecodeSymbolInfo.h"
 #include "Value/BytecodeScriptGenerationHelper.h"
 #include "Value/BytecodeGenerationOutput.h"
+#include "Runtime/Value/NativeFunction.h"
 
 namespace ska {
 	class ASTNode;
@@ -17,9 +18,7 @@ namespace ska {
 			GenerationContext(GenerationContext& old);
 			GenerationContext(GenerationContext& old, const ScriptAST& scriptAst);
 			GenerationContext(GenerationContext& old, ScriptGenerationHelper script);
-
 			GenerationContext(GenerationContext&& mv) = default;
-
 			GenerationContext(GenerationContext& old, const ASTNode& node, std::size_t scopeLevelOffset = 0);
 
 			const ASTNode& pointer() const { assert(m_pointer != nullptr); return *m_pointer; }
@@ -34,6 +33,8 @@ namespace ska {
 			ScriptASTPtr useImport(const std::string& scriptImported);
 			const SymbolInfo* getSymbolInfo(const Symbol& symbol) const;
 			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
+			const NativeFunction& getBinding(std::size_t index) const;
+			Operand storeBinding(NativeFunctionPtr binding);
 			Operand querySymbolOrOperand(const ASTNode& node);
 			Operand querySymbol(const Symbol& symbol);
 			std::optional<Operand> getSymbol(const Symbol& symbol) const;

@@ -13,7 +13,17 @@ void ska::bytecode::ScriptCache::setSymbolInfo(const ASTNode& node, SymbolInfo i
 
 void ska::bytecode::ScriptCache::setSymbolInfo(const Symbol& symbol, SymbolInfo info) {
 	SLOG(ska::LogLevel::Debug) << "[Cache " << this << "] Setting " << info << " (" << symbol.getName() << ") with key 0x" << &symbol;
-	m_symbolInfo[&symbol] = std::move(info);
+	auto it = m_symbolInfo.find(&symbol);
+	if (it == m_symbolInfo.end()) {
+		m_symbolInfo.emplace(&symbol, std::move(info));
+	} else {
+		it->second = std::move(info);
+	}
+}
+
+ska::bytecode::SymbolInfo ska::bytecode::ScriptCache::getSymbolInfoOrNew(std::size_t scriptIndex, const Symbol& symbol) const {
+	const auto* result = getSymbolInfo(symbol);
+	return result == nullptr ? SymbolInfo {scriptIndex} : *result;
 }
 
 const ska::bytecode::SymbolInfo* ska::bytecode::ScriptCache::getSymbolInfo(const Symbol& symbol) const {
@@ -54,3 +64,14 @@ const std::vector<ska::bytecode::Operand>& ska::bytecode::ScriptCache::getExport
 }
 
 bool ska::bytecode::ScriptCache::isGenerated(std::size_t index) const { return index < size() && !(*this)[index].empty();}
+
+std::size_t ska::bytecode::ScriptCache::storeBinding(NativeFunctionPtr binding) {
+	const auto result = m_bindings.size();
+	m_bindings.push_back(std::move(binding));
+	return result;
+}
+
+const ska::NativeFunction& ska::bytecode::ScriptCache::getBinding(std::size_t index) const {
+	assert(index < m_bindings.size());
+	return *m_bindings[index];
+}

@@ -19,7 +19,11 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 			auto fieldRef = childCellGroup.operand().as<ScriptVariableRef>();
 			fields->emplace(std::move(fieldRef), fields->size());
 
+			auto* oldSymbolInfo = context.getSymbolInfo(*child);
 			auto symbolInfo = SymbolInfo { context.scope() + 1, child->name(), fields, context.scriptIndex() };
+			if (oldSymbolInfo != nullptr) {
+				symbolInfo.binding = oldSymbolInfo->binding;
+			}
 			if (context.scope() == 0) {
 				symbolInfo.exported = true;
 				symbolInfo.priority = childIndex;

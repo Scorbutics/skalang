@@ -42,6 +42,7 @@ namespace ska {
 			PURE,
 			VAR,
 			REG,
+			BIND,
 			EMPTY
 		};
 
@@ -49,6 +50,7 @@ namespace ska {
 			"PURE",
 			"VAR",
 			"REG",
+			"BIND",
 			""
 		};
 
