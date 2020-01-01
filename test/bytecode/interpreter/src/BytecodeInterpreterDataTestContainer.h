@@ -29,5 +29,5 @@ struct BytecodeInterpreterDataTestContainer {
     TypeBuilderPtr typeBuilder;
 	SymbolTableUpdaterPtr symbolsTypeUpdater;
     BytecodeInterpreterPtr interpreter;
-    ska::bytecode::ScriptCache storage;
+    std::unique_ptr<ska::bytecode::ScriptCache> storage = std::make_unique<ska::bytecode::ScriptCache>();
 };

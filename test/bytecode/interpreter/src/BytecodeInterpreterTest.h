@@ -25,7 +25,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, BytecodeInterpreterTest);
 static void ASTFromInputBytecodeInterpreterNoParse(const std::string& input, BytecodeInterpreterDataTestContainer& data) {
   tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);
   tokens = tokenizer->tokenize();
-	readerI = std::make_unique<ska::ScriptAST>(data.storage.astCache, "main", tokens);
+	readerI = std::make_unique<ska::ScriptAST>(data.storage->astCache, "main", tokens);
 
 	data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosserI);
@@ -39,7 +39,7 @@ static std::pair<ska::bytecode::ScriptGenerationHelper, BytecodeInterpreterDataT
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(input, data);
 	readerI->parse(*data.parser);
-	return std::make_pair<ska::bytecode::ScriptGenerationHelper, BytecodeInterpreterDataTestContainer>(ska::bytecode::ScriptGenerationHelper{data.storage, *readerI }, std::move(data));
+	return std::make_pair<ska::bytecode::ScriptGenerationHelper, BytecodeInterpreterDataTestContainer>(ska::bytecode::ScriptGenerationHelper{*data.storage, *readerI }, std::move(data));
 }
 
 struct BytecodePart {

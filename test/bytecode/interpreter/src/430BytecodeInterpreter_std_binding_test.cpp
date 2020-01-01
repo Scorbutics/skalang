@@ -13,7 +13,7 @@
 
 static ska::bytecode::ScriptGenerationHelper Interpret(BytecodeInterpreterDataTestContainer& data, const std::string& input) {
 	readerI->parse(*data.parser);
-	return ska::bytecode::ScriptGenerationHelper{data.storage, *readerI };
+	return ska::bytecode::ScriptGenerationHelper{*data.storage, *readerI };
 }
 
 TEST_CASE("[BytecodeInterpreter] Binding std : path import only") {
@@ -24,12 +24,12 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path import only") {
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(progStr, data);
 
-	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { data.storage.astCache, data.storage, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords, *data.parser, *data.interpreter};
+	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { data.storage->astCache, *data.storage, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords, *data.parser, *data.interpreter};
 	auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
 
 	auto script = Interpret(data, progStr);
-	auto& gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 }
 
 TEST_CASE("[BytecodeInterpreter] Binding std : path + bridge function call") {
@@ -41,12 +41,12 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path + bridge function call") {
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(progStr, data);
 
-	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { data.storage.astCache, data.storage, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords, *data.parser, *data.interpreter};
+	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { data.storage->astCache, *data.storage, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords, *data.parser, *data.interpreter};
 	auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
 
 	auto script = Interpret(data, progStr);
-	auto& gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 	auto res = interpreted->variable(gen.id());
 	auto cellValue = *res.nodeval<ska::StringShared>();
 	CHECK(cellValue == "");

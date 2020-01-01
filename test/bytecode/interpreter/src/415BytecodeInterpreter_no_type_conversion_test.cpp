@@ -6,8 +6,8 @@
 TEST_CASE("[BytecodeInterpreter] no type conversion string + string") {
 	static constexpr auto progStr = "var result = \"3\" + \"7\";";
 	auto [script, data] = Interpret(progStr);
-	auto& gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<ska::StringShared>();
 	CHECK(*firstCellValue == "37");
@@ -16,8 +16,8 @@ TEST_CASE("[BytecodeInterpreter] no type conversion string + string") {
 TEST_CASE("[BytecodeInterpreter] no type conversion float + float") {
 	static constexpr auto progStr = "var result = 3.0 + 7.4;";
 	auto [script, data] = Interpret(progStr);
-	auto& gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<double>();
 	CHECK(firstCellValue == 10.4);
@@ -26,8 +26,8 @@ TEST_CASE("[BytecodeInterpreter] no type conversion float + float") {
 TEST_CASE("[BytecodeInterpreter] no type conversion array") {
 	static constexpr auto progStr = "var result = [3];";
   auto [script, data] = Interpret(progStr);
-	auto& gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<ska::NodeValueArray>();
 	CHECK((*firstCellValue)[0].nodeval<long>() == 3L);
@@ -36,8 +36,8 @@ TEST_CASE("[BytecodeInterpreter] no type conversion array") {
 TEST_CASE("[BytecodeInterpreter] no type conversion array + array") {
 	static constexpr auto progStr = "var result = [3] + [7, 12, 25];";
   auto [script, data] = Interpret(progStr);
-	auto& gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<ska::NodeValueArray>();
   CHECK(firstCellValue->size() == 4);
@@ -50,8 +50,8 @@ TEST_CASE("[BytecodeInterpreter] no type conversion array + array") {
 TEST_CASE("[BytecodeInterpreter] no type conversion int - int") {
 	static constexpr auto progStr = "var result = 3 - 4;";
   auto [script, data] = Interpret(progStr);
-	auto& gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<long>();
 	CHECK(firstCellValue == -1);
@@ -60,8 +60,8 @@ TEST_CASE("[BytecodeInterpreter] no type conversion int - int") {
 TEST_CASE("[BytecodeInterpreter] no type conversion float - float") {
 	static constexpr auto progStr = "var result = 3.1 - 4.2;";
   auto [script, data] = Interpret(progStr);
-	auto& gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<double>();
 	CHECK(firstCellValue == -1.1);
@@ -70,8 +70,8 @@ TEST_CASE("[BytecodeInterpreter] no type conversion float - float") {
 TEST_CASE("[BytecodeInterpreter] no type conversion array - array") {
 	static constexpr auto progStr = "var result = [11, 4, 9] - [1, 2];";
   auto [script, data] = Interpret(progStr);
-	auto& gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<ska::NodeValueArray>();
   CHECK(firstCellValue->size() == 1);
@@ -81,8 +81,8 @@ TEST_CASE("[BytecodeInterpreter] no type conversion array - array") {
 TEST_CASE("[BytecodeInterpreter] no type conversion int * int") {
 	static constexpr auto progStr = "var result = 3 * 4;";
   auto [script, data] = Interpret(progStr);
-	auto& gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<long>();
 	CHECK(firstCellValue == 12);
@@ -91,8 +91,8 @@ TEST_CASE("[BytecodeInterpreter] no type conversion int * int") {
 TEST_CASE("[BytecodeInterpreter] no type conversion float * float") {
 	static constexpr auto progStr = "var result = 3.0 * 4.4;";
   auto [script, data] = Interpret(progStr);
-	auto& gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<double>();
   const auto check = firstCellValue + 0.01 >= 13.2 && firstCellValue - 0.01 <= 13.2;
@@ -102,8 +102,8 @@ TEST_CASE("[BytecodeInterpreter] no type conversion float * float") {
 TEST_CASE("[BytecodeInterpreter] no type conversion int / int") {
 	static constexpr auto progStr = "var result = 3 / 4;";
   auto [script, data] = Interpret(progStr);
-	auto& gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<long>();
 	CHECK(firstCellValue == 0);
@@ -112,8 +112,8 @@ TEST_CASE("[BytecodeInterpreter] no type conversion int / int") {
 TEST_CASE("[BytecodeInterpreter] no type conversion float / float") {
 	static constexpr auto progStr = "var result = 3.0 / 4.4;";
   auto [script, data] = Interpret(progStr);
-	auto& gen = data.generator->generate(data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.id(), data.storage);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<double>();
   const auto check = firstCellValue + 0.000001 >= 0.68181818181 && firstCellValue - 0.000001 <= 0.68181818181;
