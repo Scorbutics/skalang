@@ -1,12 +1,9 @@
 #include <fstream>
 #include "Config/LoggerConfigLang.h"
 #include "ScriptBinding.h"
-#include "Service/ASTFactory.h"
-#include "Service/SymbolTable.h"
-#include "Service/TypeBuilder/TypeBuilder.h"
-#include "Service/SymbolTableUpdater.h"
-#include "Service/ScriptNameBuilder.h"
 
+#include "Service/ASTFactory.h"
+#include "Service/ScriptNameBuilder.h"
 #include "Service/StatementParser.h"
 
 ska::ScriptBindingAST::ScriptBindingAST(
@@ -14,10 +11,7 @@ ska::ScriptBindingAST::ScriptBindingAST(
 	std::string scriptName,
 	std::string templateName) :
 	m_parser(config.parser),
-	m_typeBuilder(config.typeBuilder),
-	m_symbolTypeUpdater(config.symbolTableUpdater),
-	m_reservedKeywordsPool(config.reservedKeywords),
-	m_functionBuilder(config.typeBuilder, config.symbolTableUpdater, config.reservedKeywords),
+	m_functionBuilder(config.typeBuilder, config.symbolTableUpdater, config.typeChecker, config.reservedKeywords),
 	m_name(ScriptNameDeduce("", "bind:" + scriptName)),
 	m_templateName(ScriptNameDeduce("", templateName)),
 	m_scriptAst(config.scriptAstCache, m_name, std::vector<Token>{}),

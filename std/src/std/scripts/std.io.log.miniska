@@ -1,5 +1,1 @@
-var printString = function(str: string) {
-};
-
-var printInt = function(num: int) {
-};
+var print = function(str: string) {};

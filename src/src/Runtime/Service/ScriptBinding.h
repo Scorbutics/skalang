@@ -94,9 +94,6 @@ namespace ska {
 		ScriptASTPtr m_templateScript;
 
 	private:
-		TypeBuilder& m_typeBuilder;
-		SymbolTableUpdater& m_symbolTypeUpdater;
-		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		BridgeASTBuilder m_functionBuilder;
 		std::string m_name;
 		std::string m_templateName;
