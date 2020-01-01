@@ -10,22 +10,18 @@
 #include "Service/StatementParser.h"
 
 ska::ScriptBindingAST::ScriptBindingAST(
-  StatementParser& parser,
-	ScriptCacheAST& cache,
+	ModuleConfiguration& config,
 	std::string scriptName,
-	std::string templateName,
-	TypeBuilder& typeBuilder,
-	SymbolTableUpdater& symbolTypeUpdater,
-	const ReservedKeywordsPool& reserved) :
-	m_parser(parser),
-	m_typeBuilder(typeBuilder),
-	m_symbolTypeUpdater(symbolTypeUpdater),
-	m_reservedKeywordsPool(reserved),
-	m_functionBuilder(typeBuilder, symbolTypeUpdater, reserved),
+	std::string templateName) :
+	m_parser(config.parser),
+	m_typeBuilder(config.typeBuilder),
+	m_symbolTypeUpdater(config.symbolTableUpdater),
+	m_reservedKeywordsPool(config.reservedKeywords),
+	m_functionBuilder(config.typeBuilder, config.symbolTableUpdater, config.reservedKeywords),
 	m_name(ScriptNameDeduce("", "bind:" + scriptName)),
 	m_templateName(ScriptNameDeduce("", templateName)),
-	m_scriptAst(cache, m_name, std::vector<Token>{}),
-	m_cacheAst(cache) {
+	m_scriptAst(config.scriptAstCache, m_name, std::vector<Token>{}),
+	m_cacheAst(config.scriptAstCache) {
 	queryAST();
 }
 

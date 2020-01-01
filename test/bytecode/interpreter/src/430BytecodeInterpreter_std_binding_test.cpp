@@ -17,6 +17,10 @@ static ska::bytecode::ScriptGenerationHelper Interpret(BytecodeInterpreterDataTe
 	return ska::bytecode::ScriptGenerationHelper{*data.storage, *readerI };
 }
 
+static ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> BuildModuleConfFromData(BytecodeInterpreterDataTestContainer& data) {
+	return ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { data.storage->astCache, * data.typeBuilder, * data.symbolsTypeUpdater, *data.typeChecker, reservedKeywords, * data.parser, * data.storage, * data.interpreter};
+}
+
 TEST_CASE("[BytecodeInterpreter] Binding std : path import only") {
 	constexpr auto progStr =
 	"var PathFcty = import \"bind:std.native.io.path\";"
@@ -25,7 +29,7 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path import only") {
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(progStr, data);
 
-	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { data.storage->astCache, *data.storage, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords, *data.parser, *data.interpreter};
+	auto moduleConfiguration = BuildModuleConfFromData(data);
 	auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
 
 	auto script = Interpret(data, progStr);
@@ -42,7 +46,7 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path + bridge function call") {
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(progStr, data);
 
-	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { data.storage->astCache, *data.storage, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords, *data.parser, *data.interpreter};
+	auto moduleConfiguration = BuildModuleConfFromData(data);
 	auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
 
 	auto script = Interpret(data, progStr);
@@ -61,7 +65,7 @@ TEST_CASE("[BytecodeInterpreter] Binding std : log + bridge function call") {
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(progStr, data);
 
-	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>{ data.storage->astCache, *data.storage, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords, *data.parser, *data.interpreter };
+	auto moduleConfiguration = BuildModuleConfFromData(data);
 	auto logModule = ska::lang::IOLogModule(moduleConfiguration);
 
 	auto script = Interpret(data, progStr);

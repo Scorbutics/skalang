@@ -25,9 +25,6 @@
 #include "std/module/io/path.h"
 #include "std/module/function/parameter.h"
 
-// Bytecode Services
-static std::unique_ptr<ska::bytecode::Generator> generator;
-static std::unique_ptr<ska::bytecode::Interpreter> interpreter;
 
 static ska::bytecode::ScriptGenerationHelper BasicProgramScriptStarter(ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>& module, char* argv[]) {
 	auto scriptFileName = std::string{ argv[1] };
@@ -69,13 +66,20 @@ int main(int argc, char* argv[]) {
 	auto symbolsTypeUpdater = ska::SymbolTableUpdater {parser};
 	auto typeChecker = ska::SemanticTypeChecker {parser, typeCrosser };
 	
-	auto oldInterpreter = ska::Interpreter {reservedKeywords, typeCrosser };
-	
 	auto mainCache = ska::bytecode::ScriptCache {};
 	auto generator = ska::bytecode::Generator{ reservedKeywords };
 	auto interpreter = ska::bytecode::Interpreter { generator, reservedKeywords };
 
-	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { mainCache.astCache, mainCache, typeBuilder, symbolsTypeUpdater, reservedKeywords, parser, interpreter};
+	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> {
+		mainCache.astCache,
+		typeBuilder,
+		symbolsTypeUpdater,
+		typeChecker,
+		reservedKeywords,
+		parser,
+		mainCache,
+		interpreter
+	};
 
 	try {
 		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);

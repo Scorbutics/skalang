@@ -26,15 +26,12 @@ namespace ska {
 	class StatementParser;
 
 	class ScriptBindingAST {
+		using ModuleConfiguration = lang::BaseModuleConfiguration;
 	public:
 		ScriptBindingAST(
-			StatementParser& parser,
-      ScriptCacheAST& cache,
+			ModuleConfiguration& config,
 			std::string scriptName,
-			std::string templateScriptName,
-			TypeBuilder& typeBuilder,
-			SymbolTableUpdater& symbolTypeUpdater,
-			const ReservedKeywordsPool& reserved);
+			std::string templateScriptName);
 
 		virtual ~ScriptBindingAST() = default;
 
@@ -120,7 +117,10 @@ namespace ska {
 			ModuleConfiguration& moduleConf,
 			std::string scriptName,
 			std::string templateScriptName) :
-			ScriptBindingAST(moduleConf.parser, moduleConf.scriptAstCache, scriptName, std::move(templateScriptName), moduleConf.typeBuilder, moduleConf.symbolTableUpdater, moduleConf.reservedKeywords),
+			ScriptBindingAST(
+				moduleConf,
+				scriptName, 
+				std::move(templateScriptName)), 
 			m_interpreter(moduleConf.interpreter),
 			m_script(moduleConf.scriptCache, ScriptBindingAST::name(), std::vector<Token>{}) {
 			if (ScriptBindingAST::id() != m_script.astScript().id()) {
