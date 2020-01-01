@@ -18,13 +18,19 @@ ska::Type ska::BridgeConstructorASTTemplateLooker::variable(const std::string& n
 }
 
 ska::Type ska::BridgeConstructorASTTemplateLooker::constructor() const {
-  return variable(m_name);
+    return m_name.empty() ? Type{} : variable(m_name);
 }
 
 ska::Type ska::BridgeConstructorASTTemplateLooker::field(const std::string& name) const {
-  const auto* symbol = (*m_template)[name];
+    const Symbol* symbol;
+    if (m_template == nullptr) {
+        symbol = m_parent->symbols()[name];
+    } else {
+        symbol = (*m_template)[name];
+    }
+    
   if (symbol == nullptr) {
-    throw std::runtime_error("unable to find field \"" + name + "\" in constructor \"" + m_name + "\" of template script \"" + m_parent->name() + "\"");
+    throw std::runtime_error("unable to find field \"" + name + (m_name.empty() ? "" : "\" in constructor \"" + m_name) + "\" of template script \"" + m_parent->name() + "\"");
   }
   return symbol->getType();
 }

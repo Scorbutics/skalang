@@ -10,6 +10,7 @@
 
 #include "Runtime/Value/InterpreterTypes.h"
 #include "std/module/io/path.h"
+#include "std/module/io/log.h"
 
 static ska::bytecode::ScriptGenerationHelper Interpret(BytecodeInterpreterDataTestContainer& data, const std::string& input) {
 	readerI->parse(*data.parser);
@@ -50,4 +51,20 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path + bridge function call") {
 	auto res = interpreted->variable(gen.id());
 	auto cellValue = *res.nodeval<ska::StringShared>();
 	CHECK(cellValue == "");
+}
+
+TEST_CASE("[BytecodeInterpreter] Binding std : log + bridge function call") {
+	constexpr auto progStr =
+		"var Logger = import \"bind:std.native.io.log\";"
+		"Logger.printString(\"tototo !\");";
+
+	auto data = BytecodeInterpreterDataTestContainer{};
+	ASTFromInputBytecodeInterpreterNoParse(progStr, data);
+
+	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>{ data.storage->astCache, *data.storage, *data.typeBuilder, *data.symbolsTypeUpdater, reservedKeywords, *data.parser, *data.interpreter };
+	auto logModule = ska::lang::IOLogModule(moduleConfiguration);
+
+	auto script = Interpret(data, progStr);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 }

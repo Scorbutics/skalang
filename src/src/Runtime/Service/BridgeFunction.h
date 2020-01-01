@@ -14,12 +14,11 @@ namespace ska {
     ~BridgeField() = default;
 
     BridgeField(Type fullType) : type(std::move(fullType)) {
-      assert(type.symbol() != nullptr && !type.symbol()->getName().empty());
+      //assert(type.symbol() != nullptr && !type.symbol()->getName().empty());
     }
 
-    const std::string& name() const {
-        assert(type.symbol() != nullptr && !type.symbol()->getName().empty());      
-        return type.symbol()->getName();
+    std::string name() const {
+        return type.symbol() != nullptr ? type.symbol()->getName() : "";
     }
 
   public:
@@ -51,7 +50,7 @@ namespace ska {
         return result;
     }
 
-    const std::string& name() const { return m_function.name(); }
+    std::string name() const { return m_function.name(); }
     
     const Type& type() const { return m_function.type; }
 

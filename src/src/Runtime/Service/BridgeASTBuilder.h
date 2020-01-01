@@ -56,6 +56,7 @@ namespace ska {
 		virtual ~BridgeASTBuilder();
 
 		ASTNodePtr makeFunction(ScriptAST& script, const BridgeFunction& data);
+		std::vector<ASTNodePtr> makeFieldList(ScriptAST& script, const BridgeFunction& data);
 
 	private:
 		// TODO Deprecated

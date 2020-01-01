@@ -27,6 +27,18 @@ const ska::Symbol& ska::bytecode::Script::findSymbolFromString(const std::string
 	return *symbol;
 }
 
+const ska::Symbol* ska::bytecode::Script::findFieldSymbol(const Symbol* constructor, const BridgeField& field) const {
+	if (field.type.symbol() == nullptr) {
+		return nullptr;
+	}
+
+	if (constructor != nullptr) {
+		return (*constructor)[field.type.symbol()->getName()];
+	}
+
+	return &findSymbolFromString(field.type.symbol()->getName());
+}
+
 ska::bytecode::RuntimeMemory ska::bytecode::Script::memoryField(const std::string& symbol) {
 	auto& symbolAst = findSymbolFromString(symbol);
 	return RuntimeMemory { findBytecodeMemoryFromSymbol(symbolAst) };
@@ -41,9 +53,9 @@ void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr a
 	/* Because it still targets the template script type, not the bound script one ! */
 	/* (remember, one is - almost - the copy of the other) */
 	/* so here we have to iterate through the bound script symbols instead of the template one */
-	const auto& constructorBoundSymbol = findSymbolFromString(constructor.name());
+	const Symbol* constructorBoundSymbol = constructor.type() != ExpressionType::VOID ? &findSymbolFromString(constructor.name()) : nullptr;
 	for (const auto& field : constructor.fields()) {
-		const Symbol* newerSymbol = field.type.symbol() == nullptr ? nullptr : constructorBoundSymbol[field.type.symbol()->getName()];
+		const Symbol* newerSymbol = findFieldSymbol(constructorBoundSymbol, field);
 		if(newerSymbol == nullptr) {
 			auto ss = std::stringstream {};
 			ss << "%14cNo symbol attached to type " << field.type;
@@ -51,7 +63,7 @@ void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr a
 			throw std::runtime_error(ss.str());
 		}
 
-		LOG_INFO << "%14cAttaching binding to symbol " << field.type.symbol()->getName() << " vs " << newerSymbol->getName();
+		LOG_INFO << "%14cAttaching binding to symbol " << newerSymbol->getName();
 		auto info = m_cache.getSymbolInfoOrNew(m_serviceGen.id(), *newerSymbol);
 		info.binding = std::make_shared<NativeFunction>(field.callback);
 
@@ -61,17 +73,19 @@ void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr a
 		m_cache.setSymbolInfo(*newerSymbol, std::move(info));
 	}
 
-	auto constructorInfo = m_cache.getSymbolInfoOrNew(m_serviceGen.id(), constructorBoundSymbol);
-	constructorInfo.binding = std::make_shared<NativeFunction>([&constructor](std::vector<NodeValue> params) {
-		LOG_INFO << "%14cParameters of constructor " << constructor.name() << " : ";
-		for (const auto& param : params) {
-			LOG_INFO << "%14c" << param.convertString();
-		}
-		constructor.setAdditionalParams(std::move(params));
-		return NodeValue{};
-	});
-	constructorInfo.binding->passThrough = true;
-	m_cache.setSymbolInfo(constructorBoundSymbol, std::move(constructorInfo));
+	if (constructorBoundSymbol != nullptr) {
+		auto constructorInfo = m_cache.getSymbolInfoOrNew(m_serviceGen.id(), *constructorBoundSymbol);
+		constructorInfo.binding = std::make_shared<NativeFunction>([&constructor](std::vector<NodeValue> params) {
+			LOG_INFO << "%14cParameters of constructor " << constructor.name() << " : ";
+			for (const auto& param : params) {
+				LOG_INFO << "%14c" << param.convertString();
+			}
+			constructor.setAdditionalParams(std::move(params));
+			return NodeValue{};
+		});
+		constructorInfo.binding->passThrough = true;
+		m_cache.setSymbolInfo(*constructorBoundSymbol, std::move(constructorInfo));
+	}
 
 	m_serviceGen.generate(m_cache, interpreter.generator());
 	LOG_DEBUG << "%14cGeneration done for script " << m_serviceGen.name();

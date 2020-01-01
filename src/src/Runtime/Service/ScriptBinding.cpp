@@ -65,5 +65,10 @@ ska::ASTNodePtr ska::ScriptBindingAST::buildFunctionsAST(BridgeFunction& constru
 	SLOG(LogLevel::Info) << "Building script " << m_scriptAst.name() << " from bridge";
 	SLOG(LogLevel::Info) << "Current constructor is : " << constructor.name();
 	fillConstructorWithBindings(constructor);
+
+	if (constructor.type() == ExpressionType::VOID) {
+		return ASTFactory::MakeNode<Operator::BLOCK>(m_functionBuilder.makeFieldList(m_scriptAst, constructor));
+	} 
+
 	return ASTFactory::MakeNode<Operator::BLOCK>(m_functionBuilder.makeFunction(m_scriptAst, constructor));
 }

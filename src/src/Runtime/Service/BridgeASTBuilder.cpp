@@ -220,6 +220,18 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunction(ScriptAST& script, const Bri
 	return makeVariable(script, data.name(), std::move(functionDeclaration));
 }
 
+std::vector<ska::ASTNodePtr> ska::BridgeASTBuilder::makeFieldList(ScriptAST& script, const BridgeFunction& data) {
+	auto fieldList = data.makeFunctions();
+	SLOG(LogLevel::Info) << "1a - Build fields list";
+	auto scriptNodes = std::vector<ASTNodePtr>{};
+	for (auto& field : fieldList) {
+		auto fieldVariable = makeFunction(script, std::move(field));
+		SLOG(LogLevel::Debug) << " Field built " << fieldVariable->name();
+		scriptNodes.push_back(std::move(fieldVariable));
+	}
+	return scriptNodes;
+}
+
 ska::BridgeASTBuilderSymbolTableLock::BridgeASTBuilderSymbolTableLock(BridgeASTBuilder& factory, SymbolTable& table) :
 	m_factory(factory),
 	m_symbolTable(table) {
