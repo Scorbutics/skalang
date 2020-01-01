@@ -35,7 +35,7 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path import only") {
 TEST_CASE("[BytecodeInterpreter] Binding std : path + bridge function call") {
 	constexpr auto progStr =
 	"var PathFcty = import \"bind:std.native.io.path\";"
-	"var path = PathFcty.Fcty(\"" SKALANG_TEST_DIR "\");"
+	"var path = PathFcty.Fcty(\"\");"
 	"var last = path.canonical();";
 
 	auto data = BytecodeInterpreterDataTestContainer{};

@@ -32,7 +32,7 @@ ska::bytecode::RuntimeMemory ska::bytecode::Script::memoryField(const std::strin
 	return RuntimeMemory { findBytecodeMemoryFromSymbol(symbolAst) };
 }
 
-void ska::bytecode::Script::fromBridge(const BridgeFunction& constructor, ASTNodePtr astRoot, Interpreter& interpreter) {
+void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr astRoot, Interpreter& interpreter) {
 	m_serviceGen.program().fromBridge(std::move(astRoot));
 
 	LOG_DEBUG << "%14cGenerating bindings for script " << m_serviceGen.name();
@@ -61,10 +61,20 @@ void ska::bytecode::Script::fromBridge(const BridgeFunction& constructor, ASTNod
 		m_cache.setSymbolInfo(*newerSymbol, std::move(info));
 	}
 
+	auto constructorInfo = m_cache.getSymbolInfoOrNew(m_serviceGen.id(), constructorBoundSymbol);
+	constructorInfo.binding = std::make_shared<NativeFunction>([&constructor](std::vector<NodeValue> params) {
+		LOG_INFO << "%14cParameters of constructor " << constructor.name() << " : ";
+		for (const auto& param : params) {
+			LOG_INFO << "%14c" << param.convertString();
+		}
+		constructor.setAdditionalParams(std::move(params));
+		return NodeValue{};
+	});
+	constructorInfo.binding->passThrough = true;
+	m_cache.setSymbolInfo(constructorBoundSymbol, std::move(constructorInfo));
+
 	m_serviceGen.generate(m_cache, interpreter.generator());
 	LOG_DEBUG << "%14cGeneration done for script " << m_serviceGen.name();
-
-	//execute(interpreter);
 }
 
 std::unique_ptr<ska::bytecode::Executor> ska::bytecode::Script::execute(Interpreter& interpreter) {

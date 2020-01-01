@@ -4,6 +4,7 @@
 #include "Runtime/Value/NativeFunction.h"
 #include "NodeValue/Type.h"
 #include "NodeValue/Symbol.h"
+#include "Runtime/Value/NodeValue.h"
 
 namespace ska {
   struct BridgeField {
@@ -57,9 +58,15 @@ namespace ska {
     const BridgeField::Callback& callback() const { return m_function.callback; }
     const std::vector<BridgeField>& fields() const { return m_fields; }
 
+    void setAdditionalParams(std::vector<NodeValue> params) { m_additionalParamValues = std::move(params); }
+    template <class T>
+    T& param(std::size_t index) {
+        return m_additionalParamValues[index].nodeval<T>();
+    }
+
   private:
     BridgeField m_function;
-
+    std::vector<NodeValue> m_additionalParamValues;
     std::vector<BridgeField> m_fields;
   };
 

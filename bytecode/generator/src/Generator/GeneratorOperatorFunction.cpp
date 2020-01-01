@@ -69,10 +69,8 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	LOG_DEBUG << "Generating body...";
 	const auto* functionSymbolInfo = context.getSymbolInfo(node.GetFunction());
 	LOG_DEBUG << "Function Call symbol info : " << (functionSymbolInfo == nullptr || functionSymbolInfo->binding == nullptr ? "none" : "with binding");
-	if (functionSymbolInfo == nullptr || functionSymbolInfo->binding == nullptr) {
+	if (functionSymbolInfo == nullptr || functionSymbolInfo->binding == nullptr || functionSymbolInfo->binding->passThrough) {
 		valueGroup.push(generateNext({ context, node.GetFunctionBody(), 1 }));
-	} else {
-		//valueGroup.push(Instruction {});
 	}
 
 	LOG_DEBUG << "\nGenerated " << valueGroup << " with value " << valueGroup.operand();
@@ -105,11 +103,14 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	const auto* functionSymbolInfo = context.getSymbolInfo(*node.GetFunctionNameNode().type().value().symbol());
 	LOG_DEBUG << "Function Call symbol info : " << (functionSymbolInfo == nullptr || functionSymbolInfo->binding == nullptr ? "none" : "with binding");
 
-	auto callInstruction = Instruction {};
+	auto callInstruction = InstructionOutput {};
 	if (functionSymbolInfo != nullptr && functionSymbolInfo->binding != nullptr) {
-		callInstruction = Instruction{ Command::BIND, context.storeBinding(functionSymbolInfo->binding), Operand {static_cast<long>(node.GetFunctionParameterSize())} };
+		callInstruction.push(Instruction{ Command::BIND, context.storeBinding(functionSymbolInfo->binding), Operand {static_cast<long>(node.GetFunctionParameterSize())} });
+		if (functionSymbolInfo->binding->passThrough) {
+			callInstruction.push(Instruction{ Command::JUMP_ABS, std::move(preCallValue.operand()) });
+		}
 	} else {
-		callInstruction = Instruction { Command::JUMP_ABS, std::move(preCallValue.operand()) };
+		callInstruction.push(Instruction { Command::JUMP_ABS, std::move(preCallValue.operand()) });
 	}
 	auto result = std::move(preCallValue);
 

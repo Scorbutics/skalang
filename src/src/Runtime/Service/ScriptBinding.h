@@ -46,6 +46,7 @@ namespace ska {
 		auto& templateScript() { return *m_templateScript; }
 
 	private:
+		void fillConstructorWithBindings(BridgeFunction& constructor);
 		void queryAST();
 
 		template <class ReturnType, class ... ParameterTypes, std::size_t... Idx>
@@ -91,8 +92,7 @@ namespace ska {
 		}
 
 	protected:
-		ASTNodePtr buildFunctionsAST(const BridgeFunction& constructor);
-		BridgeFunction buildConstructorFromBindings(BridgeField constructorField);
+		ASTNodePtr buildFunctionsAST(BridgeFunction& constructor);
 		StatementParser& m_parser;
 		ScriptASTPtr m_templateScript;
 
@@ -130,8 +130,7 @@ namespace ska {
 
 		auto& script() { return m_script; }
 
-		void buildFunctions(BridgeField constructorField) {
-			auto constructor = ScriptBindingAST::buildConstructorFromBindings(std::move(constructorField));
+		void buildFunctions(BridgeFunction& constructor) {
 			auto astRoot = ScriptBindingAST::buildFunctionsAST(constructor);
 			m_script.fromBridge(constructor, std::move(astRoot), m_interpreter);
 		}

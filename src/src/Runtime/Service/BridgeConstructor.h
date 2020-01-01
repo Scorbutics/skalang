@@ -31,19 +31,26 @@ namespace ska {
   public:
     BridgeConstructor(ScriptBinding<Interpreter>& bindingTarget, std::string constructorName):
       m_templateLooker(bindingTarget.templateScript(), std::move(constructorName)),
-      m_bindingTarget(bindingTarget) {
+      m_bindingTarget(bindingTarget),
+        m_constructor{ BridgeFunction{ BridgeField{m_templateLooker.constructor()} } }{
     }
 
     void generate() {
-      m_bindingTarget.buildFunctions(BridgeField{m_templateLooker.constructor()});
+      m_bindingTarget.buildFunctions(m_constructor);
     }
 
     void bindField(std::string name, NativeFunction::Callback binding) {
       m_bindingTarget.bindFunction(m_templateLooker.field(name), std::move(binding));
     }
 
+    template <class T>
+    T& param(std::size_t paramIndex) {
+        return m_constructor.template param<T>(paramIndex);
+    }
+
   private:
     BridgeConstructorASTTemplateLooker m_templateLooker;
     ScriptBinding<Interpreter>& m_bindingTarget;
+    BridgeFunction m_constructor;
   };
 }

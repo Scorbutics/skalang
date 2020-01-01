@@ -14,18 +14,17 @@ namespace ska {
         public:
             IOPathModule(ModuleConfiguration<Interpreter>& config) :
                 Module<Interpreter> { config, "std.native.io.path", "std:std.io.path" },
-                m_proxy { Module<Interpreter>::m_bridge }  {
-                auto constructor = BridgeConstructor<Interpreter> { Module<Interpreter>::m_bridge, "Fcty" };
+                m_constructor(BridgeConstructor<Interpreter> { Module<Interpreter>::m_bridge, "Fcty" }) {
 
-                constructor.bindField("canonical", std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> buildParams) -> ska::NodeValue {
-                    return std::make_shared<std::string>(FileUtils::getCanonicalPath(/*importTemplate.template param<StringShared>(0) */ ""));
+                m_constructor.bindField("canonical", std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> buildParams) -> ska::NodeValue {
+                    return std::make_shared<std::string>(FileUtils::getCanonicalPath(*m_constructor.template param<StringShared>(0)));
                 }));
 
-                constructor.generate();
+                m_constructor.generate();
             }
             ~IOPathModule() override = default;
         private:
-            ScriptProxy<Interpreter> m_proxy;
+            BridgeConstructor<Interpreter> m_constructor;
         };
     }
 }

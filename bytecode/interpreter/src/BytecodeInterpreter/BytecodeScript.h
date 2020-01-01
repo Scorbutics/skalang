@@ -36,7 +36,7 @@ namespace ska {
 
 			ScriptAST astScript() const { return m_serviceGen.program(); }
 
-			void fromBridge(const BridgeFunction& constructor, ASTNodePtr astRoot, Interpreter& interpreter);
+			void fromBridge(BridgeFunction& constructor, ASTNodePtr astRoot, Interpreter& interpreter);
 
 			RuntimeMemory memoryField(const std::string& symbol);
 
@@ -47,7 +47,6 @@ namespace ska {
 			const Symbol& findSymbolFromString(const std::string& key) const;
 			ScriptCache& m_cache;
 			ScriptGeneration& m_serviceGen;
-			ScriptExecution* m_execution = nullptr;
 		};
 	}
 }

@@ -15,6 +15,7 @@ namespace ska {
 		Callback function;
 		ASTNodePtr node;
 		ASTNode* nodeRef {};
+		bool passThrough = false;
 	};
 	using NativeFunctionPtr = std::shared_ptr<NativeFunction>;
 }
