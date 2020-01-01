@@ -60,7 +60,7 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path + bridge function call") {
 TEST_CASE("[BytecodeInterpreter] Binding std : log + bridge function call") {
 	constexpr auto progStr =
 		"var Logger = import \"bind:std.native.io.log\";"
-		"Logger.printString(\"tototo !\");";
+		"Logger.print(\"test63\");";
 
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(progStr, data);
