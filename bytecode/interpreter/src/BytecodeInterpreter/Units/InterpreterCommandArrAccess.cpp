@@ -7,7 +7,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::InterpreterCommand<ska::
 
 SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(ARR_ACCESS)(ExecutionContext& context, const Operand& left, const Operand& right) {
   assert(left.type() == OperandType::VAR || left.type() == OperandType::REG);
-  assert(right.type() == OperandType::PURE);
+  assert(right.type() != OperandType::EMPTY && right.type() != OperandType::BIND);
 
   LOG_DEBUG << "Index cell node " << right << " of type " << right.type() << " of object \"" << context.getCell(left).convertString() << "\" of type " << left.type();
 

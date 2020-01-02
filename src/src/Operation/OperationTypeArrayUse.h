@@ -16,5 +16,15 @@ namespace ska {
             assert(node.size() == 2 && node[0].type().has_value() && node[0].type().value().compound().size() == 1);
             return node[0].type().value().compound()[0];
         }
+
+		inline auto& GetArray() {
+			assert(node.size() > 0);
+			return node[0];
+		}
+
+		inline auto& GetArrayIndex() {
+			assert(node.size() > 1);
+			return node[1];
+		}
 	};
 }
