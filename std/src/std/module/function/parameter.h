@@ -5,8 +5,7 @@
 #include "Runtime/Service/ScriptProxy.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
-//#include "Interpreter/Value/Script.h"
-//#include "Interpreter/Interpreter.h"
+#include "Runtime/Service/BridgeConstructor.h"
 
 #include "std/module.h"
 
@@ -16,41 +15,30 @@ namespace ska {
         class ParameterModule : public Module<Interpreter> {
         public:
             ParameterModule(ModuleConfiguration<Interpreter>& config, const std::vector<NodeValue>& parameterValues) :
-                Module<Interpreter> { config, "std.native.parameter", "" },
+                Module<Interpreter> { config, "std.native.function.parameter", "std:std.function.parameter" },
 				m_proxy(Module<Interpreter>::m_bridge),
+                m_constructor(BridgeConstructor<Interpreter> { Module<Interpreter>::m_bridge, "Fcty" }),
 				m_parameters(parameterValues) {
-                /*
-                auto parametersImport = Module<Interpreter>::m_bridge.import("Fcty", {"Parameters", "std:std.function.parameters"});
 
-                Module<Interpreter>::m_bridge.bindGenericFunction("Gen", { "string", parametersImport.typeName("Fcty") },
-					NativeFunction::Callback ([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
-
-					auto result = m_proxy.createMemory(parametersImport);
-                    result.push("asInt", std::make_shared<ska::NativeFunction>(
-                        NativeFunction::Callback([&](std::vector<ska::NodeValue> params) {
-                        const std::size_t index = params[0].nodeval<long>();
-                        return m_parameters.size() > index ? static_cast<long>(m_parameters[index].convertNumeric()) : -1;
-                    })));
-                    result.push("asString", std::make_shared<ska::NativeFunction>(
-                        NativeFunction::Callback([&](std::vector<ska::NodeValue> params) {
-                        const std::size_t index = params[0].nodeval<long>();
-                        return std::make_shared<std::string>(std::move(m_parameters.size() > index ? m_parameters[index].convertString() : ""));
-                    })));
-                    result.push("size", std::make_shared<ska::NativeFunction>(
-                        NativeFunction::Callback([&](std::vector<ska::NodeValue> params) {
-                        return static_cast<long>(m_parameters.size());
-                    })));
-
-                    return result.value();
-                }));
-                */
-                Module<Interpreter>::m_bridge.buildFunctions({});
+                m_constructor.bindField("asInt", [&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+                    const std::size_t index = params[0].nodeval<long>();
+                    return m_parameters.size() > index ? static_cast<long>(m_parameters[index].convertNumeric()) : -1;
+                });
+                m_constructor.bindField("asString", [&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
+                    const std::size_t index = params[0].nodeval<long>();
+                    return std::make_shared<std::string>(m_parameters.size() > index ? m_parameters[index].convertString() : "");
+                });
+                m_constructor.bindField("size", [&](std::vector<ska::NodeValue> buildParams) -> ska::NodeValue {
+                    return static_cast<long>(m_parameters.size());
+                });
+                m_constructor.generate();
             }
 
             ~ParameterModule() override = default;
         private:
             ScriptProxy<Interpreter> m_proxy;
             const std::vector<NodeValue>& m_parameters;
+            BridgeConstructor<Interpreter> m_constructor;
         };
     }
 }

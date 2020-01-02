@@ -1,4 +1,4 @@
-var Fcty = function() : var {
+var Fcty = function(scriptname: string) : var {
 	return {
 		asInt : function(index: int) : int { return 0;},
 		asString : function(index: int) : string { return "";},

@@ -3,8 +3,8 @@
   "Id": "71322db7-e16f-3b07-a50f-fcf9fb3fb1bc",
   "Items": [
     {
-      "Id": "d2088a5d-455b-40e7-8795-88221a71d75d",
-      "Command": "-tc=\"[Interpreter Script]\" -sc=\"using a callback in another script & another context\""
+      "Id": "ed79aa21-1fa5-469f-8b62-88a598e9cfa3",
+      "Command": "-tc=\"[SemanticTypeChecker Complex] using a parameter of the wrong type without return variable affectation (to a void function)\""
     }
   ]
 }

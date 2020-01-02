@@ -31,8 +31,8 @@ static ska::bytecode::ScriptGenerationHelper BasicProgramScriptStarter(ska::lang
 	auto scriptName = scriptFileName.substr(0, scriptFileName.find_last_of('.'));
 
 	const auto scriptStarter = "var Script = import \"" + scriptName + "\";"
-	"var ParametersGenerator = import \"bind:std.native.parameter\";"
-	"Script.run(ParametersGenerator.Gen(\"" + scriptName + "\"));";
+	"var ParametersGenerator = import \"bind:std.native.function.parameter\";"
+	"Script.run(ParametersGenerator.Fcty(\"" + scriptName + "\"));";
 
 	auto executor = ska::ScriptAST{ module.scriptAstCache, "main", ska::Tokenizer{ module.reservedKeywords, scriptStarter}.tokenize() };
 	executor.parse(module.parser);
