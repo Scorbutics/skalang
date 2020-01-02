@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include "std/module.h"
+#include "Runtime/Service/BridgeConstructor.h"
 
 namespace ska {
     namespace lang {
