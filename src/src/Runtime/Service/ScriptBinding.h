@@ -29,18 +29,10 @@ namespace ska {
 	class ScriptBindingAST {
 		using ModuleConfiguration = lang::BaseModuleConfiguration;
 	public:
-		ScriptBindingAST(
-			ModuleConfiguration& config,
-			std::string scriptName,
-			std::string templateScriptName);
-
 		virtual ~ScriptBindingAST() = default;
 
 		void bindFunction(Type functionType, decltype(NativeFunction::function) f);
 
-		std::size_t id() const { return m_scriptAst.id(); }
-		const auto& name() const { return m_scriptAst.name(); }
-		const std::string& templateName() const;
 		auto& templateScript() { return *m_templateScript; }
 
 	private:
@@ -67,11 +59,19 @@ namespace ska {
 		}
 
 	protected:
+		ScriptBindingAST(
+			ModuleConfiguration& config,
+			std::string scriptName,
+			std::string templateScriptName);
+
+		std::size_t id() const { return m_scriptAst.id(); }
+		const auto& name() const { return m_scriptAst.name(); }
 		ASTNodePtr buildFunctionsAST(BridgeFunction& constructor);
+
+	private:
 		StatementParser& m_parser;
 		ScriptASTPtr m_templateScript;
 
-	private:
 		BridgeASTBuilder m_functionBuilder;
 		std::string m_name;
 		std::string m_templateName;
@@ -101,8 +101,6 @@ namespace ska {
 				throw std::runtime_error("script index coherence error while binding a script");
 			}
 		}
-
-		auto& script() { return m_script; }
 
 		void buildFunctions(BridgeFunction& constructor) {
 			auto astRoot = ScriptBindingAST::buildFunctionsAST(constructor);

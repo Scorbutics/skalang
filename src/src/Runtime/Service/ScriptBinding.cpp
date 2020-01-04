@@ -27,10 +27,6 @@ void ska::ScriptBindingAST::bindFunction(Type functionType, decltype(NativeFunct
 	m_bindings.push_back(std::move(field));
 }
 
-const std::string& ska::ScriptBindingAST::templateName() const {
-	return m_templateName;
-}
-
 void ska::ScriptBindingAST::queryAST() {
 	auto found = m_cacheAst.atOrNull(m_templateName);
 	if(found == nullptr) {

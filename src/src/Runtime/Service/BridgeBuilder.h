@@ -11,9 +11,9 @@ namespace ska {
   class SymbolTable;
 	class StatementParser;
 
-  class BridgeConstructorASTTemplateLooker {
+  class BridgeBuilderASTTemplateLooker {
   public:
-    BridgeConstructorASTTemplateLooker(const ScriptAST& templateParent, std::string constructorName);
+    BridgeBuilderASTTemplateLooker(const ScriptAST& templateParent, std::string constructorName);
 
     Type variable(const std::string& name) const;
     Type field(const std::string& name) const;
@@ -27,9 +27,9 @@ namespace ska {
   };
 
   template <class Interpreter>
-	class BridgeConstructor {
+	class BridgeBuilder {
   public:
-    BridgeConstructor(ScriptBinding<Interpreter>& bindingTarget, std::string constructorName):
+      BridgeBuilder(ScriptBinding<Interpreter>& bindingTarget, std::string constructorName = ""):
       m_templateLooker(bindingTarget.templateScript(), std::move(constructorName)),
       m_bindingTarget(bindingTarget),
         m_constructor{ BridgeFunction{ BridgeField{m_templateLooker.constructor()} } }{
@@ -49,7 +49,7 @@ namespace ska {
     }
 
   private:
-    BridgeConstructorASTTemplateLooker m_templateLooker;
+    BridgeBuilderASTTemplateLooker m_templateLooker;
     ScriptBinding<Interpreter>& m_bindingTarget;
     BridgeFunction m_constructor;
   };

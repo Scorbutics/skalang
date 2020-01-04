@@ -19,7 +19,7 @@
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 #include "std/module.h"
 
-#include "Runtime/Service/BridgeConstructor.h"
+#include "Runtime/Service/BridgeBuilder.h"
 
 const auto reservedKeywordsS = ska::ReservedKeywordsPool{};
 auto tokenizerS = std::unique_ptr<ska::Tokenizer>{};
@@ -62,7 +62,7 @@ TEST_CASE("[Interpreter Script]") {
 
 		auto moduleConfiguration = BuildModuleConfiguration(data);
 		auto scriptEmBinding = ska::ScriptBinding<ska::Interpreter> { moduleConfiguration, "binding1_lib", SKALANG_TEST_DIR "/interpreter/src/binding1_lib.tpl" };
-		auto constructor = ska::BridgeConstructor<ska::Interpreter>{ scriptEmBinding, "" };
+		auto constructor = ska::BridgeBuilder<ska::Interpreter>{ scriptEmBinding };
 		constructor.bindField("getToto", [](std::vector<ska::NodeValue>) {
 			return ska::NodeValue{ std::make_shared<std::string>("tototo !") };
 		});

@@ -4,7 +4,7 @@
 #include "Runtime/Value/NodeValue.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
-#include "Runtime/Service/BridgeConstructor.h"
+#include "Runtime/Service/BridgeBuilder.h"
 
 #include "std/module.h"
 
@@ -15,7 +15,7 @@ namespace ska {
         public:
             ParameterModule(ModuleConfiguration<Interpreter>& config, const std::vector<NodeValue>& parameterValues) :
                 Module<Interpreter> { config, "std.native.function.parameter", "std:std.function.parameter" },
-                m_constructor(BridgeConstructor<Interpreter> { Module<Interpreter>::m_bridge, "Fcty" }),
+                m_constructor(BridgeBuilder<Interpreter> { Module<Interpreter>::m_bridge, "Fcty" }),
 				m_parameters(parameterValues) {
 
                 m_constructor.bindField("asInt", [&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
@@ -35,7 +35,7 @@ namespace ska {
             ~ParameterModule() override = default;
         private:
             const std::vector<NodeValue>& m_parameters;
-            BridgeConstructor<Interpreter> m_constructor;
+            BridgeBuilder<Interpreter> m_constructor;
         };
     }
 }
