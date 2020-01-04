@@ -39,11 +39,6 @@ const ska::Symbol* ska::bytecode::Script::findFieldSymbol(const Symbol* construc
 	return &findSymbolFromString(field.type.symbol()->getName());
 }
 
-ska::bytecode::RuntimeMemory ska::bytecode::Script::memoryField(const std::string& symbol) {
-	auto& symbolAst = findSymbolFromString(symbol);
-	return RuntimeMemory { findBytecodeMemoryFromSymbol(symbolAst) };
-}
-
 void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr astRoot, Interpreter& interpreter) {
 	m_serviceGen.program().fromBridge(std::move(astRoot));
 

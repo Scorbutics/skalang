@@ -1,13 +1,13 @@
 var Log = import "bind:std.native.io.log";
-var Parameters = import "std:std.function.parameters";
+var Parameters = import "bind:std.native.function.parameter";
 var PathFcty = import "bind:std.native.io.path";
 
 var ArrayFcty = import "std:std.value.array";
 
 var run = function (parameters: Parameters::Fcty()) {
 	if (parameters.size() > 0) {
-		var path = PathFcty.Build(parameters.asString(0));
-		Log.printString(path.canonical());
+		var path = PathFcty.Fcty(parameters.asString(0));
+		Log.print(path.canonical());
 
 		var all = ArrayFcty.FctyInteger();
 
@@ -16,12 +16,12 @@ var run = function (parameters: Parameters::Fcty()) {
 		}
 
 		for(var i = 0; i < all.size(); i = i + 1) {
-			Log.printInt(all.get(i));
+			Log.print(all.get(i));
 		}
 
-		Log.printString("size : " + all.size());
+		Log.print("size : " + all.size());
 		
 	} else {
-		Log.printString("No argument provided");
+		Log.print("No argument provided");
 	}
 };

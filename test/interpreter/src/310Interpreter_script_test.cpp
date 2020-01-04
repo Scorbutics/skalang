@@ -3,7 +3,7 @@
 
 #include <doctest.h>
 #include "Config/LoggerConfigLang.h"
-#include "DataTestContainer.h"
+#include "InterpreterDataTestContainer.h"
 #include "Service/SymbolTable.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
@@ -12,12 +12,14 @@
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
 #include "Interpreter/Value/DirectInterpreterTypes.h"
-#include "Runtime/Service/ScriptProxy.h"
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/ScriptCache.h"
 #include "Runtime/Value/ObjectMemory.h"
 #include "Runtime/Value/StringShared.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
+#include "std/module.h"
+
+#include "Runtime/Service/BridgeConstructor.h"
 
 const auto reservedKeywordsS = ska::ReservedKeywordsPool{};
 auto tokenizerS = std::unique_ptr<ska::Tokenizer>{};
@@ -26,7 +28,7 @@ auto readerIS = std::unique_ptr<ska::Script>{};
 auto scriptCacheIS = ska::ScriptCache{};
 auto typeCrosserIS = ska::TypeCrosser{};
 
-void ASTFromInputSemanticTCInterpreterScriptNoParse(const std::string& input, DataTestContainer& data) {
+void ASTFromInputSemanticTCInterpreterScriptNoParse(const std::string& input, InterpreterDataTestContainer& data) {
     tokenizerS = std::make_unique<ska::Tokenizer>(reservedKeywordsS, input);
     tokensS = tokenizerS->tokenize();
 	scriptCacheIS.cache.clear();
@@ -40,61 +42,36 @@ void ASTFromInputSemanticTCInterpreterScriptNoParse(const std::string& input, Da
 	data.interpreter = std::make_unique<ska::Interpreter>(reservedKeywordsS, typeCrosserIS);
 }
 
-ska::Script ASTFromInputSemanticTCInterpreterScript(const std::string& input, DataTestContainer& data) {
+ska::Script ASTFromInputSemanticTCInterpreterScript(const std::string& input, InterpreterDataTestContainer& data) {
 	ASTFromInputSemanticTCInterpreterScriptNoParse(input, data);
 	readerIS->astScript().parse(*data.parser);
     return *readerIS;
 }
 
-static ska::lang::ModuleConfiguration<ska::Interpreter> BuildModuleConfiguration(DataTestContainer& data) {
-	return ska::lang::ModuleConfiguration<ska::Interpreter>{scriptCacheIS.astCache, scriptCacheIS, *data.typeBuilder, *data.symbolsTypeUpdater, data.reservedKeywords, *data.parser, *data.interpreter};
+static ska::lang::ModuleConfiguration<ska::Interpreter> BuildModuleConfiguration(InterpreterDataTestContainer& data) {
+	return ska::lang::ModuleConfiguration<ska::Interpreter>{scriptCacheIS.astCache, *data.typeBuilder, *data.symbolsTypeUpdater, *data.typeChecker, data.reservedKeywords, *data.parser, scriptCacheIS, *data.interpreter};
 }
 
 TEST_CASE("[Interpreter Script]") {
-	DataTestContainer data;
-#if 0
+	InterpreterDataTestContainer data;
+
 	SUBCASE("miniska -> C++ binding : using a miniska field from a C++ -> miniska binding") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse(
-			"var DataClassImp280 = import \"bind:dataclass_script\";"
-			"var runner = DataClassImp280.run();"
-			"runner.getToto();", data);
-
-		//TODO rework everything
+			"var DataClassImp280 = import \"bind:binding1_lib\";"
+			"DataClassImp280.getToto();" , data);
 
 		auto moduleConfiguration = BuildModuleConfiguration(data);
-		auto scriptEmBinding = ska::ScriptBridge<ska::Interpreter> { moduleConfiguration, "binding1_lib", "" };
-
-		scriptEmBinding.bindFunction("getToto", std::function<ska::StringShared()>([]() {
-			return std::make_shared<std::string>("tototo !");
-		}));
-		scriptEmBinding.buildFunctions();
-
-		auto scriptBindingDataClass = ska::ScriptBridge<ska::Interpreter>{ moduleConfiguration, "dataclass_script", "" };
-		auto scriptProxy = ska::ScriptProxy<ska::Interpreter> { scriptBindingDataClass };
-		auto importBinding = scriptBindingDataClass.import("", {"Binding1", "bind:binding1_lib"});
-		auto importTest = scriptBindingDataClass.import("", {"Test293", "" SKALANG_TEST_DIR "/src/resources/test293"});
-		scriptBindingDataClass.bindFunction("run", { "Test293::Fcty()" }, std::function<ska::NodeValue(std::vector<ska::NodeValue>)>([&](std::vector<ska::NodeValue> params) -> ska::NodeValue {
-			auto getTotoMemory = scriptProxy.accessMemory("Binding1", "getToto");
-
-			/*
-			TODO !!!
-
-			assert(getTotoMemory.first != nullptr);
-			auto mem = scriptProxy.createMemory(importBinding);
-			mem.replace("getToto", getTotoMemory.first);
-			return ska::NodeValue{ std::move(mem.memory) };
-			*/
-
-			return getTotoMemory;
-		}));
-		scriptBindingDataClass.buildFunctions();
+		auto scriptEmBinding = ska::ScriptBinding<ska::Interpreter> { moduleConfiguration, "binding1_lib", SKALANG_TEST_DIR "/interpreter/src/binding1_lib.tpl" };
+		auto constructor = ska::BridgeConstructor<ska::Interpreter>{ scriptEmBinding, "" };
+		constructor.bindField("getToto", [](std::vector<ska::NodeValue>) {
+			return ska::NodeValue{ std::make_shared<std::string>("tototo !") };
+		});
+		constructor.generate();
 
 		readerIS->astScript().parse(*data.parser);
 		auto result = data.interpreter->script(*readerIS);
 		CHECK(*result.nodeval<ska::StringShared>() == "tototo !");
 	}
-
-
 
 	SUBCASE("Outside script from file (import)") {
 		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Character179 = import \"" SKALANG_TEST_DIR "/src/resources/character\";", data);
@@ -135,6 +112,9 @@ TEST_CASE("[Interpreter Script]") {
 		auto astPtr = ASTFromInputSemanticTCInterpreterScript("var Player = import \"" SKALANG_TEST_DIR "/src/resources/play\"; var Character = import \"" SKALANG_TEST_DIR "/src/resources/character\"; var c = Character.build(\"test\"); Player.run(c);", data);
 		data.interpreter->script(astPtr);
 	}
+
+#if 0
+	//TODO rework everything
 
 	SUBCASE("C++ 1 script-function binding") {
 		ASTFromInputSemanticTCInterpreterScriptNoParse("var User218 = import \"bind:binding\"; User218.funcTest(14, \"titito\");", data);

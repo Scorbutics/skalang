@@ -30,19 +30,19 @@ ska::ScriptHandle* ska::Script::buildHandle(ScriptCache& cache, ScriptHandleAST&
 	return &cache.cache.at(name);
 }
 
-void ska::Script::memoryFromBridge(const ScriptAST& origin, Interpreter&, std::vector<NativeFunctionPtr> bindings) {
-	const ASTNode& declaredAstBlock = m_ast.rootNode();
-	assert(declaredAstBlock.size() == bindings.size() && "Cannot create memory from this ast");
+void ska::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr astRoot, Interpreter&) {
+	auto& root = m_ast.fromBridge(std::move(astRoot));
+	//assert(root.size() == constructor.fields().size() && "Cannot create memory from this ast");
 
 	//steal already existing first child content into the current scope
 	m_handle->m_currentMemory->stealFirstChildContent();
 	
-	auto& astRoot = declaredAstBlock;
+	//auto& astRoot = declaredAstBlock;
 	auto index = std::size_t{ 0 };
 	auto lock = pushNestedMemory(false);
-	for (auto& bridgeFunction : bindings) {
-		auto functionName = astRoot[index].name();
-		m_handle->m_currentMemory->emplace(functionName, NodeValue{ std::move(bridgeFunction) });
+	for (auto& bridgeFunction : constructor.fields()) {
+		auto functionName = root[index].name();
+		m_handle->m_currentMemory->emplace(functionName, NodeValue{ std::make_shared<NativeFunction>(bridgeFunction.callback) });
 		index++;
 	}
 	lock.release();

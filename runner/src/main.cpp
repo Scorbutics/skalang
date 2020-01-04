@@ -7,7 +7,6 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
 #include "Interpreter/Value/DirectInterpreterTypes.h"
-#include "Runtime/Service/ScriptProxy.h"
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/ScriptCache.h"
 #include "Service/StatementParser.h"
@@ -110,7 +109,7 @@ int main(int argc, char* argv[]) {
 	auto typeChecker = ska::SemanticTypeChecker {parser, typeCrosser };
 	auto interpreter = ska::Interpreter {reservedKeywords, typeCrosser };
 
-	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::Interpreter> {scriptCache.astCache, scriptCache, typeBuilder, symbolsTypeUpdater, reservedKeywords, parser, interpreter};
+	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::Interpreter> {scriptCache.astCache, typeBuilder, symbolsTypeUpdater, typeChecker, reservedKeywords, parser, scriptCache, interpreter};
 
 	try {
 

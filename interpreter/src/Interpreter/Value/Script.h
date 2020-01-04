@@ -6,6 +6,7 @@
 #include "Interpreter/ScriptCache.h"
 #include "Runtime/Value/NativeFunction.h"
 #include "NodeValue/ScriptAST.h"
+#include "Runtime/Service/BridgeFunction.h"
 
 namespace ska {
 
@@ -32,7 +33,7 @@ namespace ska {
 			return m_cache.cache.exist(index);
 		}
 
-		void memoryFromBridge(const ScriptAST& origin, Interpreter&, std::vector<NativeFunctionPtr> bindings);
+		void fromBridge(BridgeFunction& constructor, ASTNodePtr astRoot, Interpreter&);
 
 		const auto& handle() const { return m_handle; }
 

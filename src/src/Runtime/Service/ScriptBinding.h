@@ -14,6 +14,7 @@
 #include "Runtime/Value/InterpreterTypes.h"
 #include "Runtime/Value/ModuleConfiguration.h"
 #include "Runtime/Service/BridgeFunction.h"
+#include "Runtime/Value/BuiltinTypeMap.h"
 
 namespace ska {
 	class ScriptBindingAST;
@@ -48,7 +49,7 @@ namespace ska {
 
 		template <class ReturnType, class ... ParameterTypes, std::size_t... Idx>
 		auto callNativeFromScript(std::function<ReturnType(ParameterTypes...)> f, const std::vector<NodeValue>& v, std::index_sequence<Idx...>) {
-			return f(convertTypeFromScript<ParameterTypes, Idx>(v)...);
+			return f(BuiltinTypeMap::convertTypeFromScript<ParameterTypes, Idx>(v)...);
 		}
 
 		template <class ReturnType, class ... ParameterTypes>
@@ -63,29 +64,6 @@ namespace ska {
 			};
 
 			return std::make_shared<NativeFunction>(static_cast<decltype(NativeFunction::function)> (std::move(lambdaWrapped)));
-		}
-
-		template <class T, std::size_t Id>
-		T convertTypeFromScript(const std::vector<NodeValue>& vect) {
-			assert(Id < vect.size());
-			const auto& v = vect[Id];
-			if constexpr (std::is_same<T, StringShared>()) {
-				return std::make_shared<std::string>(v.convertString());
-			} else if constexpr (std::is_same<T, int>()) {
-				return static_cast<T>(v.convertNumeric());
-			} else if constexpr (std::is_same<T, long>()) {
-				return static_cast<T>(v.convertNumeric());
-			} else if constexpr (std::is_same<T, std::size_t>()) {
-				return static_cast<T>(v.convertNumeric());
-			} else if constexpr (std::is_same<T, float>()) {
-				return static_cast<T>(v.convertNumeric());
-			} else if constexpr (std::is_same<T, bool>()) {
-				return static_cast<int>(v.convertNumeric()) != 0;
-			} else if constexpr (std::is_same<T, double>()) {
-				return static_cast<T>(v.convertNumeric());
-			} else {
-				throw std::runtime_error("Invalid type for bridge function");
-			}
 		}
 
 	protected:
@@ -106,7 +84,6 @@ namespace ska {
 
 	template <class Interpreter>
 	class ScriptBinding : public ScriptBindingAST {
-	using ScriptCache = typename InterpreterTypes<Interpreter>::ScriptCache;
 	using Script = typename InterpreterTypes<Interpreter>::Script;
 	using ModuleConfiguration = lang::ModuleConfiguration<Interpreter>;
 	public:

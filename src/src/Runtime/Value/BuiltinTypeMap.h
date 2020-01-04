@@ -1,6 +1,7 @@
 #pragma once
 
 #include "StringShared.h"
+#include "NodeValue.h"
 
 namespace ska {
 
@@ -13,6 +14,30 @@ namespace ska {
 			(void)_;
 			return ss;
 		}
+
+		template <class T, std::size_t Id>
+		static T convertTypeFromScript(const std::vector<NodeValue>& vect) {
+			assert(Id < vect.size());
+			const auto& v = vect[Id];
+			if constexpr (std::is_same<T, StringShared>()) {
+				return std::make_shared<std::string>(v.convertString());
+			} else if constexpr (std::is_same<T, int>()) {
+				return static_cast<T>(v.convertNumeric());
+			} else if constexpr (std::is_same<T, long>()) {
+				return static_cast<T>(v.convertNumeric());
+			} else if constexpr (std::is_same<T, std::size_t>()) {
+				return static_cast<T>(v.convertNumeric());
+			} else if constexpr (std::is_same<T, float>()) {
+				return static_cast<T>(v.convertNumeric());
+			} else if constexpr (std::is_same<T, bool>()) {
+				return static_cast<int>(v.convertNumeric()) != 0;
+			} else if constexpr (std::is_same<T, double>()) {
+				return static_cast<T>(v.convertNumeric());
+			} else {
+				throw std::runtime_error("Invalid type for bridge function");
+			}
+		}
+
 	private:
 		BuiltinTypeMap() = default;
 		~BuiltinTypeMap() = default;

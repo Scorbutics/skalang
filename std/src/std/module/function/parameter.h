@@ -2,7 +2,6 @@
 #include <vector>
 
 #include "Runtime/Value/NodeValue.h"
-#include "Runtime/Service/ScriptProxy.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
 #include "Runtime/Service/BridgeConstructor.h"
@@ -16,7 +15,6 @@ namespace ska {
         public:
             ParameterModule(ModuleConfiguration<Interpreter>& config, const std::vector<NodeValue>& parameterValues) :
                 Module<Interpreter> { config, "std.native.function.parameter", "std:std.function.parameter" },
-				m_proxy(Module<Interpreter>::m_bridge),
                 m_constructor(BridgeConstructor<Interpreter> { Module<Interpreter>::m_bridge, "Fcty" }),
 				m_parameters(parameterValues) {
 
@@ -36,7 +34,6 @@ namespace ska {
 
             ~ParameterModule() override = default;
         private:
-            ScriptProxy<Interpreter> m_proxy;
             const std::vector<NodeValue>& m_parameters;
             BridgeConstructor<Interpreter> m_constructor;
         };

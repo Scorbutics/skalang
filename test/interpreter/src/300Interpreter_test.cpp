@@ -1,6 +1,6 @@
 #include <doctest.h>
 #include "Config/LoggerConfigLang.h"
-#include "DataTestContainer.h"
+#include "InterpreterDataTestContainer.h"
 #include "Service/SymbolTable.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/Tokenizer.h"
@@ -8,7 +8,6 @@
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
-#include "Runtime/Service/ScriptProxy.h"
 #include "Interpreter/Value/Script.h"
 #include "Interpreter/ScriptCache.h"
 #include "Runtime/Value/ObjectMemory.h"
@@ -21,7 +20,7 @@ auto readerI = std::unique_ptr<ska::Script>{};
 auto scriptCacheI = ska::ScriptCache{};
 auto typeCrosserI = ska::TypeCrosser{};
 
-void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTestContainer& data) {
+void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, InterpreterDataTestContainer& data) {
     tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);
     tokens = tokenizer->tokenize();
 	scriptCacheI.cache.clear();
@@ -35,14 +34,14 @@ void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, DataTest
 	data.interpreter = std::make_unique<ska::Interpreter>(reservedKeywords, typeCrosserI);
 }
 
-ska::Script ASTFromInputSemanticTCInterpreter(const std::string& input, DataTestContainer& data) {
+ska::Script ASTFromInputSemanticTCInterpreter(const std::string& input, InterpreterDataTestContainer& data) {
 	ASTFromInputSemanticTCInterpreterNoParse(input, data);
 	readerI->astScript().parse(*data.parser);
     return *readerI;
 }
 
 TEST_CASE("[Interpreter]") {
-    DataTestContainer data;
+    InterpreterDataTestContainer data;
     
 	SUBCASE("OK") {
 		SUBCASE("Basic Maths") {

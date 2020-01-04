@@ -22,11 +22,6 @@ namespace ska {
 
 			std::unique_ptr<Executor> execute(Interpreter& interpreter);
 
-			PlainMemoryTable createMemory() {
-				//TODO !!!
-				return {};
-			}
-
 			std::string name() const { return astScript().name(); }
 
 			Script(Script&&) = default;
@@ -37,10 +32,6 @@ namespace ska {
 			ScriptAST astScript() const { return m_serviceGen.program(); }
 
 			void fromBridge(BridgeFunction& constructor, ASTNodePtr astRoot, Interpreter& interpreter);
-
-			RuntimeMemory memoryField(const std::string& symbol);
-
-			Operand getSymbol(const Symbol& symbol) const;
 
 		private:
 			Operand findBytecodeMemoryFromSymbol(const Symbol& symbol) const;

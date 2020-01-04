@@ -3,7 +3,7 @@
 
 using InterpreterCommand = ska::bytecode::InterpreterCommand<ska::bytecode::Command::BIND>;
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, InterpreterCommand);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, InterpreterCommand);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, InterpreterCommand)
 
 static void SetupStackParametersAndReturnValue(ska::bytecode::ExecutionContext& context, std::vector<ska::NodeValue> parameters, ska::NodeValue result, bool passThrough) {
