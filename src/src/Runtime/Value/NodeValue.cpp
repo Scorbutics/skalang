@@ -81,11 +81,22 @@ std::string ska::NodeValue::convertString() const {
 	return result;
 }
 
+ska::NodeValue& ska::NodeValue::dereference(const NodeValueVariant_& variant) {
+	auto& referedObject = *std::get<NodeValue*>(variant);
+	if (isReference(referedObject.m_variant)) {
+		return dereference(referedObject.m_variant);
+	}
+	return referedObject;
+}
+
 void ska::NodeValue::transferValueToOwned(NodeValueVariant_ arg) {
 	if(isReference(m_variant)) {
 		SLOG(LogLevel::Debug) << "%11cReference detected, reassigning refered value";
-		auto& referedObject = *std::get<NodeValue*>(m_variant);
-		referedObject = arg;
+		if (isReference(arg)) {
+			dereference(m_variant) = dereference(arg);
+		} else {
+			dereference(m_variant) = arg;
+		}
 	} else {
 		if(isReference(arg) && std::get<NodeValue*>(arg) == this) {
 			SLOG(LogLevel::Error) << "a value ref cannot refer to itself. Aborting assignation.";

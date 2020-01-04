@@ -118,6 +118,7 @@ namespace ska {
 
 	private:
 		void transferValueToOwned(NodeValueVariant_ arg);
+		static NodeValue& dereference(const NodeValueVariant_& arg);
 		static bool isReference(const NodeValueVariant_& arg);
 
 		NodeValueVariant_ m_variant;
