@@ -5,14 +5,14 @@
 
 namespace ska {
   namespace bytecode {
-    class ScriptGeneration;
+	class ScriptGeneration;
 
-    struct BytecodePart {
-      Command command;
-      std::string dest;
-      std::string left;
-      std::string right;
-    };
+	struct BytecodePart {
+  	Command command;
+  	std::string dest;
+  	std::string left;
+  	std::string right;
+	};
   }
 }
 

@@ -5,15 +5,15 @@
 
 namespace ska {
   namespace bytecode {
-    using PlainMemoryTable = std::vector<NodeValue>;
+	using PlainMemoryTable = std::vector<NodeValue>;
 
-    /*
-    class PlainMemoryTable {
-      public:
+	/*
+	class PlainMemoryTable {
+  	public:
 
-      private:
-      std::vector<NodeValue> m_data;
-    };
-    */
+  	private:
+  	std::vector<NodeValue> m_data;
+	};
+	*/
   }
 }

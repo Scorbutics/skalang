@@ -18,12 +18,12 @@ ska::ScriptAST ASTFromInputSemanticComplexTC(ska::ScriptCacheAST& scriptCache, c
 	auto reader = ska::ScriptAST {scriptCache, "main", tokens };
 	auto typeCrosser = ska::TypeCrosser{};
 
-    data.parser = std::make_unique<ska::StatementParser> ( reservedKeywords );
-    data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosser);
+	data.parser = std::make_unique<ska::StatementParser> ( reservedKeywords );
+	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosser);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableUpdater>(*data.parser);
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, typeCrosser);
-    reader.parse(*data.parser);
-    return reader;
+	reader.parse(*data.parser);
+	return reader;
 }
 
 TEST_CASE("[SemanticTypeChecker Complex]") {
@@ -46,7 +46,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	}
 
 
-    SUBCASE("constructor with integer field accessed through function call and used in expression") {
+	SUBCASE("constructor with integer field accessed through function call and used in expression") {
 		ASTFromInputSemanticComplexTC(scriptCache,
 			"var JoueurClass = function(nom:string) : var { "
 				"var test74 = 123;"
@@ -55,7 +55,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 					"test : test74"
 				"};"
 			"};"
-            "(5 + JoueurClass(\"joueur1Nom\").test + 3 * 4) * 2;"
+	"(5 + JoueurClass(\"joueur1Nom\").test + 3 * 4) * 2;"
 			, data);
 	}
 

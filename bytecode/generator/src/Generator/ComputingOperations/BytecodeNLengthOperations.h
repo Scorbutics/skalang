@@ -7,7 +7,7 @@
 
 namespace ska {
   namespace bytecode {
-    template <Command command, class NodeIterable, size_t Modulo = 3>
+	template <Command command, class NodeIterable, size_t Modulo = 3>
 		std::size_t ApplyNOperations(Generator& generator, InstructionOutput& output, GenerationContext& script, NodeIterable&& node, std::size_t maxSize = std::numeric_limits<std::size_t>::max()) {
 			auto temporaryContainer = std::vector<Operand> {};
 

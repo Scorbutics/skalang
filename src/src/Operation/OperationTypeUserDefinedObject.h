@@ -5,7 +5,7 @@
 
 namespace ska {
 	template<>
-    class OperationType<Operator::USER_DEFINED_OBJECT> {
+	class OperationType<Operator::USER_DEFINED_OBJECT> {
 	private:
 		const ASTNode& node;
 	public:

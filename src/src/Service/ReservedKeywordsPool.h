@@ -8,7 +8,7 @@ namespace ska {
 
 	struct ReservedKeywordsPool {
 		struct TokenInfo {
-		    std::string patternString;
+			std::string patternString;
 			Token token;
 		};
 
@@ -28,7 +28,7 @@ namespace ska {
 			return patterns[token].token;
 		}
 
-        	const std::string& patternString(const std::size_t token) const {
+    		const std::string& patternString(const std::size_t token) const {
 			return patterns[token].patternString;
 		}
 

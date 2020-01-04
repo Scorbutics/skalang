@@ -9,7 +9,7 @@
 namespace ska {
 	class StatementParser;
 
-    class ScriptAST {
+	class ScriptAST {
 	public:
 		ScriptAST(ScriptHandleAST& handle) : 
 			m_cache(&handle.m_cache) {

@@ -6,7 +6,7 @@
 
 namespace ska {
 	template<>
-    class OperationType<Operator::IMPORT> {
+	class OperationType<Operator::IMPORT> {
 	private:
 		const ASTNode& node;
 	public:

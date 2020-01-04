@@ -16,7 +16,7 @@ SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(ARR_ACCESS)(ExecutionContext& conte
   LOG_INFO << "[Accessing cell at index " << index << "/" << array->size() << " of object " << left << "]";
 
   if(index >= array->size()) {
-    throw std::runtime_error("invalid array access at index " + std::to_string(index) + " on array size " + std::to_string(array->size()));
+	throw std::runtime_error("invalid array access at index " + std::to_string(index) + " on array size " + std::to_string(array->size()));
   }
   auto& result = (*array)[index];
   LOG_INFO << "[Cell content : " << result.convertString() << "]";

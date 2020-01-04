@@ -151,14 +151,14 @@ namespace ska {
 }
 
 namespace std {
-    template<typename T, std::size_t ArraySize>
-    class iterator_traits<ska::unique_buffered_priority_indexed_fixed_queue_iterator<T, ArraySize>> {
-    public:
-        using difference_type = std::ptrdiff_t;
-        using size_type = std::size_t;
-        using value_type = T;
-        using pointer = T*;
-        using reference = T&;
-        using iterator_category = std::random_access_iterator_tag;
-    };
+	template<typename T, std::size_t ArraySize>
+	class iterator_traits<ska::unique_buffered_priority_indexed_fixed_queue_iterator<T, ArraySize>> {
+	public:
+    	using difference_type = std::ptrdiff_t;
+    	using size_type = std::size_t;
+    	using value_type = T;
+    	using pointer = T*;
+    	using reference = T&;
+    	using iterator_category = std::random_access_iterator_tag;
+	};
 }

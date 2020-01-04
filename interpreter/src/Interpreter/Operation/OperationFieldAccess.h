@@ -6,7 +6,7 @@
 namespace ska {
 	class ASTNode;
 	template<>
-    class Operation<Operator::FIELD_ACCESS> {
+	class Operation<Operator::FIELD_ACCESS> {
 	private:
 		ASTNode& node;
 				

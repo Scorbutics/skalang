@@ -5,9 +5,9 @@ namespace ska {
 	class ScriptAST;
 
 	enum class ArrayTokenEventType {
-        DECLARATION,
+    	DECLARATION,
 		EXPRESSION,
-        USE
+    	USE
 	};
 
 	class ArrayTokenEvent {

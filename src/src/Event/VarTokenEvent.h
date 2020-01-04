@@ -3,7 +3,7 @@
 #include "NodeValue/Type.h"
 
 namespace ska {
-    class ASTNode;
+	class ASTNode;
 	class ScriptAST;
 
 	enum class VarTokenEventType {
@@ -14,7 +14,7 @@ namespace ska {
 		USE
 	};
 
-    class VarTokenEvent {
+	class VarTokenEvent {
 	public:
 		static VarTokenEvent MakeFunction(ASTNode& node, ScriptAST& s) {
 			return VarTokenEvent{ node, s, VarTokenEventType::FUNCTION_DECLARATION };
@@ -78,5 +78,5 @@ namespace ska {
 		ASTNode* m_typeNode = nullptr;
 		VarTokenEventType m_type;
 		ScriptAST& m_script;
-    };
+	};
 }

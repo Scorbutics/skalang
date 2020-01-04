@@ -56,7 +56,7 @@ namespace ska {
 		ASTNodePtr parse(ScriptAST& input);
 
 		ASTNodePtr statement(ScriptAST& input);
-        ASTNodePtr optstatement(ScriptAST& input, const Token& mustNotBe = Token{});
+    	ASTNodePtr optstatement(ScriptAST& input, const Token& mustNotBe = Token{});
 
 		ASTNodePtr expr(ScriptAST& input);
 		ASTNodePtr optexpr(ScriptAST& input, const Token& mustNotBe = Token{});

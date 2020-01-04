@@ -15,7 +15,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	if (symbolField == nullptr || !typeObject.hasSymbol()) {
 		auto ss = std::stringstream{};
 		ss << "trying to access to an undeclared field : \"" << fieldName << "\" of \"" << node.GetObjectNameNode().name() << "\"";
-        throw std::runtime_error(ss.str());
+	throw std::runtime_error(ss.str());
 	}
 
 	auto optFieldValue = context.getSymbol(*symbolField);

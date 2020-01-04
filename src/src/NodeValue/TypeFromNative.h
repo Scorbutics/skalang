@@ -13,8 +13,8 @@ namespace ska {
 	struct TypeFromNative<long> {
 		static const Type value();
 	};
-    
-    template<>
+	
+	template<>
 	struct TypeFromNative<bool> {
 		static const Type value();
 	};

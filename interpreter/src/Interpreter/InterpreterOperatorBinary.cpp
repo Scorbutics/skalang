@@ -11,18 +11,18 @@ namespace ska {
 	NodeValue InterpretMathematicBinaryExpression(const TypeCrosser& crosser, std::string mathOperator, TypedNodeValue firstValue, TypedNodeValue secondValue, const Type& destinationType) {
 		assert(!mathOperator.empty());
 		auto operatorIt = LogicalOperatorMap.find(mathOperator);
-        if(operatorIt != LogicalOperatorMap.end()) {
-            switch (operatorIt->second) {
-            case LogicalOperator::ADDITION :
-                return InterpretMathematicPlus(std::move(firstValue), std::move(secondValue), destinationType);
-            case LogicalOperator::SUBSTRACT:
-                return InterpretMathematicMinus(std::move(firstValue), std::move(secondValue), destinationType);
-            case LogicalOperator::MULTIPLY:
-                return InterpretMathematicMultiply(std::move(firstValue), std::move(secondValue), destinationType);
-            case LogicalOperator::DIVIDE:
-                return InterpretMathematicDivide(std::move(firstValue), std::move(secondValue), destinationType);
-            case LogicalOperator::EQUALITY:
-                return InterpretLogicCondition(std::move(firstValue), std::move(secondValue), destinationType);
+	if(operatorIt != LogicalOperatorMap.end()) {
+	switch (operatorIt->second) {
+	case LogicalOperator::ADDITION :
+	return InterpretMathematicPlus(std::move(firstValue), std::move(secondValue), destinationType);
+	case LogicalOperator::SUBSTRACT:
+	return InterpretMathematicMinus(std::move(firstValue), std::move(secondValue), destinationType);
+	case LogicalOperator::MULTIPLY:
+	return InterpretMathematicMultiply(std::move(firstValue), std::move(secondValue), destinationType);
+	case LogicalOperator::DIVIDE:
+	return InterpretMathematicDivide(std::move(firstValue), std::move(secondValue), destinationType);
+	case LogicalOperator::EQUALITY:
+	return InterpretLogicCondition(std::move(firstValue), std::move(secondValue), destinationType);
 			case LogicalOperator::LESSER_OR_EQUAL: {
 				const auto crossedType = firstValue.type.crossTypes(crosser, "=", secondValue.type);
 				return InterpretLogicLesserOrEqual(std::move(firstValue), std::move(secondValue), crossedType);
@@ -39,13 +39,13 @@ namespace ska {
 				const auto crossedType = firstValue.type.crossTypes(crosser, "=", secondValue.type);
 				return InterpretLogicGreater(std::move(firstValue), std::move(secondValue), crossedType);
 			}
-            default:
-                throw std::runtime_error("Unhandled operator " + mathOperator);
-                return "";
-            }
-	    }
+	default:
+	throw std::runtime_error("Unhandled operator " + mathOperator);
+	return "";
+	}
+		}
 		throw std::runtime_error("Unhandled operator " + mathOperator);
-    }
+	}
 }
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::BINARY>::interpret(OperateOn node) {

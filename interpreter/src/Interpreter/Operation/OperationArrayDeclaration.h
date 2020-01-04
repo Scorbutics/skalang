@@ -19,9 +19,9 @@ namespace ska {
 			return node[0].name();
 		}
 
-        inline auto GetArraySubType() {
-            return node[0].type().value();
-        }
+    	inline auto GetArraySubType() {
+        	return node[0].type().value();
+    	}
 
 		inline auto begin() {
 			return node.begin();

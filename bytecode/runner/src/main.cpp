@@ -56,9 +56,9 @@ int main(int argc, char* argv[]) {
 	auto inputFile = std::ifstream{ std::string{argv[1]} };
 	if(inputFile.fail()) {
 		std::cout << "File not found : \"" << argv[1] << std::endl;
-        	return -1;
+		return -1;
 	}
-  
+
 	const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto typeCrosser = ska::TypeCrosser{};
 	auto parser = ska::StatementParser {reservedKeywords};

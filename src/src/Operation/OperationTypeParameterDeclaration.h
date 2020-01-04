@@ -6,7 +6,7 @@
 namespace ska {
 	
 	template<>
-    class OperationType<Operator::PARAMETER_DECLARATION> {
+	class OperationType<Operator::PARAMETER_DECLARATION> {
 	private:
 		const ASTNode& node;
 	public:

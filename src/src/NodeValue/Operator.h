@@ -5,15 +5,15 @@
 namespace ska {
 	enum class Operator {
 		BINARY,
-        UNARY,
+    	UNARY,
 		LITERAL,
 		VARIABLE_DECLARATION,
 		VARIABLE_AFFECTATION,
 		PARAMETER_DECLARATION,
 		ARRAY_DECLARATION,
 		ARRAY_USE,
-        USER_DEFINED_OBJECT,
-        FUNCTION_CALL,
+    	USER_DEFINED_OBJECT,
+    	FUNCTION_CALL,
 		FUNCTION_PROTOTYPE_DECLARATION,
 		FUNCTION_DECLARATION,
 		FIELD_ACCESS,
@@ -29,17 +29,17 @@ namespace ska {
 		UNUSED_Last_Length
 	};
 
-    static constexpr const char* OperatorSTR[] = {
+	static constexpr const char* OperatorSTR[] = {
 		"BINARY",
-        "UNARY",
+    	"UNARY",
 		"LITERAL",
 		"VARIABLE_DECLARATION",
 		"VARIABLE_AFFECTATION",
 		"PARAMETER_DECLARATION",        
 		"ARRAY_DECLARATION",
 		"ARRAY_USE",
-        "USER_DEFINED_OBJECT",
-        "FUNCTION_CALL",
+    	"USER_DEFINED_OBJECT",
+    	"FUNCTION_CALL",
 		"FUNCTION_PROTOTYPE_DECLARATION",
 		"FUNCTION_DECLARATION",
 		"FIELD_ACCESS",
@@ -54,9 +54,9 @@ namespace ska {
 		"TYPE"
 	};
 
-    static inline const char* OperatorPrint(Operator op) {
-        return OperatorSTR[static_cast<std::size_t>(op)];
-    }
+	static inline const char* OperatorPrint(Operator op) {
+    	return OperatorSTR[static_cast<std::size_t>(op)];
+	}
 
 	inline std::ostream& operator<<(std::ostream& stream, const Operator& op) {
 		stream << ska::OperatorPrint(op);

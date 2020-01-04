@@ -21,13 +21,13 @@ auto scriptCacheI = ska::ScriptCache{};
 auto typeCrosserI = ska::TypeCrosser{};
 
 void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, InterpreterDataTestContainer& data) {
-    tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);
-    tokens = tokenizer->tokenize();
+	tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);
+	tokens = tokenizer->tokenize();
 	scriptCacheI.cache.clear();
 	scriptCacheI.astCache.clear();
 	readerI = std::make_unique<ska::Script>(scriptCacheI, "main", tokens);
-    
-    data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
+	
+	data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosserI);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableUpdater>(*data.parser);
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, typeCrosserI);
@@ -37,17 +37,17 @@ void ASTFromInputSemanticTCInterpreterNoParse(const std::string& input, Interpre
 ska::Script ASTFromInputSemanticTCInterpreter(const std::string& input, InterpreterDataTestContainer& data) {
 	ASTFromInputSemanticTCInterpreterNoParse(input, data);
 	readerI->astScript().parse(*data.parser);
-    return *readerI;
+	return *readerI;
 }
 
 TEST_CASE("[Interpreter]") {
-    InterpreterDataTestContainer data;
-    
+	InterpreterDataTestContainer data;
+	
 	SUBCASE("OK") {
 		SUBCASE("Basic Maths") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("(4 * 5) + 2 * (3 + 4 - 1) + 1 + 9;", data);
 			auto res = data.interpreter->script(astPtr);
-            CHECK(res.nodeval<long>() == 42);
+	CHECK(res.nodeval<long>() == 42);
 		}
 		SUBCASE("Basic Maths with var") {
 			auto astPtr = ASTFromInputSemanticTCInterpreter("var toto = 4; toto; (toto * 5) + 2 * (3 + 4 - 1) + 1 + 9;", data);

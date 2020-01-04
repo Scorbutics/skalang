@@ -9,7 +9,7 @@ namespace ska {
 	class ASTNode;
 
 	template<>
-    class Operation<Operator::IMPORT> {
+	class Operation<Operator::IMPORT> {
 	private:
 		ASTNode& node;
 	public:

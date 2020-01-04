@@ -4,18 +4,18 @@ var CharacterCommands = import "bind:character_commands_lib";
 var Callback = import "callback";
 
 var Fcty = function(id: int) : var {
-    var defaultPos = Position.Fcty(0, 0);
+	var defaultPos = Position.Fcty(0, 0);
 	var input = InputComponent.Fcty(id);
-    return {
+	return {
 		id : id,
-        direction : 0,
-        pos : defaultPos,
+	direction : 0,
+	pos : defaultPos,
 		input : input,
 		jump : CharacterCommands.jump,
 		move : function(direction: int, power: int, t: int, callback: Callback::Default) {
 			CharacterCommands.move(direction, power, t);
 			callback();
 		}
-    };
+	};
 };
 

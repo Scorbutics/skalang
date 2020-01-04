@@ -12,24 +12,24 @@ namespace ska {
 		}
 	};
 
-    template <class T>
-    class PriorityObserver : public Observer<T> {
+	template <class T>
+	class PriorityObserver : public Observer<T> {
 		friend struct PriorityObserverGetter;
-        
-    protected:
-        template <class ...Args>
-        PriorityObserver(int p, Args&& ... args) : Observer<T>::Observer(std::forward<Args>(args)...), priority(p) {}
-        
-    private:
-        int priority;
-    };
+    	
+	protected:
+    	template <class ...Args>
+    	PriorityObserver(int p, Args&& ... args) : Observer<T>::Observer(std::forward<Args>(args)...), priority(p) {}
+    	
+	private:
+    	int priority;
+	};
 
-    template <class T>
-    using priority_queue_for_observer = unique_buffered_priority_indexed_fixed_queue<T, 10, PriorityObserverGetter>;
+	template <class T>
+	using priority_queue_for_observer = unique_buffered_priority_indexed_fixed_queue<T, 10, PriorityObserverGetter>;
 
-    template <class T>
-    using observable_priority_queue = Observable<T, priority_queue_for_observer, PriorityObserver>;
+	template <class T>
+	using observable_priority_queue = Observable<T, priority_queue_for_observer, PriorityObserver>;
 
-    template <class T>
-    using subobserver_priority_queue = SubObserver<T, priority_queue_for_observer, PriorityObserver>;
+	template <class T>
+	using subobserver_priority_queue = SubObserver<T, priority_queue_for_observer, PriorityObserver>;
 }

@@ -15,10 +15,10 @@ namespace ska {
 			return node.size() > 0;
 		}
 
-        inline auto GetArraySubType() {
+    	inline auto GetArraySubType() {
 			assert(HasArrayType());
-            return node[0].type().value();
-        }
+        	return node[0].type().value();
+    	}
 		
 		auto begin() const {
 			return node.begin();

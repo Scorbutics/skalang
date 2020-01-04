@@ -77,16 +77,16 @@ namespace ska {
 			return m_type;
 		}
 
-        bool isLiteral() const {
-            switch(m_type) {
+    	bool isLiteral() const {
+        	switch(m_type) {
 				case TokenType::BOOLEAN:
-                case TokenType::DIGIT:
-                case TokenType::STRING:
-                    return true;
-                default:
-                    return false;
-            }
-        }
+            	case TokenType::DIGIT:
+            	case TokenType::STRING:
+                	return true;
+            	default:
+                	return false;
+        	}
+    	}
 		
 		std::string name() const {
 			if (m_type == TokenType::RESERVED) {

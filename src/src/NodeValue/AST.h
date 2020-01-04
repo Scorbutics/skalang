@@ -49,11 +49,11 @@ namespace ska {
 		}
 
 		auto& operator[](const std::size_t index) {
-		    return *m_children[index];
+			return *m_children[index];
 		}
 
 		const auto& operator[](const std::size_t index) const {
-		    return *m_children[index];
+			return *m_children[index];
 		}
 
 		auto begin() { return std::begin(m_children); }
@@ -66,7 +66,7 @@ namespace ska {
 			return m_op;
 		}
 
-	    void buildType(const TypeBuildersContainer& typeBuilder, const ScriptAST& script);
+		void buildType(const TypeBuildersContainer& typeBuilder, const ScriptAST& script);
 		void linkSymbol(const Symbol& symbol) {
 			m_symbol = &symbol;
 		}
@@ -82,11 +82,11 @@ namespace ska {
 	private:
 		friend class ASTFactory;
 		ASTNode();
-        
-        explicit ASTNode(Token t, ASTNodePtr l = nullptr, ASTNodePtr r = nullptr);
+    	
+    	explicit ASTNode(Token t, ASTNodePtr l = nullptr, ASTNodePtr r = nullptr);
 
-        ASTNode(Operator o, Token identifierToken = Token{}, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{});
-        ASTNode(Operator o, Token identifierToken = Token{});
+    	ASTNode(Operator o, Token identifierToken = Token{}, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{});
+    	ASTNode(Operator o, Token identifierToken = Token{});
 
 		Operator m_op = Operator::UNARY;
 		std::optional<Type> m_type;

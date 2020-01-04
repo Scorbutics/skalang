@@ -42,7 +42,7 @@ ska::Symbol* ska::Symbol::operator[](const std::string& fieldSymbolName) {
 }
 
 std::size_t ska::Symbol::size() const {
-    return m_category.compound().size();
+	return m_category.compound().size();
 }
 
 bool ska::Symbol::operator==(const Symbol& sym) const {

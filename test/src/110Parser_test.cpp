@@ -57,7 +57,7 @@ ska::ScriptAST ASTFromInput(ska::ScriptCacheAST& scriptCache, const std::string&
 	auto reader = ska::ScriptAST { scriptCache, "main", tokens };
 	auto p = ska::StatementParser{ keywords };
 	reader.parse(p, false);
-    return reader;
+	return reader;
 }
 
 TEST_CASE("Block") {
@@ -150,23 +150,23 @@ TEST_CASE("function") {
 	SUBCASE("with 2 arguments built-in types and no return type") {
 		auto astPtr = ASTFromInput(scriptCache, "var f = function(titi:int, toto:string) { };", keywords);
 		auto& ast = astPtr.rootNode()[0];
-        CHECK(ast.op() == ska::Operator::VARIABLE_DECLARATION);
-        const auto& astFunc133 = ast[0];
-        CHECK(astFunc133.op() == ska::Operator::FUNCTION_DECLARATION);
+	CHECK(ast.op() == ska::Operator::VARIABLE_DECLARATION);
+	const auto& astFunc133 = ast[0];
+	CHECK(astFunc133.op() == ska::Operator::FUNCTION_DECLARATION);
 		CHECK(astFunc133.size() == 2);
 
-        CHECK(astFunc133[0].size() == 3);
-        CHECK(astFunc133[1].size() == 0);
-        //CHECK(ast[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
+	CHECK(astFunc133[0].size() == 3);
+	CHECK(astFunc133[1].size() == 0);
+	//CHECK(ast[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
 
 	}
 	//TODO rework : doesn't properly work (doesn't detect a good function returning type)
 	SUBCASE("with 2 return placements (early return support)") {
 		auto astPtr = ASTFromInput(scriptCache, "var f_parser154 = function(titi:int) : int { if(titi == 0) { return 1; } return 0; }; var int_parser154 = f_parser154(1);", keywords);
 		auto& ast = astPtr.rootNode()[0];
-        CHECK(ast.op() == ska::Operator::VARIABLE_DECLARATION);
-        const auto& astFunc157 = ast[0];
-        CHECK(astFunc157.op() == ska::Operator::FUNCTION_DECLARATION);
+	CHECK(ast.op() == ska::Operator::VARIABLE_DECLARATION);
+	const auto& astFunc157 = ast[0];
+	CHECK(astFunc157.op() == ska::Operator::FUNCTION_DECLARATION);
 		CHECK(astFunc157.size() == 2);
 	}
 	
@@ -184,53 +184,53 @@ TEST_CASE("function") {
 }
 
 TEST_CASE("User defined object") {
-    const auto keywords = ska::ReservedKeywordsPool {};
+	const auto keywords = ska::ReservedKeywordsPool {};
 	auto scriptCache = ska::ScriptCacheAST{};
 
-    SUBCASE("constructor with 1 parameter") {
+	SUBCASE("constructor with 1 parameter") {
 
-        auto astPtr = ASTFromInput(scriptCache, "var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", keywords);
+	auto astPtr = ASTFromInput(scriptCache, "var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", keywords);
 		CHECK(astPtr.rootNode().size() == 3);
-        CHECK(astPtr.rootNode().op() == ska::Operator::BLOCK);
+	CHECK(astPtr.rootNode().op() == ska::Operator::BLOCK);
 
-        auto& varJoueurNode = astPtr.rootNode()[0];
-        CHECK(varJoueurNode.size() == 1);
-        CHECK(varJoueurNode.op() == ska::Operator::VARIABLE_DECLARATION);
-        const auto& astFunc154 = varJoueurNode[0];
-        CHECK(astFunc154.op() == ska::Operator::FUNCTION_DECLARATION);
+	auto& varJoueurNode = astPtr.rootNode()[0];
+	CHECK(varJoueurNode.size() == 1);
+	CHECK(varJoueurNode.op() == ska::Operator::VARIABLE_DECLARATION);
+	const auto& astFunc154 = varJoueurNode[0];
+	CHECK(astFunc154.op() == ska::Operator::FUNCTION_DECLARATION);
 		CHECK(astFunc154.size() == 2);
-        const auto& astFuncParameters154 = astFunc154[0];
-        CHECK(astFuncParameters154.size() == 2);
+	const auto& astFuncParameters154 = astFunc154[0];
+	CHECK(astFuncParameters154.size() == 2);
 
-        //Checks the parameter name and type
-        CHECK(astFuncParameters154[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
-        CHECK(astFuncParameters154[0].size() == 1);
+	//Checks the parameter name and type
+	CHECK(astFuncParameters154[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
+	CHECK(astFuncParameters154[0].size() == 1);
 		CHECK(astFuncParameters154[0][0].size() == 3);
-        CHECK(astFuncParameters154[0][0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
+	CHECK(astFuncParameters154[0][0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
 
-        //Checks the return type
-        CHECK(astFuncParameters154[1][0].has(keywords.pattern<ska::TokenGrammar::VARIABLE>()));
+	//Checks the return type
+	CHECK(astFuncParameters154[1][0].has(keywords.pattern<ska::TokenGrammar::VARIABLE>()));
 
-        //Checks the function body
-        CHECK(astFunc154[1].size() == 1);
+	//Checks the function body
+	CHECK(astFunc154[1].size() == 1);
 
-        const auto& userDefinedObjectNode = astFunc154[1][0][0];
+	const auto& userDefinedObjectNode = astFunc154[1][0][0];
 		CHECK(astFunc154[1][0].op() == ska::Operator::RETURN);
-        CHECK(userDefinedObjectNode.op() == ska::Operator::USER_DEFINED_OBJECT);
-        CHECK(userDefinedObjectNode.size() == 1);
+	CHECK(userDefinedObjectNode.op() == ska::Operator::USER_DEFINED_OBJECT);
+	CHECK(userDefinedObjectNode.size() == 1);
 
-        const auto& returnNomNode = userDefinedObjectNode[0];
-        CHECK(returnNomNode.size() == 1);
-        CHECK(returnNomNode.has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
+	const auto& returnNomNode = userDefinedObjectNode[0];
+	CHECK(returnNomNode.size() == 1);
+	CHECK(returnNomNode.has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
 
-        //Checks the variable declaration and the function call
-        const auto& varJoueur1Node = astPtr.rootNode()[1];
-        CHECK(varJoueur1Node.op() == ska::Operator::VARIABLE_DECLARATION);
-        CHECK(varJoueur1Node.has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER, {}} ));
+	//Checks the variable declaration and the function call
+	const auto& varJoueur1Node = astPtr.rootNode()[1];
+	CHECK(varJoueur1Node.op() == ska::Operator::VARIABLE_DECLARATION);
+	CHECK(varJoueur1Node.has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER, {}} ));
 
-        //Checks the field access
-        const auto& nomJoueur1FieldNode = astPtr.rootNode()[2];
-        CHECK(nomJoueur1FieldNode.op() == ska::Operator::FIELD_ACCESS);
+	//Checks the field access
+	const auto& nomJoueur1FieldNode = astPtr.rootNode()[2];
+	CHECK(nomJoueur1FieldNode.op() == ska::Operator::FIELD_ACCESS);
 		CHECK(nomJoueur1FieldNode.size() == 2);
 		CHECK(nomJoueur1FieldNode[0].has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER, {}} ));
 		CHECK(nomJoueur1FieldNode[1].has(ska::Token{ "nom", ska::TokenType::IDENTIFIER, {}}));
@@ -244,7 +244,7 @@ TEST_CASE("Expression and priorities") {
 	auto scriptCache = ska::ScriptCacheAST{};
 	SUBCASE("Simple mul") {
 		auto astPtr = ASTFromInput(scriptCache, "5 * 2;", keywords);
-        auto& ast = astPtr.rootNode()[0];
+	auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
 		CHECK(ast.has(ska::Token { "*", ska::TokenType::SYMBOL, {}}));
@@ -262,14 +262,14 @@ TEST_CASE("Expression and priorities") {
 		CHECK(!toCheck);
 	}
 
-    SUBCASE("Syntax error : no existing operator") {
-        try {
-            ASTFromInput(scriptCache, "5 ' 3;", keywords);
-            CHECK(false);
-        } catch(std::exception& e) {
-            CHECK(true);
-        }
-    }
+	SUBCASE("Syntax error : no existing operator") {
+	try {
+	ASTFromInput(scriptCache, "5 ' 3;", keywords);
+	CHECK(false);
+	} catch(std::exception& e) {
+	CHECK(true);
+	}
+	}
 
 	SUBCASE("Simple div") {
 		auto astPtr = ASTFromInput(scriptCache, "5 / 2;", keywords);

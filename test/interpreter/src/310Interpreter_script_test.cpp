@@ -29,13 +29,13 @@ auto scriptCacheIS = ska::ScriptCache{};
 auto typeCrosserIS = ska::TypeCrosser{};
 
 void ASTFromInputSemanticTCInterpreterScriptNoParse(const std::string& input, InterpreterDataTestContainer& data) {
-    tokenizerS = std::make_unique<ska::Tokenizer>(reservedKeywordsS, input);
-    tokensS = tokenizerS->tokenize();
+	tokenizerS = std::make_unique<ska::Tokenizer>(reservedKeywordsS, input);
+	tokensS = tokenizerS->tokenize();
 	scriptCacheIS.cache.clear();
 	scriptCacheIS.astCache.clear();
 	readerIS = std::make_unique<ska::Script>(scriptCacheIS, "main", tokensS);
-    
-    data.parser = std::make_unique<ska::StatementParser>(reservedKeywordsS);
+	
+	data.parser = std::make_unique<ska::StatementParser>(reservedKeywordsS);
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosserIS);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableUpdater>(*data.parser);
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, typeCrosserIS);
@@ -45,7 +45,7 @@ void ASTFromInputSemanticTCInterpreterScriptNoParse(const std::string& input, In
 ska::Script ASTFromInputSemanticTCInterpreterScript(const std::string& input, InterpreterDataTestContainer& data) {
 	ASTFromInputSemanticTCInterpreterScriptNoParse(input, data);
 	readerIS->astScript().parse(*data.parser);
-    return *readerIS;
+	return *readerIS;
 }
 
 static ska::lang::ModuleConfiguration<ska::Interpreter> BuildModuleConfiguration(InterpreterDataTestContainer& data) {

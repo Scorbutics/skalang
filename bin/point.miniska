@@ -1,7 +1,7 @@
 var Fcty = function(x: int, y: int): var {
-    return {
-        x: x,
-        y: y
-    };
+	return {
+	x: x,
+	y: y
+	};
 };
 

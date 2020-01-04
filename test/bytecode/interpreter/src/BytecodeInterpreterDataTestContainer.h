@@ -15,19 +15,19 @@
 #include "BytecodeInterpreter/BytecodeInterpreter.h"
 
 struct BytecodeInterpreterDataTestContainer {
-    using ParserPtr = std::unique_ptr<ska::StatementParser>;
-    using SemanticTypeCheckerPtr = std::unique_ptr<ska::SemanticTypeChecker>;
-    using TypeBuilderPtr = std::unique_ptr<ska::TypeBuilder>;
+	using ParserPtr = std::unique_ptr<ska::StatementParser>;
+	using SemanticTypeCheckerPtr = std::unique_ptr<ska::SemanticTypeChecker>;
+	using TypeBuilderPtr = std::unique_ptr<ska::TypeBuilder>;
 	using SymbolTableUpdaterPtr = std::unique_ptr<ska::SymbolTableUpdater>;
 	using BytecodeGeneratorPtr = std::unique_ptr<ska::bytecode::Generator>;
 	using BytecodeInterpreterPtr = std::unique_ptr<ska::bytecode::Interpreter>;
 
 	ska::ReservedKeywordsPool reservedKeywords;
 	BytecodeGeneratorPtr generator;
-    ParserPtr parser;
-    SemanticTypeCheckerPtr typeChecker;
-    TypeBuilderPtr typeBuilder;
+	ParserPtr parser;
+	SemanticTypeCheckerPtr typeChecker;
+	TypeBuilderPtr typeBuilder;
 	SymbolTableUpdaterPtr symbolsTypeUpdater;
-    BytecodeInterpreterPtr interpreter;
-    std::unique_ptr<ska::bytecode::ScriptCache> storage = std::make_unique<ska::bytecode::ScriptCache>();
+	BytecodeInterpreterPtr interpreter;
+	std::unique_ptr<ska::bytecode::ScriptCache> storage = std::make_unique<ska::bytecode::ScriptCache>();
 };

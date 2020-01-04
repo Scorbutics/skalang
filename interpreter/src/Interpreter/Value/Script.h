@@ -12,7 +12,7 @@ namespace ska {
 
 	class Interpreter;
 
-    class Script {
+	class Script {
 	public:
 		Script(ScriptHandle& handle) :
 			m_cache(handle.m_cache),

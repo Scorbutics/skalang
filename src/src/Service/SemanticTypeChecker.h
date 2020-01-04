@@ -10,29 +10,29 @@
 
 namespace ska {
 	class SymbolTable;
-    class StatementParser;
+	class StatementParser;
 	class TypeCrosser;
 
-    class SemanticTypeChecker :
-    public subobserver_priority_queue<VarTokenEvent>,
-    public subobserver_priority_queue<FunctionTokenEvent>,
+	class SemanticTypeChecker :
+	public subobserver_priority_queue<VarTokenEvent>,
+	public subobserver_priority_queue<FunctionTokenEvent>,
 	public subobserver_priority_queue<ArrayTokenEvent>,
-    public subobserver_priority_queue<ReturnTokenEvent>,
+	public subobserver_priority_queue<ReturnTokenEvent>,
 	public subobserver_priority_queue<IfElseTokenEvent> {
-    public:
-        SemanticTypeChecker(StatementParser& parser, const TypeCrosser& typeCrosser);
-        ~SemanticTypeChecker() = default;
-    private:
+	public:
+    	SemanticTypeChecker(StatementParser& parser, const TypeCrosser& typeCrosser);
+    	~SemanticTypeChecker() = default;
+	private:
 		static bool childrenHasReturnOnAllControlPath(const ASTNode& node);
 		static bool statementHasReturnOnAllControlPath(const ASTNode& node);
 
-        bool matchArray(const ArrayTokenEvent& token);
-        bool matchVariable(const VarTokenEvent& token); 		
-        bool matchFunction(const FunctionTokenEvent& token);
-        bool matchReturn(const ReturnTokenEvent& token);
+    	bool matchArray(const ArrayTokenEvent& token);
+    	bool matchVariable(const VarTokenEvent& token); 		
+    	bool matchFunction(const FunctionTokenEvent& token);
+    	bool matchReturn(const ReturnTokenEvent& token);
 		bool matchIfElse(const IfElseTokenEvent& token);
 
 		const TypeCrosser& m_typeCrosser;
-    };
+	};
 
 }

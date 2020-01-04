@@ -77,13 +77,13 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::statement(ScriptAST& inpu
 ska::StatementParser::ASTNodePtr ska::StatementParser::matchExpressionStatement(ScriptAST& input) {
 	SLOG(ska::LogLevel::Info) << "Expression-statement found";
 
-    auto expressionResult = expr(input);
-    input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
-    if(expressionResult == nullptr) {
+	auto expressionResult = expr(input);
+	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+	if(expressionResult == nullptr) {
 			SLOG(ska::LogLevel::Info) << "NOP statement";
 			return nullptr;
-    }
-    return expressionResult;
+	}
+	return expressionResult;
 }
 
 ska::StatementParser::ASTNodePtr ska::StatementParser::matchReservedKeyword(ScriptAST& input, const std::size_t keywordIndex) {

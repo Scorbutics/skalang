@@ -8,7 +8,7 @@ namespace ska {
 	class Script;
 
 	template<>
-    class Operation<Operator::PARAMETER_DECLARATION> {
+	class Operation<Operator::PARAMETER_DECLARATION> {
 	private:
 		ASTNode& node;
 	public:

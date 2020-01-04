@@ -4,6 +4,6 @@
 
 namespace ska {
   namespace bytecode {
-    SKALANG_BYTECODE_INTERPRETER_COMMAND_DEFINE(Command::MUL_STR_I);
+	SKALANG_BYTECODE_INTERPRETER_COMMAND_DEFINE(Command::MUL_STR_I);
   }
 }

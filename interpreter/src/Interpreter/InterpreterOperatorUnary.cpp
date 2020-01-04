@@ -6,17 +6,17 @@
 
 namespace ska {
 	NodeValue InterpreterOperatorConvertValue(ExpressionType type, const TokenVariant& value) {
-        switch(type) {
+	switch(type) {
 		case ExpressionType::INT:
-            return std::holds_alternative<long>(value) ? value : std::stol(*std::get<StringShared>(value));
+	return std::holds_alternative<long>(value) ? value : std::stol(*std::get<StringShared>(value));
 		case ExpressionType::FLOAT:
-            return std::holds_alternative<double>(value) ? value : std::stof(*std::get<StringShared>(value));
+	return std::holds_alternative<double>(value) ? value : std::stof(*std::get<StringShared>(value));
 		case ExpressionType::BOOLEAN:
 			return std::holds_alternative<bool>(value) ? value : (*std::get<StringShared>(value) == "true");
 		default:
 			return std::get<StringShared>(value);
-        }
-    }
+	}
+	}
 }
 
 ska::NodeCell ska::InterpreterOperator<ska::Operator::UNARY>::interpret(OperateOn node) {

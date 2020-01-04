@@ -6,7 +6,7 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::IF>::interpret(OperateOn n
 	auto conditionValue = m_interpreter.interpret({ node.parent, node.GetCondition() }).asRvalue();
 	if(conditionValue.object.nodeval<bool>()) {
 		m_interpreter.interpret({ node.parent, node.GetIfStatement() });
-    }
+	}
 	
 	return NodeCell {};
 }
@@ -15,9 +15,9 @@ ska::NodeCell ska::InterpreterOperator<ska::Operator::IF_ELSE>::interpret(Operat
 	auto conditionValue = m_interpreter.interpret({ node.parent, node.GetCondition() }).asRvalue();
 	if(conditionValue.object.nodeval<bool>()) {
 		m_interpreter.interpret({ node.parent, node.GetIfStatement() });
-    } else {
+	} else {
 		m_interpreter.interpret({ node.parent, node.GetElseStatement() });
-    }
+	}
 	
 	return NodeCell {};
 }

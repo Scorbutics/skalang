@@ -12,7 +12,7 @@ const ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() const {
 }
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name) {
-    return emplace(Symbol{ name, *this });
+	return emplace(Symbol{ name, *this });
 }
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
@@ -24,9 +24,9 @@ ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
 		throw std::runtime_error("Symbol already exists : " + name);
 	}
 
-    auto& s = m_symbols.at(name);
+	auto& s = m_symbols.at(name);
 	SLOG(ska::LogLevel::Debug) << "\tSymbol Inserted \"" << name << "\" \"" << s.getType() << "\"";
-    return s;
+	return s;
 }
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, const ScriptAST& script) {

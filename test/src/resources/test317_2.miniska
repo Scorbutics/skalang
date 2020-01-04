@@ -1,5 +1,5 @@
 var Callback = import "callback";
 
 var run = function(callback: Callback::Default) {
-    callback();
+	callback();
 };

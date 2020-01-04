@@ -1,13 +1,13 @@
 #pragma once
 
 namespace ska {
-    	class ASTNode;
+		class ASTNode;
 	
 	enum class BlockTokenEventType {
 		START,
 		END
 	};
-    	
+		
 	struct BlockTokenEvent {
 		BlockTokenEvent(ASTNode& n, BlockTokenEventType t) : 
 			node(n), m_type(t) {
@@ -26,7 +26,7 @@ namespace ska {
 		}
 
 	private:
-    		ASTNode& node;
+			ASTNode& node;
 			BlockTokenEventType m_type;
-    	};
+		};
 }

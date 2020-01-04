@@ -65,7 +65,7 @@ namespace ska {
 		Type() = default;
 		Type(Type&& t) noexcept = default;
 		Type(const Type& t) = default;
-        
+    	
 		Type& operator=(Type&& t) noexcept = default;
 		Type& operator=(const Type& t) = default;
 	
@@ -125,11 +125,11 @@ namespace ska {
 		Type(const Symbol* symbol, ExpressionType t);
 
 		ExpressionType m_type = ExpressionType::VOID;
-        const Symbol* m_symbol = nullptr;
+    	const Symbol* m_symbol = nullptr;
 		std::vector<Type> m_compound;
 
 		friend std::ostream& operator<<(std::ostream& stream, const Type& type);
-    };
+	};
 	
 	std::ostream& operator<<(std::ostream& stream, const Type& type);
 }

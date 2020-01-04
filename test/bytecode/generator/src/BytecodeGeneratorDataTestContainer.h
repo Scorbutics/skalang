@@ -12,17 +12,17 @@
 #include "Generator/Value/BytecodeScriptCache.h"
 
 struct BytecodeGeneratorDataTestContainer {
-    using ParserPtr = std::unique_ptr<ska::StatementParser>;
-    using SemanticTypeCheckerPtr = std::unique_ptr<ska::SemanticTypeChecker>;
-    using TypeBuilderPtr = std::unique_ptr<ska::TypeBuilder>;
+	using ParserPtr = std::unique_ptr<ska::StatementParser>;
+	using SemanticTypeCheckerPtr = std::unique_ptr<ska::SemanticTypeChecker>;
+	using TypeBuilderPtr = std::unique_ptr<ska::TypeBuilder>;
 	using SymbolTableUpdaterPtr = std::unique_ptr<ska::SymbolTableUpdater>;
 	using BytecodeGeneratorPtr = std::unique_ptr<ska::bytecode::Generator>;
 	
 	ska::ReservedKeywordsPool reservedKeywords;
 	BytecodeGeneratorPtr generator;
-    ParserPtr parser;
-    SemanticTypeCheckerPtr typeChecker;
-    TypeBuilderPtr typeBuilder;
+	ParserPtr parser;
+	SemanticTypeCheckerPtr typeChecker;
+	TypeBuilderPtr typeBuilder;
 	SymbolTableUpdaterPtr symbolsTypeUpdater;
-    ska::bytecode::ScriptCache storage;
+	ska::bytecode::ScriptCache storage;
 };

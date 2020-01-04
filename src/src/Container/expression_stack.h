@@ -54,27 +54,27 @@ namespace ska {
 		Operand groupAndPop(Group::FlowPredicate<Operator> predicate) {
 			auto groupNode = Operand{};
 
-            //Verify that maybe grouping is not necessary
+        	//Verify that maybe grouping is not necessary
 			if (emptyOperator() && !emptyOperands()) {
 				return popOperand();
 			}
 
 			while (true) {
-                //Nothing more to group, we stop
+            	//Nothing more to group, we stop
 				if (emptyOperator() || emptyOperands()) {
 					break;
 				}
-                
-                const auto currentOperator = topOperator();
-                const auto analyzeToken = predicate(currentOperator);
-                if (analyzeToken == Group::FlowControl::STOP) {
-                    break;
-                } else if (analyzeToken == Group::FlowControl::IGNORE_AND_CONTINUE) {
-                    popOperator();
-                } else {
-                    groupNode = makeGroup<NodeMaker>(std::move(groupNode));
-			    }
-            }
+            	
+            	const auto currentOperator = topOperator();
+            	const auto analyzeToken = predicate(currentOperator);
+            	if (analyzeToken == Group::FlowControl::STOP) {
+                	break;
+            	} else if (analyzeToken == Group::FlowControl::IGNORE_AND_CONTINUE) {
+                	popOperator();
+            	} else {
+                	groupNode = makeGroup<NodeMaker>(std::move(groupNode));
+				}
+        	}
 
 			return groupNode;
 		}
@@ -92,30 +92,30 @@ namespace ska {
 		}
 
 	private:
-        template <class NodeMaker>
-        Operand addGroup(Operand groupNode) {
-            return NodeMaker::MakeLogicalNode(popOperator(), popOperand(), std::move(groupNode));
-        }
+    	template <class NodeMaker>
+    	Operand addGroup(Operand groupNode) {
+        	return NodeMaker::MakeLogicalNode(popOperator(), popOperand(), std::move(groupNode));
+    	}
 
-        template <class NodeMaker>
-        Operand createGroup(bool binary) {
-            if (!binary) {
-                return NodeMaker::MakeLogicalNode(popOperator(), popOperand());
-            }
+    	template <class NodeMaker>
+    	Operand createGroup(bool binary) {
+        	if (!binary) {
+            	return NodeMaker::MakeLogicalNode(popOperator(), popOperand());
+        	}
 
-            auto rightOperand = popOperand();
-            auto leftOperand = popOperand();
-            return NodeMaker::MakeLogicalNode(popOperator(), std::move(leftOperand), std::move(rightOperand));
-        }
+        	auto rightOperand = popOperand();
+        	auto leftOperand = popOperand();
+        	return NodeMaker::MakeLogicalNode(popOperator(), std::move(leftOperand), std::move(rightOperand));
+    	}
 
-        template <class NodeMaker>
-        Operand makeGroup(Operand groupNode) {
-            if (groupNode != nullptr) {
-                return addGroup <NodeMaker>(std::move(groupNode));
-            }
-            
-            return createGroup <NodeMaker>(operands.size() >= 2);
-        }
+    	template <class NodeMaker>
+    	Operand makeGroup(Operand groupNode) {
+        	if (groupNode != nullptr) {
+            	return addGroup <NodeMaker>(std::move(groupNode));
+        	}
+        	
+        	return createGroup <NodeMaker>(operands.size() >= 2);
+    	}
 
 
 		[[nodiscard]]

@@ -13,7 +13,7 @@
 
 namespace ska {
    
-    class StatementParser;
+	class StatementParser;
 
 	class SymbolTable;
 	class ParserListenerLock {
@@ -32,16 +32,16 @@ namespace ska {
 	};
 
 	class SymbolTable :
-        public PriorityObserver<VarTokenEvent>,
-       	public PriorityObserver<BlockTokenEvent>,
-        public PriorityObserver<FunctionTokenEvent>,
-        public PriorityObserver<ReturnTokenEvent>, 
+    	public PriorityObserver<VarTokenEvent>,
+   		public PriorityObserver<BlockTokenEvent>,
+    	public PriorityObserver<FunctionTokenEvent>,
+    	public PriorityObserver<ReturnTokenEvent>, 
 		public PriorityObserver<ImportTokenEvent>,
 		public PriorityObserver<ScriptLinkTokenEvent> {
 
-        using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
+    	using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 		friend class ParserListenerLock;
-    public:
+	public:
 		SymbolTable();
 		SymbolTable(StatementParser& parser);
 		virtual ~SymbolTable();
@@ -50,7 +50,7 @@ namespace ska {
 		ParserListenerLock listenParser(StatementParser& parser);
 
 		auto* operator[](const std::string& key) { return (*m_currentTable)[key]; }
-        const auto* operator[](const std::string& key) const { return (*m_currentTable)[key]; }
+    	const auto* operator[](const std::string& key) const { return (*m_currentTable)[key]; }
 
 		ScopedSymbolTable::ChildrenScopedSymbolTable& nested() { return m_currentTable->children(); }
 		const ScopedSymbolTable::ChildrenScopedSymbolTable& nested() const { return m_currentTable->children(); }
@@ -62,7 +62,7 @@ namespace ska {
 			return m_currentTable->owner();
 		}
 
-    private:
+	private:
 		bool match(const VarTokenEvent&);
 		bool nestedTable(const BlockTokenEvent&);
 		bool matchFunction(const FunctionTokenEvent&);
@@ -74,7 +74,7 @@ namespace ska {
 		void internalUnlistenParser();
 
 		StatementParser* m_parser = nullptr;
-        std::unique_ptr<ScopedSymbolTable> m_rootTable;
+    	std::unique_ptr<ScopedSymbolTable> m_rootTable;
 		ScopedSymbolTable* m_currentTable = nullptr;
-    };
+	};
 }

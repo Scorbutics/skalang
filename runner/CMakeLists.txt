@@ -23,7 +23,7 @@ find_package(Threads REQUIRED)
 
 set(LIBS skalang_std skalang_interpreter skalang skalog skabase Threads::Threads)
 IF(UNIX)
-    set(LIBS atomic ${LIBS})
+	set(LIBS atomic ${LIBS})
 ENDIF(UNIX)
 target_link_libraries(skalang_runner ${LIBS})
 target_include_directories(skalang_runner PUBLIC ../external/skabase/src/src PUBLIC ../external/skalog/src/src)

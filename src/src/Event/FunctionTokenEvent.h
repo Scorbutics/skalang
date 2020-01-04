@@ -3,16 +3,16 @@
 #include "NodeValue/AST.h"
 
 namespace ska {
-    class ASTNode;
+	class ASTNode;
 	class ScriptAST;
 
 	enum class FunctionTokenEventType {
 		DECLARATION_NAME,		
-        DECLARATION_STATEMENT,
+    	DECLARATION_STATEMENT,
 		CALL
 	};
 
-    class FunctionTokenEvent {
+	class FunctionTokenEvent {
 	public:
 
 		FunctionTokenEvent(ASTNode& content, FunctionTokenEventType type, ScriptAST& s, std::string name = "") :
@@ -50,8 +50,8 @@ namespace ska {
 
 	private:
 		std::string m_name;
-        ASTNode& m_contentNode;
-	    FunctionTokenEventType m_type;
+    	ASTNode& m_contentNode;
+		FunctionTokenEventType m_type;
 		ScriptAST& m_script;
-    };
+	};
 }

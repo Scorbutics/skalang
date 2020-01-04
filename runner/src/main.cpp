@@ -91,16 +91,16 @@ namespace ska {
 
 int main(int argc, char* argv[]) {
 	if (argc <= 1) {
-        std::cout << "No file name entered. Exiting..." << std::endl;
-        return -1;
-    }
+	std::cout << "No file name entered. Exiting..." << std::endl;
+	return -1;
+	}
 
 	auto inputFile = std::ifstream{ std::string{argv[1]}};
 	if(inputFile.fail()) {
 		std::cout << "File not found : \"" << argv[1] << std::endl;
-        return -1;
+	return -1;
 	}
-  const auto reservedKeywords = ska::ReservedKeywordsPool{};
+const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto scriptCache = ska::ScriptCache{};
 	auto typeCrosser = ska::TypeCrosser{};
 	auto parser = ska::StatementParser {reservedKeywords};

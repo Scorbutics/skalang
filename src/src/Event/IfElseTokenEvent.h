@@ -1,9 +1,9 @@
 #pragma once
 
 namespace ska {
-    class ASTNode;
+	class ASTNode;
 
-    class IfElseTokenEvent {
+	class IfElseTokenEvent {
 	public:
 		IfElseTokenEvent(ASTNode& node) : node(node) {}
 		
@@ -16,6 +16,6 @@ namespace ska {
 		}
 
 	private:
-        ASTNode& node;
-    };
+    	ASTNode& node;
+	};
 }

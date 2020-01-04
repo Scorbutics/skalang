@@ -22,11 +22,11 @@ static ska::ScriptAST ASTFromInputSemanticTC(ska::ScriptCacheAST& scriptCache, c
 	auto typeCrosser = ska::TypeCrosser{};
 	readerSTC = std::make_unique<ska::ScriptAST>(scriptCache, "main", tokens );
 	data.parser = std::make_unique<ska::StatementParser> ( data.reservedKeywords );
-    data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosser);
+	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosser);
 	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableUpdater>(*data.parser);
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, typeCrosser);
-    readerSTC->parse(*data.parser);
-    return *readerSTC;
+	readerSTC->parse(*data.parser);
+	return *readerSTC;
 }
 
 TEST_CASE("[SymbolTableUpdater] update node symbol") {
@@ -70,16 +70,16 @@ TEST_CASE("[SymbolTableUpdater] function declaration") {
 }
 
 TEST_CASE("[SemanticTypeChecker]") {
-    DataTestContainer data;
+	DataTestContainer data;
 	auto scriptCache = ska::ScriptCacheAST{};
 
 	SUBCASE("OK") {
-        SUBCASE("boolean") {
-            auto astPtr = ASTFromInputSemanticTC(scriptCache, "var titi = 3 == 3;", data);
-            auto& ast = astPtr.rootNode();
-            CHECK(ast.size() == 1);
-            CHECK(ast[0].type() == ska::ExpressionType::BOOLEAN);
-        }
+	SUBCASE("boolean") {
+	auto astPtr = ASTFromInputSemanticTC(scriptCache, "var titi = 3 == 3;", data);
+	auto& ast = astPtr.rootNode();
+	CHECK(ast.size() == 1);
+	CHECK(ast[0].type() == ska::ExpressionType::BOOLEAN);
+	}
 
 		SUBCASE("Cross type") {
 			SUBCASE("float x float") {
@@ -206,22 +206,22 @@ TEST_CASE("[SemanticTypeChecker]") {
 			}
 		}
 
-        SUBCASE("return") {
-            SUBCASE("built-in") {
+	SUBCASE("return") {
+	SUBCASE("built-in") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var testReturn148 = function() : int { return 2543; }; var value = testReturn148(); value;", data);
-                auto& ast = astPtr.rootNode();
+	auto& ast = astPtr.rootNode();
 				CHECK(ast.size() == 3);
 				CHECK(ast[2].type() == ska::ExpressionType::INT);
-            }
+	}
 
-            SUBCASE("bad built-in type (no return type mentioned = void)") {
-                try {
-                    ASTFromInputSemanticTC(scriptCache, "var testReturn148 = function() { return 2543; }; var value = testReturn148(); value;", data);
-                    CHECK(false);
-                } catch (std::exception& e) {
-                    CHECK(std::string{e.what()}.find("bad return type : expected \"void\" on function declaration but got \"int\" on return") != std::string::npos);
-                }
-            }
+	SUBCASE("bad built-in type (no return type mentioned = void)") {
+	try {
+	ASTFromInputSemanticTC(scriptCache, "var testReturn148 = function() { return 2543; }; var value = testReturn148(); value;", data);
+	CHECK(false);
+	} catch (std::exception& e) {
+	CHECK(std::string{e.what()}.find("bad return type : expected \"void\" on function declaration but got \"int\" on return") != std::string::npos);
+	}
+	}
 
 			SUBCASE("bad custom and built-in type mix") {
 				try {
@@ -289,8 +289,8 @@ TEST_CASE("[SemanticTypeChecker]") {
 
 		SUBCASE("Loop") {
 				SUBCASE("using inner for variable successively ") {
-            ASTFromInputSemanticTC(scriptCache, "for(var i = 0; i < 10; i = i + 1); for(var i = 0; i < 10; i = i + 1);", data);
-        }
+	ASTFromInputSemanticTC(scriptCache, "for(var i = 0; i < 10; i = i + 1); for(var i = 0; i < 10; i = i + 1);", data);
+	}
 		}
 
 		SUBCASE("Array") {
@@ -341,13 +341,13 @@ TEST_CASE("[SemanticTypeChecker]") {
 
 			SUBCASE("double array string : cell") {
 
-                auto astPtr = ASTFromInputSemanticTC(scriptCache, "var str167 = [[0, 1], [2, 3]]; str167[0]; str167[0][0];", data);
+	auto astPtr = ASTFromInputSemanticTC(scriptCache, "var str167 = [[0, 1], [2, 3]]; str167[0]; str167[0][0];", data);
 				auto& ast = astPtr.rootNode();
 				CHECK(ast.size() == 3);
 				CHECK(ast[1].type() == ska::ExpressionType::ARRAY);
 				CHECK(ast[2].type() == ska::ExpressionType::INT);
 
-            }
+	}
 
 			SUBCASE("function call : array") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var titi131 = function(test131:string[]) {}; var strArray131 = [\"lol\", \"toto\"]; titi131(strArray131);", data);
@@ -363,42 +363,42 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(ast[1][0].type().value().compound()[0] == ska::ExpressionType::INT);
 			}
 
-            SUBCASE("expression-array with use in expression") {
+	SUBCASE("expression-array with use in expression") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var var193 = function() : var { var toto = [0]; return { toto : toto }; }; 2 * 3 + var193().toto[0];", data);
 				auto& ast = astPtr.rootNode();
 				CHECK(ast.size() == 2);
 				CHECK(ast[1][0].type() == ska::ExpressionType::INT);
 			}
 
-            SUBCASE("expression-array with use in expression 2") {
+	SUBCASE("expression-array with use in expression 2") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var var200 = function() : var { var toto = [0]; return { toto : toto }; }; 2 + 3 * var200().toto[0];", data);
 				auto& ast = astPtr.rootNode();
 				CHECK(ast.size() == 2);
 				CHECK(ast[1][0].type() == ska::ExpressionType::INT);
 			}
 
-            SUBCASE("post expression-array with use in expression") {
+	SUBCASE("post expression-array with use in expression") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var var201 = function() : var { var toto = [0]; return { toto : toto }; }; var201().toto[0] * 3 + 2;", data);
 				auto& ast = astPtr.rootNode();
 				CHECK(ast.size() == 2);
 				CHECK(ast[1][0].type() == ska::ExpressionType::INT);
 			}
 
-            SUBCASE("post expression-array with use in expression 2") {
+	SUBCASE("post expression-array with use in expression 2") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var var202 = function() : var { var toto = [0]; return { toto : toto }; }; var202().toto[0] + 3 * 2;", data);
 				auto& ast = astPtr.rootNode();
 				CHECK(ast.size() == 2);
-                CHECK(ast[1][0].type() == ska::ExpressionType::INT);
+	CHECK(ast[1][0].type() == ska::ExpressionType::INT);
 			}
 
-            SUBCASE("complex expression-array with use in expression") {
+	SUBCASE("complex expression-array with use in expression") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var var203 = function() : var { var toto = [0]; return { toto : toto }; }; (5 + var203().toto[0] + 3 * 4) * 2;", data);
 				auto& ast = astPtr.rootNode();
 				CHECK(ast.size() == 2);
 				CHECK(ast[1][0].type() == ska::ExpressionType::INT);
 			}
 
-            SUBCASE("complex expression-array with variable used in expression") {
+	SUBCASE("complex expression-array with variable used in expression") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var var203 = function() : var { var toto = [0]; return { toto : toto }; }; var totoVar = var203().toto; (5 + totoVar[0] + 3 * 4) * 2;", data);
 				auto& ast = astPtr.rootNode();
 				CHECK(ast.size() == 3);
@@ -415,19 +415,19 @@ TEST_CASE("[SemanticTypeChecker]") {
 					}
 				}
 
-                 SUBCASE("operator in wrong order : ") {
-                    try {
-                        auto astPtr = ASTFromInputSemanticTC(scriptCache, "var str242 = [0, 1]; str242*[0] 2;", data);
-                        auto& ast = astPtr.rootNode();
-                        CHECK(ast.size() == 2);
-                        CHECK(ast[1].type() == ska::ExpressionType::INT);
-                    } catch(std::exception& e) {
-                        CHECK(std::string{e.what()}.find("Unable to use operator \"*\" on types \"array\" and \"int\"") != std::string::npos);
-                    }
-                }
+	SUBCASE("operator in wrong order : ") {
+	try {
+	auto astPtr = ASTFromInputSemanticTC(scriptCache, "var str242 = [0, 1]; str242*[0] 2;", data);
+	auto& ast = astPtr.rootNode();
+	CHECK(ast.size() == 2);
+	CHECK(ast[1].type() == ska::ExpressionType::INT);
+	} catch(std::exception& e) {
+	CHECK(std::string{e.what()}.find("Unable to use operator \"*\" on types \"array\" and \"int\"") != std::string::npos);
+	}
+	}
 
-                SUBCASE("syntax error ']'") {
-                     try {
+	SUBCASE("syntax error ']'") {
+	try {
 						auto astPtr = ASTFromInputSemanticTC(scriptCache, "var str170 = [\"tt\", \"titi\"]];", data);
 						CHECK(false);
 					} catch (std::exception& e) {
@@ -460,7 +460,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 		}
 	}
 
-    SUBCASE("Fail") {
+	SUBCASE("Fail") {
 
 		SUBCASE("Because of undeclared symbol in expression") {
 			try {
@@ -471,41 +471,41 @@ TEST_CASE("[SemanticTypeChecker]") {
 			}
 		}
 
-        SUBCASE("Because of non-matching type (variable then function)") {
-            try {
-                ASTFromInputSemanticTC(scriptCache, "var i = 120; i = function() {};", data);
-                CHECK(false);
-            } catch(std::exception& e) {
-                CHECK(std::string{e.what()}.find("Symbol already exists : i") != std::string::npos);
-            }
-        }
+	SUBCASE("Because of non-matching type (variable then function)") {
+	try {
+	ASTFromInputSemanticTC(scriptCache, "var i = 120; i = function() {};", data);
+	CHECK(false);
+	} catch(std::exception& e) {
+	CHECK(std::string{e.what()}.find("Symbol already exists : i") != std::string::npos);
+	}
+	}
 
-        SUBCASE("Because of non-matching type (function then variable)") {
-            try {
-                ASTFromInputSemanticTC(scriptCache, "var titi = function() {}; titi = 9;", data);
-                CHECK(false);
-            } catch(std::exception& e) {
-                CHECK(std::string{e.what()}.find("Unable to use operator \"=\" on types \"function\" and \"int\"") != std::string::npos);
-            }
-        }
+	SUBCASE("Because of non-matching type (function then variable)") {
+	try {
+	ASTFromInputSemanticTC(scriptCache, "var titi = function() {}; titi = 9;", data);
+	CHECK(false);
+	} catch(std::exception& e) {
+	CHECK(std::string{e.what()}.find("Unable to use operator \"=\" on types \"function\" and \"int\"") != std::string::npos);
+	}
+	}
 
-        SUBCASE("Reassigning function (function = function)") {
-            try {
-                ASTFromInputSemanticTC(scriptCache, "var titi = function() {}; titi = function(ttt:string) {};", data);
-                CHECK(false);
-            } catch(std::exception& e) {
-                CHECK(std::string{e.what()}.find("Symbol already exists : titi") != std::string::npos);
-            }
-        }
+	SUBCASE("Reassigning function (function = function)") {
+	try {
+	ASTFromInputSemanticTC(scriptCache, "var titi = function() {}; titi = function(ttt:string) {};", data);
+	CHECK(false);
+	} catch(std::exception& e) {
+	CHECK(std::string{e.what()}.find("Symbol already exists : titi") != std::string::npos);
+	}
+	}
 
-        SUBCASE("Calling a function with wrong type arguments") {
-            try {
-                ASTFromInputSemanticTC(scriptCache, "var titi = function(test:function) {}; titi(23);", data);
-                CHECK(false);
-            } catch(std::exception& e) {
-                CHECK(std::string{e.what()}.find("Unable to use operator \"=\" on types \"function\" and \"int\"") != std::string::npos);
-            }
-        }
+	SUBCASE("Calling a function with wrong type arguments") {
+	try {
+	ASTFromInputSemanticTC(scriptCache, "var titi = function(test:function) {}; titi(23);", data);
+	CHECK(false);
+	} catch(std::exception& e) {
+	CHECK(std::string{e.what()}.find("Unable to use operator \"=\" on types \"function\" and \"int\"") != std::string::npos);
+	}
+	}
 
 		SUBCASE("constructor with 1 parameter + bad field access") {
 			try {
@@ -576,5 +576,5 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(std::string{e.what()}.find("Unable to use operator \"=\" on types \"var\" and \"int\"") != std::string::npos);
 			}
 		}
-    }
+	}
 }

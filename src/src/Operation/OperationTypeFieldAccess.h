@@ -8,7 +8,7 @@ namespace ska {
 	class Symbol;
 	
 	template<>
-    class OperationType<Operator::FIELD_ACCESS> {
+	class OperationType<Operator::FIELD_ACCESS> {
 	private:
 		const ASTNode& node;
 		
@@ -33,9 +33,9 @@ namespace ska {
 			return GetField();
 		}
 		
-        inline auto GetObjectType() {
-            return GetObject().type().value();
-        }
+    	inline auto GetObjectType() {
+        	return GetObject().type().value();
+    	}
 
 		inline auto GetFieldType() {
 			const auto objectType = GetField().type().value();

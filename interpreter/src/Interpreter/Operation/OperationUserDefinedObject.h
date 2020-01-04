@@ -6,7 +6,7 @@
 namespace ska {
 	class ASTNode;
 	template<>
-    class Operation<Operator::USER_DEFINED_OBJECT> {
+	class Operation<Operator::USER_DEFINED_OBJECT> {
 	private:
 		ASTNode& node;
 	public:

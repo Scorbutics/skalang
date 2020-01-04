@@ -12,16 +12,16 @@
 #include "Interpreter/Interpreter.h"
 
 struct InterpreterDataTestContainer {
-    using ParserPtr = std::unique_ptr<ska::StatementParser>;
-    using SemanticTypeCheckerPtr = std::unique_ptr<ska::SemanticTypeChecker>;
-    using TypeBuilderPtr = std::unique_ptr<ska::TypeBuilder>;
-    using SymbolTableUpdaterPtr = std::unique_ptr<ska::SymbolTableUpdater>;
-    using InterpreterPtr = std::unique_ptr<ska::Interpreter>;
+	using ParserPtr = std::unique_ptr<ska::StatementParser>;
+	using SemanticTypeCheckerPtr = std::unique_ptr<ska::SemanticTypeChecker>;
+	using TypeBuilderPtr = std::unique_ptr<ska::TypeBuilder>;
+	using SymbolTableUpdaterPtr = std::unique_ptr<ska::SymbolTableUpdater>;
+	using InterpreterPtr = std::unique_ptr<ska::Interpreter>;
 
-    ska::ReservedKeywordsPool reservedKeywords;
-    ParserPtr parser;
-    SemanticTypeCheckerPtr typeChecker;
-    TypeBuilderPtr typeBuilder;
-    SymbolTableUpdaterPtr symbolsTypeUpdater;
-    InterpreterPtr interpreter;
+	ska::ReservedKeywordsPool reservedKeywords;
+	ParserPtr parser;
+	SemanticTypeCheckerPtr typeChecker;
+	TypeBuilderPtr typeBuilder;
+	SymbolTableUpdaterPtr symbolsTypeUpdater;
+	InterpreterPtr interpreter;
 };

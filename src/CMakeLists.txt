@@ -5,8 +5,8 @@ include_directories(src)
 link_directories(../lib)
 
 file(GLOB_RECURSE SOURCES
-    src/*.h
-    src/*.cpp
+	src/*.h
+	src/*.cpp
 )
 
 string(REGEX REPLACE "[^;]*CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")

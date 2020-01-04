@@ -4,19 +4,19 @@
 #include "NodeValue/ScriptASTPtr.h"
 
 namespace ska {
-    class ASTNode;
-    class ScriptAST;
-    
-    class ImportTokenEvent {
+	class ASTNode;
+	class ScriptAST;
+	
+	class ImportTokenEvent {
 	public:
 		ImportTokenEvent(ASTNode& node, ScriptAST& s);
 		
-        auto& rootNode() {
-            return m_node;
+    	auto& rootNode() {
+        	return m_node;
 		}
 
 		const auto& rootNode() const {
-            return m_node;
+        	return m_node;
 		}
 
 		const ScriptAST& script() const {
@@ -33,7 +33,7 @@ namespace ska {
 
 	private:
 		ASTNode& m_node;
-        ScriptAST& m_script;
+    	ScriptAST& m_script;
 		ScriptASTPtr m_boundScript;
-    };
+	};
 }

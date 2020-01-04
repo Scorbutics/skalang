@@ -36,7 +36,7 @@ std::vector<std::unique_ptr<ska::InterpreterOperatorUnit>> ska::Interpreter::bui
 	InterpreterOperatorDeclare<ska::Operator::ARRAY_DECLARATION>(*this, result);
 	InterpreterOperatorDeclare<ska::Operator::IF>(*this, result);
 	InterpreterOperatorDeclare<ska::Operator::SCRIPT_LINK>(*this, result);
-    InterpreterOperatorDeclare<ska::Operator::IF_ELSE>(*this, result );
+	InterpreterOperatorDeclare<ska::Operator::IF_ELSE>(*this, result );
 	InterpreterOperatorDeclare<ska::Operator::FUNCTION_DECLARATION>(*this, result );
 	InterpreterOperatorDeclare<ska::Operator::FUNCTION_CALL>(*this, result );
 	InterpreterOperatorDeclare<ska::Operator::FOR_LOOP>(*this, result );
@@ -45,10 +45,10 @@ std::vector<std::unique_ptr<ska::InterpreterOperatorUnit>> ska::Interpreter::bui
 	InterpreterOperatorDeclare<ska::Operator::USER_DEFINED_OBJECT>(*this, result );
 	InterpreterOperatorDeclare<ska::Operator::VARIABLE_DECLARATION>(*this, result );
 	InterpreterOperatorDeclare<ska::Operator::VARIABLE_AFFECTATION>(*this, result );
-    InterpreterOperatorDeclare<ska::Operator::BLOCK>(*this, result );
-    InterpreterOperatorDeclare<ska::Operator::BINARY>(*this, result, m_typeCrosser );
-    InterpreterOperatorDeclare<ska::Operator::LITERAL>(*this, result );
-    InterpreterOperatorDeclare<ska::Operator::UNARY>(*this, result );
+	InterpreterOperatorDeclare<ska::Operator::BLOCK>(*this, result );
+	InterpreterOperatorDeclare<ska::Operator::BINARY>(*this, result, m_typeCrosser );
+	InterpreterOperatorDeclare<ska::Operator::LITERAL>(*this, result );
+	InterpreterOperatorDeclare<ska::Operator::UNARY>(*this, result );
 	InterpreterOperatorDeclare<ska::Operator::IMPORT>(*this, result );
 	InterpreterOperatorDeclare<ska::Operator::EXPORT>(*this, result );
 	return result;

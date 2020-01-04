@@ -85,7 +85,7 @@ int ska::ExpressionParser::matchRange(ScriptAST& input, ExpressionStack& express
 	case '(':
 		return matchParenthesis(input, expressions, isDoingOperation);
 
-    case ')': {
+	case ')': {
 		expressions.push(Token{ input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>()) });
 
 		auto endGrouping = false;
@@ -106,12 +106,12 @@ int ska::ExpressionParser::matchRange(ScriptAST& input, ExpressionStack& express
 			expressions.push(std::move(result));
 		}
 		SLOG(ska::LogLevel::Info) << "\tRange end";
-    } return 0;
+	} return 0;
 
-    default:
-        error("Unexpected token (range type) : " + token.name());
+	default:
+    	error("Unexpected token (range type) : " + token.name());
 		return 0;
-    }
+	}
 }
 
 bool ska::ExpressionParser::matchSymbol(ScriptAST& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
@@ -166,16 +166,16 @@ int ska::ExpressionParser::matchParenthesis(ScriptAST& input, ExpressionStack& e
 
 ska::ASTNodePtr ska::ExpressionParser::matchObjectFieldAccess(ScriptAST& input, ASTNodePtr objectAccessed) {
 	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::METHOD_CALL_OPERATOR>());
-    auto fieldAccessedIdentifier = input.reader().match(TokenType::IDENTIFIER);
+	auto fieldAccessedIdentifier = input.reader().match(TokenType::IDENTIFIER);
 
-    return ASTFactory::MakeNode<Operator::FIELD_ACCESS>(std::move(objectAccessed), ASTFactory::MakeLogicalNode(fieldAccessedIdentifier));
+	return ASTFactory::MakeNode<Operator::FIELD_ACCESS>(std::move(objectAccessed), ASTFactory::MakeLogicalNode(fieldAccessedIdentifier));
 }
 
 bool ska::ExpressionParser::isAtEndOfExpression(ScriptAST& input) const {
-    return input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()) ||
-            input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>()) ||
-            input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()) ||
-            input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
+	return input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()) ||
+        	input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>()) ||
+        	input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()) ||
+        	input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 }
 
 ska::ASTNodePtr ska::ExpressionParser::expression(ScriptAST& input, ExpressionStack& expressions) {

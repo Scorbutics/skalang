@@ -1,7 +1,7 @@
 var Binding1 = import "bind:binding1_lib";
 
 var Fcty = function() : var {
-    return {
+	return {
 		getToto : Binding1.getToto
-    };
+	};
 };

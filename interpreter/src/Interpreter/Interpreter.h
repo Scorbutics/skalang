@@ -8,7 +8,7 @@
 #include "Interpreter/Value/ExecutionContext.h"
 
 namespace ska {
-    struct ReservedKeywordsPool;
+	struct ReservedKeywordsPool;
 	class Script;
 	class TypeCrosser;
 

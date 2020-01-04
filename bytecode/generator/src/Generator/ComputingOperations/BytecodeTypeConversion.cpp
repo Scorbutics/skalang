@@ -16,7 +16,7 @@ namespace ska {
 	struct TypeConversionData {
 		Command command;
 		Command commandReverse;
-    };
+	};
 
 	template <class T>
 	struct OperationList {
@@ -24,15 +24,15 @@ namespace ska {
 		std::vector<T> container;
 	};
 
-    /*
-    using TypeToInstructionConverterCallback = std::function<Command(bool)>;
-    using TypeToInstructionConverter = std::variant<Command, TypeToInstructionConverterCallback>;
-    */
-    using TypeToInstructionConverter = OperationList<TypeConversionData>;
+	/*
+	using TypeToInstructionConverterCallback = std::function<Command(bool)>;
+	using TypeToInstructionConverter = std::variant<Command, TypeToInstructionConverterCallback>;
+	*/
+	using TypeToInstructionConverter = OperationList<TypeConversionData>;
 	using CommandList = OperationList<Command>;
-    using TypeToInstructionConverterContainer = std::array<TypeToInstructionConverter, static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length)>;
-    using TwoTypesConverterContainer = std::array<TypeToInstructionConverterContainer, static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length)>;
-    using TypeConvertToInstructionContainer = std::array<TwoTypesConverterContainer, static_cast<std::size_t>(LogicalOperator::UNUSED_Last_Length)>;
+	using TypeToInstructionConverterContainer = std::array<TypeToInstructionConverter, static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length)>;
+	using TwoTypesConverterContainer = std::array<TypeToInstructionConverterContainer, static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length)>;
+	using TypeConvertToInstructionContainer = std::array<TwoTypesConverterContainer, static_cast<std::size_t>(LogicalOperator::UNUSED_Last_Length)>;
 
 		template <Command cmd>
 		struct CommandComplex : std::false_type {};
