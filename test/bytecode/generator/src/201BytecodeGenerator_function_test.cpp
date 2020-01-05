@@ -5,7 +5,7 @@
 
 TEST_CASE("[BytecodeGenerator] Empty function only void") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function() { };");
-	auto& res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP_REL, "1"},
@@ -16,7 +16,7 @@ TEST_CASE("[BytecodeGenerator] Empty function only void") {
 
 TEST_CASE("[BytecodeGenerator] Empty function with 1 parameter") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function(t: int) { };");
-	auto& res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP_REL, "2"},
@@ -28,7 +28,7 @@ TEST_CASE("[BytecodeGenerator] Empty function with 1 parameter") {
 
 TEST_CASE("[BytecodeGenerator] Empty function with 4 parameters (> 3)") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function(t: int, t1: string, t2: int, t3: int) { };");
-	auto& res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP_REL, "3"},
@@ -41,7 +41,7 @@ TEST_CASE("[BytecodeGenerator] Empty function with 4 parameters (> 3)") {
 
 TEST_CASE("[BytecodeGenerator] Basic function with 1 return type") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function(): int { return 0; };");
-	auto& res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP_REL, "1"},
@@ -52,7 +52,7 @@ TEST_CASE("[BytecodeGenerator] Basic function with 1 return type") {
 
 TEST_CASE("[BytecodeGenerator] Basic function with 1 parameter 1 return type") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function(test: int): int { return 0; };");
-	auto& res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP_REL, "2"},
@@ -64,7 +64,7 @@ TEST_CASE("[BytecodeGenerator] Basic function with 1 parameter 1 return type") {
 
 TEST_CASE("[BytecodeGenerator] Function with 1 parameter and some computing inside") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function(test: int): int { var result = test + 3; return result; };");
-	auto& res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP_REL, "4"},
@@ -92,7 +92,7 @@ TEST_CASE("[BytecodeGenerator] Custom object creation") {
 		"var test = toto();";
 
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
-	auto& res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP_REL, "14"},
@@ -124,7 +124,7 @@ TEST_CASE("[BytecodeGenerator] Use complex call inside function parameters") {
 		"toto(titi().test);";
 
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
-	auto& res = data.generator->generate(data.storage, std::move(astPtr));
+	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP_REL, "4"},
@@ -161,7 +161,7 @@ TEST_CASE("[BytecodeGenerator] Custom object creation2") {
 		"test.say(\"titi\");";
 
 	auto [script, data] = ASTFromInputBytecodeGenerator(progStr);
-	auto& res = data.generator->generate(data.storage, std::move(script));
+	auto& res = data.generator->generate(*data.storage, std::move(script));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP_REL, "14"},
@@ -209,7 +209,7 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation 3 (double field function
 		"test.say(\"titi4\");";
 
 	auto [script, data] = ASTFromInputBytecodeGenerator(progStr);
-	auto& res = data.generator->generate(data.storage, std::move(script));
+	auto& res = data.generator->generate(*data.storage, std::move(script));
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP_REL, "14"},
@@ -257,5 +257,5 @@ TEST_CASE("[BytecodeGenerator] Field access affectation") {
 		"var t = toto();"
 		"t.test = 1122;";
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
-	auto& gen = data.generator->generate(data.storage, std::move(astPtr));
+	auto& gen = data.generator->generate(*data.storage, std::move(astPtr));
 }

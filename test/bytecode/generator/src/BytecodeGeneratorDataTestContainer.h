@@ -17,12 +17,13 @@ struct BytecodeGeneratorDataTestContainer {
 	using TypeBuilderPtr = std::unique_ptr<ska::TypeBuilder>;
 	using SymbolTableUpdaterPtr = std::unique_ptr<ska::SymbolTableUpdater>;
 	using BytecodeGeneratorPtr = std::unique_ptr<ska::bytecode::Generator>;
-	
+	using ScriptCachePtr = std::unique_ptr<ska::bytecode::ScriptCache>;
+
 	ska::ReservedKeywordsPool reservedKeywords;
 	BytecodeGeneratorPtr generator;
 	ParserPtr parser;
 	SemanticTypeCheckerPtr typeChecker;
 	TypeBuilderPtr typeBuilder;
 	SymbolTableUpdaterPtr symbolsTypeUpdater;
-	ska::bytecode::ScriptCache storage;
+	ScriptCachePtr storage;
 };
