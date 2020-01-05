@@ -1,6 +1,9 @@
 ﻿**/CMakeFiles
 **/lib
 **/Debug
+bin/Release
+bin/RelWithDebInfo
+x64/
 **.cmake
 **.vcxproj
 **.filters
