@@ -14,6 +14,7 @@ string(REGEX REPLACE "[^;]*CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
 
 add_definitions(-DSKALANG_TEST_DIR="${SKALANG_TEST_DIR}")
 add_definitions(-DSKALANG_SRC_DIR="${SKALANG_SRC_DIR}")
+generate_source_groups("${SOURCES}" "${SKALANG_TEST_DIR}\\src")
 add_executable(skalang_test ${SOURCES})
 
 find_package(Threads REQUIRED)

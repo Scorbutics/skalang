@@ -19,6 +19,7 @@ file(GLOB_RECURSE SOURCES
 string(REGEX REPLACE "[^;]*CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
 
 add_definitions(-DSKALANG_BYTECODE_RUN_DIR="${SKALANG_BYTECODE_RUN_DIR}")
+generate_source_groups("${SOURCES}" "${SKALANG_BYTECODE_RUN_DIR}\\src")
 add_executable(skalang_bytecode_runner ${SOURCES})
 
 find_package(Threads REQUIRED)

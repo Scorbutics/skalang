@@ -19,10 +19,11 @@ string(REGEX REPLACE "[^;]*CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
 
 add_definitions(-DSKALANG_BYTECODE_TEST_DIR="${SKALANG_BYTECODE_TEST_DIR}")
 add_definitions(-DSKALANG_TEST_DIR="${SKALANG_TEST_DIR}")
+generate_source_groups("${SOURCES}" "${SKALANG_BYTECODE_TEST_DIR}\\generator\\src")
 add_executable(skalang_bytecode_generator_test ${SOURCES})
 
 find_package(Threads REQUIRED)
-target_link_libraries(skalang_bytecode_generator_test skalang skalang_std skalang_interpreter skalang_bytecode_generator skalang_bytecode_interpreter skalog skabase Threads::Threads)
+target_link_libraries(skalang_bytecode_generator_test skalang skalang_interpreter skalang_bytecode_generator skalang_bytecode_interpreter skalog skabase Threads::Threads)
 target_include_directories(skalang_bytecode_generator_test PUBLIC ../../../external/skalog/src/src)
 target_include_directories(skalang_bytecode_generator_test PUBLIC ../../../external/skabase/src/src)
 target_include_directories(skalang_bytecode_generator_test PUBLIC ../../../external/doctest)

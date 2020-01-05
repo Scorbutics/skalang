@@ -19,6 +19,7 @@ string(REGEX REPLACE "[^;]*CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
 
 add_definitions(-DSKALANG_BYTECODE_TEST_DIR="${SKALANG_BYTECODE_TEST_DIR}")
 add_definitions(-DSKALANG_TEST_DIR="${SKALANG_TEST_DIR}")
+generate_source_groups("${SOURCES}" "${SKALANG_BYTECODE_TEST_DIR}\\interpreter\\src")
 add_executable(skalang_bytecode_interpreter_test ${SOURCES})
 
 find_package(Threads REQUIRED)

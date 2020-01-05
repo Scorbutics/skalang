@@ -15,6 +15,7 @@ file(GLOB_RECURSE SOURCES
 string(REGEX REPLACE "[^;]*CMakeFiles/[^;]+;?" "" SOURCES "${SOURCES}")
 
 add_definitions(-DSKALANG_INTERPRETER_DIR="${SKALANG_INTERPRETER_DIR}")
+generate_source_groups("${SOURCES}" "${SKALANG_INTERPRETER_DIR}\\src\\Interpreter")
 add_library(skalang_interpreter ${SOURCES})
 
 find_package(Threads REQUIRED)
