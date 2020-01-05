@@ -16,6 +16,10 @@ namespace ska {
 
 	template <class ScriptT>
 	struct ScriptCacheBase {
+	private:
+		using ScriptTPtr = std::conditional_t<is_smart_ptr<ScriptT>::value, ScriptT, std::unique_ptr<ScriptT>>;
+		using ScriptTRaw = typename remove_smart_ptr<ScriptT>::type;
+		using ScriptContainer = std::vector<ScriptTPtr>;
 	public:
 		auto find(const std::string& scriptName) { return namedMapCache.find(scriptName); }
 
@@ -45,12 +49,16 @@ namespace ska {
 			return it != namedMapCache.end() ? &at(it->second) : nullptr;
 		}
 
-		auto& at(const std::string& scriptName) {
+		ScriptTRaw& at(const std::string& scriptName) {
 			const auto index = namedMapCache.at(scriptName);
-			return at(index);
+			auto* result = atOrNull(index);
+			if (result == nullptr) {
+				throw std::runtime_error("bad script name \"" + scriptName + "\" with index \"" + std::to_string(index) + "\"");
+			}
+			return *result;
 		}
 
-		auto& at(std::size_t index) {
+		ScriptTRaw& at(std::size_t index) {
 			if (!exist(index)) {
 				throw std::runtime_error("bad script index \"" + std::to_string(index) + "\"");
 			}
@@ -113,8 +121,12 @@ namespace ska {
 		}
 
 	private:
-		using ScriptTPtr = std::conditional_t<is_smart_ptr<ScriptT>::value, ScriptT, std::unique_ptr<ScriptT>>;
-		using ScriptContainer = std::vector<ScriptTPtr>;
+		ScriptTRaw* atOrNull(std::size_t index) {
+			if (!exist(index)) {
+				return nullptr;
+			}
+			return cache[index].get();
+		}
 
 		void pushCachePtr(std::size_t index, ScriptTPtr script) {
 			resizeIfTooSmall(index + 1);

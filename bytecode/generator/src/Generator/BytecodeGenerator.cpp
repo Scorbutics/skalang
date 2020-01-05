@@ -64,7 +64,7 @@ ska::bytecode::Generator::Generator(const ReservedKeywordsPool& reserved) :
 
 ska::bytecode::InstructionOutput ska::bytecode::Generator::generatePart(GenerationContext node) {
 	const auto& operatorNode = node.pointer().op();
-	LOG_DEBUG << "[" << node.scriptName() << "] Generating " << operatorNode << " " << node.pointer();
+	LOG_INFO << "[" << node.scriptName() << "] Generating " << operatorNode << " " << node.pointer();
 	auto& builder = m_operatorGenerator[static_cast<std::size_t>(operatorNode)];
 	assert(builder != nullptr);
 	return builder->generate(node);
@@ -73,7 +73,10 @@ ska::bytecode::InstructionOutput ska::bytecode::Generator::generatePart(Generati
 const ska::bytecode::ScriptGeneration& ska::bytecode::Generator::generate(ScriptCache& cache, ScriptGenerationHelper script) {
 	auto scriptGenName = script.name();
 	auto index = script.id();
-	assert(cache.emplace(scriptGenName, std::move(script)));
+	auto emplaced = cache.emplace(scriptGenName, std::move(script));
+	if (!emplaced) {
+		throw std::runtime_error("the script " + scriptGenName + " was already emplaced");
+	}
 	return generate(cache, index);
 }
 
@@ -82,6 +85,6 @@ const ska::bytecode::ScriptGeneration& ska::bytecode::Generator::generate(Script
 	auto scriptName = scriptGen.name();
 	scriptGen.generate(cache, *this);
 
-	//LOG_INFO << "Final generation " << scriptGen << " for script " << scriptName;
+	LOG_DEBUG << "Final generation " << scriptGen << " for script " << scriptName;
 	return scriptGen;
 }
