@@ -110,6 +110,7 @@ ska::bytecode::Interpreter::Interpreter(Generator& generator, const ReservedKeyw
 }
 
 void ska::bytecode::Interpreter::interpret(ExecutionContext& node) {
+	node.generateIfNeeded(m_generator, node.currentScriptId());
 	for(auto continueExecution = !node.idle(); continueExecution; continueExecution = node.incInstruction()) {
 		auto& instruction = node.currentInstruction();
 		LOG_INFO << "[Script " << node.currentScriptId() << "] Interpreting " << instruction;

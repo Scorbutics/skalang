@@ -10,9 +10,6 @@ ska::bytecode::ExecutionContext::ExecutionContext(Executor& container, std::size
 	m_out(container),
 	m_in(instructions),
 	m_current(container.script(scriptIndex, instructions)) {
-	if (!instructions.isGenerated(scriptIndex)) {
-		throw std::runtime_error("you must compile a script to bytecode before trying to execute it.");
-	}
 }
 
 ska::bytecode::ScriptExecutionOutput ska::bytecode::ExecutionContext::generateExportedVariables(std::size_t scriptIndex) {
