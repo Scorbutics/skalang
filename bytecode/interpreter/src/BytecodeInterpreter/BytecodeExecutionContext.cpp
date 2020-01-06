@@ -29,7 +29,6 @@ ska::bytecode::ScriptExecutionOutput ska::bytecode::ExecutionContext::generateEx
 	return symbols;
 }
 
-//TODO : why can we generate from execution context ?! weird
 const ska::bytecode::ScriptGeneration& ska::bytecode::ExecutionContext::generateIfNeeded(Generator& generator, std::size_t scriptIndex) {
 	if (!m_in.isGenerated(scriptIndex)) {
 		m_in.at(scriptIndex).generate(m_in, generator);
