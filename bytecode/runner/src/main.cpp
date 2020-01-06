@@ -30,7 +30,7 @@ static ska::bytecode::ScriptGenerationHelper BasicProgramScriptStarter(ska::lang
 	auto scriptFileName = std::string{ argv[1] };
 	auto scriptName = scriptFileName.substr(0, scriptFileName.find_last_of('.'));
 
-	const auto scriptStarter = "var Script = import \"" + scriptName + "\";"
+	const auto scriptStarter = "var Script = import \"wd:" + scriptName + "\";"
 	"var ParametersGenerator = import \"bind:std.native.function.parameter\";"
 	"Script.run(ParametersGenerator.Fcty(\"" + scriptName + "\"));";
 
