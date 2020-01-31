@@ -26,7 +26,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 			}
 			if (context.scope() == 0) {
 				symbolInfo.exported = true;
-				symbolInfo.priority = childIndex;
+				symbolInfo.childIndex = childIndex;
 			}
 			LOG_INFO << "%12cRegistering symbol info " << symbolInfo << " for field node " << *child << " (this symbol is " << (context.scope() == 0 ? "exported" : "not exported") << ")";
 			context.setSymbolInfo(*child, std::move(symbolInfo));

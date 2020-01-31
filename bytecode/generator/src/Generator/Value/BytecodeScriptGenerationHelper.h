@@ -19,7 +19,7 @@ namespace ska {
 		};
 
 		static inline bool operator<(const SymbolWithInfo& lhs, const SymbolWithInfo& rhs) {
-			return lhs.info->priority > rhs.info->priority;
+			return lhs.info->childIndex > rhs.info->childIndex;
 		}
 
 	}

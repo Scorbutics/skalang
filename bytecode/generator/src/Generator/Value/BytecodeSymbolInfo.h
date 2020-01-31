@@ -19,7 +19,7 @@ namespace ska {
 			FieldsReferences references;
 			bool exported = false;
 			std::size_t script = static_cast<std::size_t>(-1);
-			std::size_t priority = 0;
+			std::size_t childIndex = 0;
 			NativeFunctionPtr binding = nullptr;
 
 			SymbolInfo(std::size_t scopeIndex, std::string name, std::size_t scriptIndex) :

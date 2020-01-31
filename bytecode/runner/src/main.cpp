@@ -17,8 +17,8 @@
 #include "Service/SymbolTableUpdater.h"
 #include "BytecodeInterpreter/Value/BytecodeInterpreterTypes.h"
 #include "BytecodeInterpreter/BytecodeInterpreter.h"
+#include "Serializer/BytecodeSerializer.h"
 
-#include "Interpreter/Interpreter.h"
 #include "Runtime/Value/InterpreterTypes.h"
 
 #include "std/module/io/log.h"
@@ -88,6 +88,10 @@ int main(int argc, char* argv[]) {
 		auto parameterModule = BasicParameterModuleBuilder(moduleConfiguration, parameterValues, argc, argv);
 		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
 		auto& gen = generator.generate(mainCache, std::move(script));
+
+		auto serializer = ska::bytecode::Serializer{};
+		serializer.serialize(mainCache, gen.id(), std::cout);
+
 		auto interpreted = interpreter.interpret(gen.id(), mainCache);
 	} catch (std::exception& e) {
 		std::cerr << "Error : " << e.what() << std::endl;

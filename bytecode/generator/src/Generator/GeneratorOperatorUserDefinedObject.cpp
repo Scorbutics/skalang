@@ -27,7 +27,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 		if (oldSymbolInfo != nullptr) {
 			symbolInfo.binding = oldSymbolInfo->binding;
 		}
-		symbolInfo.priority = childIndex;
+		symbolInfo.childIndex = childIndex;
 		LOG_INFO << "%12cRegistering symbol info " << symbolInfo << " for field node " << *field << " (this symbol is not exported)";
 
 		context.setSymbolInfo(*field, std::move(symbolInfo));
