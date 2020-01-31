@@ -1,5 +1,5 @@
 var IO = import "bind:std.native.io.log";
-var Parameters = import "std:std.function.parameters";
+var Parameters = import "bind:std.native.function.parameter";
 
 var Character = import "character";
 

@@ -34,9 +34,7 @@ static ska::bytecode::ScriptGenerationHelper BasicProgramScriptStarter(ska::lang
 	"var ParametersGenerator = import \"bind:std.native.function.parameter\";"
 	"Script.run(ParametersGenerator.Fcty(\"" + scriptName + "\"));";
 
-	auto executor = ska::ScriptAST{ module.scriptAstCache, "main", ska::Tokenizer{ module.reservedKeywords, scriptStarter}.tokenize() };
-	executor.parse(module.parser);
-	return ska::bytecode::ScriptGenerationHelper{ module.scriptCache, executor};
+	return { module.scriptCache, module.parser, "main", ska::Tokenizer{ module.reservedKeywords, scriptStarter}.tokenize() };
 }
 
 static ska::lang::ParameterModule<ska::bytecode::Interpreter> BasicParameterModuleBuilder(ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>& module, std::vector<ska::NodeValue>& parameters, int argc, char* argv[]) {

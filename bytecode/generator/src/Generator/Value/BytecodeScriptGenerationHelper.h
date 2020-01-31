@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "NodeValue/ScriptASTPtr.h"
+#include "NodeValue/Token.h"
 #include "Base/Values/MovableNonCopyable.h"
 #include "BytecodeOperand.h"
 #include "UniqueSymbolGetter.h"
@@ -27,6 +28,7 @@ namespace ska {
 namespace ska {
 	class ASTNode;
 	class ScriptAST;
+	class StatementParser;
 	struct ScriptHandleAST;
 
 	namespace bytecode {
@@ -38,6 +40,7 @@ namespace ska {
 			using VariableGetter = UniqueSymbolGetter<'V'>;
 		public:
 			ScriptGenerationHelper(ScriptCache& cache, const ScriptAST& script);
+			ScriptGenerationHelper(ScriptCache& cache, StatementParser& parser, const std::string& scriptName, std::vector<Token> tokens);
 
 			ScriptGenerationHelper(ScriptGenerationHelper&&) = default;
 			ScriptGenerationHelper& operator=(ScriptGenerationHelper&&) = default;

@@ -16,6 +16,13 @@ ska::bytecode::ScriptGenerationHelper::ScriptGenerationHelper(ScriptCache& cache
 	m_index = cache.id(name);
 }
 
+ska::bytecode::ScriptGenerationHelper::ScriptGenerationHelper(ScriptCache& cache, StatementParser& parser, const std::string& scriptName, std::vector<Token> tokens) {
+	auto scriptAst = ska::ScriptAST{ cache.astCache, scriptName, std::move(tokens) };
+	scriptAst.parse(parser);
+	m_script = scriptAst.handle();
+	m_index = cache.id(scriptName);
+}
+
 ska::ScriptAST ska::bytecode::ScriptGenerationHelper::program() const {
 	return ska::ScriptAST{ *m_script };
 }
