@@ -5,9 +5,9 @@
 
 namespace ska {
 
-	template <class ... Types>
 	class BuiltinTypeMap {
 	public:
+		template <class ... Types>
 		static const std::vector<std::string>& types() {
 			static const auto ss = std::vector<std::string>{};
 			int _[] = { 0, (buildType<Types>(ss), 0)... };
