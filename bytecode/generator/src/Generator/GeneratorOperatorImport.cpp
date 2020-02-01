@@ -21,8 +21,9 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 		auto scriptImported = context.useImport(scriptImportedName);
 		assert(scriptImported != nullptr);
 		auto scriptContext = GenerationContext{context, *scriptImported };
-		generateNext(scriptContext);
-		LOG_DEBUG << "%10cGenerated script.";
+		auto instructionsOutput = generateNext(scriptContext);
+		scriptContext.generate(std::move(instructionsOutput));
+		LOG_DEBUG << "%10cGenerated script " << scriptImportedName;
 		std::tie(importedScriptIndex, importedScript) = context.script(scriptImportedName);
 	}
 

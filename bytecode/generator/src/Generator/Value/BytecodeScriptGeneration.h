@@ -42,7 +42,6 @@ namespace ska {
 			//TODO lazy-optimize with exportedSymbols ?
 			std::vector<Operand> generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const { return m_origin.generateExportedSymbols(std::move(symbolsInfo)); }
 			std::optional<Operand> getSymbol(const Symbol& symbol) const;
-
 			ScriptGenerationHelper& helper() { return m_origin; }
 
 			ScriptAST program() const { return m_origin.program(); }
@@ -55,6 +54,7 @@ namespace ska {
 			auto end() const { return m_generated.end(); }
 
 			void generate(ScriptCache& cache, Generator& generator);
+			void generate(InstructionOutput instructions);
 
 		private:
 			friend std::ostream& operator<<(std::ostream& stream, const ScriptGeneration&);

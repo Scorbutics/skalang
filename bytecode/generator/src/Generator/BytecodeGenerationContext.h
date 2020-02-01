@@ -35,6 +35,7 @@ namespace ska {
 			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
 			const NativeFunction& getBinding(std::size_t index) const;
 			Operand storeBinding(NativeFunctionPtr binding);
+			void generate(InstructionOutput instructions);
 			Operand querySymbolOrOperand(const ASTNode& node);
 			Operand querySymbol(const Symbol& symbol);
 			std::optional<Operand> getSymbol(const Symbol& symbol) const;

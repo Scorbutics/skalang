@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
 		auto& gen = generator.generate(mainCache, std::move(script));
 
 		auto serializer = ska::bytecode::Serializer{};
-		serializer.serialize(mainCache, gen.id(), std::cout);
+		serializer.serialize(mainCache, std::cout);
 
 		auto interpreted = interpreter.interpret(gen.id(), mainCache);
 	} catch (std::exception& e) {

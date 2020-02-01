@@ -34,3 +34,7 @@ std::optional<ska::bytecode::Operand> ska::bytecode::ScriptGeneration::getSymbol
 	return m_origin.getSymbol(symbol);
 }
 
+void ska::bytecode::ScriptGeneration::generate(InstructionOutput instructions) {
+	m_generated = std::move(instructions);
+}
+

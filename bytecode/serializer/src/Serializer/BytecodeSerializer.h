@@ -15,9 +15,9 @@ namespace ska {
 			~Serializer() = default;
 
 			void serialize(SerializationContext& context) const;
-			void serialize(const ScriptCache& cache, std::size_t generatedId, std::ostream& output) const;
+			void serialize(const ScriptCache& cache, std::ostream& output) const;
 		private:
-			void serialize(const Operand& operand, SerializationContext& output) const;
+			void serialize(const Operand& operand, SerializationContext& output, std::vector<std::string>& natives) const;
 		};
 	}
 }
