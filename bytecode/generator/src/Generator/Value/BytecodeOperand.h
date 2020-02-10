@@ -39,19 +39,21 @@ namespace ska {
 		using OperandVariant = std::variant<ScriptVariableRef, long, bool, double, StringShared>;
 
 		enum class OperandType {
+			EMPTY,
 			PURE,
 			VAR,
 			REG,
 			BIND,
-			EMPTY
+			MAGIC
 		};
 
 		static constexpr const char* OperandTypeSTR[] = {
+			"",
 			"PURE",
 			"VAR",
 			"REG",
 			"BIND",
-			""
+			"MAGIC"
 		};
 
 		static inline std::ostream& operator<<(std::ostream& stream, const OperandType& val) {
@@ -96,7 +98,7 @@ namespace ska {
 		private:
 			friend bool operator==(const Operand& lhs, const Operand& rhs);
 
-			OperandVariant m_content;
+			OperandVariant m_content {};
 			OperandType m_type = OperandType::EMPTY;
 		};
 

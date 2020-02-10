@@ -3,7 +3,7 @@
 #include "LoggerConfigLang.h"
 #include <Signal/SignalHandler.h>
 
-//#define SKALANG_LOGGING
+#define SKALANG_LOGGING
 
 ska::detail::SkaLangLogger& ska::detail::LangLogger() {
 	static auto logger = ska::detail::BuildLangLogger("Log.txt");
