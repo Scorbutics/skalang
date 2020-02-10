@@ -79,6 +79,9 @@ int main(int argc, char* argv[]) {
 		interpreter
 	};
 
+	std::ofstream outputBytecode{ "bytecode.out", std::ofstream::binary };
+	std::ifstream inputBytecode { };
+
 	try {
 		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);
 		auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
@@ -90,8 +93,10 @@ int main(int argc, char* argv[]) {
 		auto& gen = generator.generate(mainCache, std::move(script));
 
 		auto serializer = ska::bytecode::Serializer{};
-		serializer.serialize(mainCache, std::cout);
-
+		serializer.serialize(mainCache, outputBytecode);
+		outputBytecode.close();
+		inputBytecode.open("bytecode.out", std::ofstream::binary);
+		serializer.deserialize(mainCache, inputBytecode);
 		auto interpreted = interpreter.interpret(gen.id(), mainCache);
 	} catch (std::exception& e) {
 		std::cerr << "Error : " << e.what() << std::endl;
