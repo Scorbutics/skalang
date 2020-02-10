@@ -80,6 +80,8 @@ void ska::bytecode::Serializer::deserialize(DeserializationContext& context) con
 
 		if(!natives.empty()) {
 			LOG_INFO << "[Script name " << natives[static_cast<std::size_t>(scriptRef)] << "]";
+			context.declare(natives[static_cast<std::size_t>(scriptRef)], std::move(instructions));
+			context.exports(std::move(exports));
 		}
 	}
 
@@ -115,6 +117,6 @@ void ska::bytecode::Serializer::serialize(const ScriptCache& cache, std::ostream
 }
 
 void ska::bytecode::Serializer::deserialize(ScriptCache& cache, std::istream& input) const {
-	auto context = DeserializationContext{ cache, 0, input };
+	auto context = DeserializationContext{ cache, input };
 	deserialize(context);
 }

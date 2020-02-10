@@ -79,24 +79,34 @@ int main(int argc, char* argv[]) {
 		interpreter
 	};
 
-	std::ofstream outputBytecode{ "bytecode.out", std::ofstream::binary };
-	std::ifstream inputBytecode { };
-
 	try {
+		std::cout << "tototo" << std::endl;
+
+		auto serializer = ska::bytecode::Serializer{};
+		std::ifstream inputBytecode { "bytecode.out", std::ofstream::binary};
+		if(!inputBytecode.fail()) {
+			std::cout << "DESERIALIZATION STARTED" << std::endl;
+			serializer.deserialize(mainCache, inputBytecode);
+			inputBytecode.close();
+		}
+
+
 		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);
 		auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
 
 		auto parameterValues = std::vector<ska::NodeValue>{};
-		
+
 		auto parameterModule = BasicParameterModuleBuilder(moduleConfiguration, parameterValues, argc, argv);
 		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
 		auto& gen = generator.generate(mainCache, std::move(script));
 
-		auto serializer = ska::bytecode::Serializer{};
-		serializer.serialize(mainCache, outputBytecode);
-		outputBytecode.close();
-		inputBytecode.open("bytecode.out", std::ofstream::binary);
-		serializer.deserialize(mainCache, inputBytecode);
+		if(inputBytecode.fail()) {
+			std::cout << "SERIALIZATION STARTED" << std::endl;
+			std::ofstream outputBytecode{ "bytecode.out", std::ofstream::binary };
+			serializer.serialize(mainCache, outputBytecode);
+			outputBytecode.close();
+		}
+
 		auto interpreted = interpreter.interpret(gen.id(), mainCache);
 	} catch (std::exception& e) {
 		std::cerr << "Error : " << e.what() << std::endl;
