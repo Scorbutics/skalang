@@ -8,42 +8,47 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Serializer);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Serializer)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Serializer)
 
-void ska::bytecode::Serializer::serialize(SerializationContext& context) const {
-	do {
-		LOG_INFO << "[Script " << context.currentScriptName() << "]";
-		context << SERIALIZER_VERSION;
-		context << context.currentScriptName();
-		context << context.currentScriptId();
-		context << static_cast<std::size_t>(context.currentScriptBridged());
+bool ska::bytecode::Serializer::serialize(SerializationContext& context) const {
+	try {
+		do {
+			LOG_INFO << "[Script " << context.currentScriptName() << "]";
+			context << SERIALIZER_VERSION;
+			context << context.currentScriptName();
+			context << context.currentScriptId();
+			context << static_cast<std::size_t>(context.currentScriptBridged());
 
-		if (!context.currentScriptBridged()) {
-			for (const auto& instruction : context) {
-				LOG_DEBUG << "Serializing " << instruction;
-				context << instruction;
-			}
-			context << Instruction{ Command::NOP, std::vector<Operand>{} };
-
-			const auto& exports = context.exports();
-			LOG_INFO << "Export serializing : " << exports.size();
-			for (const auto& exp : exports) {
-				if(!exp.empty()) {
-					LOG_INFO << exp;
-					context << exp;
+			if (!context.currentScriptBridged()) {
+				for (const auto& instruction : context) {
+					LOG_DEBUG << "Serializing " << instruction;
+					context << instruction;
 				}
-			}
-			context << Operand{};
-		}
-	} while (context.next());
+				context << Instruction{ Command::NOP, std::vector<Operand>{} };
 
+				const auto& exports = context.exports();
+				LOG_INFO << "Export serializing : " << exports.size();
+				for (const auto& exp : exports) {
+					if (!exp.empty()) {
+						LOG_INFO << exp;
+						context << exp;
+					}
+				}
+				context << Operand{};
+			}
+		} while (context.next());
+		return true;
+	} catch (std::runtime_error&) {
+		return false;
+	}
 }
 
-void ska::bytecode::Serializer::deserialize(DeserializationContext& context) const {
-	while(context.canRead()) {
+bool ska::bytecode::Serializer::deserialize(DeserializationContext& context) const {
+	auto scriptId = std::size_t{ 0 };
+	while (context.read(scriptId++)) {
+		auto scriptNameRef = Chunk{};
+		auto serializerVersion = std::size_t{};
 
-		auto scriptNameRef = Chunk {};
-		auto serializerVersion = std::size_t {};
-		auto scriptId = std::size_t {};
-		auto scriptBridged = std::size_t {};
+		auto scriptBridged = std::size_t{};
+		auto scriptId = std::size_t{ 0 };
 		context >> serializerVersion;
 		context >> scriptNameRef;
 		context >> scriptId;
@@ -69,7 +74,7 @@ void ska::bytecode::Serializer::deserialize(DeserializationContext& context) con
 
 			LOG_INFO << "Exports section ";
 
-			auto operandType = OperandType {};
+			auto operandType = OperandType{};
 			do {
 				auto operand = Operand{};
 				context >> operand;
@@ -89,12 +94,12 @@ void ska::bytecode::Serializer::deserialize(DeserializationContext& context) con
 		replaceAllNativesRef(instructions, natives);
 		replaceAllNativesRef(exports, natives);
 
-		if(!natives.empty()) {
+		if (!natives.empty()) {
 			LOG_INFO << "[Script name " << natives[static_cast<std::size_t>(scriptNameRef)] << " with id " << scriptId << "]";
 			context.declare(scriptId, natives[static_cast<std::size_t>(scriptNameRef)], std::move(instructions), std::move(exports));
 		}
 	}
-
+	return true;
 }
 
 void ska::bytecode::Serializer::replaceAllNativesRef(Operand& operand, const std::vector<std::string>& natives) const {
@@ -118,12 +123,12 @@ void ska::bytecode::Serializer::replaceAllNativesRef(std::vector<Instruction>& i
 	}
 }
 
-void ska::bytecode::Serializer::serialize(const ScriptCache& cache, std::ostream& output) const {
+bool ska::bytecode::Serializer::serialize(const ScriptCache& cache, SerializationStrategy output) const {
 	auto context = SerializationContext { cache, output };
-	serialize(context);
+	return serialize(context);
 }
 
-void ska::bytecode::Serializer::deserialize(ScriptCache& cache, std::istream& input) const {
+bool ska::bytecode::Serializer::deserialize(ScriptCache& cache, DeserializationStrategy input) const {
 	auto context = DeserializationContext{ cache, input };
-	deserialize(context);
+	return deserialize(context);
 }

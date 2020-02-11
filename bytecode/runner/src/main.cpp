@@ -81,13 +81,7 @@ int main(int argc, char* argv[]) {
 
 	try {
 		auto serializer = ska::bytecode::Serializer{};
-		std::ifstream inputBytecode { "bytecode.out", std::ofstream::binary};
-		const auto shouldSerialize = inputBytecode.fail();
-		if(!shouldSerialize) {
-			std::cout << "DESERIALIZATION STARTED" << std::endl;
-			serializer.deserialize(mainCache, inputBytecode);
-		}
-		inputBytecode.close();
+		assert(serializer.deserialize(mainCache, ska::bytecode::DeserializationStrategyType::PerScript()));
 
 		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);
 		auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
@@ -98,12 +92,7 @@ int main(int argc, char* argv[]) {
 		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
 		auto& gen = generator.generate(mainCache, std::move(script));
 
-		if(shouldSerialize) {
-			std::cout << "SERIALIZATION STARTED" << std::endl;
-			std::ofstream outputBytecode{ "bytecode.out", std::ofstream::binary };
-			serializer.serialize(mainCache, outputBytecode);
-			outputBytecode.close();
-		}
+		//assert(serializer.serialize(mainCache, ska::bytecode::SerializationStrategyType::PerScript()));
 
 		auto interpreted = interpreter.interpret(gen.id(), mainCache);
 	} catch (std::exception& e) {

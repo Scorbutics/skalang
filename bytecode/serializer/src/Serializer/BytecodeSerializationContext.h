@@ -6,16 +6,17 @@
 #include "NodeValue/ASTNodePtr.h"
 
 #include "BytecodeSerializationContext.h"
+#include "BytecodeSerializationStrategy.h"
 #include "BytecodeChunk.h"
 #include "Generator/Value/BytecodeScriptCache.h"
 
 namespace ska {
 	namespace bytecode {
 		struct SerializationContext {
-			SerializationContext(const ScriptCache& cache, std::ostream& output) :
-				m_id(0),
-				m_output(output),
-				m_cache(cache) {
+			SerializationContext(const ScriptCache& cache, SerializationStrategy strategy) :
+				m_strategy(std::move(strategy)),
+				m_cache(cache),
+				m_output(&m_strategy(m_id)) {
 			}
 
 			auto begin() const { return m_cache[m_id].begin(); }
@@ -26,7 +27,8 @@ namespace ska {
 			bool next() {
 				pushNatives();
 				m_id++;
-			 return m_id < m_cache.size();
+				m_output = &m_strategy(m_id);
+				return m_id < m_cache.size();
 			}
 
 			const std::string& currentScriptName() const { return m_cache[m_id].name(); }
@@ -34,27 +36,27 @@ namespace ska {
 			bool currentScriptBridged() const { return m_cache[m_id].program().isBridged(); }
 
 			std::ostream& operator<<(std::size_t value) {
-				m_output.write(reinterpret_cast<const char*>(&value), sizeof(uint32_t));
-				return m_output;
+				m_output->write(reinterpret_cast<const char*>(&value), sizeof(uint32_t));
+				return *m_output;
 			}
 
 			std::ostream& operator<<(std::string value) {
 				const Chunk refIndex = m_natives.size();
-				m_output.write(reinterpret_cast<const char*>(&refIndex), sizeof(Chunk));
+				m_output->write(reinterpret_cast<const char*>(&refIndex), sizeof(Chunk));
 				m_natives.push_back(std::move(value));
-				return m_output;
+				return *m_output;
 			}
 
 			std::ostream& operator<<(const Instruction& value) {
 				uint16_t cmd = static_cast<uint16_t>(value.command());
 				uint8_t numberOfValidOperands = !value.dest().empty() + !value.left().empty() + !value.right().empty();
-				m_output.write(reinterpret_cast<const char*>(&cmd), sizeof(uint16_t));
-				m_output.write(reinterpret_cast<const char*>(&numberOfValidOperands), sizeof(uint8_t));
+				m_output->write(reinterpret_cast<const char*>(&cmd), sizeof(uint16_t));
+				m_output->write(reinterpret_cast<const char*>(&numberOfValidOperands), sizeof(uint8_t));
 
-				if (numberOfValidOperands-- > 0) *this << value.dest(); else return m_output;
-				if (numberOfValidOperands-- > 0) *this << value.left(); else return m_output;
+				if (numberOfValidOperands-- > 0) *this << value.dest(); else return *m_output;
+				if (numberOfValidOperands-- > 0) *this << value.left(); else return *m_output;
 				if (numberOfValidOperands-- > 0) *this << value.right();
-				return m_output;
+				return *m_output;
 			}
 
 			std::ostream& operator<<(const Operand& value) {
@@ -63,18 +65,18 @@ namespace ska {
 				Chunk variable { 0 };
 
 				if (value.empty()) {
-					m_output.write(reinterpret_cast<const char*>(&type), sizeof(uint8_t));
+					m_output->write(reinterpret_cast<const char*>(&type), sizeof(uint8_t));
 					char empty[sizeof(Chunk) * 2] = "";
-					m_output.write(empty, sizeof(empty));
-					return m_output;
+					m_output->write(empty, sizeof(empty));
+					return *m_output;
 				}
 
 				const auto& content = value.content();
 				if (std::holds_alternative<StringShared>(content)) {
 					type = static_cast<uint8_t>(OperandType::PURE);
 					script = 0;
-					m_output.write(reinterpret_cast<const char*>(&type), sizeof(uint8_t));
-					m_output.write(reinterpret_cast<const char*>(&script), sizeof(Chunk));
+					m_output->write(reinterpret_cast<const char*>(&type), sizeof(uint8_t));
+					m_output->write(reinterpret_cast<const char*>(&script), sizeof(Chunk));
 					*this << *std::get<StringShared>(content);
 				} else {
 					type = static_cast<uint8_t>(value.type());
@@ -96,11 +98,11 @@ namespace ska {
 						}
 					}, content);
 
-					m_output.write(reinterpret_cast<const char*>(&type), sizeof(uint8_t));
-					m_output.write(reinterpret_cast<const char*>(&script), sizeof(Chunk));
-					m_output.write(reinterpret_cast<const char*>(&variable), sizeof(Chunk));
+					m_output->write(reinterpret_cast<const char*>(&type), sizeof(uint8_t));
+					m_output->write(reinterpret_cast<const char*>(&script), sizeof(Chunk));
+					m_output->write(reinterpret_cast<const char*>(&variable), sizeof(Chunk));
 				}
-				return m_output;
+				return *m_output;
 			}
 
 		private:
@@ -108,26 +110,27 @@ namespace ska {
 				for (auto& native : m_natives) {
 					if (! native.empty()) {
 						const std::size_t size = native.size();
-						m_output.write(reinterpret_cast<const char*>(&size), sizeof(Chunk));
+						m_output->write(reinterpret_cast<const char*>(&size), sizeof(Chunk));
 						if (size > 0) {
-							m_output.write(native.c_str(), sizeof(char) * size);
+							m_output->write(native.c_str(), sizeof(char) * size);
 						}
 					}
 				}
 				char empty[sizeof(Chunk)] = "";
-				m_output.write(empty, sizeof(empty));
+				m_output->write(empty, sizeof(empty));
 				m_natives.clear();
 			}
 
 			const ScriptCache& m_cache;
-			std::size_t m_id;
+			std::size_t m_id = 0;
+			SerializationStrategy m_strategy;
 			std::vector<std::string> m_natives;
-			std::ostream& m_output;
+			std::ostream* m_output = nullptr;
 		};
 
 		struct DeserializationContext {
-			DeserializationContext(ScriptCache& cache, std::istream& input) :
-				m_input(input),
+			DeserializationContext(ScriptCache& cache, DeserializationStrategy strategy) :
+				m_strategy(std::move(strategy)),
 				m_cache(cache) {
 			}
 
@@ -143,32 +146,35 @@ namespace ska {
 
 			void operator>>(std::size_t& value) {
 				value = 0;
-				if(m_input.eof()) {
+				checkValidity();
+				if(m_input->eof()) {
 					return;
 				}
-				m_input.read(reinterpret_cast<char*>(&value), sizeof(uint32_t));
+				m_input->read(reinterpret_cast<char*>(&value), sizeof(uint32_t));
 			}
 
 			void operator>>(Chunk& value) {
-				if(m_input.eof()) {
+				checkValidity();
+				if(m_input->eof()) {
 					value = Chunk{};
 					return;
 				}
-				m_input.read(reinterpret_cast<char*>(&value), sizeof(Chunk));
+				m_input->read(reinterpret_cast<char*>(&value), sizeof(Chunk));
 			}
 
 			void operator>>(Instruction& value) {
+				checkValidity();
 				auto operands = std::vector<Operand>{};
 				auto numberOfValidOperands = std::uint8_t{ 0 };
 				auto command = uint16_t { 0 };
 
-				if(m_input.eof()) {
+				if(m_input->eof()) {
 					value = Instruction{};
 					return;
 				}
 
-				m_input.read(reinterpret_cast<char*>(&command), sizeof(uint16_t));
-				m_input.read(reinterpret_cast<char*>(&numberOfValidOperands), sizeof(uint8_t));
+				m_input->read(reinterpret_cast<char*>(&command), sizeof(uint16_t));
+				m_input->read(reinterpret_cast<char*>(&numberOfValidOperands), sizeof(uint8_t));
 				for(uint8_t i = 0; i < numberOfValidOperands; i++) {
 					auto tmp = Operand {};
 					*this >> tmp;
@@ -178,18 +184,19 @@ namespace ska {
 			}
 
 			void operator>>(Operand& value) {
+				checkValidity();
 				auto type = uint8_t { 0 };
 				auto script = Chunk{ 0 };
 				auto variable = Chunk{ 0 };
 
-				if(m_input.eof()) {
+				if(m_input->eof()) {
 					value = Operand{};
 					return;
 				}
 
-				m_input.read(reinterpret_cast<char*>(&type), sizeof(uint8_t));
-				m_input.read(reinterpret_cast<char*>(&script), sizeof(Chunk));
-				m_input.read(reinterpret_cast<char*>(&variable), sizeof(Chunk));
+				m_input->read(reinterpret_cast<char*>(&type), sizeof(uint8_t));
+				m_input->read(reinterpret_cast<char*>(&script), sizeof(Chunk));
+				m_input->read(reinterpret_cast<char*>(&variable), sizeof(Chunk));
 
 				auto operandType = static_cast<OperandType>(type);
 				auto content = OperandVariant {};
@@ -230,10 +237,14 @@ namespace ska {
 				value = Operand{ std::move(content), operandType };
 			}
 
-			bool canRead() const { return !m_input.eof(); }
+			bool read(std::size_t scriptId) {
+				try { m_input = &m_strategy(scriptId); return !m_input->eof(); }
+				catch (std::runtime_error&) { return false; }
+			}
 
 			void operator>>(std::vector<std::string>& natives) {
-				if(m_input.eof()){
+				checkValidity();
+				if(m_input->eof()){
 					return;
 				}
 
@@ -244,19 +255,22 @@ namespace ska {
 			}
 
 		private:
+			void checkValidity() const { if (m_input == nullptr) { throw std::runtime_error("no input available"); } }
+
 			std::string readString() {
 				auto value = std::string {};
 				auto size = Chunk { 0 };
-				m_input.read(reinterpret_cast<char*>(&size), sizeof(Chunk));
+				m_input->read(reinterpret_cast<char*>(&size), sizeof(Chunk));
 				if (size > 0) {
 					value.resize(size);
-					m_input.read(reinterpret_cast<char*>(&value[0]), sizeof(char)* size);
+					m_input->read(reinterpret_cast<char*>(&value[0]), sizeof(char)* size);
 				}
 				return value;
 			}
 
 			ScriptCache& m_cache;
-			std::istream& m_input;
+			DeserializationStrategy m_strategy;
+			std::istream* m_input = nullptr;
 		};
 
 	}

@@ -14,10 +14,10 @@ namespace ska {
 			Serializer() = default;
 			~Serializer() = default;
 
-			void serialize(SerializationContext& context) const;
-			void serialize(const ScriptCache& cache, std::ostream& output) const;
-			void deserialize(DeserializationContext& output) const;
-			void deserialize(ScriptCache& cache, std::istream& input) const;
+			bool serialize(SerializationContext& context) const;
+			bool serialize(const ScriptCache& cache, SerializationStrategy output) const;
+			bool deserialize(DeserializationContext& output) const;
+			bool deserialize(ScriptCache& cache, DeserializationStrategy input) const;
 		private:
 			void replaceAllNativesRef(std::vector<Operand>& operands, const std::vector<std::string>& natives) const;
 			void replaceAllNativesRef(std::vector<Instruction>& instructions, const std::vector<std::string>& natives) const;
