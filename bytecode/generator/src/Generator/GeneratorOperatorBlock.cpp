@@ -23,6 +23,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 			auto symbolInfo = SymbolInfo { context.scope() + 1, child->name(), fields, context.scriptIndex() };
 			if (oldSymbolInfo != nullptr) {
 				symbolInfo.binding = oldSymbolInfo->binding;
+				symbolInfo.bindingPassThrough = oldSymbolInfo->bindingPassThrough;
 			}
 			if (context.scope() == 0) {
 				symbolInfo.exported = true;

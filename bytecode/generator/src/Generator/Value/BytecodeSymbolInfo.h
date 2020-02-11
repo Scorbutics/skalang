@@ -20,7 +20,8 @@ namespace ska {
 			bool exported = false;
 			std::size_t script = static_cast<std::size_t>(-1);
 			std::size_t childIndex = 0;
-			NativeFunctionPtr binding = nullptr;
+			std::size_t binding = std::numeric_limits<std::size_t>::max();
+			bool bindingPassThrough = false;
 
 			SymbolInfo(std::size_t scopeIndex, std::string name, std::size_t scriptIndex) :
 				name(std::make_shared<std::string>(scopeIndex == 1 ? std::move(name) : "")),

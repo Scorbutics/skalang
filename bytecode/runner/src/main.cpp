@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 	try {
 		auto serializer = ska::bytecode::Serializer{};
 		std::ifstream inputBytecode { "bytecode.out", std::ofstream::binary};
-		const auto shouldSerialize = true;//inputBytecode.fail();
+		const auto shouldSerialize = inputBytecode.fail();
 		if(!shouldSerialize) {
 			std::cout << "DESERIALIZATION STARTED" << std::endl;
 			serializer.deserialize(mainCache, inputBytecode);

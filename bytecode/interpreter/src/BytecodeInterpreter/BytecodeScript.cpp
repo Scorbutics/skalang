@@ -49,6 +49,7 @@ void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr a
 	/* (remember, one is - almost - the copy of the other) */
 	/* so here we have to iterate through the bound script symbols instead of the template one */
 	const Symbol* constructorBoundSymbol = constructor.type() != ExpressionType::VOID ? &findSymbolFromString(constructor.name()) : nullptr;
+	std::size_t bindingId = 0;
 	for (const auto& field : constructor.fields()) {
 		const Symbol* newerSymbol = findFieldSymbol(constructorBoundSymbol, field);
 		if(newerSymbol == nullptr) {
@@ -60,7 +61,9 @@ void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr a
 
 		LOG_INFO << "%14cAttaching binding to symbol " << newerSymbol->getName();
 		auto info = m_cache.getSymbolInfoOrNew(m_serviceGen.id(), *newerSymbol);
-		info.binding = std::make_shared<NativeFunction>(field.callback);
+		auto bindingRef = ScriptVariableRef{ bindingId++, m_serviceGen.id() };
+		m_cache.storeBinding(std::make_shared<NativeFunction>(field.callback), bindingRef);
+		info.binding = bindingRef.variable;
 
 		//TODO avoid going through symbol info ?
 		// Maybe instead move this algorithm directly to generators
@@ -70,15 +73,17 @@ void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr a
 
 	if (constructorBoundSymbol != nullptr) {
 		auto constructorInfo = m_cache.getSymbolInfoOrNew(m_serviceGen.id(), *constructorBoundSymbol);
-		constructorInfo.binding = std::make_shared<NativeFunction>([&constructor](std::vector<NodeValue> params) {
+		auto bindingRef = ScriptVariableRef{ bindingId++, m_serviceGen.id() };
+		m_cache.storeBinding(std::make_shared<NativeFunction>([&constructor](std::vector<NodeValue> params) {
 			LOG_INFO << "%14cParameters of constructor " << constructor.name() << " : ";
 			for (const auto& param : params) {
 				LOG_INFO << "%14c" << param.convertString();
 			}
 			constructor.setAdditionalParams(std::move(params));
 			return NodeValue{};
-		});
-		constructorInfo.binding->passThrough = true;
+		}, true), bindingRef);
+		constructorInfo.binding = bindingRef.variable;
+		constructorInfo.bindingPassThrough = true;
 		m_cache.setSymbolInfo(*constructorBoundSymbol, std::move(constructorInfo));
 	}
 

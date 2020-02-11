@@ -33,8 +33,8 @@ namespace ska {
 			ScriptASTPtr useImport(const std::string& scriptImported);
 			const SymbolInfo* getSymbolInfo(const Symbol& symbol) const;
 			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
-			const NativeFunction& getBinding(std::size_t index) const;
-			Operand storeBinding(NativeFunctionPtr binding);
+			const NativeFunction& getBinding(ScriptVariableRef bindingRef) const;
+			Operand storeBinding(NativeFunctionPtr binding, ScriptVariableRef bindingRef);
 			void generate(InstructionOutput instructions);
 			Operand querySymbolOrOperand(const ASTNode& node);
 			Operand querySymbol(const Symbol& symbol);

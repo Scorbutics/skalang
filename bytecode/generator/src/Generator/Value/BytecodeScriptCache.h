@@ -11,26 +11,26 @@ namespace ska {
       public ScriptCacheBase<ScriptGeneration> {
 				using Parent = ScriptCacheBase<ScriptGeneration>;
     public:
-      using SymbolInfosContainer = std::unordered_map<const Symbol*, SymbolInfo>;
+        using SymbolInfosContainer = std::unordered_map<const Symbol*, SymbolInfo>;
 
-			bool isGenerated(std::size_t index) const;
+	    bool isGenerated(std::size_t index) const;
 
-			void setSymbolInfo(const ASTNode& node, SymbolInfo info);
-			void setSymbolInfo(const Symbol& symbol, SymbolInfo info);
-			const SymbolInfo* getSymbolInfo(const Symbol& symbol) const;
-			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
-      SymbolInfo getSymbolInfoOrNew(std::size_t scriptIndex, const Symbol& symbol) const;
+	    void setSymbolInfo(const ASTNode& node, SymbolInfo info);
+	    void setSymbolInfo(const Symbol& symbol, SymbolInfo info);
+	    const SymbolInfo* getSymbolInfo(const Symbol& symbol) const;
+	    const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
+        SymbolInfo getSymbolInfoOrNew(std::size_t scriptIndex, const Symbol& symbol) const;
 
-			const std::vector<Operand>& getExportedSymbols(std::size_t scriptIndex);
+	    const std::vector<Operand>& getExportedSymbols(std::size_t scriptIndex);
 
-      std::size_t storeBinding(NativeFunctionPtr binding);
-      const NativeFunction& getBinding(std::size_t index) const;
+        void storeBinding(NativeFunctionPtr binding, ScriptVariableRef bindingRef);
+        const NativeFunction& getBinding(ScriptVariableRef bindingRef) const;
 
-      ScriptCacheAST astCache;
+        ScriptCacheAST astCache;
 
     private:
       SymbolInfosContainer m_symbolInfo;
-      std::vector<NativeFunctionPtr> m_bindings;
+      ScriptCacheBase<NativeFunctionPtr> m_bindings;
     };
   }
 }

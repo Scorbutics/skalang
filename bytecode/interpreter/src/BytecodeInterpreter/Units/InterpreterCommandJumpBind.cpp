@@ -17,7 +17,7 @@ static void SetupStackParametersAndReturnValue(ska::bytecode::ExecutionContext& 
 }
 
 SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(BIND)(ExecutionContext& context, const Operand& left, const Operand& right) {
-	const auto bindingIndex = context.get<long>(context.currentInstruction().dest());
+	const auto bindingIndex = context.get<ScriptVariableRef>(context.currentInstruction().dest());
 	const auto parametersNumber = context.get<long>(left);
 
 	LOG_DEBUG << "Jumping (binding) number " << bindingIndex << " with " << parametersNumber

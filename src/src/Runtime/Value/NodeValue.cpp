@@ -23,9 +23,9 @@ double ska::NodeValue::convertNumeric() const {
 		} else if constexpr (std::is_same<T, bool>::value) {
 			numeric = arg ? 1.0 : 0.0;
 		} else if constexpr (std::is_same<T, VariableRef>::value) {
-			numeric = arg.variable;
+			numeric = static_cast<double>(arg.variable);
 		} else if constexpr (std::is_same<T, ScriptVariableRef>::value) {
-			numeric = arg.variable;
+			numeric = static_cast<double>(arg.variable);
 		} else if constexpr (std::is_same<T, StringShared>::value) {
 			try {
 				numeric = std::stod(*arg);

@@ -49,6 +49,11 @@ namespace ska {
 			return it != namedMapCache.end() ? &at(it->second) : nullptr;
 		}
 
+		const auto* atOrNull(const std::string& scriptName) const {
+			const auto it = namedMapCache.find(scriptName);
+			return it != namedMapCache.end() ? &at(it->second) : nullptr;
+		}
+
 		ScriptTRaw& at(const std::string& scriptName) {
 			const auto index = namedMapCache.at(scriptName);
 			auto* result = atOrNull(index);
@@ -59,6 +64,13 @@ namespace ska {
 		}
 
 		ScriptTRaw& at(std::size_t index) {
+			if (!exist(index)) {
+				throw std::runtime_error("bad script index \"" + std::to_string(index) + "\"");
+			}
+			return *cache[index];
+		}
+
+		const ScriptTRaw& at(std::size_t index) const {
 			if (!exist(index)) {
 				throw std::runtime_error("bad script index \"" + std::to_string(index) + "\"");
 			}

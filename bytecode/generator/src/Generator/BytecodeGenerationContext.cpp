@@ -87,13 +87,13 @@ std::optional<ska::bytecode::Operand> ska::bytecode::GenerationContext::getSymbo
 	return scriptOfSymbol(symbol).getSymbol(symbol);
 }
 
-ska::bytecode::Operand ska::bytecode::GenerationContext::storeBinding(NativeFunctionPtr binding) {
-	const auto outputIndex = m_generated.storeBinding(std::move(binding));
-	return ska::bytecode::Operand { static_cast<long>(outputIndex), OperandType::BIND };
+ska::bytecode::Operand ska::bytecode::GenerationContext::storeBinding(NativeFunctionPtr binding, ScriptVariableRef bindingRef) {
+	m_generated.storeBinding(std::move(binding), bindingRef);
+	return ska::bytecode::Operand{ bindingRef, OperandType::BIND };
 }
 
-const ska::NativeFunction& ska::bytecode::GenerationContext::getBinding(std::size_t index) const {
-	return m_generated.getBinding(index);
+const ska::NativeFunction& ska::bytecode::GenerationContext::getBinding(ScriptVariableRef bindingRef) const {
+	return m_generated.getBinding(bindingRef);
 }
 
 ska::bytecode::ScriptGenerationHelper& ska::bytecode::GenerationContext::scriptOfSymbol(const Symbol& symbol) {

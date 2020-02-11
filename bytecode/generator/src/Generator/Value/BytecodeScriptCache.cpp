@@ -71,13 +71,18 @@ const std::vector<ska::bytecode::Operand>& ska::bytecode::ScriptCache::getExport
 
 bool ska::bytecode::ScriptCache::isGenerated(std::size_t index) const { return index < size() && !(*this)[index].empty();}
 
-std::size_t ska::bytecode::ScriptCache::storeBinding(NativeFunctionPtr binding) {
-	const auto result = m_bindings.size();
-	m_bindings.push_back(std::move(binding));
-	return result;
+void ska::bytecode::ScriptCache::storeBinding(NativeFunctionPtr binding, ScriptVariableRef bindingRef) {
+	auto finalId = std::to_string(bindingRef.script) + " " + std::to_string(bindingRef.variable);
+	m_bindings.emplace(std::move(finalId), std::move(binding), true);
 }
 
-const ska::NativeFunction& ska::bytecode::ScriptCache::getBinding(std::size_t index) const {
-	assert(index < m_bindings.size());
-	return *m_bindings[index];
+const ska::NativeFunction& ska::bytecode::ScriptCache::getBinding(ScriptVariableRef bindingRef) const {
+	auto finalId = std::to_string(bindingRef.script) + " " + std::to_string(bindingRef.variable);
+	auto binding = m_bindings.atOrNull(finalId);
+	if (binding == nullptr) {
+		auto ss = std::stringstream {};
+		ss << "unable to find binding with id \"" << finalId << "\"";
+		throw std::runtime_error(ss.str());
+	}
+	return *binding;
 }

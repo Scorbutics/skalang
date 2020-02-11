@@ -68,8 +68,8 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	LOG_DEBUG << "Generating body...";
 	const auto* functionSymbolInfo = context.getSymbolInfo(node.GetFunction());
-	LOG_DEBUG << "Function Call symbol info : " << (functionSymbolInfo == nullptr || functionSymbolInfo->binding == nullptr ? "none" : "with binding");
-	if (functionSymbolInfo == nullptr || functionSymbolInfo->binding == nullptr || functionSymbolInfo->binding->passThrough) {
+	LOG_DEBUG << "Function Call symbol info : " << (functionSymbolInfo == nullptr || functionSymbolInfo->binding == std::numeric_limits<std::size_t>::max() ? "none" : "with binding");
+	if (functionSymbolInfo == nullptr || functionSymbolInfo->binding == std::numeric_limits<std::size_t>::max() || functionSymbolInfo->bindingPassThrough) {
 		valueGroup.push(generateNext({ context, node.GetFunctionBody(), 1 }));
 	}
 
@@ -101,12 +101,12 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	LOG_DEBUG << "Function call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
 
 	const auto* functionSymbolInfo = context.getSymbolInfo(*node.GetFunctionNameNode().type().value().symbol());
-	LOG_DEBUG << "Function Call symbol info : " << (functionSymbolInfo == nullptr || functionSymbolInfo->binding == nullptr ? "none" : "with binding");
+	LOG_DEBUG << "Function Call symbol info : " << (functionSymbolInfo == nullptr || functionSymbolInfo->binding == std::numeric_limits<std::size_t>::max() ? "none" : "with binding");
 
 	auto callInstruction = InstructionOutput {};
-	if (functionSymbolInfo != nullptr && functionSymbolInfo->binding != nullptr) {
-		callInstruction.push(Instruction{ Command::BIND, context.storeBinding(functionSymbolInfo->binding), Operand {static_cast<long>(node.GetFunctionParameterSize()), OperandType::PURE} });
-		if (functionSymbolInfo->binding->passThrough) {
+	if (functionSymbolInfo != nullptr && functionSymbolInfo->binding != std::numeric_limits<std::size_t>::max()) {
+		callInstruction.push(Instruction{ Command::BIND, Operand { ScriptVariableRef{ functionSymbolInfo->binding, functionSymbolInfo->script}, OperandType::BIND}, Operand {static_cast<long>(node.GetFunctionParameterSize()), OperandType::PURE} });
+		if (functionSymbolInfo->bindingPassThrough) {
 			callInstruction.push(Instruction{ Command::JUMP_ABS, std::move(preCallValue.operand()) });
 		}
 	} else {

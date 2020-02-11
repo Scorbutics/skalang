@@ -74,7 +74,7 @@ namespace ska {
 
 			bool isGenerated(std::size_t scriptIndex) const;
 
-			const NativeFunction& getBinding(std::size_t index) const;
+			const NativeFunction& getBinding(ScriptVariableRef bindingRef) const;
 
 		private:
 			void checkCurrentExecutionOrThrow() const {

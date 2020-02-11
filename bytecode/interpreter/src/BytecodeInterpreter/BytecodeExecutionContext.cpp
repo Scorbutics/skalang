@@ -87,6 +87,6 @@ const ska::bytecode::ScriptExecution& ska::bytecode::ExecutionContext::scriptFro
 	return *m_current;
 }
 
-const ska::NativeFunction& ska::bytecode::ExecutionContext::getBinding(std::size_t index) const {
-	return m_in.getBinding(index);
+const ska::NativeFunction& ska::bytecode::ExecutionContext::getBinding(ScriptVariableRef bindingRef) const {
+	return m_in.getBinding(bindingRef);
 }

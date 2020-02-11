@@ -10,7 +10,7 @@ namespace ska {
 		using Callback = std::function<NodeValue(std::vector<NodeValue>)>;
 
 		template <class F>
-		NativeFunction(F&& callback) : function(std::forward<F>(callback)) {}
+		NativeFunction(F&& callback, bool passThrough = false) : function(std::forward<F>(callback)), passThrough(passThrough) {}
 
 		Callback function;
 		ASTNodePtr node;

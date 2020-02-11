@@ -1,6 +1,7 @@
 #pragma once
 #include <ostream>
 #include <vector>
+#include <cassert>
 #include "NodeValue/Operator.h"
 #include "NodeValue/Type.h"
 #include "BytecodeInstruction.h"
@@ -50,8 +51,8 @@ namespace ska {
 
 			Operand operand() const {	return m_operand.empty() ? packAsOperand() : m_operand;	}
 
-			const Instruction& operator[](std::size_t index) const { return m_pack[index]; }
-			Instruction& operator[](std::size_t index) { return m_pack[index]; }
+			const Instruction& operator[](std::size_t index) const { assert(index < m_pack.size()); return m_pack[index]; }
+			Instruction& operator[](std::size_t index) { assert(index < m_pack.size()); return m_pack[index]; }
 
 		private:
 			friend std::ostream& operator<<(std::ostream& stream, const InstructionOutput&);
