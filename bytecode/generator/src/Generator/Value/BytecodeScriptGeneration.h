@@ -1,6 +1,7 @@
 #pragma once
 #include <ostream>
 #include <vector>
+#include <optional>
 #include "NodeValue/Operator.h"
 #include "NodeValue/Type.h"
 #include "BytecodeInstruction.h"
@@ -39,8 +40,13 @@ namespace ska {
 			const std::vector<Operand>& exportedSymbols() const { return m_exports; }
 			void setExportedSymbols(std::vector<Operand> symbols) { m_exports = std::move(symbols); };
 
-			//TODO lazy-optimize with exportedSymbols ?
-			std::vector<Operand> generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const { return m_origin.generateExportedSymbols(std::move(symbolsInfo)); }
+			std::optional<std::vector<Operand>> generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const {
+				if(m_exports.empty()) {
+					return m_origin.generateExportedSymbols(std::move(symbolsInfo));
+				}
+				return std::optional<std::vector<Operand>>{};
+			}
+
 			std::optional<Operand> getSymbol(const Symbol& symbol) const;
 			ScriptGenerationHelper& helper() { return m_origin; }
 

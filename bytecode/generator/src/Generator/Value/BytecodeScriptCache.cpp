@@ -55,7 +55,10 @@ const std::vector<ska::bytecode::Operand>& ska::bytecode::ScriptCache::getExport
 		}
 
 		if (!temporarySortedScriptSymbols.empty()) {
-			(*this)[scriptIndex].setExportedSymbols((*this)[scriptIndex].generateExportedSymbols(std::move(temporarySortedScriptSymbols)));
+			auto exports = (*this)[scriptIndex].generateExportedSymbols(std::move(temporarySortedScriptSymbols));
+			if (exports.has_value()) {
+				(*this)[scriptIndex].setExportedSymbols(std::move(exports.value()));
+			}
 		}
 	} else {
 		SLOG(ska::LogLevel::Info) << "%11cNo generation of exported symbols for script \"" << scriptIndex << "\" required";
