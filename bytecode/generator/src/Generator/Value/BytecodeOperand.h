@@ -73,7 +73,7 @@ namespace ska {
 
 			Operand(const ASTNode& node);
 
-			Operand(OperandVariant var, OperandType type = OperandType::PURE) :
+			Operand(OperandVariant var, OperandType type) :
 				m_content(std::move(var)),
 				m_type(type){
 			}

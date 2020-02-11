@@ -14,9 +14,9 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	auto incrementGroup = generateNext({ context, node.GetIncrement() });
 
 	if (!incrementGroup.operand().empty()) {
-		conditionGroup.push(Instruction{ Command::JUMP_NIF, Operand { static_cast<long>(bodyGroup.size() + incrementGroup.size() + 1) }, conditionGroup.operand() });
+		conditionGroup.push(Instruction{ Command::JUMP_NIF, Operand { static_cast<long>(bodyGroup.size() + incrementGroup.size() + 1), OperandType::PURE }, conditionGroup.operand() });
 	}
-	incrementGroup.push(Instruction{ Command::JUMP_REL, Operand { - static_cast<long>(conditionGroup.size() + bodyGroup.size() + incrementGroup.size() + 1 ) } });
+	incrementGroup.push(Instruction{ Command::JUMP_REL, Operand { - static_cast<long>(conditionGroup.size() + bodyGroup.size() + incrementGroup.size() + 1 ), OperandType::PURE } });
 
 	initGroup.push(std::move(initGroup));
 	initGroup.push(std::move(conditionGroup));

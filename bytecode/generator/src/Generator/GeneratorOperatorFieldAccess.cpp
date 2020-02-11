@@ -55,6 +55,6 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	LOG_DEBUG << "This field has index " << fieldRefIndex->second << " in the object";
 
-	objectValue.push({ Instruction { Command::ARR_ACCESS, context.queryNextRegister(), objectValue.operand(), Operand {static_cast<long>(fieldRefIndex->second)} }});
+	objectValue.push({ Instruction { Command::ARR_ACCESS, context.queryNextRegister(), objectValue.operand(), Operand {static_cast<long>(fieldRefIndex->second), OperandType::PURE } }});
 	return objectValue;
 }

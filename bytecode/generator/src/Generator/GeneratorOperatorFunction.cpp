@@ -53,7 +53,7 @@ POP_IN_VAR V3, 2
 namespace ska {
 	namespace bytecode {
 		static InstructionOutput AddRelativeJumpInstruction(InstructionOutput output) {
-			auto jumpInstruction = Instruction { Command::JUMP_REL, Operand { static_cast<long>(output.size()) }};
+			auto jumpInstruction = Instruction { Command::JUMP_REL, Operand { static_cast<long>(output.size()), OperandType::PURE }};
 			auto result = InstructionOutput{ std::move(jumpInstruction) };
 			result.push(std::move(output));
 			return result;
@@ -84,7 +84,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	fullFunction.push(Instruction{
 		Command::END,
 		context.querySymbolOrOperand(node.GetFunction()),
-		Operand { -static_cast<long>(fullFunction.size()) }});
+		Operand { -static_cast<long>(fullFunction.size()), OperandType::PURE }});
 
 	return fullFunction;
 }
@@ -105,7 +105,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	auto callInstruction = InstructionOutput {};
 	if (functionSymbolInfo != nullptr && functionSymbolInfo->binding != nullptr) {
-		callInstruction.push(Instruction{ Command::BIND, context.storeBinding(functionSymbolInfo->binding), Operand {static_cast<long>(node.GetFunctionParameterSize())} });
+		callInstruction.push(Instruction{ Command::BIND, context.storeBinding(functionSymbolInfo->binding), Operand {static_cast<long>(node.GetFunctionParameterSize()), OperandType::PURE} });
 		if (functionSymbolInfo->binding->passThrough) {
 			callInstruction.push(Instruction{ Command::JUMP_ABS, std::move(preCallValue.operand()) });
 		}

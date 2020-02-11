@@ -8,7 +8,7 @@
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::IF>::generate(OperateOn node, GenerationContext& context) {
 	auto conditionGroup = generateNext({ context, node.GetCondition() });
 	auto ifGroup = generateNext({ context, node.GetIfStatement(), 1 });
-	conditionGroup.push(Instruction{ Command::JUMP_NIF, Operand { static_cast<long>(ifGroup.size()) }, conditionGroup.operand() });
+	conditionGroup.push(Instruction{ Command::JUMP_NIF, Operand { static_cast<long>(ifGroup.size()), OperandType::PURE}, conditionGroup.operand() });
 	conditionGroup.push(std::move(ifGroup));
 	return conditionGroup;
 }
@@ -18,9 +18,9 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	auto ifGroup = generateNext({ context, node.GetIfStatement(), 1 });
 	auto elseGroup = generateNext({ context, node.GetElseStatement(), 1 });
 
-	ifGroup.push(Instruction{ Command::JUMP_REL, Operand { static_cast<long>(elseGroup.size()) } });
+	ifGroup.push(Instruction{ Command::JUMP_REL, Operand { static_cast<long>(elseGroup.size()), OperandType::PURE } });
 
-	conditionGroup.push(Instruction{ Command::JUMP_NIF, Operand { static_cast<long>(ifGroup.size()) }, conditionGroup.operand()  });
+	conditionGroup.push(Instruction{ Command::JUMP_NIF, Operand { static_cast<long>(ifGroup.size()), OperandType::PURE }, conditionGroup.operand()  });
 	conditionGroup.push(std::move(ifGroup));
 	conditionGroup.push(std::move(elseGroup));
 	return conditionGroup;
