@@ -84,7 +84,8 @@ int main(int argc, char* argv[]) {
 
 		auto serializer = ska::bytecode::Serializer{};
 		std::ifstream inputBytecode { "bytecode.out", std::ofstream::binary};
-		if(!inputBytecode.fail()) {
+		const auto shouldSerialize = inputBytecode.fail();
+		if(!shouldSerialize) {
 			std::cout << "DESERIALIZATION STARTED" << std::endl;
 			serializer.deserialize(mainCache, inputBytecode);
 			inputBytecode.close();
@@ -100,7 +101,7 @@ int main(int argc, char* argv[]) {
 		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
 		auto& gen = generator.generate(mainCache, std::move(script));
 
-		if(inputBytecode.fail()) {
+		if(shouldSerialize) {
 			std::cout << "SERIALIZATION STARTED" << std::endl;
 			std::ofstream outputBytecode{ "bytecode.out", std::ofstream::binary };
 			serializer.serialize(mainCache, outputBytecode);
