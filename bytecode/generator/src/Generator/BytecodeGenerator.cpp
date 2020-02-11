@@ -54,10 +54,6 @@ std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode
 	return result;
 }
 
-ska::bytecode::GenerationOutput& ska::bytecode::Generator::postProcessing(ScriptGenerationHelper& script, GenerationOutput& generated) {
-	return generated;
-}
-
 ska::bytecode::Generator::Generator(const ReservedKeywordsPool& reserved) :
 	m_operatorGenerator(build()) {
 }

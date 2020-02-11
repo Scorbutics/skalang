@@ -30,7 +30,6 @@ namespace ska {
 			InstructionOutput generatePart(GenerationContext node);
 
 		private:
-			GenerationOutput& postProcessing(ScriptGenerationHelper& script, GenerationOutput& generated);
 			OperatorGenerator build();
 
 			OperatorGenerator m_operatorGenerator;
