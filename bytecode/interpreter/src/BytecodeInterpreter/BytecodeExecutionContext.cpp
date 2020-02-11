@@ -29,11 +29,8 @@ ska::bytecode::ScriptExecutionOutput ska::bytecode::ExecutionContext::generateEx
 	return symbols;
 }
 
-const ska::bytecode::ScriptGeneration& ska::bytecode::ExecutionContext::generateIfNeeded(Generator& generator, std::size_t scriptIndex) {
-	if (!m_in.isGenerated(scriptIndex)) {
-		m_in.at(scriptIndex).generate(m_in, generator);
-	}
-	return m_in[scriptIndex];
+bool ska::bytecode::ExecutionContext::isGenerated(std::size_t scriptIndex) const {
+	return m_in.isGenerated(scriptIndex);
 }
 
 ska::bytecode::ExecutionContext ska::bytecode::ExecutionContext::getContext(ScriptVariableRef value) {

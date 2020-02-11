@@ -28,7 +28,6 @@ namespace ska {
 			~Interpreter() = default;
 
 			void interpret(ExecutionContext& node);
-			void interpret(InterpretationPart target);
 			Generator& generator() { return m_generator; }
 			[[nodiscard]]
 			std::unique_ptr<Executor> interpret(std::size_t scriptIndex, GenerationOutput& scripts);

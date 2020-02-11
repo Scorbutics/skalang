@@ -72,7 +72,7 @@ namespace ska {
 
 			ScriptExecutionOutput generateExportedVariables(std::size_t scriptIndex);
 
-			const ScriptGeneration& generateIfNeeded(Generator& generator, std::size_t scriptIndex);
+			bool isGenerated(std::size_t scriptIndex) const;
 
 			const NativeFunction& getBinding(std::size_t index) const;
 

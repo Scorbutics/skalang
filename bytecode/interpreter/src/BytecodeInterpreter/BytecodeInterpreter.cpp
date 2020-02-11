@@ -110,7 +110,12 @@ ska::bytecode::Interpreter::Interpreter(Generator& generator, const ReservedKeyw
 }
 
 void ska::bytecode::Interpreter::interpret(ExecutionContext& node) {
-	node.generateIfNeeded(m_generator, node.currentScriptId());
+	if (!node.isGenerated(node.currentScriptId())) {
+		auto ss = std::stringstream {};
+		ss << "script id " << node.currentScriptId() << " is not bytecode-generated yet... cannot interpret !";
+		throw std::runtime_error(ss.str());
+	}
+
 	for(auto continueExecution = !node.idle(); continueExecution; continueExecution = node.incInstruction()) {
 		auto& instruction = node.currentInstruction();
 		LOG_INFO << "[Script " << node.currentScriptId() << "] Interpreting " << instruction;
@@ -122,13 +127,6 @@ void ska::bytecode::Interpreter::interpret(ExecutionContext& node) {
 			node.set(instruction.dest(), std::move(nodeValue));
 		}
 	}
-}
-
-void ska::bytecode::Interpreter::interpret(InterpretationPart target) {
-	/*
-	auto output = std::make_unique<ska::bytecode::Executor>();
-	auto context = ExecutionContext {*output, ..., ... };
-	*/
 }
 
 std::unique_ptr<ska::bytecode::Executor> ska::bytecode::Interpreter::interpret(std::size_t scriptIndex, GenerationOutput& instructions) {

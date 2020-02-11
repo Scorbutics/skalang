@@ -2,6 +2,11 @@
 #include "BytecodeScriptGeneration.h"
 #include "Generator/BytecodeGenerator.h"
 
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::ScriptGeneration);
+#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::ScriptGeneration)
+#define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::ScriptGeneration)
+#define LOG_WARN SLOG_STATIC(ska::LogLevel::Warn, ska::bytecode::ScriptGeneration)
+
 static ska::bytecode::ScriptGenerationHelper AddScript(ska::bytecode::ScriptCache& cache, std::vector<ska::Token> tokens, const std::string& name) {
 	auto ast = ska::ScriptAST{ cache.astCache, name, std::move(tokens) };
 	return { cache, ast };
@@ -26,8 +31,12 @@ std::ostream& ska::bytecode::operator<<(std::ostream& stream, const ScriptGenera
 }
 
 void ska::bytecode::ScriptGeneration::generate(ScriptCache& cache, Generator& generator) {
-	auto context = GenerationContext{ cache, m_origin.program() };
-	m_generated = generator.generatePart(context);
+	if (m_generated.empty()) {
+		auto context = GenerationContext{ cache, m_origin.program() };
+		m_generated = generator.generatePart(context);
+	} else {
+		LOG_WARN << "Script already generated";
+	}
 }
 
 std::optional<ska::bytecode::Operand> ska::bytecode::ScriptGeneration::getSymbol(const Symbol& symbol) const {
@@ -35,6 +44,10 @@ std::optional<ska::bytecode::Operand> ska::bytecode::ScriptGeneration::getSymbol
 }
 
 void ska::bytecode::ScriptGeneration::generate(InstructionOutput instructions) {
-	m_generated = std::move(instructions);
+	if (m_generated.empty()) {
+		m_generated = std::move(instructions);
+	} else {
+		LOG_WARN << "Script already generated";
+	}
 }
 
