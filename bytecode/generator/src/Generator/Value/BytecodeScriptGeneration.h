@@ -60,7 +60,7 @@ namespace ska {
 			auto end() const { return m_generated.end(); }
 
 			void generate(ScriptCache& cache, Generator& generator);
-			void generate(InstructionOutput instructions);
+			void generate(ScriptCache& cache, InstructionOutput instructions);
 
 		private:
 			friend std::ostream& operator<<(std::ostream& stream, const ScriptGeneration&);

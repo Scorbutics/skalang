@@ -24,7 +24,7 @@ ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, cons
 }
 
 void ska::bytecode::GenerationContext::generate(InstructionOutput instructions) {
-	m_script.generate(std::move(instructions));
+	m_script.generate(m_generated, std::move(instructions));
 }
 
 std::size_t ska::bytecode::GenerationContext::totalScripts() const {

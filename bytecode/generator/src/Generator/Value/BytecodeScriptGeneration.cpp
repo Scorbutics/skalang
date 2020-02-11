@@ -37,17 +37,19 @@ void ska::bytecode::ScriptGeneration::generate(ScriptCache& cache, Generator& ge
 	} else {
 		LOG_WARN << "Script already generated";
 	}
+	cache.getExportedSymbols(id());
 }
 
 std::optional<ska::bytecode::Operand> ska::bytecode::ScriptGeneration::getSymbol(const Symbol& symbol) const {
 	return m_origin.getSymbol(symbol);
 }
 
-void ska::bytecode::ScriptGeneration::generate(InstructionOutput instructions) {
+void ska::bytecode::ScriptGeneration::generate(ScriptCache& cache, InstructionOutput instructions) {
 	if (m_generated.empty()) {
 		m_generated = std::move(instructions);
 	} else {
 		LOG_WARN << "Script already generated";
 	}
+	cache.getExportedSymbols(id());
 }
 
