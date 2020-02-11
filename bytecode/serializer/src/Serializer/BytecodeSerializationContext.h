@@ -126,20 +126,20 @@ namespace ska {
 
 		struct DeserializationContext {
 			DeserializationContext(ScriptCache& cache, std::istream& input) :
-				m_id(0),
 				m_input(input),
 				m_cache(cache) {
 			}
 
-			void declare(std::string scriptName, std::vector<Instruction> instructions) {
+			void declare(std::string scriptName, std::vector<Instruction> instructions, std::vector<Operand> exports) {
 				auto output = InstructionOutput {};
 				for(auto& ins : instructions) {
 					output.push(std::move(ins));
 				}
 				auto fakeAST = ska::ScriptAST{ m_cache.astCache, scriptName, {Token {}} };
 				m_cache.emplace(scriptName, ScriptGeneration{ ScriptGenerationHelper{m_cache, fakeAST }, std::move(output)});
+				m_cache.at(scriptName).setExportedSymbols(std::move(exports));
+				m_cache.getExportedSymbols(m_cache.at(scriptName).id());
 			}
-			void exports(std::vector<Operand> exports) { m_cache[m_id].setExportedSymbols(std::move(exports)); }
 
 			void operator>>(std::size_t& value) {
 				value = 0;
@@ -256,7 +256,6 @@ namespace ska {
 			}
 
 			ScriptCache& m_cache;
-			std::size_t m_id;
 			std::istream& m_input;
 		};
 

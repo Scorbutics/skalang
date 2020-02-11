@@ -80,8 +80,7 @@ void ska::bytecode::Serializer::deserialize(DeserializationContext& context) con
 
 		if(!natives.empty()) {
 			LOG_INFO << "[Script name " << natives[static_cast<std::size_t>(scriptRef)] << "]";
-			context.declare(natives[static_cast<std::size_t>(scriptRef)], std::move(instructions));
-			context.exports(std::move(exports));
+			context.declare(natives[static_cast<std::size_t>(scriptRef)], std::move(instructions), std::move(exports));
 		}
 	}
 
@@ -96,10 +95,7 @@ void ska::bytecode::Serializer::replaceAllNativesRef(Operand& operand, const std
 
 void ska::bytecode::Serializer::replaceAllNativesRef(std::vector<Operand>& operands, const std::vector<std::string>& natives) const {
 	for (auto& operand : operands) {
-		if (operand.type() == OperandType::MAGIC) {
-			auto realValue = natives[operand.as<ScriptVariableRef>().variable];
-			operand = Operand { std::make_shared<std::string>(std::move(realValue)), OperandType::PURE };
-		}
+		replaceAllNativesRef(operand, natives);
 	}
 }
 
