@@ -44,6 +44,7 @@ const ska::bytecode::SymbolInfo* ska::bytecode::ScriptCache::getSymbolInfo(const
 }
 
 const std::vector<ska::bytecode::Operand>& ska::bytecode::ScriptCache::getExportedSymbols(std::size_t scriptIndex) {
+	// TODO : ce n'est pas à un "get" de faire tout ça...
 	if ((*this)[scriptIndex].exportedSymbols().empty()) {
 		SLOG(ska::LogLevel::Info) << "%11cGenerating exported symbols for script \"" << scriptIndex << "\"";
 		auto temporarySortedScriptSymbols = std::priority_queue<SymbolWithInfo>{};
@@ -58,6 +59,8 @@ const std::vector<ska::bytecode::Operand>& ska::bytecode::ScriptCache::getExport
 			auto exports = (*this)[scriptIndex].generateExportedSymbols(std::move(temporarySortedScriptSymbols));
 			if (exports.has_value()) {
 				(*this)[scriptIndex].setExportedSymbols(std::move(exports.value()));
+			} else {
+				SLOG(ska::LogLevel::Error) << "%11cExported symbols already set for script \"" << scriptIndex << "\" required";
 			}
 		}
 	} else {
