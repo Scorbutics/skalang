@@ -12,10 +12,13 @@
 namespace ska {
 	namespace bytecode {
 		struct SerializationContext {
-			SerializationContext(const ScriptCache& cache, std::size_t generated, std::ostream& output) :
-				m_id(generated),
+			SerializationContext(const ScriptCache& cache, std::ostream& output) :
+				m_id(0),
 				m_output(output),
 				m_cache(cache) {
+					if(m_id < m_cache.size() && m_cache[m_id].program().isBridged()) {
+						next();
+					}
 			}
 
 			auto begin() const { return m_cache[m_id].begin(); }
@@ -24,8 +27,11 @@ namespace ska {
 			const auto& exports() const { return m_cache[m_id].exportedSymbols(); }
 
 			bool next() {
-				pushNatives();
+				if (!m_cache[m_id].program().isBridged()) {
+					pushNatives();
+				}
 				m_id++;
+				while (m_id < m_cache.size() && m_cache[m_id].program().isBridged()) { m_id++; }
 			 return m_id < m_cache.size();
 			}
 

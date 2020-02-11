@@ -24,6 +24,7 @@ void ska::bytecode::Serializer::serialize(SerializationContext& context) const {
 		LOG_INFO << "Export serializing : " << exports.size();
 		for (const auto& exp : exports) {
 			if(!exp.empty()) {
+				LOG_INFO << exp;
 				context << exp;
 			}
 		}
@@ -108,7 +109,7 @@ void ska::bytecode::Serializer::replaceAllNativesRef(std::vector<Instruction>& i
 }
 
 void ska::bytecode::Serializer::serialize(const ScriptCache& cache, std::ostream& output) const {
-	auto context = SerializationContext { cache, 0, output };
+	auto context = SerializationContext { cache, output };
 	serialize(context);
 }
 
