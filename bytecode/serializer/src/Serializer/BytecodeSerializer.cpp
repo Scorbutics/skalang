@@ -11,66 +11,76 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Serializer);
 void ska::bytecode::Serializer::serialize(SerializationContext& context) const {
 	do {
 		LOG_INFO << "[Script " << context.currentScriptName() << "]";
-		context << context.currentScriptName();
 		context << SERIALIZER_VERSION;
+		context << context.currentScriptName();
+		context << context.currentScriptId();
+		context << static_cast<std::size_t>(context.currentScriptBridged());
 
-		for (const auto& instruction : context) {
-			LOG_DEBUG << "Serializing " << instruction;
-			context << instruction;
-		}
-		context << Instruction{ Command::NOP, std::vector<Operand>{} };
-
-		const auto& exports = context.exports();
-		LOG_INFO << "Export serializing : " << exports.size();
-		for (const auto& exp : exports) {
-			if(!exp.empty()) {
-				LOG_INFO << exp;
-				context << exp;
+		if (!context.currentScriptBridged()) {
+			for (const auto& instruction : context) {
+				LOG_DEBUG << "Serializing " << instruction;
+				context << instruction;
 			}
-		}
-		context << Operand{};
+			context << Instruction{ Command::NOP, std::vector<Operand>{} };
 
+			const auto& exports = context.exports();
+			LOG_INFO << "Export serializing : " << exports.size();
+			for (const auto& exp : exports) {
+				if(!exp.empty()) {
+					LOG_INFO << exp;
+					context << exp;
+				}
+			}
+			context << Operand{};
+		}
 	} while (context.next());
 
 }
 
 void ska::bytecode::Serializer::deserialize(DeserializationContext& context) const {
 	while(context.canRead()) {
-		auto nativesRef = std::vector<std::size_t>{};
-		auto scriptRef = Chunk {};
+
+		auto scriptNameRef = Chunk {};
 		auto serializerVersion = std::size_t {};
-		context >> scriptRef;
+		auto scriptId = std::size_t {};
+		auto scriptBridged = std::size_t {};
 		context >> serializerVersion;
-		nativesRef.push_back(std::move(scriptRef));
+		context >> scriptNameRef;
+		context >> scriptId;
+		context >> scriptBridged;
 
 		LOG_INFO << "[Serializer script version " << serializerVersion << "]";
 
 		auto instructions = std::vector<Instruction>{};
-		auto command = Command{};
-		do {
-			auto instruction = Instruction{};
-			context >> instruction;
-			command = instruction.command();
-			if (command != Command::NOP) {
-				LOG_INFO << "Deserializing " << instruction;
-				instructions.push_back(std::move(instruction));
-			}
-		} while (command != Command::NOP);
-
-		LOG_INFO << "Exports section ";
-
 		auto exports = std::vector<Operand>{};
-		auto operandType = OperandType {};
-		do {
-			auto operand = Operand{};
-			context >> operand;
-			operandType = operand.type();
-			if (!operand.empty()) {
-				LOG_INFO << "Getting export " << operand;
-				exports.push_back(std::move(operand));
-			}
-		} while (operandType != OperandType::EMPTY);
 
+		if (!scriptBridged) {
+
+			auto command = Command{};
+			do {
+				auto instruction = Instruction{};
+				context >> instruction;
+				command = instruction.command();
+				if (command != Command::NOP) {
+					LOG_INFO << "Deserializing " << instruction;
+					instructions.push_back(std::move(instruction));
+				}
+			} while (command != Command::NOP);
+
+			LOG_INFO << "Exports section ";
+
+			auto operandType = OperandType {};
+			do {
+				auto operand = Operand{};
+				context >> operand;
+				operandType = operand.type();
+				if (!operand.empty()) {
+					LOG_INFO << "Getting export " << operand;
+					exports.push_back(std::move(operand));
+				}
+			} while (operandType != OperandType::EMPTY);
+
+		}
 		LOG_INFO << "Natives section ";
 
 		auto natives = std::vector<std::string>{};
@@ -80,8 +90,8 @@ void ska::bytecode::Serializer::deserialize(DeserializationContext& context) con
 		replaceAllNativesRef(exports, natives);
 
 		if(!natives.empty()) {
-			LOG_INFO << "[Script name " << natives[static_cast<std::size_t>(scriptRef)] << "]";
-			context.declare(natives[static_cast<std::size_t>(scriptRef)], std::move(instructions), std::move(exports));
+			LOG_INFO << "[Script name " << natives[static_cast<std::size_t>(scriptNameRef)] << " with id " << scriptId << "]";
+			context.declare(scriptId, natives[static_cast<std::size_t>(scriptNameRef)], std::move(instructions), std::move(exports));
 		}
 	}
 

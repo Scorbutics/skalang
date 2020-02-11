@@ -39,6 +39,7 @@ namespace ska {
 			private UniqueSymbolGetter<'V'>{
 			using VariableGetter = UniqueSymbolGetter<'V'>;
 		public:
+			ScriptGenerationHelper(std::size_t index, const ScriptAST& script);
 			ScriptGenerationHelper(ScriptCache& cache, const ScriptAST& script);
 			ScriptGenerationHelper(ScriptCache& cache, StatementParser& parser, const std::string& scriptName, std::vector<Token> tokens);
 

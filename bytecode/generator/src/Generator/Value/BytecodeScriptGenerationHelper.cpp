@@ -6,6 +6,11 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::ScriptGenerationHelper);
 
+ska::bytecode::ScriptGenerationHelper::ScriptGenerationHelper(std::size_t index, const ScriptAST& script) {
+	m_script = script.handle();
+	m_index = index;
+}
+
 ska::bytecode::ScriptGenerationHelper::ScriptGenerationHelper(ScriptCache& cache, const ScriptAST& script) {
 	const auto& name = script.name();
   /*if (cache.find(name) != cache.end()) {

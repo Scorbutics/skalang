@@ -16,9 +16,6 @@ namespace ska {
 				m_id(0),
 				m_output(output),
 				m_cache(cache) {
-					if(m_id < m_cache.size() && m_cache[m_id].program().isBridged()) {
-						next();
-					}
 			}
 
 			auto begin() const { return m_cache[m_id].begin(); }
@@ -27,16 +24,14 @@ namespace ska {
 			const auto& exports() const { return m_cache[m_id].exportedSymbols(); }
 
 			bool next() {
-				if (!m_cache[m_id].program().isBridged()) {
-					pushNatives();
-				}
+				pushNatives();
 				m_id++;
-				while (m_id < m_cache.size() && m_cache[m_id].program().isBridged()) { m_id++; }
 			 return m_id < m_cache.size();
 			}
 
 			const std::string& currentScriptName() const { return m_cache[m_id].name(); }
 			std::size_t currentScriptId() const { return m_id; }
+			bool currentScriptBridged() const { return m_cache[m_id].program().isBridged(); }
 
 			std::ostream& operator<<(std::size_t value) {
 				m_output.write(reinterpret_cast<const char*>(&value), sizeof(uint32_t));
@@ -136,15 +131,14 @@ namespace ska {
 				m_cache(cache) {
 			}
 
-			void declare(std::string scriptName, std::vector<Instruction> instructions, std::vector<Operand> exports) {
+			void declare(std::size_t scriptId, std::string scriptName, std::vector<Instruction> instructions, std::vector<Operand> exports) {
 				auto output = InstructionOutput {};
 				for(auto& ins : instructions) {
 					output.push(std::move(ins));
 				}
-				auto fakeAST = ska::ScriptAST{ m_cache.astCache, scriptName, {Token {}} };
-				m_cache.emplace(scriptName, ScriptGeneration{ ScriptGenerationHelper{m_cache, fakeAST }, std::move(output)});
+				auto fakeAST = ska::ScriptAST{ m_cache.astCache, scriptName, {Token {}}, 0, scriptId };
+				m_cache.force(scriptId, scriptName, ScriptGeneration{ ScriptGenerationHelper{scriptId, fakeAST }, std::move(output)});
 				m_cache.at(scriptName).setExportedSymbols(std::move(exports));
-				m_cache.getExportedSymbols(m_cache.at(scriptName).id());
 			}
 
 			void operator>>(std::size_t& value) {

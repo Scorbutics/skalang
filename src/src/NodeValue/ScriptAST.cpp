@@ -7,12 +7,16 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptAST)
 
-ska::ScriptAST::ScriptAST(ScriptCacheAST& scriptCache, const std::string& name, std::vector<Token> input, std::size_t startIndex) :
+ska::ScriptAST::ScriptAST(ScriptCacheAST& scriptCache, const std::string& name, std::vector<Token> input, std::size_t startIndex, std::size_t scriptId) :
 	m_cache(&scriptCache) {
 	if(m_cache->find(name) == m_cache->end()) {
 		auto handle = std::unique_ptr<ScriptHandleAST>(new ScriptHandleAST{ *m_cache, std::move(input), startIndex, name });
 		SLOG(LogLevel::Info) << "Adding script AST " << name << " in cache";
-		m_cache->emplace(name, std::move(handle), true);
+		if (scriptId == std::numeric_limits<std::size_t>::max()) {
+			m_cache->emplace(name, std::move(handle), true);
+		} else {
+			m_cache->force(scriptId, name, std::move(handle));
+		}
 	} else {
 		SLOG(LogLevel::Info) << "Script AST " << name << " is already in cache";
 		m_inCache = true;

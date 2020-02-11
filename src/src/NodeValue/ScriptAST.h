@@ -16,7 +16,7 @@ namespace ska {
 			m_handle = &handle;
 		}
 
-		ScriptAST(ScriptCacheAST& scriptCache, const std::string& name, std::vector<Token> input, std::size_t startIndex = 0);
+		ScriptAST(ScriptCacheAST& scriptCache, const std::string& name, std::vector<Token> input, std::size_t startIndex = 0, std::size_t scriptId = std::numeric_limits<std::size_t>::max());
 		virtual ~ScriptAST() = default;
 	
 		bool existsInCache(const std::string& name) const {
