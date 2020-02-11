@@ -56,7 +56,7 @@ const std::vector<ska::bytecode::Operand>& ska::bytecode::ScriptCache::getExport
 
 		if (!temporarySortedScriptSymbols.empty()) {
 			auto exports = (*this)[scriptIndex].generateExportedSymbols(std::move(temporarySortedScriptSymbols));
-			if (!exports.has_value()) {
+			if (exports.has_value()) {
 				(*this)[scriptIndex].setExportedSymbols(std::move(exports.value()));
 			}
 		}
