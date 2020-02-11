@@ -80,17 +80,14 @@ int main(int argc, char* argv[]) {
 	};
 
 	try {
-		std::cout << "tototo" << std::endl;
-
 		auto serializer = ska::bytecode::Serializer{};
 		std::ifstream inputBytecode { "bytecode.out", std::ofstream::binary};
-		const auto shouldSerialize = inputBytecode.fail();
+		const auto shouldSerialize = true;//inputBytecode.fail();
 		if(!shouldSerialize) {
 			std::cout << "DESERIALIZATION STARTED" << std::endl;
 			serializer.deserialize(mainCache, inputBytecode);
-			inputBytecode.close();
 		}
-
+		inputBytecode.close();
 
 		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);
 		auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
