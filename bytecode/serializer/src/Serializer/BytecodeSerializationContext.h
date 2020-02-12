@@ -16,7 +16,7 @@ namespace ska {
 			SerializationContext(const ScriptCache& cache, SerializationStrategy strategy) :
 				m_strategy(std::move(strategy)),
 				m_cache(cache),
-				m_output(&m_strategy(m_id)) {
+				m_output(&m_strategy(cache[m_id].name())) {
 			}
 
 			auto begin() const { return m_cache[m_id].begin(); }
@@ -27,11 +27,15 @@ namespace ska {
 			bool next() {
 				pushNatives();
 				m_id++;
-				m_output = &m_strategy(m_id);
-				return m_id < m_cache.size();
+				if (m_id < m_cache.size()) {
+					m_output = &m_strategy(m_cache[m_id].name());
+					return true;
+				}
+				return false;
 			}
 
 			const std::string& currentScriptName() const { return m_cache[m_id].name(); }
+			const std::string scriptName(std::size_t id) const { return m_cache[id].name(); }
 			std::size_t currentScriptId() const { return m_id; }
 			bool currentScriptBridged() const { return m_cache[m_id].program().isBridged(); }
 
@@ -129,8 +133,9 @@ namespace ska {
 		};
 
 		struct DeserializationContext {
-			DeserializationContext(ScriptCache& cache, DeserializationStrategy strategy) :
+			DeserializationContext(ScriptCache& cache, std::string scriptStartName, DeserializationStrategy strategy) :
 				m_strategy(std::move(strategy)),
+				m_scriptStartName(std::move(scriptStartName)),
 				m_cache(cache) {
 			}
 
@@ -237,8 +242,10 @@ namespace ska {
 				value = Operand{ std::move(content), operandType };
 			}
 
-			bool read(std::size_t scriptId) {
-				try { m_input = &m_strategy(scriptId); return !m_input->eof(); }
+			const std::string& startScriptName() const { return m_scriptStartName; }
+
+			bool read(const std::string& scriptName) {
+				try { m_input = &m_strategy(scriptName); return !m_input->eof(); }
 				catch (std::runtime_error&) { return false; }
 			}
 
@@ -269,6 +276,7 @@ namespace ska {
 			}
 
 			ScriptCache& m_cache;
+			std::string m_scriptStartName;
 			DeserializationStrategy m_strategy;
 			std::istream* m_input = nullptr;
 		};

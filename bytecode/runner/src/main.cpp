@@ -55,6 +55,8 @@ int main(int argc, char* argv[]) {
 	if(inputFile.fail()) {
 		std::cout << "File not found : \"" << argv[1] << std::endl;
 		return -1;
+	} else {
+		inputFile.close();
 	}
 
 	const auto reservedKeywords = ska::ReservedKeywordsPool{};
@@ -81,7 +83,7 @@ int main(int argc, char* argv[]) {
 
 	try {
 		auto serializer = ska::bytecode::Serializer{};
-		assert(serializer.deserialize(mainCache, ska::bytecode::DeserializationStrategyType::PerScript()));
+		auto wasWritten = serializer.deserialize(mainCache, "main", ska::bytecode::DeserializationStrategyType::PerScript());
 
 		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);
 		auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
@@ -92,7 +94,9 @@ int main(int argc, char* argv[]) {
 		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
 		auto& gen = generator.generate(mainCache, std::move(script));
 
-		//assert(serializer.serialize(mainCache, ska::bytecode::SerializationStrategyType::PerScript()));
+		if (!wasWritten) {
+			assert(serializer.serialize(mainCache, ska::bytecode::SerializationStrategyType::PerScript()));
+		}
 
 		auto interpreted = interpreter.interpret(gen.id(), mainCache);
 	} catch (std::exception& e) {

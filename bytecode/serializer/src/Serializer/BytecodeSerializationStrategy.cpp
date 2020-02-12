@@ -2,30 +2,29 @@
 #include "BytecodeSerializationStrategy.h"
 
 template <class T>
-T& build(std::size_t scriptId) {
-	static std::vector<T> tabs;
-	if (scriptId >= tabs.size()) {
-		tabs.resize(tabs.size() + 1);
-		auto scriptName = "bytecode_" + std::to_string(scriptId);
-		tabs[scriptId].open(scriptName, std::iostream::binary);
-		if (tabs[scriptId].fail()) {
-			throw std::runtime_error("opening file " + scriptName + " failed");
+T& build(const std::string& scriptName) {
+	auto bytecodeScriptName = scriptName + "b";
+	static auto tabs = std::unordered_map<std::string, T> {};
+	auto tabFound = tabs.find(bytecodeScriptName);
+	if (tabFound == tabs.end()) {
+		tabFound = tabs.emplace(bytecodeScriptName, T{}).first;
+		tabFound->second.open(bytecodeScriptName, std::iostream::binary);
+		if (tabFound->second.fail()) {
+			throw std::runtime_error("opening file " + bytecodeScriptName + " failed");
 		}
 	}
-	return tabs[scriptId];
+	return tabFound->second;
 }
 
 ska::bytecode::SerializationStrategy ska::bytecode::SerializationStrategyType::PerScript() {
-	static auto result = [](std::size_t scriptId) -> std::ofstream& {
-		return build<std::ofstream>(scriptId);
+	return [](const std::string& scriptName) -> std::ofstream& {
+		return build<std::ofstream>(scriptName);
 	};
-	return result;
 }
 
 ska::bytecode::DeserializationStrategy ska::bytecode::DeserializationStrategyType::PerScript() {
-	static auto result = [](std::size_t scriptId) -> std::ifstream& {
-		return build<std::ifstream>(scriptId);
+	return [](const std::string& scriptName) -> std::ifstream& {
+		return build<std::ifstream>(scriptName);
 	};
-	return result;
 }
 
