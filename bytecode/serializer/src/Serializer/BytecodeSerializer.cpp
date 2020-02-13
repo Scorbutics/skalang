@@ -69,7 +69,7 @@ bool ska::bytecode::Serializer::deserialize(DeserializationContext& context) con
 		context >> scriptId;
 		context >> scriptBridged;
 
-		LOG_INFO << "[Serializer script version " << serializerVersion << "]";
+		LOG_INFO << "[Serializer script version " << serializerVersion << "], script id " << scriptId;
 
 		auto instructions = std::vector<Instruction>{};
 		auto exports = std::vector<Operand>{};
@@ -107,7 +107,7 @@ bool ska::bytecode::Serializer::deserialize(DeserializationContext& context) con
 			auto scriptRef = Chunk{};
 			for(std::size_t i = 0; i < linkedScriptsRefSize; i++) {
 				context >> scriptRef;
-				LOG_INFO << "Getting script " << scriptRef;
+				LOG_INFO << "Getting script name ref " << scriptRef;
 				linkedScriptsRef.push_back(scriptRef);
 			}
 
@@ -123,19 +123,20 @@ bool ska::bytecode::Serializer::deserialize(DeserializationContext& context) con
 			scripts.emplace(natives[linkedScriptRef]);
 		}
 
+		scripts.erase(scriptName);
+
 		if (!natives.empty()) {
 			scriptName = natives[static_cast<std::size_t>(scriptNameRef)];
-			scripts.erase(scriptName);
 			LOG_INFO << "[Script name " << scriptName << " with id " << scriptId << "]";
 			context.declare(scriptId, scriptName, std::move(instructions), std::move(exports));
-			auto nextScriptIt = scripts.begin();
-			if (nextScriptIt == scripts.end()) {
-				break;
-			}
-			scriptName = *nextScriptIt;
-		} else {
-			scriptName = "";
 		}
+
+		auto nextScriptIt = scripts.begin();
+		if (nextScriptIt == scripts.end()) {
+			LOG_INFO << "No more scripts, leaving deserialization";
+			break;
+		}
+		scriptName = *nextScriptIt;
 	}
 	return wasRead;
 }
