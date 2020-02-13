@@ -1,4 +1,51 @@
+#include "Config/LoggerConfigLang.h"
 #include "BytecodeSerializationContext.h"
+
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::SerializationContext);
+
+#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::SerializationContext)
+#define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::SerializationContext)
+
+void ska::bytecode::SerializationContext::writeHeader(std::size_t serializerVersion) {
+	(*this) << serializerVersion;
+	(*this) << currentScriptName();
+	(*this) << currentScriptId();
+	(*this) << static_cast<std::size_t>(currentScriptBridged());
+}
+
+std::vector<std::string> ska::bytecode::SerializationContext::writeInstructions() {
+	auto linkedScripts = std::vector<std::string>{};
+	for (const auto& instruction : (*this)) {
+		LOG_DEBUG << "Serializing " << instruction;
+		if (instruction.command() == Command::SCRIPT) {
+			linkedScripts.push_back(scriptName(instruction.left().as<ScriptVariableRef>().variable));
+		}
+		(*this) << instruction;
+	}
+	(*this) << Instruction{ Command::NOP, std::vector<Operand>{} };
+	return linkedScripts;
+}
+
+void ska::bytecode::SerializationContext::writeExternalReferences(std::vector<std::string> linkedScripts) {
+	(*this) << linkedScripts.size();
+	for (const auto& linkedScript : linkedScripts) {
+		LOG_INFO << linkedScript;
+		(*this) << linkedScript;
+	}
+}
+
+void ska::bytecode::SerializationContext::writeExports() {
+	auto& exports = m_cache[m_id].exportedSymbols();
+	LOG_INFO << "Export serializing : " << exports.size();
+	for (const auto& exp : exports) {
+		if (!exp.empty()) {
+			LOG_INFO << exp;
+			(*this) << exp;
+		}
+	}
+	(*this) << Operand{};
+}
+
 
 std::ostream& ska::bytecode::SerializationContext::operator<<(std::size_t value) {
 	m_output->write(reinterpret_cast<const char*>(&value), sizeof(uint32_t));

@@ -18,39 +18,12 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Serializer);
 bool ska::bytecode::Serializer::serialize(SerializationContext& context) const {
 	try {
 		do {
-			LOG_INFO << "[Script " << context.currentScriptName() << "]";
-			context << SERIALIZER_VERSION;
-			context << context.currentScriptName();
-			context << context.currentScriptId();
-			context << static_cast<std::size_t>(context.currentScriptBridged());
+			context.writeHeader(SERIALIZER_VERSION);
 
 			if (!context.currentScriptBridged()) {
-				auto linkedScripts = std::vector<std::string>{};
-				for (const auto& instruction : context) {
-					LOG_DEBUG << "Serializing " << instruction;
-					if (instruction.command() == Command::SCRIPT) {
-						linkedScripts.push_back(context.scriptName(instruction.left().as<ScriptVariableRef>().variable));
-					}
-					context << instruction;
-				}
-				context << Instruction{ Command::NOP, std::vector<Operand>{} };
-
-				const auto& exports = context.exports();
-				LOG_INFO << "Export serializing : " << exports.size();
-				for (const auto& exp : exports) {
-					if (!exp.empty()) {
-						LOG_INFO << exp;
-						context << exp;
-					}
-				}
-				context << Operand{};
-
-				LOG_INFO << "Linked scripts serializing : " << exports.size();
-				context << linkedScripts.size();
-				for (const auto& linkedScript : linkedScripts) {
-					LOG_INFO << linkedScript;
-					context << linkedScript;
-				}
+				auto linkedScripts = context.writeInstructions();
+				context.writeExports();
+				context.writeExternalReferences(std::move(linkedScripts));
 			}
 		} while (context.next());
 		return true;
@@ -95,27 +68,6 @@ bool ska::bytecode::Serializer::deserialize(DeserializationContext& context) con
 		scriptName = *nextScriptIt;
 	}
 	return wasRead;
-}
-
-void ska::bytecode::Serializer::replaceAllNativesRef(Operand& operand, const std::vector<std::string>& natives) const {
-	if (operand.type() == OperandType::MAGIC) {
-		auto realValue = natives[operand.as<ScriptVariableRef>().variable];
-		operand = Operand{ std::make_shared<std::string>(std::move(realValue)), OperandType::PURE };
-	}
-}
-
-void ska::bytecode::Serializer::replaceAllNativesRef(std::vector<Operand>& operands, const std::vector<std::string>& natives) const {
-	for (auto& operand : operands) {
-		replaceAllNativesRef(operand, natives);
-	}
-}
-
-void ska::bytecode::Serializer::replaceAllNativesRef(std::vector<Instruction>& instructions, const std::vector<std::string>& natives) const {
-	for (auto& instruction : instructions) {
-		replaceAllNativesRef(instruction.dest(), natives);
-		replaceAllNativesRef(instruction.left(), natives);
-		replaceAllNativesRef(instruction.right(), natives);
-	}
 }
 
 bool ska::bytecode::Serializer::serialize(const ScriptCache& cache, SerializationStrategy output) const {

@@ -19,11 +19,6 @@ namespace ska {
 				m_output(&m_strategy(cache[m_id].name())) {
 			}
 
-			auto begin() const { return m_cache[m_id].begin(); }
-			auto end() const { return m_cache[m_id].end(); }
-
-			const auto& exports() const { return m_cache[m_id].exportedSymbols(); }
-
 			bool next() {
 				pushNatives();
 				m_id++;
@@ -34,18 +29,26 @@ namespace ska {
 				return false;
 			}
 
+			bool currentScriptBridged() const { return m_cache[m_id].program().isBridged(); }
+
+			void writeHeader(std::size_t serializerVersion);
+			std::vector<std::string> writeInstructions();
+			void writeExports();
+			void writeExternalReferences(std::vector<std::string> linkedScripts);
+
+		private:
 			const std::string& currentScriptName() const { return m_cache[m_id].name(); }
 			const std::string scriptName(std::size_t id) const { return m_cache[id].name(); }
 			std::size_t currentScriptId() const { return m_id; }
-			bool currentScriptBridged() const { return m_cache[m_id].program().isBridged(); }
+			void pushNatives();
+
+			auto begin() const { return m_cache[m_id].begin(); }
+			auto end() const { return m_cache[m_id].end(); }
 
 			std::ostream& operator<<(std::size_t value);
 			std::ostream& operator<<(std::string value);
 			std::ostream& operator<<(const Instruction& value);
 			std::ostream& operator<<(const Operand& value);
-
-		private:
-			void pushNatives();
 
 			const ScriptCache& m_cache;
 			std::size_t m_id = 0;
