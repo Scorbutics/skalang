@@ -33,3 +33,5 @@ LogError.txt
 **/*.dir
 *.dir
 *.log.txt
+/bytecode/runner/mainb
+*.miniskab
