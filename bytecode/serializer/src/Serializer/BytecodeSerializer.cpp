@@ -1,6 +1,12 @@
-#include <unordered_set>
 #include "Config/LoggerConfigLang.h"
+#include <unordered_set>
 #include "BytecodeSerializer.h"
+#include "BytecodeSerializationContext.h"
+#include "BytecodeDeserializationContext.h"
+
+#include "BytecodeScriptHeader.h"
+#include "BytecodeScriptBody.h"
+#include "BytecodeScriptExternalReferences.h"
 
 static constexpr std::size_t SERIALIZER_VERSION = 1;
 
@@ -59,77 +65,27 @@ bool ska::bytecode::Serializer::deserialize(DeserializationContext& context) con
 	auto wasRead = false;
 	while (context.read(scriptName)) {
 		wasRead = true;
-		auto scriptNameRef = Chunk{};
-		auto serializerVersion = std::size_t{};
+		
+		auto header = ScriptHeader{};
+		context >> header;
 
-		auto scriptBridged = std::size_t{};
-		auto scriptId = std::size_t{ 0 };
-		context >> serializerVersion;
-		context >> scriptNameRef;
-		context >> scriptId;
-		context >> scriptBridged;
+		LOG_INFO << "[Serializer script version " << header.serializerVersion << "], script id " << header.scriptId;
 
-		LOG_INFO << "[Serializer script version " << serializerVersion << "], script id " << scriptId;
-
-		auto instructions = std::vector<Instruction>{};
-		auto exports = std::vector<Operand>{};
-		auto linkedScriptsRef = std::vector<Chunk>{};
-
-		if (!scriptBridged) {
-
-			auto command = Command{};
-			do {
-				auto instruction = Instruction{};
-				context >> instruction;
-				command = instruction.command();
-				if (command != Command::NOP) {
-					LOG_INFO << "Deserializing " << instruction;
-					instructions.push_back(std::move(instruction));
-				}
-			} while (command != Command::NOP);
-
-			LOG_INFO << "Exports section ";
-
-			auto operandType = OperandType{};
-			do {
-				auto operand = Operand{};
-				context >> operand;
-				operandType = operand.type();
-				if (!operand.empty()) {
-					LOG_INFO << "Getting export " << operand;
-					exports.push_back(std::move(operand));
-				}
-			} while (operandType != OperandType::EMPTY);
-
-			auto linkedScriptsRefSize = std::size_t{};
-			context >> linkedScriptsRefSize;
-			LOG_INFO << "Linked scripts section : " << linkedScriptsRefSize;
-			auto scriptRef = Chunk{};
-			for(std::size_t i = 0; i < linkedScriptsRefSize; i++) {
-				context >> scriptRef;
-				LOG_INFO << "Getting script name ref " << scriptRef;
-				linkedScriptsRef.push_back(scriptRef);
-			}
-
+		auto body = ScriptBody{};
+		if (!header.scriptBridged) {
+			context >> body;
 		}
-		LOG_INFO << "Natives section ";
 
-		auto natives = std::vector<std::string>{};
-		context >> natives;
+		auto externalReferences = ScriptExternalReferences { header, body };
+		context >> externalReferences;
 
-		replaceAllNativesRef(instructions, natives);
-		replaceAllNativesRef(exports, natives);
-		for (const auto& linkedScriptRef : linkedScriptsRef) {
-			scripts.emplace(natives[linkedScriptRef]);
-		}
+		std::copy(externalReferences.scripts.begin(), externalReferences.scripts.end(), std::inserter(scripts, scripts.end()));
+		scriptName = header.scriptName;
 
 		scripts.erase(scriptName);
 
-		if (!natives.empty()) {
-			scriptName = natives[static_cast<std::size_t>(scriptNameRef)];
-			LOG_INFO << "[Script name " << scriptName << " with id " << scriptId << "]";
-			context.declare(scriptId, scriptName, std::move(instructions), std::move(exports));
-		}
+		LOG_INFO << "[Script name " << scriptName << " with id " << header.scriptId << "]";
+		context.declare(header.scriptId, scriptName, std::move(body.instructions), std::move(body.exports));
 
 		auto nextScriptIt = scripts.begin();
 		if (nextScriptIt == scripts.end()) {

@@ -3,11 +3,16 @@
 #include <memory>
 #include <vector>
 #include "NodeValue/ASTNodePtr.h"
-#include "BytecodeSerializationContext.h"
+#include "BytecodeSerializationStrategy.h"
+#include "Generator/Value/BytecodeInstruction.h"
+#include "Generator/Value/BytecodeOperand.h"
 
 namespace ska {
 
 	namespace bytecode {
+		struct DeserializationContext;
+		struct SerializationContext;
+		class ScriptCache;
 
 		class Serializer {
 		public:
