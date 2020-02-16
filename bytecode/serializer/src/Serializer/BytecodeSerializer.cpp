@@ -18,12 +18,29 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Serializer);
 bool ska::bytecode::Serializer::serialize(SerializationContext& context) const {
 	try {
 		do {
+			//TODO : sorting strategy
+			auto parts = std::vector<std::stringstream>{};
 			context.writeHeader(SERIALIZER_VERSION);
 
 			if (!context.currentScriptBridged()) {
 				auto linkedScripts = context.writeInstructions();
 				context.writeExports();
 				context.writeExternalReferences(std::move(linkedScripts));
+				
+				parts.push_back(context.pop());
+				parts.push_back(context.pop());
+				parts.push_back(context.pop());
+				
+			}
+			parts.push_back(context.pop());
+			
+			context.push(std::move(parts.back()));
+			parts.pop_back();
+
+			if (!parts.empty()) {
+				context.push(std::move(parts[0]));
+				context.push(std::move(parts[2]));
+				context.push(std::move(parts[1]));
 			}
 		} while (context.next());
 		return true;

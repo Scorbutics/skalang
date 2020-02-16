@@ -23,6 +23,7 @@ std::vector<std::string> ska::bytecode::SerializationContext::writeInstructions(
 		(*this) << instruction;
 	}
 	(*this) << Instruction{ Command::NOP, std::vector<Operand>{} };
+	push({});
 	return linkedScripts;
 }
 
@@ -32,6 +33,7 @@ void ska::bytecode::SerializationContext::writeExternalReferences(std::vector<st
 		LOG_INFO << linkedScript;
 		(*this) << linkedScript;
 	}
+	push({});
 }
 
 void ska::bytecode::SerializationContext::writeExports() {
@@ -44,51 +46,48 @@ void ska::bytecode::SerializationContext::writeExports() {
 		}
 	}
 	(*this) << Operand{};
+	push({});
 }
 
-
-std::ostream& ska::bytecode::SerializationContext::operator<<(std::size_t value) {
-	m_output->write(reinterpret_cast<const char*>(&value), sizeof(uint32_t));
-	return *m_output;
+void ska::bytecode::SerializationContext::operator<<(std::size_t value) {
+	buffer().write(reinterpret_cast<const char*>(&value), sizeof(uint32_t));
 }
 
-std::ostream& ska::bytecode::SerializationContext::operator<<(std::string value) {
+void ska::bytecode::SerializationContext::operator<<(std::string value) {
 	const Chunk refIndex = m_natives.size();
-	m_output->write(reinterpret_cast<const char*>(&refIndex), sizeof(Chunk));
+	buffer().write(reinterpret_cast<const char*>(&refIndex), sizeof(Chunk));
 	m_natives.push_back(std::move(value));
-	return *m_output;
 }
 
-std::ostream& ska::bytecode::SerializationContext::operator<<(const Instruction& value) {
+void ska::bytecode::SerializationContext::operator<<(const Instruction& value) {
 	uint16_t cmd = static_cast<uint16_t>(value.command());
 	uint8_t numberOfValidOperands = !value.dest().empty() + !value.left().empty() + !value.right().empty();
-	m_output->write(reinterpret_cast<const char*>(&cmd), sizeof(uint16_t));
-	m_output->write(reinterpret_cast<const char*>(&numberOfValidOperands), sizeof(uint8_t));
+	buffer().write(reinterpret_cast<const char*>(&cmd), sizeof(uint16_t));
+	buffer().write(reinterpret_cast<const char*>(&numberOfValidOperands), sizeof(uint8_t));
 
-	if (numberOfValidOperands-- > 0) *this << value.dest(); else return *m_output;
-	if (numberOfValidOperands-- > 0) *this << value.left(); else return *m_output;
+	if (numberOfValidOperands-- > 0) *this << value.dest(); else return;
+	if (numberOfValidOperands-- > 0) *this << value.left(); else return;
 	if (numberOfValidOperands-- > 0) *this << value.right();
-	return *m_output;
 }
 
-std::ostream& ska::bytecode::SerializationContext::operator<<(const Operand& value) {
+void ska::bytecode::SerializationContext::operator<<(const Operand& value) {
 	uint8_t type = static_cast<uint8_t>(OperandType::EMPTY);
 	Chunk script { 0 };
 	Chunk variable { 0 };
 
 	if (value.empty()) {
-		m_output->write(reinterpret_cast<const char*>(&type), sizeof(uint8_t));
+		buffer().write(reinterpret_cast<const char*>(&type), sizeof(uint8_t));
 		char empty[sizeof(Chunk) * 2] = "";
-		m_output->write(empty, sizeof(empty));
-		return *m_output;
+		buffer().write(empty, sizeof(empty));
+		return;
 	}
 
 	const auto& content = value.content();
 	if (std::holds_alternative<StringShared>(content)) {
 		type = static_cast<uint8_t>(OperandType::PURE);
 		script = 0;
-		m_output->write(reinterpret_cast<const char*>(&type), sizeof(uint8_t));
-		m_output->write(reinterpret_cast<const char*>(&script), sizeof(Chunk));
+		buffer().write(reinterpret_cast<const char*>(&type), sizeof(uint8_t));
+		buffer().write(reinterpret_cast<const char*>(&script), sizeof(Chunk));
 		*this << *std::get<StringShared>(content);
 	} else {
 		type = static_cast<uint8_t>(value.type());
@@ -110,24 +109,46 @@ std::ostream& ska::bytecode::SerializationContext::operator<<(const Operand& val
 			}
 		}, content);
 
-		m_output->write(reinterpret_cast<const char*>(&type), sizeof(uint8_t));
-		m_output->write(reinterpret_cast<const char*>(&script), sizeof(Chunk));
-		m_output->write(reinterpret_cast<const char*>(&variable), sizeof(Chunk));
+		buffer().write(reinterpret_cast<const char*>(&type), sizeof(uint8_t));
+		buffer().write(reinterpret_cast<const char*>(&script), sizeof(Chunk));
+		buffer().write(reinterpret_cast<const char*>(&variable), sizeof(Chunk));
 	}
-	return *m_output;
+}
+
+void ska::bytecode::SerializationContext::commit() {
+	for (auto& buf : m_buffer) {
+		(*m_output) << buf.rdbuf();
+	}
+	m_bufferIndex = 0;
+	m_buffer.clear();
+}
+
+std::stringstream ska::bytecode::SerializationContext::pop() {
+	if (m_buffer.empty()) {
+		throw std::runtime_error("no more buffer");
+	}
+	auto result = std::move(buffer());
+	m_bufferIndex--;
+	m_buffer.pop_back();
+	return result;
+}
+
+void ska::bytecode::SerializationContext::push(std::stringstream data) {
+	m_buffer.push_back(std::move(data));
+	m_bufferIndex++;
 }
 
 void ska::bytecode::SerializationContext::pushNatives() {
 	for (auto& native : m_natives) {
 		if (! native.empty()) {
 			const std::size_t size = native.size();
-			m_output->write(reinterpret_cast<const char*>(&size), sizeof(Chunk));
+			buffer().write(reinterpret_cast<const char*>(&size), sizeof(Chunk));
 			if (size > 0) {
-				m_output->write(native.c_str(), sizeof(char) * size);
+				buffer().write(native.c_str(), sizeof(char) * size);
 			}
 		}
 	}
 	char empty[sizeof(Chunk)] = "";
-	m_output->write(empty, sizeof(empty));
+	buffer().write(empty, sizeof(empty));
 	m_natives.clear();
 }
