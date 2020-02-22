@@ -132,6 +132,15 @@ namespace ska {
 			cache.clear();
 		}
 
+		std::string findName(std::size_t scriptIndex) const {
+			for (const auto& [name, index] : namedMapCache) {
+				if (index == scriptIndex) {
+					return name;
+				}
+			}
+			return "";
+		}
+
 	private:
 		std::size_t findNextAvailableScriptId() const {
 			return namedMapCache.size();

@@ -69,7 +69,7 @@ const std::vector<ska::bytecode::Operand>& ska::bytecode::ScriptCache::getExport
 	return (*this)[scriptIndex].exportedSymbols();
 }
 
-bool ska::bytecode::ScriptCache::isGenerated(std::size_t index) const { return index < size() && !(*this)[index].empty();}
+bool ska::bytecode::ScriptCache::isGenerated(std::size_t index) const { return index < size() && exist(index) && !(*this)[index].empty();}
 
 void ska::bytecode::ScriptCache::storeBinding(NativeFunctionPtr binding, ScriptVariableRef bindingRef) {
 	auto finalId = std::to_string(bindingRef.variable) + " " + at(bindingRef.script).name();

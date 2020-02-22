@@ -1,7 +1,10 @@
+#include <fstream>
 #include "Config/LoggerConfigLang.h"
 #include "Generator/BytecodeGenerator.h"
 #include "Generator/BytecodeGenerationContext.h"
 #include "BytecodeExecutionContext.h"
+
+#include "Service/StatementParser.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::ExecutionContext);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::ExecutionContext)
@@ -89,4 +92,16 @@ const ska::bytecode::ScriptExecution& ska::bytecode::ExecutionContext::scriptFro
 
 const ska::NativeFunction& ska::bytecode::ExecutionContext::getBinding(ScriptVariableRef bindingRef) const {
 	return m_in.getBinding(bindingRef);
+}
+
+void ska::bytecode::ExecutionContext::generate(StatementParser& parser, Generator& generator) {
+	if (!m_in.exist(currentScriptId())) {
+		auto name = m_in.findName(currentScriptId());
+		auto file = std::ifstream { name };
+		auto scriptAst = parser.subParse(m_in.astCache, name, file);
+		generator.generate(m_in, ScriptGenerationHelper{ m_in, *scriptAst });
+	} else {
+		generator.generate(m_in, currentScriptId());
+	}
+	
 }

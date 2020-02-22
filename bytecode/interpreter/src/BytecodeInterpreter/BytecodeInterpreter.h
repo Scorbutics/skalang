@@ -10,7 +10,7 @@
 namespace ska {
 	struct ReservedKeywordsPool;
 	class TypeCrosser;
-
+	class StatementParser;
 	namespace bytecode {
 		class Generator;
 		class Script;
@@ -24,7 +24,7 @@ namespace ska {
 		public:
 			using CommandInterpreter = std::vector<std::unique_ptr<InterpreterCommandUnit>>;
 
-			Interpreter(Generator& generator, const ReservedKeywordsPool& reserved);
+			Interpreter(StatementParser& parser, Generator& generator, const ReservedKeywordsPool& reserved);
 			~Interpreter() = default;
 
 			void interpret(ExecutionContext& node);
@@ -33,6 +33,7 @@ namespace ska {
 			std::unique_ptr<Executor> interpret(std::size_t scriptIndex, GenerationOutput& scripts);
 		private:
 			CommandInterpreter build(Generator&);
+			StatementParser& m_parser;
 			Generator& m_generator;
 			CommandInterpreter m_commandInterpreter;
 		};

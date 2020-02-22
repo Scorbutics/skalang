@@ -9,6 +9,7 @@
 #include "Generator/Value/BytecodeGenerationOutput.h"
 
 namespace ska {
+	class StatementParser;
 	namespace bytecode {
 
 		class Generator;
@@ -72,6 +73,7 @@ namespace ska {
 
 			ScriptExecutionOutput generateExportedVariables(std::size_t scriptIndex);
 
+			void generate(StatementParser& parser, Generator& generator);
 			bool isGenerated(std::size_t scriptIndex) const;
 
 			const NativeFunction& getBinding(ScriptVariableRef bindingRef) const;

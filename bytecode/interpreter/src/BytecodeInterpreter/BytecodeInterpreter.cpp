@@ -4,6 +4,7 @@
 #include "NodeValue/AST.h"
 #include "BytecodeScript.h"
 #include "Generator/Value/BytecodeGenerationOutput.h"
+#include "Generator/BytecodeGenerator.h"
 
 #include "Units/InterpreterCommandMov.h"
 #include "Units/InterpreterCommandAddI.h"
@@ -49,6 +50,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Interpreter);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Interpreter)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Interpreter)
+#define LOG_WARN SLOG_STATIC(ska::LogLevel::Warn, ska::bytecode::Interpreter)
 
 ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build(Generator& generator) {
 	auto result = CommandInterpreter {};
@@ -104,16 +106,16 @@ ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build
 	return result;
 }
 
-ska::bytecode::Interpreter::Interpreter(Generator& generator, const ReservedKeywordsPool& reserved) :
+ska::bytecode::Interpreter::Interpreter(StatementParser& parser, Generator& generator, const ReservedKeywordsPool& reserved) :
+	m_parser(parser),
 	m_generator(generator),
 	m_commandInterpreter(build(generator)) {
 }
 
 void ska::bytecode::Interpreter::interpret(ExecutionContext& node) {
 	if (!node.isGenerated(node.currentScriptId())) {
-		auto ss = std::stringstream {};
-		ss << "script id " << node.currentScriptId() << " is not bytecode-generated yet... cannot interpret !";
-		throw std::runtime_error(ss.str());
+		LOG_WARN << "script id " << node.currentScriptId() << " is not bytecode-generated yet... cannot interpret !";
+		node.generate(m_parser, m_generator);
 	}
 
 	for(auto continueExecution = !node.idle(); continueExecution; continueExecution = node.incInstruction()) {

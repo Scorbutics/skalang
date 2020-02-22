@@ -45,7 +45,12 @@ namespace ska {
 			auto& buffer() { return m_buffer.back(); }
 
 			const std::string& currentScriptName() const { return m_cache[m_id].name(); }
-			const std::string scriptName(std::size_t id) const { return m_cache[id].name(); }
+			
+			const std::string scriptName(std::size_t id) const {
+				if (!m_cache.exist(id)) { throw std::runtime_error("script with id \"" + std::to_string(id) + "\" does not exist"); }
+				return m_cache[id].name();
+			}
+
 			std::size_t currentScriptId() const { return m_id; }
 			
 			std::size_t pushNatives();

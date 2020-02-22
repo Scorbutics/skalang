@@ -80,7 +80,6 @@ const ska::bytecode::ScriptGeneration& ska::bytecode::Generator::generate(Script
 	auto& scriptGen = cache.at(scriptIndex);
 	auto scriptName = scriptGen.name();
 	scriptGen.generate(cache, *this);
-	cache.getExportedSymbols(scriptGen.id());
 	LOG_DEBUG << "Final generation " << scriptGen << " for script " << scriptName;
 	return scriptGen;
 }

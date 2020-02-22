@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
 	
 	auto mainCache = ska::bytecode::ScriptCache {};
 	auto generator = ska::bytecode::Generator{ reservedKeywords };
-	auto interpreter = ska::bytecode::Interpreter { generator, reservedKeywords };
+	auto interpreter = ska::bytecode::Interpreter { parser, generator, reservedKeywords };
 
 	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> {
 		mainCache.astCache,
@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
 
 	try {
 		auto serializer = ska::bytecode::Serializer{};
-		auto wasWritten = serializer.deserialize(mainCache, "main", ska::bytecode::DeserializationStrategyType::PerScript());
+		auto failedToRead = serializer.deserialize(mainCache, "main", ska::bytecode::DeserializationStrategyType::PerScript());	
 
 		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);
 		auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
@@ -94,11 +94,12 @@ int main(int argc, char* argv[]) {
 		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
 		auto& gen = generator.generate(mainCache, std::move(script));
 
-		if (!wasWritten) {
+		auto interpreted = interpreter.interpret(gen.id(), mainCache);
+
+		if (!failedToRead.empty()) {
 			assert(serializer.serialize(mainCache, ska::bytecode::SerializationStrategyType::PerScript()));
 		}
 
-		auto interpreted = interpreter.interpret(gen.id(), mainCache);
 	} catch (std::exception& e) {
 		std::cerr << "Error : " << e.what() << std::endl;
 		return -1;
