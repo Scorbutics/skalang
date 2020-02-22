@@ -17,32 +17,19 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Serializer);
 
 bool ska::bytecode::Serializer::serialize(SerializationContext& context) const {
 	try {
+		auto partIndexes = std::deque<std::size_t>{};
 		do {
-			//TODO : sorting strategy
-			auto parts = std::vector<std::stringstream>{};
-			context.writeHeader(SERIALIZER_VERSION);
+			partIndexes.push_back(context.writeHeader(SERIALIZER_VERSION));
 
 			if (!context.currentScriptBridged()) {
-				auto linkedScripts = context.writeInstructions();
-				context.writeExports();
-				context.writeExternalReferences(std::move(linkedScripts));
-				
-				parts.push_back(context.pop());
-				parts.push_back(context.pop());
-				parts.push_back(context.pop());
-				
+				auto [instructionIndex, linkedScripts] = context.writeInstructions();
+				auto exportIndex = context.writeExports();
+				partIndexes.push_back(context.writeExternalReferences(std::move(linkedScripts)));
+				partIndexes.push_back(instructionIndex);
+				partIndexes.push_back(exportIndex);
 			}
-			parts.push_back(context.pop());
 			
-			context.push(std::move(parts.back()));
-			parts.pop_back();
-
-			if (!parts.empty()) {
-				context.push(std::move(parts[0]));
-				context.push(std::move(parts[2]));
-				context.push(std::move(parts[1]));
-			}
-		} while (context.next());
+		} while (context.next(std::move(partIndexes)));
 		return true;
 	} catch (std::runtime_error&) {
 		return false;
@@ -56,26 +43,27 @@ bool ska::bytecode::Serializer::deserialize(DeserializationContext& context) con
 	while (context.read(scriptName)) {
 		wasRead = true;
 		
-		auto header = ScriptHeader{};
-		context >> header;
+		auto script = ScriptParts{};
+		LOG_INFO << "Natives section ";
+		context >> script.natives;
 
-		LOG_INFO << "[Serializer script version " << header.serializerVersion << "], script id " << header.scriptId;
+		context >> script.header;
 
-		auto body = ScriptBody{};
-		if (!header.scriptBridged) {
-			context >> body;
-		}
+		LOG_INFO << "[Serializer script version " << script.header.serializerVersion << "], script " << script.header.scriptName() << " refered as id " << script.header.scriptId << " when it was compiled";
 
-		auto externalReferences = ScriptExternalReferences { header, body };
-		context >> externalReferences;
+		context >> script.references;
 
-		std::copy(externalReferences.scripts.begin(), externalReferences.scripts.end(), std::inserter(scripts, scripts.end()));
-		scriptName = header.scriptName;
+		scripts.insert(std::make_move_iterator(script.references.scripts.begin()), std::make_move_iterator(script.references.scripts.end()));
+		script.references.scripts.clear();
+		scriptName = script.header.scriptName();
 
 		scripts.erase(scriptName);
 
-		LOG_INFO << "[Script name " << scriptName << " with id " << header.scriptId << "]";
-		context.declare(header.scriptId, scriptName, std::move(body.instructions), std::move(body.exports));
+		if (!script.header.scriptBridged) {
+			context >> script.body;
+		}
+
+		context.declare(std::move(scriptName), std::move(script.body.instructions), std::move(script.body.exports));
 
 		auto nextScriptIt = scripts.begin();
 		if (nextScriptIt == scripts.end()) {

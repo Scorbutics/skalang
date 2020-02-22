@@ -89,7 +89,7 @@ std::optional<ska::bytecode::Operand> ska::bytecode::GenerationContext::getSymbo
 
 ska::bytecode::Operand ska::bytecode::GenerationContext::storeBinding(NativeFunctionPtr binding, ScriptVariableRef bindingRef) {
 	m_generated.storeBinding(std::move(binding), bindingRef);
-	return ska::bytecode::Operand{ bindingRef, OperandType::BIND };
+	return ska::bytecode::Operand{ bindingRef, OperandType::BIND_NATIVE };
 }
 
 const ska::NativeFunction& ska::bytecode::GenerationContext::getBinding(ScriptVariableRef bindingRef) const {

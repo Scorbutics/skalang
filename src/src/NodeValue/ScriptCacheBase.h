@@ -81,25 +81,14 @@ namespace ska {
 			const auto wantedScriptId = findNextAvailableScriptId();
 			const auto emplacedItem = namedMapCache.emplace(std::move(scriptName), wantedScriptId);
 			if(emplacedItem.second) {
-				SLOG_STATIC(LogLevel::Info, ScriptCacheBaseLog) << "Adding script " << emplacedItem.first->first << " at index " << emplacedItem.first->second;
+				SLOG_STATIC(LogLevel::Info, ScriptCacheBaseLog) << "Adding script \"" << emplacedItem.first->first << "\" at index " << wantedScriptId;
 				pushCache(wantedScriptId, std::move(script));
 				return false;
 			} else if (force || !exist(emplacedItem.first->second)) {
-				SLOG_STATIC(LogLevel::Info, ScriptCacheBaseLog) << "Adding script " << emplacedItem.first->first << " at index " << emplacedItem.first->second;
+				SLOG_STATIC(LogLevel::Info, ScriptCacheBaseLog) << "Adding script \"" << emplacedItem.first->first << "\" at index " << emplacedItem.first->second;
 				pushCache(emplacedItem.first->second, std::move(script));
 			}
 			return true;
-		}
-
-		void force(std::size_t scriptId, std::string scriptName, ScriptT script) {
-			auto previous = namedMapCache.find(scriptName);
-			if (previous != namedMapCache.end()) {
-				cache[previous->second] = nullptr;
-				namedMapCache.erase(previous);
-			}
-			namedMapCache[scriptName] = scriptId;
-			SLOG_STATIC(LogLevel::Info, ScriptCacheBaseLog) << "Force script " << scriptName << " at index " << scriptId;
-			pushCache(scriptId, std::move(script));
 		}
 
 		template <class ScriptTLocal>
@@ -145,13 +134,7 @@ namespace ska {
 
 	private:
 		std::size_t findNextAvailableScriptId() const {
-			std::size_t i;
-			for(i = 0; i < cache.size(); i++) {
-				if(cache[i] == nullptr) {
-					return i;
-				}
-			}
-			return i;
+			return namedMapCache.size();
 		}
 
 		ScriptTRaw* atOrNull(std::size_t index) {

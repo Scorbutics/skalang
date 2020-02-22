@@ -105,7 +105,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	auto callInstruction = InstructionOutput {};
 	if (functionSymbolInfo != nullptr && functionSymbolInfo->binding != std::numeric_limits<std::size_t>::max()) {
-		callInstruction.push(Instruction{ Command::BIND, Operand { ScriptVariableRef{ functionSymbolInfo->binding, functionSymbolInfo->script}, OperandType::BIND}, Operand {static_cast<long>(node.GetFunctionParameterSize()), OperandType::PURE} });
+		callInstruction.push(Instruction{ Command::BIND, Operand { ScriptVariableRef{ functionSymbolInfo->binding, functionSymbolInfo->script}, OperandType::BIND_NATIVE}, Operand {static_cast<long>(node.GetFunctionParameterSize()), OperandType::PURE} });
 		if (functionSymbolInfo->bindingPassThrough) {
 			callInstruction.push(Instruction{ Command::JUMP_ABS, std::move(preCallValue.operand()) });
 		}

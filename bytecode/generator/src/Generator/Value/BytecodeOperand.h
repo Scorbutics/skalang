@@ -43,7 +43,8 @@ namespace ska {
 			PURE,
 			VAR,
 			REG,
-			BIND,
+			BIND_NATIVE,
+			BIND_SCRIPT,
 			MAGIC
 		};
 
@@ -52,7 +53,8 @@ namespace ska {
 			"PURE",
 			"VAR",
 			"REG",
-			"BIND",
+			"BIND_NATIVE",
+			"BIND_SCRIPT",
 			"MAGIC"
 		};
 

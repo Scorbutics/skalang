@@ -1,6 +1,8 @@
 #pragma once
 #include <sstream>
 #include <memory>
+#include <deque>
+#include <unordered_set>
 #include <vector>
 #include <cstdint>
 #include "NodeValue/ASTNodePtr.h"
@@ -16,15 +18,14 @@ namespace ska {
 			SerializationContext(const ScriptCache& cache, SerializationStrategy strategy) :
 				m_strategy(std::move(strategy)),
 				m_cache(cache),
-				m_output(&m_strategy(cache[m_id].name())),
-				m_buffer(1) {
+				m_output(&m_strategy(cache[m_id].name())) {
 			}
 
-			bool next() {
-				pushNatives();
-				commit();
+			bool next(std::deque<std::size_t> partIndexes) {
+				partIndexes.push_front(pushNatives());
+				commit(std::move(partIndexes));
 				m_id++;
-				if (m_id < m_cache.size()) {
+				if (m_cache.exist(m_id)) {
 					m_output = &m_strategy(m_cache[m_id].name());
 					return true;
 				}
@@ -33,23 +34,21 @@ namespace ska {
 
 			bool currentScriptBridged() const { return m_cache[m_id].program().isBridged(); }
 
-			void commit();
-			std::stringstream pop();
-			void push(std::stringstream data);
-
-			void writeHeader(std::size_t serializerVersion);
-			std::vector<std::string> writeInstructions();
-			void writeExports();
-			void writeExternalReferences(std::vector<std::string> linkedScripts);
+			std::size_t writeHeader(std::size_t serializerVersion);
+			std::pair<std::size_t, std::vector<std::string>> writeInstructions();
+			std::size_t writeExports();
+			std::size_t writeExternalReferences(std::vector<std::string> linkedScripts);
 
 		private:
-			auto& buffer() { return m_buffer[m_bufferIndex]; }
+			void commit(std::deque<std::size_t> partIndexes);
+			void push();
+			auto& buffer() { return m_buffer.back(); }
 
 			const std::string& currentScriptName() const { return m_cache[m_id].name(); }
 			const std::string scriptName(std::size_t id) const { return m_cache[id].name(); }
 			std::size_t currentScriptId() const { return m_id; }
 			
-			void pushNatives();
+			std::size_t pushNatives();
 			auto begin() const { return m_cache[m_id].begin(); }
 			auto end() const { return m_cache[m_id].end(); }
 
@@ -60,9 +59,8 @@ namespace ska {
 
 			const ScriptCache& m_cache;
 			std::size_t m_id = 0;
-			std::size_t m_bufferIndex = 0;
 			SerializationStrategy m_strategy;
-			std::vector<std::string> m_natives;
+			std::unordered_map<std::string, std::size_t> m_natives;
 			std::vector<std::stringstream> m_buffer;
 			std::ostream* m_output = nullptr;
 		};

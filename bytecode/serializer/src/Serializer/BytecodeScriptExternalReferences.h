@@ -9,11 +9,11 @@ namespace ska {
 		struct ScriptBody;
 
 		struct ScriptExternalReferences {
-			ScriptExternalReferences(ScriptHeader& header, ScriptBody& body) : header(header), body(body) {}
-
-			ScriptHeader& header;
-			ScriptBody& body;
+			ScriptExternalReferences(const std::vector<std::string>& natives) : m_natives(natives) {}
+			const std::vector<std::string>& natives() const { return m_natives; }
 			std::unordered_set<std::string> scripts{};
+		private:
+			const std::vector<std::string>& m_natives;
 		};
 	}
 }

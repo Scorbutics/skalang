@@ -22,6 +22,6 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	}
 
 	assert(importedScriptIndex != std::numeric_limits<std::size_t>::max());
-	importGroup.push(Instruction { Command::SCRIPT, context.queryNextRegister(), Operand { ScriptVariableRef { importedScriptIndex, context.scriptIndex() }, OperandType::BIND } });
+	importGroup.push(Instruction { Command::SCRIPT, context.queryNextRegister(), Operand { ScriptVariableRef { importedScriptIndex, context.scriptIndex() }, OperandType::BIND_SCRIPT } });
 	return importGroup;
 }

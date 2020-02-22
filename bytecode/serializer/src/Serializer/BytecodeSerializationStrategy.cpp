@@ -1,9 +1,15 @@
 #include <string>
 #include "BytecodeSerializationStrategy.h"
+#include "Service/ScriptNameBuilder.h"
 
 template <class T>
 T& build(const std::string& scriptName) {
-	auto bytecodeScriptName = scriptName + "b";
+	const auto foundExtPos = scriptName.rfind("." SKALANG_SCRIPT_EXT);
+	auto ext = std::string{ "b" };
+	if (foundExtPos == std::string::npos) {
+		ext = "." SKALANG_SCRIPT_EXT + ext;
+	}
+	auto bytecodeScriptName = scriptName + ext;
 	static auto tabs = std::unordered_map<std::string, T> {};
 	auto tabFound = tabs.find(bytecodeScriptName);
 	if (tabFound == tabs.end()) {
