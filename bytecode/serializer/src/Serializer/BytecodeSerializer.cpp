@@ -45,7 +45,7 @@ std::vector<std::string> ska::bytecode::Serializer::deserialize(DeserializationC
 	scripts.insert(scriptName);
 	
 	auto scriptIt = scripts.begin();
-	
+	auto first = true;
 	while (scriptIt != scripts.end()) {
 		auto canRead = context.read(*scriptIt);
 		
@@ -69,8 +69,10 @@ std::vector<std::string> ska::bytecode::Serializer::deserialize(DeserializationC
 			if (!script.header.scriptBridged) {
 				context >> script.body;
 			}
-
-			context.declare(script.header.scriptName(), std::move(script.body.instructions), std::move(script.body.exports));
+			if (!first) {
+				context.declare(script.header.scriptName(), std::move(script.body.instructions), std::move(script.body.exports));
+			}
+			first = false;
 		} else {
 			failedScripts.push_back(*scriptIt);
 			scriptIt++;
