@@ -5,7 +5,7 @@
 #include "Runtime/Service/BridgeFunction.h"
 #include "Generator/BytecodeGenerator.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Script);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::Script);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Script)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Script)
 #define LOG_ERROR SLOG_STATIC(ska::LogLevel::Error, ska::bytecode::Script)

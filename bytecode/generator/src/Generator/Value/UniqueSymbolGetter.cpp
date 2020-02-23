@@ -3,7 +3,7 @@
 #include "NodeValue/AST.h"
 #include "NodeValue/ScriptAST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::UniqueSymbolGetterBase);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::UniqueSymbolGetterBase);
 
 std::pair<ska::bytecode::Operand, bool> ska::bytecode::UniqueSymbolGetterBase::query(std::size_t script, const ASTNode& node) {
 	if (node.symbol() == nullptr) {

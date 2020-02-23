@@ -12,7 +12,7 @@
 
 #include "Service/ScriptNameBuilder.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::BridgeASTBuilder)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::BridgeASTBuilder)
 
 ska::BridgeASTBuilder::BridgeASTBuilder(TypeBuilder& typeBuilder, SymbolTableUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved) :
 	m_reserved(reserved),

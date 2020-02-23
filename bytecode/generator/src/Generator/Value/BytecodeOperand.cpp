@@ -2,7 +2,7 @@
 #include "BytecodeOperand.h"
 #include "NodeValue/AST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Operand);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::Operand);
 
 ska::bytecode::Operand::Operand(const ASTNode& node) :
 	m_type(OperandType::PURE) {

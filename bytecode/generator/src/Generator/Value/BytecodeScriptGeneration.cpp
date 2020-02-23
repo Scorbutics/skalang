@@ -2,7 +2,7 @@
 #include "BytecodeScriptGeneration.h"
 #include "Generator/BytecodeGenerator.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::ScriptGeneration);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::ScriptGeneration);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::ScriptGeneration)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::ScriptGeneration)
 #define LOG_WARN SLOG_STATIC(ska::LogLevel::Warn, ska::bytecode::ScriptGeneration)

@@ -10,7 +10,7 @@ namespace ska {
 	struct ScriptCacheBaseLog;
 }
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ScriptCacheBaseLog);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptCacheBaseLog);
 
 namespace ska {
 

@@ -4,7 +4,7 @@
 #include "NodeValue/ScriptAST.h"
 #include "BytecodeScriptCache.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::ScriptGenerationHelper);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::ScriptGenerationHelper);
 
 ska::bytecode::ScriptGenerationHelper::ScriptGenerationHelper(std::size_t index, const ScriptAST& script) {
 	m_script = script.handle();

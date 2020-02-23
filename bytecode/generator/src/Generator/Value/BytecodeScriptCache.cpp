@@ -1,7 +1,7 @@
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeScriptCache.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::ScriptCache);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::ScriptCache);
 
 
 void ska::bytecode::ScriptCache::setSymbolInfo(const ASTNode& node, SymbolInfo info) {
