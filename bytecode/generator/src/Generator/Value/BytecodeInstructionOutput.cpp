@@ -49,3 +49,11 @@ ska::bytecode::Operand ska::bytecode::InstructionOutput::packAsOperand() const {
 
 	return m_pack.back().dest();
 }
+
+bool ska::bytecode::operator==(const InstructionOutput& lhs, const InstructionOutput& rhs) {
+	return lhs.m_pack == rhs.m_pack;
+}
+
+bool ska::bytecode::operator!=(const InstructionOutput& lhs, const InstructionOutput& rhs) {
+	return !operator==(lhs, rhs);
+}

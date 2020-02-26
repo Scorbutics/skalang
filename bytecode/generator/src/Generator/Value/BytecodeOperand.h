@@ -99,6 +99,7 @@ namespace ska {
 
 		private:
 			friend bool operator==(const Operand& lhs, const Operand& rhs);
+			friend bool operator!=(const Operand& lhs, const Operand& rhs);
 
 			OperandVariant m_content {};
 			OperandType m_type = OperandType::EMPTY;
@@ -107,6 +108,7 @@ namespace ska {
 		using Register = Operand;
 
 		bool operator==(const Operand& lhs, const Operand& rhs);
+		bool operator!=(const Operand& lhs, const Operand& rhs);
 
 	}
 

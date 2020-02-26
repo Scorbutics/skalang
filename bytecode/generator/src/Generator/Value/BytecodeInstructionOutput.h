@@ -56,6 +56,8 @@ namespace ska {
 
 		private:
 			friend std::ostream& operator<<(std::ostream& stream, const InstructionOutput&);
+			friend bool operator==(const InstructionOutput& lhs, const InstructionOutput& rhs);
+			friend bool operator!=(const InstructionOutput& lhs, const InstructionOutput& rhs);
 
 			Operand packAsOperand() const;
 
@@ -64,5 +66,7 @@ namespace ska {
 		};
 
     std::ostream& operator<<(std::ostream& stream, const InstructionOutput&);
+		bool operator==(const InstructionOutput& lhs, const InstructionOutput& rhs);
+		bool operator!=(const InstructionOutput& lhs, const InstructionOutput& rhs);
 	}
 }

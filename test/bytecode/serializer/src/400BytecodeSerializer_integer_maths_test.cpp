@@ -56,7 +56,7 @@ TEST_CASE("[BytecodeSerializer] var declaration") {
 	auto original = data.serializer->deserialize(destinationCache, "main", DeserializeInStream(), true);
 	CHECK(original.empty());
 
-	auto firstInstructionEquality = destinationCache.at(0).begin()[0].command() == data.storage->at(0).begin()[0].command() && destinationCache.at(0).begin()[0].dest() == data.storage->at(0).begin()[0].dest() && destinationCache.at(0).begin()[0].left() == data.storage->at(0).begin()[0].left();
+	auto firstInstructionEquality = *destinationCache.at(0).begin() == *data.storage->at(0).begin();
 	CHECK(firstInstructionEquality);
 }
 

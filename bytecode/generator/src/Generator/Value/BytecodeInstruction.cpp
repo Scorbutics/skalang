@@ -16,3 +16,11 @@ std::ostream& ska::bytecode::operator<<(std::ostream& stream, const Instruction&
 	<< "]";
 	return stream;
 }
+
+bool ska::bytecode::operator==(const ska::bytecode::Instruction& left, const ska::bytecode::Instruction& right) {
+	return left.m_command == right.m_command && left.m_left == right.m_left && left.m_right == right.m_right && left.m_dest == right.m_dest;
+}
+
+bool ska::bytecode::operator!=(const ska::bytecode::Instruction& left, const ska::bytecode::Instruction& right) {
+	return !operator==(left, right);
+}

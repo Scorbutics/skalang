@@ -34,7 +34,8 @@ namespace ska {
 			auto& dest() { return m_dest; }
 
 			friend std::ostream& operator<<(std::ostream& stream, const Instruction&);
-
+			friend bool operator==(const Instruction& left, const Instruction& right);
+			friend bool operator!=(const Instruction& left, const Instruction& right);
 		private:
 			Command m_command = Command::NOP;
 			Operand m_dest;
@@ -43,6 +44,8 @@ namespace ska {
 		};
 
 		std::ostream& operator<<(std::ostream& stream, const Instruction&);
+		bool operator==(const Instruction& left, const Instruction& right);
+		bool operator!=(const Instruction& left, const Instruction& right);
 
 	}
 }

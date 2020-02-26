@@ -72,3 +72,7 @@ std::string ska::bytecode::Operand::toString() const {
 bool ska::bytecode::operator==(const Operand& lhs, const Operand& rhs) {
 	return lhs.m_content == rhs.m_content && lhs.m_type == rhs.m_type;
 }
+
+bool ska::bytecode::operator!=(const Operand& lhs, const Operand& rhs) {
+	return !operator==(lhs, rhs);
+}
