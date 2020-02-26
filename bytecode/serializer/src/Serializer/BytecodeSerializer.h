@@ -21,8 +21,8 @@ namespace ska {
 
 			bool serialize(SerializationContext& context) const;
 			bool serialize(const ScriptCache& cache, SerializationStrategy output) const;
-			std::vector<std::string> deserialize(DeserializationContext& output) const;
-			std::vector<std::string> deserialize(ScriptCache& cache, const std::string& startScriptName, DeserializationStrategy input) const;
+			std::vector<std::string> deserialize(DeserializationContext& output, bool declareFirst = false) const;
+			std::vector<std::string> deserialize(ScriptCache& cache, const std::string& startScriptName, DeserializationStrategy input, bool declareFirst = false) const;
 		};
 	}
 }

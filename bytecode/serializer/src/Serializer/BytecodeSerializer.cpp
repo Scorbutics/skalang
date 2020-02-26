@@ -10,7 +10,7 @@
 
 static constexpr std::size_t SERIALIZER_VERSION = 1;
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::Serializer);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Serializer);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Serializer)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Serializer)
@@ -38,14 +38,14 @@ bool ska::bytecode::Serializer::serialize(SerializationContext& context) const {
 	}
 }
 
-std::vector<std::string> ska::bytecode::Serializer::deserialize(DeserializationContext& context) const {
+std::vector<std::string> ska::bytecode::Serializer::deserialize(DeserializationContext& context, bool declareFirst) const {
 	auto failedScripts = std::vector<std::string> {};
 	std::string scriptName = context.startScriptName();
 	auto scripts = std::unordered_set<std::string> {};
 	scripts.insert(scriptName);
 	
 	auto scriptIt = scripts.begin();
-	auto first = true;
+	auto first = !declareFirst;
 	while (scriptIt != scripts.end()) {
 		auto canRead = context.read(*scriptIt);
 		
@@ -55,6 +55,7 @@ std::vector<std::string> ska::bytecode::Serializer::deserialize(DeserializationC
 			auto script = ScriptParts{};
 			LOG_INFO << "Natives section ";
 			context >> script.natives;
+			LOG_INFO << script.natives.size() << " natives";
 
 			context >> script.header;
 
@@ -87,7 +88,7 @@ bool ska::bytecode::Serializer::serialize(const ScriptCache& cache, Serializatio
 	return serialize(context);
 }
 
-std::vector<std::string> ska::bytecode::Serializer::deserialize(ScriptCache& cache, const std::string& startScriptName, DeserializationStrategy input) const {
+std::vector<std::string> ska::bytecode::Serializer::deserialize(ScriptCache& cache, const std::string& startScriptName, DeserializationStrategy input, bool declareFirst) const {
 	auto context = DeserializationContext{ cache, startScriptName, input };
-	return deserialize(context);
+	return deserialize(context, declareFirst);
 }

@@ -43,7 +43,7 @@ namespace ska {
 			void commit(std::deque<std::size_t> partIndexes);
 			void push();
 			auto& buffer() { return m_buffer.back(); }
-
+			std::size_t instructionsSize() { return m_cache[m_id].size(); }
 			const std::string& currentScriptName() const { return m_cache[m_id].name(); }
 			
 			const std::string scriptName(std::size_t id) const {

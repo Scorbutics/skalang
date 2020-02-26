@@ -1,7 +1,7 @@
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeSerializationContext.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::SerializationContext);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::SerializationContext);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::SerializationContext)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::SerializationContext)
@@ -19,14 +19,14 @@ std::size_t ska::bytecode::SerializationContext::writeHeader(std::size_t seriali
 std::pair<std::size_t, std::vector<std::string>> ska::bytecode::SerializationContext::writeInstructions() {
 	push();
 	auto linkedScripts = std::vector<std::string>{};
-	for (const auto& instruction : (*this)) {
+	(*this) << instructionsSize();
+	for (const Instruction& instruction : (*this)) {
 		LOG_DEBUG << "Serializing " << instruction;
+		(*this) << instruction;
 		if (instruction.command() == Command::SCRIPT) {
 			linkedScripts.push_back(scriptName(instruction.left().as<ScriptVariableRef>().variable));
 		}
-		(*this) << instruction;
 	}
-	(*this) << Instruction{ Command::NOP, std::vector<Operand>{} };
 	
 	return std::make_pair(m_buffer.size() - 1, std::move(linkedScripts));
 }
@@ -45,13 +45,13 @@ std::size_t ska::bytecode::SerializationContext::writeExports() {
 	push();
 	auto& exports = m_cache[m_id].exportedSymbols();
 	LOG_INFO << "Export serializing : " << exports.size();
+	(*this) << exports.size();
 	for (const auto& exp : exports) {
 		if (!exp.empty()) {
 			LOG_INFO << exp;
 			(*this) << exp;
 		}
 	}
-	(*this) << Operand{};
 	return m_buffer.size() - 1;
 }
 
@@ -151,29 +151,26 @@ void ska::bytecode::SerializationContext::push() {
 std::size_t ska::bytecode::SerializationContext::pushNatives() {
 	push();
 	if (!m_natives.empty()) {
-		auto nativeVector = std::vector<std::string>(m_natives.size());
+		auto nativeVector = std::vector<std::string>();
 		for (auto& [native, index] : m_natives) {
 			if (!native.empty()) {
-				nativeVector[index] = native;
+				nativeVector.push_back(native);
 			}
 		}
 
-		LOG_INFO << "Natives";
+		const auto totalSize = nativeVector.size();
+		LOG_INFO << "Natives : " << totalSize;
+		
+		buffer().write(reinterpret_cast<const char*>(&totalSize), sizeof(uint32_t));
+		
 		for (auto& native : nativeVector) {
 			LOG_INFO << native;
-			std::size_t size = native.size();
-			if (size > 0) {
-				buffer().write(reinterpret_cast<const char*>(&size), sizeof(Chunk));
-				buffer().write(native.c_str(), sizeof(char) * size);
-			} else {
-				size = 1;
-				buffer().write(reinterpret_cast<const char*>(&size), sizeof(Chunk));
-				buffer().write("", sizeof(char) * size);
-			}
+			const auto size = native.size();
+			assert(size > 0);
+			buffer().write(reinterpret_cast<const char*>(&size), sizeof(Chunk));
+			buffer().write(native.c_str(), sizeof(char) * size);
 		}
 	}
-	char empty[sizeof(Chunk)] = "";
-	buffer().write(empty, sizeof(empty));
 	m_natives.clear();
 	return m_buffer.size() - 1;
 }

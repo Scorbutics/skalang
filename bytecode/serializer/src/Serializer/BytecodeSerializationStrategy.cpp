@@ -1,4 +1,5 @@
 #include <string>
+#include <fstream>
 #include "BytecodeSerializationStrategy.h"
 #include "Service/ScriptNameBuilder.h"
 
@@ -23,13 +24,13 @@ T& build(const std::string& scriptName) {
 }
 
 ska::bytecode::SerializationStrategy ska::bytecode::SerializationStrategyType::PerScript() {
-	return [](const std::string& scriptName) -> std::ofstream& {
+	return [](const std::string& scriptName) -> std::ostream& {
 		return build<std::ofstream>(scriptName);
 	};
 }
 
 ska::bytecode::DeserializationStrategy ska::bytecode::DeserializationStrategyType::PerScript() {
-	return [](const std::string& scriptName) -> std::ifstream& {
+	return [](const std::string& scriptName) -> std::istream& {
 		return build<std::ifstream>(scriptName);
 	};
 }

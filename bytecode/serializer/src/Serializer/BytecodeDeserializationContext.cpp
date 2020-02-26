@@ -4,7 +4,7 @@
 #include "BytecodeScriptHeader.h"
 #include "BytecodeScriptBody.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::DeserializationContext);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::DeserializationContext);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::DeserializationContext)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::DeserializationContext)
@@ -82,17 +82,18 @@ void ska::bytecode::DeserializationContext::replaceAllNativesRef(std::vector<Ins
 }
 
 std::vector<ska::bytecode::Instruction> ska::bytecode::DeserializationContext::readInstructions() {
-	auto instructions = std::vector<Instruction>{};
-	auto command = Command{};
-	do {
-		auto instruction = Instruction{};
-		(*this) >> instruction;
-		command = instruction.command();
-		if (command != Command::NOP) {
-			LOG_INFO << "Deserializing " << instruction;
-			instructions.push_back(std::move(instruction));
-		}
-	} while (command != Command::NOP);
+	auto instructionsSize = std::size_t{};
+	(*this) >> instructionsSize;
+
+	if (instructionsSize == 0) {
+		return {};
+	}
+
+	auto instructions = std::vector<Instruction>(instructionsSize);
+	for (std::size_t i = 0; i < instructionsSize; i++){
+		(*this) >> instructions[i];
+		LOG_INFO << "Deserializing " << instructions[i];
+	}
 	return instructions;
 }
 
@@ -113,18 +114,17 @@ std::unordered_set<std::string> ska::bytecode::DeserializationContext::readLinke
 }
 
 std::vector<ska::bytecode::Operand> ska::bytecode::DeserializationContext::readExports() {
-	LOG_INFO << "Exports section ";
-	auto exports = std::vector<Operand>{};
-	auto operandType = OperandType{};
-	do {
-		auto operand = Operand{};
-		(*this) >> operand;
-		operandType = operand.type();
-		if (!operand.empty()) {
-			LOG_INFO << "Getting export " << operand;
-			exports.push_back(std::move(operand));
-		}
-	} while (operandType != OperandType::EMPTY);
+	auto exportsSize = std::size_t{};
+	(*this) >> exportsSize;
+	LOG_INFO << "Exports section : " << exportsSize;
+	if (exportsSize == 0) {
+		return {};
+	}
+	auto exports = std::vector<Operand>(exportsSize);
+	for(std::size_t i = 0; i < exportsSize; i++) {
+		(*this) >> exports[i];		
+		LOG_INFO << "Getting export " << exports[i];
+	};
 	return exports;
 }
 
@@ -227,16 +227,13 @@ void ska::bytecode::DeserializationContext::operator>>(std::vector<std::string>&
 		return;
 	}
 
-	auto index = 0;
-	bool isLast = true;
-	do {
+	auto nativesSize = std::size_t{ };
+	(*this) >> nativesSize;
+	for (std::size_t i = 0; i < nativesSize; i++) {
 		auto native = readString();
-		isLast = !native.has_value();
-		if (!isLast) {
-			LOG_INFO << index++ << "\t: " << native.value();
-			natives.push_back(std::move(native.value()));
-		}
-	} while (!isLast);
+		LOG_INFO << i << "\t: " << native.value();
+		natives.push_back(std::move(native.value()));		
+	}
 }
 
 std::optional<std::string> ska::bytecode::DeserializationContext::readString() {

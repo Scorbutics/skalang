@@ -1,11 +1,11 @@
 #pragma once
 #include <functional>
-#include <fstream>
+#include <iostream>
 
 namespace ska {
     namespace bytecode {
-        using DeserializationStrategy = std::function<std::ifstream&(const std::string&)>;
-        using SerializationStrategy = std::function<std::ofstream&(const std::string&)>;
+        using DeserializationStrategy = std::function<std::istream&(const std::string&)>;
+        using SerializationStrategy = std::function<std::ostream&(const std::string&)>;
 
         struct DeserializationStrategyType {
             static DeserializationStrategy PerScript();
