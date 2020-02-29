@@ -64,7 +64,8 @@ namespace ska {
 
 		private:
 			friend std::ostream& operator<<(std::ostream& stream, const ScriptGeneration&);
-
+			friend bool operator==(const ScriptGeneration& left, const ScriptGeneration& right);
+			friend bool operator!=(const ScriptGeneration& left, const ScriptGeneration& right);
 			//void push(ScriptGeneration output);
 
 			ScriptGenerationHelper m_origin;

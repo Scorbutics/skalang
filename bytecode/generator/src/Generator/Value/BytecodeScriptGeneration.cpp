@@ -53,3 +53,11 @@ void ska::bytecode::ScriptGeneration::generate(ScriptCache& cache, InstructionOu
 	cache.getExportedSymbols(id());
 }
 
+
+bool ska::bytecode::operator==(const ScriptGeneration& left, const ScriptGeneration& right) {
+	return left.m_exports == right.m_exports && left.m_generated == right.m_generated;
+}
+
+bool ska::bytecode::operator!=(const ScriptGeneration& left, const ScriptGeneration& right) {
+	return operator!=(left, right);
+}

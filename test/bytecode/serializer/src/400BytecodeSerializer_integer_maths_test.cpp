@@ -60,15 +60,21 @@ TEST_CASE("[BytecodeSerializer] var declaration") {
 	CHECK(firstInstructionEquality);
 }
 
-/*
-TEST_CASE("[BytecodeInterpreter] var declaration from var") {
-	auto [script, data] = Interpret("var toto = 4; var titi = toto;");
+
+TEST_CASE("[BytecodeSerializer] var declaration from var") {
+	auto [script, data] = Serialize("var toto = 4; var titi = toto;");
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
-	auto res = interpreted->variable(0);
-	CHECK(res.nodeval<long>() == 4);
+	auto res = data.serializer->serialize(*data.storage, SerializeInStream());
+	CHECK(res);
+	auto destinationCache = ska::bytecode::ScriptCache{};
+	auto original = data.serializer->deserialize(destinationCache, "main", DeserializeInStream(), true);
+	CHECK(original.empty());
+
+	const auto equality = destinationCache.at(0) == data.storage->at(0);
+	CHECK(equality);
 }
 
+/*
 TEST_CASE("[BytecodeInterpreter] Basic Maths linear") {
 	auto [script, data] = Interpret("var t = 3 + 4 - 1;");
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
