@@ -107,6 +107,9 @@ std::unordered_set<std::string> ska::bytecode::DeserializationContext::readLinke
 	auto scriptRef = Chunk{};
 	for (std::size_t i = 0; i < linkedScriptsRefSize; i++) {
 		(*this) >> scriptRef;
+		if (scriptRef >= natives.size()) { 
+			throw std::runtime_error("bad bytecode : script reference \"" + std::to_string(scriptRef) + "\" has no native correspondance");
+		}
 		LOG_INFO << "Getting script reference " << natives[scriptRef];
 		linkedScriptsRef.insert(natives[scriptRef]);
 	}
