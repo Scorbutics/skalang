@@ -70,6 +70,15 @@ std::string ska::bytecode::Operand::toString() const {
 }
 
 bool ska::bytecode::operator==(const Operand& lhs, const Operand& rhs) {
+	if (std::holds_alternative<StringShared>(lhs.m_content)) {
+		if (!std::holds_alternative<StringShared>(rhs.m_content)) return false;
+		
+		const auto& leftContent = std::get<StringShared>(lhs.m_content);
+		const auto& rightContent = std::get<StringShared>(rhs.m_content);
+		if (leftContent == rightContent) return true;
+		if (leftContent && rightContent) return *leftContent == *rightContent;
+		return false;
+	}
 	return lhs.m_content == rhs.m_content && lhs.m_type == rhs.m_type;
 }
 
