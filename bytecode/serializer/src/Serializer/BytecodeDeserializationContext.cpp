@@ -234,12 +234,12 @@ void ska::bytecode::DeserializationContext::operator>>(std::vector<std::string>&
 	(*this) >> nativesSize;
 	for (std::size_t i = 0; i < nativesSize; i++) {
 		auto native = readString();
-		LOG_INFO << i << "\t: " << native.value();
-		natives.push_back(std::move(native.value()));		
+		LOG_INFO << i << "\t: " << native;
+		natives.push_back(std::move(native));		
 	}
 }
 
-std::optional<std::string> ska::bytecode::DeserializationContext::readString() {
+std::string ska::bytecode::DeserializationContext::readString() {
 	auto value = std::string {};
 	auto size = Chunk { 0 };
 	m_input->read(reinterpret_cast<char*>(&size), sizeof(Chunk));
@@ -248,5 +248,5 @@ std::optional<std::string> ska::bytecode::DeserializationContext::readString() {
 		m_input->read(reinterpret_cast<char*>(&value[0]), sizeof(char)* size);
 		return value;
 	}
-	return {};
+	return "";
 }

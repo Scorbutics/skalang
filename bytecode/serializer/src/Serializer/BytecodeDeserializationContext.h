@@ -47,7 +47,7 @@ namespace ska {
 			void operator>>(Instruction& value);
 			void operator>>(Operand& value);
 
-			std::optional<std::string> readString();
+			std::string readString();
 			std::vector<Operand> readExports();
 			std::unordered_set<std::string> readLinkedScripts(const std::vector<std::string>& natives);
 			std::vector<Instruction> readInstructions();

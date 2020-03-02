@@ -153,10 +153,10 @@ std::size_t ska::bytecode::SerializationContext::pushNatives() {
 	push();
 	if (m_natives.size() != 0) {
 		auto nativeVector = std::vector<std::string>(m_natives.size());
+		LOG_DEBUG << "Total of " << nativeVector.size() << " natives";
 		for (auto& [native, index] : m_natives) {
-			if (!native.empty()) {
-				nativeVector[index] = std::move(native);
-			}
+			LOG_DEBUG << "Building native vector [" << index << "] = " << native;
+			nativeVector[index] = std::move(native);
 		}
 
 		const auto totalSize = nativeVector.size();
@@ -167,9 +167,10 @@ std::size_t ska::bytecode::SerializationContext::pushNatives() {
 		for (auto& native : nativeVector) {
 			LOG_INFO << native;
 			const auto size = native.size();
-			assert(size > 0);
 			buffer().write(reinterpret_cast<const char*>(&size), sizeof(Chunk));
-			buffer().write(native.c_str(), sizeof(char) * size);
+			if(size > 0) {
+				buffer().write(native.c_str(), sizeof(char) * size);
+			}
 		}
 	}
 	m_natives.clear();
