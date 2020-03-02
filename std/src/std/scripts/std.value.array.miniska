@@ -2,13 +2,13 @@ FctyString = function() : var do
 	array_ = [""]
   size_ = 1
 	return {
-		add : function(str: string) do
+		add = function(str: string) do
 			array_ = array_ + str
 			size_ = size_ + 1
-		end,
-		get : function(index: int) : string do return array_[index + 1] end,
-		size : function() : int do return size_ - 1 end
-	};
+		end
+		get = function(index: int) : string do return array_[index + 1] end
+		size = function() : int do return size_ - 1 end
+	}
 end
 
 FctyFloat = function() : var do
@@ -21,7 +21,7 @@ FctyFloat = function() : var do
 		end
 		get = function(index: int) : float do return array_[index + 1] end
 		size = function() : int do return size_ - 1 end
-	};
+	}
 end
 
 FctyInteger = function() : var do
@@ -34,5 +34,5 @@ FctyInteger = function() : var do
 		end
 		get = function(index: int) : int do return array_[index + 1] end
 		size = function() : int do return size_ - 1 end
-	};
+	}
 end

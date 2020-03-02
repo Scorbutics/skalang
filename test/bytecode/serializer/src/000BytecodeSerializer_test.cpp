@@ -27,7 +27,7 @@ ska::bytecode::DeserializationStrategy DeserializeInStream() {
 }
 
 TEST_CASE("[BytecodeSerializer] literal alone") {
-	auto [script, data] = Serialize("4;");
+	auto [script, data] = Serialize("4\n");
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto res = data.serializer->serialize(*data.storage, SerializeInStream());
 	CHECK(res);
@@ -40,7 +40,7 @@ TEST_CASE("[BytecodeSerializer] literal alone") {
 }
 
 TEST_CASE("[BytecodeSerializer] function + field access + floating point value + integer value + string value") {
-	auto [script, data] = Serialize("var toto = function(): var { return { bark : \"bibi\" }; }; toto().bark; \"test\"; 3.4; 3;");
+	auto [script, data] = Serialize("toto = function(): var do return { bark = \"bibi\" }\n end\n toto().bark\n \"test\"\n 3.4\n 3\n");
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto res = data.serializer->serialize(*data.storage, SerializeInStream());
 	CHECK(res);
@@ -48,17 +48,16 @@ TEST_CASE("[BytecodeSerializer] function + field access + floating point value +
 	auto original = data.serializer->deserialize(destinationCache, "main", DeserializeInStream(), true);
 	CHECK(original.empty());
 
-	const auto equality = destinationCache.at(0) == data.storage->at(0);
-	CHECK(equality);
+	CHECK(destinationCache.at(0) == data.storage->at(0));
 }
 
 
 TEST_CASE("[BytecodeSerializer] concrete external script use") {
 	constexpr auto progStr =
-		"var Character66 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
-		"var enemy = Character66.default;"
-		"enemy.age = 99;"
-		"var t = enemy.age;";
+		"Character66 = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
+		"enemy = Character66.default\n"
+		"enemy.age = 99\n"
+		"t = enemy.age\n";
 	auto [script, data] = Serialize(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto res = data.serializer->serialize(*data.storage, SerializeInStream());
@@ -76,8 +75,8 @@ TEST_CASE("[BytecodeSerializer] binded external script use") {
 	std::cout << std::endl;
 	std::cout << std::endl;
 	constexpr auto progStr =
-		"var Logger = import \"bind:std.native.io.log\";"
-		"Logger.print(\"test63\");";
+		"Logger = import \"bind:std.native.io.log\"\n"
+		"Logger.print(\"test63\")\n";
 
 	
 	auto data = BytecodeSerializerDataTestContainer {};
