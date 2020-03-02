@@ -2,6 +2,6 @@ Binding1 = import "bind:binding1_lib"
 
 Fcty = function() : var do
 	return {
-		getToto : Binding1.getToto
+		getToto = Binding1.getToto
 	}
 end

@@ -1,8 +1,8 @@
 build = function (name_: string) : var do
 	age = 10
 	return {
-		age : age,
-		name : name_
+		age = age
+		name = name_
 	}
 end
 

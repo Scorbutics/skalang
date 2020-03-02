@@ -182,7 +182,7 @@ TEST_CASE("User defined object") {
 
 	SUBCASE("constructor with 1 parameter") {
 
-	auto astPtr = ASTFromInput(scriptCache, "Joueur = function(nom:string) : var do return { nom : nom }\n end\n joueur1 = Joueur(\"joueur 1\")\n joueur1.nom\n", keywords);
+	auto astPtr = ASTFromInput(scriptCache, "Joueur = function(nom:string) : var do return { nom = nom }\n end\n joueur1 = Joueur(\"joueur 1\")\n joueur1.nom\n", keywords);
 		CHECK(astPtr.rootNode().size() == 3);
 	CHECK(astPtr.rootNode().op() == ska::Operator::BLOCK);
 

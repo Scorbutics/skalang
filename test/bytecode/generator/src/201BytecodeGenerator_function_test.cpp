@@ -82,8 +82,8 @@ TEST_CASE("[BytecodeGenerator] Custom object creation") {
 		"toto = function() : var do\n"
 			"priv_test = 1\n"
 			"return {"
-				"test : priv_test,"
-				"say : function(more : string) : string do\n"
+				"test = priv_test\n"
+				"say = function(more : string) : string do\n"
 					"s = \"lol\" + priv_test + more\n"
 					"return s\n"
 				"end\n"
@@ -119,7 +119,7 @@ TEST_CASE("[BytecodeGenerator] Custom object creation") {
 
 TEST_CASE("[BytecodeGenerator] Use complex call inside function parameters") {
 	constexpr auto progStr =
-		"titi = function() : var do return { test : \"tulululu\" }\n end\n"
+		"titi = function() : var do return { test = \"tulululu\" }\n end\n"
 		"toto = function(arg1 : string) : void do end\n"
 		"toto(titi().test)\n";
 
@@ -150,8 +150,8 @@ TEST_CASE("[BytecodeGenerator] Custom object creation2") {
 		"toto = function() : var do\n"
 			"priv_test = 123\n"
 			"return {"
-				"test : priv_test,"
-				"say : function(more : string) : string do\n"
+				"test = priv_test\n"
+				"say = function(more : string) : string do\n"
 					"s = \"lol\" + priv_test + more\n"
 					"return s\n"
 				"end"
@@ -197,8 +197,8 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation 3 (double field function
 		"toto = function() : var do\n"
 			"priv_test = 123\n"
 			"return {"
-				"test : priv_test,"
-				"say : function(more : string) : string do\n"
+				"test = priv_test\n"
+				"say = function(more : string) : string do\n"
 					"s = \"lol\" + priv_test + more\n"
 					"return s\n"
 				"end\n"
@@ -247,8 +247,8 @@ TEST_CASE("[BytecodeGenerator] Field access affectation") {
 		"toto = function() : var do\n"
 			"priv_test = 123\n"
 			"return {"
-				"test : priv_test,"
-				"say : function(more : string) : string do\n"
+				"test = priv_test\n"
+				"say = function(more : string) : string do\n"
 					"s = \"lol\" + priv_test + more\n"
 					"return s\n"
 				"end"

@@ -37,7 +37,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 				"end\n"
 
 				"return {"
-					"attaquer : attaquer"
+					"attaquer = attaquer"
 				"}\n"
 			"end\n"
 			"joueur1 = JoueurClass(\"joueur1Nom\")\n"
@@ -52,7 +52,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 				"test74 = 123\n"
 
 				"return {"
-					"test : test74"
+					"test = test74"
 				"}\n"
 			"end\n"
 	"(5 + JoueurClass(\"joueur1Nom\").test + 3 * 4) * 2\n"
@@ -68,10 +68,10 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			"end\n"
 
 			"return {"
-				"nom: nom,"
-				"puissance : puissance,"
-				"pv : 100,"
-				"attaquer : attaquer"
+				"nom= nom\n"
+				"puissance = puissance\n"
+				"pv = 100\n"
+				"attaquer = attaquer\n"
 			"}\n"
 		"end\n"
 		"joueur1 = JoueurClass(\"joueur1Nom\")\n"
@@ -88,7 +88,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 					"pointsDeVie = pointsDeVie - degats\n"
 				"end\n"
 				"return {"
-					"blesser : blesser"
+					"blesser = blesser"
 				"}\n"
 			"end\n"
 			"JoueurClass = function(nom:string) : var do "
@@ -99,8 +99,8 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			"end\n"
 
 			"return {"
-			"attaquer : attaquer,"
-			"stats : stats"
+			"attaquer = attaquer\n"
+			"stats = stats\n"
 			"}\n"
 			"end\n"
 			"joueur1 = JoueurClass(\"joueur1Nom\")\n"
@@ -117,8 +117,8 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			"pointsDeVie = pointsDeVie - degats\n"
 			"end\n"
 			"return {"
-			"blesser : blesser,"
-			"pdv : pointsDeVie"
+			"blesser = blesser\n"
+			"pdv = pointsDeVie\n"
 			"}\n"
 			"end\n"
 			"JoueurClass = function(nom:string) : var do "
@@ -129,7 +129,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			"end\n"
 
 			"return {"
-			"attaquer : attaquer"
+			"attaquer = attaquer"
 			"}\n"
 			"end\n"
 			"joueur1 = JoueurClass(\"joueur1Nom\")\n"
@@ -143,7 +143,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			ASTFromInputSemanticComplexTC(scriptCache,
 				"lvalFunc137 = function() : var do\n" 
 					"test137_ = function() : int do \n return 0\n end\n" 
-					"return { test : test137_}\n" 
+					"return { test = test137_}\n" 
 				"end\n" 
 				"object = lvalFunc137()\n"
 				"object.test() = 1234\n", data);
@@ -172,7 +172,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 
 	SUBCASE("Function 0 parameter creating custom object but forget to use it as a factory (direct use of function)") {
 		try {
-			auto astPtr = ASTFromInputSemanticComplexTC(scriptCache, "Dummy = function() : var do\n return { data: 3 }\n end\n Dummy.data\n ", data);
+			auto astPtr = ASTFromInputSemanticComplexTC(scriptCache, "Dummy = function() : var do\n return { data= 3 }\n end\n Dummy.data\n ", data);
 			CHECK(false);
 		} catch (std::exception& e) {
 			CHECK(std::string{e.what()}.find("the variable \"Dummy\" is not registered as an object but as a \"function Dummy (var Dummy)\"") != std::string::npos);
@@ -182,7 +182,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	SUBCASE("return a concrete custom type") {
 		ASTFromInputSemanticComplexTC(scriptCache,
 			"lvalFunc185 = function() : var do\n"
-			"return { test : 14 }\n"
+			"return { test = 14 }\n"
 			"end\n"
 			"lvalFunc188 = function() : lvalFunc185() do\n"
 			"return lvalFunc185()\n"
@@ -204,7 +204,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	SUBCASE("using a function as a parameter") {
 		ASTFromInputSemanticComplexTC(scriptCache,
 			"lvalFunc206 = function() : var do\n"
-				"return { test : 14 }\n"
+				"return { test = 14 }\n"
 			"end\n"
 			"lvalFunc209 = function(toto: lvalFunc206) : lvalFunc206() do\n"
 				"return toto()\n"

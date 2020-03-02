@@ -25,7 +25,7 @@ ska::ASTNodePtr ska::MatcherReturn::match(ScriptAST& input) {
             input.reader().mightMatch(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
 
             auto field = input.reader().match(TokenType::IDENTIFIER);
-            input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
+            input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
             auto fieldValue = input.expr(m_parser);
 
             SLOG(ska::LogLevel::Info) << "Constructor with field \"" << field << "\" and field value \"" << (*fieldValue) << "\"";
@@ -36,13 +36,16 @@ ska::ASTNodePtr ska::MatcherReturn::match(ScriptAST& input) {
 			m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 
             returnFieldNodes.push_back(std::move(fieldNode));
-                
-            input.reader().mightMatch(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
-            input.reader().mightMatch(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+
+            if(input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>())) {
+                input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+            } else if(!input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::OBJECT_BLOCK_END>())) {
+                throw std::runtime_error("an object block-end token was expected");
+            }
         }
-        
+
         input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::OBJECT_BLOCK_END>());
-    
+
         returnNode = ASTFactory::MakeNode<Operator::RETURN>(ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(returnFieldNodes)));
         auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT> (*returnNode, input);
 		m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnEndEvent);

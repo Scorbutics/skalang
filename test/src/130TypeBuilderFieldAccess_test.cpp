@@ -8,7 +8,7 @@
 TEST_CASE("[TypeBuilderFieldAccess]") {
 	DataTestContainer data;
 	auto scriptCache = ska::ScriptCacheAST{};
-	auto script = TypeBuilderTestCommonBuildAST(scriptCache, "Factory = function() : var do pdv = 0\n return { pdv : pdv }\n end\n obj = Factory()\n obj.pdv\n", data);
+	auto script = TypeBuilderTestCommonBuildAST(scriptCache, "Factory = function() : var do pdv = 0\n return { pdv = pdv }\n end\n obj = Factory()\n obj.pdv\n", data);
 	script.parse(*data.parser);
 
 	const auto& node = (script.rootNode())[2];
