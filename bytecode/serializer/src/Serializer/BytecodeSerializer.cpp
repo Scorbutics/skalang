@@ -38,14 +38,14 @@ bool ska::bytecode::Serializer::serialize(SerializationContext& context) const {
 	}
 }
 
-std::vector<std::string> ska::bytecode::Serializer::deserialize(DeserializationContext& context, bool declareFirst) const {
+std::vector<std::string> ska::bytecode::Serializer::deserialize(DeserializationContext& context, const std::unordered_set<std::string>& blacklist) const {
 	auto failedScripts = std::vector<std::string> {};
 	std::string scriptName = context.startScriptName();
 	auto scripts = std::unordered_set<std::string> {};
 	scripts.insert(scriptName);
 	
 	auto scriptIt = scripts.begin();
-	auto first = !declareFirst;
+
 	while (scriptIt != scripts.end()) {
 		auto canRead = context.read(*scriptIt);
 		
@@ -67,14 +67,17 @@ std::vector<std::string> ska::bytecode::Serializer::deserialize(DeserializationC
 			scriptIt = scripts.begin();
 			script.references.scripts.clear();
 
-			if (!script.header.scriptBridged) {
-				context >> script.body;
-			}
-			if (!first) {
+			if (blacklist.find(script.header.scriptName()) == blacklist.end()) {
+				if (!script.header.scriptBridged) {
+					context >> script.body;
+				}
+				LOG_INFO << "Declaring script " << script.header.scriptName();
 				context.declare(script.header.scriptName(), std::move(script.body.instructions), std::move(script.body.exports));
+			} else {
+				LOG_INFO << "Script " << script.header.scriptName() << " is blacklisted. Not declared";
 			}
-			first = false;
 		} else {
+			LOG_INFO << "Script " << *scriptIt << " cannot be read. Added to queue.";
 			failedScripts.push_back(*scriptIt);
 			scriptIt++;
 		}
@@ -88,7 +91,7 @@ bool ska::bytecode::Serializer::serialize(const ScriptCache& cache, Serializatio
 	return serialize(context);
 }
 
-std::vector<std::string> ska::bytecode::Serializer::deserialize(ScriptCache& cache, const std::string& startScriptName, DeserializationStrategy input, bool declareFirst) const {
+std::vector<std::string> ska::bytecode::Serializer::deserialize(ScriptCache& cache, const std::string& startScriptName, DeserializationStrategy input, const std::unordered_set<std::string>& blacklist) const {
 	auto context = DeserializationContext{ cache, startScriptName, input };
-	return deserialize(context, declareFirst);
+	return deserialize(context, blacklist);
 }

@@ -2,6 +2,7 @@
 #include <sstream>
 #include <memory>
 #include <vector>
+#include <unordered_set>
 #include "NodeValue/ASTNodePtr.h"
 #include "BytecodeSerializationStrategy.h"
 #include "Generator/Value/BytecodeInstruction.h"
@@ -21,8 +22,8 @@ namespace ska {
 
 			bool serialize(SerializationContext& context) const;
 			bool serialize(const ScriptCache& cache, SerializationStrategy output) const;
-			std::vector<std::string> deserialize(DeserializationContext& output, bool declareFirst = false) const;
-			std::vector<std::string> deserialize(ScriptCache& cache, const std::string& startScriptName, DeserializationStrategy input, bool declareFirst = false) const;
+			std::vector<std::string> deserialize(DeserializationContext& output, const std::unordered_set<std::string>& blacklist = {}) const;
+			std::vector<std::string> deserialize(ScriptCache& cache, const std::string& startScriptName, DeserializationStrategy input, const std::unordered_set<std::string>& blacklist = {}) const;
 		};
 	}
 }

@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
 
 	try {
 		auto serializer = ska::bytecode::Serializer{};
-		auto failedToRead = serializer.deserialize(mainCache, "main", ska::bytecode::DeserializationStrategyType::PerScript());	
+		auto failedToRead = serializer.deserialize(mainCache, "main", ska::bytecode::DeserializationStrategyType::PerScript(), {"main"});	
 
 		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);
 		auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);

@@ -32,7 +32,7 @@ TEST_CASE("[BytecodeSerializer] literal alone") {
 	auto res = data.serializer->serialize(*data.storage, SerializeInStream());
 	CHECK(res);
 	auto destinationCache = ska::bytecode::ScriptCache{};
-	auto original = data.serializer->deserialize(destinationCache, "main", DeserializeInStream(), true);
+	auto original = data.serializer->deserialize(destinationCache, "main", DeserializeInStream());
 	CHECK(original.empty());
 
 	// A way to test instructions emptyness
@@ -45,7 +45,7 @@ TEST_CASE("[BytecodeSerializer] function + field access + floating point value +
 	auto res = data.serializer->serialize(*data.storage, SerializeInStream());
 	CHECK(res);
 	auto destinationCache = ska::bytecode::ScriptCache{};
-	auto original = data.serializer->deserialize(destinationCache, "main", DeserializeInStream(), true);
+	auto original = data.serializer->deserialize(destinationCache, "main", DeserializeInStream());
 	CHECK(original.empty());
 
 	CHECK(destinationCache.at(0) == data.storage->at(0));
@@ -63,7 +63,7 @@ TEST_CASE("[BytecodeSerializer] concrete external script use") {
 	auto res = data.serializer->serialize(*data.storage, SerializeInStream());
 	CHECK(res);
 	auto destinationCache = ska::bytecode::ScriptCache{};
-	auto original = data.serializer->deserialize(destinationCache, "main", DeserializeInStream(), true);
+	auto original = data.serializer->deserialize(destinationCache, "main", DeserializeInStream());
 	CHECK(original.empty());
 
 	CHECK(destinationCache.size() == 2);
@@ -93,7 +93,7 @@ TEST_CASE("[BytecodeSerializer] binded external script use") {
 	auto res = data.serializer->serialize(*data.storage, SerializeInStream());
 	CHECK(res);
 	auto destinationCache = ska::bytecode::ScriptCache{};
-	auto original = data.serializer->deserialize(destinationCache, "main", DeserializeInStream(), true);
+	auto original = data.serializer->deserialize(destinationCache, "main", DeserializeInStream());
 	CHECK(original.empty());
 
 	CHECK(destinationCache.size() == 2);
