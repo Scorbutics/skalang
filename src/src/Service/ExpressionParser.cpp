@@ -80,7 +80,7 @@ std::pair<bool, int> ska::ExpressionParser::parseTokenExpression(ScriptAST& inpu
 		return { matchSymbol(input, expressions, token, isDoingOperation), rangeCounterOffsetPostMatching };
 
 	default:
-		error("Expected a symbol, a literal, an identifier or a reserved keyword, but got the token : " + token.name());
+		error("Expected a symbol, a literal, an identifier or a reserved keyword, but got the token \"" + token.name() + "\"");
 	}
 
 	return { false, rangeCounterOffsetPostMatching };
