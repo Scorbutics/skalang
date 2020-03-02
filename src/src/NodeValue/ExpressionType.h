@@ -30,6 +30,7 @@ namespace ska {
 		"bool"
 	};
 
+	static_assert(sizeof(ExpressionTypeSTR) / sizeof(ExpressionTypeSTR[0]) == static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length));
 
 	class ScopedSymbolTable;
 

@@ -1,5 +1,5 @@
-var Fcty = function(path: string) : var {
+Fcty = function(path: string) : var do
 	return {
-		canonical : function() : string { return "";}
-	};
-};
+		canonical : function() : string do return "" end
+	}
+end

@@ -56,7 +56,7 @@ std::pair<ska::Token, ska::Token> ska::Tokenizer::stackToken(TokenType currentTy
 
 ska::Cursor ska::Tokenizer::computeTokenPositionCursor(std::size_t index, const Token& readToken, bool wasRequired, const Cursor& lastCursor) {
 	const auto rawIndex = (wasRequired ? 0 : 1 ) + index;
-	const auto isEOL = readToken.type() == TokenType::SPACE && std::get<std::string>(readToken.content()) == "\n";
+	const auto isEOL = std::holds_alternative<std::string>(readToken.content()) &&  std::get<std::string>(readToken.content()) == "\n";
 	const auto tokenLength = readToken.name().size();
 	
 	const auto column =  
@@ -213,10 +213,17 @@ ska::RequiredToken ska::Tokenizer::initializeCharType(const ska::TokenType charT
 
 	case ska::TokenType::SPACE:
 		required.required = true;
+		required.requiredOrUntil[static_cast<std::size_t>(ska::TokenType::SPACE)] = true;
 		break;
 
 	case ska::TokenType::SYMBOL:
 		required.required = true;
+		break;
+	
+	case ska::TokenType::END_STATEMENT:
+		required.required = true;
+		required.requiredOrUntil[static_cast<std::size_t>(ska::TokenType::END_STATEMENT)] = true;
+		required.requiredOrUntil[static_cast<std::size_t>(ska::TokenType::SPACE)] = true;
 		break;
 
 	case ska::TokenType::RANGE:
@@ -242,12 +249,24 @@ ska::RequiredToken ska::Tokenizer::initializeCharType(const ska::TokenType charT
 	return required;
 }
 
+static std::string rtrim(std::string str) {
+	static const auto whiteSpacesExceptEndLine = std::string (" \f\r\t\v");
+	std::string::size_type pos = str.find_last_not_of(whiteSpacesExceptEndLine);
+	if (pos == std::string::npos) {
+		return "";
+	}
+	if (str[pos] == '\n') {
+		return "\n";
+	}
+	return str.substr(0, pos + 1);
+}
+
 std::string ska::Tokenizer::getInputStringTokenOrThrow(const TokenType& tokenType, std::size_t index, const Cursor& lastCursor, const std::size_t offset) const {
 	if((lastCursor.rawIndex + offset) >= m_input.size()) {
 		throw ParserError("unterminated token " + std::string{TokenTypeSTR[static_cast<std::size_t>(tokenType)]}, lastCursor);
 	}
 
-	return m_input.substr(lastCursor.rawIndex + offset, index - lastCursor.rawIndex - 2 * offset);
+	return rtrim(m_input.substr(lastCursor.rawIndex + offset, index - lastCursor.rawIndex - 2 * offset));
 }
 
 ska::Token ska::Tokenizer::postComputing(std::size_t index, const ska::RequiredToken& requiredToken, const Cursor& lastCursor) const {
@@ -295,13 +314,17 @@ ska::TokenType ska::Tokenizer::calculateCharacterTokenType(const char c) const {
 	case '8':
 	case '9':
 		return ska::TokenType::DIGIT;
+	
 	case '.':
 		return ska::TokenType::DOT_SYMBOL;
+
+	case '\n':
+		return ska::TokenType::END_STATEMENT;
+
 	case ' ':
 	case '\t':
 	case '\v':
 	case '\f':
-	case '\n':
 	case '\r':
 		return ska::TokenType::SPACE;
 

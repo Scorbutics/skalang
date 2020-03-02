@@ -141,8 +141,6 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationBody(ScriptAST& input) {
 		auto optionalStatement = input.statement(m_parser);
 		if (optionalStatement != nullptr && !optionalStatement->logicalEmpty()) {
 			statements.push_back(std::move(optionalStatement));
-		} else {
-			break;
 		}
 	}
 	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());

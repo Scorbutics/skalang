@@ -23,7 +23,6 @@ namespace ska {
 			m_reservedKeywordsPool(pool), m_parser(parser) {}
 	
 		ASTNodePtr matchImport(ScriptAST& input);
-		ASTNodePtr matchExport(ScriptAST& input);
 		
 		static ASTNodePtr createNewImport(
 			StatementParser& parser,

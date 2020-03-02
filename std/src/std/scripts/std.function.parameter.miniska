@@ -1,7 +1,7 @@
-var Fcty = function(scriptname: string) : var {
+Fcty = function(scriptname: string) : var do
 	return {
-		asInt : function(index: int) : int { return 0;},
-		asString : function(index: int) : string { return "";},
-		size : function() : int { return 0;}
-	};
-};
+		asInt : function(index: int) : int do return 0 end,
+		asString : function(index: int) : string do return "" end,
+		size : function() : int do return 0 end
+	}
+end

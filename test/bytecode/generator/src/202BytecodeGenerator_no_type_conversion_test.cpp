@@ -4,7 +4,7 @@
 #include "BytecodeGeneratorTest.h"
 
 TEST_CASE("[BytecodeGenerator] no type conversion string + string") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = \"3\" + \"7\";");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = \"3\" + \"7\"\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -14,7 +14,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion string + string") {
 }
 
 TEST_CASE("[BytecodeGenerator] no type conversion float + float") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3.0 + 7.4;");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = 3.0 + 7.4\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -24,7 +24,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion float + float") {
 }
 
 TEST_CASE("[BytecodeGenerator] no type conversion array") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = [3];");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = [3]\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -35,7 +35,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion array") {
 }
 
 TEST_CASE("[BytecodeGenerator] no type conversion array + array") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = [3] + [7, 12, 25];");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = [3] + [7, 12, 25]\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -49,7 +49,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion array + array") {
 }
 
 TEST_CASE("[BytecodeGenerator] no type conversion int - int") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3 - 4;");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = 3 - 4\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -59,7 +59,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion int - int") {
 }
 
 TEST_CASE("[BytecodeGenerator] no type conversion float - float") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3.1 - 4.2;");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = 3.1 - 4.2\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -69,7 +69,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion float - float") {
 }
 
 TEST_CASE("[BytecodeGenerator] no type conversion array - array") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = [11, 4, 9] - [1, 2];");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = [11, 4, 9] - [1, 2]\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -83,7 +83,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion array - array") {
 }
 
 TEST_CASE("[BytecodeGenerator] no type conversion int * int") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3 * 4;");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = 3 * 4\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -93,7 +93,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion int * int") {
 }
 
 TEST_CASE("[BytecodeGenerator] no type conversion float * float") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3.0 * 4.4;");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = 3.0 * 4.4\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -103,7 +103,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion float * float") {
 }
 
 TEST_CASE("[BytecodeGenerator] no type conversion int / int") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3 / 4;");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = 3 / 4\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -113,7 +113,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion int / int") {
 }
 
 TEST_CASE("[BytecodeGenerator] no type conversion float / float") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3.0 / 4.4;");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = 3.0 / 4.4\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {

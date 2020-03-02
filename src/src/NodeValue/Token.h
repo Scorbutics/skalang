@@ -16,6 +16,7 @@ namespace ska {
 		"IDENTIFIER",
 		"DIGIT",
 		"DOT_SYMBOL",
+		"END_STATEMENT",
 		"SPACE",
 		"STRING",
 		"RANGE",
@@ -31,6 +32,7 @@ namespace ska {
 		IDENTIFIER,
 		DIGIT,
 		DOT_SYMBOL,
+		END_STATEMENT,
 		SPACE,
 		STRING,
 		RANGE,
@@ -42,6 +44,7 @@ namespace ska {
 	};
 
 	struct Token {
+		using Variant = std::variant<std::size_t, std::string>;
 		Token() = default;
 		Token(const Token& t) = default;
 		Token(Token&& t) noexcept = default;
@@ -112,7 +115,6 @@ namespace ska {
 		}
 
 	private:
-		using Variant = std::variant<std::size_t, std::string>;
 		void init(std::size_t c, TokenType t) {
 			m_type = t;
 			assert(m_type == TokenType::RESERVED);

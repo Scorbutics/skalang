@@ -23,6 +23,16 @@ ska::ASTNodePtr ska::ExpressionParser::parse(ScriptAST& input) {
 	return expression(input, data);
 }
 
+ska::ASTNodePtr ska::ExpressionParser::matchVariable(ScriptAST& input, const Token& token) {	
+	auto varNode = ASTFactory::MakeLogicalNode(input.reader().match(token.type()));
+	if (input.reader().actual() == m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>()) {
+		return m_matcherVar.matchAffectation(input, std::move(varNode));
+	}
+	auto event = VarTokenEvent::MakeUse(*varNode, input);
+	m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
+	return varNode;
+}
+
 std::pair<bool, int> ska::ExpressionParser::parseTokenExpression(ScriptAST& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
 	auto rangeCounterOffsetPostMatching = 0;
 
@@ -44,10 +54,7 @@ std::pair<bool, int> ska::ExpressionParser::parseTokenExpression(ScriptAST& inpu
 
 	case TokenType::IDENTIFIER: {
 		SLOG(ska::LogLevel::Info) << "\tPushing var operand " << token;
-		auto varNode = ASTFactory::MakeLogicalNode(input.reader().match(token.type()));
-		auto event = VarTokenEvent::MakeUse(*varNode, input);
-		m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
-		expressions.push(std::move(varNode));
+		expressions.push(matchVariable(input, token));
 	} break;
 
 	case TokenType::ARRAY: {
@@ -109,7 +116,7 @@ int ska::ExpressionParser::matchRange(ScriptAST& input, ExpressionStack& express
 	} return 0;
 
 	default:
-    	error("Unexpected token (range type) : " + token.name());
+    	error("Unexpected token (range type) \"" + token.name() + "\"");
 		return 0;
 	}
 }
@@ -175,6 +182,7 @@ bool ska::ExpressionParser::isAtEndOfExpression(ScriptAST& input) const {
 	return input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()) ||
         	input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>()) ||
         	input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()) ||
+			input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::OBJECT_BLOCK_END>()) ||
         	input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 }
 

@@ -6,7 +6,7 @@
 using namespace ska::bytecode;
 
 TEST_CASE("[BytecodeGenerator] import ") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var Player = import \"" SKALANG_TEST_DIR "/src/resources/play\";");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("Player = import \"" SKALANG_TEST_DIR "/src/resources/play\"\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 	BytecodeCompare(res, {
 		{ Command::SCRIPT, "R0", "1" },
@@ -16,19 +16,19 @@ TEST_CASE("[BytecodeGenerator] import ") {
 
 TEST_CASE("[BytecodeGenerator] Outside script from file (import) and use") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator(
-		"var Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
-		"var player = Character184.build(\"Player\");"
-		"var enemy = Character184.default; enemy.age;");
+		"Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
+		"player = Character184.build(\"Player\")\n"
+		"enemy = Character184.default\n enemy.age\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 	//CHECK(res.nodeval<int>() == 10);
 }
 
 TEST_CASE("[BytecodeGenerator] Use 2x same script and modifying a value in first import var : should modify also value in second import var") {
 	constexpr auto progStr =
-		"var Character91 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
-		"var Character92 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
-		"Character91.default.age = 123;"
-		"var t = Character92.default.age;";
+		"Character91 = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
+		"Character92 = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
+		"Character91.default.age = 123\n"
+		"t = Character92.default.age\n";
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(astPtr));
 }

@@ -4,7 +4,7 @@
 #include "BytecodeGeneratorTest.h"
 
 TEST_CASE("[BytecodeGenerator] type conversion + int => string") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 7 + \"3\";");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator(" result = 7 + \"3\"\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -18,7 +18,7 @@ TEST_CASE("[BytecodeGenerator] type conversion + int => string") {
 // TODO: Unsupported atm (Unable to use operator "+" on types "float" and "string")
 
 TEST_CASE("[BytecodeGenerator] type conversion + float => string") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 7.0 + \"3\";");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator(" result = 7.0 + \"3\"\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -30,7 +30,7 @@ TEST_CASE("[BytecodeGenerator] type conversion + float => string") {
 */
 
 TEST_CASE("[BytecodeGenerator] type conversion + int => float") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 7.0 + 3;");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator(" result = 7.0 + 3\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -41,7 +41,7 @@ TEST_CASE("[BytecodeGenerator] type conversion + int => float") {
 }
 
 TEST_CASE("[BytecodeGenerator] type conversion + int => array (back)") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = [7, 12, 25] + 3;");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator(" result = [7, 12, 25] + 3\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -53,7 +53,7 @@ TEST_CASE("[BytecodeGenerator] type conversion + int => array (back)") {
 }
 
 TEST_CASE("[BytecodeGenerator] type conversion + int => array (front)") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var result = 3 + [7, 12, 25];");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator(" result = 3 + [7, 12, 25]\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {

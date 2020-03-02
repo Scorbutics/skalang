@@ -4,7 +4,7 @@
 #include "BytecodeInterpreterTest.h"
 
 TEST_CASE("[BytecodeInterpreter] no type conversion string + string") {
-	static constexpr auto progStr = "var result = \"3\" + \"7\";";
+	static constexpr auto progStr = "result = \"3\" + \"7\"\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -14,7 +14,7 @@ TEST_CASE("[BytecodeInterpreter] no type conversion string + string") {
 }
 
 TEST_CASE("[BytecodeInterpreter] no type conversion float + float") {
-	static constexpr auto progStr = "var result = 3.0 + 7.4;";
+	static constexpr auto progStr = "result = 3.0 + 7.4\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -24,7 +24,7 @@ TEST_CASE("[BytecodeInterpreter] no type conversion float + float") {
 }
 
 TEST_CASE("[BytecodeInterpreter] no type conversion array") {
-	static constexpr auto progStr = "var result = [3];";
+	static constexpr auto progStr = "result = [3]\n";
   auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -34,7 +34,7 @@ TEST_CASE("[BytecodeInterpreter] no type conversion array") {
 }
 
 TEST_CASE("[BytecodeInterpreter] no type conversion array + array") {
-	static constexpr auto progStr = "var result = [3] + [7, 12, 25];";
+	static constexpr auto progStr = "result = [3] + [7, 12, 25]\n";
   auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -48,7 +48,7 @@ TEST_CASE("[BytecodeInterpreter] no type conversion array + array") {
 }
 
 TEST_CASE("[BytecodeInterpreter] no type conversion int - int") {
-	static constexpr auto progStr = "var result = 3 - 4;";
+	static constexpr auto progStr = "result = 3 - 4\n";
   auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -58,7 +58,7 @@ TEST_CASE("[BytecodeInterpreter] no type conversion int - int") {
 }
 
 TEST_CASE("[BytecodeInterpreter] no type conversion float - float") {
-	static constexpr auto progStr = "var result = 3.1 - 4.2;";
+	static constexpr auto progStr = "result = 3.1 - 4.2\n";
   auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -68,7 +68,7 @@ TEST_CASE("[BytecodeInterpreter] no type conversion float - float") {
 }
 
 TEST_CASE("[BytecodeInterpreter] no type conversion array - array") {
-	static constexpr auto progStr = "var result = [11, 4, 9] - [1, 2];";
+	static constexpr auto progStr = "result = [11, 4, 9] - [1, 2]\n";
   auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -79,7 +79,7 @@ TEST_CASE("[BytecodeInterpreter] no type conversion array - array") {
 }
 
 TEST_CASE("[BytecodeInterpreter] no type conversion int * int") {
-	static constexpr auto progStr = "var result = 3 * 4;";
+	static constexpr auto progStr = "result = 3 * 4\n";
   auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -89,7 +89,7 @@ TEST_CASE("[BytecodeInterpreter] no type conversion int * int") {
 }
 
 TEST_CASE("[BytecodeInterpreter] no type conversion float * float") {
-	static constexpr auto progStr = "var result = 3.0 * 4.4;";
+	static constexpr auto progStr = "result = 3.0 * 4.4\n";
   auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -100,7 +100,7 @@ TEST_CASE("[BytecodeInterpreter] no type conversion float * float") {
 }
 
 TEST_CASE("[BytecodeInterpreter] no type conversion int / int") {
-	static constexpr auto progStr = "var result = 3 / 4;";
+	static constexpr auto progStr = "result = 3 / 4\n";
   auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -110,7 +110,7 @@ TEST_CASE("[BytecodeInterpreter] no type conversion int / int") {
 }
 
 TEST_CASE("[BytecodeInterpreter] no type conversion float / float") {
-	static constexpr auto progStr = "var result = 3.0 / 4.4;";
+	static constexpr auto progStr = "result = 3.0 / 4.4\n";
   auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);

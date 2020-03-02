@@ -5,10 +5,10 @@
 
 TEST_CASE("[BytecodeInterpreter] Outside script from file (import) and use") {
 	constexpr auto progStr = 
-		"var Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
-		"var player = Character184.build(\"Player\");"
-		"var enemy = Character184.default;"
-		"var t = enemy.age;";
+		"Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
+		"player = Character184.build(\"Player\")\n"
+		"enemy = Character184.default\n"
+		"t = enemy.age\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -19,10 +19,10 @@ TEST_CASE("[BytecodeInterpreter] Outside script from file (import) and use") {
 
 TEST_CASE("[BytecodeInterpreter] Outside script from file (import) - edit - and use") {
 	constexpr auto progStr = 
-		"var Character260 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
-		"var enemy = Character260.default;"
-		"enemy.age = 99;"
-		"var t = enemy.age;";
+		"Character260 = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
+		"enemy = Character260.default\n"
+		"enemy.age = 99\n"
+		"t = enemy.age\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -33,10 +33,10 @@ TEST_CASE("[BytecodeInterpreter] Outside script from file (import) - edit - and 
 
 TEST_CASE("[BytecodeInterpreter] Use 2x same script : ensure we do not try to recompile neither rerun it") {
 	constexpr auto progStr =
-		"var Character270 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
-		"var Character272 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
-		"Character270.default.age;"
-		"var t = Character272.default.age;";
+		"Character270 = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
+		"Character272 = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
+		"Character270.default.age\n"
+		"t = Character272.default.age\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -47,10 +47,10 @@ TEST_CASE("[BytecodeInterpreter] Use 2x same script : ensure we do not try to re
 
 TEST_CASE("[BytecodeInterpreter] Use 2x same script and modifying a value in first import var : should modify also value in second import var") {
 	constexpr auto progStr =
-		"var Character284 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
-		"var Character285 = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
-		"Character284.default.age = 123;"
-		"var t = Character285.default.age;";
+		"Character284 = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
+		"Character285 = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
+		"Character284.default.age = 123\n"
+		"t = Character285.default.age\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);

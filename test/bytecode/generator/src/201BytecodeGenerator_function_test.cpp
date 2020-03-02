@@ -4,7 +4,7 @@
 #include "BytecodeGeneratorTest.h"
 
 TEST_CASE("[BytecodeGenerator] Empty function only void") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function() { };");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("toto = function() do end\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -15,7 +15,7 @@ TEST_CASE("[BytecodeGenerator] Empty function only void") {
 }
 
 TEST_CASE("[BytecodeGenerator] Empty function with 1 parameter") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function(t: int) { };");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("toto = function(t: int) do end\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -27,7 +27,7 @@ TEST_CASE("[BytecodeGenerator] Empty function with 1 parameter") {
 }
 
 TEST_CASE("[BytecodeGenerator] Empty function with 4 parameters (> 3)") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function(t: int, t1: string, t2: int, t3: int) { };");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("toto = function(t: int, t1: string, t2: int, t3: int) do end\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -40,7 +40,7 @@ TEST_CASE("[BytecodeGenerator] Empty function with 4 parameters (> 3)") {
 }
 
 TEST_CASE("[BytecodeGenerator] Basic function with 1 return type") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function(): int { return 0; };");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("toto = function(): int do return 0\n end\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -51,7 +51,7 @@ TEST_CASE("[BytecodeGenerator] Basic function with 1 return type") {
 }
 
 TEST_CASE("[BytecodeGenerator] Basic function with 1 parameter 1 return type") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function(test: int): int { return 0; };");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("toto = function(test: int): int do return 0\n end\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -63,7 +63,7 @@ TEST_CASE("[BytecodeGenerator] Basic function with 1 parameter 1 return type") {
 }
 
 TEST_CASE("[BytecodeGenerator] Function with 1 parameter and some computing inside") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("var toto = function(test: int): int { var result = test + 3; return result; };");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("toto = function(test: int): int do result = test + 3\n return result\n end\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -79,17 +79,17 @@ TEST_CASE("[BytecodeGenerator] Function with 1 parameter and some computing insi
 
 TEST_CASE("[BytecodeGenerator] Custom object creation") {
 	constexpr auto progStr =
-		"var toto = function() : var {"
-			"var priv_test = 1;"
+		"toto = function() : var do\n"
+			"priv_test = 1\n"
 			"return {"
 				"test : priv_test,"
-				"say : function(more : string) : string {"
-					"var s = \"lol\" + priv_test + more;"
-					"return s;"
-				"}"
-			"};"
-		"};"
-		"var test = toto();";
+				"say : function(more : string) : string do\n"
+					"s = \"lol\" + priv_test + more\n"
+					"return s\n"
+				"end\n"
+			"}\n"
+		"end\n"
+		"test = toto()\n";
 
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
@@ -119,9 +119,9 @@ TEST_CASE("[BytecodeGenerator] Custom object creation") {
 
 TEST_CASE("[BytecodeGenerator] Use complex call inside function parameters") {
 	constexpr auto progStr =
-		"var titi = function() : var { return { test : \"tulululu\" }; };"
-		"var toto = function(arg1 : string) : void {};"
-		"toto(titi().test);";
+		"titi = function() : var do return { test : \"tulululu\" }\n end\n"
+		"toto = function(arg1 : string) : void do end\n"
+		"toto(titi().test)\n";
 
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
@@ -147,18 +147,18 @@ TEST_CASE("[BytecodeGenerator] Use complex call inside function parameters") {
 
 TEST_CASE("[BytecodeGenerator] Custom object creation2") {
 	constexpr auto progStr =
-		"var toto = function() : var {"
-			"var priv_test = 123;"
+		"toto = function() : var do\n"
+			"priv_test = 123\n"
 			"return {"
 				"test : priv_test,"
-				"say : function(more : string) : string {"
-					"var s = \"lol\" + priv_test + more;"
-					"return s;"
-				"}"
-			"};"
-		"};"
-		"var test = toto();"
-		"test.say(\"titi\");";
+				"say : function(more : string) : string do\n"
+					"s = \"lol\" + priv_test + more\n"
+					"return s\n"
+				"end"
+			"}\n"
+		"end\n"
+		"test = toto()\n"
+		"test.say(\"titi\")\n";
 
 	auto [script, data] = ASTFromInputBytecodeGenerator(progStr);
 	auto& res = data.generator->generate(*data.storage, std::move(script));
@@ -194,19 +194,19 @@ TEST_CASE("[BytecodeGenerator] Custom object creation2") {
 // JUMP_ABS instruction
 TEST_CASE("[BytecodeInterpreter] Custom object creation 3 (double field function call)") {
 	constexpr auto progStr =
-		"var toto = function() : var {"
-			"var priv_test = 123;"
+		"toto = function() : var do\n"
+			"priv_test = 123\n"
 			"return {"
 				"test : priv_test,"
-				"say : function(more : string) : string {"
-					"var s = \"lol\" + priv_test + more;"
-					"return s;"
-				"}"
-			"};"
-		"};"
-		"var test = toto();"
-		"test.say(\"titi\");"
-		"test.say(\"titi4\");";
+				"say : function(more : string) : string do\n"
+					"s = \"lol\" + priv_test + more\n"
+					"return s\n"
+				"end\n"
+			"}\n"
+		"end\n"
+		"test = toto()\n"
+		"test.say(\"titi\")\n"
+		"test.say(\"titi4\")\n";
 
 	auto [script, data] = ASTFromInputBytecodeGenerator(progStr);
 	auto& res = data.generator->generate(*data.storage, std::move(script));
@@ -244,18 +244,18 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation 3 (double field function
 
 TEST_CASE("[BytecodeGenerator] Field access affectation") {
 	constexpr auto progStr =
-		"var toto = function() : var {"
-			"var priv_test = 123;"
+		"toto = function() : var do\n"
+			"priv_test = 123\n"
 			"return {"
 				"test : priv_test,"
-				"say : function(more : string) : string {"
-					"var s = \"lol\" + priv_test + more;"
-					"return s;"
-				"}"
-			"};"
-		"};"
-		"var t = toto();"
-		"t.test = 1122;";
+				"say : function(more : string) : string do\n"
+					"s = \"lol\" + priv_test + more\n"
+					"return s\n"
+				"end"
+			"}\n"
+		"end\n"
+		"t = toto()\n"
+		"t.test = 1122\n";
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(astPtr));
 }

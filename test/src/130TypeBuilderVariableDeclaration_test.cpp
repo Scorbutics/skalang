@@ -16,7 +16,7 @@ TEST_CASE("[TypeBuilderVariableDeclaration]") {
 	DataTestContainer data;
 	auto script = TypeBuilderTestCommonBuildAST(scriptCache, "", data, false);
 	script.parse(*data.parser);
-		auto typeBuilder = ska::TypeBuilderOperator<ska::Operator::VARIABLE_DECLARATION>{};
+		auto typeBuilder = ska::TypeBuilderOperator<ska::Operator::VARIABLE_AFFECTATION>{};
 	
 	auto nameToken = ska::Token{"toto", ska::TokenType::IDENTIFIER, {} };
 	auto valueToken = ska::Token{ "1", ska::TokenType::DIGIT, {} };
@@ -31,7 +31,7 @@ TEST_CASE("[TypeBuilderVariableDeclaration]") {
 	valueNode->buildType(result, script);
 	auto children = std::vector<ska::ASTNodePtr>{ };
 	children.push_back(std::move(valueNode));
-	auto node = ska::ASTFactory::MakeNode<ska::Operator::VARIABLE_DECLARATION>(std::move(nameToken), std::move(children));
+	auto node = ska::ASTFactory::MakeNode<ska::Operator::VARIABLE_AFFECTATION>(std::move(nameToken), std::move(children));
 	auto type = typeBuilder.build(script, *node);
 	CHECK(type == ska::ExpressionType::INT);
 }

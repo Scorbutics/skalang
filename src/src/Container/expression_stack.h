@@ -83,7 +83,7 @@ namespace ska {
 			const std::string topOperatorContent = (emptyOperator() || topOperator().name().empty()) ? "" : topOperator().name();
 			if (PRIORITY_MAP.find(tokenOperator) == PRIORITY_MAP.end()) {
 				auto ss = std::stringstream{};
-				ss << "syntax error : bad operator : " << tokenOperator;
+				ss << "syntax error : bad operator \"" << tokenOperator << "\"";
 				throw std::runtime_error(ss.str());
 			}
 

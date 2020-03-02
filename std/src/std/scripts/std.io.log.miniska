@@ -1,1 +1,1 @@
-var print = function(str: string) {};
+print = function(str: string) do end

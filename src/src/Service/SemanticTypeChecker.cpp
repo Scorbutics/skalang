@@ -203,33 +203,37 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 		throw std::runtime_error("The symbol \"" + name + "\" cannot be declared as a void type");
 	}
 
-	if(variable.type() == VarTokenEventType::AFFECTATION) {
-		assert(variable.rootNode().size() > 0);
-		if (!OperatorTraits::isLvalueCompatible(variable.rootNode()[0].op())) {
+	if (variable.type() == VarTokenEventType::VARIABLE_AFFECTATION &&
+		OperatorTraits::isNamed(variable.rootNode().op()) && name.empty()) {
+		throw std::runtime_error("invalid symbol declaration");
+	}
+
+	if(variable.type() == VarTokenEventType::AFFECTATION || variable.type() == VarTokenEventType::VARIABLE_AFFECTATION) {
+		if (!OperatorTraits::isLvalueCompatible(variable.var().op())) {
 			auto ss = std::stringstream{};
 			ss << "The symbol \"" << name << "\" is not an lvalue, therefore cannot be assigned";
 			throw std::runtime_error(ss.str());
 		}
-		
-		const auto tokenNodeExpressionType = variable.valType().value();
-		const auto newTokenType = type.crossTypes(m_typeCrosser, "=", tokenNodeExpressionType);
-				if(newTokenType == ExpressionType::VOID) {
-						const auto expressionTypeIndex = tokenNodeExpressionType;
-			auto ss = std::stringstream{};
-			ss << "The symbol \"" << name << "\" has already been declared as \"" <<
-				type << "\" but is now wanted to be \"" <<
-				expressionTypeIndex << "\"";
-			throw std::runtime_error(ss.str());		
-				}
-		if (OperatorTraits::isNamed(variable.rootNode()[0].op()) && name.empty()) {
-			throw std::runtime_error("invalid symbol affectation");
-		}
+
+		if (variable.valType().has_value()) {
+			const auto tokenNodeExpressionType = variable.valType().value();
+			const auto newTokenType = type.crossTypes(m_typeCrosser, "=", tokenNodeExpressionType);
+			if (newTokenType == ExpressionType::VOID) {
+				const auto expressionTypeIndex = tokenNodeExpressionType;
+				auto ss = std::stringstream{};
+				ss << "The symbol \"" << name << "\" has already been declared as \"" <<
+					type << "\" but is now wanted to be \"" <<
+					expressionTypeIndex << "\"";
+				throw std::runtime_error(ss.str());
+			}
 		}
 
-	if (variable.type() == VarTokenEventType::VARIABLE_DECLARATION && 
-		OperatorTraits::isNamed(variable.rootNode().op()) && name.empty()) {
-		throw std::runtime_error("invalid symbol declaration");
+		if (OperatorTraits::isNamed(variable.var().op()) && name.empty()) {
+			throw std::runtime_error("invalid symbol affectation");
+		}
 	}
+
+
 
 		return true;
 }

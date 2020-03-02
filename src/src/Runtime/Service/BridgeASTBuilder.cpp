@@ -139,8 +139,8 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeVariable(ScriptAST& script, const std
 	auto lock = BridgeASTBuilderSymbolTableLock{*this, script.symbols() };
 	SLOG(LogLevel::Info) << " 8 - Making variable \"" << name << "\"";
 	auto tokenField = Token {name, TokenType::IDENTIFIER, {} };
-	auto variable = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(tokenField), std::move(value));
-	auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_DECLARATION> (*variable, script);
+	auto variable = ASTFactory::MakeNode<Operator::VARIABLE_AFFECTATION>(std::move(tokenField), std::move(value));
+	auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_AFFECTATION> (*variable, script);
 	observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 	return variable;
 }

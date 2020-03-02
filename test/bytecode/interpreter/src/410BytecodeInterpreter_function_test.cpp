@@ -5,18 +5,18 @@
 
 TEST_CASE("[BytecodeInterpreter] Custom object creation (field access)") {
 	constexpr auto progStr =
-		"var toto = function() : var {"
-			"var priv_test = 123;"
+		"toto = function() : var do\n"
+			"priv_test = 123\n"
 			"return {"
 				"test : priv_test,"
-				"say : function(more : string) : string {"
-					"var s = \"lol\" + priv_test + more;"
-					"return s;"
-				"}"
-			"};"
-		"};"
-		"var test = toto();"
-		"var t = test.test;";
+				"say : function(more : string) : string do\n"
+					"s = \"lol\" + priv_test + more\n"
+					"return s\n"
+				"end\n"
+			"}\n"
+		"end\n"
+		"test = toto()\n"
+		"t = test.test\n";
 
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
@@ -28,19 +28,19 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation (field access)") {
 
 TEST_CASE("[BytecodeInterpreter] Custom object creation 2 (field function call)") {
 	constexpr auto progStr =
-		"var toto = function() : var {"
-			"var priv_test = 123;"
+		"toto = function() : var do\n"
+			"priv_test = 123\n"
 			"return {"
 				"test : priv_test,"
-				"say : function(more : string) : string {"
-					"var s = \"lol\" + priv_test + more;"
-					"return s;"
-				"}"
-			"};"
-		"};"
-		"var test = toto();"
-		"test.say(\"titi\");"
-		"var t = test.say(\"titi4\");";
+				"say : function(more : string) : string do\n"
+					"s = \"lol\" + priv_test + more\n"
+					"return s\n"
+				"end\n"
+			"}\n"
+		"end\n"
+		"test = toto()\n"
+		"test.say(\"titi\")\n"
+		"t = test.say(\"titi4\")\n";
 
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
@@ -54,19 +54,19 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation 2 (field function call)"
 // still refers to the same function and the resulting value is different
 TEST_CASE("[BytecodeInterpreter] Custom object creation 3 (double field function call)") {
 	constexpr auto progStr =
-		"var toto = function() : var {"
-			"var priv_test = 123;"
+		"toto = function() : var do\n"
+			"priv_test = 123\n"
 			"return {"
 				"test : priv_test,"
-				"say : function(more : string) : string {"
-					"var s = \"lol\" + priv_test + more;"
-					"return s;"
-				"}"
-			"};"
-		"};"
-		"var test = toto();"
-		"test.say(\"titi\");"
-		"var t = test.say(\"titi4\");";
+				"say : function(more : string) : string do\n"
+					"s = \"lol\" + priv_test + more\n"
+					"return s\n"
+				"end\n"
+			"}\n"
+		"end\n"
+		"test = toto()\n"
+		"test.say(\"titi\")\n"
+		"t = test.say(\"titi4\")\n";
 
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
@@ -78,14 +78,14 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation 3 (double field function
 
 TEST_CASE("[BytecodeInterpreter] using a function as a parameter") {
 	constexpr auto progStr =
-		"var bi_193 = function() : var {"
-		"return { test : 14 };"
-		"};"
-		"var bi_209 = function(toto: bi_193) : bi_193() {"
-		"return toto();"
-		"};"
-		"var object = bi_209(bi_193);"
-		"var t = object.test;";
+		"bi_193 = function() : var do\n"
+		"return { test : 14 }\n"
+		"end\n"
+		"bi_209 = function(toto: bi_193) : bi_193() do\n"
+		"return toto()\n"
+		"end\n"
+		"object = bi_209(bi_193)\n"
+		"t = object.test\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -96,10 +96,10 @@ TEST_CASE("[BytecodeInterpreter] using a function as a parameter") {
 
 TEST_CASE("[BytecodeInterpreter] down scope function variable access") {
 	constexpr auto progStr =
-		"var testValue = 0;"
-		"var callback = function() { testValue = 1; };"
-		"callback();"
-		"var out = testValue;";
+		"testValue = 0\n"
+		"callback = function() do testValue = 1\n end\n"
+		"callback()\n"
+		"out = testValue\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto res = data.interpreter->interpret(gen.id(), *data.storage)->variable(0);
@@ -109,13 +109,13 @@ TEST_CASE("[BytecodeInterpreter] down scope function variable access") {
 
 TEST_CASE("[BytecodeInterpreter] using a callback function as a parameter") {
 	constexpr auto progStr =
-		"var testValue = 1234;"
-		"var callback = function() { testValue = 789; };"
-		"var lvalFunc219 = function(toto: callback) {"
-		" toto();"
-		"};"
-		"lvalFunc219(callback);"
-		"var out = testValue;";
+		"testValue = 1234\n"
+		"callback = function() do testValue = 789\n end\n"
+		"lvalFunc219 = function(toto: callback) do\n"
+		" toto()\n"
+		"end\n"
+		"lvalFunc219(callback)\n"
+		"out = testValue\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto res = data.interpreter->interpret(gen.id(), *data.storage)->variable(0);
@@ -125,14 +125,14 @@ TEST_CASE("[BytecodeInterpreter] using a callback function as a parameter") {
 
 TEST_CASE("[BytecodeInterpreter] using a callback function as a parameter without using the source type (function type compatibility)") {
 	constexpr auto progStr =
-		"var lvalFunc218 = function() {};"
-		"var lvalFunc219 = function(toto: lvalFunc218) : lvalFunc218() {"
-		" toto();"
-		"};"
-		"var testValue = 1234;"
-		"var callback = function() { testValue = 789; };"
-		"lvalFunc219(callback);"
-		"var out = testValue;";
+		"lvalFunc218 = function() do end\n"
+		"lvalFunc219 = function(toto: lvalFunc218) : lvalFunc218() do\n"
+		" toto()\n"
+		"end\n"
+		"testValue = 1234\n"
+		"callback = function() do testValue = 789\n end\n"
+		"lvalFunc219(callback)\n"
+		"out = testValue\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto res = data.interpreter->interpret(gen.id(), *data.storage)->variable(0);

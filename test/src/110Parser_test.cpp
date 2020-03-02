@@ -13,7 +13,7 @@
 TEST_CASE("[Parser]") {
 	auto scriptCache = ska::ScriptCacheAST{};
 
-	const auto inputStr = std::string("for(var i = 0; i < 5; i++) { lol; \"mdr\"; 12; }");
+	const auto inputStr = std::string("for(i = 0\n i < 5\n i++) do lol\n \"mdr\"\n 12\n end");
 	const auto keywords = ska::ReservedKeywordsPool{};
 	auto t = ska::Tokenizer {keywords, inputStr};
 	auto tokens = t.tokenize();
@@ -28,7 +28,7 @@ TEST_CASE("[Parser]") {
 
 	CHECK(tree.size() == 4);
 	const auto& declaration = tree[0];
-	CHECK(declaration.op() == ska::Operator::VARIABLE_DECLARATION);
+	CHECK(declaration.op() == ska::Operator::VARIABLE_AFFECTATION);
 	CHECK(declaration.size() == 1);
 	CHECK(declaration.has(ska::Token { "i", ska::TokenType::IDENTIFIER, {} }));
 	CHECK(declaration[0].has(ska::Token { "0", ska::TokenType::DIGIT, {} }));
@@ -65,14 +65,22 @@ TEST_CASE("Block") {
 	auto scriptCache = ska::ScriptCacheAST{};
 
 	SUBCASE("Empty block statement") {
-		auto astPtr = ASTFromInput(scriptCache, "{}", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "do end", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BLOCK);
 		CHECK(ast.size() == 0);
 	}
 
 	SUBCASE("1 statement block statement") {
-		auto astPtr = ASTFromInput(scriptCache, "{ test; }", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "do test\n end", keywords);
+		auto& ast = astPtr.rootNode()[0];
+		CHECK(ast.op() == ska::Operator::BLOCK);
+		CHECK(ast.size() == 1);
+		CHECK(ast[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER, {}}));
+	}
+
+	SUBCASE("1 statement block statement + no end statement (direct end block)") {
+		auto astPtr = ASTFromInput(scriptCache, "do test end", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BLOCK);
 		CHECK(ast.size() == 1);
@@ -80,7 +88,7 @@ TEST_CASE("Block") {
 	}
 
 	SUBCASE("1 statement block statement") {
-		auto astPtr = ASTFromInput(scriptCache, "{ test; titi; }", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "do test\n titi\n end", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BLOCK);
 		CHECK(ast.size() == 2);
@@ -89,7 +97,7 @@ TEST_CASE("Block") {
 	}
 
 	SUBCASE("1 statement, then a block statement") {
-		auto& ast = ASTFromInput(scriptCache, "tititi; { test; titi; }", keywords).rootNode();
+		auto& ast = ASTFromInput(scriptCache, "tititi\n do test\n titi\n end", keywords).rootNode();
 
 		CHECK(ast.op() == ska::Operator::BLOCK);
 		CHECK(ast.size() == 2);
@@ -98,33 +106,18 @@ TEST_CASE("Block") {
 	}
 }
 
-TEST_CASE("for") {
-	auto scriptCache = ska::ScriptCacheAST{};
-	const auto keywords = ska::ReservedKeywordsPool {};
-	SUBCASE("All empty") {
-		auto astPtr = ASTFromInput(scriptCache, "for(;;);", keywords);
-		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::FOR_LOOP);
-		CHECK(ast.size() == 4);
-		CHECK(ast[0].logicalEmpty());
-		CHECK(ast[1].logicalEmpty());
-		CHECK(ast[2].logicalEmpty());
-		CHECK(ast[3].logicalEmpty());
-	}
-}
-
 TEST_CASE("booleans") {
 	const auto keywords = ska::ReservedKeywordsPool{};
 	auto scriptCache = ska::ScriptCacheAST{};
 	SUBCASE("true") {
-		auto astPtr = ASTFromInput(scriptCache, "true;", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "true\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::LITERAL);
 		CHECK(ast.has(ska::Token{ "true", ska::TokenType::BOOLEAN, {}}));
 	}
 
 	SUBCASE("false") {
-		auto astPtr = ASTFromInput(scriptCache, "false;", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "false\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::LITERAL);
 		CHECK(ast.has(ska::Token{ "false", ska::TokenType::BOOLEAN, {}}));
@@ -135,7 +128,7 @@ TEST_CASE("If keyword pattern") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	auto scriptCache = ska::ScriptCacheAST{};
 	SUBCASE("If only with cond and block statement") {
-		auto astPtr = ASTFromInput(scriptCache, "if (test) {}", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "if (test) do end", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::IF);
 		CHECK(ast.size() == 2);
@@ -148,9 +141,9 @@ TEST_CASE("function") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	auto scriptCache = ska::ScriptCacheAST{};
 	SUBCASE("with 2 arguments built-in types and no return type") {
-		auto astPtr = ASTFromInput(scriptCache, "var f = function(titi:int, toto:string) { };", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "f = function(titi:int, toto:string) do end\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-	CHECK(ast.op() == ska::Operator::VARIABLE_DECLARATION);
+	CHECK(ast.op() == ska::Operator::VARIABLE_AFFECTATION);
 	const auto& astFunc133 = ast[0];
 	CHECK(astFunc133.op() == ska::Operator::FUNCTION_DECLARATION);
 		CHECK(astFunc133.size() == 2);
@@ -162,24 +155,24 @@ TEST_CASE("function") {
 	}
 	//TODO rework : doesn't properly work (doesn't detect a good function returning type)
 	SUBCASE("with 2 return placements (early return support)") {
-		auto astPtr = ASTFromInput(scriptCache, "var f_parser154 = function(titi:int) : int { if(titi == 0) { return 1; } return 0; }; var int_parser154 = f_parser154(1);", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "f_parser154 = function(titi:int) : int do if(titi == 0) do return 1\n end return 0\n end\n int_parser154 = f_parser154(1)\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-	CHECK(ast.op() == ska::Operator::VARIABLE_DECLARATION);
+	CHECK(ast.op() == ska::Operator::VARIABLE_AFFECTATION);
 	const auto& astFunc157 = ast[0];
 	CHECK(astFunc157.op() == ska::Operator::FUNCTION_DECLARATION);
 		CHECK(astFunc157.size() == 2);
 	}
 	
 	SUBCASE("Empty statement") {
-		ASTFromInput(scriptCache, ";", keywords);
+		ASTFromInput(scriptCache, "\n", keywords);
 	}
 
 	SUBCASE("Empty statement-block") {
-		ASTFromInput(scriptCache, "{;}", keywords);
+		ASTFromInput(scriptCache, "do\nend", keywords);
 	}
 
 	SUBCASE("Empty statement-function") {
-		ASTFromInput(scriptCache, "var test255 = function() { ; }; test255();", keywords);
+		ASTFromInput(scriptCache, "test255 = function() do \n end\n test255()\n", keywords);
 	}
 }
 
@@ -189,13 +182,13 @@ TEST_CASE("User defined object") {
 
 	SUBCASE("constructor with 1 parameter") {
 
-	auto astPtr = ASTFromInput(scriptCache, "var Joueur = function(nom:string) : var { return { nom : nom }; }; var joueur1 = Joueur(\"joueur 1\"); joueur1.nom;", keywords);
+	auto astPtr = ASTFromInput(scriptCache, "Joueur = function(nom:string) : var do return { nom : nom }\n end\n joueur1 = Joueur(\"joueur 1\")\n joueur1.nom\n", keywords);
 		CHECK(astPtr.rootNode().size() == 3);
 	CHECK(astPtr.rootNode().op() == ska::Operator::BLOCK);
 
 	auto& varJoueurNode = astPtr.rootNode()[0];
 	CHECK(varJoueurNode.size() == 1);
-	CHECK(varJoueurNode.op() == ska::Operator::VARIABLE_DECLARATION);
+	CHECK(varJoueurNode.op() == ska::Operator::VARIABLE_AFFECTATION);
 	const auto& astFunc154 = varJoueurNode[0];
 	CHECK(astFunc154.op() == ska::Operator::FUNCTION_DECLARATION);
 		CHECK(astFunc154.size() == 2);
@@ -225,7 +218,7 @@ TEST_CASE("User defined object") {
 
 	//Checks the variable declaration and the function call
 	const auto& varJoueur1Node = astPtr.rootNode()[1];
-	CHECK(varJoueur1Node.op() == ska::Operator::VARIABLE_DECLARATION);
+	CHECK(varJoueur1Node.op() == ska::Operator::VARIABLE_AFFECTATION);
 	CHECK(varJoueur1Node.has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER, {}} ));
 
 	//Checks the field access
@@ -243,7 +236,7 @@ TEST_CASE("Expression and priorities") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	auto scriptCache = ska::ScriptCacheAST{};
 	SUBCASE("Simple mul") {
-		auto astPtr = ASTFromInput(scriptCache, "5 * 2;", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "5 * 2\n", keywords);
 	auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
@@ -264,7 +257,7 @@ TEST_CASE("Expression and priorities") {
 
 	SUBCASE("Syntax error : no existing operator") {
 	try {
-	ASTFromInput(scriptCache, "5 ' 3;", keywords);
+	ASTFromInput(scriptCache, "5 ' 3\n", keywords);
 	CHECK(false);
 	} catch(std::exception& e) {
 	CHECK(true);
@@ -272,7 +265,7 @@ TEST_CASE("Expression and priorities") {
 	}
 
 	SUBCASE("Simple div") {
-		auto astPtr = ASTFromInput(scriptCache, "5 / 2;", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "5 / 2\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
@@ -282,7 +275,7 @@ TEST_CASE("Expression and priorities") {
 	}
 
 	SUBCASE("Simple add") {
-		auto astPtr = ASTFromInput(scriptCache, "5 + 2;", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "5 + 2\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
@@ -292,7 +285,7 @@ TEST_CASE("Expression and priorities") {
 	}
 
 	SUBCASE("Simple sub") {
-		auto astPtr = ASTFromInput(scriptCache, "5 - 2;", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "5 - 2\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
@@ -302,7 +295,7 @@ TEST_CASE("Expression and priorities") {
 	}
 
 	SUBCASE("Priorization with mul before add") {
-		auto astPtr = ASTFromInput(scriptCache, "5 * 2 + 4;", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "5 * 2 + 4\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
@@ -316,7 +309,7 @@ TEST_CASE("Expression and priorities") {
 	}
 
 	SUBCASE("Priorization with mul after add") {
-		auto astPtr = ASTFromInput(scriptCache, "5 + 2 * 4;", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "5 + 2 * 4\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);
@@ -331,7 +324,7 @@ TEST_CASE("Expression and priorities") {
 
 
 	SUBCASE("Priorization with mul after add with parenthesis") {
-		auto astPtr = ASTFromInput(scriptCache, "(5 + 2) * 4;", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "(5 + 2) * 4\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::BINARY);
 		CHECK(ast.size() == 2);

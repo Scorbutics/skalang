@@ -25,7 +25,7 @@ ska::ScriptAST ASTFromInputSemanticExpressionType(ska::ScriptCacheAST& scriptCac
 TEST_CASE("[ExpressionType]") {
 	ParserPtr parser_test;
 	auto scriptCache = ska::ScriptCacheAST{};
-	auto script = ASTFromInputSemanticExpressionType(scriptCache, "{var toto = 2;}", parser_test);
+	auto script = ASTFromInputSemanticExpressionType(scriptCache, "do toto = 2\n end", parser_test);
 	script.parse(*parser_test);
 	auto* symbol_test = &script.symbols();
 	auto& table = *script.symbols().nested()[0];

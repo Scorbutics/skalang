@@ -1,10 +1,10 @@
-var Test = import "test317_2";
-var Character = import "character";
+Test = import "test317_2"
+Character = import "character"
 
-var actualCharacter = Character.build("");
+actualCharacter = Character.build("")
 
-var callback = function() {
-	actualCharacter = Character.build("test317");
-};
+callback = function() do
+	actualCharacter = Character.build("test317")
+end
 
-Test.run(callback);
+Test.run(callback)

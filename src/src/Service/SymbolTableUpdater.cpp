@@ -28,11 +28,12 @@ bool ska::SymbolTableUpdater::matchVariable(VarTokenEvent& event) {
 		SLOG(LogLevel::Debug) << "Variable event USE";
 		updateNode(event.rootNode(), event.rootNode().name(), event.script().symbols());
 		break;
+	
 	case VarTokenEventType::FUNCTION_DECLARATION:
 	case VarTokenEventType::PARAMETER_DECLARATION:
-	case VarTokenEventType::VARIABLE_DECLARATION:
+	case VarTokenEventType::VARIABLE_AFFECTATION:
 		SLOG(LogLevel::Debug) << "Variable event DECLARATION";
-		updateNode(event.rootNode(), event.rootNode().name(), event.script().symbols());
+		updateNode(event.rootNode(), event.name(), event.script().symbols());
 		updateType(event.rootNode(), event.script().symbols());
 	break;
 		

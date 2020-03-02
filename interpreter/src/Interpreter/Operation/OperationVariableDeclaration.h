@@ -6,7 +6,7 @@
 namespace ska {
 	class ASTNode;
 	template<>
-	class Operation<Operator::VARIABLE_DECLARATION> {
+	class Operation<Operator::VARIABLE_AFFECTATION> {
 	private:
 		ASTNode& node;
 	public:

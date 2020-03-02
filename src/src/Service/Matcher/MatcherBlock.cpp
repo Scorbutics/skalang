@@ -27,8 +27,6 @@ ska::ASTNodePtr ska::MatcherBlock::match(ScriptAST& input, const std::string& co
 			auto optionalStatement = input.optstatement(m_parser, Token{});
 			if (!optionalStatement->logicalEmpty()) {
 				blockNodeStatements.push_back(std::move(optionalStatement));
-			} else {
-				break;
 			}
 		}
 

@@ -5,10 +5,10 @@
 
 TEST_CASE("[BytecodeInterpreter] if : if body") {
 	static constexpr auto progStr =
-	"var t = false;"
-	"if ([18] == [18]) {"
-	"t = true;"
-	"}";
+	"t = false\n"
+	"if ([18] == [18]) do "
+	"t = true "
+	"end";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -19,12 +19,12 @@ TEST_CASE("[BytecodeInterpreter] if : if body") {
 
 TEST_CASE("[BytecodeInterpreter] if : else body") {
 	static constexpr auto progStr =
-	"var t = 0;"
-	"if ([18] == [1124]) {"
-	"t = 1;"
-	"} else {"
-	"t = 2;"
-	"}";
+	"t = 0\n"
+	"if ([18] == [1124]) do\n"
+	"t = 1\n"
+	"end else do\n"
+	"t = 2 "
+	"end\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -34,7 +34,7 @@ TEST_CASE("[BytecodeInterpreter] if : else body") {
 }
 
 TEST_CASE("[BytecodeInterpreter] for without body") {
-	static constexpr auto progStr = "for(var i = 0; i < 10; i = i + 1);";
+	static constexpr auto progStr = "for(i = 0\n i < 10\n i = i + 1) do end\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -44,7 +44,7 @@ TEST_CASE("[BytecodeInterpreter] for without body") {
 }
 
 TEST_CASE("[BytecodeInterpreter] for with body") {
-	static constexpr auto progStr = "var toto = 123; for(var i = 0; i < 10; i = i + 1) { toto = toto + i * 2; } var test = toto;";
+	static constexpr auto progStr = "toto = 123\n for(i = 0\n i < 10\n i = i + 1) do toto = toto + i * 2\n end test = toto\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);

@@ -10,7 +10,6 @@ namespace ska {
 		FUNCTION,
 		RETURN,
 		IMPORT,
-		EXPORT,
 		BOOLEAN,
     	INT,
 		FLOAT,
@@ -21,6 +20,8 @@ namespace ska {
 		AFFECTATION,
 		BLOCK_BEGIN,
 		BLOCK_END,
+		OBJECT_BLOCK_BEGIN,
+		OBJECT_BLOCK_END,
 		PARENTHESIS_BEGIN,
 		PARENTHESIS_END,
 		BRACKET_BEGIN,
@@ -45,7 +46,6 @@ namespace ska {
 		"function",
 		"return",
 		"import",
-		"export",
     	"bool",
 		"int",
 		"float",
@@ -53,6 +53,8 @@ namespace ska {
 		"void",
 		".",
 		"=",
+		"do",
+		"end",
 		"{",
 		"}",
 		"(",
@@ -60,10 +62,12 @@ namespace ska {
 		"[",
 		"]",
 		"\"",
-		";",
+		"\n",
 		",",
 		":",
 		"true",
 		"false"
 	};
+
+	static_assert(sizeof(TokenGrammarSTR) / sizeof(TokenGrammarSTR[0]) == static_cast<std::size_t>(TokenGrammar::UNUSED_Last_Length));
 }

@@ -1,10 +1,10 @@
 {
-"FileVersion": 2,
-"Id": "71322db7-e16f-3b07-a50f-fcf9fb3fb1bc",
-"Items": [
-	{
-	"Id": "ed79aa21-1fa5-469f-8b62-88a598e9cfa3",
-	"Command": "-tc=\"[SemanticTypeChecker Complex] using a parameter of the wrong type without return variable affectation (to a void function)\""
-	}
-]
+  "FileVersion": 2,
+  "Id": "71322db7-e16f-3b07-a50f-fcf9fb3fb1bc",
+  "Items": [
+    {
+      "Id": "ed79aa21-1fa5-469f-8b62-88a598e9cfa3",
+      "Command": "-tc=\"[SemanticTypeChecker Complex] using a parameter of the wrong type without return variable affectation (to a void function)\""
+    }
+  ]
 }

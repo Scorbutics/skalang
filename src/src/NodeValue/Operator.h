@@ -7,8 +7,8 @@ namespace ska {
 		BINARY,
     	UNARY,
 		LITERAL,
-		VARIABLE_DECLARATION,
 		VARIABLE_AFFECTATION,
+		AFFECTATION,
 		PARAMETER_DECLARATION,
 		ARRAY_DECLARATION,
 		ARRAY_USE,
@@ -33,8 +33,8 @@ namespace ska {
 		"BINARY",
     	"UNARY",
 		"LITERAL",
-		"VARIABLE_DECLARATION",
 		"VARIABLE_AFFECTATION",
+		"AFFECTATION",
 		"PARAMETER_DECLARATION",        
 		"ARRAY_DECLARATION",
 		"ARRAY_USE",
@@ -53,6 +53,8 @@ namespace ska {
 		"SCRIPT_LINK",
 		"TYPE"
 	};
+
+	static_assert(sizeof(OperatorSTR) / sizeof(OperatorSTR[0]) == static_cast<std::size_t>(Operator::UNUSED_Last_Length));
 
 	static inline const char* OperatorPrint(Operator op) {
     	return OperatorSTR[static_cast<std::size_t>(op)];

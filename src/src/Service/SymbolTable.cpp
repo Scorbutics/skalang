@@ -158,17 +158,16 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 	assert(m_currentTable != nullptr);
 	
 	switch(token.type()) {
-		case VarTokenEventType::VARIABLE_DECLARATION:
+		case VarTokenEventType::VARIABLE_AFFECTATION:
 		case VarTokenEventType::PARAMETER_DECLARATION: {
 			const auto variableName = token.name();
-			SLOG(ska::LogLevel::Info) << "Matching new variable : " << variableName;
-			auto symbolInCurrentTable = (*m_currentTable)(variableName);
+			SLOG(ska::LogLevel::Info) << "Matching variable : " << variableName;
+			auto symbolInCurrentTable = (*m_currentTable)[variableName];
 			if (symbolInCurrentTable == nullptr) {
+				SLOG(ska::LogLevel::Info) << " that was a new variable";
 				m_currentTable->emplace(variableName);
-			} else if(
-				symbolInCurrentTable->getType() != ExpressionType::FUNCTION && 
-				symbolInCurrentTable->getType() != ExpressionType::VOID) {
-				throw std::runtime_error("Symbol already defined : " + variableName);
+			} else {
+				SLOG(ska::LogLevel::Info) << " that was an existing variable";
 			}
     	} break;
 

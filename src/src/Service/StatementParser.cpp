@@ -78,7 +78,13 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::matchExpressionStatement(
 	SLOG(ska::LogLevel::Info) << "Expression-statement found";
 
 	auto expressionResult = expr(input);
-	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+
+	if(input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>())) {
+		input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+	} else if(!input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
+		error("expected block-end statement");
+	}
+
 	if(expressionResult == nullptr) {
 			SLOG(ska::LogLevel::Info) << "NOP statement";
 			return nullptr;
@@ -102,9 +108,6 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::matchReservedKeyword(Scri
 
 	case static_cast<std::size_t>(TokenGrammar::RETURN):
 		return m_matcherReturn.match(input);
-
-	case static_cast<std::size_t>(TokenGrammar::EXPORT) :
-		return m_matcherImport.matchExport(input);
 
 	default: {
 			std::stringstream ss;

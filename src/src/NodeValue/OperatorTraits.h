@@ -9,7 +9,7 @@ namespace ska {
 			switch (o) {
 				case Operator::FUNCTION_PROTOTYPE_DECLARATION:
 				case Operator::FUNCTION_DECLARATION:
-				case Operator::VARIABLE_DECLARATION:
+				case Operator::VARIABLE_AFFECTATION:
 				case Operator::PARAMETER_DECLARATION:
 					return true;
 				default:
@@ -22,8 +22,8 @@ namespace ska {
 			case Operator::UNARY:
 			case Operator::FIELD_ACCESS:
 			case Operator::FUNCTION_DECLARATION:
+			case Operator::AFFECTATION:
 			case Operator::VARIABLE_AFFECTATION:
-			case Operator::VARIABLE_DECLARATION:
 			case Operator::ARRAY_USE:
 			case Operator::ARRAY_DECLARATION:
 				return true;

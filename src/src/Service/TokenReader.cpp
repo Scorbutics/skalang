@@ -21,6 +21,16 @@ const ska::Token& ska::TokenReader::match(const TokenType type) {
 	throw std::runtime_error("unexpected error");
 }
 
+bool ska::TokenReader::ahead(const TokenReaderExpectCallback& callback, std::size_t offset) const {
+	const auto* token = nextToken(offset);	
+	return token != nullptr && callback(*token);
+}
+
+bool ska::TokenReader::ahead(const Token& expected, std::size_t offset) const {
+	const auto* token = nextToken(offset);
+	return token != nullptr && *token == expected;
+}
+
 void ska::TokenReader::rewind() {
 	if (!m_input.empty()) {
 		m_lookAheadIndex = 0;
@@ -37,6 +47,10 @@ ska::Token ska::TokenReader::actual() const {
 
 bool ska::TokenReader::expect(const Token& token) const {
 	return m_lookAhead != nullptr && (*m_lookAhead) == token;
+}
+
+const ska::Token* ska::TokenReader::mightMatch(const Token& token) {
+	return expect(token) ? &match(token) : nullptr;
 }
 
 bool ska::TokenReader::expect(const TokenType& tokenType) const {
@@ -67,4 +81,8 @@ void ska::TokenReader::error(const Token* token) {
 
 void ska::TokenReader::nextToken() {
 	m_lookAhead = (m_lookAheadIndex + 1) < m_input.size() ? &m_input[++m_lookAheadIndex] : nullptr;
+}
+
+const ska::Token* ska::TokenReader::nextToken(std::size_t offset) const {
+	return (m_lookAheadIndex + offset) < m_input.size() ? &m_input[m_lookAheadIndex + offset] : nullptr;
 }

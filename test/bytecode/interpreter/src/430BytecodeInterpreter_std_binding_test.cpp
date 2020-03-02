@@ -23,8 +23,8 @@ static ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> BuildModuleCon
 
 TEST_CASE("[BytecodeInterpreter] Binding std : path import only") {
 	constexpr auto progStr =
-	"var PathFcty = import \"bind:std.native.io.path\";"
-	"var path = PathFcty.Fcty(\"" SKALANG_TEST_DIR "\");";
+	"PathFcty = import \"bind:std.native.io.path\"\n"
+	"path = PathFcty.Fcty(\"" SKALANG_TEST_DIR "\")\n";
 
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(progStr, data);
@@ -39,9 +39,9 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path import only") {
 
 TEST_CASE("[BytecodeInterpreter] Binding std : path + bridge function call") {
 	constexpr auto progStr =
-	"var PathFcty = import \"bind:std.native.io.path\";"
-	"var path = PathFcty.Fcty(\"\");"
-	"var last = path.canonical();";
+	"PathFcty = import \"bind:std.native.io.path\"\n"
+	"path = PathFcty.Fcty(\"\")\n"
+	"last = path.canonical()\n";
 
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(progStr, data);
@@ -59,8 +59,8 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path + bridge function call") {
 
 TEST_CASE("[BytecodeInterpreter] Binding std : log + bridge function call") {
 	constexpr auto progStr =
-		"var Logger = import \"bind:std.native.io.log\";"
-		"Logger.print(\"test63\");";
+		"Logger = import \"bind:std.native.io.log\"\n"
+		"Logger.print(\"test63\")\n";
 
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(progStr, data);

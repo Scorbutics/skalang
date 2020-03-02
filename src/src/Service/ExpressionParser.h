@@ -36,6 +36,7 @@ namespace ska {
 		int matchRange(ScriptAST& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
 		int matchParenthesis(ScriptAST& input, ExpressionStack& expressions, bool isDoingOperation);
 
+		ASTNodePtr matchVariable(ScriptAST& input, const Token& token);
 		ASTNodePtr matchReserved(ScriptAST& input);
 		ASTNodePtr matchObjectFieldAccess(ScriptAST& input, ASTNodePtr objectAccessed);
 

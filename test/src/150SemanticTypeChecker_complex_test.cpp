@@ -32,121 +32,121 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 
 	SUBCASE("constructor with function field accessed through variable") {
 		ASTFromInputSemanticComplexTC(scriptCache,
-			"var JoueurClass = function(nom:string) : var { "
-				"var attaquer = function(degats:int) {"
-				"};"
+			"JoueurClass = function(nom:string) : var do "
+				"attaquer = function(degats:int) do\n"
+				"end\n"
 
 				"return {"
 					"attaquer : attaquer"
-				"};"
-			"};"
-			"var joueur1 = JoueurClass(\"joueur1Nom\");"
-			"joueur1.attaquer(10);"
+				"}\n"
+			"end\n"
+			"joueur1 = JoueurClass(\"joueur1Nom\")\n"
+			"joueur1.attaquer(10)\n"
 			, data);
 	}
 
 
 	SUBCASE("constructor with integer field accessed through function call and used in expression") {
 		ASTFromInputSemanticComplexTC(scriptCache,
-			"var JoueurClass = function(nom:string) : var { "
-				"var test74 = 123;"
+			"JoueurClass = function(nom:string) : var do "
+				"test74 = 123\n"
 
 				"return {"
 					"test : test74"
-				"};"
-			"};"
-	"(5 + JoueurClass(\"joueur1Nom\").test + 3 * 4) * 2;"
+				"}\n"
+			"end\n"
+	"(5 + JoueurClass(\"joueur1Nom\").test + 3 * 4) * 2\n"
 			, data);
 	}
 
 	SUBCASE("constructor complex with contained function NOT USING the current type BUT mentioning it...") {
 		ASTFromInputSemanticComplexTC(scriptCache,
-		"var JoueurClass = function(nom:string) : var { "
-			"var puissance = 10;"
+		"JoueurClass = function(nom:string) : var do "
+			"puissance = 10\n"
 
-			"var attaquer = function(cible:JoueurClass()) {"
-			"};"
+			"attaquer = function(cible:JoueurClass()) do\n"
+			"end\n"
 
 			"return {"
 				"nom: nom,"
 				"puissance : puissance,"
 				"pv : 100,"
 				"attaquer : attaquer"
-			"};"
-		"};"
-		"var joueur1 = JoueurClass(\"joueur1Nom\");"
-		"var joueur2 = JoueurClass(\"joueur2Nom\");"
-		"joueur1.attaquer(joueur2);"
+			"}\n"
+		"end\n"
+		"joueur1 = JoueurClass(\"joueur1Nom\")\n"
+		"joueur2 = JoueurClass(\"joueur2Nom\")\n"
+		"joueur1.attaquer(joueur2)\n"
 			, data);
 	}
 
 	SUBCASE("class with internal data used in public function") {
 		ASTFromInputSemanticComplexTC(scriptCache,
-			"var Stats = function() : var {"
-			"var pointsDeVie = 100;"
-			"var blesser = function(degats:int) {"
-			"pointsDeVie = pointsDeVie - degats;"
-			"};"
-			"return {"
-			"blesser : blesser"
-			"};"
-			"};"
-			"var JoueurClass = function(nom:string) : var { "
-			"var stats = Stats();"
+			"Stats = function() : var do\n"
+				"pointsDeVie = 100\n"
+				"blesser = function(degats:int) do\n"
+					"pointsDeVie = pointsDeVie - degats\n"
+				"end\n"
+				"return {"
+					"blesser : blesser"
+				"}\n"
+			"end\n"
+			"JoueurClass = function(nom:string) : var do "
+			"stats = Stats()\n"
 
-			"var attaquer = function(degats:int) {"
-			"stats.blesser(degats);"
-			"};"
+			"attaquer = function(degats:int) do\n"
+			"stats.blesser(degats)\n"
+			"end\n"
 
 			"return {"
 			"attaquer : attaquer,"
 			"stats : stats"
-			"};"
-			"};"
-			"var joueur1 = JoueurClass(\"joueur1Nom\");"
-			"joueur1.attaquer(1);"
-			"joueur1.stats.blesser(1);"
+			"}\n"
+			"end\n"
+			"joueur1 = JoueurClass(\"joueur1Nom\")\n"
+			"joueur1.attaquer(1)\n"
+			"joueur1.stats.blesser(1)\n"
 			, data);
 	}
 
 	SUBCASE("class with internal data used in public function 2") {
 		ASTFromInputSemanticComplexTC(scriptCache,
-			"var Stats = function() : var {"
-			"var pointsDeVie = 100;"
-			"var blesser = function(degats:int) {"
-			"pointsDeVie = pointsDeVie - degats;"
-			"};"
+			"Stats = function() : var do\n"
+			"pointsDeVie = 100\n"
+			"blesser = function(degats:int) do\n"
+			"pointsDeVie = pointsDeVie - degats\n"
+			"end\n"
 			"return {"
 			"blesser : blesser,"
 			"pdv : pointsDeVie"
-			"};"
-			"};"
-			"var JoueurClass = function(nom:string) : var { "
-			"var stats = Stats();"
+			"}\n"
+			"end\n"
+			"JoueurClass = function(nom:string) : var do "
+			"stats = Stats()\n"
 
-			"var attaquer = function(statsDegats:Stats(), test:int) {"
-			"stats.blesser(statsDegats.pdv);"
-			"};"
+			"attaquer = function(statsDegats:Stats(), test:int) do\n"
+			"stats.blesser(statsDegats.pdv)\n"
+			"end\n"
 
 			"return {"
 			"attaquer : attaquer"
-			"};"
-			"};"
-			"var joueur1 = JoueurClass(\"joueur1Nom\");"
-			"var statsDeg = Stats();"
-			"joueur1.attaquer(statsDeg, 0);"
+			"}\n"
+			"end\n"
+			"joueur1 = JoueurClass(\"joueur1Nom\")\n"
+			"statsDeg = Stats()\n"
+			"joueur1.attaquer(statsDeg, 0)\n"
 			, data);
 	}
 
 	SUBCASE("after field access, not an lvalue") {
 		try {
 			ASTFromInputSemanticComplexTC(scriptCache,
-				"var lvalFunc137 = function() : var {" 
-					"var test137_ = function() : int { return 0; };" 
-					"return { test : test137_};" 
-				"};" 
-				"var object = lvalFunc137();"
-				"object.test() = 1234;", data);
+				"lvalFunc137 = function() : var do\n" 
+					"test137_ = function() : int do \n return 0\n end\n" 
+					"return { test : test137_}\n" 
+				"end\n" 
+				"object = lvalFunc137()\n"
+				"object.test() = 1234\n", data);
 			CHECK(false);
 		} catch (std::exception& e) {
 			CHECK(std::string{e.what()}.find("The symbol \"\" is not an lvalue, therefore cannot be assigned") != std::string::npos);
@@ -156,14 +156,14 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	SUBCASE("assign 2 differents object types") {
 		try {
 			ASTFromInputSemanticComplexTC(scriptCache,
-				"var lvalFunc160 = function() : var {"
-				"return {};"
-				"};"
-				"var lvalFunc163 = function() : var {"
-				"return {};"
-				"};"
-				"var object = lvalFunc160();"
-				"object = lvalFunc163();", data);
+				"lvalFunc160 = function() : var do\n"
+				"return {}\n"
+				"end\n"
+				"lvalFunc163 = function() : var do\n"
+				"return {}\n"
+				"end\n"
+				"object = lvalFunc160()\n"
+				"object = lvalFunc163()\n", data);
 			CHECK(false);
 		} catch (std::exception & e) {
 			CHECK(std::string{e.what()}.find("The symbol \"object\" has already been declared as \"var lvalFunc160\" but is now wanted to be \"var lvalFunc163\"") != std::string::npos);
@@ -172,7 +172,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 
 	SUBCASE("Function 0 parameter creating custom object but forget to use it as a factory (direct use of function)") {
 		try {
-			auto astPtr = ASTFromInputSemanticComplexTC(scriptCache, "var Dummy = function() : var { return { data: 3 }; }; Dummy.data; ", data);
+			auto astPtr = ASTFromInputSemanticComplexTC(scriptCache, "Dummy = function() : var do\n return { data: 3 }\n end\n Dummy.data\n ", data);
 			CHECK(false);
 		} catch (std::exception& e) {
 			CHECK(std::string{e.what()}.find("the variable \"Dummy\" is not registered as an object but as a \"function Dummy (var Dummy)\"") != std::string::npos);
@@ -181,53 +181,53 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 
 	SUBCASE("return a concrete custom type") {
 		ASTFromInputSemanticComplexTC(scriptCache,
-			"var lvalFunc185 = function() : var {"
-			"return { test : 14 };"
-			"};"
-			"var lvalFunc188 = function() : lvalFunc185() {"
-			"return lvalFunc185();"
-			"};"
-			"var object = lvalFunc188();"
-			"object.test = 1234;", data);
+			"lvalFunc185 = function() : var do\n"
+			"return { test : 14 }\n"
+			"end\n"
+			"lvalFunc188 = function() : lvalFunc185() do\n"
+			"return lvalFunc185()\n"
+			"end\n"
+			"object = lvalFunc188()\n"
+			"object.test = 1234\n", data);
 	}
 
 	SUBCASE("return a concrete custom type with namespace") {
 		ASTFromInputSemanticComplexTC(scriptCache,
-			"var Character = import \"" SKALANG_TEST_DIR "/src/resources/character\";"
-			"var lvalFunc188 = function() : Character::build() {"
-				"return Character.build(\"t\");"
-			"};"
-			"var object = lvalFunc188();"
-			"object.age = 1234;", data);
+			"Character = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
+			"lvalFunc188 = function() : Character::build() do\n"
+				"return Character.build(\"t\")\n"
+			"end\n"
+			"object = lvalFunc188()\n"
+			"object.age = 1234\n", data);
 	}
 
 	SUBCASE("using a function as a parameter") {
 		ASTFromInputSemanticComplexTC(scriptCache,
-			"var lvalFunc206 = function() : var {"
-				"return { test : 14 };"
-			"};"
-			"var lvalFunc209 = function(toto: lvalFunc206) : lvalFunc206() {"
-				"return toto();"
-			"};"
-			"var object = lvalFunc209(lvalFunc206);"
-			"object.test = 1234;", data);
+			"lvalFunc206 = function() : var do\n"
+				"return { test : 14 }\n"
+			"end\n"
+			"lvalFunc209 = function(toto: lvalFunc206) : lvalFunc206() do\n"
+				"return toto()\n"
+			"end\n"
+			"object = lvalFunc209(lvalFunc206)\n"
+			"object.test = 1234\n", data);
 	}
 
 	SUBCASE("using a callback function as a parameter without using the source type (function type compatibility)") {
 		ASTFromInputSemanticComplexTC(scriptCache,
-			"var lvalFunc218 = function() {};"
-			"var lvalFunc219 = function(toto: lvalFunc218) : lvalFunc218() {"
-			"	toto();"
-			"};"
-			"var callback = function() {};"
-			"lvalFunc219(callback);", data);
+			"lvalFunc218 = function() do end\n"
+			"lvalFunc219 = function(toto: lvalFunc218) : lvalFunc218() do\n"
+			"	toto()\n"
+			"end\n"
+			"callback = function() do end\n"
+			"lvalFunc219(callback)\n", data);
 	}
 
 	SUBCASE("for with empty statement in if") {
 		ASTFromInputSemanticComplexTC(scriptCache, 
-			"var size = function() : int { return 10;};"
-			"if (size() > 0) {"
-				"for(var i = 0; i < size(); i = i + 1);"
-			"}", data);
+			"size = function() : int do return 10\n end\n"
+			"if (size() > 0) do\n"
+				"for(i = 0\n i < size()\n i = i + 1)\n"
+			"end\n", data);
 	}
 }

@@ -30,14 +30,6 @@ ska::ASTNodePtr ska::MatcherImport::matchImport(ScriptAST& input) {
 	return scriptLinkNode->type() != ExpressionType::VOID ? std::move(scriptLinkNode) : matchNewImport(input, importNodeClass);
 }
 
-ska::ASTNodePtr ska::MatcherImport::matchExport(ScriptAST& input) {
-	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::EXPORT>());
-	if (!input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>())) {
-		throw std::runtime_error("only a variable declaration can be exported");
-	}
-	return ASTFactory::MakeNode<Operator::EXPORT>(input.statement(m_parser));
-}
-
 ska::ASTNodePtr ska::MatcherImport::matchNewImport(ScriptAST& input, Token importNodeClass) {
 	return createNewImport(m_parser, m_parser, m_parser, input, importNodeClass);
 }

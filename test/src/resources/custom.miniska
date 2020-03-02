@@ -1,11 +1,14 @@
-var Character = import "custom_base";
+Character = import "custom_base"
 
-var player = Character.build("Player");
-var enemy = Character.default;
+player = Character.build("Player")
+enemy = Character.default
 
-var totalAge = 0;
+totalAge = 0
 
-for(var i = 0; i < enemy.age; i = i + 1) {
-	totalAge = totalAge + 1;
-}
-totalAge = totalAge + enemy.age + player.age;
+for(i = 0
+	i < enemy.age
+	i = i + 1) do
+	totalAge = totalAge + 1
+end
+
+totalAge = totalAge + enemy.age + player.age

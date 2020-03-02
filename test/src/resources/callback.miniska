@@ -1,1 +1,1 @@
-var Default = function() {};
+Default = function() do end
