@@ -62,6 +62,7 @@ void ska::bytecode::SerializationContext::operator<<(std::size_t value) {
 void ska::bytecode::SerializationContext::operator<<(std::string value) {
 	m_natives.emplace(value, m_natives.size());
 	auto refIndex = m_natives.at(value);
+	LOG_DEBUG << "Writing native index " << refIndex << " for value " << value;
 	buffer().write(reinterpret_cast<const char*>(&refIndex), sizeof(Chunk));
 }
 
@@ -150,11 +151,11 @@ void ska::bytecode::SerializationContext::push() {
 
 std::size_t ska::bytecode::SerializationContext::pushNatives() {
 	push();
-	if (!m_natives.empty()) {
-		auto nativeVector = std::vector<std::string>();
+	if (m_natives.size() != 0) {
+		auto nativeVector = std::vector<std::string>(m_natives.size());
 		for (auto& [native, index] : m_natives) {
 			if (!native.empty()) {
-				nativeVector.push_back(native);
+				nativeVector[index] = std::move(native);
 			}
 		}
 

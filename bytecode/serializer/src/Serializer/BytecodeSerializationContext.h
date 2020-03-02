@@ -2,7 +2,6 @@
 #include <sstream>
 #include <memory>
 #include <deque>
-#include <unordered_set>
 #include <vector>
 #include <cstdint>
 #include "NodeValue/ASTNodePtr.h"
