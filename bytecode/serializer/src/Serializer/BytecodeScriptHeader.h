@@ -9,7 +9,7 @@ namespace ska {
 			ScriptHeader(const std::vector<std::string>& natives) : m_natives(natives) {}
 
 			const std::string& scriptName() {
-				if (m_scriptName.empty()) { m_scriptName = m_natives[scriptNameRef]; }
+				if (m_scriptName.empty()) { if (scriptNameRef >= m_natives.size()) { throw std::runtime_error("no script name present in natives"); } m_scriptName = m_natives[scriptNameRef]; }
 				return m_scriptName;
 				 
 			}

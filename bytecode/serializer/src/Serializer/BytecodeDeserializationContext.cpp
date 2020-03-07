@@ -243,7 +243,7 @@ std::string ska::bytecode::DeserializationContext::readString() {
 	auto value = std::string {};
 	auto size = Chunk { 0 };
 	m_input->read(reinterpret_cast<char*>(&size), sizeof(Chunk));
-	if (size > 0) {
+	if (size > 0 && size <= std::numeric_limits<std::size_t>::max()) {
 		value.resize(size);
 		m_input->read(reinterpret_cast<char*>(&value[0]), sizeof(char)* size);
 		return value;
