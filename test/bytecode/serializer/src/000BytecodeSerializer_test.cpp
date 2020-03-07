@@ -72,8 +72,6 @@ TEST_CASE("[BytecodeSerializer] concrete external script use") {
 }
 
 TEST_CASE("[BytecodeSerializer] binded external script use") {
-	std::cout << std::endl;
-	std::cout << std::endl;
 	constexpr auto progStr =
 		"Logger = import \"bind:std.native.io.log\"\n"
 		"Logger.print(\"test63\")\n";
@@ -99,4 +97,66 @@ TEST_CASE("[BytecodeSerializer] binded external script use") {
 	CHECK(destinationCache.size() == 2);
 	const auto equality = destinationCache.at(1) == data.storage->at(1) && destinationCache.at(0).size() == 0;
 	CHECK(equality);
+}
+
+TEST_CASE("[BytecodeSerializer] external script use, other stack") {
+	
+	std::unordered_map<std::string, std::stringstream> serializingStreamsOut = {};
+	auto stringSerializer = [&serializingStreamsOut](const std::string& scriptName) -> std::ostream& {
+		std::cout << "local serialization " << scriptName << std::endl;
+		return serializingStreamsOut[scriptName];
+	};
+
+	auto stringDeserializer = [&serializingStreamsOut](const std::string& scriptName) -> std::istream& {
+		std::cout << "local deserialization " << scriptName << std::endl;
+		return serializingStreamsOut[scriptName];
+	};
+
+
+	constexpr auto progStr =
+		"Character66 = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
+		"enemy = Character66.default\n"
+		"enemy.age = 99\n"
+		"t = enemy.age\n";
+
+	{
+		auto data = BytecodeSerializerDataTestContainer{};
+		ASTFromInputBytecodeSerializerNoParse(progStr, data);
+
+		auto interpreter = ska::bytecode::Interpreter{ *data.parser, *data.generator, data.reservedKeywords };
+	
+		auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>{ data.storage->astCache, *data.typeBuilder, *data.symbolsTypeUpdater, *data.typeChecker, reservedKeywords, *data.parser, *data.storage, interpreter };
+		auto logModule = ska::lang::IOLogModule<ska::bytecode::Interpreter>(moduleConfiguration);
+
+		readerI->parse(*data.parser);
+		auto script = ska::bytecode::ScriptGenerationHelper{ *data.storage, *readerI };
+
+		auto& gen = data.generator->generate(*data.storage, std::move(script));
+		auto res = data.serializer->serialize(*data.storage, stringSerializer);
+		CHECK(res);
+		readerI = nullptr;
+		tokenizer = {};
+		tokens = {};
+	}
+	{
+		auto data = BytecodeSerializerDataTestContainer{};
+		ASTFromInputBytecodeSerializerNoParse(progStr, data);
+
+		auto interpreter = ska::bytecode::Interpreter{ *data.parser, *data.generator, data.reservedKeywords };
+
+		auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>{ data.storage->astCache, *data.typeBuilder, *data.symbolsTypeUpdater, *data.typeChecker, reservedKeywords, *data.parser, *data.storage, interpreter };
+		auto original = data.serializer->deserialize(*data.storage, "main", stringDeserializer, { "main" });
+		CHECK(original.empty());
+
+		auto logModule = ska::lang::IOLogModule<ska::bytecode::Interpreter>(moduleConfiguration);
+
+		readerI->parse(*data.parser);
+		auto script = ska::bytecode::ScriptGenerationHelper{ *data.storage, *readerI };
+		auto& gen = data.generator->generate(*data.storage, std::move(script));
+
+
+		CHECK(data.storage->size() == 2);
+		const auto equality = data.storage->at(1) == data.storage->at(1) && data.storage->at(0).size() == 0;
+		CHECK(equality);
+	}
 }
