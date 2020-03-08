@@ -7,6 +7,7 @@
 #include "BytecodeInstruction.h"
 #include "BytecodeSymbolInfo.h"
 #include "BytecodeInstructionOutput.h"
+#include "BytecodeExport.h"
 #include "BytecodeScriptGenerationHelper.h"
 #include "NodeValue/ScriptAST.h"
 
@@ -37,14 +38,14 @@ namespace ska {
 			const Instruction& operator[](std::size_t index) const { return m_generated[index]; }
 			Instruction& operator[](std::size_t index) { return m_generated[index]; }
 
-			const std::vector<Operand>& exportedSymbols() const { return m_exports; }
-			void setExportedSymbols(std::vector<Operand> symbols) { m_exports = std::move(symbols); };
+			const std::vector<ExportSymbol>& exportedSymbols() const { return m_exports; }
+			void setExportedSymbols(std::vector<ExportSymbol> symbols) { m_exports = std::move(symbols); };
 
-			std::optional<std::vector<Operand>> generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const {
+			std::optional<std::vector<ExportSymbol>> generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const {
 				if(m_exports.empty()) {
 					return m_origin.generateExportedSymbols(std::move(symbolsInfo));
 				}
-				return std::optional<std::vector<Operand>>{};
+				return std::optional<std::vector<ExportSymbol>>{};
 			}
 
 			std::optional<Operand> getSymbol(const Symbol& symbol) const;
@@ -69,7 +70,7 @@ namespace ska {
 			//void push(ScriptGeneration output);
 
 			ScriptGenerationHelper m_origin;
-			std::vector<Operand> m_exports;
+			std::vector<ExportSymbol> m_exports;
 			InstructionOutput m_generated;
 		};
 

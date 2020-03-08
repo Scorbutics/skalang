@@ -47,9 +47,11 @@ std::size_t ska::bytecode::SerializationContext::writeExports() {
 	LOG_INFO << "Export serializing : " << exports.size();
 	(*this) << exports.size();
 	for (const auto& exp : exports) {
-		if (!exp.empty()) {
+		if (!exp.value.empty()) {
 			LOG_INFO << exp;
-			(*this) << exp;
+			
+			//TODO also symbols
+			(*this) << exp.value;
 		}
 	}
 	return m_buffer.size() - 1;

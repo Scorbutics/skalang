@@ -23,7 +23,7 @@ ska::bytecode::ScriptExecutionOutput ska::bytecode::ExecutionContext::generateEx
 		auto result = std::make_shared<NodeValueArrayRaw>();
 		const auto& exportedSymbolsVariables = m_in.getExportedSymbols(scriptIndex);
 		for (const auto& variable : exportedSymbolsVariables) {
-			result->push_back(getCell(variable));
+			result->push_back(getCell(variable.value));
 		}
 		scriptExecution->setExportsSection(result);
 		return result;

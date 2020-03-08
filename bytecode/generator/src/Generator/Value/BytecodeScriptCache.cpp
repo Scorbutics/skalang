@@ -43,7 +43,7 @@ const ska::bytecode::SymbolInfo* ska::bytecode::ScriptCache::getSymbolInfo(const
 	return getSymbolInfo(*node.symbol());
 }
 
-const std::vector<ska::bytecode::Operand>& ska::bytecode::ScriptCache::getExportedSymbols(std::size_t scriptIndex) {
+const std::vector<ska::bytecode::ExportSymbol>& ska::bytecode::ScriptCache::getExportedSymbols(std::size_t scriptIndex) {
 	// TODO : ce n'est pas à un "get" de faire tout ça...
 	if ((*this)[scriptIndex].exportedSymbols().empty()) {
 		SLOG(ska::LogLevel::Info) << "%11cGenerating exported symbols for script \"" << scriptIndex << "\"";

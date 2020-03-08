@@ -56,15 +56,15 @@ std::optional<ska::bytecode::Operand> ska::bytecode::ScriptGenerationHelper::get
 	return VariableGetter::get(m_index, symbol);
 }
 
-std::vector<ska::bytecode::Operand> ska::bytecode::ScriptGenerationHelper::generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const {
-	auto result = std::vector<Operand>{};
+std::vector<ska::bytecode::ExportSymbol> ska::bytecode::ScriptGenerationHelper::generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const {
+	auto result = std::vector<ExportSymbol>{};
 	result.reserve(symbolsInfo.size());
 
 	while (!symbolsInfo.empty()) {
 		const auto& symbolWithInfo = symbolsInfo.top();
 		auto operand = VariableGetter::get(m_index, *symbolWithInfo.symbol);
 		if (operand.has_value()) {
-			result.push_back(std::move(operand.value()));
+			result.push_back(ExportSymbol{ std::move(operand.value()), symbolWithInfo.symbol });
 		}
 		symbolsInfo.pop();
 	}

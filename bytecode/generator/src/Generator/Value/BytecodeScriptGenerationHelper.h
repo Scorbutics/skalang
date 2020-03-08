@@ -10,6 +10,7 @@
 #include "BytecodeOperand.h"
 #include "UniqueSymbolGetter.h"
 #include "BytecodeSymbolInfo.h"
+#include "BytecodeExport.h"
 
 namespace ska {
 	namespace bytecode {
@@ -56,7 +57,7 @@ namespace ska {
 			Operand querySymbolOrOperand(const ASTNode& node);
 			Operand querySymbol(const Symbol& symbol);
 			std::optional<Operand> getSymbol(const Symbol& symbol) const;
-			std::vector<Operand> generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const;
+			std::vector<ExportSymbol> generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const;
 
 			~ScriptGenerationHelper() override = default;
 

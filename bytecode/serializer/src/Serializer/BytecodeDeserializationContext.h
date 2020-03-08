@@ -10,6 +10,7 @@
 #include "BytecodeSerializationStrategy.h"
 #include "BytecodeScriptParts.h"
 #include "BytecodeChunk.h"
+#include "Generator/Value/BytecodeExport.h"
 #include "Generator/Value/BytecodeScriptCache.h"
 
 namespace ska {
@@ -25,7 +26,7 @@ namespace ska {
 				m_cache(cache) {
 			}
 
-			void declare(std::string scriptName, std::vector<Instruction> instructions, std::vector<Operand> exports);
+			void declare(std::string scriptName, std::vector<Instruction> instructions, std::vector<ExportSymbol> exports);
 			bool read(const std::string& scriptName) {
 				try { m_input = &m_strategy(scriptName); return !m_input->eof(); }
 				catch (std::runtime_error&) { return false; }
@@ -38,7 +39,7 @@ namespace ska {
 			void operator>>(ScriptExternalReferences& externalReferences);
 			void operator>>(std::vector<std::string>& natives);
 		private:
-			void replaceAllNativesRef(std::vector<Operand>& operands, const std::vector<std::string>& natives) const;
+			void replaceAllNativesRef(std::vector<ExportSymbol>& operands, const std::vector<std::string>& natives) const;
 			void replaceAllNativesRef(std::vector<Instruction>& instructions, const std::vector<std::string>& natives) const;
 			void replaceAllNativesRef(Operand& operand, const std::vector<std::string>& natives) const;
 
@@ -48,7 +49,7 @@ namespace ska {
 			void operator>>(Operand& value);
 
 			std::string readString();
-			std::vector<Operand> readExports();
+			std::vector<ExportSymbol> readExports();
 			std::unordered_set<std::string> readLinkedScripts(const std::vector<std::string>& natives);
 			std::vector<Instruction> readInstructions();
 			void checkValidity() const { if (m_input == nullptr) { throw std::runtime_error("no input available"); } }

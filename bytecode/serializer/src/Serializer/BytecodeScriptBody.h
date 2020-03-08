@@ -2,6 +2,7 @@
 #include <cstddef>
 
 #include "Generator/Value/BytecodeInstruction.h"
+#include "Generator/Value/BytecodeExport.h"
 
 namespace ska {
 	namespace bytecode {
@@ -11,7 +12,7 @@ namespace ska {
 			const std::vector<std::string>& natives() const { return m_natives; }
 			
 			std::vector<Instruction> instructions {};
-			std::vector<Operand> exports {};
+			std::vector<ExportSymbol> exports {};
 
 		private:
 			const std::vector<std::string>& m_natives;

@@ -9,7 +9,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::DeserializationContext);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::DeserializationContext)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::DeserializationContext)
 
-void ska::bytecode::DeserializationContext::declare(std::string scriptName, std::vector<Instruction> instructions, std::vector<Operand> exports) {
+void ska::bytecode::DeserializationContext::declare(std::string scriptName, std::vector<Instruction> instructions, std::vector<ExportSymbol> exports) {
 	auto output = InstructionOutput {};
 	for(auto& ins : instructions) {
 		output.push(std::move(ins));
@@ -67,9 +67,9 @@ void ska::bytecode::DeserializationContext::replaceAllNativesRef(Operand& operan
 	}
 }
 
-void ska::bytecode::DeserializationContext::replaceAllNativesRef(std::vector<Operand>& operands, const std::vector<std::string>& natives) const {
+void ska::bytecode::DeserializationContext::replaceAllNativesRef(std::vector<ExportSymbol>& operands, const std::vector<std::string>& natives) const {
 	for (auto& operand : operands) {
-		replaceAllNativesRef(operand, natives);
+		replaceAllNativesRef(operand.value, natives);
 	}
 }
 
@@ -116,16 +116,17 @@ std::unordered_set<std::string> ska::bytecode::DeserializationContext::readLinke
 	return linkedScriptsRef;
 }
 
-std::vector<ska::bytecode::Operand> ska::bytecode::DeserializationContext::readExports() {
+std::vector<ska::bytecode::ExportSymbol> ska::bytecode::DeserializationContext::readExports() {
 	auto exportsSize = std::size_t{};
 	(*this) >> exportsSize;
 	LOG_INFO << "Exports section : " << exportsSize;
 	if (exportsSize == 0) {
 		return {};
 	}
-	auto exports = std::vector<Operand>(exportsSize);
+	auto exports = std::vector<ExportSymbol>(exportsSize);
 	for(std::size_t i = 0; i < exportsSize; i++) {
-		(*this) >> exports[i];		
+		//TODO symbol
+		(*this) >> exports[i].value;
 		LOG_INFO << "Getting export " << exports[i];
 	};
 	return exports;
