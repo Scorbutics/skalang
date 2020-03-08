@@ -4,6 +4,7 @@
 #include <deque>
 #include <vector>
 #include <cstdint>
+#include <unordered_set>
 #include "NodeValue/ASTNodePtr.h"
 
 #include "BytecodeSerializationStrategy.h"
@@ -60,12 +61,17 @@ namespace ska {
 			void operator<<(std::string value);
 			void operator<<(const Instruction& value);
 			void operator<<(const Operand& value);
+			void operator<<(const Symbol* value);
+			void operator<<(const Type value);
+
+			Operand extractGeneratedOperandFromSymbol(const Symbol& symbol);
 
 			const ScriptCache& m_cache;
 			std::size_t m_id = 0;
 			SerializationStrategy m_strategy;
 			std::unordered_map<std::string, std::size_t> m_natives;
 			std::vector<std::stringstream> m_buffer;
+			std::unordered_set<const Symbol*> m_symbols;
 			std::ostream* m_output = nullptr;
 		};
 

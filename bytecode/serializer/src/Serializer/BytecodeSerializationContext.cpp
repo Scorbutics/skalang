@@ -1,7 +1,7 @@
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeSerializationContext.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::SerializationContext);
+SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::SerializationContext);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::SerializationContext)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::SerializationContext)
@@ -48,9 +48,7 @@ std::size_t ska::bytecode::SerializationContext::writeExports() {
 	(*this) << exports.size();
 	for (const auto& exp : exports) {
 		if (!exp.value.empty()) {
-			LOG_INFO << exp;
-			
-			//TODO also symbols
+			(*this) << exp.symbol;
 			(*this) << exp.value;
 		}
 	}
@@ -77,6 +75,53 @@ void ska::bytecode::SerializationContext::operator<<(const Instruction& value) {
 	if (numberOfValidOperands-- > 0) *this << value.dest(); else return;
 	if (numberOfValidOperands-- > 0) *this << value.left(); else return;
 	if (numberOfValidOperands-- > 0) *this << value.right();
+}
+
+void ska::bytecode::SerializationContext::operator<<(const Symbol* value) {
+	if (value == nullptr) {
+		throw std::runtime_error("cannot serialize a null symbol");
+	}
+	if (m_symbols.find(value) == m_symbols.end()) {
+		m_symbols.insert(value);
+		*this << extractGeneratedOperandFromSymbol(*value);
+		*this << value->getType();
+	}
+}
+
+ska::bytecode::Operand ska::bytecode::SerializationContext::extractGeneratedOperandFromSymbol(const Symbol& symbol) {
+	auto* info = m_cache.getSymbolInfo(symbol);
+	if (info == nullptr) {
+		throw std::runtime_error("unknown ast symbol detected during script bytecode serialization");
+	}
+	auto operand = m_cache[info->script].getSymbol(symbol);
+	if (!operand.has_value()) {
+		throw std::runtime_error("not generated symbol in ast detected during script bytecode serialization");
+	}
+
+	LOG_DEBUG << "Symbol " << symbol.getName() << " as variable " << operand.value();
+
+	return operand.value();
+}
+
+void ska::bytecode::SerializationContext::operator<<(const Type value) {
+	auto rawType = value.type();
+	buffer().write(reinterpret_cast<const char*>(&rawType), sizeof(uint8_t));
+
+	*this << value.compound().size();
+	
+	LOG_INFO << "Type " << value << " is being serialized with " << value.compound().size() << " compound types";
+	LOG_INFO << "\tRaw : " << ExpressionTypeSTR[static_cast<std::size_t>(rawType)];
+
+	for (auto& childType : value.compound()) {
+		auto operand = Operand{};
+		if (childType.hasSymbol()) {
+			operand = extractGeneratedOperandFromSymbol(*childType.symbol());
+			LOG_INFO << "\t\tChild operand " << operand;
+		}
+		LOG_INFO << "\t\tChild type " << childType;
+		*this << operand;
+		*this << childType;
+	}
 }
 
 void ska::bytecode::SerializationContext::operator<<(const Operand& value) {
@@ -145,6 +190,7 @@ void ska::bytecode::SerializationContext::commit(std::deque<std::size_t> partInd
 		(*m_output) << buf.rdbuf();
 	}
 	m_buffer.clear();
+	m_symbols.clear();
 }
 
 void ska::bytecode::SerializationContext::push() {
