@@ -13,12 +13,7 @@ namespace ska {
 			friend bool operator!=(const ExportSymbol& lhs, const ExportSymbol& rhs);
 		};
 
-		static bool operator==(const ExportSymbol& lhs, const ExportSymbol& rhs) {
-			return lhs.value == rhs.value;
-		}
-
-		static bool operator!=(const ExportSymbol& lhs, const ExportSymbol& rhs) {
-			return lhs.value != rhs.value;
-		}
+		bool operator==(const ExportSymbol& lhs, const ExportSymbol& rhs);
+		bool operator!=(const ExportSymbol& lhs, const ExportSymbol& rhs);
 	}
 }
