@@ -7,7 +7,7 @@ const ska::Symbol* ska::OperationType<ska::Operator::TYPE>::GetSymbol(const Symb
 	auto& typeNameNode = node[0];
 	if (typeNameNode.size() == 1) {
 		const auto* importedScriptSymbol = symbolTable[typeNameNode.name()];
-		return importedScriptSymbol == nullptr ? nullptr : (importedScriptSymbol->getType())[typeNameNode[0].name()];
+		return importedScriptSymbol == nullptr ? nullptr : (importedScriptSymbol->type())[typeNameNode[0].name()];
 	} 
 	
 	return symbolTable[typeNameNode.name()];

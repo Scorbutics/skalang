@@ -14,7 +14,7 @@ namespace ska {
 		const auto type = node.type().value();
 		const auto objectIsVar = type == ExpressionType::OBJECT;
 		if (objectIsVar) {
-			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function prototype declaration has an OBJECT return type \""<< (symbolFunction != nullptr ? symbolFunction->getName() : "") << "\"";
+			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function prototype declaration has an OBJECT return type \""<< (symbolFunction != nullptr ? symbolFunction->name() : "") << "\"";
 			const auto objectDoesntRefersToItself = type.hasSymbol();
 			if (!objectDoesntRefersToItself) {
 				return Type::MakeCustom<ExpressionType::OBJECT>(symbolFunction);
@@ -22,12 +22,12 @@ namespace ska {
 			const auto operateOnType = OperationType<Operator::TYPE>{node};
 			const auto* symbol = operateOnType.GetSymbol(symbolTable);
 			assert(symbol != nullptr);
-			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function symbol type deduced from type \""<<  symbol->getType() << "\"";
-			if(symbol->getType() == ExpressionType::VOID) {
+			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function symbol type deduced from type \""<<  symbol->type() << "\"";
+			if(symbol->type() == ExpressionType::VOID) {
 				return Type::MakeCustom<ExpressionType::OBJECT>(symbolFunction);
 			}
-			assert(!symbol->getType().compound().empty());
-			return symbol->getType().compound().back();
+			assert(!symbol->type().compound().empty());
+			return symbol->type().compound().back();
 
 			/*
 			const auto* returnSymbol = objectDoesntRefersToItself ? (node.size() == 1 ? (type)[node[0].name()] : type[node.name()]) : symbolFunction;
@@ -36,12 +36,12 @@ namespace ska {
 		}
 		
 		if(type == ExpressionType::FUNCTION) {
-			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function prototype declaration has a FUNCTION return type \""<< (symbolFunction != nullptr ? symbolFunction->getName() : "") << "\"";
+			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function prototype declaration has a FUNCTION return type \""<< (symbolFunction != nullptr ? symbolFunction->name() : "") << "\"";
 			assert(!type.compound().empty());
 			return type.compound().back();
 		}
 
-		SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function prototype declaration has a return type \"" << type << "\" for function \"" << (symbolFunction != nullptr ? symbolFunction->getName() : "") << "\"";
+		SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function prototype declaration has a return type \"" << type << "\" for function \"" << (symbolFunction != nullptr ? symbolFunction->name() : "") << "\"";
 		return type;
 	}
 }

@@ -32,7 +32,7 @@ bool ska::Type::equalIgnoreSymbol(const Type& t) const {
 
 std::ostream& ska::operator<<(std::ostream& stream, const ska::Type& type) {
 	const auto mainType = ExpressionTypeSTR[static_cast<std::size_t>(type.m_type)];
-	auto addedSymbolPart = (type.m_symbol == nullptr ? "" : (" " + type.m_symbol->getName()));
+	auto addedSymbolPart = (type.m_symbol == nullptr ? "" : (" " + type.m_symbol->name()));
 	if (type.m_compound.empty()) {
 		stream << mainType << addedSymbolPart;
 	} else {

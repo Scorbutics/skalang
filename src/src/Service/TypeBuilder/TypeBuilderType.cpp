@@ -12,11 +12,11 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::TYPE>::build(const ScriptAST& 
     if (!isBuiltIn) {
 		const Symbol* symbolType = node.GetSymbol(script.symbols());
 		if(symbolType != nullptr) {
-			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::TYPE>) << "Type-node looked \"" << symbolType->getType() << "\" for node \"" << node.GetName() << "\"";
+			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::TYPE>) << "Type-node looked \"" << symbolType->type() << "\" for node \"" << node.GetName() << "\"";
 		} else {
 			throw std::runtime_error("undeclared custom type \"" + node.GetName() + "\" (when trying to look on token type \"" + node.GetTypeName() + "\")");
 		}
-		result = node.IsObject() ? Type::MakeCustom<ExpressionType::OBJECT>(symbolType) : symbolType->getType();
+		result = node.IsObject() ? Type::MakeCustom<ExpressionType::OBJECT>(symbolType) : symbolType->type();
    } else { 
 		assert(!node.IsObject());
 	   result = ExpressionTypeMap.at(node.GetName());

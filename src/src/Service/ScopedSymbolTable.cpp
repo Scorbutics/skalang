@@ -18,8 +18,8 @@ ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name) {
 }
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
-	auto name = symbol.getName();
-	SLOG(ska::LogLevel::Debug) << "\tSymbol \"" << name << "\" \"" <<  symbol.getType() << "\"";
+	auto name = symbol.name();
+	SLOG(ska::LogLevel::Debug) << "\tSymbol \"" << name << "\" \"" <<  symbol.type() << "\"";
 	if(m_symbols.find(name) == m_symbols.end()) {
 		m_symbols.emplace(name, std::move(std::move(symbol)));
 	} else {
@@ -27,7 +27,7 @@ ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
 	}
 
 	auto& s = m_symbols.at(name);
-	SLOG(ska::LogLevel::Info) << "\tSymbol Inserted \"" << name << "\" \"" << s.getType() << "\"";
+	SLOG(ska::LogLevel::Info) << "\tSymbol Inserted \"" << name << "\" \"" << s.type() << "\"";
 	return s;
 }
 
@@ -44,4 +44,14 @@ ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(Symbol* s) {
 	//No bad memory access possible when unique_ptr are moved, that's why it's safe to return the address of contained item
 	//even if we move the vector or if the vector moves its content automatically 
 	return lastChild;
+}
+
+void ska::ScopedSymbolTable::forceType(const std::string& symbolName, Type value) {
+	auto* symbol = (*this)[symbolName];
+	if (symbol == nullptr) {
+		auto ss = std::stringstream{};
+		ss << "bad symbol \"" << symbolName << "\" : cannot assign type \"" << value << "\"";
+		throw std::runtime_error(ss.str());
+	}
+	symbol->forceType(std::move(value));
 }

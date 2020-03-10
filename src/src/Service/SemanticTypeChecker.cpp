@@ -63,16 +63,16 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 				case ReturnTokenEventType::BUILTIN:
 		case ReturnTokenEventType::OBJECT: {
 			const auto symbol = token.script().symbols().enclosingType();
-			auto* finalSymbol = token.script().symbols()[symbol->getName()];
-			if (symbol == nullptr || symbol->getName().empty() || finalSymbol == nullptr) {
+			auto* finalSymbol = token.script().symbols()[symbol->name()];
+			if (symbol == nullptr || symbol->name().empty() || finalSymbol == nullptr) {
 				throw std::runtime_error("return must be place in a function block or a nested one");
 			}
 
-			const auto type = finalSymbol->getType();
+			const auto type = finalSymbol->type();
 			auto operationReturn = OperationType<Operator::RETURN>{token.rootNode()};
 			const auto& returnedValue = operationReturn.GetValue();
 			if (type.compound().empty() || !returnedValue.type().has_value()) {
-				throw std::runtime_error("\"" + symbol->getName() + "\" is not a function");
+				throw std::runtime_error("\"" + symbol->name() + "\" is not a function");
 			}
 
 			const auto expectedReturnType = type.compound().back();

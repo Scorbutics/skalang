@@ -15,7 +15,6 @@ namespace ska {
 		ScriptHandleAST(const ScriptHandleAST&) = delete;
 		ScriptHandleAST& operator=(const ScriptHandleAST&) = delete;
 
-		SymbolTable& symbols() { return m_symbols; }
 		const SymbolTable& symbols() const { return m_symbols; }
 
 		ASTNode& rootNode() { assert(m_ast != nullptr); return *m_ast; }

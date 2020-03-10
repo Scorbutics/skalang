@@ -12,5 +12,5 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_DECLARATION>::build(c
 	auto& symbols = script.symbols();
 	const auto symbol = symbols(functionName);
 	assert(symbol != nullptr);
-	return symbol->getType();
+	return symbol->type();
 }

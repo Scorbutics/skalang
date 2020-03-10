@@ -14,7 +14,7 @@ ska::Type ska::BridgeBuilderASTTemplateLooker::variable(const std::string& name)
   if(symbol == nullptr) {
     throw std::runtime_error("unable to find variable \"" + name + "\" in template script \"" + m_parent->name() + "\"");
   }
-  return symbol->getType();
+  return symbol->type();
 }
 
 ska::Type ska::BridgeBuilderASTTemplateLooker::constructor() const {
@@ -32,7 +32,7 @@ ska::Type ska::BridgeBuilderASTTemplateLooker::field(const std::string& name) co
   if (symbol == nullptr) {
     throw std::runtime_error("unable to find field \"" + name + (m_name.empty() ? "" : "\" in constructor \"" + m_name) + "\" of template script \"" + m_parent->name() + "\"");
   }
-  return symbol->getType();
+  return symbol->type();
 }
 
 bool ska::BridgeBuilderASTTemplateLooker::hasField(const std::string& name) const {

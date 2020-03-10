@@ -119,7 +119,7 @@ bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
             	throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
         	}
         	m_currentTable = &m_currentTable->createNested();
-        	SLOG(ska::LogLevel::Info) << "\tReturn : nested named symbol table with name : " << actualNameSymbol->getName();
+        	SLOG(ska::LogLevel::Info) << "\tReturn : nested named symbol table with name : " << actualNameSymbol->name();
     	}
   	break;
 
@@ -155,13 +155,7 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 }
 
 void ska::SymbolTable::forceType(const std::string& symbolName, Type value) {
-	auto* symbol = (*m_currentTable)[symbolName];
-	if(symbol == nullptr) {
-		auto ss = std::stringstream{};
-		ss << "bad symbol \"" << symbolName << "\" : cannot assign type \"" << value <<  "\"";
-		throw std::runtime_error(ss.str());
-	}
-	symbol->forceType(std::move(value));
+	m_currentTable->forceType(symbolName, std::move(value));
 }
 
 const ska::Symbol* ska::SymbolTable::lookup(SymbolTableLookup strategy, SymbolTableNested depth) const {

@@ -16,7 +16,7 @@ namespace ska {
     BridgeField(Type fullType) : type(std::move(fullType)) {}
 
     std::string name() const {
-        return type.symbol() != nullptr ? type.symbol()->getName() : "";
+        return type.symbol() != nullptr ? type.symbol()->name() : "";
     }
 
   public:

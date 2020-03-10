@@ -27,17 +27,17 @@ namespace ska {
             case TokenType::IDENTIFIER: {
                 const auto symbol = symbols[node.name()];
 				if (symbol != nullptr) {
-					if (symbol->getType().hasSymbol()) {
-						return symbol->getType();
+					if (symbol->type().hasSymbol()) {
+						return symbol->type();
 					}			
 					const auto* finalSymbol = (*symbol)[node.name()];
-					switch (symbol->getType().type()) {
+					switch (symbol->type().type()) {
 					case ExpressionType::OBJECT:
 						return Type::MakeCustom<ExpressionType::OBJECT>(finalSymbol);
 					case ExpressionType::FUNCTION:
 						return Type::MakeCustom<ExpressionType::FUNCTION>(finalSymbol);
 					default:
-						return symbol->getType();
+						return symbol->type();
 					}
 				}
 				return Type{};

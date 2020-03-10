@@ -23,7 +23,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 		LOG_DEBUG << "Accessing field " << optFieldValue.value() << " of object " << node.GetObjectNameNode();
 	} else {
 		auto ss = std::stringstream{ };
-		ss << "invalid bytecode : cannot access field \"" << symbolField->getName() << " of object " << node.GetObjectNameNode() << " in script \"" << context.scriptName() << "\"";
+		ss << "invalid bytecode : cannot access field \"" << symbolField->name() << " of object " << node.GetObjectNameNode() << " in script \"" << context.scriptName() << "\"";
 		throw std::runtime_error(ss.str());		
 	}
 
@@ -38,7 +38,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	const auto objectFieldReferences = objectSymbolInfo->references;
 	if(objectFieldReferences == nullptr || objectFieldReferences->empty()) {
 		auto ss = std::stringstream{};
-		ss << "invalid bytecode : the field \"" << symbolField->getName() << "\" in the dereferenced object \"" << node.GetObjectNameNode() << "\" has no fields references in script ";
+		ss << "invalid bytecode : the field \"" << symbolField->name() << "\" in the dereferenced object \"" << node.GetObjectNameNode() << "\" has no fields references in script ";
 		ss << context.scriptName(objectSymbolInfo->script);
 		throw std::runtime_error(ss.str());
 	}

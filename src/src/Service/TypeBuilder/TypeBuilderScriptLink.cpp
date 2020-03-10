@@ -8,6 +8,6 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator:
 ska::Type ska::TypeBuilderOperator<ska::Operator::SCRIPT_LINK>::build(const ScriptAST& script, OperateOn node) {
 	auto& symbols = script.symbols();
 	const auto* symbol = symbols[node.GetValue().name()];
-    SLOG(LogLevel::Info) << "Looking for script cache \"" << node.GetValue().name() << "\" with symbol " << (symbol == nullptr ? "" : symbol->getName());
+    SLOG(LogLevel::Info) << "Looking for script cache \"" << node.GetValue().name() << "\" with symbol " << (symbol == nullptr ? "" : symbol->name());
 	return symbol == nullptr ? Type::MakeBuiltIn(ExpressionType::VOID) : Type::MakeCustom<ExpressionType::OBJECT>(symbol);
 }

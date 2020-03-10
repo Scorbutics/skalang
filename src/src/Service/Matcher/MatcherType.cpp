@@ -97,8 +97,8 @@ ska::ASTNodePtr ska::MatcherType::match(const Type& input) {
 				if (symbol == nullptr) {
 					malformedType(input, " : no symbol in a variable/function type");
 				}
-				SLOG(LogLevel::Info) << "Type " << input << " is an object/function named " << symbol->getName();
-				auto token = Token { symbol->getName(), TokenType::IDENTIFIER, {}};
+				SLOG(LogLevel::Info) << "Type " << input << " is an object/function named " << symbol->name();
+				auto token = Token { symbol->name(), TokenType::IDENTIFIER, {}};
 				nodes.push_back(ASTFactory::MakeLogicalNode(std::move(token)));
 				nodes.push_back(input.type() == ExpressionType::OBJECT ? ASTFactory::MakeLogicalNode(Token { "", TokenType::RANGE, {}}) : ASTFactory::MakeEmptyNode());
 				nodes.push_back(ASTFactory::MakeEmptyNode());

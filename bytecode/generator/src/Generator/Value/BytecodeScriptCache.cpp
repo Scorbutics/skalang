@@ -12,7 +12,7 @@ void ska::bytecode::ScriptCache::setSymbolInfo(const ASTNode& node, SymbolInfo i
 }
 
 void ska::bytecode::ScriptCache::setSymbolInfo(const Symbol& symbol, SymbolInfo info) {
-	SLOG(ska::LogLevel::Debug) << "[Cache " << this << "] Setting " << info << " (" << symbol.getName() << ") with key 0x" << &symbol;
+	SLOG(ska::LogLevel::Debug) << "[Cache " << this << "] Setting " << info << " (" << symbol.name() << ") with key 0x" << &symbol;
 	auto it = m_symbolInfo.find(&symbol);
 	if (it == m_symbolInfo.end()) {
 		m_symbolInfo.emplace(&symbol, std::move(info));
@@ -27,7 +27,7 @@ ska::bytecode::SymbolInfo ska::bytecode::ScriptCache::getSymbolInfoOrNew(std::si
 }
 
 const ska::bytecode::SymbolInfo* ska::bytecode::ScriptCache::getSymbolInfo(const Symbol& symbol) const {
-	SLOG(ska::LogLevel::Debug) << "[Cache " << this << "] Getting " << symbol.getName() << " with key 0x" << &symbol;
+	SLOG(ska::LogLevel::Debug) << "[Cache " << this << "] Getting " << symbol.name() << " with key 0x" << &symbol;
 	if(m_symbolInfo.find(&symbol) == m_symbolInfo.end()) {
 		SLOG(ska::LogLevel::Debug) << "\t NULL";
 		return nullptr;
@@ -50,7 +50,7 @@ const std::vector<ska::bytecode::ExportSymbol>& ska::bytecode::ScriptCache::getE
 		auto temporarySortedScriptSymbols = std::priority_queue<SymbolWithInfo>{};
 		for (const auto& data : m_symbolInfo) {
 			if (data.second.exported && data.second.script == scriptIndex) {
-				SLOG(ska::LogLevel::Info) << "%11c\tFound symbol " << data.first->getName() << " with info " << data.second;
+				SLOG(ska::LogLevel::Info) << "%11c\tFound symbol " << data.first->name() << " with info " << data.second;
 				temporarySortedScriptSymbols.push(SymbolWithInfo{ data.first, &data.second });
 			}
 		}

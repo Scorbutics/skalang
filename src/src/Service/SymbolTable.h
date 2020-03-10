@@ -50,7 +50,7 @@ namespace ska {
 		[[nodiscard]]
 		ParserListenerLock listenParser(StatementParser& parser);
 
-    const auto* operator[](const std::string& key) const { return (*m_currentTable)[key]; }
+		const Symbol* operator[](const std::string& key) const { return (*m_currentTable)[key]; }
 
 		const Symbol* operator()(const std::string& key) const { return (*m_currentTable)(key); }
 

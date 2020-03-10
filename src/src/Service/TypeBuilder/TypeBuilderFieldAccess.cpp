@@ -27,13 +27,13 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const Scr
         throw std::runtime_error(ss.str());
     }
 
-    SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Field accessed \"" << fieldName << "\" (type \"" << symbolField->getType() << "\") of \"" << node.GetObjectNameNode().name() << "\"";
+    SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Field accessed \"" << fieldName << "\" (type \"" << symbolField->type() << "\") of \"" << node.GetObjectNameNode().name() << "\"";
 	
-	if (symbolField->getType() == ExpressionType::VOID) {
+	if (symbolField->type() == ExpressionType::VOID) {
 		auto ss = std::stringstream{};
 		ss << "field \"" << node.GetFieldNameNode().name() << "\" of \"" << node.GetObjectNameNode().name() << "\" has a void type, which is invalid";
 		throw std::runtime_error(ss.str());
 	}
 
-	return symbolField->getType();
+	return symbolField->type();
 }

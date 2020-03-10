@@ -197,10 +197,10 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionPrototype(ScriptAST& script, 
 	const auto* functionSymbol = fullTypeFunction.symbol();
 	SLOG(LogLevel::Info) << " 2 - Making function prototype \"" << fullTypeFunction << "\"";
 
-	if(functionSymbol == nullptr || functionSymbol->getName().empty()) { std::stringstream ss; ss << "type is not named : " << fullTypeFunction; throw std::runtime_error(ss.str()); };
+	if(functionSymbol == nullptr || functionSymbol->name().empty()) { std::stringstream ss; ss << "type is not named : " << fullTypeFunction; throw std::runtime_error(ss.str()); };
 	if(fullTypeFunction.type() != ExpressionType::FUNCTION) { std::stringstream ss; ss << "type is not a function : " << fullTypeFunction; throw std::runtime_error(ss.str()); };
 
-	auto functionNameNode = makeFunctionName(script, functionSymbol->getName());
+	auto functionNameNode = makeFunctionName(script, functionSymbol->name());
 	auto parametersAndReturn = makeFunctionInputOutput(script, fullTypeFunction);
 	return makeFunctionPrototype(script, std::move(functionNameNode), std::move(parametersAndReturn));
 }

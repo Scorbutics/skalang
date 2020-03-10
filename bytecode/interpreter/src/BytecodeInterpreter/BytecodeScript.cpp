@@ -13,7 +13,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::Script);
 ska::bytecode::Operand ska::bytecode::Script::findBytecodeMemoryFromSymbol(const Symbol& symbol) const {
 	auto bytecodeSymbol = m_serviceGen.getSymbol(symbol);
 	if (bytecodeSymbol.has_value()) {
-		throw std::runtime_error("unable to find generated symbol \"" + symbol.getName() + "\" in script \"" + astScript().name() + "\"");
+		throw std::runtime_error("unable to find generated symbol \"" + symbol.name() + "\" in script \"" + astScript().name() + "\"");
 	}
 	return bytecodeSymbol.value();
 }
@@ -33,10 +33,10 @@ const ska::Symbol* ska::bytecode::Script::findFieldSymbol(const Symbol* construc
 	}
 
 	if (constructor != nullptr) {
-		return (*constructor)[field.type.symbol()->getName()];
+		return (*constructor)[field.type.symbol()->name()];
 	}
 
-	return &findSymbolFromString(field.type.symbol()->getName());
+	return &findSymbolFromString(field.type.symbol()->name());
 }
 
 void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr astRoot, Interpreter& interpreter) {
@@ -59,7 +59,7 @@ void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr a
 			throw std::runtime_error(ss.str());
 		}
 
-		LOG_INFO << "%14cAttaching binding to symbol " << newerSymbol->getName();
+		LOG_INFO << "%14cAttaching binding to symbol " << newerSymbol->name();
 		auto info = m_cache.getSymbolInfoOrNew(m_serviceGen.id(), *newerSymbol);
 		auto bindingRef = ScriptVariableRef{ bindingId++, m_serviceGen.id() };
 		m_cache.storeBinding(std::make_shared<NativeFunction>(field.callback), bindingRef);

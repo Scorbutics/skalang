@@ -34,13 +34,7 @@ namespace ska {
         	return m_parentSymbol;
     	}
 
-		Symbol* operator[](const std::string& key) {
-        	auto valueIt = m_symbols.find(key);
-			if(valueIt == m_symbols.end()) {
-				return &m_parent == this ? nullptr : m_parent[key];
-			}
-			return valueIt == m_symbols.end() ? nullptr : &(valueIt->second);
-    	}
+		void forceType(const std::string& symbol, Type value);
 
     	const Symbol* operator[](const std::string& key) const {
         	const auto valueIt = m_symbols.find(key);
@@ -49,11 +43,6 @@ namespace ska {
         	}
 			return valueIt == m_symbols.end() ? nullptr : &(valueIt->second);
     	}
-		
-		Symbol* operator()(const std::string& key) {
-			auto valueIt = m_symbols.find(key);
-			return valueIt == m_symbols.end() ? nullptr : &(valueIt->second);
-		}
 
 		const Symbol* operator()(const std::string& key) const {
 			const auto valueIt = m_symbols.find(key);
@@ -64,26 +53,14 @@ namespace ska {
 			return m_children;
 		}
 
-		
-
-		bool erase(const std::string& name) {
-			auto valueIt = m_symbols.find(name);
-			if (valueIt == m_symbols.end()) {				
-				return (&m_parent != this) ? m_parent.erase(name) : false;
-			}
-			m_symbols.erase(name);
-			return true;
-		}
-
-		auto begin() {
-			return m_symbols.begin();
-		}
-
-		auto end() {
-			return m_symbols.end();
-		}
-
 	private:
+		Symbol* operator[](const std::string& key) {
+			auto valueIt = m_symbols.find(key);
+			if (valueIt == m_symbols.end()) {
+				return &m_parent == this ? nullptr : m_parent[key];
+			}
+			return valueIt == m_symbols.end() ? nullptr : &(valueIt->second);
+		}
 		Symbol& emplace(Symbol symbol);
 
     	std::unordered_map<std::string, Symbol> m_symbols;

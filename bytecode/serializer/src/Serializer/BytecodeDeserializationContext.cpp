@@ -126,6 +126,7 @@ std::vector<ska::bytecode::ExportSymbol> ska::bytecode::DeserializationContext::
 	auto exports = std::vector<ExportSymbol>(exportsSize);
 	for(std::size_t i = 0; i < exportsSize; i++) {
 		//TODO symbol
+		//m_cache[0].program().symbols();
 		(*this) >> exports[i].value;
 		LOG_INFO << "Getting export " << exports[i];
 	};
