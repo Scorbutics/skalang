@@ -37,12 +37,12 @@ TEST_CASE("[SymbolTableUpdater] update node symbol") {
 
 	auto& table = astPtr.symbols();
 
-	CHECK(table.nested().size() == 1);
+	CHECK(table.countDirect() == 1);
 	const auto* i = table["i"];
-	const auto* nestedToto = (*table.nested()[0])["toto"];
+	const auto* nestedToto = table.lookup(ska::SymbolTableLookup::hierarchical("toto"), ska::SymbolTableNested::firstChild());
 	const auto* toto = table["toto"];
 	const auto* titi = table["titi"];
-	const auto* nestedI = (*table.nested()[0])["i"];
+	const auto* nestedI = table.lookup(ska::SymbolTableLookup::hierarchical("i"), ska::SymbolTableNested::firstChild());
 
 	auto& ast = astPtr.rootNode();
 	CHECK(i == ast[0].symbol());

@@ -28,8 +28,6 @@ TEST_CASE("[ExpressionType]") {
 	auto script = ASTFromInputSemanticExpressionType(scriptCache, "do toto = 2\n end", parser_test);
 	script.parse(*parser_test);
 	auto* symbol_test = &script.symbols();
-	auto& table = *script.symbols().nested()[0];
-	auto& nested = table.createNested();
 
 	SUBCASE("Type is set") {
 		auto type = ska::Type::MakeCustom<ska::ExpressionType::FUNCTION>((*symbol_test)["toto"]);

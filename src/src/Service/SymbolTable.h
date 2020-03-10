@@ -10,6 +10,7 @@
 #include "Event/ImportTokenEvent.h"
 
 #include "ScopedSymbolTable.h"
+#include "SymbolTableOperation.h"
 
 namespace ska {
    
@@ -50,15 +51,20 @@ namespace ska {
 		ParserListenerLock listenParser(StatementParser& parser);
 
 		auto* operator[](const std::string& key) { return (*m_currentTable)[key]; }
-    	const auto* operator[](const std::string& key) const { return (*m_currentTable)[key]; }
+    const auto* operator[](const std::string& key) const { return (*m_currentTable)[key]; }
 
-		const ScopedSymbolTable::ChildrenScopedSymbolTable& nested() const { return m_currentTable->children(); }
+		Symbol* operator()(const std::string& key) { return (*m_currentTable)(key); }
+		const Symbol* operator()(const std::string& key) const { return (*m_currentTable)(key); }
 
-		const ScopedSymbolTable* current() const { return m_currentTable; }
-
-		const Symbol* enclosingType() const { 
+		const Symbol* enclosingType() const {
 			return m_currentTable->owner();
 		}
+
+		std::size_t countDirect() const {
+			return m_currentTable->children().size();
+		}
+
+		const Symbol* lookup(SymbolTableLookup strategy, SymbolTableNested depth = SymbolTableNested::current()) const;
 
 	private:
 		bool match(const VarTokenEvent&);

@@ -154,6 +154,34 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 	return true;
 }
 
+const ska::Symbol* ska::SymbolTable::lookup(SymbolTableLookup strategy, SymbolTableNested depth) const {
+	auto* selectedTable = m_currentTable;
+	while(depth.depth < 0) {
+		selectedTable = &selectedTable->parent();
+		depth.depth++;
+	}
+
+	while(depth.depth > 0 && !selectedTable->children().empty()) {
+		if(depth.childIndex >= selectedTable->children().size()) {
+			depth.childIndex = selectedTable->children().size() - 1;
+		}
+		selectedTable = selectedTable->children()[depth.childIndex].get();
+		depth.depth--;
+	}
+
+	assert(selectedTable != nullptr);
+
+	switch (strategy.type) {
+	case SymbolTableLookupType::Hierarchical:
+		return (*selectedTable)[std::move(strategy.symbolName)];
+	case SymbolTableLookupType::Direct:
+		return (*selectedTable)(std::move(strategy.symbolName));
+	default:
+		throw std::runtime_error("unhandled enum value");
+		return nullptr;
+	}
+}
+
 bool ska::SymbolTable::match(const VarTokenEvent& token) {
 	assert(m_currentTable != nullptr);
 	

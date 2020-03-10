@@ -10,8 +10,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator:
 ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_DECLARATION>::build(const ScriptAST& script, OperateOn node) {
 	auto functionName = node.GetFunctionName();
 	auto& symbols = script.symbols();
-	assert(!symbols.nested().empty());
-	const auto symbol = (*symbols.current())(functionName);
+	const auto symbol = symbols(functionName);
 	assert(symbol != nullptr);
 	return symbol->getType();
 }

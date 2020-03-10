@@ -60,13 +60,11 @@ namespace ska {
 			return valueIt == m_symbols.end() ? nullptr : &(valueIt->second);
 		}
 
-		ChildrenScopedSymbolTable& children() {
-			return m_children;
-		}
-		
 		const ChildrenScopedSymbolTable& children() const {
 			return m_children;
 		}
+
+		
 
 		bool erase(const std::string& name) {
 			auto valueIt = m_symbols.find(name);

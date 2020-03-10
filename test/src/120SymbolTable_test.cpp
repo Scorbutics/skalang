@@ -24,13 +24,13 @@ TEST_CASE("test") {
 	auto astPtr = ASTFromInput(scriptCache, "i = 0\n titi = \"llllll\"\n do toto = 2\n i = 9\n end", data);
 	auto& table = reader->symbols();
 	
-	CHECK(table.nested().size() == 1);
-	auto nestedI = (*table.nested()[0])["i"];
+	CHECK(table.countDirect() == 1);
+	const auto* nestedI = table.lookup(ska::SymbolTableLookup::hierarchical("i"), ska::SymbolTableNested::lastChild());
 	auto i = table["i"];
-	auto nestedToto = (*table.nested()[0])["toto"];
+	const auto* nestedToto = table.lookup(ska::SymbolTableLookup::hierarchical("toto"), ska::SymbolTableNested::firstChild());
 	auto toto = table["toto"];
 	auto titi = table["titi"];
-	auto nestedTiti = (*table.nested()[0])["titi"];
+	auto nestedTiti = table.lookup(ska::SymbolTableLookup::hierarchical("titi"), ska::SymbolTableNested::firstChild());
 
 	CHECK(i != nullptr);
 	CHECK(nestedI  != nullptr);
@@ -51,8 +51,8 @@ TEST_CASE("Matching") {
 			auto astPtr = ASTFromInput(scriptCache, "i = 0\n i = 123\n do i = 9\n end", data);
 			auto& table = reader->symbols();
 			
-			CHECK(table.nested().size() == 1);
-			auto nestedI = (*table.nested()[0])["i"];
+			CHECK(table.countDirect() == 1);
+			auto nestedI = table.lookup(ska::SymbolTableLookup::hierarchical("i"), ska::SymbolTableNested::firstChild());
 			auto i = table["i"];
 
 			CHECK(i != nullptr);
@@ -62,9 +62,8 @@ TEST_CASE("Matching") {
 			auto astPtr = ASTFromInput(scriptCache, "test59 = 21\n func59 = function() do test59 = 123\n end\n", data);
 			auto& table = reader->symbols();
 
-			CHECK(table.nested().size() == 1);
-			auto& functionTable = (*table.nested()[0]);
-			auto nestedVar = functionTable["test59"];
+			CHECK(table.countDirect() == 1);
+			auto nestedVar = table.lookup(ska::SymbolTableLookup::hierarchical("test59"), ska::SymbolTableNested::firstChild());
 			auto var = table["test59"];
 
 			CHECK(nestedVar == var);
@@ -74,9 +73,8 @@ TEST_CASE("Matching") {
 			auto astPtr = ASTFromInput(scriptCache, "func63 = function(test63:int) do test63 = 123\n end\n", data);
 			auto& table = reader->symbols();
 
-			CHECK(table.nested().size() == 1);
-			auto& functionTable = (*table.nested()[0]);
-			auto nestedVar = functionTable["test63"];
+			CHECK(table.countDirect() == 1);
+			auto nestedVar = table.lookup(ska::SymbolTableLookup::hierarchical("test63"), ska::SymbolTableNested::firstChild());
 			auto var = table["test63"];
 
 			CHECK(var == nullptr);
