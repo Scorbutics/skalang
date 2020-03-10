@@ -52,10 +52,8 @@ namespace ska {
 		auto* operator[](const std::string& key) { return (*m_currentTable)[key]; }
     	const auto* operator[](const std::string& key) const { return (*m_currentTable)[key]; }
 
-		ScopedSymbolTable::ChildrenScopedSymbolTable& nested() { return m_currentTable->children(); }
 		const ScopedSymbolTable::ChildrenScopedSymbolTable& nested() const { return m_currentTable->children(); }
 
-		ScopedSymbolTable* current() { return m_currentTable; }
 		const ScopedSymbolTable* current() const { return m_currentTable; }
 
 		const Symbol* enclosingType() const { 
