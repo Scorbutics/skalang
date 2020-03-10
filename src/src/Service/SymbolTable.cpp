@@ -154,6 +154,16 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 	return true;
 }
 
+void ska::SymbolTable::forceType(const std::string& symbolName, Type value) {
+	auto* symbol = (*m_currentTable)[symbolName];
+	if(symbol == nullptr) {
+		auto ss = std::stringstream{};
+		ss << "bad symbol \"" << symbolName << "\" : cannot assign type \"" << value <<  "\"";
+		throw std::runtime_error(ss.str());
+	}
+	symbol->forceType(std::move(value));
+}
+
 const ska::Symbol* ska::SymbolTable::lookup(SymbolTableLookup strategy, SymbolTableNested depth) const {
 	auto* selectedTable = m_currentTable;
 	while(depth.depth < 0) {

@@ -68,10 +68,10 @@ void ska::SymbolTableUpdater::updateType(const ASTNode& node, SymbolTable& symbo
 
 	const auto& type = node.type();
 	assert(type.has_value() && !node.name().empty());
-	auto* symbol = symbols[node.name()];	
+	const auto* symbol = symbols[node.name()];
 	if (symbol != nullptr) {
 		if (symbol->getType() != type.value()) {
-			symbol->forceType(type.value());
+			symbols.forceType(node.name(), type.value());
 			SLOG(LogLevel::Info) << "Type updated for symbol \"" << node.name() << "\" = \"" << node.type().value() << "\"";
 		} else {
 			SLOG(LogLevel::Warn) << "No type updated for symbol \"" << node.name() << "\" with operator \"" << node.op() << "\" : existing type \"" << symbol->getType() << "\"";

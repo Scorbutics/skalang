@@ -50,10 +50,8 @@ namespace ska {
 		[[nodiscard]]
 		ParserListenerLock listenParser(StatementParser& parser);
 
-		auto* operator[](const std::string& key) { return (*m_currentTable)[key]; }
     const auto* operator[](const std::string& key) const { return (*m_currentTable)[key]; }
 
-		Symbol* operator()(const std::string& key) { return (*m_currentTable)(key); }
 		const Symbol* operator()(const std::string& key) const { return (*m_currentTable)(key); }
 
 		const Symbol* enclosingType() const {
@@ -64,6 +62,7 @@ namespace ska {
 			return m_currentTable->children().size();
 		}
 
+		void forceType(const std::string& symbolName, Type value);
 		const Symbol* lookup(SymbolTableLookup strategy, SymbolTableNested depth = SymbolTableNested::current()) const;
 
 	private:
