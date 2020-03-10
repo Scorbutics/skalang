@@ -63,17 +63,17 @@ namespace ska {
 		}
 
 		const std::string& getName() const {
-				return m_name;
+			return m_name;
 		}
 
 		const Type& getType() const {
-				return m_category;
+			return m_category;
 		}
 
 		void forceType(Type t);
 
 		bool empty() const {
-				return m_category.compound().empty();
+			return m_category.compound().empty();
 		}
 
 		const Symbol* operator[](const std::string& fieldSymbolName) const;
