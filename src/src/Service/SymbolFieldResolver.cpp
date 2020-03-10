@@ -4,7 +4,7 @@
 #include "ScopedSymbolTable.h"
 #include "SymbolFieldResolver.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolFieldResolver)
+SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SymbolFieldResolver)
 
 ska::SymbolFieldResolver::SymbolFieldResolver(Variant value) :
   m_data(std::move(value)) {
@@ -22,18 +22,21 @@ const ska::Symbol* ska::SymbolFieldResolver::operator[](const std::string& field
 		auto* scopedTable = std::get<ScopedSymbolTable*>(m_data);
 		assert(scopedTable != nullptr);
 
+    auto index = std::size_t {0};
 		for(const auto& innerSymbolTable : scopedTable->children()) {
 			if(!innerSymbolTable->children().empty()) {
 				const auto* lastInnerSymbolElement = innerSymbolTable->children().back().get();
 				assert(lastInnerSymbolElement != nullptr && (std::string{"symbol \""} + fieldName + "\" doesn't exists for element ").c_str());
+        SLOG(ska::LogLevel::Info) << "Looking for symbol field \"" << fieldName << "\" in " << index << "nth child of current symbol";
 				const auto* result = (*lastInnerSymbolElement)[fieldName];
 				if(result != nullptr) {
 					return result;
 				}
 			}
+      index++;
 		}
 
-		SLOG(ska::LogLevel::Info) << "Unable to find " << fieldName << " in this symbol";
+		SLOG(ska::LogLevel::Info) << "Unable to find \"" << fieldName << "\" in this symbol in the table";
 		return nullptr;
 	}
 
@@ -48,7 +51,7 @@ const ska::Symbol* ska::SymbolFieldResolver::operator[](const std::string& field
 		return result;
 	}
 
-	SLOG(ska::LogLevel::Info) << "Unable to find " << fieldName << " in this symbol";
+	SLOG(ska::LogLevel::Info) << "Unable to find \"" << fieldName << "\" in this symbol in script \"" << script->name() << "\"";
 	return nullptr;
 }
 
