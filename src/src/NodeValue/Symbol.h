@@ -13,82 +13,83 @@ namespace ska {
 	struct ScriptHandleAST;
 
 	class Symbol {
-    	friend class ScopedSymbolTable;
-    	private:
-			Symbol(){}
+		friend class ScopedSymbolTable;
+	private:
+		Symbol() {}
 
-			Symbol(std::string name, ScopedSymbolTable& symbolTable) :
-				m_name(std::move(name)), 
-				m_data(&symbolTable) {
-				SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" from table";
-        	}
+		Symbol(std::string name, ScopedSymbolTable& symbolTable) :
+			m_name(std::move(name)),
+			m_data(&symbolTable) {
+			SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" from table";
+		}
 
-        	Symbol(std::string name, const ScriptHandleAST* script) :
-				m_name(std::move(name)), 
-				m_data(script) {
-				SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" from script";
-        	}
-    	public:
-        	Symbol(const Symbol& s) {
-            	*this = s;
-        	}
+		Symbol(std::string name, const ScriptHandleAST* script) :
+			m_name(std::move(name)),
+			m_data(script) {
+			SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" from script";
+		}
 
-        	Symbol(Symbol&& s) noexcept {
-            	*this = std::move(s);
-        	}
+	public:
+		Symbol(const Symbol& s) {
+			*this = s;
+		}
 
-        	Symbol& operator=(const Symbol& s) {
-            	m_data = s.m_data;
-            	m_name = s.m_name;
-            	m_category = s.m_category;
-				SLOG(ska::LogLevel::Debug) << "   Copy, Symbol " << s.getName() << " " << s.m_category << " copied to " << m_name << " " << m_category;
-            	return *this;
-        	}
+		Symbol(Symbol&& s) noexcept {
+			*this = std::move(s);
+		}
 
-        	Symbol& operator=(Symbol&& s) noexcept {
-            	m_data = std::move(s.m_data);
-            	m_name = std::move(s.m_name);
-            	m_category = std::move(s.m_category);
-				SLOG(ska::LogLevel::Debug) << "   Move, Symbol " << s.getName() << " " << s.m_category << " moved to " << m_name << " " << m_category;
-            	return *this;
-        	}
+		Symbol& operator=(const Symbol& s) {
+			m_data = s.m_data;
+			m_name = s.m_name;
+			m_category = s.m_category;
+			SLOG(ska::LogLevel::Debug) << "   Copy, Symbol " << s.getName() << " " << s.m_category << " copied to " << m_name << " " << m_category;
+			return *this;
+		}
 
-        	const Type& operator()(std::size_t index) const {
-            	return m_category.compound()[index];
-        	}
+		Symbol& operator=(Symbol&& s) noexcept {
+			m_data = std::move(s.m_data);
+			m_name = std::move(s.m_name);
+			m_category = std::move(s.m_category);
+			SLOG(ska::LogLevel::Debug) << "   Move, Symbol " << s.getName() << " " << s.m_category << " moved to " << m_name << " " << m_category;
+			return *this;
+		}
 
-			Type operator()(std::size_t index) {
-				return m_category.compound()[index];
-			}
+		const Type& operator()(std::size_t index) const {
+			return m_category.compound()[index];
+		}
 
-        	const std::string& getName() const {
-            	return m_name;
-        	}
+		Type operator()(std::size_t index) {
+			return m_category.compound()[index];
+		}
 
-        	const Type& getType() const {
-            	return m_category;
-        	}
+		const std::string& getName() const {
+				return m_name;
+		}
 
-			void forceType(Type t);
+		const Type& getType() const {
+				return m_category;
+		}
 
-        	bool empty() const {
-            	return m_category.compound().empty();
-        	}
+		void forceType(Type t);
 
-        	const Symbol* operator[](const std::string& fieldSymbolName) const;
-        	Symbol* operator[](const std::string& fieldSymbolName);
+		bool empty() const {
+				return m_category.compound().empty();
+		}
 
-        	std::size_t size() const;
+		const Symbol* operator[](const std::string& fieldSymbolName) const;
+		Symbol* operator[](const std::string& fieldSymbolName);
 
-			bool operator==(const Symbol& sym) const;
+		std::size_t size() const;
 
-			bool operator!=(const Symbol& sym) const {
-				return !(*this == sym);
-			}
+		bool operator==(const Symbol& sym) const;
 
-    	private:
-			std::variant<ScopedSymbolTable*, const ScriptHandleAST* > m_data = static_cast<ScopedSymbolTable*>(nullptr);
-        	std::string m_name;
-        	Type m_category;
+		bool operator!=(const Symbol& sym) const {
+			return !(*this == sym);
+		}
+
+	private:
+		std::variant<ScopedSymbolTable*, const ScriptHandleAST* > m_data = static_cast<ScopedSymbolTable*>(nullptr);
+		std::string m_name;
+		Type m_category;
 	};
 }
