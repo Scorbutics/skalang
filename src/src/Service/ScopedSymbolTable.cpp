@@ -2,7 +2,7 @@
 #include "Service/SymbolFieldResolver.h"
 #include "NodeValue/ScriptAST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScopedSymbolTable)
+SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::ScopedSymbolTable)
 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
 	return m_parent;
@@ -13,6 +13,7 @@ const ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() const {
 }
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name) {
+	SLOG(ska::LogLevel::Info) << "\tSymbol Created \"" << name << "\" with scoped table";
 	return emplace(Symbol{ name, SymbolFieldResolver{this} });
 }
 
@@ -26,11 +27,12 @@ ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
 	}
 
 	auto& s = m_symbols.at(name);
-	SLOG(ska::LogLevel::Debug) << "\tSymbol Inserted \"" << name << "\" \"" << s.getType() << "\"";
+	SLOG(ska::LogLevel::Info) << "\tSymbol Inserted \"" << name << "\" \"" << s.getType() << "\"";
 	return s;
 }
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, const ScriptAST& script) {
+	SLOG(ska::LogLevel::Info) << "\tSymbol Created \"" << name << "\" with script \"" << script.name() << "\"";
 	return emplace(Symbol{ name, SymbolFieldResolver{script.handle()} });
 }
 
