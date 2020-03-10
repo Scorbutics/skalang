@@ -1,4 +1,5 @@
 #include "ScopedSymbolTable.h"
+#include "Service/SymbolFieldResolver.h"
 #include "NodeValue/ScriptAST.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScopedSymbolTable)
@@ -12,7 +13,7 @@ const ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() const {
 }
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name) {
-	return emplace(Symbol{ name, *this });
+	return emplace(Symbol{ name, SymbolFieldResolver{this} });
 }
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
@@ -30,7 +31,7 @@ ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
 }
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, const ScriptAST& script) {
-	return emplace(Symbol{ name, script.handle() });
+	return emplace(Symbol{ name, SymbolFieldResolver{script.handle()} });
 }
 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(Symbol* s) {

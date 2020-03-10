@@ -1,6 +1,6 @@
 #pragma once
-#include <variant>
 #include "Type.h"
+#include "Service/SymbolFieldResolver.h"
 
 namespace ska {
 	class Symbol;
@@ -9,24 +9,15 @@ namespace ska {
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Symbol)
 
 namespace ska {
-	class ScopedSymbolTable;
-	struct ScriptHandleAST;
 
 	class Symbol {
 		friend class ScopedSymbolTable;
 	private:
 		Symbol() {}
 
-		Symbol(std::string name, ScopedSymbolTable& symbolTable) :
+		Symbol(std::string name, SymbolFieldResolver fields) :
 			m_name(std::move(name)),
-			m_data(&symbolTable) {
-			SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" from table";
-		}
-
-		Symbol(std::string name, const ScriptHandleAST* script) :
-			m_name(std::move(name)),
-			m_data(script) {
-			SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" from script";
+			m_data(std::move(fields)) {
 		}
 
 	public:
@@ -88,7 +79,7 @@ namespace ska {
 		}
 
 	private:
-		std::variant<ScopedSymbolTable*, const ScriptHandleAST* > m_data = static_cast<ScopedSymbolTable*>(nullptr);
+		SymbolFieldResolver m_data = SymbolFieldResolver{static_cast<ScopedSymbolTable*>(nullptr)};
 		std::string m_name;
 		Type m_category;
 	};
