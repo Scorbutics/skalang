@@ -10,7 +10,7 @@
 
 static constexpr std::size_t SERIALIZER_VERSION = 1;
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::Serializer);
+SKA_LOGC_CONFIG(ska::LogLevel::Error , ska::bytecode::Serializer);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Serializer)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Serializer)

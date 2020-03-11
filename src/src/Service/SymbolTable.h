@@ -62,7 +62,7 @@ namespace ska {
 			return m_currentTable->children().size();
 		}
 
-		void forceType(const std::string& symbolName, Type value);
+		bool changeTypeIfRequired(const std::string& symbolName, Type value);
 		const Symbol* lookup(SymbolTableLookup strategy, SymbolTableNested depth = SymbolTableNested::current()) const;
 
 	private:

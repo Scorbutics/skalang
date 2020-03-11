@@ -34,7 +34,7 @@ namespace ska {
 			return m_parentSymbol;
 		}
 
-		void forceType(const std::string& symbol, Type value);
+		bool changeTypeIfRequired(const std::string& symbol, Type value);
 
 		const Symbol* operator[](const std::string& key) const {
 			const auto valueIt = m_symbols.find(key);

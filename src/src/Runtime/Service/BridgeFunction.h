@@ -2,32 +2,29 @@
 #include <string>
 #include <vector>
 #include "Runtime/Value/NativeFunction.h"
-#include "NodeValue/Type.h"
-#include "NodeValue/Symbol.h"
 #include "Runtime/Value/NodeValue.h"
 
 namespace ska {
+  class Symbol;
   struct BridgeField {
     using Callback = typename NativeFunction::Callback;
 
     BridgeField() = default;
     ~BridgeField() = default;
 
-    BridgeField(Type fullType) : type(std::move(fullType)) {}
+    BridgeField(const Symbol& fullType) : symbol(&fullType) {}
 
-    std::string name() const {
-        return type.symbol() != nullptr ? type.symbol()->name() : "";
-    }
+    std::string name() const;
 
   public:
-    Type type;
+    const Symbol* symbol = nullptr;
     Callback callback;
   };
 
   class BridgeFunction {
   public:
     BridgeFunction() = default;
-    BridgeFunction(Type fullType) : m_function(std::move(fullType)) {}
+    BridgeFunction(const Symbol& fullType) : m_function(fullType) {}
     BridgeFunction(BridgeField function) : m_function(std::move(function)) {}
 
     void bindField(BridgeField field) {
@@ -43,14 +40,17 @@ namespace ska {
         }
         result.resize(m_fields.size());
         std::transform(m_fields.begin(), m_fields.end(), result.begin(), [](const auto& field) {
-            return BridgeFunction{ field.type };
+            assert(field.symbol != nullptr);
+            return BridgeFunction{ *field.symbol };
         });
         return result;
     }
 
     std::string name() const { return m_function.name(); }
     
-    const Type& type() const { return m_function.type; }
+    const Symbol& symbol() const { if(m_function.symbol == nullptr) throw std::runtime_error("bad function symbol"); return *m_function.symbol; }
+
+    bool isVoid() const;
 
     const BridgeField::Callback& callback() const { return m_function.callback; }
     const std::vector<BridgeField>& fields() const { return m_fields; }

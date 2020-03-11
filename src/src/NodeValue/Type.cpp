@@ -9,9 +9,11 @@ ska::Type ska::Type::crossTypes(const TypeCrosser& crosser, std::string op, cons
 	return crosser.cross(op, *this, type2);
 }
 
+/*
 const ska::Symbol* ska::Type::operator[](const std::string& fieldName) const {
 	return hasSymbol() ? (*m_symbol)[fieldName] : nullptr;
 }
+*/
 
 ska::Type::Type(const Symbol* symbol, ExpressionType t) :
 	m_type(t),

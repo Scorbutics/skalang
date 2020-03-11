@@ -28,15 +28,15 @@ const ska::Symbol& ska::bytecode::Script::findSymbolFromString(const std::string
 }
 
 const ska::Symbol* ska::bytecode::Script::findFieldSymbol(const Symbol* constructor, const BridgeField& field) const {
-	if (field.type.symbol() == nullptr) {
+	if (field.symbol == nullptr) {
 		return nullptr;
 	}
 
 	if (constructor != nullptr) {
-		return (*constructor)[field.type.symbol()->name()];
+		return (*constructor)[field.symbol->name()];
 	}
 
-	return &findSymbolFromString(field.type.symbol()->name());
+	return &findSymbolFromString(field.symbol->name());
 }
 
 void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr astRoot, Interpreter& interpreter) {
@@ -48,13 +48,14 @@ void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr a
 	/* Because it still targets the template script type, not the bound script one ! */
 	/* (remember, one is - almost - the copy of the other) */
 	/* so here we have to iterate through the bound script symbols instead of the template one */
-	const Symbol* constructorBoundSymbol = constructor.type() != ExpressionType::VOID ? &findSymbolFromString(constructor.name()) : nullptr;
+	const Symbol* constructorBoundSymbol = !constructor.isVoid() ? &findSymbolFromString(constructor.name()) : nullptr;
 	std::size_t bindingId = 0;
 	for (const auto& field : constructor.fields()) {
 		const Symbol* newerSymbol = findFieldSymbol(constructorBoundSymbol, field);
 		if(newerSymbol == nullptr) {
 			auto ss = std::stringstream {};
-			ss << "%14cNo symbol attached to type " << field.type;
+			assert(field.symbol != nullptr);
+			ss << "%14cNo symbol attached to type " << field.symbol->type();
 			LOG_ERROR << ss.str();
 			throw std::runtime_error(ss.str());
 		}

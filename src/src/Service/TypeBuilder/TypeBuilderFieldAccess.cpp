@@ -20,7 +20,7 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const Scr
 	}
 
 	const auto& fieldName = node.GetFieldNameNode().name();
-	const auto* symbolField = typeObject[fieldName];
+	const auto* symbolField = typeObject.symbol() == nullptr ? nullptr : (*typeObject.symbol())[fieldName];
     if (symbolField == nullptr || !typeObject.hasSymbol()) {
 		auto ss = std::stringstream{};
 		ss << "trying to access to an undeclared field : \"" << fieldName << "\" of \"" << node.GetObjectNameNode().name() << "\"";
@@ -29,7 +29,7 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const Scr
 
     SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Field accessed \"" << fieldName << "\" (type \"" << symbolField->type() << "\") of \"" << node.GetObjectNameNode().name() << "\"";
 	
-	if (symbolField->type() == ExpressionType::VOID) {
+	if (symbolField->nativeType() == ExpressionType::VOID) {
 		auto ss = std::stringstream{};
 		ss << "field \"" << node.GetFieldNameNode().name() << "\" of \"" << node.GetObjectNameNode().name() << "\" has a void type, which is invalid";
 		throw std::runtime_error(ss.str());

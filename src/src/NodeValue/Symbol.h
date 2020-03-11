@@ -31,10 +31,13 @@ namespace ska {
 		Symbol& operator=(const Symbol& s);
 		Symbol& operator=(Symbol&& s) noexcept;
 
-		void forceType(Type t);
-
 		const std::string& name() const { return m_name; }
-		const Type& type() const { return m_category; }
+		ExpressionType nativeType() const { return m_category.type(); }
+		Type type() const { return m_category; }
+		const Symbol* typeLookup(const std::string& symbol) const;
+		bool linkedTypeHasSymbol() const { return m_category.symbol() != nullptr; }
+
+		bool changeTypeIfRequired(const Type& type);
 
 		std::size_t size() const;
 		bool empty() const { return m_category.compound().empty(); }

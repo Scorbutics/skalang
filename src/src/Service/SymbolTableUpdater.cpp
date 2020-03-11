@@ -70,11 +70,10 @@ void ska::SymbolTableUpdater::updateType(const ASTNode& node, SymbolTable& symbo
 	assert(type.has_value() && !node.name().empty());
 	const auto* symbol = symbols[node.name()];
 	if (symbol != nullptr) {
-		if (symbol->type() != type.value()) {
-			symbols.forceType(node.name(), type.value());
+		if(symbols.changeTypeIfRequired(node.name(), type.value())) {
 			SLOG(LogLevel::Info) << "Type updated for symbol \"" << node.name() << "\" = \"" << node.type().value() << "\"";
 		} else {
-			SLOG(LogLevel::Warn) << "No type updated for symbol \"" << node.name() << "\" with operator \"" << node.op() << "\" : existing type \"" << symbol->type() << "\"";
+			SLOG(LogLevel::Warn) << "No type updated for symbol \"" << node.name() << "\" with operator \"" << node.op() << "\" : existing type \"" << (*symbol) << "\"";
 		}
 	} else {
 		auto ss = std::stringstream{};
