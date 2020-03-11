@@ -109,6 +109,35 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 			, data);
 	}
 
+	SUBCASE("class with internal data used in public function : not same names") {
+		ASTFromInputSemanticComplexTC(scriptCache,
+			"Stats = function() : var do\n"
+			"pointsDeVie = 100\n"
+			"blesser = function(degats:int) do\n"
+			"pointsDeVie = pointsDeVie - degats\n"
+			"end\n"
+			"return {"
+			"blesser = blesser"
+			"}\n"
+			"end\n"
+			"JoueurClass = function(nom:string) : var do "
+			"stats_ = Stats()\n"
+
+			"attaquer_ = function(degats:int) do\n"
+			"stats_.blesser(degats)\n"
+			"end\n"
+
+			"return {"
+			"attaquer = attaquer_\n"
+			"stats = stats_\n"
+			"}\n"
+			"end\n"
+			"joueur1 = JoueurClass(\"joueur1Nom\")\n"
+			"joueur1.attaquer(1)\n"
+			"joueur1.stats.blesser(1)\n"
+			, data);
+	}
+
 	SUBCASE("class with internal data used in public function 2") {
 		ASTFromInputSemanticComplexTC(scriptCache,
 			"Stats = function() : var do\n"

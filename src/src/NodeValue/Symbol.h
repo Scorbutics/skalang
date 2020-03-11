@@ -13,9 +13,10 @@ namespace ska {
 	private:
 		Symbol() = default;
 
-		Symbol(std::string name, SymbolFieldResolver fields) :
+		Symbol(std::size_t tableIndex, std::string name, SymbolFieldResolver fields) :
 			m_name(std::move(name)),
-			m_data(std::move(fields)) {
+			m_data(std::move(fields)),
+			m_tableIndex(tableIndex) {
 		}
 
 	public:
@@ -47,5 +48,6 @@ namespace ska {
 		SymbolFieldResolver m_data = SymbolFieldResolver{static_cast<ScopedSymbolTable*>(nullptr)};
 		std::string m_name;
 		Type m_category;
+		std::size_t m_tableIndex = 0;
 	};
 }

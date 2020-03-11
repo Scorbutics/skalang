@@ -16,24 +16,22 @@ ska::SymbolFieldResolver::SymbolFieldResolver(Variant value) :
   }
 }
 
+const ska::Symbol* ska::SymbolFieldResolver::lookup(std::size_t tableIndex, const std::string& fieldName) const {
+	if(std::holds_alternative<ScopedSymbolTable*>(m_data)) {
+		auto* containingTable = std::get<ScopedSymbolTable*>(m_data);
+		assert(containingTable != nullptr);
 
-const ska::Symbol* ska::SymbolFieldResolver::operator[](const std::string& fieldName) const {
-  if(std::holds_alternative<ScopedSymbolTable*>(m_data)) {
-		auto* scopedTable = std::get<ScopedSymbolTable*>(m_data);
-		assert(scopedTable != nullptr);
-
-    auto index = std::size_t {0};
-		for(const auto& innerSymbolTable : scopedTable->children()) {
-			if(!innerSymbolTable->children().empty()) {
+		if (containingTable->children().size() > tableIndex) {
+			const auto& innerSymbolTable = containingTable->children()[tableIndex];
+			if (!innerSymbolTable->children().empty()) {
 				const auto* lastInnerSymbolElement = innerSymbolTable->children().back().get();
-				assert(lastInnerSymbolElement != nullptr && (std::string{"symbol \""} + fieldName + "\" doesn't exists for element ").c_str());
-        SLOG(ska::LogLevel::Info) << "Looking for symbol field \"" << fieldName << "\" in " << index << "nth child of current symbol";
+				assert(lastInnerSymbolElement != nullptr && (std::string{ "symbol \"" } +fieldName + "\" doesn't exists for element ").c_str());
+				SLOG(ska::LogLevel::Info) << "Looking for symbol field \"" << fieldName << "\" in " << tableIndex << "nth child of current symbol";
 				const auto* result = (*lastInnerSymbolElement)[fieldName];
-				if(result != nullptr) {
+				if (result != nullptr) {
 					return result;
 				}
 			}
-      index++;
 		}
 
 		SLOG(ska::LogLevel::Info) << "Unable to find \"" << fieldName << "\" in this symbol in the table";

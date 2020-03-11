@@ -99,7 +99,7 @@ TEST_CASE("[BytecodeSerializer] binded external script use") {
 	CHECK(equality);
 }
 
-TEST_CASE("[BytecodeSerializer] external script use, other stack") {
+TEST_CASE("[BytecodeSerializer] external script use, other stack, triggers rebuild") {
 	
 	std::unordered_map<std::string, std::stringstream> serializingStreamsOut = {};
 	auto stringSerializer = [&serializingStreamsOut](const std::string& scriptName) -> std::ostream& {
