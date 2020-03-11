@@ -9,10 +9,14 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::O
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>)
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>::generate(OperateOn node, GenerationContext& context) {
-	const auto typeObject = node.GetObjectType();
 	const auto& fieldName = node.GetFieldNameNode().name();
-	const auto* symbolField = typeObject.symbol() == nullptr ? nullptr : (*typeObject.symbol())[fieldName];
-	if (symbolField == nullptr || !typeObject.hasSymbol()) {
+	const auto* objectTypeSymbol = node.GetObjectNameNode().typeSymbol();
+	if(objectTypeSymbol == nullptr) {
+		throw std::runtime_error("unable to retrieve object type");
+	}
+
+	const auto* symbolField = (*objectTypeSymbol)[fieldName];
+	if (symbolField == nullptr) {
 		auto ss = std::stringstream{};
 		ss << "trying to access to an undeclared field : \"" << fieldName << "\" of \"" << node.GetObjectNameNode().name() << "\"";
 	throw std::runtime_error(ss.str());

@@ -32,6 +32,7 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path import only") {
 	auto moduleConfiguration = BuildModuleConfFromData(data);
 	auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
 
+std::cout << "coucou" << std::endl;;
 	auto script = Interpret(data, progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);

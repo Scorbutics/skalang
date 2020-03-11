@@ -12,7 +12,7 @@
 
 #include "Service/ScriptNameBuilder.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::BridgeASTBuilder)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::BridgeASTBuilder)
 
 ska::BridgeASTBuilder::BridgeASTBuilder(TypeBuilder& typeBuilder, SymbolTableUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved) :
 	m_reserved(reserved),
@@ -106,8 +106,8 @@ std::vector<ska::ASTNodePtr> ska::BridgeASTBuilder::makeFunctionInputOutput(Scri
 std::vector<ska::ASTNodePtr> ska::BridgeASTBuilder::makeFunctionInputOutput(ScriptAST& script, const Symbol& fullTypeFunction) {
 	auto parametersAndReturn = std::vector<ASTNodePtr>{};
 	SLOG(LogLevel::Info) << " 4 - Making function parameters and return type";
-	for (std::size_t index = 0u; index < fullTypeFunction.size(); index++) {
-		auto& type = fullTypeFunction(index);
+	for (std::size_t index = 0u; index < fullTypeFunction.type().compound().size(); index++) {
+		const auto& type = fullTypeFunction.type().compound()[index];
 		auto isReturnType = index == fullTypeFunction.size() - 1;
 		SLOG(LogLevel::Info) << (isReturnType ? "return" : "parameter") << " : " << type;
 		auto t = m_matcherType.match(type);
@@ -195,7 +195,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionDeclaration(ScriptAST& script
 ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionPrototype(ScriptAST& script, const Symbol& fullTypeFunction) {
 	auto lock = BridgeASTBuilderSymbolTableLock{*this, script.symbols() };
 	const auto* functionSymbol = &fullTypeFunction;
-	SLOG(LogLevel::Info) << " 2 - Making function prototype \"" << fullTypeFunction << "\"";
+	SLOG(LogLevel::Info) << " 2 - Making function prototype \"" << fullTypeFunction.type() << "\"";
 
 	if(functionSymbol == nullptr || functionSymbol->name().empty()) { std::stringstream ss; ss << "type is not named : " << fullTypeFunction.name(); throw std::runtime_error(ss.str()); };
 	if(fullTypeFunction.nativeType() != ExpressionType::FUNCTION) { std::stringstream ss; ss << "type is not a function : " << fullTypeFunction.name(); throw std::runtime_error(ss.str()); };

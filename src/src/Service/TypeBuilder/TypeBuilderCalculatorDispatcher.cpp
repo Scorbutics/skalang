@@ -27,7 +27,7 @@ namespace ska {
             case TokenType::IDENTIFIER: {
                 const auto symbol = symbols[node.name()];
 				if (symbol != nullptr) {
-					if (symbol->linkedTypeHasSymbol()) {
+					if (symbol->type().hasSymbol()) {
 						return symbol->type();
 					}
 					const auto* finalSymbol = (*symbol)[node.name()];

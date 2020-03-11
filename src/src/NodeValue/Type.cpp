@@ -9,12 +9,6 @@ ska::Type ska::Type::crossTypes(const TypeCrosser& crosser, std::string op, cons
 	return crosser.cross(op, *this, type2);
 }
 
-/*
-const ska::Symbol* ska::Type::operator[](const std::string& fieldName) const {
-	return hasSymbol() ? (*m_symbol)[fieldName] : nullptr;
-}
-*/
-
 ska::Type::Type(const Symbol* symbol, ExpressionType t) :
 	m_type(t),
 	m_symbol(symbol) {
@@ -26,6 +20,18 @@ bool ska::Type::operator==(const Type& t) const {
 	}
 
 	return equalIgnoreSymbol(t);
+}
+
+std::string ska::Type::name() const {
+	return m_symbol == nullptr ? "" : m_symbol->name();
+}
+
+std::optional<ska::Type> ska::Type::lookup(const std::string& field) const {
+	if(m_symbol == nullptr) {
+		return {};
+	}
+	auto* symbol = (*m_symbol)[field];
+	return symbol == nullptr ? std::optional<Type>{} : symbol->type();
 }
 
 bool ska::Type::equalIgnoreSymbol(const Type& t) const {

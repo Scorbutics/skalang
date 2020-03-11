@@ -7,7 +7,7 @@
 
 #include "Operation/OperationTypeType.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
 
 namespace ska {
 	Type TypeBuilderFunctionPrototypeDeclarationDeduceReturnType(const ASTNode& node, const SymbolTable& symbolTable, const Symbol* symbolFunction) {
@@ -15,19 +15,22 @@ namespace ska {
 		const auto objectIsVar = type == ExpressionType::OBJECT;
 		if (objectIsVar) {
 			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function prototype declaration has an OBJECT return type \""<< (symbolFunction != nullptr ? symbolFunction->name() : "") << "\"";
-			const auto objectDoesntRefersToItself = type.hasSymbol();
+			const auto objectDoesntRefersToItself = node.typeSymbol() != nullptr;
 			if (!objectDoesntRefersToItself) {
 				return Type::MakeCustom<ExpressionType::OBJECT>(symbolFunction);
 			}
-			const auto operateOnType = OperationType<Operator::TYPE>{node};
-			const auto* symbol = operateOnType.GetSymbol(symbolTable);
-			assert(symbol != nullptr);
-			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function symbol type deduced from type \""<<  symbol->type() << "\"";
-			if(symbol->type() == ExpressionType::VOID) {
+			
+			const auto symbolType = node.typeSymbol() == nullptr ? std::optional<Type>{} : node.typeSymbol()->type();
+			if(!symbolType.has_value()) {
+				throw std::runtime_error("unable to find type symbol type of function");
+			}
+
+			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function symbol type deduced from type \""<<  symbolType.value() << "\"";
+			if(symbolType.value() == ExpressionType::VOID) {
 				return Type::MakeCustom<ExpressionType::OBJECT>(symbolFunction);
 			}
-			assert(!symbol->type().compound().empty());
-			return symbol->type().compound().back();
+			assert(!symbolType.value().compound().empty());
+			return symbolType.value().compound().back();
 
 			/*
 			const auto* returnSymbol = objectDoesntRefersToItself ? (node.size() == 1 ? (type)[node[0].name()] : type[node.name()]) : symbolFunction;

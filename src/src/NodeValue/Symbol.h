@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include "Type.h"
 #include "Service/SymbolFieldResolver.h"
 
@@ -33,16 +34,12 @@ namespace ska {
 
 		const std::string& name() const { return m_name; }
 		ExpressionType nativeType() const { return m_category.type(); }
-		Type type() const { return m_category; }
-		const Symbol* typeLookup(const std::string& symbol) const;
-		bool linkedTypeHasSymbol() const { return m_category.symbol() != nullptr; }
-
+		const Type& type() const { return m_category; }
 		bool changeTypeIfRequired(const Type& type);
 
 		std::size_t size() const;
 		bool empty() const { return m_category.compound().empty(); }
 
-		const Type& operator()(std::size_t index) const { return m_category.compound()[index]; }
 		const Symbol* operator[](const std::string& fieldSymbolName) const;
 		bool operator==(const Symbol& sym) const;
 		bool operator!=(const Symbol& sym) const {	return !(*this == sym);	}

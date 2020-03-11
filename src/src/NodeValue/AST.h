@@ -7,7 +7,7 @@
 #include "ASTNodePtr.h"
 #include "Operator.h"
 #include "ExpressionType.h"
-
+#include "SymbolTypeAccess.h"
 #include "Service/TypeBuilder/TypeBuildersContainer.h"
 #include "Type.h"
 
@@ -47,7 +47,7 @@ namespace ska {
 		void linkSymbol(const Symbol& symbol) { m_symbol = &symbol;	}
 
 		const auto& type() const { return m_type; }
-
+		const Symbol* typeSymbol() const { return !m_type.has_value() ? nullptr : TypeSymbolAccess(m_type.value()); }
 		const auto* symbol() const { return m_symbol; }
 
 	private:

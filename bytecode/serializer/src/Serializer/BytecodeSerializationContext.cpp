@@ -121,10 +121,10 @@ void ska::bytecode::SerializationContext::operator<<(const Type value) {
 	for (auto& childType : value.compound()) {
 		auto operand = Operand{};
 		LOG_INFO << "\t\tChild type " << childType;
-		if (childType.hasSymbol()) {
+		/*if (childType.hasSymbol()) {
 			operand = extractGeneratedOperandFromSymbol(*childType.symbol());
 		}
-		LOG_INFO << "%13cChild " << index << "\t\twith name "<< (childType.symbol() ? childType.symbol()->name() : "");
+		LOG_INFO << "%13cChild " << index << "\t\twith name "<< (childType.symbol() ? childType.symbol()->name() : "");*/
 		LOG_INFO << "%13c\t\twith Raw operand " << operand;
 		LOG_INFO << "%13c\t\twith " << childType.compound().size() << " children";
 		LOG_INFO << "%13c\t\twith Raw type : " << ExpressionTypeSTR[static_cast<std::size_t>(childType.type())];

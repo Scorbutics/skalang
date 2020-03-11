@@ -74,7 +74,7 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 				throw std::runtime_error("\"" + symbol->name() + "\" is not a function");
 			}
 
-			const auto expectedReturnType = (*finalSymbol)(finalSymbol->size() - 1);
+			const auto expectedReturnType = finalSymbol->type().compound().back();
 			if (((returnedValue.op() == Operator::USER_DEFINED_OBJECT) && (expectedReturnType != ExpressionType::OBJECT)) || 
 				(returnedValue.op() != Operator::USER_DEFINED_OBJECT && expectedReturnType != returnedValue.type())) {
 				auto ss = std::stringstream{};

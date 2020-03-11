@@ -4,6 +4,7 @@
 #include <sstream>
 #include "Config/LoggerConfigLang.h"
 #include "ExpressionType.h"
+#include "SymbolTypeAccess.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Type)
 
@@ -62,6 +63,12 @@ namespace ska {
 		}
 
 
+		template<ExpressionType t>
+		static Type MakeCustom(const Type& symbolType) {
+			static_assert(isNamed(t));
+			return Type{ symbolType.m_symbol, t };
+		}
+
 		Type() = default;
 		Type(Type&& t) noexcept = default;
 		Type(const Type& t) = default;
@@ -112,11 +119,14 @@ namespace ska {
 			return m_compound.size();
 		}
 
-		//const Symbol* operator[](const std::string& fieldName) const;
-		const Symbol* symbol() const { return m_symbol; }
+		std::optional<Type> lookup(const std::string& field) const;
+
+		std::string name() const;
 
 	private:
 		friend class TypeCrosser;
+		friend const Symbol* TypeSymbolAccess(const Type& type);
+
 		bool equalIgnoreSymbol(const Type& t) const;
 		explicit Type(ExpressionType t) :
 			m_type(std::move(t)) {

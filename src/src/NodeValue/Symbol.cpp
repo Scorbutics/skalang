@@ -45,10 +45,3 @@ bool ska::Symbol::changeTypeIfRequired(const Type& type) {
 	}
 	return false;
 }
-
-const ska::Symbol* ska::Symbol::typeLookup(const std::string& symbol) const {
-	if(m_category.symbol() == nullptr) {
-		return nullptr;
-	}
-	return (*m_category.symbol())[symbol];
-}
