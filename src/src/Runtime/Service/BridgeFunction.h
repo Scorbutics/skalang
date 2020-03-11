@@ -33,18 +33,7 @@ namespace ska {
 
     bool hasFields() const { return !m_fields.empty(); }
 
-    std::vector<BridgeFunction> makeFunctions() const {
-        auto result = std::vector<BridgeFunction> {};
-        if (m_fields.empty()) {
-            return result;
-        }
-        result.resize(m_fields.size());
-        std::transform(m_fields.begin(), m_fields.end(), result.begin(), [](const auto& field) {
-            assert(field.symbol != nullptr);
-            return BridgeFunction{ *field.symbol };
-        });
-        return result;
-    }
+    std::vector<BridgeFunction> makeFunctions() const;
 
     std::string name() const { return m_function.name(); }
     

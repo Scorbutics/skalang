@@ -1,6 +1,6 @@
 #pragma once
 
-#include "NodeValue/Type.h"
+#include "NodeValue/TypeHierarchy.h"
 
 namespace ska {
 	class ScriptAST;
@@ -8,7 +8,7 @@ namespace ska {
 
     class TypeBuildUnit {
     public:
-        virtual Type build(const ScriptAST&, const ASTNode&) = 0;
+        virtual TypeHierarchy build(ScriptAST&, const ASTNode&) = 0;
     	virtual ~TypeBuildUnit() = default;
     };
 

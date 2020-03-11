@@ -2,10 +2,10 @@
 #include "Service/ASTFactory.h"
 #include "NodeValue/ScriptAST.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
+#include "Service/TypeBuilder/TypeBuildersContainer.h"
 
-ska::ASTNode::ASTNode(): 
-	m_type(Type::MakeBuiltIn(ExpressionType::VOID)) {
-}
+ska::ASTNode::ASTNode() :
+	m_type(Type::MakeBuiltIn(ExpressionType::VOID)) {}
 
 ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
 	m_op(l != nullptr && r != nullptr ? Operator::BINARY : Operator::UNARY),
@@ -42,7 +42,22 @@ ska::ASTNode::ASTNode(Operator o, Token identifierToken) :
 	m_token(std::move(identifierToken)) {
 }
 
-void ska::ASTNode::buildType(const TypeBuildersContainer& typeBuilders, const ScriptAST& script) {
+const ska::Symbol* ska::ASTNode::typeSymbol() const { 
+	//return m_symbol == nullptr ? nullptr : m_symbol->master(); 
+	return !m_type.has_value() ? nullptr : TypeSymbolAccess(m_type.value());
+}
+
+const std::optional<ska::Type>& ska::ASTNode::type() const {
+	//return m_symbol == nullptr ? m_type : m_symbol->type();
+	return m_type;
+}
+
+void ska::ASTNode::linkSymbol(Symbol& symbol) { 
+	m_symbol = &symbol;
+	//refreshSymbolType();
+	//m_type = symbol.type().type();
+}
+void ska::ASTNode::buildType(const TypeBuildersContainer& typeBuilders, ScriptAST& script) {
 	if (m_type.has_value()) {
 		return;
 	}
@@ -52,5 +67,5 @@ void ska::ASTNode::buildType(const TypeBuildersContainer& typeBuilders, const Sc
 	}
 	auto& typeBuilder = typeBuilders[static_cast<std::size_t>(op())];
 	assert(typeBuilder != nullptr && "Cannot calculate the node type (it might be an empty node)");
-	m_type = typeBuilder->build(script, *this);
+	m_type = typeBuilder->build(script, *this).type;
 }

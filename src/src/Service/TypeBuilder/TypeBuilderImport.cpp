@@ -8,7 +8,7 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::IMPORT>)
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::IMPORT>::build(const ScriptAST& script, OperateOn node) {
+ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::IMPORT>::build(ScriptAST& script, OperateOn node) {
     SLOG(LogLevel::Info) << "Importing script " << node.GetScriptPathNode().name();
 	auto& symbols = script.symbols();
 	assert(symbols.countDirect() > 0);

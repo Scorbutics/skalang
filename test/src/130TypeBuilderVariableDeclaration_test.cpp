@@ -32,6 +32,6 @@ TEST_CASE("[TypeBuilderVariableDeclaration]") {
 	auto children = std::vector<ska::ASTNodePtr>{ };
 	children.push_back(std::move(valueNode));
 	auto node = ska::ASTFactory::MakeNode<ska::Operator::VARIABLE_AFFECTATION>(std::move(nameToken), std::move(children));
-	auto type = typeBuilder.build(script, *node);
+	auto type = typeBuilder.build(script, *node).type;
 	CHECK(type == ska::ExpressionType::INT);
 }

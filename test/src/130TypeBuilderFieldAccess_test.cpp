@@ -14,6 +14,6 @@ TEST_CASE("[TypeBuilderFieldAccess]") {
 	const auto& node = (script.rootNode())[2];
 
 	auto typeBuilder = ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>{};
-	auto type = typeBuilder.build(script, node);
+	auto type = typeBuilder.build(script, node).type;
 	CHECK(type == ska::ExpressionType::INT);
 }

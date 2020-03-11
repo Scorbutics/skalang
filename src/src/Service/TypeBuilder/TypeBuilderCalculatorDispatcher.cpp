@@ -86,7 +86,7 @@ namespace ska {
 				return Type::MakeBuiltIn<ExpressionType::ARRAY>();
 
             default:
-				assert(!"Unhandled type for this node");
+				throw std::runtime_error("Unhandled type for this node");
                 break;
         }
 

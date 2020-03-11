@@ -56,8 +56,8 @@ bool ska::SymbolTableUpdater::matchFunction(FunctionTokenEvent& event) {
 	return true;
 }
 
-void ska::SymbolTableUpdater::updateNode(ASTNode& node, const std::string& variableName, const SymbolTable& symbols) {
-	const auto* symbol = symbols[variableName];
+void ska::SymbolTableUpdater::updateNode(ASTNode& node, const std::string& variableName, SymbolTable& symbols) {
+	auto* symbol = symbols[variableName];
 	assert(symbol != nullptr);
 	node.linkSymbol(*symbol);
 }

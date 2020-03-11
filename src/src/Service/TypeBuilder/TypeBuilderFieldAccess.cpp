@@ -6,7 +6,7 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>)
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const ScriptAST& script, OperateOn node) {
+ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(ScriptAST& script, OperateOn node) {
 	const auto typeObject = node.GetObjectType();
 	if (typeObject != ExpressionType::OBJECT) {
 		auto error = std::stringstream {};
@@ -20,7 +20,7 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const Scr
 
 	const auto& fieldName = node.GetFieldNameNode().name();
 	const auto symbolFieldType = typeObject.lookup(fieldName);
-    if (!symbolFieldType.has_value()) {
+	if (!symbolFieldType.has_value()) {
 		auto ss = std::stringstream{};
 		ss << "trying to access to an undeclared field : \"" << fieldName << "\" of \"" << node.GetObjectNameNode().name() << "\"";
         throw std::runtime_error(ss.str());

@@ -10,7 +10,7 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
 
 namespace ska {
-	Type TypeBuilderFunctionPrototypeDeclarationDeduceReturnType(const ASTNode& node, const SymbolTable& symbolTable, const Symbol* symbolFunction) {
+	TypeHierarchy TypeBuilderFunctionPrototypeDeclarationDeduceReturnType(const ASTNode& node, const SymbolTable& symbolTable, const Symbol* symbolFunction) {
 		const auto type = node.type().value();
 		const auto objectIsVar = type == ExpressionType::OBJECT;
 		if (objectIsVar) {
@@ -49,7 +49,7 @@ namespace ska {
 	}
 }
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::build(const ScriptAST& script, OperateOn node) {
+ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::build(ScriptAST& script, OperateOn node) {
 	auto functionName = node.GetFunctionName();
     auto& symbols = script.symbols();
 	const auto* symbolFunction = symbols[functionName];
@@ -58,7 +58,7 @@ ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION
     for (auto& paramNode : node) {
 			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << paramNode->name();
 		if (index == node.GetParameterSize()) {
-			functionType.add(TypeBuilderFunctionPrototypeDeclarationDeduceReturnType(*paramNode, script.symbols(), symbolFunction));
+			functionType.add(TypeBuilderFunctionPrototypeDeclarationDeduceReturnType(*paramNode, script.symbols(), symbolFunction).type);
 		} else {
 			auto type = paramNode->type().value();
 			functionType.add(type);

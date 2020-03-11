@@ -34,7 +34,7 @@ namespace ska {
 			return m_parentSymbol;
 		}
 
-		bool changeTypeIfRequired(const std::string& symbol, Type value);
+		bool changeTypeIfRequired(const std::string& symbol, const Type& value);
 
 		const Symbol* operator[](const std::string& key) const {
 			const auto valueIt = m_symbols.find(key);
@@ -44,8 +44,21 @@ namespace ska {
 			return valueIt == m_symbols.end() ? nullptr : &(valueIt->second);
 		}
 
+		Symbol* operator[](const std::string& key) {
+			auto valueIt = m_symbols.find(key);
+			if (valueIt == m_symbols.end()) {
+				return &m_parent == this ? nullptr : m_parent[key];
+			}
+			return valueIt == m_symbols.end() ? nullptr : &(valueIt->second);
+		}
+
 		const Symbol* operator()(const std::string& key) const {
 			const auto valueIt = m_symbols.find(key);
+			return valueIt == m_symbols.end() ? nullptr : &(valueIt->second);
+		}
+
+		Symbol* operator()(const std::string& key) {
+			auto valueIt = m_symbols.find(key);
 			return valueIt == m_symbols.end() ? nullptr : &(valueIt->second);
 		}
 
@@ -54,13 +67,6 @@ namespace ska {
 		}
 
 	private:
-		Symbol* operator[](const std::string& key) {
-			auto valueIt = m_symbols.find(key);
-			if (valueIt == m_symbols.end()) {
-				return &m_parent == this ? nullptr : m_parent[key];
-			}
-			return valueIt == m_symbols.end() ? nullptr : &(valueIt->second);
-		}
 		Symbol& emplace(Symbol symbol);
 
 		std::unordered_map<std::string, Symbol> m_symbols;

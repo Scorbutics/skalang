@@ -46,12 +46,12 @@ ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(Symbol* s) {
 	return lastChild;
 }
 
-bool ska::ScopedSymbolTable::changeTypeIfRequired(const std::string& symbolName, Type value) {
+bool ska::ScopedSymbolTable::changeTypeIfRequired(const std::string& symbolName, const Type& value) {
 	auto* symbol = (*this)[symbolName];
 	if (symbol == nullptr) {
 		auto ss = std::stringstream{};
 		ss << "bad symbol \"" << symbolName << "\" : cannot assign type \"" << value << "\"";
 		throw std::runtime_error(ss.str());
 	}
-	return symbol->changeTypeIfRequired(std::move(value));
+	return symbol->changeTypeIfRequired(value);
 }

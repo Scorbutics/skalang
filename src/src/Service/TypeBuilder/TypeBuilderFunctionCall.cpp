@@ -7,7 +7,7 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>);
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>::build(const ScriptAST& script, OperateOn node) {
+ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>::build(ScriptAST& script, OperateOn node) {
 	const auto type = node.GetFunctionType();
 	SLOG(LogLevel::Info) << "function " << type << " call";
     if(type.compound().size() == 0) {

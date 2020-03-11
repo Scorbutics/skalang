@@ -1,3 +1,4 @@
+#include <array>
 #include "NodeValue/AST.h"
 #include "BytecodeTypeConversion.h"
 #include "Generator/Value/BytecodeScriptGenerationHelper.h"

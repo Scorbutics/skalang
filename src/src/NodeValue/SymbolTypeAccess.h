@@ -2,7 +2,7 @@
 
 namespace ska {
   class Symbol;
-  class Type;
+  struct Type;
 
   const Symbol* TypeSymbolAccess(const Type& type);
 

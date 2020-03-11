@@ -41,13 +41,17 @@ namespace ska {
 		const auto begin() const { return std::begin(m_children); }
 		const auto end() const { return std::end(m_children); }
 
+		auto begin() { return std::begin(m_children); }
+		auto end() { return std::end(m_children); }
+
 		const auto& op() const { return m_op; }
 
-		void buildType(const TypeBuildersContainer& typeBuilder, const ScriptAST& script);
-		void linkSymbol(const Symbol& symbol) { m_symbol = &symbol;	}
+		void linkSymbol(Symbol& symbol);
+		void buildType(const TypeBuildersContainer& typeBuilder, ScriptAST& script);
+		const std::optional<Type>& type() const;
+		
 
-		const auto& type() const { return m_type; }
-		const Symbol* typeSymbol() const { return !m_type.has_value() ? nullptr : TypeSymbolAccess(m_type.value()); }
+		const Symbol* typeSymbol() const;
 		const auto* symbol() const { return m_symbol; }
 
 	private:
@@ -61,7 +65,7 @@ namespace ska {
 
 		Operator m_op = Operator::UNARY;
 		std::optional<Type> m_type;
-		const Symbol* m_symbol = nullptr;
+		Symbol* m_symbol = nullptr;
 
 		Token m_token;
 		std::vector<ASTNodePtr> m_children;

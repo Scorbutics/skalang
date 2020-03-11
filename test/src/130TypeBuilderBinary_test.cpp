@@ -30,6 +30,6 @@ TEST_CASE("[TypeBuilderBinary]") {
 	(*node)[1].buildType(result, script);
 	
 	//This one makes a "crossType"
-	auto type = typeBuilder.build(script, *node);
+	auto type = typeBuilder.build(script, *node).type;
 	CHECK(type == ska::ExpressionType::STRING);
 }

@@ -21,6 +21,6 @@ namespace ska {
 		bool matchFunction(FunctionTokenEvent& token);
 
 		void updateType(const ASTNode& node, SymbolTable& s);
-		void updateNode(ASTNode& node, const std::string& variableName, const SymbolTable& s);
+		void updateNode(ASTNode& node, const std::string& variableName, SymbolTable& s);
 	};
 }

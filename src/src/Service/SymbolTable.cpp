@@ -154,8 +154,8 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 	return true;
 }
 
-bool ska::SymbolTable::changeTypeIfRequired(const std::string& symbolName, Type value) {
-	return m_currentTable->changeTypeIfRequired(symbolName, std::move(value));
+bool ska::SymbolTable::changeTypeIfRequired(const std::string& symbolName, const Type& value) {
+	return m_currentTable->changeTypeIfRequired(symbolName, value);
 }
 
 const ska::Symbol* ska::SymbolTable::lookup(SymbolTableLookup strategy, SymbolTableNested depth) const {
