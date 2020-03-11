@@ -14,7 +14,7 @@ const ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() const {
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name) {
 	SLOG(ska::LogLevel::Info) << "\tSymbol Created \"" << name << "\" with scoped table";
-	return emplace(Symbol{ m_symbols.size(), name, SymbolFieldResolver{this} });
+	return emplace(Symbol{ m_children.size(), name, SymbolFieldResolver{this} });
 }
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
@@ -33,7 +33,7 @@ ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, const ScriptAST& script) {
 	SLOG(ska::LogLevel::Info) << "\tSymbol Created \"" << name << "\" with script \"" << script.name() << "\"";
-	return emplace(Symbol{ m_symbols.size(), name, SymbolFieldResolver{script.handle()} });
+	return emplace(Symbol{ m_children.size(), name, SymbolFieldResolver{script.handle()} });
 }
 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(Symbol* s) {
