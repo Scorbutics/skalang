@@ -131,7 +131,7 @@ bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
 	return true;
 }
 
-bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
+bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
 	assert(m_currentTable != nullptr);
 
 	switch(token.type()) {
@@ -139,12 +139,17 @@ bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
 		case FunctionTokenEventType::DECLARATION_NAME: {
 			auto& symbol = m_currentTable->emplace(token.name());
 			SLOG(ska::LogLevel::Info) << "\t\tNew function : adding a nested symbol table named \"" << token.name() << "\"";
-        	m_currentTable = &m_currentTable->createNested(&symbol);
+      m_currentTable = &m_currentTable->createNested(&symbol);
+			token.rootNode().linkSymbol(symbol);
     	} break;
 
-    	case FunctionTokenEventType::DECLARATION_STATEMENT:
+    	case FunctionTokenEventType::DECLARATION_STATEMENT: {
 			SLOG(ska::LogLevel::Debug) << "\t\tFunction end: going up in nested symbol table hierarchy";
-        	m_currentTable = &m_currentTable->parent();
+      m_currentTable = &m_currentTable->parent();
+			auto * symbol = (*m_currentTable)[token.name()];
+			assert(symbol != nullptr);
+			token.rootNode().linkSymbol(*symbol);
+			}
     	break;
 
 		default:
@@ -186,7 +191,7 @@ const ska::Symbol* ska::SymbolTable::lookup(SymbolTableLookup strategy, SymbolTa
 	}
 }
 
-bool ska::SymbolTable::match(const VarTokenEvent& token) {
+bool ska::SymbolTable::match(VarTokenEvent& token) {
 	assert(m_currentTable != nullptr);
 	
 	switch(token.type()) {
@@ -197,9 +202,11 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 			auto symbolInCurrentTable = (*m_currentTable)[variableName];
 			if (symbolInCurrentTable == nullptr) {
 				SLOG(ska::LogLevel::Info) << " that was a new variable";
-				m_currentTable->emplace(variableName);
+				auto& symbol = m_currentTable->emplace(variableName);
+				token.rootNode().linkSymbol(symbol);
 			} else {
 				SLOG(ska::LogLevel::Info) << " that was an existing variable";
+				token.rootNode().linkSymbol(*symbolInCurrentTable);
 			}
     	} break;
 
@@ -209,11 +216,17 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 			const auto symbol = (*this)[variableName];
 			if(symbol == nullptr) {
 				throw std::runtime_error("Symbol not found : " + variableName);
-			}       
+			}
+			token.rootNode().linkSymbol(*symbol);
 		}
 		break;
-			case VarTokenEventType::AFFECTATION:
-			case VarTokenEventType::FUNCTION_DECLARATION:
+
+		case VarTokenEventType::FUNCTION_DECLARATION: {
+			auto* symbol = (*m_currentTable)[token.name()];
+			assert(symbol != nullptr);
+			token.rootNode().linkSymbol(*symbol);
+		} break;
+		case VarTokenEventType::AFFECTATION:
 			break;
 		default:
 			throw std::runtime_error("Unmanaged variable event");

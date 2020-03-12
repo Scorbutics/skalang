@@ -67,9 +67,9 @@ namespace ska {
 		const Symbol* lookup(SymbolTableLookup strategy, SymbolTableNested depth = SymbolTableNested::current()) const;
 
 	private:
-		bool match(const VarTokenEvent&);
+		bool match(VarTokenEvent&);
 		bool nestedTable(const BlockTokenEvent&);
-		bool matchFunction(const FunctionTokenEvent&);
+		bool matchFunction(FunctionTokenEvent&);
 		bool matchReturn(const ReturnTokenEvent&);
 		bool matchImport(const ImportTokenEvent&);
 		bool matchScriptLink(const ScriptLinkTokenEvent&);
