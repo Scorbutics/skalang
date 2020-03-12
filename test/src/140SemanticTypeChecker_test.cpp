@@ -23,7 +23,6 @@ static ska::ScriptAST ASTFromInputSemanticTC(ska::ScriptCacheAST& scriptCache, c
 	readerSTC = std::make_unique<ska::ScriptAST>(scriptCache, "main", tokens );
 	data.parser = std::make_unique<ska::StatementParser> ( data.reservedKeywords );
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosser);
-	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableUpdater>(*data.parser);
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, typeCrosser);
 	readerSTC->parse(*data.parser);
 	return *readerSTC;

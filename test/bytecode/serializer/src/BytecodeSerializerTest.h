@@ -29,7 +29,6 @@ static void ASTFromInputBytecodeSerializerNoParse(const std::string& input, Byte
 
 	data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosserI);
-	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableUpdater>(*data.parser);
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, typeCrosserI);
 	data.generator = std::make_unique<ska::bytecode::Generator>(reservedKeywords);
 	data.serializer = std::make_unique<ska::bytecode::Serializer>();

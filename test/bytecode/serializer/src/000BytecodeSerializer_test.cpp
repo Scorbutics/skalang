@@ -81,7 +81,7 @@ TEST_CASE("[BytecodeSerializer] binded external script use") {
 	ASTFromInputBytecodeSerializerNoParse(progStr, data);
 	
 	auto interpreter = ska::bytecode::Interpreter{ *data.parser, *data.generator, data.reservedKeywords };
-	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>{ data.storage->astCache, *data.typeBuilder, *data.symbolsTypeUpdater, *data.typeChecker, reservedKeywords, *data.parser, *data.storage, interpreter };
+	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>{ data.storage->astCache, *data.typeBuilder, *data.typeChecker, reservedKeywords, *data.parser, *data.storage, interpreter };
 	auto logModule = ska::lang::IOLogModule<ska::bytecode::Interpreter>(moduleConfiguration);
 	
 	readerI->parse(*data.parser);
@@ -125,7 +125,7 @@ TEST_CASE("[BytecodeSerializer] external script use, other stack, triggers rebui
 
 		auto interpreter = ska::bytecode::Interpreter{ *data.parser, *data.generator, data.reservedKeywords };
 	
-		auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>{ data.storage->astCache, *data.typeBuilder, *data.symbolsTypeUpdater, *data.typeChecker, reservedKeywords, *data.parser, *data.storage, interpreter };
+		auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>{ data.storage->astCache, *data.typeBuilder, *data.typeChecker, reservedKeywords, *data.parser, *data.storage, interpreter };
 		auto logModule = ska::lang::IOLogModule<ska::bytecode::Interpreter>(moduleConfiguration);
 
 		readerI->parse(*data.parser);
@@ -144,7 +144,7 @@ TEST_CASE("[BytecodeSerializer] external script use, other stack, triggers rebui
 
 		auto interpreter = ska::bytecode::Interpreter{ *data.parser, *data.generator, data.reservedKeywords };
 
-		auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>{ data.storage->astCache, *data.typeBuilder, *data.symbolsTypeUpdater, *data.typeChecker, reservedKeywords, *data.parser, *data.storage, interpreter };
+		auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>{ data.storage->astCache, *data.typeBuilder, *data.typeChecker, reservedKeywords, *data.parser, *data.storage, interpreter };
 		auto original = data.serializer->deserialize(*data.storage, "main", stringDeserializer, { "main" });
 		CHECK(original.empty());
 

@@ -18,7 +18,7 @@ static ska::bytecode::ScriptGenerationHelper Interpret(BytecodeInterpreterDataTe
 }
 
 static ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> BuildModuleConfFromData(BytecodeInterpreterDataTestContainer& data) {
-	return ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { data.storage->astCache, * data.typeBuilder, * data.symbolsTypeUpdater, *data.typeChecker, reservedKeywords, * data.parser, * data.storage, * data.interpreter};
+	return ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { data.storage->astCache, * data.typeBuilder, *data.typeChecker, reservedKeywords, * data.parser, * data.storage, * data.interpreter};
 }
 
 TEST_CASE("[BytecodeInterpreter] Binding std : path import only") {

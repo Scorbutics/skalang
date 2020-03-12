@@ -16,6 +16,7 @@
 namespace ska {
     class StatementParser;
 	class TypeCrosser;
+    class SymbolTable;
 
     class TypeBuilder : 
 	    public subobserver_priority_queue<ExpressionTokenEvent>,
@@ -29,12 +30,15 @@ namespace ska {
             virtual ~TypeBuilder() = default;
             
         private:
-            bool matchVariable(VarTokenEvent& token) const;
-            bool matchFunction(FunctionTokenEvent& event) const;
-            bool matchExpression(ExpressionTokenEvent& event) const;
-			bool matchReturn(ReturnTokenEvent& event) const;
-			bool matchArray(ArrayTokenEvent& event) const;
-			bool matchScriptLink(ScriptLinkTokenEvent& event) const;
+            void updateNode(ASTNode& node, const std::string& variableName, SymbolTable& symbols);
+            void buildType(ASTNode& node, ScriptAST& script);
+
+            bool matchVariable(VarTokenEvent& token);
+            bool matchFunction(FunctionTokenEvent& event);
+            bool matchExpression(ExpressionTokenEvent& event);
+			bool matchReturn(ReturnTokenEvent& event);
+			bool matchArray(ArrayTokenEvent& event);
+			bool matchScriptLink(ScriptLinkTokenEvent& event);
 
 			TypeBuildersContainer m_typeBuilder;
     };

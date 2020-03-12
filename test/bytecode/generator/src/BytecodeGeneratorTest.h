@@ -26,7 +26,6 @@ static void ASTFromInputBytecodeGeneratorNoParse(const std::string& input, Bytec
   data.storage = std::make_unique<ska::bytecode::ScriptCache>();
   data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosserI);
-	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableUpdater>(*data.parser);
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, typeCrosserI);
 	data.generator = std::make_unique<ska::bytecode::Generator>(reservedKeywords);
 	readerI = std::make_unique<ska::ScriptAST>(data.storage->astCache, "main", tokens);

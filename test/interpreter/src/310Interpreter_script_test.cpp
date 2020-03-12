@@ -37,7 +37,6 @@ void ASTFromInputSemanticTCInterpreterScriptNoParse(const std::string& input, In
 	
 	data.parser = std::make_unique<ska::StatementParser>(reservedKeywordsS);
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosserIS);
-	data.symbolsTypeUpdater = std::make_unique<ska::SymbolTableUpdater>(*data.parser);
 	data.typeChecker = std::make_unique<ska::SemanticTypeChecker>(*data.parser, typeCrosserIS);
 	data.interpreter = std::make_unique<ska::Interpreter>(reservedKeywordsS, typeCrosserIS);
 }
@@ -49,7 +48,7 @@ ska::Script ASTFromInputSemanticTCInterpreterScript(const std::string& input, In
 }
 
 static ska::lang::ModuleConfiguration<ska::Interpreter> BuildModuleConfiguration(InterpreterDataTestContainer& data) {
-	return ska::lang::ModuleConfiguration<ska::Interpreter>{scriptCacheIS.astCache, *data.typeBuilder, *data.symbolsTypeUpdater, *data.typeChecker, data.reservedKeywords, *data.parser, scriptCacheIS, *data.interpreter};
+	return ska::lang::ModuleConfiguration<ska::Interpreter>{scriptCacheIS.astCache, *data.typeBuilder, *data.typeChecker, data.reservedKeywords, *data.parser, scriptCacheIS, *data.interpreter};
 }
 
 TEST_CASE("[Interpreter Script]") {

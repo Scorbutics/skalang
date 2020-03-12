@@ -47,9 +47,9 @@ namespace ska {
 		const auto& op() const { return m_op; }
 
 		void linkSymbol(Symbol& symbol);
-		void buildType(const TypeBuildersContainer& typeBuilder, ScriptAST& script);
 		const std::optional<Type>& type() const;
 		
+		bool updateType(Type type);
 
 		const Symbol* typeSymbol() const;
 		const auto* symbol() const { return m_symbol; }
@@ -62,6 +62,8 @@ namespace ska {
 
     	ASTNode(Operator o, Token identifierToken = Token{}, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{});
     	ASTNode(Operator o, Token identifierToken = Token{});
+
+		void refreshSymbolType();
 
 		Operator m_op = Operator::UNARY;
 		std::optional<Type> m_type;

@@ -14,7 +14,6 @@
 #include "BytecodeInterpreter/BytecodeScript.h"
 #include "Generator/BytecodeGenerator.h"
 #include "Generator/Value/BytecodeScriptCache.h"
-#include "Service/SymbolTableUpdater.h"
 #include "BytecodeInterpreter/Value/BytecodeInterpreterTypes.h"
 #include "BytecodeInterpreter/BytecodeInterpreter.h"
 #include "Serializer/BytecodeSerializer.h"
@@ -63,7 +62,6 @@ int main(int argc, char* argv[]) {
 	auto typeCrosser = ska::TypeCrosser{};
 	auto parser = ska::StatementParser {reservedKeywords};
 	auto typeBuilder = ska::TypeBuilder {parser, typeCrosser };
-	auto symbolsTypeUpdater = ska::SymbolTableUpdater {parser};
 	auto typeChecker = ska::SemanticTypeChecker {parser, typeCrosser };
 	
 	auto mainCache = ska::bytecode::ScriptCache {};
@@ -73,7 +71,6 @@ int main(int argc, char* argv[]) {
 	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> {
 		mainCache.astCache,
 		typeBuilder,
-		symbolsTypeUpdater,
 		typeChecker,
 		reservedKeywords,
 		parser,

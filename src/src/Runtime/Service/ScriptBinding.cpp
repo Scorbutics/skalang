@@ -11,7 +11,7 @@ ska::ScriptBindingAST::ScriptBindingAST(
 	std::string scriptName,
 	std::string templateName) :
 	m_parser(config.parser),
-	m_functionBuilder(config.typeBuilder, config.symbolTableUpdater, config.reservedKeywords),
+	m_functionBuilder(config.typeBuilder, config.reservedKeywords),
 	m_name(ScriptNameDeduce("", "bind:" + scriptName)),
 	m_templateName(ScriptNameDeduce("", templateName)),
 	m_scriptAst(config.scriptAstCache, m_name, std::vector<Token>{}),

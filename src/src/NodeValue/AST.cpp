@@ -54,18 +54,18 @@ const std::optional<ska::Type>& ska::ASTNode::type() const {
 
 void ska::ASTNode::linkSymbol(Symbol& symbol) { 
 	m_symbol = &symbol;
-	//refreshSymbolType();
+	refreshSymbolType();
 	//m_type = symbol.type().type();
 }
-void ska::ASTNode::buildType(const TypeBuildersContainer& typeBuilders, ScriptAST& script) {
-	if (m_type.has_value()) {
-		return;
-	}
 
-	for(auto& child : m_children) {
-    	child->buildType(typeBuilders, script);
+void ska::ASTNode::refreshSymbolType() {
+	if (m_symbol != nullptr && m_type.has_value()) {
+		m_symbol->changeTypeIfRequired(m_type.value());
 	}
-	auto& typeBuilder = typeBuilders[static_cast<std::size_t>(op())];
-	assert(typeBuilder != nullptr && "Cannot calculate the node type (it might be an empty node)");
-	m_type = typeBuilder->build(script, *this).type;
+}
+
+bool ska::ASTNode::updateType(Type type) {
+	m_type = std::move(type);
+	refreshSymbolType();
+	return true;
 }

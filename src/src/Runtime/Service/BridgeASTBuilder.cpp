@@ -5,27 +5,21 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/SymbolTable.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
-#include "Service/SymbolTableUpdater.h"
 #include "Service/ASTFactory.h"
 #include "BridgeASTBuilder.h"
 #include "NodeValue/ScriptAST.h"
-
 #include "Service/ScriptNameBuilder.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::BridgeASTBuilder)
 
-ska::BridgeASTBuilder::BridgeASTBuilder(TypeBuilder& typeBuilder, SymbolTableUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved) :
+ska::BridgeASTBuilder::BridgeASTBuilder(TypeBuilder& typeBuilder, const ReservedKeywordsPool& reserved) :
 	m_reserved(reserved),
 	m_typeBuilder(typeBuilder),
-	m_symbolTypeUpdater(symbolTypeUpdater),
 	m_matcherType(reserved) {
 	observable_priority_queue<VarTokenEvent>::addObserver(m_typeBuilder);
 	observable_priority_queue<ReturnTokenEvent>::addObserver(m_typeBuilder);
 	observable_priority_queue<FunctionTokenEvent>::addObserver(m_typeBuilder);
 	observable_priority_queue<ScriptLinkTokenEvent>::addObserver(m_typeBuilder);
-
-	observable_priority_queue<FunctionTokenEvent>::addObserver(m_symbolTypeUpdater);
-	observable_priority_queue<VarTokenEvent>::addObserver(m_symbolTypeUpdater);
 }
 
 void ska::BridgeASTBuilder::internalListen(SymbolTable& symbolTable) {
@@ -60,9 +54,6 @@ void ska::BridgeASTBuilder::internalUnlisten(SymbolTable& symbolTable) {
 }
 
 ska::BridgeASTBuilder::~BridgeASTBuilder() {
-	observable_priority_queue<VarTokenEvent>::removeObserver(m_symbolTypeUpdater);
-	observable_priority_queue<FunctionTokenEvent>::removeObserver(m_symbolTypeUpdater);
-
 	observable_priority_queue<ScriptLinkTokenEvent>::removeObserver(m_typeBuilder);
 	observable_priority_queue<FunctionTokenEvent>::removeObserver(m_typeBuilder);
 	observable_priority_queue<ReturnTokenEvent>::removeObserver(m_typeBuilder);

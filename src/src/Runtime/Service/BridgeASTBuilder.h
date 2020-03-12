@@ -53,7 +53,7 @@ namespace ska {
 		public observable_priority_queue<ReturnTokenEvent> {
 		friend class BridgeASTBuilderSymbolTableLock;
 	public:
-		BridgeASTBuilder(TypeBuilder& typeBuilder, SymbolTableUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
+		BridgeASTBuilder(TypeBuilder& typeBuilder, const ReservedKeywordsPool& reserved);
 		virtual ~BridgeASTBuilder();
 
 		ASTNodePtr makeFunction(ScriptAST& script, const BridgeFunction& data);
@@ -80,7 +80,6 @@ namespace ska {
 
 		std::unordered_map<const SymbolTable*, int> m_symbolTableLockCounter;
 		TypeBuilder& m_typeBuilder;
-		SymbolTableUpdater& m_symbolTypeUpdater;
 		const ReservedKeywordsPool& m_reserved;
 		MatcherType m_matcherType;
 	};
