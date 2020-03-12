@@ -39,9 +39,19 @@ bool ska::Symbol::operator==(const Symbol& sym) const {
 }
 
 bool ska::Symbol::changeTypeIfRequired(const Type& type) {
-	if (m_category != type) {
+	if (/*m_master == this && */m_category != type) {
 		m_category = type;
 		return true;
 	}
 	return false;
+}
+
+void ska::Symbol::implement(Symbol& symbol) {
+	if (symbol.m_master == this) {
+		return;
+	}
+
+	symbol.m_master->m_implementationReferences.erase(&symbol);	
+	symbol.m_master = this;
+	m_implementationReferences.insert(&symbol);
 }

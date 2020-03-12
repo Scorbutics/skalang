@@ -1,5 +1,6 @@
 #pragma once
 #include <optional>
+#include <unordered_set>
 #include "Type.h"
 #include "Service/SymbolFieldResolver.h"
 
@@ -40,6 +41,9 @@ namespace ska {
 		std::size_t size() const;
 		bool empty() const { return m_category.compound().empty(); }
 
+		void implement(Symbol& symbol);
+		const Symbol* master() const { return m_master; }
+
 		const Symbol* operator[](const std::string& fieldSymbolName) const;
 		bool operator==(const Symbol& sym) const;
 		bool operator!=(const Symbol& sym) const {	return !(*this == sym);	}
@@ -48,6 +52,8 @@ namespace ska {
 		SymbolFieldResolver m_data = SymbolFieldResolver{static_cast<ScopedSymbolTable*>(nullptr)};
 		std::string m_name;
 		Type m_category;
+		std::unordered_set<Symbol*> m_implementationReferences;
+		Symbol* m_master = this;
 		std::size_t m_tableIndex = 0;
 	};
 }
