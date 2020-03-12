@@ -8,6 +8,10 @@ const ska::Symbol* ska::Symbol::operator[](const std::string& fieldSymbolName) c
 	return m_data.lookup(m_tableIndex, fieldSymbolName);
 }
 
+ska::Symbol* ska::Symbol::operator[](const std::string& fieldSymbolName) {
+	return m_data.lookup(m_tableIndex, fieldSymbolName);
+}
+
 std::size_t ska::Symbol::size() const {
 	return m_category.compound().size();
 }

@@ -65,6 +65,7 @@ namespace ska {
 
 		bool changeTypeIfRequired(const std::string& symbolName, const Type& value);
 		const Symbol* lookup(SymbolTableLookup strategy, SymbolTableNested depth = SymbolTableNested::current()) const;
+		Symbol* lookup(SymbolTableLookup strategy, SymbolTableNested depth = SymbolTableNested::current());
 
 	private:
 		bool match(VarTokenEvent&);

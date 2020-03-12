@@ -65,6 +65,9 @@ namespace ska {
 		const ChildrenScopedSymbolTable& children() const {
 			return m_children;
 		}
+		ChildrenScopedSymbolTable& children() {
+			return m_children;
+		}
 
 	private:
 		Symbol& emplace(Symbol symbol);

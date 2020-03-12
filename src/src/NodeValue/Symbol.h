@@ -45,6 +45,7 @@ namespace ska {
 		const Symbol* master() const { return m_master; }
 
 		const Symbol* operator[](const std::string& fieldSymbolName) const;
+		Symbol* operator[](const std::string& fieldSymbolName);
 		bool operator==(const Symbol& sym) const;
 		bool operator!=(const Symbol& sym) const {	return !(*this == sym);	}
 

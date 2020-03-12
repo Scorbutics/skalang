@@ -53,6 +53,7 @@ namespace ska {
 
 		const Symbol* typeSymbol() const;
 		const auto* symbol() const { return m_symbol; }
+		auto* symbol() { return m_symbol; }
 
 	private:
 		friend class ASTFactory;

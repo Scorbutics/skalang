@@ -163,8 +163,9 @@ bool ska::SymbolTable::changeTypeIfRequired(const std::string& symbolName, const
 	return m_currentTable->changeTypeIfRequired(symbolName, value);
 }
 
-const ska::Symbol* ska::SymbolTable::lookup(SymbolTableLookup strategy, SymbolTableNested depth) const {
-	auto* selectedTable = m_currentTable;
+template <class ThisType, class Return>
+static Return Lookup(ThisType& currentTable, ska::SymbolTableLookup strategy, ska::SymbolTableNested depth) {
+	auto* selectedTable = &currentTable;
 	while(depth.depth < 0) {
 		selectedTable = &selectedTable->parent();
 		depth.depth++;
@@ -181,14 +182,22 @@ const ska::Symbol* ska::SymbolTable::lookup(SymbolTableLookup strategy, SymbolTa
 	assert(selectedTable != nullptr);
 
 	switch (strategy.type) {
-	case SymbolTableLookupType::Hierarchical:
+	case ska::SymbolTableLookupType::Hierarchical:
 		return (*selectedTable)[std::move(strategy.symbolName)];
-	case SymbolTableLookupType::Direct:
+	case ska::SymbolTableLookupType::Direct:
 		return (*selectedTable)(std::move(strategy.symbolName));
 	default:
 		throw std::runtime_error("unhandled enum value");
 		return nullptr;
 	}
+}
+
+const ska::Symbol* ska::SymbolTable::lookup(SymbolTableLookup strategy, SymbolTableNested depth) const {
+	return Lookup<const ScopedSymbolTable&, const Symbol*>(*m_currentTable, std::move(strategy), std::move(depth));
+}
+
+ska::Symbol* ska::SymbolTable::lookup(SymbolTableLookup strategy, SymbolTableNested depth) {
+	return Lookup<ScopedSymbolTable&, Symbol*>(*m_currentTable, std::move(strategy), std::move(depth));
 }
 
 bool ska::SymbolTable::match(VarTokenEvent& token) {

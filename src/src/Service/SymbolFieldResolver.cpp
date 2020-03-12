@@ -16,47 +16,56 @@ ska::SymbolFieldResolver::SymbolFieldResolver(Variant value) :
   }
 }
 
-const ska::Symbol* ska::SymbolFieldResolver::lookup(std::size_t tableIndex, const std::string& fieldName) const {
-	if(std::holds_alternative<ScopedSymbolTable*>(m_data)) {
-		auto* containingTable = std::get<ScopedSymbolTable*>(m_data);
+template<class ThisType, class Return>
+static Return Lookup(ThisType& variant, std::size_t tableIndex, const std::string& fieldName) {
+		if(std::holds_alternative<ska::ScopedSymbolTable*>(variant)) {
+		auto* containingTable = std::get<ska::ScopedSymbolTable*>(variant);
 		assert(containingTable != nullptr);
 
 		if (containingTable->children().size() > tableIndex) {
-			const auto& innerSymbolTable = containingTable->children()[tableIndex];
+			auto& innerSymbolTable = containingTable->children()[tableIndex];
 			if (!innerSymbolTable->children().empty()) {
-				const auto* lastInnerSymbolElement = innerSymbolTable->children().back().get();
+				auto* lastInnerSymbolElement = innerSymbolTable->children().back().get();
 				assert(lastInnerSymbolElement != nullptr && (std::string{ "symbol \"" } +fieldName + "\" doesn't exists for element ").c_str());
-				SLOG(ska::LogLevel::Info) << "Looking for symbol field \"" << fieldName << "\" in " << tableIndex << "nth child of current symbol";
-				const auto* result = (*lastInnerSymbolElement)[fieldName];
+				SLOG_STATIC(ska::LogLevel::Info, ska::SymbolFieldResolver) << "Looking for symbol field \"" << fieldName << "\" in " << tableIndex << "nth child of current symbol";
+				auto* result = (*lastInnerSymbolElement)[fieldName];
 				if (result != nullptr) {
 					return result;
 				}
 			}
 		}
 
-		SLOG(ska::LogLevel::Info) << "Unable to find \"" << fieldName << "\" in this symbol in the table";
+		SLOG_STATIC(ska::LogLevel::Info, ska::SymbolFieldResolver) << "Unable to find \"" << fieldName << "\" in this symbol in the table";
 		return nullptr;
 	}
 
-	assert(std::holds_alternative<const ScriptHandleAST*>(m_data));
-	auto* script = std::get<const ScriptHandleAST*>(m_data);
+	assert(std::holds_alternative<ska::ScriptHandleAST*>(variant));
+	auto* script = std::get<ska::ScriptHandleAST*>(variant);
 	assert(script != nullptr);
 
-	SLOG(ska::LogLevel::Debug) << "Looking for " << fieldName << " in the targetted script";
+	SLOG_STATIC(ska::LogLevel::Debug, ska::SymbolFieldResolver) << "Looking for " << fieldName << " in the targetted script";
 
-	const auto* result = (script->symbols())[fieldName];
+	auto* result = (script->symbols())[fieldName];
 	if(result != nullptr) {
 		return result;
 	}
 
-	SLOG(ska::LogLevel::Info) << "Unable to find \"" << fieldName << "\" in this symbol in script \"" << script->name() << "\"";
+	SLOG_STATIC(ska::LogLevel::Info, ska::SymbolFieldResolver) << "Unable to find \"" << fieldName << "\" in this symbol in script \"" << script->name() << "\"";
 	return nullptr;
+}
+
+const ska::Symbol* ska::SymbolFieldResolver::lookup(std::size_t tableIndex, const std::string& fieldName) const {
+	return Lookup<const Variant&, const Symbol*>(m_data, tableIndex, fieldName);
+}
+
+ska::Symbol* ska::SymbolFieldResolver::lookup(std::size_t tableIndex, const std::string& fieldName) {
+	return Lookup<Variant&, Symbol*>(m_data, tableIndex, fieldName);
 }
 
 bool ska::operator==(const SymbolFieldResolver& lhs, const SymbolFieldResolver& rhs) {
   	return (std::holds_alternative<ScopedSymbolTable*>(lhs.m_data) ?
 		std::holds_alternative<ScopedSymbolTable*>(rhs.m_data) && std::get<ScopedSymbolTable*>(rhs.m_data) == std::get<ScopedSymbolTable*>(lhs.m_data) :
-		std::holds_alternative<const ScriptHandleAST*>(rhs.m_data) && std::get<const ScriptHandleAST*>(rhs.m_data) == std::get<const ScriptHandleAST*>(lhs.m_data));
+		std::holds_alternative<ScriptHandleAST*>(rhs.m_data) && std::get<ScriptHandleAST*>(rhs.m_data) == std::get<ScriptHandleAST*>(lhs.m_data));
 }
 
 bool ska::operator!=(const SymbolFieldResolver& lhs, const SymbolFieldResolver& rhs) {

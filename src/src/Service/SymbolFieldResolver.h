@@ -8,8 +8,10 @@ namespace ska {
 
 	class SymbolFieldResolver {
   public:
-    using Variant = std::variant<ScopedSymbolTable*, const ScriptHandleAST*>;
+    using Variant = std::variant<ScopedSymbolTable*, ScriptHandleAST*>;
     SymbolFieldResolver(Variant value);
+
+    Symbol* lookup(std::size_t tableIndex, const std::string& fieldName);
     const Symbol* lookup(std::size_t tableIndex, const std::string& fieldName) const;
 
     friend bool operator==(const SymbolFieldResolver& lhs, const SymbolFieldResolver& rhs);
