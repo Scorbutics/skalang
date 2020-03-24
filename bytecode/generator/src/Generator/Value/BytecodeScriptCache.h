@@ -9,8 +9,8 @@ namespace ska {
 	class ASTNode;
   namespace bytecode {
     class ScriptCache :
-      public ScriptCacheBase<ScriptGeneration> {
-				using Parent = ScriptCacheBase<ScriptGeneration>;
+      public order_indexed_string_map<ScriptGeneration> {
+				using Parent = order_indexed_string_map<ScriptGeneration>;
     public:
         using SymbolInfosContainer = std::unordered_map<const Symbol*, SymbolInfo>;
 
@@ -31,7 +31,7 @@ namespace ska {
 
     private:
       SymbolInfosContainer m_symbolInfo;
-      ScriptCacheBase<NativeFunctionPtr> m_bindings;
+      order_indexed_string_map<NativeFunctionPtr> m_bindings;
     };
   }
 }
