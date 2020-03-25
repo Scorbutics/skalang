@@ -14,7 +14,6 @@ namespace ska {
 	class TypeCrosser;
 
 	struct Type {
-		friend class Symbol;
 		static constexpr bool isNamed(ExpressionType type) {
 			return type == ExpressionType::FUNCTION || type == ExpressionType::OBJECT;
 		}
@@ -62,12 +61,11 @@ namespace ska {
 			return Type{ symbol, t };
 		}
 
-
-		template<ExpressionType t>
-		static Type MakeCustom(const Type& symbolType) {
-			static_assert(isNamed(t));
-			return Type{ symbolType.m_symbol, t };
+		static Type Override(Type t, const Symbol* symbol) {
+			t.m_symbol = symbol;
+			return t;
 		}
+
 
 		Type() = default;
 		Type(Type&& t) noexcept = default;
@@ -83,9 +81,6 @@ namespace ska {
 		}
 		bool operator==(const Type& t) const;
 
-		bool hasSymbol() const {
-			return m_symbol != nullptr;
-		}
 
 		bool operator==(const ExpressionType& t) const {
 			return m_type == t;
@@ -94,6 +89,9 @@ namespace ska {
 		bool operator!=(const ExpressionType& t) const {
 			return m_type != t;
 		}
+
+		Type& operator[](std::size_t index) { return m_compound[index]; }
+		const Type& operator[](std::size_t index) const { return m_compound[index]; }
 
 		Type& operator=(ExpressionType t) {
 			m_type = std::move(t);
@@ -105,29 +103,35 @@ namespace ska {
 			return *this;
 		}
 
-		const std::vector<Type>& compound() const {
-			return m_compound;
-		}
-
 		bool operator!=(const Type& t) const {
 			return !(*this == t);
 		}
 
+		bool structuralEquality(const Type&) const;
+
 		Type crossTypes(const TypeCrosser& crosser, std::string op, const Type& type2) const;
 		
-		std::size_t size() const {
-			return m_compound.size();
-		}
+		std::size_t size() const { return m_compound.size(); }
+		bool empty() const { return m_compound.empty(); }
 
-		std::optional<Type> lookup(const std::string& field) const;
+		const Type& back() const { return m_compound.back(); }
 
 		std::string name() const;
+		
+		auto begin() const { return m_compound.begin(); }
+		auto end() const { return m_compound.end(); }
+		auto begin() { return m_compound.begin(); }
+		auto end() { return m_compound.end(); }
+
+		//bool hasSymbol(const Type* otherType) const {
+		//	return otherType == nullptr ? m_symbol == nullptr : m_symbol == otherType->m_symbol;
+		//}
+
+		bool tryChangeSymbol(const Type& type);
 
 	private:
 		friend class TypeCrosser;
-		friend const Symbol* TypeSymbolAccess(const Type& type);
 
-		bool equalIgnoreSymbol(const Type& t) const;
 		explicit Type(ExpressionType t) :
 			m_type(std::move(t)) {
 		}

@@ -8,7 +8,7 @@
 #include "Event/ScriptLinkTokenEvent.h"
 #include "NodeValue/ScriptAST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTable)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::SymbolTable)
 
 namespace ska::detail::symbol {
 	template <bool remove, class Event>
@@ -91,19 +91,19 @@ bool ska::SymbolTable::nestedTable(const BlockTokenEvent& event) {
 	assert(m_currentTable != nullptr);
 
 	switch(event.type()) {
-		case BlockTokenEventType::START:
-			SLOG(ska::LogLevel::Debug) << "\tNew block : adding a nested symbol table";
-			m_currentTable = &m_currentTable->createNested();
-			break;
+	case BlockTokenEventType::START:
+		SLOG(ska::LogLevel::Debug) << "\tNew block : adding a nested symbol table";
+		m_currentTable = &m_currentTable->createNested();
+		break;
 		
-		case BlockTokenEventType::END:
-			SLOG(ska::LogLevel::Debug) << "\tBlock end : going up in nested symbol table hierarchy";
-			assert(m_currentTable != nullptr);
-			m_currentTable = &m_currentTable->parent();
-			break;
+	case BlockTokenEventType::END:
+		SLOG(ska::LogLevel::Debug) << "\tBlock end : going up in nested symbol table hierarchy";
+		assert(m_currentTable != nullptr);
+		m_currentTable = &m_currentTable->parent();
+		break;
 
-		default:
-			break;
+	default:
+		break;
 	}
 	return true;
 }
@@ -112,21 +112,26 @@ bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
 	assert(m_currentTable != nullptr);
 
 	switch(token.type()) {
-		case ReturnTokenEventType::START: {
-			SLOG(ska::LogLevel::Debug) << "\t\tNew Return : adding a nested symbol table";
-        	const auto actualNameSymbol = m_currentTable->directOwner();
-        	if (actualNameSymbol == nullptr) {
-            	throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
-        	}
-        	m_currentTable = &m_currentTable->createNested();
-        	SLOG(ska::LogLevel::Info) << "\tReturn : nested named symbol table with name : " << actualNameSymbol->name();
-    	}
+	case ReturnTokenEventType::START: {
+		SLOG(ska::LogLevel::Debug) << "\t\tNew Return : adding a nested symbol table";
+        const auto* actualNameSymbol = m_currentTable->directOwner();
+        if (actualNameSymbol == nullptr) {
+            throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
+        }
+        m_currentTable = &m_currentTable->createNested(nullptr, true);
+        SLOG(ska::LogLevel::Info) << "\tReturn : nested named symbol table with name : " << actualNameSymbol->name();
+    }
   	break;
 
-    	default:
-			SLOG(ska::LogLevel::Debug) << "\t\tReturn end: going up in nested symbol table hierarchy";
-        	m_currentTable = &m_currentTable->parent();
-    	break;
+    default:
+		SLOG(ska::LogLevel::Debug) << "\t\tReturn end: going up in nested symbol table hierarchy";
+		m_currentTable = &m_currentTable->parent();
+		auto* actualNameSymbol = m_currentTable->directOwner();
+		if (actualNameSymbol == nullptr) {
+			throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
+		}
+		actualNameSymbol->close();
+    break;
 	}
 	return true;
 }
@@ -135,25 +140,25 @@ bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
 	assert(m_currentTable != nullptr);
 
 	switch(token.type()) {
+	case FunctionTokenEventType::DECLARATION_NAME: {
+		auto& symbol = m_currentTable->emplace(token.name());
+		SLOG(ska::LogLevel::Info) << "\t\tNew function : adding a nested symbol table named \"" << token.name() << "\"";
+		m_currentTable = &m_currentTable->createNested(&symbol);
+		symbol.open();
+		token.rootNode().linkSymbol(symbol);
+    } break;
 
-		case FunctionTokenEventType::DECLARATION_NAME: {
-			auto& symbol = m_currentTable->emplace(token.name());
-			SLOG(ska::LogLevel::Info) << "\t\tNew function : adding a nested symbol table named \"" << token.name() << "\"";
-      m_currentTable = &m_currentTable->createNested(&symbol);
-			token.rootNode().linkSymbol(symbol);
-    	} break;
+    case FunctionTokenEventType::DECLARATION_STATEMENT: {
+		SLOG(ska::LogLevel::Debug) << "\t\tFunction end: going up in nested symbol table hierarchy";
+		m_currentTable = &m_currentTable->parent();
+		auto * symbol = (*m_currentTable)[token.name()];
+		assert(symbol != nullptr);
+		symbol->close();
+		token.rootNode().linkSymbol(*symbol);
+	} break;
 
-    	case FunctionTokenEventType::DECLARATION_STATEMENT: {
-			SLOG(ska::LogLevel::Debug) << "\t\tFunction end: going up in nested symbol table hierarchy";
-      m_currentTable = &m_currentTable->parent();
-			auto * symbol = (*m_currentTable)[token.name()];
-			assert(symbol != nullptr);
-			token.rootNode().linkSymbol(*symbol);
-			}
-    	break;
-
-		default:
-		break;
+	default:
+	break;
 	}
 	
 	return true;
@@ -165,17 +170,23 @@ bool ska::SymbolTable::changeTypeIfRequired(const std::string& symbolName, const
 
 template <class ThisType, class Return>
 static Return Lookup(ThisType& currentTable, ska::SymbolTableLookup strategy, ska::SymbolTableNested depth) {
+	if (!depth.childName.empty()) {
+		auto* symbol = currentTable[depth.childName];
+		if (symbol == nullptr) { return nullptr; }
+		return (*symbol)(std::move(strategy.symbolName));
+	}
+
 	auto* selectedTable = &currentTable;
-	while(depth.depth < 0) {
+	while (depth.depth < 0) {
 		selectedTable = &selectedTable->parent();
 		depth.depth++;
 	}
 
-	while(depth.depth > 0 && !selectedTable->children().empty()) {
-		if(depth.childIndex >= selectedTable->children().size()) {
-			depth.childIndex = selectedTable->children().size() - 1;
+	while (depth.depth > 0 && selectedTable != nullptr && selectedTable->scopes() > 0) {
+		if (depth.childIndex >= selectedTable->scopes()) {
+			depth.childIndex = selectedTable->scopes() - 1;
 		}
-		selectedTable = selectedTable->children()[depth.childIndex].get();
+		selectedTable = selectedTable->child(depth.childIndex);
 		depth.depth--;
 	}
 
@@ -208,7 +219,7 @@ bool ska::SymbolTable::match(VarTokenEvent& token) {
 		case VarTokenEventType::PARAMETER_DECLARATION: {
 			const auto variableName = token.name();
 			SLOG(ska::LogLevel::Info) << "Matching variable : " << variableName;
-			auto symbolInCurrentTable = (*m_currentTable)[variableName];
+			auto symbolInCurrentTable = m_currentTable->exported() ? (*m_currentTable)(variableName) : (*m_currentTable)[variableName];
 			if (symbolInCurrentTable == nullptr) {
 				SLOG(ska::LogLevel::Info) << " that was a new variable";
 				auto& symbol = m_currentTable->emplace(variableName);

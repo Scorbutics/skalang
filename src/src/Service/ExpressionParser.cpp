@@ -7,7 +7,7 @@
 #include "Service/ASTFactory.h"
 #include "NodeValue/ScriptAST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ExpressionParser)
+SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::ExpressionParser)
 
 ska::ExpressionParser::ExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, StatementParser& parser) :
 	m_reservedKeywordsPool(reservedKeywordsPool),
@@ -174,8 +174,16 @@ int ska::ExpressionParser::matchParenthesis(ScriptAST& input, ExpressionStack& e
 ska::ASTNodePtr ska::ExpressionParser::matchObjectFieldAccess(ScriptAST& input, ASTNodePtr objectAccessed) {
 	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::METHOD_CALL_OPERATOR>());
 	auto fieldAccessedIdentifier = input.reader().match(TokenType::IDENTIFIER);
+	auto fieldAccessed = ASTFactory::MakeLogicalNode(fieldAccessedIdentifier);
 
-	return ASTFactory::MakeNode<Operator::FIELD_ACCESS>(std::move(objectAccessed), ASTFactory::MakeLogicalNode(fieldAccessedIdentifier));
+	if (OperatorTraits::isNamed(objectAccessed->op())) {
+		auto objectEvent = VarTokenEvent::MakeUse(*objectAccessed, input);
+		m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(objectEvent);
+	}
+
+	SLOG(ska::LogLevel::Info) << "\tField access ! symbol \"" << (objectAccessed->symbol() == nullptr ? "" : objectAccessed->symbol()->name()) << "\"";
+
+	return ASTFactory::MakeNode<Operator::FIELD_ACCESS>(std::move(objectAccessed), std::move(fieldAccessed));
 }
 
 bool ska::ExpressionParser::isAtEndOfExpression(ScriptAST& input) const {

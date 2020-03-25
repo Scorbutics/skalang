@@ -14,7 +14,8 @@ namespace ska {
 	public:
 		OperationType(const ASTNode& node) : node(node) { assert(node.size() == 3); }		
 
-		std::optional<Type> GetSymbolType(const SymbolTable& symbolTable) const ;
+		const Symbol* GetTypeSymbol(const SymbolTable& symbolTable) const;
+
 		bool IsBuiltIn() const;
 		bool IsObject() const;
 		std::string GetName() const;

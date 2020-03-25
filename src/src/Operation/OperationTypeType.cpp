@@ -2,16 +2,14 @@
 #include "Service/SymbolTable.h"
 #include "NodeValue/ExpressionType.h"
 
-std::optional<ska::Type> ska::OperationType<ska::Operator::TYPE>::GetSymbolType(const SymbolTable& symbolTable) const {
+const ska::Symbol* ska::OperationType<ska::Operator::TYPE>::GetTypeSymbol(const SymbolTable& symbolTable) const {
 	assert(node.size() > 0);
 	auto& typeNameNode = node[0];
 	if (typeNameNode.size() == 1) {
-		const auto* importedScriptSymbol = symbolTable[typeNameNode.name()];
-		return importedScriptSymbol == nullptr ? std::optional<Type>{} : importedScriptSymbol->type().lookup(typeNameNode[0].name());
+		return symbolTable.lookup(SymbolTableLookup::hierarchical(typeNameNode[0].name()), SymbolTableNested::child(typeNameNode.name()));
 	}
 
-	auto * symbol = symbolTable[typeNameNode.name()];
-	return symbol != nullptr ? symbol->type() : std::optional<Type>{};
+	return symbolTable[typeNameNode.name()];
 }
 
 bool ska::OperationType<ska::Operator::TYPE>::IsBuiltIn() const {

@@ -24,7 +24,7 @@ TEST_CASE("test") {
 	auto astPtr = ASTFromInput(scriptCache, "i = 0\n titi = \"llllll\"\n do toto = 2\n i = 9\n end", data);
 	auto& table = reader->symbols();
 	
-	CHECK(table.countDirect() == 1);
+	CHECK(table.scopes() == 1);
 	const auto* nestedI = table.lookup(ska::SymbolTableLookup::hierarchical("i"), ska::SymbolTableNested::lastChild());
 	auto i = table["i"];
 	const auto* nestedToto = table.lookup(ska::SymbolTableLookup::hierarchical("toto"), ska::SymbolTableNested::firstChild());
@@ -51,7 +51,7 @@ TEST_CASE("Matching") {
 			auto astPtr = ASTFromInput(scriptCache, "i = 0\n i = 123\n do i = 9\n end", data);
 			auto& table = reader->symbols();
 			
-			CHECK(table.countDirect() == 1);
+			CHECK(table.scopes() == 1);
 			auto nestedI = table.lookup(ska::SymbolTableLookup::hierarchical("i"), ska::SymbolTableNested::firstChild());
 			auto i = table["i"];
 
@@ -62,7 +62,7 @@ TEST_CASE("Matching") {
 			auto astPtr = ASTFromInput(scriptCache, "test59 = 21\n func59 = function() do test59 = 123\n end\n", data);
 			auto& table = reader->symbols();
 
-			CHECK(table.countDirect() == 1);
+			CHECK(table.scopes() == 1);
 			auto nestedVar = table.lookup(ska::SymbolTableLookup::hierarchical("test59"), ska::SymbolTableNested::firstChild());
 			auto var = table["test59"];
 
@@ -73,7 +73,7 @@ TEST_CASE("Matching") {
 			auto astPtr = ASTFromInput(scriptCache, "func63 = function(test63:int) do test63 = 123\n end\n", data);
 			auto& table = reader->symbols();
 
-			CHECK(table.countDirect() == 1);
+			CHECK(table.scopes() == 1);
 			auto nestedVar = table.lookup(ska::SymbolTableLookup::hierarchical("test63"), ska::SymbolTableNested::firstChild());
 			auto var = table["test63"];
 

@@ -21,7 +21,6 @@
 namespace ska {
 	class SymbolTable;
 	class TypeBuilder;
-	class Symbol;
 	class SymbolTableUpdater;
 	struct ReservedKeywordsPool;
 	class StatementParser;
@@ -65,7 +64,7 @@ namespace ska {
 		// TODO Deprecated
 		std::vector<ASTNodePtr> makeFunctionInputOutput(ScriptAST& script, const std::vector<std::string>& typeNames);
 
-		ASTNodePtr makeFunctionPrototype(ScriptAST& script, const Symbol& fullTypeFunction);
+		ASTNodePtr makeFunctionPrototype(ScriptAST& script, const Type& fullTypeFunction);
 		ASTNodePtr makeFunctionDeclaration(ScriptAST& script, ASTNodePtr prototype, const BridgeFunction& data);
 		ASTNodePtr makeFunctionParameterOrReturnType(ScriptAST& script, ASTNodePtr nodeType, std::size_t parameterIndex, std::size_t totalParameters);
 		ASTNodePtr makeFunctionName(ScriptAST& script, const std::string& name);
@@ -73,7 +72,7 @@ namespace ska {
 		ASTNodePtr makeVariable(ScriptAST& script, const std::string& name, ASTNodePtr value);
 		ASTNodePtr makeBridgeBody(ScriptAST& script, const BridgeField::Callback& binding);
 		ASTNodePtr makeReturn(ScriptAST& script, std::vector<BridgeFunction> fieldList);
-		std::vector<ASTNodePtr> makeFunctionInputOutput(ScriptAST& script, const Symbol& fullTypeFunction);
+		std::vector<ASTNodePtr> makeFunctionInputOutput(ScriptAST& script, const Type& fullTypeFunction);
 
 		void internalUnlisten(SymbolTable& symbolTable);
 		void internalListen(SymbolTable& symbolTable);

@@ -94,16 +94,17 @@ std::vector<ska::ASTNodePtr> ska::BridgeASTBuilder::makeFunctionInputOutput(Scri
 	return parametersAndReturn;
 }
 
-std::vector<ska::ASTNodePtr> ska::BridgeASTBuilder::makeFunctionInputOutput(ScriptAST& script, const Symbol& fullTypeFunction) {
+std::vector<ska::ASTNodePtr> ska::BridgeASTBuilder::makeFunctionInputOutput(ScriptAST& script, const Type& fullTypeFunction) {
 	auto parametersAndReturn = std::vector<ASTNodePtr>{};
 	SLOG(LogLevel::Info) << " 4 - Making function parameters and return type";
-	for (std::size_t index = 0u; index < fullTypeFunction.type().compound().size(); index++) {
-		const auto& type = fullTypeFunction.type().compound()[index];
+	std::size_t index = 0u;
+	for (const auto& type : fullTypeFunction) {
 		auto isReturnType = index == fullTypeFunction.size() - 1;
 		SLOG(LogLevel::Info) << (isReturnType ? "return" : "parameter") << " : " << type;
 		auto t = m_matcherType.match(type);
 		SLOG(LogLevel::Debug) << " Deduced." ;
 		parametersAndReturn.push_back(std::move(makeFunctionParameterOrReturnType(script, std::move(t), index, fullTypeFunction.size() - 1)));
+		index++;
 	}
 	return parametersAndReturn;
 }
@@ -183,13 +184,13 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionDeclaration(ScriptAST& script
 	return functionDeclarationNode;
 }
 
-ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionPrototype(ScriptAST& script, const Symbol& fullTypeFunction) {
+ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionPrototype(ScriptAST& script, const Type& fullTypeFunction) {
 	auto lock = BridgeASTBuilderSymbolTableLock{*this, script.symbols() };
 	const auto* functionSymbol = &fullTypeFunction;
-	SLOG(LogLevel::Info) << " 2 - Making function prototype \"" << fullTypeFunction.type() << "\"";
+	SLOG(LogLevel::Info) << " 2 - Making function prototype \"" << fullTypeFunction << "\"";
 
 	if(functionSymbol == nullptr || functionSymbol->name().empty()) { std::stringstream ss; ss << "type is not named : " << fullTypeFunction.name(); throw std::runtime_error(ss.str()); };
-	if(fullTypeFunction.nativeType() != ExpressionType::FUNCTION) { std::stringstream ss; ss << "type is not a function : " << fullTypeFunction.name(); throw std::runtime_error(ss.str()); };
+	if(fullTypeFunction.type() != ExpressionType::FUNCTION) { std::stringstream ss; ss << "type is not a function : " << fullTypeFunction.name(); throw std::runtime_error(ss.str()); };
 
 	auto functionNameNode = makeFunctionName(script, functionSymbol->name());
 	auto parametersAndReturn = makeFunctionInputOutput(script, fullTypeFunction);
@@ -206,7 +207,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionPrototype(ScriptAST& script, 
 
 ska::ASTNodePtr ska::BridgeASTBuilder::makeFunction(ScriptAST& script, const BridgeFunction& data) {
 	SLOG(LogLevel::Info) << " 1 - Making function \"" << data.name() << "\"";
-	auto prototype = makeFunctionPrototype(script, data.symbol());	
+	auto prototype = makeFunctionPrototype(script, data.symbol().type());	
 	auto functionDeclaration = makeFunctionDeclaration(script, std::move(prototype), data);
 	return makeVariable(script, data.name(), std::move(functionDeclaration));
 }

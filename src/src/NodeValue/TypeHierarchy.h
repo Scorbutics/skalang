@@ -1,18 +1,22 @@
 #pragma once
 #include "Type.h"
+#include "Symbol.h"
 
 namespace ska {
-	struct SymbolLink {
-		const Symbol* master = nullptr;
-		const Symbol* implementation = nullptr;
-	};
 	
 	struct TypeHierarchy {
-		TypeHierarchy(Type t, SymbolLink link = {}) : 
+		TypeHierarchy(Type t, const Symbol* link = nullptr) :
 			type(std::move(t)),
-			link(std::move(link)) {}
+			m_link(link) {}
+
+		TypeHierarchy(const Symbol& symbol) :
+			type(symbol.type()),
+			m_link(&symbol) {}
+
+		const Symbol* link() { return m_link; }
 
 		Type type;
-		SymbolLink link;
+	private:
+		const Symbol* m_link = nullptr;
 	};
 }

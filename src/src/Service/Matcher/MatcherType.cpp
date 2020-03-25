@@ -6,7 +6,7 @@
 #include "Service/ASTFactory.h"
 #include "NodeValue/Symbol.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherType)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::MatcherType)
 
 ska::ASTNodePtr ska::MatcherType::match(TokenReader& input) {
 	const auto& typeDelimiterToken = m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>();
@@ -78,16 +78,16 @@ ska::ASTNodePtr ska::MatcherType::match(const Type& input) {
 		// ARRAY, VAR, FUNCTION (not built-ins !)
 
 		SLOG(LogLevel::Info) << "Type " << input << " is not built-in";
-		if(input.compound().size() > 2) {
+		if(input.size() > 2) {
 			malformedType(input);
 		}
 
 		switch(input.type()) {
 			case ExpressionType::ARRAY:
-				if(input.compound().size() != 1) {
+				if(input.size() != 1) {
 					malformedType(input, " : bad type size in array type (should be 1)");
 				}
-				nodes.push_back(match(input.compound()[0]));
+				nodes.push_back(match(input[0]));
 				nodes.push_back(ASTFactory::MakeEmptyNode());
 				nodes.push_back(ASTFactory::MakeLogicalNode(Token{ "", TokenType::ARRAY, {}}));
 				break;

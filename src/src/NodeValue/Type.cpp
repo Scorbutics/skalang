@@ -15,27 +15,27 @@ ska::Type::Type(const Symbol* symbol, ExpressionType t) :
 }
 
 bool ska::Type::operator==(const Type& t) const {	
-	if (hasSymbol() && t.hasSymbol()) {
+	if (m_symbol != nullptr && t.m_symbol != nullptr) {
 		return *m_symbol == *t.m_symbol;
 	}
 
-	return equalIgnoreSymbol(t);
+	return structuralEquality(t);
 }
 
 std::string ska::Type::name() const {
 	return m_symbol == nullptr ? "" : m_symbol->name();
 }
 
-std::optional<ska::Type> ska::Type::lookup(const std::string& field) const {
-	if(m_symbol == nullptr) {
-		return {};
-	}
-	auto* symbol = (*m_symbol)[field];
-	return symbol == nullptr ? std::optional<Type>{} : symbol->type();
+bool ska::Type::structuralEquality(const Type& t) const {
+	return m_type == t.m_type && m_compound == t.m_compound;
 }
 
-bool ska::Type::equalIgnoreSymbol(const Type& t) const {
-	return m_type == t.m_type && m_compound == t.m_compound;
+bool ska::Type::tryChangeSymbol(const Type& type) {
+	if (type.m_symbol != nullptr && m_symbol != type.m_symbol) {
+		m_symbol = type.m_symbol;
+		return true;
+	}
+	return false;
 }
 
 std::ostream& ska::operator<<(std::ostream& stream, const ska::Type& type) {
@@ -55,3 +55,4 @@ std::ostream& ska::operator<<(std::ostream& stream, const ska::Type& type) {
 
 	return stream;
 }
+

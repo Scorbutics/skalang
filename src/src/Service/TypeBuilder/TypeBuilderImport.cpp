@@ -8,10 +8,10 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::IMPORT>)
 
-ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::IMPORT>::build(ScriptAST& script, OperateOn node) {
+ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::IMPORT>::build(const ScriptAST& script, OperateOn node) {
     SLOG(LogLevel::Info) << "Importing script " << node.GetScriptPathNode().name();
 	auto& symbols = script.symbols();
-	assert(symbols.countDirect() > 0);
-	const auto*	symbol = symbols.lookup(SymbolTableLookup::hierarchical(node.GetScriptPathNode().name()), SymbolTableNested::lastChild());
-	return Type::MakeCustom<ExpressionType::OBJECT>(symbol);
+	assert(symbols.scopes() > 0);
+	auto* symbol = symbols.lookup(SymbolTableLookup::hierarchical(node.GetScriptPathNode().name()), SymbolTableNested::lastChild());
+	return { Type::MakeCustom<ExpressionType::OBJECT>(nullptr), symbol };
 }

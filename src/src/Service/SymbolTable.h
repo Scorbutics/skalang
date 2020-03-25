@@ -38,7 +38,8 @@ namespace ska {
     	public PriorityObserver<FunctionTokenEvent>,
     	public PriorityObserver<ReturnTokenEvent>, 
 		public PriorityObserver<ImportTokenEvent>,
-		public PriorityObserver<ScriptLinkTokenEvent> {
+		public PriorityObserver<ScriptLinkTokenEvent>,
+		public SymbolFactory {
 
     	using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 		friend class ParserListenerLock;
@@ -50,22 +51,38 @@ namespace ska {
 		[[nodiscard]]
 		ParserListenerLock listenParser(StatementParser& parser);
 
-		const Symbol* operator[](const std::string& key) const { return (*m_currentTable)[key]; }
+		Symbol* operator[](std::size_t index) { return (*m_currentTable)[index]; }
+		const Symbol* operator[](std::size_t index) const { return (*m_currentTable)[index];  }
+
 		Symbol* operator[](const std::string& key) { return (*m_currentTable)[key]; }
-		const Symbol* operator()(const std::string& key) const { return (*m_currentTable)(key); }
+		const Symbol* operator[](const std::string& key) const { return (*m_currentTable)[key]; }
+
 		Symbol* operator()(const std::string& key) { return (*m_currentTable)(key); }
+		const Symbol* operator()(const std::string& key) const { return (*m_currentTable)(key); }
 
 		const Symbol* enclosingType() const {
 			return m_currentTable->owner();
 		}
 
-		std::size_t countDirect() const {
-			return m_currentTable->children().size();
+		std::size_t size() const {
+			return m_currentTable->size();
+		}
+
+		std::size_t scopes() const {
+			return m_currentTable->scopes();
 		}
 
 		bool changeTypeIfRequired(const std::string& symbolName, const Type& value);
 		const Symbol* lookup(SymbolTableLookup strategy, SymbolTableNested depth = SymbolTableNested::current()) const;
 		Symbol* lookup(SymbolTableLookup strategy, SymbolTableNested depth = SymbolTableNested::current());
+
+		auto begin() { return m_rootTable->begin(); }
+		auto end() { return m_rootTable->end(); }
+		auto begin() const { return m_rootTable->begin(); }
+		auto end() const  { return m_rootTable->end(); }
+
+		ScopedSymbolTable& root() { return *m_rootTable; }
+		const ScopedSymbolTable& root() const { return *m_rootTable; }
 
 	private:
 		bool match(VarTokenEvent&);

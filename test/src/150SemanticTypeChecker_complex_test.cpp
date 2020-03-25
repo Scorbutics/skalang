@@ -274,7 +274,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	SUBCASE("using a callback function as a parameter without using the source type (function type compatibility)") {
 		ASTFromInputSemanticComplexTC(scriptCache,
 			"lvalFunc218 = function() do end\n"
-			"lvalFunc219 = function(toto: lvalFunc218) : lvalFunc218() do\n"
+			"lvalFunc219 = function(toto: lvalFunc218) do\n"
 			"	toto()\n"
 			"end\n"
 			"callback = function() do end\n"

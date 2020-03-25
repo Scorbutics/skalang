@@ -60,21 +60,21 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 				case ReturnTokenEventType::START:
 						break;
 
-				case ReturnTokenEventType::BUILTIN:
+		case ReturnTokenEventType::BUILTIN:
 		case ReturnTokenEventType::OBJECT: {
 			const auto symbol = token.script().symbols().enclosingType();
-			auto* finalSymbol = token.script().symbols()[symbol->name()];
-			if (symbol == nullptr || symbol->name().empty() || finalSymbol == nullptr) {
+			//auto* finalSymbol = token.script().symbols()[symbol->name()];
+			if (symbol == nullptr || symbol->name().empty()) {
 				throw std::runtime_error("return must be place in a function block or a nested one");
 			}
 
 			auto operationReturn = OperationType<Operator::RETURN>{token.rootNode()};
 			const auto& returnedValue = operationReturn.GetValue();
-			if (finalSymbol->empty() || !returnedValue.type().has_value()) {
+			if (symbol->type().empty() || !returnedValue.type().has_value()) {
 				throw std::runtime_error("\"" + symbol->name() + "\" is not a function");
 			}
 
-			const auto expectedReturnType = finalSymbol->type().compound().back();
+			const auto expectedReturnType = symbol->type().back();
 			if (((returnedValue.op() == Operator::USER_DEFINED_OBJECT) && (expectedReturnType != ExpressionType::OBJECT)) || 
 				(returnedValue.op() != Operator::USER_DEFINED_OBJECT && expectedReturnType != returnedValue.type())) {
 				auto ss = std::stringstream{};
@@ -163,7 +163,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 			auto index = 0u;
 			for (auto& arg : functionCallOperation) {		
 				const auto calculatedArgumentType = arg->type().value();
-				const auto requiredParameterType = functionFullRequiredType.compound()[index];
+				const auto requiredParameterType = functionFullRequiredType[index];
 
 								if(requiredParameterType.crossTypes(m_typeCrosser, "=", calculatedArgumentType) == ExpressionType::VOID) {
 										auto ss = std::stringstream {};
@@ -177,7 +177,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 
 		case FunctionTokenEventType::DECLARATION_STATEMENT: {
 			auto operation = OperationType<Operator::FUNCTION_DECLARATION>{ token.rootNode() };
-			auto functionReturnType = operation.GetFunctionPrototype().type().value().compound().back();
+			auto functionReturnType = operation.GetFunctionPrototype().type().value().back();
 			if (functionReturnType != ExpressionType::VOID && 
 				!childrenHasReturnOnAllControlPath(operation.GetFunctionBody())) {
 				throw std::runtime_error("function lacks of return in one of its code path");

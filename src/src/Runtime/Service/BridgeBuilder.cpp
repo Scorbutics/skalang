@@ -27,15 +27,15 @@ const ska::Symbol& ska::BridgeBuilderASTTemplateLooker::field(const std::string&
     if (m_template == nullptr) {
         symbol = m_parent->symbols()[name];
     } else {
-        symbol = (*m_template)[name];
+        symbol = (*m_template)(name);
     }
     
-  if (symbol == nullptr) {
-    throw std::runtime_error("unable to find field \"" + name + (m_name.empty() ? "" : "\" in constructor \"" + m_name) + "\" of template script \"" + m_parent->name() + "\"");
-  }
-  return *symbol;
+    if (symbol == nullptr) {
+        throw std::runtime_error("unable to find field \"" + name + (m_name.empty() ? "" : "\" in constructor \"" + m_name) + "\" of template script \"" + m_parent->name() + "\"");
+    }
+    return *symbol;
 }
 
 bool ska::BridgeBuilderASTTemplateLooker::hasField(const std::string& name) const {
-  return (*m_template)[name] != nullptr;
+  return (*m_template)(name) != nullptr;
 }

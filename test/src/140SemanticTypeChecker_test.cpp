@@ -36,7 +36,7 @@ TEST_CASE("[SymbolTableUpdater] update node symbol") {
 
 	auto& table = astPtr.symbols();
 
-	CHECK(table.countDirect() == 1);
+	CHECK(table.scopes() == 1);
 	const auto* i = table["i"];
 	const auto* nestedToto = table.lookup(ska::SymbolTableLookup::hierarchical("toto"), ska::SymbolTableNested::firstChild());
 	const auto* toto = table["toto"];
@@ -201,7 +201,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 			}
 
 			SUBCASE("constructor with 1 parameter same name") {
-				ASTFromInputSemanticTC(scriptCache, "Joueur2 = function(nom:string) : var do return { nom = nom }\n end\n joueur1 = Joueur2(\"joueur 1\")\n joueur1.nom\n", data);
+				ASTFromInputSemanticTC(scriptCache, "Joueur2 = function(nom204:string) : var do return { nom204 = nom204 }\n end\n joueur1 = Joueur2(\"joueur 1\")\n joueur1.nom204\n", data);
 			}
 		}
 
@@ -227,7 +227,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 					ASTFromInputSemanticTC(scriptCache, "testReturn148 = function() do return { toto = 2 }\n end\n value = testReturn148()\n value\n", data);
 					CHECK(false);
 				} catch (std::exception & e) {
-					CHECK(std::string{e.what()}.find("bad return type : expected \"void\" on function declaration but got \"var\" on return") != std::string::npos);
+					CHECK(std::string{e.what()}.find("bad return type : expected \"void\" on function declaration but got \"var testReturn148\" on return") != std::string::npos);
 				}
 			}
 
@@ -300,7 +300,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(ast.size() == 1);
 				CHECK(ast[0].type() == ska::ExpressionType::ARRAY);
 				CHECK(ast[0].type().value().size() == 1);
-				CHECK(ast[0].type().value().compound()[0] == ska::ExpressionType::STRING);
+				CHECK(ast[0].type().value()[0] == ska::ExpressionType::STRING);
 			}
 
 			SUBCASE("string : cell") {
@@ -359,7 +359,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				auto& ast = astPtr.rootNode();
 				CHECK(ast.size() == 2);
 				CHECK(ast[1][0].type() == ska::ExpressionType::ARRAY);
-				CHECK(ast[1][0].type().value().compound()[0] == ska::ExpressionType::INT);
+				CHECK(ast[1][0].type().value()[0] == ska::ExpressionType::INT);
 			}
 
 	SUBCASE("expression-array with use in expression") {

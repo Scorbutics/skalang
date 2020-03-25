@@ -8,7 +8,7 @@ namespace ska {
 
     class TypeBuildUnit {
     public:
-        virtual TypeHierarchy build(ScriptAST&, const ASTNode&) = 0;
+        virtual TypeHierarchy build(const ScriptAST&, ASTNode&) = 0;
     	virtual ~TypeBuildUnit() = default;
     };
 

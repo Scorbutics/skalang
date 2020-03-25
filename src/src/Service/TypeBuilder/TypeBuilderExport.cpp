@@ -7,6 +7,6 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::EXPORT>)
 
-ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::EXPORT>::build(ScriptAST& script, OperateOn node) {
+ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::EXPORT>::build(const ScriptAST& script, OperateOn node) {
 	return node.GetVariable().type().value();
 }

@@ -7,7 +7,7 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_DECLARATION>)
 
-ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FUNCTION_DECLARATION>::build(ScriptAST& script, OperateOn node) {
+ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FUNCTION_DECLARATION>::build(const ScriptAST& script, OperateOn node) {
 	auto functionName = node.GetFunctionName();
 	auto& symbols = script.symbols();
 	const auto symbol = symbols(functionName);

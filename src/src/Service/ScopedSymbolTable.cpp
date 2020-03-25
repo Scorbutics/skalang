@@ -14,7 +14,7 @@ const ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() const {
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name) {
 	SLOG(ska::LogLevel::Info) << "\tSymbol Created \"" << name << "\" with scoped table";
-	return emplace(Symbol{ m_children.size(), name, SymbolFieldResolver{this} });
+	return emplace(make(m_children.size(), std::move(name), *this));
 }
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
@@ -33,13 +33,14 @@ ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
 
 ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, const ScriptAST& script) {
 	SLOG(ska::LogLevel::Info) << "\tSymbol Created \"" << name << "\" with script \"" << script.name() << "\"";
-	return emplace(Symbol{ m_children.size(), name, SymbolFieldResolver{script.handle()} });
+	return emplace(make(m_children.size(), name, *script.handle()));
 }
 
-ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(Symbol* s) {
+ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(Symbol* s, bool isExported) {
 	m_children.push_back(std::make_unique<ska::ScopedSymbolTable>(*this));
 	auto& lastChild = *m_children.back();
 	lastChild.m_parentSymbol = s;
+	lastChild.m_exported = isExported;
 	
 	//No bad memory access possible when unique_ptr are moved, that's why it's safe to return the address of contained item
 	//even if we move the vector or if the vector moves its content automatically 
@@ -54,4 +55,38 @@ bool ska::ScopedSymbolTable::changeTypeIfRequired(const std::string& symbolName,
 		throw std::runtime_error(ss.str());
 	}
 	return symbol->changeTypeIfRequired(value);
+}
+
+const ska::Symbol* ska::ScopedSymbolTable::operator[](const std::string& key) const {
+	const auto valueIt = m_symbols.find(key);
+	if (valueIt == m_symbols.end()) {
+		return &m_parent == this ? nullptr : m_parent[key];
+	}
+	return valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
+}
+
+ska::Symbol* ska::ScopedSymbolTable::operator[](const std::string& key) {
+	auto valueIt = m_symbols.find(key);
+	if (valueIt == m_symbols.end()) {
+		return &m_parent == this ? nullptr : m_parent[key];
+	}
+	return valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
+}
+
+const ska::Symbol* ska::ScopedSymbolTable::operator[](std::size_t index) const {
+	return index < m_symbols.size() ? &m_symbols.at(index) : nullptr;
+}
+
+ska::Symbol* ska::ScopedSymbolTable::operator[](std::size_t index) {
+	return index < m_symbols.size() ? &m_symbols.at(index) : nullptr;
+}
+
+const ska::Symbol* ska::ScopedSymbolTable::operator()(const std::string& key) const {
+	const auto valueIt = m_symbols.find(key);
+	return valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
+}
+
+ska::Symbol* ska::ScopedSymbolTable::operator()(const std::string& key) {
+	auto valueIt = m_symbols.find(key);
+	return valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
 }

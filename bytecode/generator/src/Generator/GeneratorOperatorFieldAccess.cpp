@@ -15,7 +15,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 		throw std::runtime_error("unable to retrieve object type");
 	}
 
-	const auto* symbolField = (*objectTypeSymbol)[fieldName];
+	const auto* symbolField = (*objectTypeSymbol)(fieldName);
 	if (symbolField == nullptr) {
 		auto ss = std::stringstream{};
 		ss << "trying to access to an undeclared field : \"" << fieldName << "\" of \"" << node.GetObjectNameNode().name() << "\"";

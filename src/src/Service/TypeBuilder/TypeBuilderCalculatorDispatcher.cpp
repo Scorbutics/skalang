@@ -3,11 +3,16 @@
 #include "Config/LoggerConfigLang.h"
 #include "Service/SymbolTable.h"
 #include "NodeValue/AST.h"
+#include "TypeBuilderCalculatorDispatcher.h"
 
 namespace ska {
 	struct TypeBuilderBuildFromTokenTypeTag;
+}
 
-    Type TypeBuilderBuildFromTokenType(const SymbolTable& symbols, const ASTNode& node) {
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderBuildFromTokenTypeTag)
+namespace ska {
+
+    TypeHierarchy TypeBuilderBuildFromTokenType(const SymbolTable& symbols, const ASTNode& node) {
 
         switch(node.tokenType()) {
             case TokenType::SYMBOL:
@@ -24,24 +29,14 @@ namespace ska {
 				return isDecimal ? Type::MakeBuiltIn<ExpressionType::FLOAT>() : Type::MakeBuiltIn<ExpressionType::INT>();
             }
 
-            case TokenType::IDENTIFIER: {
-                const auto symbol = symbols[node.name()];
+			case TokenType::IDENTIFIER: {
+				auto* symbol = symbols[node.name()];
 				if (symbol != nullptr) {
-					if (symbol->type().hasSymbol()) {
-						return symbol->type();
-					}
-					const auto* finalSymbol = (*symbol)[node.name()];
-					switch (symbol->nativeType()) {
-					case ExpressionType::OBJECT:
-						return Type::MakeCustom<ExpressionType::OBJECT>(finalSymbol);
-					case ExpressionType::FUNCTION:
-						return Type::MakeCustom<ExpressionType::FUNCTION>(finalSymbol);
-					default:
-						return symbol->type();
-					}
+					return *symbol;
 				}
 				return Type{};
-            }
+			}
+
 			case TokenType::BOOLEAN:
 				return Type::MakeBuiltIn<ExpressionType::BOOLEAN>();
 

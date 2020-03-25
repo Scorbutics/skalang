@@ -11,10 +11,10 @@
 	private:\
 		using OperateOn = OperationType<OperatorType>;\
 	public:\
-        TypeHierarchy build(ScriptAST& script, const ASTNode& node) override final {\
+        TypeHierarchy build(const ScriptAST& script, ASTNode& node) override final {\
 			return build(script, OperateOn{node});\
 		}\
-		TypeHierarchy build(ScriptAST& script, OperateOn node);\
+		TypeHierarchy build(const ScriptAST& script, OperateOn node);\
     };
 
 namespace ska {
@@ -23,7 +23,7 @@ namespace ska {
 
     template <Operator O>
     struct TypeBuilderOperator : public TypeBuildUnit {
-        TypeHierarchy build(ScriptAST& script, const ASTNode& node) override {
+        TypeHierarchy build(const ScriptAST& script, ASTNode& node) override {
 			return Type{ };
         }
     };

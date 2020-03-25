@@ -29,9 +29,10 @@ namespace ska {
 
 	struct SymbolTableNested {
 	private:
-		SymbolTableNested(int depth, std::size_t childIndex) :
+		SymbolTableNested(int depth, std::size_t childIndex, std::string name = "") :
 			depth(depth),
-			childIndex(childIndex) {}
+			childIndex(childIndex),
+			childName(std::move(name)) {}
 
 	public:
 		static SymbolTableNested lastChild(std::size_t depth = 1) {
@@ -50,7 +51,12 @@ namespace ska {
 			return { 0, 0 };
 		}
 
+		static SymbolTableNested child(std::string name) {
+			return { 0, 0, std::move(name) };
+		}
+
 		int depth = 0;
 		std::size_t childIndex = 0;
+		std::string childName;
 	};
 }

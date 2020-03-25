@@ -1,8 +1,11 @@
+#include "Config/LoggerConfigLang.h"
 #include "AST.h"
 #include "Service/ASTFactory.h"
 #include "NodeValue/ScriptAST.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
 #include "Service/TypeBuilder/TypeBuildersContainer.h"
+
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ASTNode)
 
 ska::ASTNode::ASTNode() :
 	m_type(Type::MakeBuiltIn(ExpressionType::VOID)) {}
@@ -43,24 +46,24 @@ ska::ASTNode::ASTNode(Operator o, Token identifierToken) :
 }
 
 const ska::Symbol* ska::ASTNode::typeSymbol() const { 
-	//return m_symbol == nullptr ? nullptr : m_symbol->master(); 
-	return !m_type.has_value() ? nullptr : TypeSymbolAccess(m_type.value());
+	SLOG(ska::LogLevel::Debug) << "Accessing type symbol of node \"" << m_token << "\" with type \"" << m_type.value_or(Type{}) << "\"";
+	return m_symbol == nullptr ? nullptr : m_symbol->master(); 
+	//return !m_type.has_value() ? nullptr : TypeSymbolAccess(m_type.value());
 }
 
 const std::optional<ska::Type>& ska::ASTNode::type() const {
-	//return m_symbol == nullptr ? m_type : m_symbol->type();
 	return m_type;
 }
 
-void ska::ASTNode::linkSymbol(Symbol& symbol) { 
+void ska::ASTNode::linkSymbol(Symbol& symbol) {
 	m_symbol = &symbol;
 	refreshSymbolType();
-	//m_type = symbol.type().type();
+	SLOG(ska::LogLevel::Info) << "Linking symbol \"" << &symbol << "\" in node \"" << m_token << "\"";
 }
 
 void ska::ASTNode::refreshSymbolType() {
-	if (m_symbol != nullptr && m_type.has_value()) {
-		m_symbol->changeTypeIfRequired(m_type.value());
+	if (m_symbol != nullptr && m_type.has_value() && m_symbol->changeTypeIfRequired(m_type.value())) {
+		SLOG(ska::LogLevel::Debug) << "Symbol \"" << m_symbol->name() << "\" in node \"" << m_token << "\" has type updated \"" << m_symbol->type() << "\"";
 	}
 }
 

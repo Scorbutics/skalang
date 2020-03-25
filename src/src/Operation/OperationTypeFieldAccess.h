@@ -30,7 +30,7 @@ namespace ska {
 		}
 		
 		inline const auto* GetObjectSymbol() {
-			return node.symbol();
+			return GetObject().symbol();
 		}
 
 		inline auto& GetFieldNameNode() {

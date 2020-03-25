@@ -33,7 +33,7 @@ const ska::Symbol* ska::bytecode::Script::findFieldSymbol(const Symbol* construc
 	}
 
 	if (constructor != nullptr) {
-		return (*constructor)[field.symbol->name()];
+		return (*constructor)(field.symbol->name());
 	}
 
 	return &findSymbolFromString(field.symbol->name());

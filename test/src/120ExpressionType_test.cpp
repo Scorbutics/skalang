@@ -9,8 +9,7 @@
 using SymbolTablePtr = std::unique_ptr<ska::SymbolTable>;
 using ParserPtr = std::unique_ptr<ska::StatementParser>;
 
-const auto reservedKeywords = ska::ReservedKeywordsPool{};
-
+static const auto reservedKeywords = ska::ReservedKeywordsPool{};
 
 ska::ScriptAST ASTFromInputSemanticExpressionType(ska::ScriptCacheAST& scriptCache, const std::string& input, ParserPtr& parser_test) {
 	static auto refCounter = 0;
@@ -42,8 +41,8 @@ TEST_CASE("[ExpressionType]") {
 		type.add(ska::Type::MakeBuiltIn<ska::ExpressionType::INT>());
 	auto typeCopied = type;
 	CHECK(typeCopied == ska::ExpressionType::OBJECT);
-	CHECK(!typeCopied.compound().empty());
-	CHECK(typeCopied.compound()[0] == ska::ExpressionType::INT);
+	CHECK(!typeCopied.empty());
+	CHECK(typeCopied[0] == ska::ExpressionType::INT);
 	CHECK(typeCopied == type);
 	}
 
@@ -52,7 +51,7 @@ TEST_CASE("[ExpressionType]") {
 		type.add(ska::Type::MakeBuiltIn<ska::ExpressionType::INT>());
 	auto typeMoved = std::move(type);        
 	CHECK(typeMoved == ska::ExpressionType::OBJECT);
-	CHECK(!typeMoved.compound().empty());
-	CHECK(typeMoved.compound()[0] == ska::ExpressionType::INT);
+	CHECK(!typeMoved.empty());
+	CHECK(typeMoved[0] == ska::ExpressionType::INT);
 	}
 }

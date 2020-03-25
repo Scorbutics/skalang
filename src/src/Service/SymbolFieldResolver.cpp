@@ -6,68 +6,123 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SymbolFieldResolver)
 
-ska::SymbolFieldResolver::SymbolFieldResolver(Variant value) :
-  m_data(std::move(value)) {
+ska::SymbolFieldResolver::SymbolFieldResolver(const std::string& name, std::size_t tableIndex, Variant value) :
+	m_tableIndex(tableIndex),
+	m_inputData(std::move(value)),
+	m_symbolName(name) {
 
-  if(std::holds_alternative<ScopedSymbolTable*>(value)) {
-    SLOG(ska::LogLevel::Debug) << "Creating symbol fields resolver from table";
-  } else {
-    SLOG(ska::LogLevel::Debug) << "Creating symbol fields resolver from script";
-  }
+	if(std::holds_alternative<ScopedSymbolTable*>(m_inputData)) {
+		SLOG(ska::LogLevel::Debug) << "Creating symbol fields resolver from table";
+	} else {
+		SLOG(ska::LogLevel::Debug) << "Creating symbol fields resolver from script";
+	}
 }
 
-template<class ThisType, class Return>
-static Return Lookup(ThisType& variant, std::size_t tableIndex, const std::string& fieldName) {
-		if(std::holds_alternative<ska::ScopedSymbolTable*>(variant)) {
+ska::SymbolFieldResolver::SymbolFieldResolver(SymbolFieldResolver&& toMove) {
+	std::lock_guard lock{ toMove.m_cacheMutex };
+	m_tableIndex = toMove.m_tableIndex;
+	m_symbolName = std::move(toMove.m_symbolName);
+	m_inputData = std::move(toMove.m_inputData);
+	m_cacheData = std::move(toMove.m_cacheData);
+}
+
+ska::SymbolFieldResolver& ska::SymbolFieldResolver::operator=(SymbolFieldResolver&& toMove) {
+	if (this != &toMove) {
+		std::unique_lock<std::mutex> lhs_lk{ m_cacheMutex, std::defer_lock };
+		std::unique_lock<std::mutex> rhs_lk{ toMove.m_cacheMutex, std::defer_lock };
+		std::lock(lhs_lk, rhs_lk);
+		m_tableIndex = toMove.m_tableIndex;
+		m_symbolName = std::move(toMove.m_symbolName);
+		m_inputData = std::move(toMove.m_inputData);
+		m_cacheData = std::move(toMove.m_cacheData);
+	}
+	return *this;
+}
+
+ska::SymbolFieldResolver::SymbolFieldResolver(const SymbolFieldResolver& toCopy) {
+	std::lock_guard lock{ toCopy.m_cacheMutex };
+	m_tableIndex = toCopy.m_tableIndex;
+	m_symbolName = toCopy.m_symbolName;
+	m_inputData = toCopy.m_inputData;
+	m_cacheData = toCopy.m_cacheData;
+}
+
+ska::SymbolFieldResolver& ska::SymbolFieldResolver::operator=(const SymbolFieldResolver& toCopy) {
+	if (this != &toCopy) {
+		std::unique_lock<std::mutex> lhs_lk{ m_cacheMutex, std::defer_lock };
+		std::unique_lock<std::mutex> rhs_lk{ toCopy.m_cacheMutex, std::defer_lock };
+		std::lock(lhs_lk, rhs_lk);
+		m_tableIndex = toCopy.m_tableIndex;
+		m_symbolName = toCopy.m_symbolName;
+		m_inputData = toCopy.m_inputData;
+		m_cacheData = toCopy.m_cacheData;
+	}
+	return *this;
+}
+
+template<class Variant>
+static ska::ScopedSymbolTable* GetTable(Variant& variant, const std::string name, std::size_t tableIndex) {
+	if (std::holds_alternative<ska::ScopedSymbolTable*>(variant)) {
 		auto* containingTable = std::get<ska::ScopedSymbolTable*>(variant);
-		assert(containingTable != nullptr);
-
-		if (containingTable->children().size() > tableIndex) {
-			auto& innerSymbolTable = containingTable->children()[tableIndex];
-			if (!innerSymbolTable->children().empty()) {
-				auto* lastInnerSymbolElement = innerSymbolTable->children().back().get();
-				assert(lastInnerSymbolElement != nullptr && (std::string{ "symbol \"" } +fieldName + "\" doesn't exists for element ").c_str());
-				SLOG_STATIC(ska::LogLevel::Info, ska::SymbolFieldResolver) << "Looking for symbol field \"" << fieldName << "\" in " << tableIndex << "nth child of current symbol";
-				auto* result = (*lastInnerSymbolElement)[fieldName];
-				if (result != nullptr) {
-					return result;
-				}
+		if (containingTable != nullptr && containingTable->scopes() > tableIndex) {
+			auto* tableSymbol = containingTable->child(tableIndex);
+			if (tableSymbol != nullptr && tableSymbol->scopes() > 0) {
+				return tableSymbol->child(tableSymbol->scopes() - 1);
 			}
-		}
-
-		SLOG_STATIC(ska::LogLevel::Info, ska::SymbolFieldResolver) << "Unable to find \"" << fieldName << "\" in this symbol in the table";
+		} 
+		SLOG_STATIC(ska::LogLevel::Warn, ska::SymbolFieldResolver) << "Unable to the enclosing table of the current symbol \"" << name << "\"";	
 		return nullptr;
 	}
 
 	assert(std::holds_alternative<ska::ScriptHandleAST*>(variant));
 	auto* script = std::get<ska::ScriptHandleAST*>(variant);
 	assert(script != nullptr);
+	SLOG_STATIC(ska::LogLevel::Warn, ska::SymbolFieldResolver) << "Found external script symbol table refered by the current symbol \"" << name << "\"";
+	return &script->symbols().root();
+}
 
-	SLOG_STATIC(ska::LogLevel::Debug, ska::SymbolFieldResolver) << "Looking for " << fieldName << " in the targetted script";
-
-	auto* result = (script->symbols())[fieldName];
-	if(result != nullptr) {
-		return result;
+ska::ScopedSymbolTable* ska::SymbolFieldResolver::lookup() {
+	if (!m_closed) {
+		return nullptr;
 	}
 
-	SLOG_STATIC(ska::LogLevel::Info, ska::SymbolFieldResolver) << "Unable to find \"" << fieldName << "\" in this symbol in script \"" << script->name() << "\"";
-	return nullptr;
+	std::lock_guard lock{ m_cacheMutex };
+	if (m_cacheData != nullptr) {
+		return m_cacheData;
+	}
+
+	m_cacheData = GetTable(m_inputData, m_symbolName, m_tableIndex);
+
+	return m_cacheData;
 }
 
-const ska::Symbol* ska::SymbolFieldResolver::lookup(std::size_t tableIndex, const std::string& fieldName) const {
-	return Lookup<const Variant&, const Symbol*>(m_data, tableIndex, fieldName);
-}
+const ska::ScopedSymbolTable* ska::SymbolFieldResolver::lookup() const {
+	if (!m_closed) {
+		return nullptr;
+	}
 
-ska::Symbol* ska::SymbolFieldResolver::lookup(std::size_t tableIndex, const std::string& fieldName) {
-	return Lookup<Variant&, Symbol*>(m_data, tableIndex, fieldName);
+	std::lock_guard lock{ m_cacheMutex };
+	if (m_cacheData != nullptr) {
+		return m_cacheData;
+	}
+
+	m_cacheData = GetTable(m_inputData, m_symbolName, m_tableIndex);
+
+	return m_cacheData;
 }
 
 bool ska::operator==(const SymbolFieldResolver& lhs, const SymbolFieldResolver& rhs) {
-  	return (std::holds_alternative<ScopedSymbolTable*>(lhs.m_data) ?
-		std::holds_alternative<ScopedSymbolTable*>(rhs.m_data) && std::get<ScopedSymbolTable*>(rhs.m_data) == std::get<ScopedSymbolTable*>(lhs.m_data) :
-		std::holds_alternative<ScriptHandleAST*>(rhs.m_data) && std::get<ScriptHandleAST*>(rhs.m_data) == std::get<ScriptHandleAST*>(lhs.m_data));
+	return lhs.m_tableIndex == rhs.m_tableIndex &&
+		lhs.m_symbolName == rhs.m_symbolName &&
+		lhs.m_inputData == rhs.m_inputData;
 }
 
 bool ska::operator!=(const SymbolFieldResolver& lhs, const SymbolFieldResolver& rhs) {
-  return !operator==(lhs, rhs);
+	return !operator==(lhs, rhs);
 }
+
+ska::SymbolFieldResolver::Iterator ska::SymbolFieldResolver::begin() { auto* table = lookup(); return table == nullptr ? m_defaultEmptyVector.end() : table->begin(); }
+ska::SymbolFieldResolver::Iterator ska::SymbolFieldResolver::end() { auto* table = lookup(); return table == nullptr ? m_defaultEmptyVector.end() : table->end(); }
+ska::SymbolFieldResolver::ConstIterator ska::SymbolFieldResolver::begin() const { auto* table = lookup(); return table == nullptr ? m_defaultEmptyVector.end() : table->begin(); }
+ska::SymbolFieldResolver::ConstIterator ska::SymbolFieldResolver::end() const { auto* table = lookup(); return table == nullptr ? m_defaultEmptyVector.end() : table->end(); }
+
