@@ -3,7 +3,7 @@
 #include "BytecodeCommand.h"
 #include "Generator/Value/BytecodeScriptGenerationHelper.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_AFFECTATION>);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_AFFECTATION>);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_AFFECTATION>)
 
 namespace ska {
@@ -14,7 +14,7 @@ namespace ska {
 			auto operandDestination = finalGroup.operand();
 			if((dest.symbol() != node.symbol() || node.symbol() == nullptr) && !finalGroup.empty()) {
 				LOG_DEBUG << "Creating MOV instruction with operand group " << finalGroup;
-				auto variable = dest.symbol() != nullptr ? InstructionOutput{context.querySymbolOrOperand(dest)} : generator.generateNext({ context, dest });
+				auto variable = dest.symbol() != nullptr && dest.size() < 2 ? InstructionOutput{context.querySymbolOrOperand(dest)} : generator.generateNext({ context, dest });
 				auto variableDestination = variable.operand();
 
 				finalGroup.push(std::move(variable));
