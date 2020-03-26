@@ -55,6 +55,8 @@ namespace ska {
 		const auto* symbol() const { return m_symbol; }
 		auto* symbol() { return m_symbol; }
 
+		bool isSymbolicLeaf() const;
+
 	private:
 		friend class ASTFactory;
 		ASTNode();

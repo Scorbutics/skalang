@@ -72,3 +72,7 @@ bool ska::ASTNode::updateType(Type type) {
 	refreshSymbolType();
 	return true;
 }
+
+bool ska::ASTNode::isSymbolicLeaf() const { 
+	return m_symbol != nullptr && m_children.size() < 2;
+}

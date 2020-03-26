@@ -15,7 +15,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	std::size_t childIndex = 0;
 	for (const auto& child : node) {
 		auto childCellGroup = generateNext({ context, *child, 1});
-		if(child->symbol() != nullptr && childCellGroup.operand().type() == OperandType::VAR) {
+		if(child->isSymbolicLeaf() && childCellGroup.operand().type() == OperandType::VAR) {
 			auto fieldRef = childCellGroup.operand().as<ScriptVariableRef>();
 			fields->emplace(std::move(fieldRef), fields->size());
 

@@ -14,7 +14,7 @@ namespace ska {
 			auto operandDestination = finalGroup.operand();
 			if((dest.symbol() != node.symbol() || node.symbol() == nullptr) && !finalGroup.empty()) {
 				LOG_DEBUG << "Creating MOV instruction with operand group " << finalGroup;
-				auto variable = dest.symbol() != nullptr && dest.size() < 2 ? InstructionOutput{context.querySymbolOrOperand(dest)} : generator.generateNext({ context, dest });
+				auto variable = dest.isSymbolicLeaf() ? InstructionOutput{context.querySymbolOrOperand(dest)} : generator.generateNext({ context, dest });
 				auto variableDestination = variable.operand();
 
 				finalGroup.push(std::move(variable));
