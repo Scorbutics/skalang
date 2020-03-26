@@ -36,29 +36,47 @@ TEST_CASE("[BytecodeGenerator] Use 2x same script and modifying a value in first
 		{ Command::MOV, "V0", "R0" },
 		{ Command::SCRIPT, "R1", "1" },
 		{ Command::MOV, "V1", "R1" },
-		{ Command::MOV, "V2", "123" },
-		{ Command::ARR_ACCESS, "R2", "V1", "2" },
+		{ Command::ARR_ACCESS, "R2", "V0", "2" },
 		{ Command::ARR_ACCESS, "R3", "R2", "0" },
-		{ Command::MOV, "V2", "R3" }
+		{ Command::MOV, "R3", "123" },
+		{ Command::ARR_ACCESS, "R4", "V1", "2" },
+		{ Command::ARR_ACCESS, "R5", "R4", "0" },
+		{ Command::MOV, "V2", "R5" }
 	});
 }
 
-TEST_CASE("[BytecodeInterpreter] Outside script from file (import) - edit - and use") {
+TEST_CASE("[BytecodeGenerator] Outside script from file (import) - edit - and use") {
 	constexpr auto progStr =
 		"Character260 = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
 		"enemy = Character260.default\n"
-		"enemy.age = enemy.age\n"
 		"enemy.age = 99\n"
 		"t = enemy.age\n";
 	auto [script, data] = ASTFromInputBytecodeGenerator(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	BytecodeCompare(data.storage->at(1), {
+		{ Command::JUMP_REL, "8" },
+		{ Command::POP, "V0" },
+		{ Command::MOV, "V1", "10" },
+		{ Command::MOV, "V2", "V1" },
+		{ Command::PUSH, "V2" },
+		{ Command::MOV, "V3", "V0" },
+		{ Command::PUSH, "V3" },
+		{ Command::POP_IN_VAR, "R0", "2" },
+		{ Command::RET, "R0" },
+		{ Command::END, "V4", "-9" },
+		{ Command::MOV, "V5", "Default" },
+		{ Command::PUSH, "V5" },
+		{ Command::JUMP_ABS, "V4" },
+		{ Command::POP, "R1" },
+		{ Command::MOV, "V6", "R1" }
+	});
 	BytecodeCompare(gen, {
 		{ Command::SCRIPT, "R0", "1" },
 		{ Command::MOV, "V0", "R0" },
 		{ Command::ARR_ACCESS, "R1", "V0", "2" },
 		{ Command::MOV, "V1", "R1" },
 		{ Command::ARR_ACCESS, "R2", "V1", "0" },
-		{ Command::MOV, "V2", "99" },
+		{ Command::MOV, "R2", "99" },
 		{ Command::ARR_ACCESS, "R3", "V1", "0" },
 		{ Command::MOV, "V2", "R3" }
 	});
