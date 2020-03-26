@@ -41,7 +41,7 @@ const std::string& ska::bytecode::ScriptGenerationHelper::name() const {
 }
 
 ska::bytecode::Register ska::bytecode::ScriptGenerationHelper::queryNextRegister() {
-	return { ScriptVariableRef { m_register++ }, OperandType::REG };
+	return { ScriptVariableRef { m_register++, m_index }, OperandType::REG };
 }
 
 ska::bytecode::Operand ska::bytecode::ScriptGenerationHelper::querySymbolOrOperand(const ASTNode& node) {
