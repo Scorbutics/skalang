@@ -48,7 +48,7 @@ std::size_t ska::bytecode::SerializationContext::writeExports() {
 	(*this) << exports.size();
 	for (const auto& exp : exports) {
 		if (!exp.value.empty()) {
-			(*this) << exp.symbol;
+			//(*this) << exp.symbol;
 			(*this) << exp.value;
 		}
 	}
@@ -85,7 +85,7 @@ void ska::bytecode::SerializationContext::operator<<(const Symbol* value) {
 	auto operand = extractGeneratedOperandFromSymbol(*value);
 	LOG_INFO << "%13cName : " << value->name();
 	LOG_INFO << "%13c\twith Raw operand " << operand;
-	LOG_INFO << "%13c\twith " << value->type().compound().size() << " children";
+	LOG_INFO << "%13c\twith " << value->type().size() << " children";
 	LOG_INFO << "%13c\twith Raw type : " << ExpressionTypeSTR[static_cast<std::size_t>(value->type().type())];
 	*this << operand;
 	if (m_symbols.find(value) == m_symbols.end()) {
@@ -115,10 +115,10 @@ void ska::bytecode::SerializationContext::operator<<(const Type value) {
 	auto rawType = value.type();
 	buffer().write(reinterpret_cast<const char*>(&rawType), sizeof(uint8_t));
 
-	LOG_INFO << "Type \"" << value << "\" is being serialized with " << value.compound().size() << " compound types";
+	LOG_INFO << "Type \"" << value << "\" is being serialized with " << value.size() << " compound types";
 
 	auto index = std::size_t{0};
-	for (auto& childType : value.compound()) {
+	for (auto& childType : value) {
 		auto operand = Operand{};
 		LOG_INFO << "\t\tChild type " << childType;
 		/*if (childType.hasSymbol()) {
@@ -126,10 +126,10 @@ void ska::bytecode::SerializationContext::operator<<(const Type value) {
 		}
 		LOG_INFO << "%13cChild " << index << "\t\twith name "<< (childType.symbol() ? childType.symbol()->name() : "");*/
 		LOG_INFO << "%13c\t\twith Raw operand " << operand;
-		LOG_INFO << "%13c\t\twith " << childType.compound().size() << " children";
+		LOG_INFO << "%13c\t\twith " << childType.size() << " children";
 		LOG_INFO << "%13c\t\twith Raw type : " << ExpressionTypeSTR[static_cast<std::size_t>(childType.type())];
 		*this << static_cast<std::size_t>(childType.type());
-		*this << childType.compound().size();
+		*this << childType.size();
 		*this << operand;
 		*this << childType;
 		index++;

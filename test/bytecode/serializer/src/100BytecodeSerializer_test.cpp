@@ -12,14 +12,14 @@
 
 static std::unordered_map<std::string, std::stringstream> SerializingStreams = {};
 
-ska::bytecode::SerializationStrategy SerializeInStream() {
+static ska::bytecode::SerializationStrategy SerializeInStream() {
 	return [](const std::string& scriptName) -> std::ostream& {
 		std::cout << "serializing " << scriptName << std::endl;
 		return SerializingStreams[scriptName];
 	};
 }
 
-ska::bytecode::DeserializationStrategy DeserializeInStream() {
+static ska::bytecode::DeserializationStrategy DeserializeInStream() {
 	return [](const std::string& scriptName) -> std::istream& {
 		std::cout << "deserializing " << scriptName << std::endl;
 		return SerializingStreams[scriptName];
