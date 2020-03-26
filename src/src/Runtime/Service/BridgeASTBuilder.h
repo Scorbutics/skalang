@@ -64,7 +64,7 @@ namespace ska {
 		// TODO Deprecated
 		std::vector<ASTNodePtr> makeFunctionInputOutput(ScriptAST& script, const std::vector<std::string>& typeNames);
 
-		ASTNodePtr makeFunctionPrototype(ScriptAST& script, const Type& fullTypeFunction);
+		ASTNodePtr makeFunctionPrototype(ScriptAST& script, const Type& fullTypeFunction, const std::string& name);
 		ASTNodePtr makeFunctionDeclaration(ScriptAST& script, ASTNodePtr prototype, const BridgeFunction& data);
 		ASTNodePtr makeFunctionParameterOrReturnType(ScriptAST& script, ASTNodePtr nodeType, std::size_t parameterIndex, std::size_t totalParameters);
 		ASTNodePtr makeFunctionName(ScriptAST& script, const std::string& name);

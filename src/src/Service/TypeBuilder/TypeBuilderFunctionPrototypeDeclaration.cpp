@@ -35,7 +35,12 @@ namespace ska {
 				LOG_WARN << "Linking current function return type to master symbol \"" << (symbolFunction != nullptr ? symbolFunction->name() : "") << "\"";
 				return { Type::MakeCustom<ExpressionType::OBJECT>(symbolFunction), node.symbol() == nullptr ? symbolFunction : node.symbol() };
 			}
-			assert(!symbolType.value().empty());
+
+			if (symbolType.value().empty()) {
+				auto ss = std::stringstream{};
+				ss << "bad function type encountered \"" << symbolType.value() << "\": could not deduce its return value";
+				throw std::runtime_error(ss.str());
+			}
 			return { symbolType.value().back(), node.typeSymbol() };
 		}
 		
