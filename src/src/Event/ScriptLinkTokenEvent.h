@@ -4,7 +4,6 @@
 #include "NodeValue/ScriptASTPtr.h"
 
 namespace ska {
-	class SymbolTable;
 	class ScriptAST;
 	class ASTNode;
 
@@ -22,8 +21,6 @@ namespace ska {
 		const ASTNode& rootNode() const;
 
 		const std::string& name() const { return m_name; }
-
-		SymbolTable& symbolTable();
 
 	private:
 		ASTNode& m_node;

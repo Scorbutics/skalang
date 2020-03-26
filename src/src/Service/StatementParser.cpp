@@ -39,8 +39,6 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::parse(ScriptAST& input) {
 			auto optionalStatement = optstatement(input);
 			if (optionalStatement != nullptr && !optionalStatement->logicalEmpty()) {
 				blockNodeStatements.push_back(std::move(optionalStatement));
-			} else {
-				break;
 			}
 		}
 		return ASTFactory::MakeNode<Operator::BLOCK>(std::move(blockNodeStatements));
@@ -53,7 +51,6 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::statement(ScriptAST& inpu
 	if (input.reader().empty()) {
 		return nullptr;
 	}
-
 
 		const auto token = input.reader().actual();
 	try {
@@ -79,13 +76,13 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::matchExpressionStatement(
 
 	auto expressionResult = expr(input);
 
-	if(input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>())) {
+	if (input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>())) {
 		input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
-	} else if(!input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
+	} else if (!input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
 		error("expected block-end statement");
 	}
 
-	if(expressionResult == nullptr) {
+	if (expressionResult == nullptr) {
 			SLOG(ska::LogLevel::Info) << "NOP statement";
 			return nullptr;
 	}

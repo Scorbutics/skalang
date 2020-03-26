@@ -69,6 +69,24 @@ TEST_CASE("Matching") {
 			CHECK(nestedVar == var);
 		}
 
+		SUBCASE("outer scope, then inner, then outer again") {
+			auto astPtr = ASTFromInput(scriptCache, 
+				"test73 = 21\n"
+				"do\n"
+				"test76 = 123\n"
+				"end\n"
+				"test78 = 11\n", data);
+			auto& table = reader->symbols();
+
+			CHECK(table.scopes() == 1);
+			CHECK(table.size() == 2);
+			auto nestedVar = table.lookup(ska::SymbolTableLookup::hierarchical("test76"), ska::SymbolTableNested::firstChild());
+			CHECK(nestedVar != nullptr);
+
+			CHECK(table("test73") != nullptr);
+			CHECK(table("test78") != nullptr);
+		}
+
 		SUBCASE("function parameter use into function") {
 			auto astPtr = ASTFromInput(scriptCache, "func63 = function(test63:int) do test63 = 123\n end\n", data);
 			auto& table = reader->symbols();

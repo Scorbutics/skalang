@@ -25,7 +25,3 @@ ska::ASTNode& ska::ScriptLinkTokenEvent::rootNode() {
 const ska::ASTNode& ska::ScriptLinkTokenEvent::rootNode() const {
 	return m_node;
 }
-
-ska::SymbolTable& ska::ScriptLinkTokenEvent::symbolTable() {
-	return m_scriptCaller.symbols();
-}
