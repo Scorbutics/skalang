@@ -5,7 +5,7 @@
 #include "Service/TypeBuilder/TypeBuildUnit.h"
 #include "Service/TypeBuilder/TypeBuildersContainer.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ASTNode)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ASTNode)
 
 ska::ASTNode::ASTNode() :
 	m_type(Type::MakeBuiltIn(ExpressionType::VOID)) {}

@@ -6,7 +6,7 @@
 #include "Service/ASTFactory.h"
 #include "NodeValue/Symbol.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::MatcherType)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherType)
 
 ska::ASTNodePtr ska::MatcherType::match(TokenReader& input) {
 	const auto& typeDelimiterToken = m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>();

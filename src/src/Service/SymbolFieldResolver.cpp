@@ -4,7 +4,7 @@
 #include "ScopedSymbolTable.h"
 #include "SymbolFieldResolver.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::SymbolFieldResolver)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolFieldResolver)
 
 ska::SymbolFieldResolver::SymbolFieldResolver(const std::string& name, std::size_t tableIndex, Variant value) :
 	m_tableIndex(tableIndex),

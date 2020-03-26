@@ -2,7 +2,7 @@
 #include "Service/SymbolFieldResolver.h"
 #include "NodeValue/ScriptAST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::ScopedSymbolTable)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScopedSymbolTable)
 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
 	return m_parent;

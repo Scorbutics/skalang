@@ -7,7 +7,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::UniqueSymbolGetterBase);
 
 std::pair<ska::bytecode::Operand, bool> ska::bytecode::UniqueSymbolGetterBase::query(std::size_t script, const ASTNode& node) {
 	if (node.symbol() == nullptr) {
-		SLOG(ska::LogLevel::Debug) << "Querying symbol node with value " << node.name();
+		SLOG(ska::LogLevel::Debug) << "Querying symbol node with value \"" << node.name() << "\" (no symbol)";
 		return std::make_pair(Operand { node }, false);
 	}
 
@@ -24,7 +24,7 @@ std::pair<ska::bytecode::Operand, bool> ska::bytecode::UniqueSymbolGetterBase::q
 	auto ss = std::stringstream{};
 	ss << m_symbol << varCount->second;
 
-	SLOG(ska::LogLevel::Debug) << "Querying symbol node " << symbol.name() << " with value " << ss.str();
+	SLOG(ska::LogLevel::Debug) << "Querying symbol node \"" << symbol.name() << "\" with value " << ss.str() << (isNew ? " (new)" : "") << " address " << &symbol;
 
 	return std::make_pair(Operand { ScriptVariableRef{ varCount->second, script }, OperandType::VAR}, isNew);
 }

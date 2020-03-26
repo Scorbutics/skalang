@@ -9,7 +9,7 @@ namespace ska {
 	struct TypeBuilderBuildFromTokenTypeTag;
 }
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderBuildFromTokenTypeTag)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderBuildFromTokenTypeTag)
 namespace ska {
 
     TypeHierarchy TypeBuilderBuildFromTokenType(const SymbolTable& symbols, const ASTNode& node) {

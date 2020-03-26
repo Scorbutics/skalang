@@ -7,7 +7,7 @@
 #include "NodeValue/ScriptAST.h"
 #include "Service/StatementParser.h"
 
-SKA_LOGC_CONFIG(LogLevel::Info, TypeBuilder)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, TypeBuilder)
 
 ska::TypeBuilder::TypeBuilder(StatementParser& parser, const TypeCrosser& typeCrosser) :
   subobserver_priority_queue<ExpressionTokenEvent>(std::bind(&TypeBuilder::matchExpression, this, std::placeholders::_1), parser, 6),

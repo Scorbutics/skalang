@@ -2,7 +2,7 @@
 #include "Service/ScopedSymbolTable.h"
 #include "NodeValue/ScriptAST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::Symbol)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Symbol)
 
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::Symbol)
 
