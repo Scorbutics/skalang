@@ -4,7 +4,7 @@
 #include <tuple>
 
 #include "BytecodeSerializerTest.h"
-#include "Serializer/BytecodeTreeSymbolTableSerializer.h"
+#include "Serializer/BytecodeSymbolTableSerializer.h"
 
 static std::unordered_map<std::string, std::stringstream> SerializingStreams = {};
 
@@ -19,11 +19,11 @@ TEST_CASE("[BytecodeTreeSymbolTableSerializer] 2 levels test") {
 		"toutou = 5\n"
 	);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
-	auto symbolTableSerializer = ska::bytecode::TreeSymbolTableSerializer{};
-
-	symbolTableSerializer.serialize(gen.program().symbols());
+	auto symbolTableSerializer = ska::bytecode::SymbolTableSerializer{ *data.storage };
+	std::stringstream ss;
+	std::unordered_map<std::string, std::size_t> natives;
+	symbolTableSerializer.writeFull(gen.id(), natives, ss);
 }
-
 
 TEST_CASE("[BytecodeTreeSymbolTableSerializer] 3 levels test") {
 	auto [script, data] = Serialize(
@@ -39,8 +39,9 @@ TEST_CASE("[BytecodeTreeSymbolTableSerializer] 3 levels test") {
 		"toutou = 5\n"
 	);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
-	auto symbolTableSerializer = ska::bytecode::TreeSymbolTableSerializer{};
-
-	symbolTableSerializer.serialize(gen.program().symbols());
+	auto symbolTableSerializer = ska::bytecode::SymbolTableSerializer{ *data.storage };
+	std::stringstream ss;
+	std::unordered_map<std::string, std::size_t> natives;
+	symbolTableSerializer.writeFull(gen.id(), natives, ss);
 }
 

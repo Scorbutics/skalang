@@ -18,12 +18,7 @@ namespace ska {
 		friend class SymbolFactory;
 		Symbol() = default;
 
-		Symbol(std::size_t tableIndex, std::string name, SymbolFieldResolver fields) :
-			m_master(this),
-			m_name(std::move(name)),
-			m_data(std::move(fields)),
-			m_tableIndex(tableIndex) {
-		}
+		Symbol(std::size_t tableIndex, std::string name, SymbolFieldResolver fields);
 
 	public:
 		Symbol(const Symbol& s);

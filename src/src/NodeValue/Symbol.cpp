@@ -6,6 +6,13 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Symbol)
 
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::Symbol)
 
+ska::Symbol::Symbol(std::size_t tableIndex, std::string name, SymbolFieldResolver fields) :
+	m_master(this),
+	m_name(std::move(name)),
+	m_data(std::move(fields)),
+	m_tableIndex(tableIndex) {
+}
+
 template <class Return, class Data, class Master>
 static Return Lookup(Data& data, Master* master, const std::string& fieldSymbolName) {
 	auto* table = data.lookup();

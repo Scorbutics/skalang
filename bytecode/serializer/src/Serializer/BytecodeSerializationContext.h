@@ -10,33 +10,23 @@
 #include "BytecodeSerializationStrategy.h"
 #include "BytecodeChunk.h"
 #include "Generator/Value/BytecodeScriptCache.h"
+#include "BytecodeSymbolTableSerializer.h"
 
 namespace ska {
 	namespace bytecode {
 
 		struct SerializationContext {
-			SerializationContext(const ScriptCache& cache, SerializationStrategy strategy) :
-				m_strategy(std::move(strategy)),
-				m_cache(cache),
-				m_output(&m_strategy(cache[m_id].name())) {
-			}
+			using NativesContainer = std::unordered_map<std::string, std::size_t>;
+			SerializationContext(const ScriptCache& cache, SerializationStrategy strategy);
 
-			bool next(std::deque<std::size_t> partIndexes) {
-				partIndexes.push_front(pushNatives());
-				commit(std::move(partIndexes));
-				m_id++;
-				if (m_cache.exist(m_id)) {
-					m_output = &m_strategy(m_cache[m_id].name());
-					return true;
-				}
-				return false;
-			}
+			bool next(std::deque<std::size_t> partIndexes);
 
 			bool currentScriptBridged() const { return m_cache[m_id].program().isBridged(); }
 
 			std::size_t writeHeader(std::size_t serializerVersion);
 			std::pair<std::size_t, std::vector<std::string>> writeInstructions();
 			std::size_t writeExports();
+			std::size_t writeSymbolTable();
 			std::size_t writeExternalReferences(std::vector<std::string> linkedScripts);
 
 		private:
@@ -61,18 +51,14 @@ namespace ska {
 			void operator<<(std::string value);
 			void operator<<(const Instruction& value);
 			void operator<<(const Operand& value);
-			void operator<<(const Symbol* value);
-			void operator<<(const Type value);
-
-			Operand extractGeneratedOperandFromSymbol(const Symbol& symbol);
 
 			const ScriptCache& m_cache;
 			std::size_t m_id = 0;
 			SerializationStrategy m_strategy;
-			std::unordered_map<std::string, std::size_t> m_natives;
+			NativesContainer m_natives;
 			std::vector<std::stringstream> m_buffer;
-			std::unordered_set<const Symbol*> m_symbols;
 			std::ostream* m_output = nullptr;
+			SymbolTableSerializer m_symbolsSerializer;
 		};
 
 	}

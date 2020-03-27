@@ -25,8 +25,10 @@ bool ska::bytecode::Serializer::serialize(SerializationContext& context) const {
 			if (!context.currentScriptBridged()) {
 				auto [instructionIndex, linkedScripts] = context.writeInstructions();
 				auto exportIndex = context.writeExports();
+				auto symbolTableIndex = context.writeSymbolTable();
 				partIndexes.push_back(context.writeExternalReferences(std::move(linkedScripts)));
 				partIndexes.push_back(instructionIndex);
+				partIndexes.push_back(symbolTableIndex);
 				partIndexes.push_back(exportIndex);
 			}
 			

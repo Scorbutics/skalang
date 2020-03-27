@@ -100,10 +100,12 @@ TEST_CASE("Matching") {
 		}
 	
 		SUBCASE("function declared in another function with upper variable") {
+			//TODO étoffer
 			ASTFromInput(scriptCache, "func67 = function(testParam67:int) do toutou67 = function(blurp:string) do testParam67 = 123\n end\n testParam67 = 78\n end\n", data);
 		}
 
 		SUBCASE("shadowing variable into inner function") {
+			//TODO étoffer
 			ASTFromInput(scriptCache, "test71 = 3\n func71 = function(test71:string) do test71\n end\n", data);
 		}
 	
