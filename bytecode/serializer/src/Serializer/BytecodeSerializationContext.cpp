@@ -1,9 +1,10 @@
-#include "Config/LoggerConfigLang.h"
+#include "Serializer/Config/LoggerSerializer.h"
 #include "BytecodeSerializationContext.h"
 #include "BytecodeCommonSerializer.h"
 #include "BytecodeOperandSerializer.h"
+#include "Runtime/Value/SerializerOutput.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::SerializationContext);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::SerializationContext);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::SerializationContext)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::SerializationContext)
@@ -29,17 +30,20 @@ bool ska::bytecode::SerializationContext::next(std::deque<std::size_t> partIndex
 std::size_t ska::bytecode::SerializationContext::writeHeader(std::size_t serializerVersion) {
 	push();
 	LOG_DEBUG << "Serializing script " << currentScriptName() << " with compiled id " << currentScriptId();
-	(*this) << serializerVersion;
-	(*this) << currentScriptName();
-	(*this) << currentScriptId();
-	(*this) << static_cast<std::size_t>(currentScriptBridged());
+	auto output = SerializerOutput{ {buffer(), m_natives} };
+	output.acquireMemory<sizeof(uint32_t)>("script serializer version").write(serializerVersion);
+	output.acquireMemory<sizeof(Chunk)>("script name").write(currentScriptName());
+	output.acquireMemory<sizeof(uint32_t)>("script compile id").write(currentScriptId());
+	output.acquireMemory<sizeof(uint32_t)>("is script bridged").write(static_cast<std::size_t>(currentScriptBridged()));
+	output.validate();
 	return m_buffer.size() - 1;
 }
 
 std::pair<std::size_t, std::vector<std::string>> ska::bytecode::SerializationContext::writeInstructions() {
 	push();
 	auto linkedScripts = std::vector<std::string>{};
-	(*this) << instructionsSize();
+	auto output = SerializerOutput{ {buffer(), m_natives} };
+	output.acquireMemory<sizeof(uint32_t)>("instructions size").write(instructionsSize());
 	for (const Instruction& instruction : (*this)) {
 		LOG_DEBUG << "Serializing " << instruction;
 		(*this) << instruction;
@@ -53,17 +57,19 @@ std::pair<std::size_t, std::vector<std::string>> ska::bytecode::SerializationCon
 
 std::size_t ska::bytecode::SerializationContext::writeExternalReferences(std::vector<std::string> linkedScripts) {
 	push();
-	(*this) << linkedScripts.size();
+	auto output = SerializerOutput{ SerializerOutputData{ buffer(), m_natives } };
+	output.acquireMemory<sizeof(uint32_t)>("linkedScripts (size)").write(linkedScripts.size());
 	for (const auto& linkedScript : linkedScripts) {
 		LOG_INFO << linkedScript;
-		(*this) << linkedScript;
+		output.acquireMemory<sizeof(Chunk)>("linkedScript name").write(linkedScript);
 	}
+	output.validate();
 	return m_buffer.size() - 1;
 }
 
 std::size_t ska::bytecode::SerializationContext::writeSymbolTable() {
 	push();
-	m_symbolsSerializer.writeFull(m_id, m_natives, buffer());
+	m_symbolsSerializer.writeFull(SerializerOutput{ {buffer(), m_natives} }, m_id);
 	return m_buffer.size() - 1;
 }
 
@@ -71,25 +77,18 @@ std::size_t ska::bytecode::SerializationContext::writeExports() {
 	push();
 	auto& exports = m_cache[m_id].exportedSymbols();
 	LOG_INFO << "Export serializing : " << exports.size();
-	(*this) << exports.size();
+	auto output = SerializerOutput{ {buffer(), m_natives} };
+	output.acquireMemory<sizeof(uint32_t)>("exports size").write(exports.size());
 	for (const auto& exp : exports) {
 		if (!exp.value.empty()) {
-			m_symbolsSerializer.writeIfExists(buffer(), m_natives, exp.symbol);
+			assert(exp.symbol != nullptr);
+			LOG_INFO << "Writing export " << exp.value << " with symbol " << exp.symbol->type();
+			m_symbolsSerializer.writeIfExists(output, exp.symbol);
 			(*this) << exp.value;
 		}
 	}
+	output.validate();
 	return m_buffer.size() - 1;
-}
-
-void ska::bytecode::SerializationContext::operator<<(std::size_t value) {
-	CommonSerializer::write(buffer(), value);
-}
-
-void ska::bytecode::SerializationContext::operator<<(std::string value) {
-	m_natives.emplace(value, m_natives.size());
-	auto refIndex = m_natives.at(value);
-	LOG_DEBUG << "Writing native index " << refIndex << " for value " << value;
-	buffer().write(reinterpret_cast<const char*>(&refIndex), sizeof(Chunk));
 }
 
 void ska::bytecode::SerializationContext::operator<<(const Instruction& value) {
@@ -104,7 +103,9 @@ void ska::bytecode::SerializationContext::operator<<(const Instruction& value) {
 }
 
 void ska::bytecode::SerializationContext::operator<<(const Operand& value) {
-	OperandSerializer::write(m_cache, buffer(), m_natives, value);
+	auto output = SerializerOutput{ {buffer(), m_natives} };
+	OperandSerializer::write(m_cache, output.acquireMemory<2 * sizeof(Chunk) + sizeof(uint8_t)>("Operand"), value);
+	output.validate();
 }
 
 void ska::bytecode::SerializationContext::commit(std::deque<std::size_t> partIndexes) {

@@ -1,10 +1,11 @@
+#include "Serializer/Config/LoggerSerializer.h"
 #include "BytecodeSymbolTableSerializer.h"
 #include "BytecodeCommonSerializer.h"
 #include "BytecodeOperandSerializer.h"
 #include "NodeValue/Symbol.h"
 #include "Generator/Value/BytecodeScriptCache.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::SymbolTableSerializer);
+SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::SymbolTableSerializer);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::SymbolTableSerializer)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::SymbolTableSerializer)
@@ -25,47 +26,25 @@ ska::bytecode::TreeSymbolTableMapBuilder& ska::bytecode::SymbolTableSerializer::
 	return m_mapBuilder[id].value();
 }
 
-void ska::bytecode::SymbolTableSerializer::writeFull(std::size_t id, std::unordered_map<std::string, std::size_t>& natives, std::stringstream& buffer) {
-	getMapBuilder(id).write(buffer, natives, *this);
+void ska::bytecode::SymbolTableSerializer::writeFull(SerializerOutput output, std::size_t id) {
+	getMapBuilder(id).write(output, *this);
+	output.validate();
 }
 
-void ska::bytecode::SymbolTableSerializer::writeFull(std::stringstream& buffer, std::unordered_map<std::string, std::size_t>& natives, const TreeSymbolTableMapBuilder::ReverseIndexSymbolMap& reversedMap) {
+void ska::bytecode::SymbolTableSerializer::writeFull(SerializerOutput& output, const TreeSymbolTableMapBuilder::ReverseIndexSymbolMap& reversedMap) {
 	for (const auto& [key, symbol] : reversedMap) {
-		writeIfExists(buffer, natives, symbol);
+		LOG_INFO << "Writing symbol \"" << symbol->name() << "\"";
+		writeIfExists(output, symbol);
 	}
 }
 
-void ska::bytecode::SymbolTableSerializer::writeIfExists(std::stringstream& buffer, std::unordered_map<std::string, std::size_t>& natives, const Symbol* value) {
+void ska::bytecode::SymbolTableSerializer::writeIfExists(SerializerOutput& output, const Symbol* value) {
 	if (value == nullptr) {
 		throw std::runtime_error("cannot serialize a null symbol");
 	}
 
-	auto [scriptId, operand] = extractGeneratedOperandFromSymbol(*value);
-	LOG_INFO << "%13cName : " << value->name();
-	LOG_INFO << "%13c\twith Raw operand " << operand;
-	LOG_INFO << "%13c\twith " << value->type().size() << " children";
-	LOG_INFO << "%13c\twith Raw type : " << ExpressionTypeSTR[static_cast<std::size_t>(value->type().type())];
-	
-	OperandSerializer::write(*m_cache, buffer, natives, operand);
-
-	if (m_mapBuilder.size() <= scriptId) {
-		throw std::runtime_error("bad script id : \"" + std::to_string(scriptId) + "\" id is not already known by map builder");
-	}
-
-	auto absoluteScriptKey = getAbsoluteScriptKey(scriptId, *value);
-
-	// TODO call write for symbol type ?
-
-	/*
-		TODO write symbol data
-
-	if (m_symbols.find(value) == m_symbols.end()) {
-		m_symbols.insert(value);
-		*this << value->type();
-	} else {
-		LOG_DEBUG << "Symbol \"" << value->name() << "\" already registered, linked";
-	}
-	*/
+	value->type().serialize(output, *this, false);
+	writeSymbolRefAndParents(output.acquireMemory<2 * sizeof(Chunk)>("symbol ref & parent"), *value);
 }
 
 std::pair<std::size_t, ska::bytecode::Operand> ska::bytecode::SymbolTableSerializer::extractGeneratedOperandFromSymbol(const Symbol& symbol) {
@@ -91,37 +70,65 @@ std::string ska::bytecode::SymbolTableSerializer::getAbsoluteScriptKey(std::size
 		throw std::runtime_error(ss.str());
 	}
 
-	return std::to_string(scriptId) + "." + relativeScriptKey;
+	auto result = std::to_string(scriptId) + "." + relativeScriptKey;
+	LOG_DEBUG << "Getting symbol \"" << value.name() << "\" absolute script key \"" << result << "\"";
+
+	return result;
 }
 
-void ska::bytecode::SymbolTableSerializer::write(std::stringstream& buffer, std::unordered_map<std::string, std::size_t>& natives, const Type value) {
-	auto rawType = value.type();
-	buffer.write(reinterpret_cast<const char*>(&rawType), sizeof(uint8_t));
+void ska::bytecode::SymbolTableSerializer::writeTypeAndSymbolOneLevel(SerializerSafeZone<sizeof(uint32_t) + sizeof(uint8_t) + 2 * sizeof(Chunk)> output, const Symbol* symbol, const Type& type) {
+	auto rawType = type.type();
+	output.acquireMemory<sizeof(uint8_t)>("raw").write(static_cast<uint8_t>(rawType));
 
-	LOG_INFO << "Type \"" << value << "\" is being serialized with " << value.size() << " compound types";
+	LOG_INFO << "Type \"" << type << "\" is being serialized with " << type.size() << " compound types";
 
-	auto index = std::size_t{ 0 };
-	for (auto& childType : value) {
-		auto operand = Operand{};
+	if (symbol != nullptr) {
+		writeSymbolRefAndParents(output.acquireMemory<2 * sizeof(Chunk)>("Symbol ref & parent"), *symbol);
+	} else {
+		CommonSerializer::writeNullChunk<2>(output.acquireMemory<2 * sizeof(Chunk)>("no symbol ref & parent"));
+	}
+
+	output.acquireMemory<sizeof(uint32_t)>("type children").write(static_cast<uint32_t>(type.size()));
+}
+
+void ska::bytecode::SymbolTableSerializer::write(SerializerOutput& output, const Symbol* symbol, const Type& type) {
+	writeTypeAndSymbolOneLevel(output.acquireMemory<sizeof(uint8_t) + sizeof(uint32_t) + 2 * sizeof(Chunk)>("type"), symbol, type);
+
+	for (auto& childType : type) {
 		LOG_INFO << "\t\tChild type " << childType;
-		/*if (childType.hasSymbol()) {
-			operand = extractGeneratedOperandFromSymbol(*childType.symbol());
-		}
-		LOG_INFO << "%13cChild " << index << "\t\twith name "<< (childType.symbol() ? childType.symbol()->name() : "");*/
-		LOG_INFO << "%13c\t\twith Raw operand " << operand;
-		LOG_INFO << "%13c\t\twith " << childType.size() << " children";
 		LOG_INFO << "%13c\t\twith Raw type : " << ExpressionTypeSTR[static_cast<std::size_t>(childType.type())];
-		
-		CommonSerializer::write(buffer, static_cast<std::size_t>(childType.type()));
-		CommonSerializer::write(buffer, childType.size());
-		OperandSerializer::write(*m_cache, buffer, natives, operand);
-		
-		// TODO rethink about writing a type
+		LOG_INFO << "%13c\t\twith " << childType.size() << " children";
 
-		// TODO reccursive ?
-		//*this << childType;
+		// Recursive call into this function is done inside Type::serialize
+		childType.serialize(output, *this, true);
+	}
+}
 
-		index++;
+void ska::bytecode::SymbolTableSerializer::writeSymbolRefBody(SerializerSafeZone<sizeof(Chunk)> output, const Symbol& value) {
+	auto [scriptId, operand] = extractGeneratedOperandFromSymbol(value);
+	
+	//LOG_INFO << "%13c\twith Raw operand " << operand;
+	//LOG_INFO << "%13c\twith " << value.size() << " children";
+
+	// Operand (???)
+	// OperandSerializer::write(*m_cache, buffer, natives, operand);
+
+	auto absoluteScriptKey = getAbsoluteScriptKey(scriptId, value);
+
+	LOG_INFO << "%13cSymbol Name refered : " << value.name() << " with key : " << absoluteScriptKey;
+
+	output.write(std::move(absoluteScriptKey));
+}
+
+
+void ska::bytecode::SymbolTableSerializer::writeSymbolRefAndParents(SerializerSafeZone<2 * sizeof(Chunk)> output, const Symbol& value) {
+	writeSymbolRefBody(output.acquireMemory<sizeof(Chunk)>("Symbol ref"), value);
+
+	if (&value == value.master()) {
+		CommonSerializer::writeNullChunk<1>(output.acquireMemory<sizeof(Chunk)>("null"));
+	} else {
+		LOG_INFO << "%13c\twith master : " << value.master()->name();
+		writeSymbolRefBody(output.acquireMemory<sizeof(Chunk)>("parent"), *value.master());
 	}
 }
 

@@ -4,6 +4,9 @@
 #include "Type.h"
 #include "Service/SymbolTable.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
+#include "Runtime/Service/ScriptTypeSerializer.h"
+
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Type)
 
 ska::Type ska::Type::crossTypes(const TypeCrosser& crosser, std::string op, const Type& type2) const {
 	return crosser.cross(op, *this, type2);
@@ -54,5 +57,9 @@ std::ostream& ska::operator<<(std::ostream& stream, const ska::Type& type) {
 	}
 
 	return stream;
+}
+
+void ska::Type::serialize(SerializerOutput& output, ScriptTypeSerializer& serializer, bool writeSymbol) const {
+	serializer.write(output, writeSymbol ? m_symbol : nullptr, *this);
 }
 

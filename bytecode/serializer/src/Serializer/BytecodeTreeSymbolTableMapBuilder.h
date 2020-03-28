@@ -1,15 +1,16 @@
 #pragma once
-#include <unordered_map>
 #include <map>
+#include <unordered_map>
 #include <sstream>
 
 namespace ska {
 	class SymbolTable;
 	class Symbol;
 	class ScopedSymbolTable;
-
+	struct SerializerOutput;
+	
 	namespace bytecode {
-		class SymbolTableSerializer;
+		class SymbolTableSerializer;	
 
 		class TreeSymbolTableMapBuilder {
 			using IndexSymbolMap = std::unordered_map<const Symbol*, std::string>;
@@ -19,7 +20,7 @@ namespace ska {
 			~TreeSymbolTableMapBuilder() = default;
 
 			std::string TreeSymbolTableMapBuilder::key(const Symbol& symbol) const;
-			void write(std::stringstream& buffer, std::unordered_map<std::string, std::size_t>& natives, SymbolTableSerializer& serializer) const;
+			void write(SerializerOutput& output, SymbolTableSerializer& serializer) const;
 
 		private:
 			void store(const SymbolTable& table, const std::string& defaultDepth);

@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "TypeCrossExpression.h"
 
 namespace ska {

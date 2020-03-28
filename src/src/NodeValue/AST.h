@@ -7,7 +7,6 @@
 #include "ASTNodePtr.h"
 #include "Operator.h"
 #include "ExpressionType.h"
-#include "SymbolTypeAccess.h"
 #include "Service/TypeBuilder/TypeBuildersContainer.h"
 #include "Type.h"
 

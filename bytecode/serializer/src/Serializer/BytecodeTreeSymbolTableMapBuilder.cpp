@@ -1,4 +1,5 @@
 #include "BytecodeTreeSymbolTableMapBuilder.h"
+#include "Runtime/Value/SerializerOutput.h"
 #include "BytecodeSymbolTableSerializer.h"
 #include "Service/SymbolTable.h"
 
@@ -59,6 +60,6 @@ std::string ska::bytecode::TreeSymbolTableMapBuilder::key(const Symbol& symbol) 
 	return symbolSeekIt == m_symbols.end() ? "" : symbolSeekIt->second;
 }
 
-void ska::bytecode::TreeSymbolTableMapBuilder::write(std::stringstream& buffer, std::unordered_map<std::string, std::size_t>& natives, SymbolTableSerializer& serializer) const {
-	serializer.writeFull(buffer, natives, m_symbolsReversed);
+void ska::bytecode::TreeSymbolTableMapBuilder::write(SerializerOutput& output, SymbolTableSerializer& serializer) const {
+	serializer.writeFull(output, m_symbolsReversed);
 }

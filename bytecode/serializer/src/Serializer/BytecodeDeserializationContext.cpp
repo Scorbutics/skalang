@@ -1,10 +1,10 @@
-#include "Config/LoggerConfigLang.h"
+#include "Serializer/Config/LoggerSerializer.h"
 #include "BytecodeDeserializationContext.h"
 #include "BytecodeScriptExternalReferences.h"
 #include "BytecodeScriptHeader.h"
 #include "BytecodeScriptBody.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::DeserializationContext);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::DeserializationContext);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::DeserializationContext)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::DeserializationContext)
@@ -126,9 +126,11 @@ std::vector<ska::bytecode::ExportSymbol> ska::bytecode::DeserializationContext::
 	auto exports = std::vector<ExportSymbol>(exportsSize);
 	for(std::size_t i = 0; i < exportsSize; i++) {
 		//TODO symbol
+		
+		assert(exports[i].symbol != nullptr);
 		//m_cache[0].program().symbols();
 		(*this) >> exports[i].value;
-		LOG_INFO << "Getting export " << exports[i];
+		LOG_INFO << "Getting export " << exports[i].value << " with symbol " << exports[i].symbol->type();
 	};
 	return exports;
 }

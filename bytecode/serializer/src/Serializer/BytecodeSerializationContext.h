@@ -47,8 +47,6 @@ namespace ska {
 			auto begin() const { return m_cache[m_id].begin(); }
 			auto end() const { return m_cache[m_id].end(); }
 
-			void operator<<(std::size_t value);
-			void operator<<(std::string value);
 			void operator<<(const Instruction& value);
 			void operator<<(const Operand& value);
 

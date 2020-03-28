@@ -6,13 +6,19 @@
 #include "BytecodeTreeSymbolTableMapBuilder.h"
 
 #include "Generator/Value/BytecodeOperand.h"
+#include "Runtime/Service/ScriptTypeSerializer.h"
+#include "Runtime/Value/SerializerOutput.h"
+#include "Serializer/BytecodeChunk.h"
 
 namespace ska {
 	class Symbol;
+	struct SerializerOutput;
+
 	namespace bytecode {
 		class ScriptCache;
 
-		class SymbolTableSerializer {
+		class SymbolTableSerializer :
+			public ScriptTypeSerializer {
 		public:
 			SymbolTableSerializer(const ScriptCache& cache);
 			SymbolTableSerializer(SymbolTableSerializer&&) = delete;
@@ -21,13 +27,18 @@ namespace ska {
 			SymbolTableSerializer& operator=(const SymbolTableSerializer&) = delete;
 			~SymbolTableSerializer() = default;
 
-			void writeIfExists(std::stringstream& buffer, std::unordered_map<std::string, std::size_t>& natives, const Symbol* value);
-			void writeFull(std::size_t id, std::unordered_map<std::string, std::size_t>& natives, std::stringstream& buffer);
-			void writeFull(std::stringstream& buffer, std::unordered_map<std::string, std::size_t>& natives, const TreeSymbolTableMapBuilder::ReverseIndexSymbolMap& reversedMap);
+			void writeIfExists(SerializerOutput& output, const Symbol* value);
+			void writeFull(SerializerOutput output, std::size_t id);
+			void writeFull(SerializerOutput& output, const TreeSymbolTableMapBuilder::ReverseIndexSymbolMap& reversedMap);
+
+			void write(SerializerOutput& output, const Symbol* value, const Type& type) override;			
 		private:
 			TreeSymbolTableMapBuilder& getMapBuilder(std::size_t id);
 			std::string getAbsoluteScriptKey(std::size_t scriptId, const Symbol& value);
-			void write(std::stringstream& buffer, std::unordered_map<std::string, std::size_t>& natives, const Type value);
+
+			void writeSymbolRefAndParents(SerializerSafeZone<2 * sizeof(Chunk)> output, const Symbol& value);
+			void writeSymbolRefBody(SerializerSafeZone<sizeof(Chunk)> output, const Symbol& value);
+			void writeTypeAndSymbolOneLevel(SerializerSafeZone<sizeof(uint32_t) + sizeof(uint8_t) + 2 * sizeof(Chunk)> output, const Symbol* symbol, const Type& type);
 
 			std::pair<std::size_t, Operand> extractGeneratedOperandFromSymbol(const Symbol& symbol);
 

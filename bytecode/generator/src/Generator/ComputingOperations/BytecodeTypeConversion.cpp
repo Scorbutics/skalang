@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include <array>
 #include "NodeValue/AST.h"
 #include "BytecodeTypeConversion.h"

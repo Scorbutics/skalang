@@ -3,6 +3,8 @@
 #include <sstream>
 #include <string>
 #include <unordered_map>
+#include "Runtime/Value/SerializerOutput.h"
+#include "Serializer/BytecodeChunk.h"
 
 namespace ska {
 	namespace bytecode {
@@ -13,7 +15,7 @@ namespace ska {
 			OperandSerializer() = default;
 			~OperandSerializer() = default;
 
-			static void write(const ScriptCache& cache, std::stringstream& buffer, std::unordered_map<std::string, std::size_t>& natives, const Operand& value);
+			static void write(const ScriptCache& cache, SerializerSafeZone<sizeof(uint8_t) + sizeof(Chunk) * 2> output, const Operand& value);
 
 		private:
 			static const std::string scriptName(const ScriptCache& cache, std::size_t id);

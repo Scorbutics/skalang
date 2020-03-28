@@ -59,5 +59,5 @@ bool ska::bytecode::operator==(const ScriptGeneration& left, const ScriptGenerat
 }
 
 bool ska::bytecode::operator!=(const ScriptGeneration& left, const ScriptGeneration& right) {
-	return operator!=(left, right);
+	return !operator==(left, right);
 }

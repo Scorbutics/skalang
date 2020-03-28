@@ -1,4 +1,4 @@
-#include "Config/LoggerConfigLang.h"
+#include "Serializer/Config/LoggerSerializer.h"
 #include <unordered_set>
 #include "BytecodeSerializer.h"
 #include "BytecodeSerializationContext.h"
@@ -10,7 +10,7 @@
 
 static constexpr std::size_t SERIALIZER_VERSION = 1;
 
-SKA_LOGC_CONFIG(ska::LogLevel::Error , ska::bytecode::Serializer);
+SKA_LOGC_CONFIG(ska::LogLevel::Error, ska::bytecode::Serializer);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Serializer)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Serializer)

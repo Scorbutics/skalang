@@ -2,16 +2,15 @@
 #include <unordered_map>
 #include <vector>
 #include <sstream>
-#include "Config/LoggerConfigLang.h"
+#include <cassert>
 #include "ExpressionType.h"
-#include "SymbolTypeAccess.h"
-
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Type)
 
 namespace ska {
 	class Symbol;
 	class SymbolTable;
 	class TypeCrosser;
+	class SerializerOutput;
+	class ScriptTypeSerializer;
 
 	struct Type {
 		static constexpr bool isNamed(ExpressionType type) {
@@ -65,7 +64,6 @@ namespace ska {
 			t.m_symbol = symbol;
 			return t;
 		}
-
 
 		Type() = default;
 		Type(Type&& t) noexcept = default;
@@ -123,11 +121,9 @@ namespace ska {
 		auto begin() { return m_compound.begin(); }
 		auto end() { return m_compound.end(); }
 
-		//bool hasSymbol(const Type* otherType) const {
-		//	return otherType == nullptr ? m_symbol == nullptr : m_symbol == otherType->m_symbol;
-		//}
-
 		bool tryChangeSymbol(const Type& type);
+
+		void serialize(SerializerOutput& output, ScriptTypeSerializer& serializer, bool writeSymbol) const;
 
 	private:
 		friend class TypeCrosser;
