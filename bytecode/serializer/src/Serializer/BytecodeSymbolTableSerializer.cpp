@@ -28,7 +28,7 @@ ska::bytecode::TreeSymbolTableMapBuilder& ska::bytecode::SymbolTableSerializer::
 
 void ska::bytecode::SymbolTableSerializer::writeFull(SerializerOutput output, std::size_t id) {
 	getMapBuilder(id).write(output, *this);
-	output.validate();
+	output.validateOrThrow();
 }
 
 void ska::bytecode::SymbolTableSerializer::writeFull(SerializerOutput& output, const TreeSymbolTableMapBuilder::ReverseIndexSymbolMap& reversedMap) {

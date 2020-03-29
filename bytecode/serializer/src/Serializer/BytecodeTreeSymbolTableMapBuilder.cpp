@@ -1,5 +1,5 @@
 #include "BytecodeTreeSymbolTableMapBuilder.h"
-#include "Runtime/Value/SerializerOutput.h"
+#include "Base/Serialization/SerializerOutput.h"
 #include "BytecodeSymbolTableSerializer.h"
 #include "Service/SymbolTable.h"
 

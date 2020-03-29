@@ -7,7 +7,7 @@ namespace ska {
 	class SymbolTable;
 	class Symbol;
 	class ScopedSymbolTable;
-	struct SerializerOutput;
+	class SerializerOutput;
 	
 	namespace bytecode {
 		class SymbolTableSerializer;	

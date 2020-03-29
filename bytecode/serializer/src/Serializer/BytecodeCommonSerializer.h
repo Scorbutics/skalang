@@ -3,7 +3,7 @@
 #include <cstddef>
 #include <unordered_map>
 #include "Serializer/BytecodeChunk.h"
-#include "Runtime/Value/SerializerOutput.h"
+#include "Base/Serialization/SerializerOutput.h"
 
 namespace ska {
 	namespace bytecode {

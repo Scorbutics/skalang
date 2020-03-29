@@ -7,12 +7,12 @@
 
 #include "Generator/Value/BytecodeOperand.h"
 #include "Runtime/Service/ScriptTypeSerializer.h"
-#include "Runtime/Value/SerializerOutput.h"
+#include "Base/Serialization/SerializerSafeZone.h"
 #include "Serializer/BytecodeChunk.h"
 
 namespace ska {
 	class Symbol;
-	struct SerializerOutput;
+	class SerializerOutput;
 
 	namespace bytecode {
 		class ScriptCache;

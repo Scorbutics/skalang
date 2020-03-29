@@ -5,7 +5,7 @@
 
 #include "BytecodeSerializerTest.h"
 #include "Serializer/BytecodeSymbolTableSerializer.h"
-#include "Runtime/Value/SerializerOutput.h"
+#include "Base/Serialization/SerializerOutput.h"
 
 static std::unordered_map<std::string, std::stringstream> SerializingStreams = {};
 

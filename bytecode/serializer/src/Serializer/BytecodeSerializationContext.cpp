@@ -2,7 +2,7 @@
 #include "BytecodeSerializationContext.h"
 #include "BytecodeCommonSerializer.h"
 #include "BytecodeOperandSerializer.h"
-#include "Runtime/Value/SerializerOutput.h"
+#include "Base/Serialization/SerializerOutput.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::SerializationContext);
 
@@ -35,7 +35,7 @@ std::size_t ska::bytecode::SerializationContext::writeHeader(std::size_t seriali
 	output.acquireMemory<sizeof(Chunk)>("script name").write(currentScriptName());
 	output.acquireMemory<sizeof(uint32_t)>("script compile id").write(currentScriptId());
 	output.acquireMemory<sizeof(uint32_t)>("is script bridged").write(static_cast<std::size_t>(currentScriptBridged()));
-	output.validate();
+	output.validateOrThrow();
 	return m_buffer.size() - 1;
 }
 
@@ -63,7 +63,7 @@ std::size_t ska::bytecode::SerializationContext::writeExternalReferences(std::ve
 		LOG_INFO << linkedScript;
 		output.acquireMemory<sizeof(Chunk)>("linkedScript name").write(linkedScript);
 	}
-	output.validate();
+	output.validateOrThrow();
 	return m_buffer.size() - 1;
 }
 
@@ -87,7 +87,7 @@ std::size_t ska::bytecode::SerializationContext::writeExports() {
 			(*this) << exp.value;
 		}
 	}
-	output.validate();
+	output.validateOrThrow();
 	return m_buffer.size() - 1;
 }
 
@@ -105,7 +105,7 @@ void ska::bytecode::SerializationContext::operator<<(const Instruction& value) {
 void ska::bytecode::SerializationContext::operator<<(const Operand& value) {
 	auto output = SerializerOutput{ {buffer(), m_natives} };
 	OperandSerializer::write(m_cache, output.acquireMemory<2 * sizeof(Chunk) + sizeof(uint8_t)>("Operand"), value);
-	output.validate();
+	output.validateOrThrow();
 }
 
 void ska::bytecode::SerializationContext::commit(std::deque<std::size_t> partIndexes) {
