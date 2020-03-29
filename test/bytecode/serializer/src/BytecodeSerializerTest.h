@@ -19,8 +19,6 @@ static auto readerI = std::unique_ptr<ska::ScriptAST>{};
 static auto typeCrosserI = ska::TypeCrosser{};
 
 struct BytecodeSerializerTest;
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, BytecodeSerializerTest);
-#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, BytecodeSerializerTest)
 
 static void ASTFromInputBytecodeSerializerNoParse(const std::string& input, BytecodeSerializerDataTestContainer& data) {
   tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);

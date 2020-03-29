@@ -53,7 +53,7 @@ namespace ska {
 			const ScriptCache& m_cache;
 			std::size_t m_id = 0;
 			SerializationStrategy m_strategy;
-			NativesContainer m_natives;
+			order_indexed_string_map<std::string> m_natives;
 			std::vector<std::stringstream> m_buffer;
 			std::ostream* m_output = nullptr;
 			SymbolTableSerializer m_symbolsSerializer;

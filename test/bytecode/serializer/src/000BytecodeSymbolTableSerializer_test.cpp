@@ -22,7 +22,7 @@ TEST_CASE("[BytecodeSymbolTableSerializer] 2 scopes levels test") {
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto symbolTableSerializer = ska::bytecode::SymbolTableSerializer{ *data.storage };
 	std::stringstream ss;
-	std::unordered_map<std::string, std::size_t> natives;
+	ska::order_indexed_string_map<std::string> natives;
 	auto output = ska::SerializerOutput{ {ss, natives} };
 	symbolTableSerializer.writeFull(std::move(output), gen.id());
 }
@@ -43,7 +43,7 @@ TEST_CASE("[BytecodeSymbolTableSerializer] 3 scopes levels test") {
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto symbolTableSerializer = ska::bytecode::SymbolTableSerializer{ *data.storage };
 	std::stringstream ss;
-	std::unordered_map<std::string, std::size_t> natives;
+	ska::order_indexed_string_map<std::string> natives;
 	auto output = ska::SerializerOutput{ {ss, natives} };
 	symbolTableSerializer.writeFull(std::move(output), gen.id());
 }
@@ -63,7 +63,7 @@ TEST_CASE("[BytecodeSymbolTableSerializer] function var factory test") {
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto symbolTableSerializer = ska::bytecode::SymbolTableSerializer{ *data.storage };
 	std::stringstream ss;
-	std::unordered_map<std::string, std::size_t> natives;
+	ska::order_indexed_string_map<std::string> natives;
 	auto output = ska::SerializerOutput{ {ss, natives} };
 	symbolTableSerializer.writeFull(std::move(output), gen.id());
 }

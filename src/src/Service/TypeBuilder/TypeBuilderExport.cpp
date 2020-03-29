@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include <fstream>
 #include "TypeBuilderExport.h"
 

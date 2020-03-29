@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <iterator>
 #include <vector>
-#include "Service/IsSmartPtr.h"
+#include "Base/Meta/IsSmartPtr.h"
 namespace ska {
 
   template <template <class T> class Container, class Key, class Value>

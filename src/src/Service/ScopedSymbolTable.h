@@ -2,7 +2,7 @@
 #include <unordered_map>
 #include <memory>
 #include "NodeValue/Symbol.h"
-#include "Container/order_indexed_string_map.h"
+#include "Base/Containers/order_indexed_string_map.h"
 #include "SymbolFactory.h"
 
 namespace ska {

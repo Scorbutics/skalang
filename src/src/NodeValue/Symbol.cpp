@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "NodeValue/Symbol.h"
 #include "Service/ScopedSymbolTable.h"
 #include "NodeValue/ScriptAST.h"

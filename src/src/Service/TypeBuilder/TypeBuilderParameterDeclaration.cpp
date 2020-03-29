@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "TypeBuilderParameterDeclaration.h"
 
 #include "NodeValue/ExpressionType.h"

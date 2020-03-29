@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "Serializer/Config/LoggerSerializer.h"
 #include "BytecodeSerializationContext.h"
 #include "BytecodeCommonSerializer.h"
@@ -133,9 +134,10 @@ std::size_t ska::bytecode::SerializationContext::pushNatives() {
 	if (m_natives.size() != 0) {
 		auto nativeVector = std::vector<std::string>(m_natives.size());
 		LOG_DEBUG << "Total of " << nativeVector.size() << " natives";
-		for (auto& [native, index] : m_natives) {
+		for (auto& native : m_natives) {
+			auto index = m_natives.id(*native);
 			LOG_DEBUG << "Building native vector [" << index << "] = " << native;
-			nativeVector[index] = native;
+			nativeVector[index] = *native;
 		}
 
 		const auto totalSize = nativeVector.size();

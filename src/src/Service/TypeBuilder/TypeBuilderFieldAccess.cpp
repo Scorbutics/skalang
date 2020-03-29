@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "TypeBuilderFieldAccess.h"
 
 #include "NodeValue/AST.h"
