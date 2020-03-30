@@ -4,7 +4,7 @@
 #include <tuple>
 
 #include "BytecodeSerializerTest.h"
-#include "Serializer/BytecodeSymbolTableSerializer.h"
+#include "Serializer/Symbol/BytecodeSymbolTableSerializer.h"
 #include "Base/Serialization/SerializerOutput.h"
 
 static std::unordered_map<std::string, std::stringstream> SerializingStreams = {};

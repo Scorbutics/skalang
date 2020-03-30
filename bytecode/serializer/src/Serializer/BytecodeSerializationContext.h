@@ -10,7 +10,7 @@
 #include "BytecodeSerializationStrategy.h"
 #include "BytecodeChunk.h"
 #include "Generator/Value/BytecodeScriptCache.h"
-#include "BytecodeSymbolTableSerializer.h"
+#include "Serializer/Symbol/BytecodeSymbolTableSerializer.h"
 
 namespace ska {
 	namespace bytecode {

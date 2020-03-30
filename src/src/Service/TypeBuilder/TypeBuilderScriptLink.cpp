@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "TypeBuilderScriptLink.h"
 #include "NodeValue/AST.h"
 #include "Service/SymbolTable.h"
