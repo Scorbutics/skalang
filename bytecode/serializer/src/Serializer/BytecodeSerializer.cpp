@@ -88,7 +88,7 @@ std::vector<std::string> ska::bytecode::Serializer::deserialize(DeserializationC
 	return failedScripts;
 }
 
-bool ska::bytecode::Serializer::serialize(const ScriptCache& cache, SerializationStrategy output) const {
+bool ska::bytecode::Serializer::serialize(ScriptCache& cache, SerializationStrategy output) const {
 	auto context = SerializationContext { cache, output };
 	return serialize(context);
 }

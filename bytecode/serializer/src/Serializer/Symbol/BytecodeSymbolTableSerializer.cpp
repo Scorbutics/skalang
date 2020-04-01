@@ -21,7 +21,8 @@ void ska::bytecode::SymbolTableSerializer::writeFull(SerializerOutput output, st
 	output.validateOrThrow();
 }
 
-void ska::bytecode::SymbolTableSerializer::writeFull(SerializerOutput& output, const TreeSymbolTableMapBuilder::ReverseIndexSymbolMap& reversedMap) {
+void ska::bytecode::SymbolTableSerializer::writeFull(SerializerOutput& output, const TreeSymbolTableMapBuilder::ReverseIndexSymbolMapWrite& reversedMap) {
+	output.acquireMemory<sizeof (uint32_t)>("Symbol table : total number of symbols").write(static_cast<uint32_t>(reversedMap.size()));
 	for (const auto& [key, symbol] : reversedMap) {
 		LOG_INFO << "Writing symbol \"" << symbol->name() << "\"";
 		writeIfExists(output, symbol);
@@ -33,11 +34,13 @@ void ska::bytecode::SymbolTableSerializer::writeIfExists(SerializerOutput& outpu
 		throw std::runtime_error("cannot serialize a null symbol");
 	}
 
-	value->type().serialize(output, *this, false);
+	write(output ,value, value->type());
+		//.serialize(output, *this, true);
 	
-	auto symbolSerializer = SerializerType<Symbol, SymbolTableSerializerHelper&>{ output };
-	symbolSerializer.write(*value, m_helper);
+	/*auto symbolSerializer = SerializerType<Symbol*, SymbolTableSerializerHelper&>{ output };
+	symbolSerializer.write(*value, m_helper);*/
 }
+
 
 void ska::bytecode::SymbolTableSerializer::write(SerializerOutput& output, const Symbol* symbol, const Type& type) {
 	auto symbolizedTypeSerializer = SerializerType<CSymbolizedType, SymbolTableSerializerHelper&>{ output };

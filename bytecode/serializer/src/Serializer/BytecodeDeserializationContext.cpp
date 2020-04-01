@@ -3,6 +3,7 @@
 #include "BytecodeScriptExternalReferences.h"
 #include "BytecodeScriptHeader.h"
 #include "BytecodeScriptBody.h"
+#include "Base/Serialization/SerializerOutput.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::DeserializationContext);
 
@@ -31,13 +32,14 @@ void ska::bytecode::DeserializationContext::operator>>(ScriptBody& body) {
 	replaceAllNativesRef(body.instructions, body.natives());
 	body.exports = readExports();
 	replaceAllNativesRef(body.exports, body.natives());
+	readSymbolTable(body.natives());
 }
 
 void ska::bytecode::DeserializationContext::operator>>(ScriptExternalReferences& externalReferences) {
 	externalReferences.scripts = readLinkedScripts(externalReferences.natives());
 }
 
-void ska::bytecode::DeserializationContext::replaceAllNativesRef(Operand& operand, const std::vector<std::string>& natives) const {
+void ska::bytecode::DeserializationContext::replaceAllNativesRef(Operand& operand, const SerializerNativeContainer& natives) const {
 	switch (operand.type()) {
 	case OperandType::MAGIC: {
 		auto realValue = natives[operand.as<ScriptVariableRef>().variable];
@@ -67,13 +69,13 @@ void ska::bytecode::DeserializationContext::replaceAllNativesRef(Operand& operan
 	}
 }
 
-void ska::bytecode::DeserializationContext::replaceAllNativesRef(std::vector<ExportSymbol>& operands, const std::vector<std::string>& natives) const {
+void ska::bytecode::DeserializationContext::replaceAllNativesRef(std::vector<ExportSymbol>& operands, const SerializerNativeContainer& natives) const {
 	for (auto& operand : operands) {
 		replaceAllNativesRef(operand.value, natives);
 	}
 }
 
-void ska::bytecode::DeserializationContext::replaceAllNativesRef(std::vector<Instruction>& instructions, const std::vector<std::string>& natives) const {
+void ska::bytecode::DeserializationContext::replaceAllNativesRef(std::vector<Instruction>& instructions, const SerializerNativeContainer& natives) const {
 	for (auto& instruction : instructions) {
 		replaceAllNativesRef(instruction.dest(), natives);
 		replaceAllNativesRef(instruction.left(), natives);
@@ -97,7 +99,7 @@ std::vector<ska::bytecode::Instruction> ska::bytecode::DeserializationContext::r
 	return instructions;
 }
 
-std::unordered_set<std::string> ska::bytecode::DeserializationContext::readLinkedScripts(const std::vector<std::string>& natives) {
+std::unordered_set<std::string> ska::bytecode::DeserializationContext::readLinkedScripts(const SerializerNativeContainer& natives) {
 	auto linkedScriptsRef = std::unordered_set<std::string>{};
 	auto linkedScriptsRefSize = std::size_t{};
 	(*this) >> linkedScriptsRefSize;
@@ -125,7 +127,7 @@ std::vector<ska::bytecode::ExportSymbol> ska::bytecode::DeserializationContext::
 	}
 	auto exports = std::vector<ExportSymbol>(exportsSize);
 	for(std::size_t i = 0; i < exportsSize; i++) {
-		//TODO symbol
+		//TODO symbol... ????
 		
 		assert(exports[i].symbol != nullptr);
 		//m_cache[0].program().symbols();
@@ -133,6 +135,20 @@ std::vector<ska::bytecode::ExportSymbol> ska::bytecode::DeserializationContext::
 		LOG_INFO << "Getting export " << exports[i].value << " with symbol " << exports[i].symbol->type();
 	};
 	return exports;
+}
+
+void ska::bytecode::DeserializationContext::readSymbolTable(SerializerNativeContainer& natives) {
+	auto ss = std::stringstream{};
+	auto* oldBuf = m_input->rdbuf(ss.rdbuf());
+	try {
+		auto output = SerializerOutput{ { ss, natives} };
+		m_symbolsDeserializer.readFull(output);
+		m_input->rdbuf(oldBuf);
+	} catch (std::exception & e) {
+		m_input->rdbuf(oldBuf);
+		std::cerr << e.what() << std::endl;
+		throw;
+	} 
 }
 
 void ska::bytecode::DeserializationContext::operator>>(std::size_t& value) {
@@ -228,7 +244,7 @@ void ska::bytecode::DeserializationContext::operator>>(Operand& value) {
 	}
 	value = Operand{ std::move(content), operandType };
 }
-void ska::bytecode::DeserializationContext::operator>>(std::vector<std::string>& natives) {
+void ska::bytecode::DeserializationContext::operator>>(SerializerNativeContainer& natives) {
 	checkValidity();
 	if(m_input->eof()){
 		return;
@@ -239,7 +255,8 @@ void ska::bytecode::DeserializationContext::operator>>(std::vector<std::string>&
 	for (std::size_t i = 0; i < nativesSize; i++) {
 		auto native = readString();
 		LOG_INFO << i << "\t: " << native;
-		natives.push_back(std::move(native));		
+		auto cpNative = native;
+		natives.emplace(std::move(native), std::move(cpNative));
 	}
 }
 

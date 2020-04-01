@@ -51,7 +51,8 @@ namespace ska {
 			std::optional<Operand> getSymbol(const Symbol& symbol) const;
 			ScriptGenerationHelper& helper() { return m_origin; }
 
-			ScriptAST program() const { return m_origin.program(); }
+			const ScriptAST program() const { return m_origin.program(); }
+			ScriptAST program() { return m_origin.program(); }
 			bool empty() const { return m_generated.empty(); }
 			std::size_t size() const { return m_generated.size(); }
 			std::size_t id() const { return m_origin.id(); }

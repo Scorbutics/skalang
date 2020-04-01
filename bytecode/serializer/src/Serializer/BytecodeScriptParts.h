@@ -10,7 +10,7 @@ namespace ska {
 		struct ScriptParts {
 			ScriptParts() : body(natives), header(natives), references(natives) {}
 
-			std::vector<std::string> natives;
+			SerializerNativeContainer natives;
 			ScriptHeader header;
 			ScriptBody body;
 			ScriptExternalReferences references;

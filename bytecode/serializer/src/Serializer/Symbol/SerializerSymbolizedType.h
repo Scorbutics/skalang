@@ -4,12 +4,13 @@
 #include "BytecodeSymbolTableSerializerHelper.h"
 #include "NodeValue/Type.h"
 #include "Serializer/BytecodeChunk.h"
-
+#include "SerializerSymbol.h"
 namespace ska {
 	class Symbol;
 
 	namespace bytecode {
 		class SymbolTableSerializerHelper;
+		class SymbolTableDeserializerHelper;
 	}
 
 	struct CSymbolizedType {
@@ -18,20 +19,18 @@ namespace ska {
 	};
 	
 	struct SymbolizedType {
-		Type& type;
+		Type type {};
 		Symbol* symbol = nullptr;
+		std::size_t compoundTypes = 0;
 	};
 	
 	template <>
 	struct SerializerTypeTraits<CSymbolizedType> {
-		static constexpr std::size_t BytesRequired = sizeof(uint8_t) + sizeof(uint32_t) + 2 * sizeof(bytecode::Chunk);
+		static constexpr std::size_t BytesRequired = 2 * sizeof(uint8_t) + sizeof(uint32_t) + SerializerTypeTraits<Symbol*>::BytesRequired;
 		static constexpr const char* Name = "CSymbolizedType";
 
-		static void Read(SerializerSafeZone<BytesRequired>& zone, CSymbolizedType& symbolizedType, bytecode::SymbolTableSerializerHelper&) {}
+		static void Read(SerializerSafeZone<BytesRequired>& zone, CSymbolizedType& symbolizedType, bytecode::SymbolTableDeserializerHelper&) { assert(false); }
 		static void Write(SerializerSafeZone<BytesRequired>& zone, const CSymbolizedType& symbolizedType, bytecode::SymbolTableSerializerHelper&);
-
-	private:
-		static void WriteTypeAndSymbolOneLevel(SerializerSafeZone<BytesRequired>& zone, const CSymbolizedType& symbol, bytecode::SymbolTableSerializerHelper&);
 	};
 	
 	template <>
@@ -39,7 +38,7 @@ namespace ska {
 		static constexpr std::size_t BytesRequired = SerializerTypeTraits<CSymbolizedType>::BytesRequired;
 		static constexpr const char* Name = "SymbolizedType";
 
-		static void Read(SerializerSafeZone<BytesRequired>& zone, SymbolizedType& symbolizedType, bytecode::SymbolTableSerializerHelper&);
-		static void Write(SerializerSafeZone<BytesRequired>& zone, const SymbolizedType& symbolizedType, bytecode::SymbolTableSerializerHelper&){}
+		static void Read(SerializerSafeZone<BytesRequired>& zone, SymbolizedType& symbolizedType, bytecode::SymbolTableDeserializerHelper&);
+		static void Write(SerializerSafeZone<BytesRequired>& zone, const SymbolizedType& symbolizedType, bytecode::SymbolTableSerializerHelper&){ assert(false); }
 	};
 }

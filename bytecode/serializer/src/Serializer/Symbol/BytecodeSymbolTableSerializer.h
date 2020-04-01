@@ -30,12 +30,10 @@ namespace ska {
 
 			void writeIfExists(SerializerOutput& output, const Symbol* value);
 			void writeFull(SerializerOutput output, std::size_t id);
-			void writeFull(SerializerOutput& output, const TreeSymbolTableMapBuilder::ReverseIndexSymbolMap& reversedMap);
+			void writeFull(SerializerOutput& output, const TreeSymbolTableMapBuilder::ReverseIndexSymbolMapWrite& reversedMap);		
 
-			void write(SerializerOutput& output, const Symbol* value, const Type& type) override;			
-		
+			void write(SerializerOutput& output, const Symbol* value, const Type& type) override;
 		private:
-			const ScriptCache* m_cache = nullptr;
 			SymbolTableSerializerHelper m_helper;
 		};
 	}

@@ -17,7 +17,7 @@ namespace ska {
 
 		struct SerializationContext {
 			using NativesContainer = std::unordered_map<std::string, std::size_t>;
-			SerializationContext(const ScriptCache& cache, SerializationStrategy strategy);
+			SerializationContext(ScriptCache& cache, SerializationStrategy strategy);
 
 			bool next(std::deque<std::size_t> partIndexes);
 

@@ -10,7 +10,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::SerializationContext);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::SerializationContext)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::SerializationContext)
 
-ska::bytecode::SerializationContext::SerializationContext(const ScriptCache& cache, SerializationStrategy strategy) :
+ska::bytecode::SerializationContext::SerializationContext(ScriptCache& cache, SerializationStrategy strategy) :
 	m_strategy(std::move(strategy)),
 	m_cache(cache),
 	m_output(&m_strategy(cache.at(m_id).name())),

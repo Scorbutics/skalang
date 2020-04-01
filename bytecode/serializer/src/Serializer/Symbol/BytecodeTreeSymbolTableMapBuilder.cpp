@@ -2,6 +2,7 @@
 #include "Base/Serialization/SerializerOutput.h"
 #include "BytecodeSymbolTableSerializer.h"
 #include "Service/SymbolTable.h"
+#include "Base/Values/Strings/StringUtils.h"
 
 ska::bytecode::TreeSymbolTableMapBuilder::TreeSymbolTableMapBuilder(const SymbolTable& table) {
 	store(table, "");
@@ -46,7 +47,7 @@ void ska::bytecode::TreeSymbolTableMapBuilder::store(const Symbol& symbol, const
 	if (existingSymbolIt == m_symbols.end()) {
 		auto key = buildKey(depth, childIndex);
 		m_symbols.emplace(&symbol, key);
-		m_symbolsReversed.emplace(std::move(key), &symbol);
+		m_symbolsReversedWrite.emplace(std::move(key), &symbol);
 	}
 }
 
@@ -61,5 +62,5 @@ std::string ska::bytecode::TreeSymbolTableMapBuilder::key(const Symbol& symbol) 
 }
 
 void ska::bytecode::TreeSymbolTableMapBuilder::write(SerializerOutput& output, SymbolTableSerializer& serializer) const {
-	serializer.writeFull(output, m_symbolsReversed);
+	serializer.writeFull(output, m_symbolsReversedWrite);
 }

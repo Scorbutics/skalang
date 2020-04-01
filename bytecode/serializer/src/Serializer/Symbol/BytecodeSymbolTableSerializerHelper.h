@@ -1,5 +1,5 @@
 #pragma once
-#include <optional>
+#include <memory>
 #include <vector>
 #include "Serializer/Symbol/BytecodeTreeSymbolTableMapBuilder.h"
 #include "Generator/Value/BytecodeOperand.h"
@@ -20,13 +20,13 @@ namespace ska {
 
 		
 			TreeSymbolTableMapBuilder& getMapBuilder(std::size_t id);
-			std::string getAbsoluteScriptKey(std::size_t scriptId, const Symbol& value);
-
+			std::string getRelativeScriptKey(std::size_t scriptId, const Symbol& value);
+			const std::string& getScriptName(const std::size_t scriptId) const;
 			std::pair<std::size_t, Operand> extractGeneratedOperandFromSymbol(const Symbol& symbol);
 
 		public:
 			const ScriptCache* m_cache = nullptr;
-			std::vector<std::optional<TreeSymbolTableMapBuilder>> m_mapBuilder;
+			std::vector<std::unique_ptr<TreeSymbolTableMapBuilder>> m_mapBuilder;
 		};
 	}
 }

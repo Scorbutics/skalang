@@ -6,6 +6,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::SymbolTableSerializerHelper)
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::SymbolTableSerializerHelper)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::SymbolTableSerializerHelper)
+#define LOG_ERROR SLOG_STATIC(ska::LogLevel::Error, ska::bytecode::SymbolTableSerializerHelper)
 
 ska::bytecode::SymbolTableSerializerHelper::SymbolTableSerializerHelper(const ScriptCache& cache) :
 	m_cache(&cache) {
@@ -16,11 +17,11 @@ ska::bytecode::TreeSymbolTableMapBuilder& ska::bytecode::SymbolTableSerializerHe
 		m_mapBuilder.resize(id + 1);
 	}
 
-	if (!m_mapBuilder[id].has_value()) {
-		m_mapBuilder[id] = TreeSymbolTableMapBuilder{ m_cache->at(id).program().symbols() };
+	if (m_mapBuilder[id] == nullptr) {
+		m_mapBuilder[id] = std::make_unique<TreeSymbolTableMapBuilder>(m_cache->at(id).program().symbols());
 	}
 
-	return m_mapBuilder[id].value();
+	return *m_mapBuilder[id];
 }
 
 std::pair<std::size_t, ska::bytecode::Operand> ska::bytecode::SymbolTableSerializerHelper::extractGeneratedOperandFromSymbol(const Symbol& symbol) {
@@ -38,7 +39,11 @@ std::pair<std::size_t, ska::bytecode::Operand> ska::bytecode::SymbolTableSeriali
 	return std::make_pair(info->script, operand.value());
 }
 
-std::string ska::bytecode::SymbolTableSerializerHelper::getAbsoluteScriptKey(std::size_t scriptId, const Symbol& value) {
+const std::string& ska::bytecode::SymbolTableSerializerHelper::getScriptName(const std::size_t scriptId) const {
+	return m_cache->at(scriptId).name();
+}
+
+std::string ska::bytecode::SymbolTableSerializerHelper::getRelativeScriptKey(std::size_t scriptId, const Symbol& value) {
 	auto relativeScriptKey = getMapBuilder(scriptId).key(value);
 	if (relativeScriptKey.empty()) {
 		auto ss = std::stringstream{};
@@ -46,8 +51,9 @@ std::string ska::bytecode::SymbolTableSerializerHelper::getAbsoluteScriptKey(std
 		throw std::runtime_error(ss.str());
 	}
 
-	auto result = std::to_string(scriptId) + "." + relativeScriptKey;
-	LOG_DEBUG << "Getting symbol \"" << value.name() << "\" absolute script key \"" << result << "\"";
+	auto result = relativeScriptKey;
+	LOG_DEBUG << "Getting symbol \"" << value.name() << "\" relative script key \"" << result << "\"";
 
 	return result;
 }
+

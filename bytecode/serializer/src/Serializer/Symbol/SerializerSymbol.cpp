@@ -1,5 +1,6 @@
 #include "Config/LoggerConfigLang.h"
 #include "SerializerSymbol.h"
+#include "BytecodeSymbolTableDeserializer.h"
 #include "BytecodeSymbolTableSerializer.h"
 
 namespace ska {
@@ -11,22 +12,37 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::SerializerTypeTraitsSymbolLog);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::SerializerTypeTraitsSymbolLog)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::SerializerTypeTraitsSymbolLog)
 
-void ska::SerializerTypeTraits<ska::Symbol>::Read(SerializerSafeZone<BytesRequired>& zone, Symbol& symbol, bytecode::SymbolTableSerializerHelper& helper) {
-	//TODO
+void ska::SerializerTypeTraits<ska::Symbol*>::Read(SerializerSafeZone<BytesRequired>& zone, Symbol*& symbol, bytecode::SymbolTableDeserializerHelper& helper) {
+	auto absoluteScriptKey = zone.read<std::string>();
+	auto symbolName = zone.read<std::string>();
+	symbol = &helper.buildSymbol(zone, absoluteScriptKey, symbolName);
+
+	LOG_INFO << "%13cSymbol Name refered : " << symbolName << " with key : " << absoluteScriptKey;
+
+	if (symbol == symbol->master()) {
+		LOG_INFO << "%13cNo parent symbol for " << symbolName;
+		zone.acquireMemory<2 * sizeof(bytecode::Chunk)>("No parent").readNull<2 * sizeof(bytecode::Chunk)>();
+	} else {
+		LOG_INFO << "%13c\twith master : " << symbol->master()->name();
+		auto absoluteScriptParentKey = zone.read<std::string>();
+		auto parentSymbolName = zone.read<std::string>();
+		auto& master = helper.buildSymbol(zone, absoluteScriptKey, parentSymbolName);
+		master.implement(*symbol);
+	}
 }
 
-void ska::SerializerTypeTraits<ska::Symbol>::Write(SerializerSafeZone<BytesRequired>& zone, const Symbol& symbol, bytecode::SymbolTableSerializerHelper& helper) {
-	WriteSymbolRefBody(zone.acquireMemory<sizeof(bytecode::Chunk)>("Symbol ref"), symbol, helper);
+void ska::SerializerTypeTraits<ska::Symbol*>::Write(SerializerSafeZone<BytesRequired>& zone, const Symbol& symbol, bytecode::SymbolTableSerializerHelper& helper) {
+	WriteSymbolRefBody(zone.acquireMemory<2 * sizeof(bytecode::Chunk)>("Symbol ref"), symbol, helper);
 
 	if (&symbol == symbol.master()) {
-		zone.acquireMemory<sizeof(bytecode::Chunk)>("null").writeNull<sizeof(bytecode::Chunk)>();
+		zone.writeNull<2*sizeof(bytecode::Chunk)>();
 	} else {
 		LOG_INFO << "%13c\twith master : " << symbol.master()->name();
-		WriteSymbolRefBody(zone.acquireMemory<sizeof(bytecode::Chunk)>("parent"), *symbol.master(), helper);
+		WriteSymbolRefBody(zone.acquireMemory<2 * sizeof(bytecode::Chunk)>("parent"), *symbol.master(), helper);
 	}
 }
 	
-void ska::SerializerTypeTraits<ska::Symbol>::WriteSymbolRefBody(SerializerSafeZone<sizeof(bytecode::Chunk)> zone, const Symbol& symbol, bytecode::SymbolTableSerializerHelper& helper) {
+void ska::SerializerTypeTraits<ska::Symbol*>::WriteSymbolRefBody(SerializerSafeZone<2 * sizeof(bytecode::Chunk)> zone, const Symbol& symbol, bytecode::SymbolTableSerializerHelper& helper) {
 	auto [scriptId, operand] = helper.extractGeneratedOperandFromSymbol(symbol);
 
 	//LOG_INFO << "%13c\twith Raw operand " << operand;
@@ -35,10 +51,12 @@ void ska::SerializerTypeTraits<ska::Symbol>::WriteSymbolRefBody(SerializerSafeZo
 	// Operand (???)
 	// OperandSerializer::write(*m_cache, buffer, natives, operand);
 
-	auto absoluteScriptKey = helper.getAbsoluteScriptKey(scriptId, symbol);
+	auto absoluteScriptKey = std::to_string(zone.ref(helper.getScriptName(scriptId))) + "." + helper.getRelativeScriptKey(scriptId, symbol);
 
 	LOG_INFO << "%13cSymbol Name refered : " << symbol.name() << " with key : " << absoluteScriptKey;
 
 	zone.write(std::move(absoluteScriptKey));
+
+	zone.write(symbol.name());
 }
 

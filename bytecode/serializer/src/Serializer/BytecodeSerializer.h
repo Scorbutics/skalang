@@ -21,7 +21,7 @@ namespace ska {
 			~Serializer() = default;
 
 			bool serialize(SerializationContext& context) const;
-			bool serialize(const ScriptCache& cache, SerializationStrategy output) const;
+			bool serialize(ScriptCache& cache, SerializationStrategy output) const;
 			std::vector<std::string> deserialize(DeserializationContext& output, const std::unordered_set<std::string>& blacklist = {}) const;
 			std::vector<std::string> deserialize(ScriptCache& cache, const std::string& startScriptName, DeserializationStrategy input, const std::unordered_set<std::string>& blacklist = {}) const;
 		};

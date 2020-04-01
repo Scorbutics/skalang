@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <optional>
 #include <unordered_map>
 #include <sstream>
 
@@ -15,11 +16,19 @@ namespace ska {
 		class TreeSymbolTableMapBuilder {
 			using IndexSymbolMap = std::unordered_map<const Symbol*, std::string>;
 		public:
-			using ReverseIndexSymbolMap = std::map<std::string, const Symbol*>;
+			using ReverseIndexSymbolMapWrite = std::map<std::string, const Symbol*>;
+
 			TreeSymbolTableMapBuilder(const SymbolTable& table);
+			
+			TreeSymbolTableMapBuilder(TreeSymbolTableMapBuilder&&) noexcept = default;
+			TreeSymbolTableMapBuilder& operator=(TreeSymbolTableMapBuilder&&) = default;
+
+			TreeSymbolTableMapBuilder(const TreeSymbolTableMapBuilder&) = delete;
+			TreeSymbolTableMapBuilder& operator=(const TreeSymbolTableMapBuilder&) = delete;
+			
 			~TreeSymbolTableMapBuilder() = default;
 
-			std::string TreeSymbolTableMapBuilder::key(const Symbol& symbol) const;
+			std::string key(const Symbol& symbol) const;
 			void write(SerializerOutput& output, SymbolTableSerializer& serializer) const;
 
 		private:
@@ -29,7 +38,7 @@ namespace ska {
 
 			static std::string buildKey(const std::string& depth, std::size_t childIndex);
 			IndexSymbolMap m_symbols;
-			ReverseIndexSymbolMap m_symbolsReversed;
+			ReverseIndexSymbolMapWrite m_symbolsReversedWrite;			
 		};
 	}
 }
