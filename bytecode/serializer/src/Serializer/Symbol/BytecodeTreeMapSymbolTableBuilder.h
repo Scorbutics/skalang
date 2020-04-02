@@ -28,7 +28,7 @@ namespace ska {
 			Symbol* value(const std::string& key, std::optional<std::string> name);
 
 		private:
-			ScopedSymbolTable& walkScope(const std::vector<std::string>& parts);
+			Symbol& walkScope(const std::vector<std::string>& parts, std::string leafName);
 
 			ReverseIndexSymbolMapRead m_symbolsReversedRead;
 			ScopedSymbolTable* m_rootRead;

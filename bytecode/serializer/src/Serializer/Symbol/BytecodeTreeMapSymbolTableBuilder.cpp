@@ -8,20 +8,40 @@ ska::bytecode::TreeMapSymbolTableBuilder::TreeMapSymbolTableBuilder(SymbolTable&
 	m_rootRead(&table.root()) {
 }
 
-ska::ScopedSymbolTable& ska::bytecode::TreeMapSymbolTableBuilder::walkScope(const std::vector<std::string>& parts) {
+ska::Symbol& ska::bytecode::TreeMapSymbolTableBuilder::walkScope(const std::vector<std::string>& parts, std::string leafName) {
 	auto* currentSymbolTable = m_rootRead;
 
-	ska::ScopedSymbolTable* parent = currentSymbolTable;
-	for (std::size_t i = 1u; i < parts.size(); i++) {
-		const auto scopeNumericValue = std::atoi(parts[i].c_str());
-
-		while (scopeNumericValue >= parent->scopes()) {
-			parent->createNested();
-		}
-		parent = currentSymbolTable->child(scopeNumericValue);
+	if (parts.size() == 1) {
+		throw std::runtime_error("invalid symbol path");
 	}
 
-	return *parent;
+	ska::ScopedSymbolTable* parent = currentSymbolTable;
+	// First part is script name native index. Last part is leaf child index.
+	// avoid using both
+	for (std::size_t i = 1u; i < parts.size() - 1; i++) {
+		auto scopeNumericValue = std::atoi(parts[i].c_str()) ;
+
+		if (scopeNumericValue < parent->size()) {
+			// Attached to a symbol (named scope)
+			if (scopeNumericValue >= parent->scopes()) {
+				// Unexisting symbol named scope : create one
+				auto* symbol = (*parent)[scopeNumericValue];
+				parent = &parent->createNested(symbol);
+			} else {
+				parent = parent->child(scopeNumericValue);
+			}
+		} else {
+			// Create an unnamed scope
+			scopeNumericValue -= (parent->size());
+			while (scopeNumericValue >= parent->scopes()) {
+				parent->createNested();
+			}
+			parent = parent->child(scopeNumericValue);
+		}
+	}
+
+	auto* symbolLeaf = (*parent)(leafName);
+	return (symbolLeaf != nullptr) ? *symbolLeaf : parent->emplace(std::move(leafName));
 }
 
 ska::Symbol* ska::bytecode::TreeMapSymbolTableBuilder::value(const std::string& key, std::optional<std::string> name) {
@@ -35,10 +55,7 @@ ska::Symbol* ska::bytecode::TreeMapSymbolTableBuilder::value(const std::string& 
 			return nullptr;
 		}
 		
-		auto& parentScope = walkScope(std::move(parts));
-		auto& parentSymbol = parentScope.emplace(name.value());
-		//parentScope.createNested(&parentSymbol);
-		return &parentSymbol;
+		return &walkScope(std::move(parts), name.value());
 	}
 
 	return symbolSeekIt->second;
