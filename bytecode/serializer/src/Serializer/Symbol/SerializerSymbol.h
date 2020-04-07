@@ -12,7 +12,7 @@ namespace ska {
 
 	template <>
 	struct SerializerTypeTraits<Symbol*> {
-		static constexpr std::size_t BytesRequired = 4 * sizeof(bytecode::Chunk);
+		static constexpr std::size_t BytesRequired = 4 * sizeof(bytecode::Chunk) + sizeof(uint8_t);
 		static constexpr const char* Name = "Symbol";
 
 		static void Read(SerializerSafeZone<BytesRequired>& zone, Symbol*& symbol, bytecode::SymbolTableDeserializerHelper& helper);

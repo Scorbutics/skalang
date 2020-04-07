@@ -28,6 +28,11 @@ void ska::SerializerTypeTraits<ska::SymbolizedType>::Read(SerializerSafeZone<Byt
 	
 	symbolizedType.compoundTypes = zone.read<uint32_t>();
 
+	if (symbolizedType.symbol != nullptr) {
+		symbolizedType.type = Type::Override(symbolizedType.type, symbolizedType.symbol);
+		symbolizedType.symbol->changeTypeIfRequired(symbolizedType.type);
+	}
+
 	LOG_INFO << "Type \"" << symbolizedType.type << "\" is being deserialized with " << symbolizedType.type.size() << " compound types";
 }
 

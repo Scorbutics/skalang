@@ -62,10 +62,10 @@ void ska::TypeBuilder::buildType(ASTNode& node, ScriptAST& script) {
 }
 
 bool ska::TypeBuilder::matchReturn(ReturnTokenEvent& event) {
-	if(event.type() != ReturnTokenEventType::START) {
+	if (event.type() != ReturnTokenEventType::START) {
 		auto& node = event.rootNode();
 		buildType(node, event.script());
-  }
+	}
 	return true;
 }
 

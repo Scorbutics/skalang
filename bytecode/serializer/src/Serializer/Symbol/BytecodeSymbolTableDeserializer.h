@@ -10,6 +10,7 @@
 #include "Runtime/Service/ScriptTypeSerializer.h"
 #include "Base/Serialization/SerializerSafeZone.h"
 #include "Serializer/BytecodeChunk.h"
+#include "SerializerSymbolizedType.h"
 
 namespace ska {
 	class Symbol;
@@ -28,9 +29,10 @@ namespace ska {
 			~SymbolTableDeserializer() = default;
 
 			void readFull(SerializerOutput output);
-			void read(SerializerOutput& output, Symbol*& value, Type& type);
-
 		private:
+			void read(SerializerOutput& output);
+			SymbolizedType readPart(SerializerOutput& output);
+
 			SymbolTableDeserializerHelper m_helper;
 		};
 	}

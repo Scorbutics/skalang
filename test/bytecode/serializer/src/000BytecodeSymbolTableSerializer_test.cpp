@@ -140,7 +140,7 @@ TEST_CASE("[BytecodeSymbolTableSerializer] 3 scopes levels test") {
 	}
 }
 
-TEST_CASE("[BytecodeSymbolTableSerializer] function var factory test") {
+TEST_CASE("[BytecodeSymbolTableSerializer] function var factory test + type check") {
 	std::stringstream ss;
 	ska::order_indexed_string_map<std::string> natives;
 	{
@@ -171,6 +171,26 @@ TEST_CASE("[BytecodeSymbolTableSerializer] function var factory test") {
 		const auto& deserializedSymbolTable = script.program().symbols();
 		CHECK(deserializedSymbolTable.scopes() == 1);
 		CHECK(deserializedSymbolTable.size() == 3);
+
+		CHECK(deserializedSymbolTable.lookup(ska::SymbolTableLookup::direct("test"), ska::SymbolTableNested::firstChild()) != nullptr);
+		CHECK(deserializedSymbolTable.lookup(ska::SymbolTableLookup::direct("tata"), ska::SymbolTableNested::firstChild()) == nullptr);
+		
+		CHECK(deserializedSymbolTable.lookup(ska::SymbolTableLookup::direct("test"), ska::SymbolTableNested::firstChild(2)) != nullptr);
+		CHECK(deserializedSymbolTable.lookup(ska::SymbolTableLookup::direct("tata"), ska::SymbolTableNested::firstChild(2)) != nullptr);
+
+		auto toto = deserializedSymbolTable.lookup(ska::SymbolTableLookup::direct("toto"));
+		auto tata = deserializedSymbolTable.lookup(ska::SymbolTableLookup::direct("tata"));
+		auto titi = deserializedSymbolTable.lookup(ska::SymbolTableLookup::direct("titi"));
+		CHECK(toto != nullptr);
+		CHECK(tata != nullptr);
+		CHECK(titi != nullptr);
+
+		CHECK(titi->nativeType() == ska::ExpressionType::OBJECT);
+		CHECK(titi->master() == toto);
+
+		CHECK(toto->nativeType() == ska::ExpressionType::FUNCTION);
+		CHECK(toto->type().size() == 1);
+		CHECK((toto->type())[0] == titi->type());
 	}
 }
 

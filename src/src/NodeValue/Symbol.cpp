@@ -96,7 +96,7 @@ bool ska::Symbol::operator==(const Symbol& sym) const {
 }
 
 bool ska::Symbol::changeTypeIfRequired(const Type& type) {
-	if (m_category == ExpressionType::VOID) {
+	if (m_category == ExpressionType::VOID || m_category.type() == type.type()) {
 		m_category = type;
 		return true;
 	}

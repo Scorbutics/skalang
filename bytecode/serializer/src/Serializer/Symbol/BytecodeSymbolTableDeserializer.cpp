@@ -5,7 +5,6 @@
 #include "Generator/Value/BytecodeScriptCache.h"
 
 #include "SerializerSymbol.h"
-#include "SerializerSymbolizedType.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::SymbolTableDeserializer);
 
@@ -17,21 +16,18 @@ ska::bytecode::SymbolTableDeserializer::SymbolTableDeserializer(ScriptCache& cac
 }
 
 void ska::bytecode::SymbolTableDeserializer::readFull(SerializerOutput output) {
-	Symbol* dumb;
-	Type dumbT;
-
 	const std::size_t totalSymbolsInMap = output.acquireMemory<sizeof(uint32_t)>("Symbol table : total number of symbols").read<uint32_t>();
 
 	LOG_INFO << "Symbols (in total) : " << totalSymbolsInMap;
 
 	for (std::size_t i = 0; i < totalSymbolsInMap; i++) {
-		read(output, dumb, dumbT);
+		read(output);
 	}
 
 	output.validateOrThrow();
 }
 
-void ska::bytecode::SymbolTableDeserializer::read(SerializerOutput& output, Symbol*& value, Type& type) {
+ska::SymbolizedType ska::bytecode::SymbolTableDeserializer::readPart(SerializerOutput& output) {
 	auto symbolizedTypeSerializer = SerializerType<SymbolizedType, SymbolTableDeserializerHelper&>{ output };
 	auto symbolizedType = SymbolizedType{};
 	symbolizedTypeSerializer.read(symbolizedType, m_helper);
@@ -41,12 +37,17 @@ void ska::bytecode::SymbolTableDeserializer::read(SerializerOutput& output, Symb
 	LOG_INFO << "%13c\t\twith " << symbolizedType.compoundTypes << " children";
 
 	for (std::size_t index = 0; index < symbolizedType.compoundTypes; index++) {
-		auto childSymbolizedType = SymbolizedType{  };
-		read(output, symbolizedType.symbol, symbolizedType.type);
+		auto childSymbolizedType = readPart(output);
 		symbolizedType.type.add(std::move(childSymbolizedType.type));
 	}
 
-	value = symbolizedType.symbol;
-	type = std::move(symbolizedType.type);
-	value->changeTypeIfRequired(type);
+	if (symbolizedType.symbol != nullptr) {
+		symbolizedType.symbol->changeTypeIfRequired(symbolizedType.type);
+	}
+
+	return symbolizedType;
+}
+
+void ska::bytecode::SymbolTableDeserializer::read(SerializerOutput& output) {
+	auto symbolizedType = readPart(output);
 }
