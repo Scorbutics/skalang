@@ -30,9 +30,9 @@ void ska::bytecode::DeserializationContext::operator>>(ScriptHeader& header) {
 void ska::bytecode::DeserializationContext::operator>>(ScriptBody& body) {
 	body.instructions = readInstructions();
 	replaceAllNativesRef(body.instructions, body.natives());
+	readSymbolTable(body.natives());
 	body.exports = readExports();
 	replaceAllNativesRef(body.exports, body.natives());
-	readSymbolTable(body.natives());
 }
 
 void ska::bytecode::DeserializationContext::operator>>(ScriptExternalReferences& externalReferences) {
@@ -129,23 +129,22 @@ std::vector<ska::bytecode::ExportSymbol> ska::bytecode::DeserializationContext::
 	for(std::size_t i = 0; i < exportsSize; i++) {
 		//TODO symbol... ????
 		
-		assert(exports[i].symbol != nullptr);
+		//assert(exports[i].symbol != nullptr);
 		//m_cache[0].program().symbols();
 		(*this) >> exports[i].value;
-		LOG_INFO << "Getting export " << exports[i].value << " with symbol " << exports[i].symbol->type();
+		//LOG_INFO << "Getting export " << exports[i].value << " with symbol " << exports[i].symbol->type();
 	};
 	return exports;
 }
 
 void ska::bytecode::DeserializationContext::readSymbolTable(SerializerNativeContainer& natives) {
 	auto ss = std::stringstream{};
-	auto* oldBuf = m_input->rdbuf(ss.rdbuf());
+
+	ss << m_input->rdbuf();
 	try {
 		auto output = SerializerOutput{ { ss, natives} };
 		m_symbolsDeserializer.readFull(output);
-		m_input->rdbuf(oldBuf);
 	} catch (std::exception & e) {
-		m_input->rdbuf(oldBuf);
 		std::cerr << e.what() << std::endl;
 		throw;
 	} 

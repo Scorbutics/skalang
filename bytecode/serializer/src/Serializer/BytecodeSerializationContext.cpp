@@ -32,10 +32,10 @@ std::size_t ska::bytecode::SerializationContext::writeHeader(std::size_t seriali
 	push();
 	LOG_DEBUG << "Serializing script " << currentScriptName() << " with compiled id " << currentScriptId();
 	auto output = SerializerOutput{ {buffer(), m_natives} };
-	output.acquireMemory<sizeof(uint32_t)>("script serializer version").write(serializerVersion);
+	output.acquireMemory<sizeof(uint32_t)>("script serializer version").write(static_cast<uint32_t>(serializerVersion));
 	output.acquireMemory<sizeof(Chunk)>("script name").write(currentScriptName());
-	output.acquireMemory<sizeof(uint32_t)>("script compile id").write(currentScriptId());
-	output.acquireMemory<sizeof(uint32_t)>("is script bridged").write(static_cast<std::size_t>(currentScriptBridged()));
+	output.acquireMemory<sizeof(uint32_t)>("script compile id").write(static_cast<uint32_t>(currentScriptId()));
+	output.acquireMemory<sizeof(uint32_t)>("is script bridged").write(static_cast<std::uint32_t>(currentScriptBridged()));
 	output.validateOrThrow();
 	return m_buffer.size() - 1;
 }
@@ -44,7 +44,7 @@ std::pair<std::size_t, std::vector<std::string>> ska::bytecode::SerializationCon
 	push();
 	auto linkedScripts = std::vector<std::string>{};
 	auto output = SerializerOutput{ {buffer(), m_natives} };
-	output.acquireMemory<sizeof(uint32_t)>("instructions size").write(instructionsSize());
+	output.acquireMemory<sizeof(uint32_t)>("instructions size").write(static_cast<uint32_t>(instructionsSize()));
 	for (const Instruction& instruction : (*this)) {
 		LOG_DEBUG << "Serializing " << instruction;
 		(*this) << instruction;
@@ -59,7 +59,7 @@ std::pair<std::size_t, std::vector<std::string>> ska::bytecode::SerializationCon
 std::size_t ska::bytecode::SerializationContext::writeExternalReferences(std::vector<std::string> linkedScripts) {
 	push();
 	auto output = SerializerOutput{ SerializerOutputData{ buffer(), m_natives } };
-	output.acquireMemory<sizeof(uint32_t)>("linkedScripts (size)").write(linkedScripts.size());
+	output.acquireMemory<sizeof(uint32_t)>("linkedScripts (size)").write(static_cast<uint32_t>(linkedScripts.size()));
 	for (const auto& linkedScript : linkedScripts) {
 		LOG_INFO << linkedScript;
 		output.acquireMemory<sizeof(Chunk)>("linkedScript name").write(linkedScript);
@@ -79,12 +79,12 @@ std::size_t ska::bytecode::SerializationContext::writeExports() {
 	auto& exports = m_cache[m_id].exportedSymbols();
 	LOG_INFO << "Export serializing : " << exports.size();
 	auto output = SerializerOutput{ {buffer(), m_natives} };
-	output.acquireMemory<sizeof(uint32_t)>("exports size").write(exports.size());
+	output.acquireMemory<sizeof(uint32_t)>("exports size").write(static_cast<uint32_t>(exports.size()));
 	for (const auto& exp : exports) {
 		if (!exp.value.empty()) {
 			assert(exp.symbol != nullptr);
 			LOG_INFO << "Writing export " << exp.value << " with symbol " << exp.symbol->type();
-			m_symbolsSerializer.writeIfExists(output, exp.symbol);
+			//m_symbolsSerializer.writeIfExists(output, exp.symbol);
 			(*this) << exp.value;
 		}
 	}
