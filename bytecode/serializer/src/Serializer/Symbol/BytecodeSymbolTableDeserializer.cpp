@@ -48,4 +48,5 @@ void ska::bytecode::SymbolTableDeserializer::read(SerializerOutput& output, Symb
 
 	value = symbolizedType.symbol;
 	type = std::move(symbolizedType.type);
+	value->changeTypeIfRequired(type);
 }
