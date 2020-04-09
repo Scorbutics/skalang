@@ -41,6 +41,8 @@ namespace ska {
 		void implement(Symbol& symbol);
 		const Symbol* master() const { return m_master; }
 
+		std::size_t id(const Symbol& field) const;
+
 		const Symbol* back() const;
 		Symbol* back();
 

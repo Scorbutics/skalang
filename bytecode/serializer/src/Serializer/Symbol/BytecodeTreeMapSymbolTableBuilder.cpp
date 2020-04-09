@@ -3,6 +3,7 @@
 #include "BytecodeSymbolTableSerializer.h"
 #include "Service/SymbolTable.h"
 #include "Base/Values/Strings/StringUtils.h"
+#include "Generator/Value/BytecodeScriptCache.h"
 
 ska::bytecode::TreeMapSymbolTableBuilder::TreeMapSymbolTableBuilder(SymbolTable& table) :
 	m_rootRead(&table.root()) {
@@ -55,4 +56,48 @@ ska::Symbol* ska::bytecode::TreeMapSymbolTableBuilder::value(const std::string& 
 	}
 
 	return symbolSeekIt->second;
+}
+
+void ska::bytecode::TreeMapSymbolTableBuilder::buildFieldReferences(ScriptCache& cache, Symbol& symbol, FieldsReferences& refParent, std::size_t index) {
+	auto* symbolInfo = cache.getSymbolInfo(symbol);
+	if (symbolInfo != nullptr) {
+		auto info = *symbolInfo;
+		info.childIndex = index;
+		
+		auto operand = cache.at(info.script).helper().getSymbol(symbol);
+		if (operand.has_value()) {
+			auto fieldRef = operand.value().as<ScriptVariableRef>();
+			refParent->emplace(std::move(fieldRef), refParent->size());
+			
+			auto fieldReferences = std::make_shared<FieldsReferencesRaw>();
+			if (symbol.master() != &symbol) {
+				auto* symbolIt = symbol.master();
+				do {
+					auto* masterSymbolInfo = cache.getSymbolInfo(*symbolIt);
+					if (masterSymbolInfo != nullptr) {
+						for (auto& [masterRefKey, masterRefValue] : *masterSymbolInfo->references) {
+							fieldReferences->emplace(masterRefKey, fieldReferences->size());
+						}
+					}
+				} while (symbolIt->master() != symbolIt);
+			}
+
+			
+			std::size_t childIndex = 0;
+			for (auto& child : symbol) {
+				buildFieldReferences(cache, *child, fieldReferences, childIndex++);
+			}
+			info.references = std::move(fieldReferences);
+			cache.setSymbolInfo(symbol, std::move(info));
+		}
+	}
+}
+
+void ska::bytecode::TreeMapSymbolTableBuilder::buildFieldReferences(ScriptCache& cache) {
+	std::size_t childIndex = 0;
+	auto fieldReferences = std::make_shared<FieldsReferencesRaw>();
+	/*for (auto& child : *m_rootRead) {
+		buildFieldReferences(cache, *child, fieldReferences, childIndex);
+		childIndex++;
+	}*/
 }

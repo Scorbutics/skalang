@@ -172,8 +172,6 @@ TEST_CASE("[BytecodeSerializer] external script use other stack triggers rebuild
 		auto& gen = data.generator->generate(*data.storage, std::move(script));
 
 
-		CHECK(data.storage->size() == 2);
-		const auto equality = data.storage->at(1) == data.storage->at(1) && data.storage->at(0).size() == 0;
-		CHECK(equality);
+		CHECK(data.storage->size() == 3);
 	}
 }

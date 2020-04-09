@@ -23,6 +23,7 @@ namespace ska {
 		
 			TreeMapSymbolTableBuilder& getSymbolTableBuilder(const std::string& scriptName);
 			Symbol& buildSymbol(detail::SerializerSafeZone& zone, const std::string& absoluteScriptKey, std::string symbolName, const Operand& operand);
+			void buildFieldReferences();
 			Operand readOperand(SerializerSafeZone<17> safeZone);
 
 		public:

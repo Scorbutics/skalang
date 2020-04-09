@@ -91,3 +91,11 @@ ska::Symbol* ska::ScopedSymbolTable::operator()(const std::string& key) {
 	auto valueIt = m_symbols.find(key);
 	return valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
 }
+
+std::optional<std::size_t> ska::ScopedSymbolTable::id(const Symbol& field) const {
+	if (m_symbols.atOrNull(field.name()) == nullptr || &m_symbols.at(field.name()) != &field) {
+		return {};
+	}
+
+	return m_symbols.id(field.name());
+}

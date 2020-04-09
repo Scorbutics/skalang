@@ -2,6 +2,7 @@
 #include <map>
 #include <optional>
 #include <unordered_map>
+#include "Generator/Value/BytecodeSymbolInfo.h"
 
 namespace ska {
 	class SymbolTable;
@@ -9,6 +10,7 @@ namespace ska {
 	class ScopedSymbolTable;
 	
 	namespace bytecode {
+		class ScriptCache;
 
 		class TreeMapSymbolTableBuilder {
 			using IndexSymbolMap = std::unordered_map<const Symbol*, std::string>;
@@ -26,6 +28,8 @@ namespace ska {
 
 			
 			Symbol* value(const std::string& key, std::optional<std::string> name);
+			void buildFieldReferences(ScriptCache& cache, Symbol& symbol, FieldsReferences& ref, std::size_t childIndex);
+			void buildFieldReferences(ScriptCache& cache);
 
 		private:
 			Symbol& walkScope(const std::vector<std::string>& parts, std::string leafName);

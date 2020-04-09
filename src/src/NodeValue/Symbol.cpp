@@ -162,3 +162,20 @@ void ska::Symbol::close() {
 	m_closed = true; 
 	m_data.close();
 }
+
+std::size_t ska::Symbol::id(const Symbol& field) const {
+	auto* table = m_data.lookup();
+	if (table != nullptr) {
+		auto found = table->id(field);
+		if (found.has_value()) {
+			return found.value();
+		}
+	}
+
+	if (m_master != nullptr) {
+		LOG_INFO << "Symbol \"" << field.name() << "\" not found here, looking into master symbol \"" << m_master->name() << "\"";
+		return m_master->id(field);
+	}
+
+	throw std::runtime_error("field \"" + field.name() + "\" id lookup failed in object \"" + m_name + "\"");
+}

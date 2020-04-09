@@ -1,4 +1,5 @@
 #pragma once
+#include <optional>
 #include <unordered_map>
 #include <memory>
 #include "NodeValue/Symbol.h"
@@ -39,6 +40,8 @@ namespace ska {
 		bool exported() const { return m_exported; }
 
 		bool changeTypeIfRequired(const std::string& symbol, const Type& value);
+
+		std::optional<std::size_t> id(const Symbol& field) const;
 
 		const Symbol* operator[](const std::string& key) const;
 		Symbol* operator[](const std::string& key);

@@ -89,3 +89,9 @@ ska::Symbol& ska::bytecode::SymbolTableDeserializerHelper::buildSymbol(detail::S
 ska::bytecode::Operand ska::bytecode::SymbolTableDeserializerHelper::readOperand(SerializerSafeZone<17> safeZone) {
 	return OperandSerializer::read(*m_cache, std::move(safeZone));
 }
+
+void ska::bytecode::SymbolTableDeserializerHelper::buildFieldReferences() {
+	for (auto& script : *m_cache) {
+		getSymbolTableBuilder(script->name()).buildFieldReferences(*m_cache);
+	}
+}

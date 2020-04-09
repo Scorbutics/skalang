@@ -25,6 +25,7 @@ void ska::bytecode::SymbolTableDeserializer::readFull(SerializerOutput output) {
 	}
 
 	output.validateOrThrow();
+	m_helper.buildFieldReferences();
 }
 
 ska::Symbol* ska::bytecode::SymbolTableDeserializer::read(SerializerOutput& output) {
