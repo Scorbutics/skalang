@@ -11,7 +11,7 @@
 #include "NodeValue/ScriptAST.h"
 
 TEST_CASE("[BytecodeSymbolTableSerializer] 1 scope level test + type") {
-
+	ska::SerializerValidator::DisableAbort();
 	std::stringstream ss;
 	ska::order_indexed_string_map<std::string> natives;
 
@@ -27,7 +27,8 @@ TEST_CASE("[BytecodeSymbolTableSerializer] 1 scope level test + type") {
 	}
 
 	{
-		auto [script, data] = Serialize("");
+		auto [scriptHelper, data] = Serialize("");
+		auto& script = data.storage->emplaceNamed(ska::bytecode::ScriptGeneration{ std::move(scriptHelper) });
 
 		auto symbolTableDeserializer = ska::bytecode::SymbolTableDeserializer{ *data.storage };
 		auto output = ska::SerializerOutput{ {ss, natives} };
@@ -44,7 +45,7 @@ TEST_CASE("[BytecodeSymbolTableSerializer] 1 scope level test + type") {
 }
 
 TEST_CASE("[BytecodeSymbolTableSerializer] 2 scopes levels test") {
-	
+	ska::SerializerValidator::DisableAbort();
 	std::stringstream ss;
 	ska::order_indexed_string_map<std::string> natives;
 
@@ -66,7 +67,8 @@ TEST_CASE("[BytecodeSymbolTableSerializer] 2 scopes levels test") {
 	}
 
 	{
-		auto [script, data] = Serialize("");
+		auto [scriptHelper, data] = Serialize("");
+		auto& script = data.storage->emplaceNamed(ska::bytecode::ScriptGeneration{ std::move(scriptHelper) });
 
 		auto symbolTableDeserializer = ska::bytecode::SymbolTableDeserializer{ *data.storage };
 		auto output = ska::SerializerOutput{ {ss, natives} };
@@ -89,6 +91,7 @@ TEST_CASE("[BytecodeSymbolTableSerializer] 2 scopes levels test") {
 }
 
 TEST_CASE("[BytecodeSymbolTableSerializer] 3 scopes levels test") {
+	ska::SerializerValidator::DisableAbort();
 	std::stringstream ss;
 	ska::order_indexed_string_map<std::string> natives;
 	{
@@ -112,7 +115,8 @@ TEST_CASE("[BytecodeSymbolTableSerializer] 3 scopes levels test") {
 	}
 
 	{
-		auto [script, data] = Serialize("");
+		auto [scriptHelper, data] = Serialize("");
+		auto& script = data.storage->emplaceNamed(ska::bytecode::ScriptGeneration{ std::move(scriptHelper) });
 
 		auto symbolTableDeserializer = ska::bytecode::SymbolTableDeserializer{ *data.storage };
 		auto output = ska::SerializerOutput{ {ss, natives} };
@@ -141,6 +145,7 @@ TEST_CASE("[BytecodeSymbolTableSerializer] 3 scopes levels test") {
 }
 
 TEST_CASE("[BytecodeSymbolTableSerializer] function var factory test + type check") {
+	ska::SerializerValidator::DisableAbort();
 	std::stringstream ss;
 	ska::order_indexed_string_map<std::string> natives;
 	{
@@ -162,7 +167,8 @@ TEST_CASE("[BytecodeSymbolTableSerializer] function var factory test + type chec
 	}
 
 	{
-		auto [script, data] = Serialize("");
+		auto [scriptHelper, data] = Serialize("");
+		auto& script = data.storage->emplaceNamed(ska::bytecode::ScriptGeneration{ std::move(scriptHelper) });
 
 		auto symbolTableDeserializer = ska::bytecode::SymbolTableDeserializer{ *data.storage };
 		auto output = ska::SerializerOutput{ {ss, natives} };

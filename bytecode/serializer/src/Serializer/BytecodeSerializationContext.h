@@ -25,7 +25,6 @@ namespace ska {
 
 			std::size_t writeHeader(std::size_t serializerVersion);
 			std::pair<std::size_t, std::vector<std::string>> writeInstructions();
-			std::size_t writeExports();
 			std::size_t writeSymbolTable();
 			std::size_t writeExternalReferences(std::vector<std::string> linkedScripts);
 

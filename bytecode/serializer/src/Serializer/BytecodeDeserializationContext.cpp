@@ -43,13 +43,18 @@ ska::bytecode::DeserializationScriptContext* ska::bytecode::DeserializationConte
 	}
 }
 
-void ska::bytecode::DeserializationContext::declare(std::string scriptName, std::vector<Instruction> instructions, std::vector<ExportSymbol> exports) {
+void ska::bytecode::DeserializationContext::declare(const std::string& scriptName, std::vector<Instruction> instructions) {
 	auto output = InstructionOutput {};
 	for (auto& ins : instructions) {
 		output.push(std::move(ins));
 	}
-	auto fakeAST = ScriptAST{ m_cache.astCache.at(scriptName) };
-	m_cache.at(scriptName) = ScriptGeneration{ ScriptGenerationHelper{ m_cache, fakeAST}, std::move(output) };
-	m_cache.at(scriptName).setExportedSymbols(std::move(exports));
+	auto helper = std::move(m_cache.at(scriptName).helper());
+	m_cache.at(scriptName) = ScriptGeneration{ std::move(helper), std::move(output) };
 	LOG_INFO << "Script \"" << scriptName << "\" has index " << m_cache.id(scriptName);
+}
+
+
+void ska::bytecode::DeserializationContext::generateExports(const std::string& scriptName) {
+	m_cache.getExportedSymbols(m_cache.id(scriptName));
+	LOG_INFO << "Script \"" << scriptName << "\" has exports generated sucessfully";
 }

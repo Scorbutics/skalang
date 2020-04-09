@@ -13,10 +13,6 @@ ska::bytecode::ScriptGenerationHelper::ScriptGenerationHelper(std::size_t index,
 
 ska::bytecode::ScriptGenerationHelper::ScriptGenerationHelper(ScriptCache& cache, const ScriptAST& script) {
 	const auto& name = script.name();
-  /*if (cache.find(name) != cache.end()) {
-		throw std::runtime_error("the script \"" + name + "\" already exists");
-	}
-*/
 	m_script = script.handle();
 	m_index = cache.id(name);
 }
@@ -50,6 +46,10 @@ ska::bytecode::Operand ska::bytecode::ScriptGenerationHelper::querySymbolOrOpera
 
 ska::bytecode::Operand ska::bytecode::ScriptGenerationHelper::querySymbol(const Symbol& symbol) {
 	return VariableGetter::query(m_index, symbol).first;
+}
+
+void ska::bytecode::ScriptGenerationHelper::declareSymbol(const Symbol& symbol, const Operand& operand) {
+	VariableGetter::declare(m_index, symbol, operand);
 }
 
 std::optional<ska::bytecode::Operand> ska::bytecode::ScriptGenerationHelper::getSymbol(const Symbol& symbol) const {

@@ -24,12 +24,10 @@ bool ska::bytecode::Serializer::serialize(SerializationContext& context) const {
 
 			if (!context.currentScriptBridged()) {
 				auto [instructionIndex, linkedScripts] = context.writeInstructions();
-				auto exportIndex = context.writeExports();
 				auto symbolTableIndex = context.writeSymbolTable();
 				partIndexes.push_back(context.writeExternalReferences(std::move(linkedScripts)));
 				partIndexes.push_back(instructionIndex);
 				partIndexes.push_back(symbolTableIndex);
-				partIndexes.push_back(exportIndex);
 			}
 			
 		} while (context.next(std::move(partIndexes)));
@@ -57,24 +55,30 @@ std::vector<std::string> ska::bytecode::Serializer::deserialize(DeserializationC
 
 		LOG_INFO << "[Serializer script version " << script.header.serializerVersion << "], script " << script.header.scriptName() << " refered as id " << script.header.scriptId << " when it was compiled";
 
-		*scriptSerializationContext >> script.references;
+		if (!script.header.scriptBridged) {
+			*scriptSerializationContext >> script.references;
 
-		for (const auto& referencedScript : script.references.scripts) {
-			auto referencedFailedScripts = deserialize(context, referencedScript, blacklist);
-			failedScripts.insert(failedScripts.end(), std::make_move_iterator(referencedFailedScripts.begin()),
-				std::make_move_iterator(referencedFailedScripts.end()));
+			for (const auto& referencedScript : script.references.scripts) {
+				auto referencedFailedScripts = deserialize(context, referencedScript, blacklist);
+				failedScripts.insert(failedScripts.end(), std::make_move_iterator(referencedFailedScripts.begin()),
+					std::make_move_iterator(referencedFailedScripts.end()));
+			}
+
+			script.references.scripts.clear();
 		}
-
-		script.references.scripts.clear();
 
 		if (blacklist.find(script.header.scriptName()) == blacklist.end()) {
 			if (!script.header.scriptBridged) {
 				*scriptSerializationContext >> script.body;
 			}
 			LOG_INFO << "Declaring script " << script.header.scriptName();
-			context.declare(script.header.scriptName(), std::move(script.body.instructions), std::move(script.body.exports));
+			context.declare(script.header.scriptName(), std::move(script.body.instructions));
 		} else {
 			LOG_INFO << "Script " << script.header.scriptName() << " is blacklisted. Not declared";
+		}
+
+		if (!script.header.scriptBridged) {
+			context.generateExports(script.header.scriptName());
 		}
 	} else {
 		failedScripts.push_back(scriptName);

@@ -3,11 +3,9 @@
 #include <unordered_map>
 #include "Serializer/Symbol/BytecodeTreeMapSymbolTableBuilder.h"
 #include "Generator/Value/BytecodeOperand.h"
+#include "Base/Serialization/SerializerSafeZone.h"
 
 namespace ska {
-	namespace detail {
-		class SerializerSafeZone;
-	}
 
 	namespace bytecode {
 		class ScriptCache;
@@ -24,7 +22,8 @@ namespace ska {
 
 		
 			TreeMapSymbolTableBuilder& getSymbolTableBuilder(const std::string& scriptName);
-			Symbol& buildSymbol(detail::SerializerSafeZone& zone, const std::string& absoluteScriptKey, std::string symbolName);			
+			Symbol& buildSymbol(detail::SerializerSafeZone& zone, const std::string& absoluteScriptKey, std::string symbolName, const Operand& operand);
+			Operand readOperand(SerializerSafeZone<17> safeZone);
 
 		public:
 			ScriptCache* m_cache = nullptr;

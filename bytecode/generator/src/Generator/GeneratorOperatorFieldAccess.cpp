@@ -28,7 +28,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 		LOG_DEBUG << "Accessing field " << optFieldValue.value() << " of object " << node.GetObjectNameNode();
 	} else {
 		auto ss = std::stringstream{ };
-		ss << "invalid bytecode : cannot access field \"" << symbolField->name() << " of object " << node.GetObjectNameNode() << " in script \"" << context.scriptName() << "\"";
+		ss << "invalid bytecode : cannot access field \"" << symbolField->name() << "\" of object \"" << node.GetObjectNameNode() << "\" in script \"" << context.scriptName() << "\"";
 		throw std::runtime_error(ss.str());		
 	}
 

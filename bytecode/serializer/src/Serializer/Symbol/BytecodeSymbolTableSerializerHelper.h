@@ -2,6 +2,7 @@
 #include <memory>
 #include <vector>
 #include "Serializer/Symbol/BytecodeTreeSymbolTableMapBuilder.h"
+#include "Base/Serialization/SerializerSafeZone.h"
 #include "Generator/Value/BytecodeOperand.h"
 
 namespace ska {
@@ -23,6 +24,8 @@ namespace ska {
 			std::string getRelativeScriptKey(std::size_t scriptId, const Symbol& value);
 			const std::string& getScriptName(const std::size_t scriptId) const;
 			std::size_t scriptOfSymbol(const Symbol& symbol);
+			Operand operandOfSymbol(const Symbol& symbol);
+			void writeOperand(SerializerSafeZone<17> safeZone, const Operand& value);
 
 		public:
 			const ScriptCache* m_cache = nullptr;

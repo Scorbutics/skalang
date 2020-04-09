@@ -39,7 +39,6 @@ void ska::bytecode::DeserializationScriptContext::operator>>(ScriptHeader& heade
 void ska::bytecode::DeserializationScriptContext::operator>>(ScriptBody& body) {
 	body.instructions = readInstructions();
 	readSymbolTable();
-	body.exports = readExports();
 }
 
 void ska::bytecode::DeserializationScriptContext::operator>>(ScriptExternalReferences& externalReferences) {
@@ -76,24 +75,6 @@ std::unordered_set<std::string> ska::bytecode::DeserializationScriptContext::rea
 		linkedScriptsRef.insert(m_natives[scriptRef]);
 	}
 	return linkedScriptsRef;
-}
-
-std::vector<ska::bytecode::ExportSymbol> ska::bytecode::DeserializationScriptContext::readExports() {
-	auto exportsSize = m_input.acquireMemory<sizeof(uint32_t)>("exports size").read<uint32_t>();
-	LOG_INFO << "Exports section : " << exportsSize;
-	if (exportsSize == 0) {
-		return {};
-	}
-
-	auto exports = std::vector<ExportSymbol>(exportsSize);
-	for(std::size_t i = 0; i < exportsSize; i++) {
-		exports[i].symbol = m_symbolsDeserializer.read(m_input);
-		exports[i].value = OperandSerializer::read(m_cache, m_input.acquireMemory<2 * sizeof(Chunk) + sizeof(uint8_t)>("export symbol operand"));
-		
-		assert(exports[i].symbol != nullptr);		
-		LOG_INFO << "Getting export " << exports[i].value << " with symbol " << exports[i].symbol->type();
-	};
-	return exports;
 }
 
 void ska::bytecode::DeserializationScriptContext::readSymbolTable() {

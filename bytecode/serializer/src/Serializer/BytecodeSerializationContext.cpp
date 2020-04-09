@@ -74,24 +74,6 @@ std::size_t ska::bytecode::SerializationContext::writeSymbolTable() {
 	return m_buffer.size() - 1;
 }
 
-std::size_t ska::bytecode::SerializationContext::writeExports() {
-	push();
-	auto& exports = m_cache[m_id].exportedSymbols();
-	LOG_INFO << "Export serializing : " << exports.size();
-	auto output = SerializerOutput{ {buffer(), m_natives} };
-	output.acquireMemory<sizeof(uint32_t)>("exports size").write(static_cast<uint32_t>(exports.size()));
-	for (const auto& exp : exports) {
-		if (!exp.value.empty()) {
-			assert(exp.symbol != nullptr);
-			LOG_INFO << "Writing export " << exp.value << " with symbol " << exp.symbol->type();
-			m_symbolsSerializer.writeSymbolOnlyIfExists(output, exp.symbol);
-			(*this) << exp.value;
-		}
-	}
-	output.validateOrThrow();
-	return m_buffer.size() - 1;
-}
-
 void ska::bytecode::SerializationContext::operator<<(const Instruction& value) {
 	uint16_t cmd = static_cast<uint16_t>(value.command());
 	uint8_t numberOfValidOperands = !value.dest().empty() + !value.left().empty() + !value.right().empty();

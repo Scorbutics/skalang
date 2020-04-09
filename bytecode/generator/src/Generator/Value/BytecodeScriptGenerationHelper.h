@@ -56,6 +56,7 @@ namespace ska {
 			Register queryNextRegister();
 			Operand querySymbolOrOperand(const ASTNode& node);
 			Operand querySymbol(const Symbol& symbol);
+			void declareSymbol(const Symbol& symbol, const Operand& operand);
 			std::optional<Operand> getSymbol(const Symbol& symbol) const;
 			std::vector<ExportSymbol> generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const;
 

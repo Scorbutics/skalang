@@ -59,14 +59,16 @@ std::size_t ska::Symbol::size() const {
 	return table == nullptr ? 0 : table->size();
 }
 
+/*
 ska::Symbol::Symbol(const Symbol& s) {
 	*this = s;
 }
+*/
 
 ska::Symbol::Symbol(Symbol&& s) noexcept {
 	*this = std::move(s);
 }
-
+/*
 ska::Symbol& ska::Symbol::operator=(const Symbol& s) {
 	m_data = s.m_data;
 	m_name = s.m_name;
@@ -75,6 +77,7 @@ ska::Symbol& ska::Symbol::operator=(const Symbol& s) {
 	SLOG(ska::LogLevel::Debug) << "   Copy, Symbol " << s.name() << " " << s.m_category << " copied to " << m_name << " " << m_category;
 	return *this;
 }
+*/
 
 ska::Symbol& ska::Symbol::operator=(Symbol&& s) noexcept {
 	m_data = std::move(s.m_data);

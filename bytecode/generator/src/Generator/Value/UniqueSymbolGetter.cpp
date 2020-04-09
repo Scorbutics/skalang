@@ -37,3 +37,24 @@ std::optional<ska::bytecode::Operand> ska::bytecode::UniqueSymbolGetterBase::get
 	}
 	return Operand{ ScriptVariableRef{ varCount->second, script }, OperandType::VAR };
 }
+
+void ska::bytecode::UniqueSymbolGetterBase::declare(std::size_t script, const Symbol& symbol, Operand operand) {
+	auto varCount = m_container.find(&symbol);
+
+	if (operand.type() != OperandType::VAR) {
+		auto ss = std::stringstream{};
+		ss << "symbol \"" << symbol.name() << "\" is not a variable";
+		throw std::runtime_error(ss.str());
+	}
+
+	const auto wantedSymbolId = operand.as<ScriptVariableRef>().variable;
+	if (varCount == m_container.end()) {
+		varCount = m_container.emplace(&symbol, wantedSymbolId).first;
+	} else if (varCount->second != wantedSymbolId) {
+		auto ss = std::stringstream{}; 
+		ss << "already existing symbol id for the symbol \"" << symbol.name() << "\"";
+		throw std::runtime_error(ss.str());
+	}
+
+	m_count = wantedSymbolId >= m_count ? (wantedSymbolId + 1) : m_count;
+}

@@ -25,7 +25,8 @@ namespace ska {
 		struct DeserializationContext {
 			DeserializationContext(ScriptCache& cache, std::string scriptStartName, DeserializationStrategy strategy);
 
-			void declare(std::string scriptName, std::vector<Instruction> instructions, std::vector<ExportSymbol> exports);
+			void declare(const std::string& scriptName, std::vector<Instruction> instructions);
+			void generateExports(const std::string& scriptName);
 			DeserializationScriptContext* read(const std::string& scriptName);
 			bool isReadingStarted(const std::string& scriptName) const;
 

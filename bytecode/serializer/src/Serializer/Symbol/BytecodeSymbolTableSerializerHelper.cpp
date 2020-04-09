@@ -1,6 +1,7 @@
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeSymbolTableSerializerHelper.h"
 #include "Generator/Value/BytecodeScriptCache.h"
+#include "Serializer/BytecodeOperandSerializer.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::SymbolTableSerializerHelper);
 
@@ -41,24 +42,29 @@ std::size_t ska::bytecode::SymbolTableSerializerHelper::scriptOfSymbol(const Sym
 	return scriptId;
 }
 
+ska::bytecode::Operand ska::bytecode::SymbolTableSerializerHelper::operandOfSymbol(const Symbol& symbol) {
+	auto scriptId = scriptOfSymbol(symbol);
+	auto& script = (*m_cache)[scriptId];
+
+	auto operand = script.getSymbol(symbol);
+	if (!operand.has_value()) {
+		operand = Operand{ ScriptVariableRef{ scriptId, scriptId }, OperandType::BIND_SCRIPT };
+		//throw std::runtime_error("unable to find the matching operand for symbol \"" + symbol.name() + "\" detected during script bytecode serialization");
+	}
+	LOG_DEBUG << "Symbol \"" << symbol.name() << "\" has operand \"" << operand.value() << "\"";
+	return operand.value();
+}
+
 const std::string& ska::bytecode::SymbolTableSerializerHelper::getScriptName(const std::size_t scriptId) const {
 	return m_cache->at(scriptId).name();
 }
 
 std::string ska::bytecode::SymbolTableSerializerHelper::getRelativeScriptKey(std::size_t scriptId, const Symbol& value) {
 	auto relativeScriptKey = getMapBuilder(scriptId).key(value);
-	
-	/*
-	if (relativeScriptKey.empty()) {
-		auto ss = std::stringstream{};
-		ss << "bad symbol key retrieved in map for symbol \"" << value.type() << "\"";
-		throw std::runtime_error(ss.str());
-	}
-	*/
-
-	auto result = relativeScriptKey;
-	LOG_DEBUG << "Getting symbol \"" << value.name() << "\" relative script key \"" << result << "\"";
-
-	return result;
+	LOG_DEBUG << "Getting symbol \"" << value.name() << "\" relative script key \"" << relativeScriptKey << "\"";
+	return relativeScriptKey;
 }
 
+void ska::bytecode::SymbolTableSerializerHelper::writeOperand(SerializerSafeZone<17> safeZone, const Operand& value) {
+	OperandSerializer::write(*m_cache, std::move(safeZone), value);
+}

@@ -14,7 +14,6 @@ namespace ska {
 			SerializerNativeContainer& natives() { return m_natives; }
 
 			std::vector<Instruction> instructions {};
-			std::vector<ExportSymbol> exports {};
 
 		private:
 			SerializerNativeContainer& m_natives;

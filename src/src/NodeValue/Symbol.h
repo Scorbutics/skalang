@@ -21,10 +21,10 @@ namespace ska {
 		Symbol(std::size_t tableIndex, std::string name, SymbolFieldResolver fields);
 
 	public:
-		Symbol(const Symbol& s);
+		Symbol(const Symbol& s) = delete;
 		Symbol(Symbol&& s) noexcept;
 
-		Symbol& operator=(const Symbol& s);
+		Symbol& operator=(const Symbol& s) = delete;
 		Symbol& operator=(Symbol&& s) noexcept;
 
 		const std::string& name() const { return m_name; }

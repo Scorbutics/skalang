@@ -10,15 +10,23 @@ namespace ska {
 		class SymbolTableSerializerHelper;
 	}
 
+	template <std::size_t Bytes>
+	struct BytesValue {
+		static constexpr auto value = Bytes;
+	};
+
 	template <>
 	struct SerializerTypeTraits<Symbol*> {
-		static constexpr std::size_t BytesRequired = 4 * sizeof(bytecode::Chunk) + sizeof(uint8_t);
+		static constexpr std::size_t BytesSymbolRefRequired = 4 * sizeof(bytecode::Chunk) + sizeof(uint8_t);
+		static constexpr std::size_t BytesRequired = 2 * BytesValue<BytesSymbolRefRequired>::value + sizeof(uint8_t);
+
 		static constexpr const char* Name = "Symbol";
 
 		static void Read(SerializerSafeZone<BytesRequired>& zone, Symbol*& symbol, bytecode::SymbolTableDeserializerHelper& helper);
 		static void Write(SerializerSafeZone<BytesRequired>& zone, const Symbol& symbol, bytecode::SymbolTableSerializerHelper& helper);
 
 	private:
-		static void WriteSymbolRefBody(SerializerSafeZone<2*sizeof(bytecode::Chunk)> zone, const Symbol& symbol, bytecode::SymbolTableSerializerHelper& helper);
+		static Symbol& ReadSymbolRefBody(SerializerSafeZone<BytesSymbolRefRequired> zone, bytecode::SymbolTableDeserializerHelper& helper);
+		static void WriteSymbolRefBody(SerializerSafeZone<BytesSymbolRefRequired> zone, const Symbol& symbol, bytecode::SymbolTableSerializerHelper& helper);
 	};
 }
