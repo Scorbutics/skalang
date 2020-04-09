@@ -21,10 +21,17 @@ void ska::bytecode::SymbolTableDeserializer::readFull(SerializerOutput output) {
 	LOG_INFO << "Symbols (in total) : " << totalSymbolsInMap;
 
 	for (std::size_t i = 0; i < totalSymbolsInMap; i++) {
-		read(output);
+		readPart(output);
 	}
 
 	output.validateOrThrow();
+}
+
+ska::Symbol* ska::bytecode::SymbolTableDeserializer::read(SerializerOutput& output) {
+	auto symbolSerializer = SerializerType<ska::Symbol*, SymbolTableDeserializerHelper&>{output};
+	Symbol* symbol;
+	symbolSerializer.read(symbol, m_helper);
+	return symbol;
 }
 
 ska::SymbolizedType ska::bytecode::SymbolTableDeserializer::readPart(SerializerOutput& output) {
@@ -48,6 +55,3 @@ ska::SymbolizedType ska::bytecode::SymbolTableDeserializer::readPart(SerializerO
 	return symbolizedType;
 }
 
-void ska::bytecode::SymbolTableDeserializer::read(SerializerOutput& output) {
-	auto symbolizedType = readPart(output);
-}

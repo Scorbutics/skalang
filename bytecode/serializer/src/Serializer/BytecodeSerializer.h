@@ -24,6 +24,9 @@ namespace ska {
 			bool serialize(ScriptCache& cache, SerializationStrategy output) const;
 			std::vector<std::string> deserialize(DeserializationContext& output, const std::unordered_set<std::string>& blacklist = {}) const;
 			std::vector<std::string> deserialize(ScriptCache& cache, const std::string& startScriptName, DeserializationStrategy input, const std::unordered_set<std::string>& blacklist = {}) const;
+
+		private:
+			std::vector<std::string> deserialize(DeserializationContext& context, const std::string& scriptName, const std::unordered_set<std::string>& blacklist) const;
 		};
 	}
 }

@@ -29,8 +29,8 @@ namespace ska {
 			~SymbolTableDeserializer() = default;
 
 			void readFull(SerializerOutput output);
+			Symbol* read(SerializerOutput& output);
 		private:
-			void read(SerializerOutput& output);
 			SymbolizedType readPart(SerializerOutput& output);
 
 			SymbolTableDeserializerHelper m_helper;

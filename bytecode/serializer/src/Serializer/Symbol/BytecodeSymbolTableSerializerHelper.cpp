@@ -2,7 +2,7 @@
 #include "BytecodeSymbolTableSerializerHelper.h"
 #include "Generator/Value/BytecodeScriptCache.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::SymbolTableSerializerHelper);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::SymbolTableSerializerHelper);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::SymbolTableSerializerHelper)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::SymbolTableSerializerHelper)
@@ -24,19 +24,21 @@ ska::bytecode::TreeSymbolTableMapBuilder& ska::bytecode::SymbolTableSerializerHe
 	return *m_mapBuilder[id];
 }
 
-std::pair<std::size_t, ska::bytecode::Operand> ska::bytecode::SymbolTableSerializerHelper::extractGeneratedOperandFromSymbol(const Symbol& symbol) {
+std::size_t ska::bytecode::SymbolTableSerializerHelper::scriptOfSymbol(const Symbol& symbol) {
+	std::size_t scriptId;
 	auto* info = m_cache->getSymbolInfo(symbol);
 	if (info == nullptr) {
-		throw std::runtime_error("unknown ast symbol \"" + symbol.name() + "\" detected during script bytecode serialization");
+		auto scriptIt = m_cache->find(symbol.name());
+		if (scriptIt == m_cache->end()) {
+			throw std::runtime_error("unknown ast symbol \"" + symbol.name() + "\" detected during script bytecode serialization");
+		}
+		scriptId = (*scriptIt)->id();
+	} else {
+		scriptId = info->script;
 	}
-	auto operand = m_cache->at(info->script).getSymbol(symbol);
-	if (!operand.has_value()) {
-		throw std::runtime_error("not generated symbol \"" + symbol.name() + "\" in ast detected during script bytecode serialization");
-	}
+	LOG_DEBUG << "Symbol \"" << symbol.name() << "\" is in script \"" << scriptId << "\"";
 
-	LOG_DEBUG << "Symbol \"" << symbol.name() << "\" as variable \"" << operand.value() << "\"";
-
-	return std::make_pair(info->script, operand.value());
+	return scriptId;
 }
 
 const std::string& ska::bytecode::SymbolTableSerializerHelper::getScriptName(const std::size_t scriptId) const {
@@ -45,11 +47,14 @@ const std::string& ska::bytecode::SymbolTableSerializerHelper::getScriptName(con
 
 std::string ska::bytecode::SymbolTableSerializerHelper::getRelativeScriptKey(std::size_t scriptId, const Symbol& value) {
 	auto relativeScriptKey = getMapBuilder(scriptId).key(value);
+	
+	/*
 	if (relativeScriptKey.empty()) {
 		auto ss = std::stringstream{};
 		ss << "bad symbol key retrieved in map for symbol \"" << value.type() << "\"";
 		throw std::runtime_error(ss.str());
 	}
+	*/
 
 	auto result = relativeScriptKey;
 	LOG_DEBUG << "Getting symbol \"" << value.name() << "\" relative script key \"" << result << "\"";

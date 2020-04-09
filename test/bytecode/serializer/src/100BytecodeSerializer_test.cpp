@@ -9,6 +9,7 @@
 #include "BytecodeInterpreter/BytecodeInterpreter.h"
 #include "BytecodeSerializerTest.h"
 #include "std/module/io/log.h"
+#include "Base/Serialization/SerializerValidator.h"
 
 static std::unordered_map<std::string, std::stringstream> SerializingStreams = {};
 
@@ -27,6 +28,7 @@ static ska::bytecode::DeserializationStrategy DeserializeInStream() {
 }
 
 TEST_CASE("[BytecodeSerializer] literal alone") {
+	ska::SerializerValidator::DisableAbort();
 	auto [script, data] = Serialize("4\n");
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto res = data.serializer->serialize(*data.storage, SerializeInStream());
@@ -40,38 +42,48 @@ TEST_CASE("[BytecodeSerializer] literal alone") {
 }
 
 TEST_CASE("[BytecodeSerializer] function + field access + floating point value + integer value + string value") {
-	auto [script, data] = Serialize("toto = function(): var do return { bark = \"bibi\" }\n end\n toto().bark\n \"test\"\n 3.4\n 3\n");
-	auto& gen = data.generator->generate(*data.storage, std::move(script));
-	auto res = data.serializer->serialize(*data.storage, SerializeInStream());
+	ska::SerializerValidator::DisableAbort();
+	
+	auto [scriptIn, dataIn] = Serialize("toto = function(): var do return { bark = \"bibi\" }\n end\n toto().bark\n \"test\"\n 3.4\n 3\n");
+	auto& gen = dataIn.generator->generate(*dataIn.storage, std::move(scriptIn));
+	auto res = dataIn.serializer->serialize(*dataIn.storage, SerializeInStream());
 	CHECK(res);
-	auto destinationCache = ska::bytecode::ScriptCache{};
-	auto original = data.serializer->deserialize(destinationCache, "main", DeserializeInStream());
-	CHECK(original.empty());
 
-	CHECK(destinationCache.at(0) == data.storage->at(0));
+	auto [scriptOut, dataOut] = Serialize("");
+	auto original = dataOut.serializer->deserialize(*dataOut.storage, "main", DeserializeInStream());
+	CHECK(original.empty());
+	
+	CHECK(dataIn.storage->at(0) == dataOut.storage->at(0));
 }
 
 
 TEST_CASE("[BytecodeSerializer] concrete external script use") {
+	ska::SerializerValidator::DisableAbort();
+
 	constexpr auto progStr =
 		"Character66 = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
 		"enemy = Character66.default\n"
 		"enemy.age = 99\n"
 		"t = enemy.age\n";
-	auto [script, data] = Serialize(progStr);
-	auto& gen = data.generator->generate(*data.storage, std::move(script));
-	auto res = data.serializer->serialize(*data.storage, SerializeInStream());
+	auto [scriptIn, dataIn] = Serialize(progStr);
+	auto& gen = dataIn.generator->generate(*dataIn.storage, std::move(scriptIn));
+	auto res = dataIn.serializer->serialize(*dataIn.storage, SerializeInStream());
 	CHECK(res);
-	auto destinationCache = ska::bytecode::ScriptCache{};
-	auto original = data.serializer->deserialize(destinationCache, "main", DeserializeInStream());
+
+	auto [scriptOut, dataOut] = Serialize("");
+	auto original = dataOut.serializer->deserialize(*dataOut.storage, "main", DeserializeInStream());
 	CHECK(original.empty());
 
-	CHECK(destinationCache.size() == 2);
-	const auto equality = destinationCache.at(0) == data.storage->at(0) && destinationCache.at(1) == data.storage->at(1);
+	CHECK(dataOut.storage->size() == 2);
+
+	const auto equalityMain = dataIn.storage->at(0) == dataOut.storage->at(0);
+	const auto equalityCharacter = dataIn.storage->at(1) == dataOut.storage->at(1);
+	const auto equality = equalityMain && equalityCharacter;
 	CHECK(equality);
 }
 
 TEST_CASE("[BytecodeSerializer] binded external script use") {
+	ska::SerializerValidator::DisableAbort();
 	constexpr auto progStr =
 		"Logger = import \"bind:std.native.io.log\"\n"
 		"Logger.print(\"test63\")\n";
@@ -100,7 +112,7 @@ TEST_CASE("[BytecodeSerializer] binded external script use") {
 }
 
 TEST_CASE("[BytecodeSerializer] external script use, other stack, triggers rebuild") {
-	
+	ska::SerializerValidator::DisableAbort();
 	std::unordered_map<std::string, std::stringstream> serializingStreamsOut = {};
 	auto stringSerializer = [&serializingStreamsOut](const std::string& scriptName) -> std::ostream& {
 		std::cout << "local serialization " << scriptName << std::endl;

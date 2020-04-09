@@ -11,10 +11,6 @@ ska::bytecode::TreeMapSymbolTableBuilder::TreeMapSymbolTableBuilder(SymbolTable&
 ska::Symbol& ska::bytecode::TreeMapSymbolTableBuilder::walkScope(const std::vector<std::string>& parts, std::string leafName) {
 	auto* currentSymbolTable = m_rootRead;
 
-	if (parts.size() == 1) {
-		throw std::runtime_error("invalid symbol path");
-	}
-
 	ska::ScopedSymbolTable* parent = currentSymbolTable;
 	// First part is script name native index. Last part is leaf child index.
 	// avoid using both

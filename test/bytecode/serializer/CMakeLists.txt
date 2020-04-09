@@ -2,7 +2,6 @@ project(skalang_bytecode_serializer_test)
 
 include_directories(${SKALANG_SRC_DIR}/src)
 include_directories(${SKALANG_TEST_DIR}/src)
-include_directories(${SKALANG_INTERPRETER_DIR}/src)
 include_directories(${SKALANG_BYTECODE_GEN_DIR}/src)
 include_directories(${SKALANG_BYTECODE_SER_DIR}/src)
 include_directories(${SKALANG_BYTECODE_INT_DIR}/src)

@@ -1,13 +1,16 @@
 #include "BytecodeOperandSerializer.h"
 #include "BytecodeCommonSerializer.h"
 
-#include "Generator/Value/BytecodeOperand.h"
 #include "Generator/Value/BytecodeScriptCache.h"
 #include "Serializer/BytecodeChunk.h"
 
 const std::string ska::bytecode::OperandSerializer::scriptName(const ScriptCache& cache, std::size_t id) {
 	if (!cache.exist(id)) { throw std::runtime_error("script with id \"" + std::to_string(id) + "\" does not exist"); }
 	return cache[id].name();
+}
+
+std::size_t ska::bytecode::OperandSerializer::scriptId(const ScriptCache& cache, const std::string& name) {
+	return cache.id(name);
 }
 
 void ska::bytecode::OperandSerializer::write(const ScriptCache& cache, SerializerSafeZone<sizeof(uint8_t) + sizeof(Chunk) * 2> output, const Operand& value) {
@@ -60,3 +63,50 @@ void ska::bytecode::OperandSerializer::write(const ScriptCache& cache, Serialize
 	}
 }
 
+
+ska::bytecode::Operand ska::bytecode::OperandSerializer::read(const ScriptCache& cache, SerializerSafeZone<2 * sizeof(Chunk) + sizeof(uint8_t)> input) {
+
+	auto type = input.read<uint8_t>();
+	auto script = input.read<Chunk>();
+	auto variable = input.read<Chunk>();
+
+	auto operandType = static_cast<OperandType>(type);
+	auto content = OperandVariant{};
+	switch (operandType) {
+	case OperandType::PURE:
+		switch (static_cast<std::size_t>(script)) {
+		case 0:
+			//native ref
+			content = std::make_shared<std::string>(input.ref(variable));
+			operandType = OperandType::MAGIC;
+			break;
+		case 1:
+			content = static_cast<long>(variable);
+			break;
+		case 2:
+			content = static_cast<double>(variable);
+			break;
+		case 3:
+			content = static_cast<bool>(variable);
+			break;
+		}
+		break;
+
+	case OperandType::BIND_SCRIPT:
+		content = ScriptVariableRef{ scriptId(cache, input.ref(variable)), scriptId(cache, input.ref(script)) };
+		break;
+	case OperandType::BIND_NATIVE:
+	case OperandType::REG:
+	case OperandType::VAR:
+		content = ScriptVariableRef{ static_cast<std::size_t>(variable), scriptId(cache, input.ref(script)) };
+		break;
+
+	case OperandType::EMPTY:
+		return {};
+
+	default:
+		throw std::runtime_error("cannot handle operand type deserialization " + std::to_string(type));
+		break;
+	}
+	return Operand{ std::move(content), operandType };
+}

@@ -84,7 +84,7 @@ std::size_t ska::bytecode::SerializationContext::writeExports() {
 		if (!exp.value.empty()) {
 			assert(exp.symbol != nullptr);
 			LOG_INFO << "Writing export " << exp.value << " with symbol " << exp.symbol->type();
-			//m_symbolsSerializer.writeIfExists(output, exp.symbol);
+			m_symbolsSerializer.writeSymbolOnlyIfExists(output, exp.symbol);
 			(*this) << exp.value;
 		}
 	}

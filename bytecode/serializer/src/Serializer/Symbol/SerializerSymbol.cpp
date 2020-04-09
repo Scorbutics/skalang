@@ -45,20 +45,14 @@ void ska::SerializerTypeTraits<ska::Symbol*>::Write(SerializerSafeZone<BytesRequ
 }
 	
 void ska::SerializerTypeTraits<ska::Symbol*>::WriteSymbolRefBody(SerializerSafeZone<2 * sizeof(bytecode::Chunk)> zone, const Symbol& symbol, bytecode::SymbolTableSerializerHelper& helper) {
-	auto [scriptId, operand] = helper.extractGeneratedOperandFromSymbol(symbol);
+	auto scriptId = helper.scriptOfSymbol(symbol);
 
-	//LOG_INFO << "%13c\twith Raw operand " << operand;
-	//LOG_INFO << "%13c\twith " << symbol.size() << " children";
-
-	// Operand (???)
-	// OperandSerializer::write(*m_cache, buffer, natives, operand);
-
-	auto absoluteScriptKey = std::to_string(zone.ref(helper.getScriptName(scriptId))) + "." + helper.getRelativeScriptKey(scriptId, symbol);
+	auto relativeScriptKey = helper.getRelativeScriptKey(scriptId, symbol);
+	auto absoluteScriptKey = std::to_string(zone.ref(helper.getScriptName(scriptId))) + (relativeScriptKey.empty() ? "" : ("." + relativeScriptKey));
 
 	LOG_INFO << "%13cSymbol Name refered : " << symbol.name() << " with key : " << absoluteScriptKey;
 
 	zone.write(std::move(absoluteScriptKey));
-
 	zone.write(symbol.name());
 }
 

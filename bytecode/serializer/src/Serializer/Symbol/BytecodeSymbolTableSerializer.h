@@ -28,12 +28,14 @@ namespace ska {
 			SymbolTableSerializer& operator=(const SymbolTableSerializer&) = delete;
 			~SymbolTableSerializer() = default;
 
-			void writeIfExists(SerializerOutput& output, const Symbol* value);
+			void writeSymbolOnlyIfExists(SerializerOutput& output, const Symbol* value);
 			void writeFull(SerializerOutput output, std::size_t id);
 			void writeFull(SerializerOutput& output, const TreeSymbolTableMapBuilder::ReverseIndexSymbolMapWrite& reversedMap);		
 
 			void write(SerializerOutput& output, const Symbol* value, const Type& type) override;
 		private:
+			void writeFullTypeIfExists(SerializerOutput& output, const Symbol* value);
+
 			SymbolTableSerializerHelper m_helper;
 		};
 	}

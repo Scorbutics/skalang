@@ -22,7 +22,7 @@ namespace ska {
 			TreeSymbolTableMapBuilder& getMapBuilder(std::size_t id);
 			std::string getRelativeScriptKey(std::size_t scriptId, const Symbol& value);
 			const std::string& getScriptName(const std::size_t scriptId) const;
-			std::pair<std::size_t, Operand> extractGeneratedOperandFromSymbol(const Symbol& symbol);
+			std::size_t scriptOfSymbol(const Symbol& symbol);
 
 		public:
 			const ScriptCache* m_cache = nullptr;

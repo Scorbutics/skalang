@@ -159,7 +159,7 @@ int ska::ExpressionParser::matchParenthesis(ScriptAST& input, ExpressionStack& e
 			//We have to pop it, then matching the function call as the new operand.
 			expressions.push(m_matcherFunction.matchCall(input, std::move(functionNameOperand)));
 			return -1;
-		} else if(functionNameOperand->type().has_value()) {
+		} else if (functionNameOperand->type().has_value()) {
 			auto ss = std::stringstream{};
 			ss << "expected a function as identifier but got a \"" << functionNameOperand->type().value() << "\"";
 			error(ss.str());

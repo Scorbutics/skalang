@@ -15,6 +15,11 @@ ska::bytecode::SymbolTableDeserializerHelper::SymbolTableDeserializerHelper(Scri
 
 ska::bytecode::TreeMapSymbolTableBuilder& ska::bytecode::SymbolTableDeserializerHelper::getSymbolTableBuilder(const std::string& scriptName) {
 	if (m_symbolTableBuilder[scriptName] == nullptr) {
+		// Virtually rebuild a ScriptAST to refer its symbol table
+		if (m_cache->astCache.atOrNull(scriptName) == nullptr) {
+			auto scriptAST = ScriptAST{ m_cache->astCache, scriptName, {} };
+			LOG_INFO << "Script AST \"" << scriptName << "\" was empty-built for deserialization of its symbol table";
+		}
 		m_symbolTableBuilder[scriptName] = std::make_unique<TreeMapSymbolTableBuilder>(m_cache->astCache.at(scriptName).symbols());
 	}
 
@@ -26,13 +31,14 @@ ska::Symbol& ska::bytecode::SymbolTableDeserializerHelper::buildSymbol(detail::S
 
 	if (!absoluteScriptKey.empty()) {
 		const auto scriptDelimiter = absoluteScriptKey.find_first_of('.');
+		std::size_t scriptNativeStrId;
 		if (scriptDelimiter != std::string::npos) {
-			std::size_t scriptNativeStrId = std::atoi(absoluteScriptKey.substr(0, scriptDelimiter).c_str());
-			const auto& scriptName = zone.ref(scriptNativeStrId);
-			symbol = getSymbolTableBuilder(scriptName).value(absoluteScriptKey, symbolName);
+			scriptNativeStrId = std::atoi(absoluteScriptKey.substr(0, scriptDelimiter).c_str());
 		} else {
-			LOG_ERROR << "Unable to find script part in absolute script key \"" << absoluteScriptKey << "\"";
+			scriptNativeStrId = std::atoi(absoluteScriptKey.c_str());
 		}
+		const auto& scriptName = zone.ref(scriptNativeStrId);
+		symbol = getSymbolTableBuilder(scriptName).value(absoluteScriptKey, symbolName);
 	} else {
 		LOG_ERROR << "Empty symbol script key provided";
 	}

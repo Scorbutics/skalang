@@ -10,7 +10,7 @@
 
 static constexpr std::size_t SERIALIZER_VERSION = 1;
 
-SKA_LOGC_CONFIG(ska::LogLevel::Error, ska::bytecode::Serializer);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Serializer);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Serializer)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Serializer)
@@ -40,52 +40,54 @@ bool ska::bytecode::Serializer::serialize(SerializationContext& context) const {
 	}
 }
 
-std::vector<std::string> ska::bytecode::Serializer::deserialize(DeserializationContext& context, const std::unordered_set<std::string>& blacklist) const {
-	auto failedScripts = std::vector<std::string> {};
-	std::string scriptName = context.startScriptName();
-	auto scripts = std::unordered_set<std::string> {};
-	scripts.insert(scriptName);
-	
-	auto scriptIt = scripts.begin();
-
-	while (scriptIt != scripts.end()) {
-		auto canRead = context.read(*scriptIt);
-		
-		if (canRead) {
-			scripts.erase(scriptIt);
-
-			auto script = ScriptParts{};
-			LOG_INFO << "Natives section ";
-			context >> script.natives;
-			LOG_INFO << script.natives.size() << " natives";
-
-			context >> script.header;
-
-			LOG_INFO << "[Serializer script version " << script.header.serializerVersion << "], script " << script.header.scriptName() << " refered as id " << script.header.scriptId << " when it was compiled";
-
-			context >> script.references;
-
-			scripts.insert(std::make_move_iterator(script.references.scripts.begin()), std::make_move_iterator(script.references.scripts.end()));
-			scriptIt = scripts.begin();
-			script.references.scripts.clear();
-
-			if (blacklist.find(script.header.scriptName()) == blacklist.end()) {
-				if (!script.header.scriptBridged) {
-					context >> script.body;
-				}
-				LOG_INFO << "Declaring script " << script.header.scriptName();
-				context.declare(script.header.scriptName(), std::move(script.body.instructions), std::move(script.body.exports));
-			} else {
-				LOG_INFO << "Script " << script.header.scriptName() << " is blacklisted. Not declared";
-			}
-		} else {
-			LOG_INFO << "Script " << *scriptIt << " cannot be read. Added to queue.";
-			failedScripts.push_back(*scriptIt);
-			scriptIt++;
-		}
+std::vector<std::string> ska::bytecode::Serializer::deserialize(DeserializationContext& context, const std::string& scriptName, const std::unordered_set<std::string>& blacklist) const {
+	if (context.isReadingStarted(scriptName)) {
+		return {};
 	}
-	LOG_INFO << "No more scripts, leaving deserialization";
+	
+	auto scriptSerializationContext = context.read(scriptName);
+
+	auto failedScripts = std::vector<std::string>{};
+
+	if (scriptSerializationContext != nullptr) {
+
+		auto& script = scriptSerializationContext->parts();
+
+		*scriptSerializationContext >> script.header;
+
+		LOG_INFO << "[Serializer script version " << script.header.serializerVersion << "], script " << script.header.scriptName() << " refered as id " << script.header.scriptId << " when it was compiled";
+
+		*scriptSerializationContext >> script.references;
+
+		for (const auto& referencedScript : script.references.scripts) {
+			auto referencedFailedScripts = deserialize(context, referencedScript, blacklist);
+			failedScripts.insert(failedScripts.end(), std::make_move_iterator(referencedFailedScripts.begin()),
+				std::make_move_iterator(referencedFailedScripts.end()));
+		}
+
+		script.references.scripts.clear();
+
+		if (blacklist.find(script.header.scriptName()) == blacklist.end()) {
+			if (!script.header.scriptBridged) {
+				*scriptSerializationContext >> script.body;
+			}
+			LOG_INFO << "Declaring script " << script.header.scriptName();
+			context.declare(script.header.scriptName(), std::move(script.body.instructions), std::move(script.body.exports));
+		} else {
+			LOG_INFO << "Script " << script.header.scriptName() << " is blacklisted. Not declared";
+		}
+	} else {
+		failedScripts.push_back(scriptName);
+		LOG_INFO << "Script " << scriptName << " cannot be read. Added to queue.";
+	}
+		
 	return failedScripts;
+	
+}
+
+std::vector<std::string> ska::bytecode::Serializer::deserialize(DeserializationContext& context, const std::unordered_set<std::string>& blacklist) const {
+	std::string scriptName = context.startScriptName();
+	return deserialize(context, scriptName, blacklist);
 }
 
 bool ska::bytecode::Serializer::serialize(ScriptCache& cache, SerializationStrategy output) const {

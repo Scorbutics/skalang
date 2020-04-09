@@ -2,7 +2,6 @@ project(skalang_bytecode_interpreter_test)
 
 include_directories(${SKALANG_SRC_DIR}/src)
 include_directories(${SKALANG_TEST_DIR}/src)
-include_directories(${SKALANG_INTERPRETER_DIR}/src)
 include_directories(${SKALANG_BYTECODE_GEN_DIR}/src)
 include_directories(${SKALANG_BYTECODE_INT_DIR}/src)
 include_directories(${SKALANG_STD_DIR}/src)
@@ -23,7 +22,7 @@ generate_source_groups("${SOURCES}" "${SKALANG_BYTECODE_TEST_DIR}\\interpreter\\
 add_executable(skalang_bytecode_interpreter_test ${SOURCES})
 
 find_package(Threads REQUIRED)
-target_link_libraries(skalang_bytecode_interpreter_test skalang skalang_interpreter skalang_bytecode_generator skalang_bytecode_interpreter skalog skabase Threads::Threads)
+target_link_libraries(skalang_bytecode_interpreter_test skalang skalang_bytecode_generator skalang_bytecode_interpreter skalog skabase Threads::Threads)
 target_include_directories(skalang_bytecode_interpreter_test PUBLIC ../../../external/skalog/src/src)
 target_include_directories(skalang_bytecode_interpreter_test PUBLIC ../../../external/skabase/src/src)
 target_include_directories(skalang_bytecode_interpreter_test PUBLIC ../../../external/doctest)
