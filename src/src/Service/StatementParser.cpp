@@ -137,11 +137,14 @@ ska::ScriptASTPtr ska::StatementParser::subParse(ScriptCacheAST& scriptCache, co
 		(std::istreambuf_iterator<char>())
 	);
 
-	auto tokenizer = Tokenizer{ m_reservedKeywordsPool, std::move(content)};
-	auto tokens = tokenizer.tokenize();
-
 	const auto scriptAlreadyExists = scriptCache.find(name) != scriptCache.end();
 	SLOG(ska::LogLevel::Info) << "SubParsing script " << name << " : " << (scriptAlreadyExists ? "not " : "") << "in cache";
+	if (scriptAlreadyExists) {
+		return std::make_unique<ScriptAST>(scriptCache.at(name));
+	}
+
+	auto tokenizer = Tokenizer{ m_reservedKeywordsPool, std::move(content) };
+	auto tokens = tokenizer.tokenize();
 	auto script = ScriptASTPtr{std::make_unique<ScriptAST>( scriptCache, name, tokens )};
 	script->parse(*this);
 	return script;

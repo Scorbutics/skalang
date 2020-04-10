@@ -16,12 +16,12 @@ ska::ScriptAST::ScriptAST(ScriptCacheAST& scriptCache, const std::string& name, 
 	} else {
 		auto& scriptWanted = m_cache->at(name);
 		if (!input.empty() && scriptWanted.m_input.emptyTokens()) {
+			if (scriptWanted.m_ast != nullptr) {
+				throw std::runtime_error("invalid ast script instantiation : tokens were provided but ast is already built");
+			}
+			scriptWanted.m_input = TokenReader{ std::move(input) };
 			
-			//if (scriptWanted.m_ast == nullptr) {
-				//throw std::runtime_error("invalid ast script instantiation : tokens were provided but ast is already built");
-				scriptWanted.m_input = TokenReader{ std::move(input) };
-			//}
-				m_inCache = true;
+			//m_inCache = true;
 		} else {
 			SLOG(LogLevel::Info) << "Script AST " << name << " is already in cache";
 			m_inCache = true;

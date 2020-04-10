@@ -5,7 +5,7 @@
 #include "Base/Serialization/SerializerSafeZone.h"
 #include "Serializer/BytecodeOperandSerializer.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::SymbolTableDeserializerHelper);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::SymbolTableDeserializerHelper);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::SymbolTableDeserializerHelper)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::SymbolTableDeserializerHelper)

@@ -7,7 +7,7 @@
 #include "SerializerSymbol.h"
 #include "SerializerSymbolizedType.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Info, ska::bytecode::SymbolTableSerializer);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::SymbolTableSerializer);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::SymbolTableSerializer)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::SymbolTableSerializer)

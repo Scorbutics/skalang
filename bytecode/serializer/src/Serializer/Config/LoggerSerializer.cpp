@@ -6,7 +6,7 @@
 #define SKALANG_SERIALIZER_LOGGING
 
 ska::detail::SkaLangSerializerLogger& ska::detail::LangSerializerLogger() {
-	static auto logger = ska::detail::BuildLangSerializerLogger("SerializerLog.txt");
+	static auto logger = ska::detail::BuildLangSerializerLogger("SerializerLog.log");
 	return logger;
 }
 

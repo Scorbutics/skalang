@@ -8,7 +8,7 @@ namespace ska {
 	struct SerializerTypeTraitsSymbolizedTypeLog;
 }
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::SerializerTypeTraitsSymbolizedTypeLog);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SerializerTypeTraitsSymbolizedTypeLog);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::SerializerTypeTraitsSymbolizedTypeLog)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::SerializerTypeTraitsSymbolizedTypeLog)

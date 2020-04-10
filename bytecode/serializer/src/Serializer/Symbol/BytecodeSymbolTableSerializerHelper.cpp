@@ -3,7 +3,7 @@
 #include "Generator/Value/BytecodeScriptCache.h"
 #include "Serializer/BytecodeOperandSerializer.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::SymbolTableSerializerHelper);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::SymbolTableSerializerHelper);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::SymbolTableSerializerHelper)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::SymbolTableSerializerHelper)

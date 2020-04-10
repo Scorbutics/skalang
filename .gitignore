@@ -29,6 +29,7 @@ TypeBuilderLogError.txt
 Log.txt
 LogError.txt
 **/LogError.txt
+*.log
 .vscode
 **/*.dir
 *.dir
