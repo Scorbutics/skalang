@@ -65,21 +65,21 @@ std::vector<std::string> ska::bytecode::Serializer::deserialize(DeserializationC
 			}
 
 			script.references.scripts.clear();
-		}
+
 
 		if (blacklist.find(script.header.scriptName()) == blacklist.end()) {
-			if (!script.header.scriptBridged) {
 				*scriptSerializationContext >> script.body;
-			}
-			LOG_INFO << "Declaring script " << script.header.scriptName();
+
+				LOG_INFO << "Declaring script " << script.header.scriptName() << (script.header.scriptBridged ? " (bridged)" : "");
 			context.declare(script.header.scriptName(), std::move(script.body.instructions));
-			if (!script.header.scriptBridged) {
+
 				context.generateExports(script.header.scriptName());
+
 			}
-		} else {
+			else {
 			LOG_INFO << "Script " << script.header.scriptName() << " is blacklisted. Not declared";
 		}
-
+		}
 	} else {
 		failedScripts.push_back(scriptName);
 		LOG_INFO << "Script " << scriptName << " cannot be read. Added to queue.";

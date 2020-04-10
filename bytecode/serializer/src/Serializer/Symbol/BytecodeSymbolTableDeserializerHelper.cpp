@@ -66,6 +66,7 @@ ska::Symbol& ska::bytecode::SymbolTableDeserializerHelper::buildSymbol(detail::S
 	if (oldSymbolInfo != nullptr) {
 		LOG_INFO << "Symbol \"" << symbol->name() << "\" already has symbol info (it should be a binded symbol)";
 		symbolInfo.binding = oldSymbolInfo->binding;
+		symbolInfo.bindingPassThrough = oldSymbolInfo->bindingPassThrough;
 	}
 	
 	const auto childIndexDelimiter = absoluteScriptKey.find_last_of('.');

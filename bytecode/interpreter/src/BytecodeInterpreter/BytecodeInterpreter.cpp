@@ -114,7 +114,7 @@ ska::bytecode::Interpreter::Interpreter(StatementParser& parser, Generator& gene
 
 void ska::bytecode::Interpreter::interpret(ExecutionContext& node) {
 	if (!node.isGenerated(node.currentScriptId())) {
-		LOG_WARN << "script id " << node.currentScriptId() << " is not bytecode-generated yet... cannot interpret !";
+		LOG_WARN << "script \"" << node.currentScriptName() << "\" is not bytecode-generated yet... cannot interpret !";
 		node.generate(m_parser, m_generator);
 	}
 

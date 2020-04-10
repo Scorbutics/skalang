@@ -80,21 +80,20 @@ int main(int argc, char* argv[]) {
 
 	try {
 		auto serializer = ska::bytecode::Serializer{};
-		auto failedToRead = serializer.deserialize(mainCache, "main", ska::bytecode::DeserializationStrategyType::PerScript(), {"main"});	
-
 		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);
 		auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
-
 		auto parameterValues = std::vector<ska::NodeValue>{};
-
 		auto parameterModule = BasicParameterModuleBuilder(moduleConfiguration, parameterValues, argc, argv);
-		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
-		auto& gen = generator.generate(mainCache, std::move(script));
 
-		auto interpreted = interpreter.interpret(gen.id(), mainCache);
+		auto failedToRead = serializer.deserialize(moduleConfiguration.scriptCache, "main", ska::bytecode::DeserializationStrategyType::PerScript(), {"main"});
+		
+		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
+		auto& gen = generator.generate(moduleConfiguration.scriptCache, std::move(script));
+
+		auto interpreted = interpreter.interpret(gen.id(), moduleConfiguration.scriptCache);
 
 		if (!failedToRead.empty()) {
-			assert(serializer.serialize(mainCache, ska::bytecode::SerializationStrategyType::PerScript()));
+			assert(serializer.serialize(moduleConfiguration.scriptCache, ska::bytecode::SerializationStrategyType::PerScript()));
 		}
 
 	} catch (std::exception& e) {

@@ -37,6 +37,10 @@ std::size_t ska::bytecode::ScriptExecution::id() const {
 	return scriptIndex;
 }
 
+const std::string& ska::bytecode::ScriptExecution::name() const {
+	return instructions.at(scriptIndex).name();
+}
+
 ska::bytecode::PlainMemoryTable* ska::bytecode::ScriptExecution::selectMemory(const Operand& dest) {
 	return SelectMemoryHelper<decltype(*this), PlainMemoryTable*>(*this, dest);
 }
