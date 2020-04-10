@@ -24,7 +24,7 @@ namespace ska {
 		class ScriptGeneration {
 			friend class InstructionOutput;
 		public:
-			ScriptGeneration(ScriptGenerationHelper origin, InstructionOutput instruction = {}, std::vector<ExportSymbol> symbols = {});
+			ScriptGeneration(ScriptGenerationHelper origin, InstructionOutput instruction = {}, ExportSymbolContainer symbols = {});
 			ScriptGeneration(ScriptCache& cache, std::vector<ska::Token> tokens, const std::string& name);
 
 			ScriptGeneration(ScriptGeneration&&) = default;
@@ -38,14 +38,14 @@ namespace ska {
 			const Instruction& operator[](std::size_t index) const { return m_generated[index]; }
 			Instruction& operator[](std::size_t index) { return m_generated[index]; }
 
-			const std::vector<ExportSymbol>& exportedSymbols() const { return m_exports; }
-			void setExportedSymbols(std::vector<ExportSymbol> symbols) { m_exports = std::move(symbols); }
+			const ExportSymbolContainer& exportedSymbols() const { return m_exports; }
+			void setExportedSymbols(ExportSymbolContainer symbols) { m_exports = std::move(symbols); }
 
-			std::optional<std::vector<ExportSymbol>> generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const {
+			std::optional<ExportSymbolContainer> generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const {
 				if(m_exports.empty()) {
 					return m_origin.generateExportedSymbols(std::move(symbolsInfo));
 				}
-				return std::optional<std::vector<ExportSymbol>>{};
+				return std::optional<ExportSymbolContainer>{};
 			}
 
 			std::optional<Operand> getSymbol(const Symbol& symbol) const;
@@ -71,7 +71,7 @@ namespace ska {
 			//void push(ScriptGeneration output);
 
 			ScriptGenerationHelper m_origin;
-			std::vector<ExportSymbol> m_exports;
+			ExportSymbolContainer m_exports;
 			InstructionOutput m_generated;
 		};
 

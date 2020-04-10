@@ -73,13 +73,13 @@ std::vector<std::string> ska::bytecode::Serializer::deserialize(DeserializationC
 			}
 			LOG_INFO << "Declaring script " << script.header.scriptName();
 			context.declare(script.header.scriptName(), std::move(script.body.instructions));
+			if (!script.header.scriptBridged) {
+				context.generateExports(script.header.scriptName());
+			}
 		} else {
 			LOG_INFO << "Script " << script.header.scriptName() << " is blacklisted. Not declared";
 		}
 
-		if (!script.header.scriptBridged) {
-			context.generateExports(script.header.scriptName());
-		}
 	} else {
 		failedScripts.push_back(scriptName);
 		LOG_INFO << "Script " << scriptName << " cannot be read. Added to queue.";

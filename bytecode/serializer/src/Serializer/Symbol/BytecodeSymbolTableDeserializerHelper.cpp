@@ -55,10 +55,8 @@ ska::Symbol& ska::bytecode::SymbolTableDeserializerHelper::buildSymbol(detail::S
 
 	LOG_DEBUG << "Got symbol \"" << symbol->name() << "\" from absolute script key \"" << absoluteScriptKey << "\"";
 
-	if (operand.type() == OperandType::VAR) {
-		m_cache->at(scriptId).helper().declareSymbol(*symbol, operand);
-		LOG_INFO << "Declared symbol as VAR \"" << symbol->name() << "\" with operand \"" << operand << "\"";
-	}
+	m_cache->at(scriptId).helper().declareSymbol(*symbol, operand);
+	LOG_INFO << "Declared symbol as VAR \"" << symbol->name() << "\" with operand \"" << operand << "\"";
 
 	const auto* oldSymbolInfo = m_cache->getSymbolInfo(*symbol);
 	auto scopeIndex = std::count(absoluteScriptKey.begin(), absoluteScriptKey.end(), '.');

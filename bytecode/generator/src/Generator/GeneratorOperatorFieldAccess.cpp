@@ -31,9 +31,12 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 		throw std::runtime_error(ss.str());
 	}
 
-	auto index = objectTypeSymbol->id(*symbolField);
-
-
+	std::size_t index;
+	if (objectSymbolInfo->exported) {
+		index = context.exportId(*symbolField);
+	} else {
+		index = objectTypeSymbol->id(*symbolField);
+	}
 
 	auto objectValue = generateNext({ context, node.GetObjectNameNode()});
 

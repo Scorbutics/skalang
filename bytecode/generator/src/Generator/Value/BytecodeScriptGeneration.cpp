@@ -16,7 +16,7 @@ ska::bytecode::ScriptGeneration::ScriptGeneration(ScriptCache& cache, std::vecto
 	ScriptGeneration(AddScript(cache, std::move(tokens), name)) {
 }
 
-ska::bytecode::ScriptGeneration::ScriptGeneration(ScriptGenerationHelper origin, InstructionOutput instruction, std::vector<ExportSymbol> symbols) :
+ska::bytecode::ScriptGeneration::ScriptGeneration(ScriptGenerationHelper origin, InstructionOutput instruction, ExportSymbolContainer symbols) :
 	m_origin(std::move(origin)),
 	m_generated(std::move(instruction)),
 	m_exports(std::move(symbols)) {

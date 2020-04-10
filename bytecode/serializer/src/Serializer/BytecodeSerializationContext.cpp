@@ -5,7 +5,7 @@
 #include "BytecodeOperandSerializer.h"
 #include "Base/Serialization/SerializerOutput.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::SerializationContext);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::SerializationContext);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::SerializationContext)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::SerializationContext)

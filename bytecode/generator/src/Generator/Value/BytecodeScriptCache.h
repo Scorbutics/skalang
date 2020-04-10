@@ -22,7 +22,7 @@ namespace ska {
 	    const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
         SymbolInfo getSymbolInfoOrNew(std::size_t scriptIndex, const Symbol& symbol) const;
 
-	    const std::vector<ExportSymbol>& getExportedSymbols(std::size_t scriptIndex);
+	    const ExportSymbolContainer& getExportedSymbols(std::size_t scriptIndex);
 
         void storeBinding(NativeFunctionPtr binding, ScriptVariableRef bindingRef);
         const NativeFunction& getBinding(ScriptVariableRef bindingRef) const;

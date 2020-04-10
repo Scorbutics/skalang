@@ -41,7 +41,7 @@ std::optional<ska::bytecode::Operand> ska::bytecode::UniqueSymbolGetterBase::get
 void ska::bytecode::UniqueSymbolGetterBase::declare(std::size_t script, const Symbol& symbol, Operand operand) {
 	auto varCount = m_container.find(&symbol);
 
-	if (operand.type() != OperandType::VAR) {
+	if (!std::holds_alternative<ScriptVariableRef>(operand.content())) {
 		auto ss = std::stringstream{};
 		ss << "symbol \"" << symbol.name() << "\" is not a variable";
 		throw std::runtime_error(ss.str());

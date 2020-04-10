@@ -31,14 +31,21 @@ ska::bytecode::DeserializationScriptContext* ska::bytecode::DeserializationConte
 
 		auto* scriptDeserializationContext = m_scriptDeserializationContext.atOrNull(scriptName);
 		if (scriptDeserializationContext == nullptr) {
-			auto fakeAST = ska::ScriptAST{ m_cache.astCache, scriptName, {Token {}} };
-			m_cache.emplace(scriptName, ScriptGeneration{ ScriptGenerationHelper{ m_cache, fakeAST} });
+			auto* ast = m_cache.astCache.atOrNull(scriptName);
+			if (ast == nullptr) {
+				auto fakeAST = ska::ScriptAST{ m_cache.astCache, scriptName, {} };
+				m_cache.emplace(scriptName, ScriptGeneration{ ScriptGenerationHelper{ m_cache, fakeAST } });
+			} else {
+				m_cache.emplace(scriptName, ScriptGeneration{ ScriptGenerationHelper{ m_cache, *ast } });
+			}
+			
 			m_scriptDeserializationContext.emplace(scriptName, DeserializationScriptContext{m_cache, m_symbolsDeserializer, input });
 		}
 
 		return &m_scriptDeserializationContext.at(scriptName);
-	} catch (std::runtime_error&) { 
+	} catch (std::runtime_error& e) { 
 		// unexisting script
+		std::cerr << e.what() << std::endl;
 		return nullptr;
 	}
 }

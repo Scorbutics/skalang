@@ -51,7 +51,7 @@ void ska::TypeBuilder::buildType(ASTNode& node, ScriptAST& script) {
 			node.linkSymbol(*computedSymbol);
 			return;
 		} else if (computedSymbol != currentSymbol) {
-			SLOG(LogLevel::Warn) << "Symbol link \"" << computedSymbol->name() << "\" now implements \"" << currentSymbol->name() << "\"";
+			SLOG(LogLevel::Warn) << "%14cSymbol link \"" << computedSymbol->name() << "\" now implements \"" << currentSymbol->name() << "\"";
 			node.updateType(typeHierarchy.type);
 			computedSymbol->implement(*currentSymbol);
 			return;

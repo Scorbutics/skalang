@@ -39,6 +39,7 @@ namespace ska {
 			Operand querySymbolOrOperand(const ASTNode& node);
 			Operand querySymbol(const Symbol& symbol);
 			std::optional<Operand> getSymbol(const Symbol& symbol) const;
+			std::size_t exportId(const Symbol& symbol) const;
 
 			const auto scriptIndex() const { return m_script.id(); }
 			auto scriptName() const { return m_script.name(); }
