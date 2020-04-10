@@ -22,7 +22,7 @@ ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
 	auto name = symbol.name();
 	SLOG(ska::LogLevel::Debug) << "\tSymbol \"" << name << "\" \"" <<  symbol.type() << "\"";
 	if(m_symbols.find(name) == m_symbols.end()) {
-		m_symbols.emplace(name, std::move(std::move(symbol)));
+		m_symbols.emplace(name, std::make_unique<Symbol>(std::move(symbol)));
 	} else {
 		throw std::runtime_error("Symbol already exists : " + name);
 	}

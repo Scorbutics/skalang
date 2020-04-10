@@ -28,8 +28,6 @@ namespace ska {
 
 			
 			Symbol* value(const std::string& key, std::optional<std::string> name);
-			void buildFieldReferences(ScriptCache& cache, Symbol& symbol, FieldsReferences& ref, std::size_t childIndex);
-			void buildFieldReferences(ScriptCache& cache);
 
 		private:
 			Symbol& walkScope(const std::vector<std::string>& parts, std::string leafName);

@@ -12,7 +12,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::O
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>::generate(OperateOn node, GenerationContext& context) {
 	const auto& fieldName = node.GetFieldNameNode().name();
 	const auto* objectTypeSymbol = node.GetObjectNameNode().typeSymbol();
-	if(objectTypeSymbol == nullptr) {
+	if (objectTypeSymbol == nullptr) {
 		throw std::runtime_error("unable to retrieve object type");
 	}
 
@@ -23,16 +23,6 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	throw std::runtime_error(ss.str());
 	}
 
-	auto optFieldValue = context.getSymbol(*symbolField);
-	if (optFieldValue.has_value()) {
-		LOG_DEBUG << "Accessing field " << optFieldValue.value() << " of object " << node.GetObjectNameNode();
-	} else {
-		auto ss = std::stringstream{ };
-		ss << "invalid bytecode : cannot access field \"" << symbolField->name() << "\" of object \"" << node.GetObjectNameNode() << "\" in script \"" << context.scriptName() << "\"";
-		throw std::runtime_error(ss.str());		
-	}
-
-	auto objectValue = generateNext({ context, node.GetObjectNameNode()});
 	const auto* objectSymbolInfo = context.getSymbolInfo(*symbolField);
 	if (objectSymbolInfo == nullptr) {
 		auto ss = std::stringstream { };
@@ -43,26 +33,9 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	auto index = objectTypeSymbol->id(*symbolField);
 
-	/*const auto& objectFieldReferences = objectSymbolInfo->references;
-	if (objectFieldReferences == nullptr || objectFieldReferences->empty()) {
-		auto ss = std::stringstream{};
-		ss << "invalid bytecode : the field \"" << symbolField->name() << "\" in the dereferenced object \"" << node.GetObjectNameNode() << "\" has no fields references in script ";
-		ss << context.scriptName(objectSymbolInfo->script);
-		throw std::runtime_error(ss.str());
-	}
 
-	auto fieldValue = optFieldValue.value();
-	const auto fieldVarReference = fieldValue.as<ScriptVariableRef>();
-	LOG_DEBUG << "This field is " << fieldVarReference.variable << " in script " << context.scriptName(fieldVarReference.script);
 
-	const auto fieldRefIndex = objectFieldReferences->find(fieldVarReference);
-	if (fieldRefIndex == objectFieldReferences->end()) {
-		throw std::runtime_error("invalid bytecode : the field \"" + fieldValue.toString()
-			+ "\" does not exist in object \"" + node.GetObjectNameNode().name() + "\" (" + objectValue.operand().toString() + ")");
-	}
-
-	LOG_DEBUG << "This field has index " << fieldRefIndex->second << " in the object";
-	*/
+	auto objectValue = generateNext({ context, node.GetObjectNameNode()});
 
 	LOG_DEBUG << "This field has index " << index << " in the object";
 

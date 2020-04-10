@@ -30,6 +30,13 @@ namespace ska {
 			}
     	}
 
+		TokenReader(const TokenReader&) = delete;
+		TokenReader(TokenReader&&) noexcept = default;
+		TokenReader& operator=(const TokenReader&) = delete;
+		TokenReader& operator=(TokenReader&&) = default;
+		~TokenReader() = default;
+
+		bool emptyTokens() const;
 		const Token* mightMatch(const Token& token);
 		const Token& match(const Token& t);
 		const Token& match(const TokenType type);
@@ -49,8 +56,8 @@ namespace ska {
 		const Token* nextToken(std::size_t offset) const;
     	void error(const Token* token = nullptr);
 
-    	const std::vector<ska::Token> m_input;
+    	std::vector<ska::Token> m_input;
     	std::size_t m_lookAheadIndex {};
-    	const Token* m_lookAhead {};
+    	Token* m_lookAhead {};
 	};
 }

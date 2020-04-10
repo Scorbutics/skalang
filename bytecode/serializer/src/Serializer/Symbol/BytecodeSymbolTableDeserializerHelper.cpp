@@ -63,7 +63,7 @@ ska::Symbol& ska::bytecode::SymbolTableDeserializerHelper::buildSymbol(detail::S
 	const auto* oldSymbolInfo = m_cache->getSymbolInfo(*symbol);
 	auto scopeIndex = std::count(absoluteScriptKey.begin(), absoluteScriptKey.end(), '.');
 	scopeIndex = scopeIndex == 0 ? 0 : (scopeIndex - 1);
-	auto symbolInfo = SymbolInfo{ static_cast<std::size_t>(scopeIndex + 1), symbolName, {}, scriptId };
+	auto symbolInfo = SymbolInfo{ static_cast<std::size_t>(scopeIndex + 1), symbolName, scriptId };
 
 	if (oldSymbolInfo != nullptr) {
 		LOG_INFO << "Symbol \"" << symbol->name() << "\" already has symbol info (it should be a binded symbol)";
@@ -90,8 +90,3 @@ ska::bytecode::Operand ska::bytecode::SymbolTableDeserializerHelper::readOperand
 	return OperandSerializer::read(*m_cache, std::move(safeZone));
 }
 
-void ska::bytecode::SymbolTableDeserializerHelper::buildFieldReferences() {
-	for (auto& script : *m_cache) {
-		getSymbolTableBuilder(script->name()).buildFieldReferences(*m_cache);
-	}
-}

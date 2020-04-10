@@ -61,6 +61,10 @@ bool ska::TokenReader::empty() const {
 	return m_lookAhead == nullptr || m_lookAhead->type() == ska::TokenType::EMPTY;
 }
 
+bool ska::TokenReader::emptyTokens() const {
+	return m_input.empty();
+}
+
 bool ska::TokenReader::canReadPrevious(std::size_t offset) const {
 	return m_lookAheadIndex >= offset;
 }
