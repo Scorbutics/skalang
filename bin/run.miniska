@@ -5,7 +5,7 @@ PathFcty = import "bind:std.native.io.path"
 ArrayFcty = import "std:std.value.array"
 
 run = function (parameters: Parameters::Fcty()) do
-	if (parameters.size() > 0) do
+	if parameters.size() > 0 do
 		path = PathFcty.Fcty(parameters.asString(0))
 		Log.print(path.canonical())
 

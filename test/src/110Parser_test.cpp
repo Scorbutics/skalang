@@ -135,6 +135,15 @@ TEST_CASE("If keyword pattern") {
 		CHECK(ast[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER, {}}));
 		CHECK(ast[1].op() == ska::Operator::BLOCK);
 	}
+
+	SUBCASE("If without parenthesis") {
+		auto astPtr = ASTFromInput(scriptCache, "if test do end", keywords);
+		auto& ast = astPtr.rootNode()[0];
+		CHECK(ast.op() == ska::Operator::IF);
+		CHECK(ast.size() == 2);
+		CHECK(ast[0].has(ska::Token{ "test", ska::TokenType::IDENTIFIER, {} }));
+		CHECK(ast[1].op() == ska::Operator::BLOCK);
+	}
 }
 
 TEST_CASE("function") {

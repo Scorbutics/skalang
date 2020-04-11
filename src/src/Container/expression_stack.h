@@ -61,7 +61,7 @@ namespace ska {
 
 			while (true) {
             	//Nothing more to group, we stop
-				if (emptyOperator() || emptyOperands()) {
+				if (emptyOperator()) {
 					break;
 				}
             	

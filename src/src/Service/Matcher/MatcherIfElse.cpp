@@ -17,12 +17,10 @@ ska::ASTNodePtr ska::MatcherIfElse::match(ScriptAST& input) {
     SLOG(ska::LogLevel::Debug) << "Matching if";
 
     input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::IF>());
-    input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>());
 
     {
         auto conditionExpression = input.expr(m_parser);
         SLOG(ska::LogLevel::Debug) << "Matching if - expression done";
-        input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 
         auto conditionStatement = input.statement(m_parser);
         SLOG(ska::LogLevel::Debug) << "Matching if - if statement done";
