@@ -11,6 +11,7 @@ namespace ska {
 				case Operator::FUNCTION_DECLARATION:
 				case Operator::VARIABLE_AFFECTATION:
 				case Operator::PARAMETER_DECLARATION:
+				case Operator::FILTER_PARAMETER_DECLARATION:
 					return true;
 				default:
 					return false;

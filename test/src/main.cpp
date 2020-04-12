@@ -14,7 +14,7 @@ int main(int argc, char* argv[]) {
 	if (context.shouldExit() || resultCode != 0) {
 	exit(-1);
 	}
-	return 0;
+	return resultCode;
 }
 
 

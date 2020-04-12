@@ -30,6 +30,7 @@ namespace ska {
 		STATEMENT_END,
 		ARGUMENT_DELIMITER,
 		TYPE_DELIMITER,
+		FILTER,
 		//Reserved values
 		TRUE,
 		FALSE,
@@ -65,6 +66,7 @@ namespace ska {
 		"\n",
 		",",
 		":",
+		"|",
 		"true",
 		"false"
 	};

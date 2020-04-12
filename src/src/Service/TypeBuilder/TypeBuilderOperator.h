@@ -47,3 +47,4 @@ namespace ska {
 #include "Service/TypeBuilder/TypeBuilderFieldAccess.h"
 #include "Service/TypeBuilder/TypeBuilderType.h"
 #include "Service/TypeBuilder/TypeBuilderUserDefinedObject.h"
+#include "Service/TypeBuilder/TypeBuilderFilterParameterDeclaration.h"

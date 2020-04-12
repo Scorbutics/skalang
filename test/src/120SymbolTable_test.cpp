@@ -109,6 +109,20 @@ TEST_CASE("Matching") {
 			ASTFromInput(scriptCache, "test71 = 3\n func71 = function(test71:string) do test71\n end\n", data);
 		}
 	
+		SUBCASE("filter") {
+			auto astPtr = ASTFromInput(scriptCache, "array113 = [0, 2, 3] \n array113 | (iterator, index) do end\n", data);
+			auto& table = reader->symbols();
+
+			CHECK(table.scopes() == 1);
+			auto parameterIterator = table.lookup(ska::SymbolTableLookup::direct("iterator"), ska::SymbolTableNested::firstChild());
+			CHECK(parameterIterator != nullptr);
+
+			auto parameterIndex = table.lookup(ska::SymbolTableLookup::direct("index"), ska::SymbolTableNested::firstChild());
+			CHECK(parameterIndex != nullptr);
+
+			const auto expectScope = table.root().child(0) != nullptr && table.root().child(0)->scopes() == 1;
+			CHECK(expectScope);
+		}
 	}
 
 }

@@ -185,6 +185,82 @@ TEST_CASE("function") {
 	}
 }
 
+TEST_CASE("filter") {
+	const auto keywords = ska::ReservedKeywordsPool{};
+	auto scriptCache = ska::ScriptCacheAST{};
+
+	SUBCASE("with 1 argument") {
+		auto astPtr = ASTFromInput(scriptCache, "array193 | (iterator) do end\n", keywords);
+		auto& ast = astPtr.rootNode()[0];
+		CHECK(ast.op() == ska::Operator::FILTER);
+		
+		CHECK(ast[0].op() == ska::Operator::UNARY);
+
+		const auto& astArray193Declaration = ast[1];
+		CHECK(astArray193Declaration.op() == ska::Operator::FILTER_DECLARATION);
+		CHECK(astArray193Declaration.size() == 2);
+
+		CHECK(astArray193Declaration[0].name() == "iterator");
+		CHECK(astArray193Declaration[0].op() == ska::Operator::FILTER_PARAMETER_DECLARATION);
+
+		CHECK(astArray193Declaration[1].op() == ska::Operator::UNARY);
+		CHECK(astArray193Declaration[1].tokenType() == ska::TokenType::EMPTY);
+
+		const auto& astArray193Body = ast[2];
+		CHECK(astArray193Body.op() == ska::Operator::BLOCK);
+		CHECK(astArray193Body.size() == 0);
+	}
+
+	SUBCASE("with 2 arguments") {
+		auto astPtr = ASTFromInput(scriptCache, "array193 | (iterator, index) do end\n", keywords);
+		auto& ast = astPtr.rootNode()[0];
+		CHECK(ast.op() == ska::Operator::FILTER);
+		CHECK(ast[0].op() == ska::Operator::UNARY);
+
+		const auto& astArray193Declaration = ast[1];
+		CHECK(astArray193Declaration.op() == ska::Operator::FILTER_DECLARATION);
+		CHECK(astArray193Declaration.size() == 2);
+
+		CHECK(astArray193Declaration[0].name() == "iterator");
+		CHECK(astArray193Declaration[0].op() == ska::Operator::FILTER_PARAMETER_DECLARATION);
+
+		CHECK(astArray193Declaration[1].name() == "index");
+		CHECK(astArray193Declaration[1].op() == ska::Operator::FILTER_PARAMETER_DECLARATION);
+
+		const auto& astArray193Body = ast[2];
+		CHECK(astArray193Body.op() == ska::Operator::BLOCK);
+		CHECK(astArray193Body.size() == 0);
+	}
+
+	SUBCASE("missing at least 1 argument") {
+		try {
+			auto astPtr = ASTFromInput(scriptCache, "array236 | () do end\n", keywords);
+			CHECK(false);
+		} catch (std::runtime_error & e) {
+			CHECK(std::string{ e.what() }.find("syntax error : bad token matching : expected \"a token with type \"IDENTIFIER\"\" but got \")\"") != std::string::npos);
+		}
+	}
+
+	SUBCASE("missing body") {
+		try {
+			auto astPtr = ASTFromInput(scriptCache, "array240 | (iterator) \n", keywords);
+			CHECK(false);
+		} catch (std::runtime_error & e) {
+			CHECK(std::string{ e.what() }.find("bad token detected (expected a block start token)") != std::string::npos);
+		}	
+	}
+
+	SUBCASE("missing filter declaration + body") {
+		try {
+			auto astPtr = ASTFromInput(scriptCache, "array254 | \n", keywords);
+			CHECK(false);
+		} catch (std::runtime_error & e) {
+			CHECK(std::string{ e.what() }.find("syntax error : bad token matching : expected \"(\" but got") != std::string::npos);
+		}
+	}
+
+}
+
 TEST_CASE("User defined object") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	auto scriptCache = ska::ScriptCacheAST{};

@@ -25,11 +25,12 @@ ska::StatementParser::StatementParser(const ReservedKeywordsPool& reservedKeywor
 	m_matcherIfElse(m_reservedKeywordsPool, *this),
 	m_matcherVar(m_reservedKeywordsPool, *this),
 	m_matcherReturn(m_reservedKeywordsPool, *this),
-	m_matcherImport(m_reservedKeywordsPool, *this) {
+	m_matcherImport(m_reservedKeywordsPool, *this),
+	m_matcherFilter(m_reservedKeywordsPool, *this, m_matcherBlock) {
 }
 
 ska::StatementParser::ASTNodePtr ska::StatementParser::parse(ScriptAST& input) {
-  if(input.reader().empty()) {
+	if (input.reader().empty()) {
 		return nullptr;
 	}
 
@@ -42,7 +43,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::parse(ScriptAST& input) {
 			}
 		}
 		return ASTFactory::MakeNode<Operator::BLOCK>(std::move(blockNodeStatements));
-	} catch(std::exception& e) {
+	} catch (std::exception& e) {
 		throw LangError(input.name(), e);
 	}
 }
@@ -52,7 +53,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::statement(ScriptAST& inpu
 		return nullptr;
 	}
 
-		const auto token = input.reader().actual();
+	const auto token = input.reader().actual();
 	try {
 		switch (token.type()) {
 		case TokenType::RESERVED:
@@ -60,7 +61,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::statement(ScriptAST& inpu
 
 		case TokenType::RANGE:
 			return m_matcherBlock.match(input, std::get<std::string>(token.content()));
-
+		
 		default:
 			return matchExpressionStatement(input);
 		}
@@ -75,6 +76,10 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::matchExpressionStatement(
 	SLOG(ska::LogLevel::Info) << "Expression-statement found";
 
 	auto expressionResult = expr(input);
+
+	if (input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::FILTER>())) {
+		return m_matcherFilter.match(input, std::move(expressionResult));
+	}
 
 	if (input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>())) {
 		input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());

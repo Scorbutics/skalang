@@ -21,7 +21,7 @@ ska::ASTNodePtr ska::MatcherReturn::match(ScriptAST& input) {
     if(input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::OBJECT_BLOCK_BEGIN>())) {
         auto returnFieldNodes = std::vector<ASTNodePtr>{};
         input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::OBJECT_BLOCK_BEGIN>());
-        while(!input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::OBJECT_BLOCK_END>())) {
+        while (!input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::OBJECT_BLOCK_END>())) {
             input.reader().mightMatch(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
 
             auto field = input.reader().match(TokenType::IDENTIFIER);

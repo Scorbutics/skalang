@@ -47,6 +47,7 @@ ska::SymbolTable::SymbolTable() :
 	PriorityObserver<FunctionTokenEvent>(5, std::bind(&ska::SymbolTable::matchFunction, this, std::placeholders::_1)),
 	PriorityObserver<ReturnTokenEvent>(5, std::bind(&ska::SymbolTable::matchReturn, this, std::placeholders::_1)),
 	PriorityObserver<ImportTokenEvent>(5, std::bind(&ska::SymbolTable::matchImport, this, std::placeholders::_1)),
+	PriorityObserver<FilterTokenEvent>(5, std::bind(&ska::SymbolTable::matchFilter, this, std::placeholders::_1)),
 	PriorityObserver<ScriptLinkTokenEvent>(5, std::bind(&ska::SymbolTable::matchScriptLink, this, std::placeholders::_1)) {
 	m_rootTable = std::make_unique<ScopedSymbolTable>();
 	m_currentTable = m_rootTable.get();
@@ -67,7 +68,8 @@ void ska::SymbolTable::internalListenParser(StatementParser& parser) {
 		VarTokenEvent, 
 		BlockTokenEvent, 
 		FunctionTokenEvent, 
-		ReturnTokenEvent, 
+		ReturnTokenEvent,
+		FilterTokenEvent,
 		ImportTokenEvent, 
 		ScriptLinkTokenEvent
 	> (*m_parser, *this);
@@ -79,7 +81,8 @@ void ska::SymbolTable::internalUnlistenParser() {
 			VarTokenEvent, 
 			BlockTokenEvent, 
 			FunctionTokenEvent, 
-			ReturnTokenEvent, 
+			ReturnTokenEvent,
+			FilterTokenEvent,
 			ImportTokenEvent, 
 			ScriptLinkTokenEvent
 		> (*m_parser, *this);
@@ -134,6 +137,31 @@ bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
     break;
 	}
 	return true;
+}
+
+bool ska::SymbolTable::matchFilter(const FilterTokenEvent& event) {
+	assert(m_currentTable != nullptr);
+	switch (event.type()) {
+	case FilterTokenEventType::DECLARATION: {
+		SLOG(ska::LogLevel::Info) << "\t\tNew filter-foreach-function : adding a nested unnamed symbol table";
+		m_currentTable = &m_currentTable->createNested();
+		m_currentTable->emplace(event.elementIterator().name());
+		if (!event.indexIterator().logicalEmpty()) {
+			m_currentTable->emplace(event.indexIterator().name());
+		}
+	} break;
+
+	case FilterTokenEventType::DEFINITION: {
+		SLOG(ska::LogLevel::Debug) << "\t\tFilter end";
+		m_currentTable = &m_currentTable->parent();
+	} break;
+
+	default:
+		break;
+	}
+
+	return true;
+
 }
 
 bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {

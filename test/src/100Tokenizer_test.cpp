@@ -172,6 +172,15 @@ TEST_CASE("Symbol by symbol") {
 		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::OBJECT_BLOCK_END>());
 	}
 
+	SUBCASE("filter symbol") {
+		const auto input = std::string("|");
+		auto t = ska::Tokenizer{ keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 1);
+		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::FILTER>());
+	}
+
 	SUBCASE("parenthesis begin") {
 		const auto input = std::string("(");
 		auto t = ska::Tokenizer {keywords, input};

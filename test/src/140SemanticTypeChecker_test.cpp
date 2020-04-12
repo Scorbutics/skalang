@@ -354,12 +354,30 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(ast.size() == 3);
 			}
 
+			SUBCASE("filter applied on array") {
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "array358 = [\"bup\", \"bip\", \"bap\"]\n array358 | (iteratorOnArray358) do end\n", data);
+				auto& ast = astPtr.rootNode();
+				CHECK(ast.size() == 2);
+				CHECK(ast[1].size() == 3);
+				CHECK(ast[1][1].size() == 2);
+				CHECK(ast[1][1][0].type() == ska::ExpressionType::STRING);
+			}
+
 			SUBCASE("expression-array") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var186 = function() : var do\n toto = [0]\n return { toto = toto }\n end\n var186().toto[0]\n", data);
 				auto& ast = astPtr.rootNode();
 				CHECK(ast.size() == 2);
 				CHECK(ast[1][0].type() == ska::ExpressionType::ARRAY);
 				CHECK(ast[1][0].type().value()[0] == ska::ExpressionType::INT);
+			}
+
+			SUBCASE("filter applied on expression-array") {
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var375 = function() : var do\n toto = [0]\n return { toto = toto }\n end\n var375().toto | (iteratorOnArray375) do end\n", data);
+				auto& ast = astPtr.rootNode();
+				CHECK(ast.size() == 2);
+				CHECK(ast[1].size() == 3);
+				CHECK(ast[1][1].size() == 2);
+				CHECK(ast[1][1][0].type() == ska::ExpressionType::INT);
 			}
 
 	SUBCASE("expression-array with use in expression") {
@@ -531,6 +549,15 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(false);
 			} catch (std::exception & e) {
 				CHECK(std::string{e.what()}.find("Unable to use operator \"-\" on types \"array (float)\" and \"array (float)\"" ) != std::string::npos);
+			}
+		}
+
+		SUBCASE("filter applied on expression that is not an array") {
+			try {
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var556 = function() : var do\n toto = 0\n return { toto = toto }\n end\n var556().toto | (iterator) do end\n", data);
+				CHECK(false);
+			} catch (std::exception & e) {
+				CHECK(std::string{ e.what() }.find("invalid collection for the current filter : expected an array but got \"int toto\" instead") != std::string::npos);
 			}
 		}
 

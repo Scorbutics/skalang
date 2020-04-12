@@ -192,6 +192,7 @@ bool ska::ExpressionParser::isAtEndOfExpression(ScriptAST& input) const {
 			input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>()) ||
 			input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()) ||
 			input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::OBJECT_BLOCK_END>()) ||
+			input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::FILTER>()) ||
 			input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 }
 

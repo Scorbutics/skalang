@@ -8,6 +8,7 @@
 #include "Event/ReturnTokenEvent.h"
 #include "Event/ScriptLinkTokenEvent.h"
 #include "Event/ImportTokenEvent.h"
+#include "Event/FilterTokenEvent.h"
 
 #include "ScopedSymbolTable.h"
 #include "SymbolTableOperation.h"
@@ -39,6 +40,7 @@ namespace ska {
     	public PriorityObserver<ReturnTokenEvent>, 
 		public PriorityObserver<ImportTokenEvent>,
 		public PriorityObserver<ScriptLinkTokenEvent>,
+		public PriorityObserver<FilterTokenEvent>,
 		public SymbolFactory {
 
     	using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
@@ -91,6 +93,7 @@ namespace ska {
 		bool matchReturn(const ReturnTokenEvent&);
 		bool matchImport(const ImportTokenEvent&);
 		bool matchScriptLink(const ScriptLinkTokenEvent&);
+		bool matchFilter(const FilterTokenEvent&);
 
 		void internalListenParser(StatementParser& parser);
 		void internalUnlistenParser();

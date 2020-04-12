@@ -34,6 +34,9 @@ ska::TypeBuildersContainer ska::BuildTypeBuildersContainer(const TypeCrosser& ty
 	TypeBuilderMakeBuilder<Operator::RETURN>(result);
 	TypeBuilderMakeBuilder<Operator::SCRIPT_LINK>(result);
 	TypeBuilderMakeBuilder<Operator::TYPE>(result);
+	TypeBuilderMakeBuilder<Operator::FILTER>(result);
+	TypeBuilderMakeBuilder<Operator::FILTER_DECLARATION>(result);
+	TypeBuilderMakeBuilder<Operator::FILTER_PARAMETER_DECLARATION>(result);
 
 	for (std::size_t i = 0; i < MaxOperatorSize; i++) {
 		assert(result[i] != nullptr);
