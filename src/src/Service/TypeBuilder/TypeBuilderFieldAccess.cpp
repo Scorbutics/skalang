@@ -15,7 +15,9 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(
 	// Handling built-in direct fields
 	if (typeObject == ExpressionType::ARRAY) {
 		if (fieldName == "size") {
-			return Type::MakeBuiltIn<ExpressionType::INT>();
+			auto type = Type::MakeCustom<ExpressionType::FUNCTION>(nullptr);
+			type.add(Type::MakeBuiltIn<ExpressionType::INT>());
+			return type;
 		}
 		auto ss = std::stringstream{};
 		ss << "trying to access an undeclared built-in field \"" << fieldName << "\" of the type \"" << typeObject << "\"";

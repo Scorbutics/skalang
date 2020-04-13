@@ -133,7 +133,7 @@ TEST_CASE("[BytecodeGenerator] no type conversion array explicit declaration") {
 }
 
 TEST_CASE("[BytecodeGenerator] no type conversion array field size access") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = []:int\n test = result.size\n");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = []:int\n test = result.size()\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {

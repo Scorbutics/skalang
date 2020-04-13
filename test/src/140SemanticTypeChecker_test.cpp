@@ -454,7 +454,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 			}
 
 	SUBCASE("array built-in field size") {
-		auto astPtr = ASTFromInputSemanticTC(scriptCache, "toto457 = [0]\n toto457.size\n", data);
+		auto astPtr = ASTFromInputSemanticTC(scriptCache, "toto457 = [0]\n toto457.size()\n", data);
 		auto& ast = astPtr.rootNode();
 		CHECK(ast.size() == 2);
 		CHECK(ast[1].type() == ska::ExpressionType::INT);
@@ -479,9 +479,9 @@ TEST_CASE("[SemanticTypeChecker]") {
 					}
 				}
 
-				SUBCASE("array trying to assign a value to built-in readonly field size") {
+				SUBCASE("array trying to assign a value to built-in method size") {
 					try {
-						auto astPtr = ASTFromInputSemanticTC(scriptCache, "toto457 = [0]\n toto457.size = 123\n", data);
+						auto astPtr = ASTFromInputSemanticTC(scriptCache, "toto457 = [0]\n toto457.size() = 123\n", data);
 						CHECK(false);
 					} catch (std::exception & e) {
 						CHECK(std::string{ e.what() }.find("The left part of assignation is a read-only value, therefore cannot be assigned") != std::string::npos);

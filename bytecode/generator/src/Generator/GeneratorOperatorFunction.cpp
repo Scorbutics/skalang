@@ -100,10 +100,13 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	auto preCallValue = generateNext({context, node.GetFunctionNameNode()});
 	LOG_DEBUG << "Function call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
 
+	// Handle built-in type functions : no symbol provided
 	const auto* functionTypeSymbol = node.GetFunctionNameNode().typeSymbol();
-	if(functionTypeSymbol == nullptr) {
-		throw std::runtime_error("unable to retrieve function type");
+	if (functionTypeSymbol == nullptr) {
+		return preCallValue;
 	}
+
+	// Handle custom type functions
 	const auto* functionSymbolInfo = context.getSymbolInfo(*functionTypeSymbol);
 	LOG_DEBUG << "Function Call symbol info : " << (functionSymbolInfo == nullptr || functionSymbolInfo->binding == std::numeric_limits<std::size_t>::max() ? "none" : "with binding");
 

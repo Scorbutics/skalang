@@ -18,7 +18,7 @@ run = function (parameters: Parameters::Fcty()) do
 			Log.print(element)
 		end
 
-		Log.print("size : " + all.size)
+		Log.print("size : " + all.size())
 
 	end else do
 		Log.print("No argument provided")
