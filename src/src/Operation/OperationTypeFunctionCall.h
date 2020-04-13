@@ -22,6 +22,10 @@ namespace ska {
 			return node[0];
 		}
 
+		inline const auto* GetFunctionSymbol() {
+			return node[0].symbol();
+		}
+
 		auto begin() const {
 			return node.begin() + 1;
 		}

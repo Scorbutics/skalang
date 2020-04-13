@@ -1,10 +1,11 @@
+#include "Config/LoggerConfigLang.h"
 #include <string>
 #include "GeneratorOperatorVariable.h"
 #include "BytecodeCommand.h"
 #include "Generator/Value/BytecodeScriptGenerationHelper.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_DECLARATION>);
-#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_DECLARATION>)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_AFFECTATION>);
+#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_AFFECTATION>)
 
 namespace ska {
 	namespace bytecode {
@@ -14,7 +15,7 @@ namespace ska {
 			auto operandDestination = finalGroup.operand();
 			if((dest.symbol() != node.symbol() || node.symbol() == nullptr) && !finalGroup.empty()) {
 				LOG_DEBUG << "Creating MOV instruction with operand group " << finalGroup;
-				auto variable = dest.symbol() != nullptr ? InstructionOutput{context.querySymbolOrOperand(dest)} : generator.generateNext({ context, dest });
+				auto variable = dest.isSymbolicLeaf() ? InstructionOutput{context.querySymbolOrOperand(dest)} : generator.generateNext({ context, dest });
 				auto variableDestination = variable.operand();
 
 				finalGroup.push(std::move(variable));
@@ -26,11 +27,11 @@ namespace ska {
 	}
 }
 
-ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_AFFECTATION>::generate(OperateOn node, GenerationContext& context) {
+ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::AFFECTATION>::generate(OperateOn node, GenerationContext& context) {
 	return CommonGenerate(*this, node.GetVariableNameNode(), node.GetVariableValueNode(), context);
 }
 
-ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
+ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_AFFECTATION>::generate(OperateOn node, GenerationContext& context) {
 	return CommonGenerate(*this, node.GetVariableNameNode(), node.GetVariableValueNode(), context);
 }
 

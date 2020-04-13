@@ -19,16 +19,18 @@ namespace ska {
 
 		const std::unordered_map<std::string, TokenInfo> pool {};
 
+		TokenGrammar grammar(const std::string& tokenValueStr) const;
+
 		template <TokenGrammar token>
 		const Token& pattern() const {
 			return patterns[static_cast<std::size_t>(token)].token;
 		}
 
-		const Token& pattern(const std::size_t token) const {
-			return patterns[token].token;
+		const Token& pattern(TokenGrammar token) const {
+			return patterns[static_cast<std::size_t>(token)].token;
 		}
 
-    		const std::string& patternString(const std::size_t token) const {
+    	const std::string& patternString(const std::size_t token) const {
 			return patterns[token].patternString;
 		}
 

@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include <string>
 #include "NodeValue/AST.h"
 #include "GeneratorOperatorFieldAccess.h"
@@ -9,52 +10,52 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::O
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>)
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>::generate(OperateOn node, GenerationContext& context) {
-	const auto typeObject = node.GetObjectType();
 	const auto& fieldName = node.GetFieldNameNode().name();
-	const auto* symbolField = typeObject[fieldName];
-	if (symbolField == nullptr || !typeObject.hasSymbol()) {
+
+	const auto* objectTypeSymbol = node.GetObjectNameNode().typeSymbol();
+	if (objectTypeSymbol == nullptr) {
+		throw std::runtime_error("unable to retrieve object type");
+	}
+
+	// Handling built-in direct fields
+	const auto typeObject = node.GetObjectType();
+	if (typeObject == ExpressionType::ARRAY) {
+		if (fieldName == "size") {
+			auto objectValue = generateNext({ context, node.GetObjectNameNode() });
+			return { Instruction{ Command::ARR_LENGTH, context.queryNextRegister(), objectValue.operand() } };
+		}
+		auto ss = std::stringstream{};
+		ss << "trying to access an undeclared built-in field \"" << fieldName << "\" of the type \"" << typeObject << "\"";
+		throw std::runtime_error(ss.str());
+	}
+
+	// Handling custom types
+	const auto* symbolField = (*objectTypeSymbol)(fieldName);
+	if (symbolField == nullptr) {
 		auto ss = std::stringstream{};
 		ss << "trying to access to an undeclared field : \"" << fieldName << "\" of \"" << node.GetObjectNameNode().name() << "\"";
-	throw std::runtime_error(ss.str());
+		throw std::runtime_error(ss.str());
 	}
 
-	auto optFieldValue = context.getSymbol(*symbolField);
-	if (optFieldValue.has_value()) {
-		LOG_DEBUG << "Accessing field " << optFieldValue.value() << " of object " << node.GetObjectNameNode();
-	} else {
-		auto ss = std::stringstream{ };
-		ss << "invalid bytecode : cannot access field \"" << symbolField->getName() << " of object " << node.GetObjectNameNode() << " in script \"" << context.scriptName() << "\"";
-		throw std::runtime_error(ss.str());		
-	}
-
-	auto objectValue = generateNext({ context, node.GetObjectNameNode()});
 	const auto* objectSymbolInfo = context.getSymbolInfo(*symbolField);
-	if(objectSymbolInfo == nullptr) {
+	if (objectSymbolInfo == nullptr) {
 		auto ss = std::stringstream { };
 		ss << "invalid bytecode : the dereferenced object \"" << node.GetObjectNameNode() << "\" is not registered in script ";
 		ss << context.scriptName();
 		throw std::runtime_error(ss.str());
 	}
-	const auto objectFieldReferences = objectSymbolInfo->references;
-	if(objectFieldReferences == nullptr || objectFieldReferences->empty()) {
-		auto ss = std::stringstream{};
-		ss << "invalid bytecode : the field \"" << symbolField->getName() << "\" in the dereferenced object \"" << node.GetObjectNameNode() << "\" has no fields references in script ";
-		ss << context.scriptName(objectSymbolInfo->script);
-		throw std::runtime_error(ss.str());
+
+	std::size_t index;
+	if (objectSymbolInfo->exported) {
+		index = context.exportId(*symbolField);
+	} else {
+		index = objectTypeSymbol->id(*symbolField);
 	}
 
-	auto fieldValue = optFieldValue.value();
-	const auto fieldVarReference = fieldValue.as<ScriptVariableRef>();
-	LOG_DEBUG << "This field is " << fieldVarReference.variable << " in script " << context.scriptName(fieldVarReference.script);
+	auto objectValue = generateNext({ context, node.GetObjectNameNode()});
 
-	const auto fieldRefIndex = objectFieldReferences->find(fieldVarReference);
-	if(fieldRefIndex == objectFieldReferences->end()) {
-		throw std::runtime_error("invalid bytecode : the field \"" + fieldValue.toString()
-			+ "\" does not exist in object \"" + node.GetObjectNameNode().name() + "\" (" + objectValue.operand().toString() + ")");
-	}
+	LOG_DEBUG << "This field has index " << index << " in the object";
 
-	LOG_DEBUG << "This field has index " << fieldRefIndex->second << " in the object";
-
-	objectValue.push({ Instruction { Command::ARR_ACCESS, context.queryNextRegister(), objectValue.operand(), Operand {static_cast<long>(fieldRefIndex->second), OperandType::PURE } }});
+	objectValue.push({ Instruction { Command::ARR_ACCESS, context.queryNextRegister(), objectValue.operand(), Operand {static_cast<long>(index), OperandType::PURE } }});
 	return objectValue;
 }

@@ -36,7 +36,7 @@ ska::NodeValue ska::InterpretMathematicPlus(TypedNodeValue firstValue, TypedNode
 			return t1;
 		});
 
-		switch (firstValue.type.compound()[0].type()) {
+		switch (firstValue.type[0].type()) {
 		case ExpressionType::STRING:
 			return ComputeTwoTypeOperation<StringShared, NodeValueArray>(std::move(firstValue), std::move(secondValue),
 			std::get<0>(lambdas),

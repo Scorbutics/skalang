@@ -4,13 +4,7 @@ std::ostream& ska::bytecode::operator<<(std::ostream& stream, const SymbolInfo& 
 	if(symbol.name != nullptr) {
 		stream << *symbol.name;
 	}
-	stream << " (script_id|var_id:value) [";
-	if(symbol.references != nullptr) {
-		for(const auto& [key, value] : *symbol.references) {
-			stream << " " << key.script << "|" << key.variable << ":" << value << ", ";
-		}
-	}
-	stream << " ]";
+	stream << " (script_id|var_id:value)";
 
 	return stream;
 }

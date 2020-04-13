@@ -28,4 +28,25 @@ namespace ska {
 			return node.end();
 		}
 	};
+
+	template<>
+	class OperationType<Operator::ARRAY_TYPE_DECLARATION> {
+	private:
+		const ASTNode& node;
+	public:
+		OperationType(const ASTNode& node) : node(node) {}
+
+		inline auto HasExplicitArrayType() const {
+			return !node[1].logicalEmpty() && node[1].type().has_value();
+		}
+
+		inline auto GetArraySubType() const {
+			assert(HasExplicitArrayType());
+			return node[1].type().value();
+		}
+
+		inline auto& GetArrayContent() const {
+			return node[0];
+		}
+	};
 }

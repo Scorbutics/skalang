@@ -14,6 +14,7 @@
 #include "Matcher/MatcherFunction.h"
 #include "Matcher/MatcherVar.h"
 #include "Matcher/MatcherImport.h"
+#include "Matcher/MatcherType.h"
 
 namespace ska {
 	class ASTNode;
@@ -36,6 +37,7 @@ namespace ska {
 		int matchRange(ScriptAST& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation);
 		int matchParenthesis(ScriptAST& input, ExpressionStack& expressions, bool isDoingOperation);
 
+		ASTNodePtr matchVariable(ScriptAST& input, const Token& token);
 		ASTNodePtr matchReserved(ScriptAST& input);
 		ASTNodePtr matchObjectFieldAccess(ScriptAST& input, ASTNodePtr objectAccessed);
 
@@ -48,6 +50,7 @@ namespace ska {
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		StatementParser& m_parser;
 
+		MatcherType m_matcherType;
 		MatcherArray m_matcherArray;
 		MatcherFunction m_matcherFunction;
 		MatcherVar m_matcherVar;

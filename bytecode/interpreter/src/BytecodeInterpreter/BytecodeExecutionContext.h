@@ -36,6 +36,11 @@ namespace ska {
 				return m_current->id();
 			}
 
+			const std::string& currentScriptName() const {
+				checkCurrentExecutionOrThrow();
+				return m_current->name();
+			}
+
 			bool incInstruction() { return m_current == nullptr ? false : m_current->incInstruction(); }
 
 			NodeValue getCell(const Operand& v) const { return scriptFromOperand(v).getCell(v); }

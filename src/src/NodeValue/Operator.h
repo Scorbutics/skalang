@@ -7,9 +7,13 @@ namespace ska {
 		BINARY,
     	UNARY,
 		LITERAL,
-		VARIABLE_DECLARATION,
 		VARIABLE_AFFECTATION,
+		AFFECTATION,
 		PARAMETER_DECLARATION,
+		FILTER_DECLARATION,
+		FILTER_PARAMETER_DECLARATION,
+		FILTER,
+		ARRAY_TYPE_DECLARATION,
 		ARRAY_DECLARATION,
 		ARRAY_USE,
     	USER_DEFINED_OBJECT,
@@ -33,9 +37,13 @@ namespace ska {
 		"BINARY",
     	"UNARY",
 		"LITERAL",
-		"VARIABLE_DECLARATION",
 		"VARIABLE_AFFECTATION",
-		"PARAMETER_DECLARATION",        
+		"AFFECTATION",
+		"PARAMETER_DECLARATION",
+		"FILTER_DECLARATION",
+		"FILTER_PARAMETER_DECLARATION",
+		"FILTER",
+		"ARRAY_TYPE_DECLARATION",
 		"ARRAY_DECLARATION",
 		"ARRAY_USE",
     	"USER_DEFINED_OBJECT",
@@ -53,6 +61,8 @@ namespace ska {
 		"SCRIPT_LINK",
 		"TYPE"
 	};
+
+	static_assert(sizeof(OperatorSTR) / sizeof(OperatorSTR[0]) == static_cast<std::size_t>(Operator::UNUSED_Last_Length));
 
 	static inline const char* OperatorPrint(Operator op) {
     	return OperatorSTR[static_cast<std::size_t>(op)];

@@ -1,10 +1,11 @@
 #pragma once
 
 #include "NodeValue/ExpressionType.h"
+#include "NodeValue/TypeHierarchy.h"
 
 namespace ska {
     class SymbolTable;
     class ASTNode;
 
-	Type TypeBuilderBuildFromTokenType(const SymbolTable& symbols, const ASTNode& node);
+    TypeHierarchy TypeBuilderBuildFromTokenType(const SymbolTable& symbols, const ASTNode& node);
 }

@@ -12,7 +12,7 @@ void ska::bytecode::ScriptCache::setSymbolInfo(const ASTNode& node, SymbolInfo i
 }
 
 void ska::bytecode::ScriptCache::setSymbolInfo(const Symbol& symbol, SymbolInfo info) {
-	SLOG(ska::LogLevel::Debug) << "[Cache " << this << "] Setting " << info << " (" << symbol.getName() << ") with key 0x" << &symbol;
+	SLOG(ska::LogLevel::Debug) << "[Cache " << this << "] Setting " << info << " (" << symbol.name() << ") with key 0x" << &symbol;
 	auto it = m_symbolInfo.find(&symbol);
 	if (it == m_symbolInfo.end()) {
 		m_symbolInfo.emplace(&symbol, std::move(info));
@@ -27,7 +27,7 @@ ska::bytecode::SymbolInfo ska::bytecode::ScriptCache::getSymbolInfoOrNew(std::si
 }
 
 const ska::bytecode::SymbolInfo* ska::bytecode::ScriptCache::getSymbolInfo(const Symbol& symbol) const {
-	SLOG(ska::LogLevel::Debug) << "[Cache " << this << "] Getting " << symbol.getName() << " with key 0x" << &symbol;
+	SLOG(ska::LogLevel::Debug) << "[Cache " << this << "] Getting " << symbol.name() << " with key 0x" << &symbol;
 	if(m_symbolInfo.find(&symbol) == m_symbolInfo.end()) {
 		SLOG(ska::LogLevel::Debug) << "\t NULL";
 		return nullptr;
@@ -43,14 +43,14 @@ const ska::bytecode::SymbolInfo* ska::bytecode::ScriptCache::getSymbolInfo(const
 	return getSymbolInfo(*node.symbol());
 }
 
-const std::vector<ska::bytecode::Operand>& ska::bytecode::ScriptCache::getExportedSymbols(std::size_t scriptIndex) {
+const ska::bytecode::ExportSymbolContainer& ska::bytecode::ScriptCache::getExportedSymbols(std::size_t scriptIndex) {
 	// TODO : ce n'est pas à un "get" de faire tout ça...
 	if ((*this)[scriptIndex].exportedSymbols().empty()) {
 		SLOG(ska::LogLevel::Info) << "%11cGenerating exported symbols for script \"" << scriptIndex << "\"";
 		auto temporarySortedScriptSymbols = std::priority_queue<SymbolWithInfo>{};
 		for (const auto& data : m_symbolInfo) {
 			if (data.second.exported && data.second.script == scriptIndex) {
-				SLOG(ska::LogLevel::Info) << "%11c\tFound symbol " << data.first->getName() << " with info " << data.second;
+				SLOG(ska::LogLevel::Info) << "%11c\tFound symbol " << data.first->name() << " with info " << data.second;
 				temporarySortedScriptSymbols.push(SymbolWithInfo{ data.first, &data.second });
 			}
 		}
@@ -69,7 +69,9 @@ const std::vector<ska::bytecode::Operand>& ska::bytecode::ScriptCache::getExport
 	return (*this)[scriptIndex].exportedSymbols();
 }
 
-bool ska::bytecode::ScriptCache::isGenerated(std::size_t index) const { return index < size() && exist(index) && !(*this)[index].empty();}
+bool ska::bytecode::ScriptCache::isGenerated(std::size_t index) const { 
+	return index < size() && exist(index) && !(*this)[index].empty();
+}
 
 void ska::bytecode::ScriptCache::storeBinding(NativeFunctionPtr binding, ScriptVariableRef bindingRef) {
 	auto finalId = std::to_string(bindingRef.variable) + " " + at(bindingRef.script).name();

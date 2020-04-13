@@ -1,27 +1,38 @@
-var Log = import "bind:std.native.io.log";
-var Parameters = import "bind:std.native.function.parameter";
-var PathFcty = import "bind:std.native.io.path";
+Log = import "bind:std.native.io.log"
+Parameters = import "bind:std.native.function.parameter"
+PathFcty = import "bind:std.native.io.path"
 
-var ArrayFcty = import "std:std.value.array";
+testFcty = function(): var do
+	return {
+		toto = "lol"
+		titi = "lil"
+		tutu = 2
 
-var run = function (parameters: Parameters::Fcty()) {
-	if (parameters.size() > 0) {
-		var path = PathFcty.Fcty(parameters.asString(0));
-		Log.print(path.canonical());
-
-		var all = ArrayFcty.FctyInteger();
-
-		for(var i = 1; i < parameters.size(); i = i + 1) {
-			all.add(parameters.asInt(i) + i * i);
-		}
-
-		for(var i = 0; i < all.size(); i = i + 1) {
-			Log.print(all.get(i));
-		}
-
-		Log.print("size : " + all.size());
-		
-	} else {
-		Log.print("No argument provided");
+		:int = function():int do
+			return tutu
+		end
 	}
-};
+end
+
+run = function (parameters: Parameters::Fcty()) do
+	if parameters.size() > 0
+		path = PathFcty.Fcty(parameters.asString(0))
+		Log.print(path.canonical())
+
+		all = []:int
+		for(i = 1
+				i < parameters.size()
+				i = i + 1) do
+			all = all + (parameters.asInt(i) + i * i)
+		end
+
+		all | (element) do
+			Log.print(element)
+		end
+
+		Log.print("size : " + all.size())
+
+	else
+		Log.print("No argument provided")
+	end
+end

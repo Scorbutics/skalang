@@ -1,29 +1,38 @@
-var FctyString = function() : var {
-	var array_ = [""];
-  var size_ = 1;
+FctyString = function() : var do
+	array_ = [""]
+  size_ = 1
 	return {
-	add : function(str: string) { array_ = array_ + str; size_ = size_ + 1; },
-	get : function(index: int) : string { return array_[index + 1]; },
-	size : function() : int { return size_ - 1; }
-	};
-};
+		add = function(str: string) do
+			array_ = array_ + str
+			size_ = size_ + 1
+		end
+		get = function(index: int) : string do return array_[index + 1] end
+		size = function() : int do return size_ - 1 end
+	}
+end
 
-var FctyFloat = function() : var {
-	var array_ = [0.0];
-  var size_ = 1;
+FctyFloat = function() : var do
+	array_ = [0.0]
+  size_ = 1
 	return {
-	add : function(v: float) { array_ = array_ + v; size_ = size_ + 1; },
-	get : function(index: int) : float { return array_[index + 1]; },
-	size : function() : int { return size_ - 1; }
-	};
-};
+		add = function(v: float) do
+			array_ = array_ + v
+			size_ = size_ + 1
+		end
+		get = function(index: int) : float do return array_[index + 1] end
+		size = function() : int do return size_ - 1 end
+	}
+end
 
-var FctyInteger = function() : var {
-	var array_ = [0];
-  var size_ = 1;
+FctyInteger = function() : var do
+	array_ = [0]
+  size_ = 1
 	return {
-	add : function(v: int) { array_ = array_ + v; size_ = size_ + 1; },
-	get : function(index: int) : int { return array_[index + 1]; },
-	size : function() : int { return size_ - 1; }
-	};
-};
+		add = function(v: int) do
+			array_ = array_ + v
+			size_ = size_ + 1
+		end
+		get = function(index: int) : int do return array_[index + 1] end
+		size = function() : int do return size_ - 1 end
+	}
+end

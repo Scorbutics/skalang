@@ -1,3 +1,4 @@
+#include "Config/LoggerConfigLang.h"
 #include "TypeBuilderFieldAccess.h"
 
 #include "NodeValue/AST.h"
@@ -6,34 +7,50 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>)
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const ScriptAST& script, OperateOn node) {
+ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const ScriptAST& script, OperateOn node) {
 	const auto typeObject = node.GetObjectType();
 
-	if (typeObject != ExpressionType::OBJECT) {
+	const auto& fieldName = node.GetFieldNameNode().name();
+
+	// Handling built-in direct fields
+	if (typeObject == ExpressionType::ARRAY) {
+		if (fieldName == "size") {
+			auto type = Type::MakeCustom<ExpressionType::FUNCTION>(nullptr);
+			type.add(Type::MakeBuiltIn<ExpressionType::INT>());
+			return type;
+		}
+		auto ss = std::stringstream{};
+		ss << "trying to access an undeclared built-in field \"" << fieldName << "\" of the type \"" << typeObject << "\"";
+		throw std::runtime_error(ss.str());
+	}
+
+	const auto* symbolObject = node.GetObjectSymbol();
+
+	// Handling custom objects
+	if (symbolObject == nullptr || typeObject != ExpressionType::OBJECT) {
 		auto error = std::stringstream {};
 		if (typeObject == ExpressionType::VOID) {
 			error << "the class symbol table \"" << node.GetObjectNameNode().name() << "\" is not registered. Maybe you're trying to use the type you're defining in its definition...";
 		} else {
-			error << "the variable \"" << node.GetObjectNameNode().name() << "\" is not registered as an object but as a \"" << typeObject << "\"";
+			error << "the variable \"" << node.GetObjectNameNode().name() << "\" is not registered as an object but as a \"" << typeObject << "\" type";
 		}
 		throw std::runtime_error(error.str());
 	}
 
-	const auto& fieldName = node.GetFieldNameNode().name();
-	const auto* symbolField = typeObject[fieldName];
-    if (symbolField == nullptr || !typeObject.hasSymbol()) {
+	const auto* symbolField = (*symbolObject)(fieldName);
+	if (symbolField == nullptr) {
 		auto ss = std::stringstream{};
 		ss << "trying to access to an undeclared field : \"" << fieldName << "\" of \"" << node.GetObjectNameNode().name() << "\"";
         throw std::runtime_error(ss.str());
     }
 
-    SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Field accessed \"" << fieldName << "\" (type \"" << symbolField->getType() << "\") of \"" << node.GetObjectNameNode().name() << "\"";
-	
-	if (symbolField->getType() == ExpressionType::VOID) {
+    SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Field accessed \"" << fieldName << "\" (type \"" << symbolField->type() << "\") of \"" << node.GetObjectNameNode().name() << "\"";
+
+	if (symbolField->type() == ExpressionType::VOID) {
 		auto ss = std::stringstream{};
 		ss << "field \"" << node.GetFieldNameNode().name() << "\" of \"" << node.GetObjectNameNode().name() << "\" has a void type, which is invalid";
 		throw std::runtime_error(ss.str());
 	}
 
-	return symbolField->getType();
+	return *symbolField;
 }

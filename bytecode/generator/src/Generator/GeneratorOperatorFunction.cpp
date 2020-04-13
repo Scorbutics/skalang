@@ -75,7 +75,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	LOG_DEBUG << "\nGenerated " << valueGroup << " with value " << valueGroup.operand();
 
-	const auto returningFunctionType = node.GetFunctionPrototype().type().value().compound().back();
+	const auto returningFunctionType = node.GetFunctionPrototype().type().value().back();
 
 	const auto isVoidReturningFunction = returningFunctionType == ExpressionType::VOID;
 	valueGroup.push(Instruction{ Command::RET, isVoidReturningFunction ? Operand{} : valueGroup.operand() });
@@ -100,7 +100,14 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	auto preCallValue = generateNext({context, node.GetFunctionNameNode()});
 	LOG_DEBUG << "Function call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
 
-	const auto* functionSymbolInfo = context.getSymbolInfo(*node.GetFunctionNameNode().type().value().symbol());
+	// Handle built-in type functions : no symbol provided
+	const auto* functionTypeSymbol = node.GetFunctionNameNode().typeSymbol();
+	if (functionTypeSymbol == nullptr) {
+		return preCallValue;
+	}
+
+	// Handle custom type functions
+	const auto* functionSymbolInfo = context.getSymbolInfo(*functionTypeSymbol);
 	LOG_DEBUG << "Function Call symbol info : " << (functionSymbolInfo == nullptr || functionSymbolInfo->binding == std::numeric_limits<std::size_t>::max() ? "none" : "with binding");
 
 	auto callInstruction = InstructionOutput {};
@@ -118,7 +125,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	LOG_DEBUG << " PUSH result : " << result;
 
 	result.push(std::move(callInstruction));
-	if(node.GetFunctionType().compound().back() != ExpressionType::VOID) {
+	if(node.GetFunctionType().back() != ExpressionType::VOID) {
 		result.push(Instruction{ Command::POP, context.queryNextRegister()});
 	}
 

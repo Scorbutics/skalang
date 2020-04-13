@@ -3,11 +3,16 @@
 #include "Config/LoggerConfigLang.h"
 #include "Service/SymbolTable.h"
 #include "NodeValue/AST.h"
+#include "TypeBuilderCalculatorDispatcher.h"
 
 namespace ska {
 	struct TypeBuilderBuildFromTokenTypeTag;
+}
 
-    Type TypeBuilderBuildFromTokenType(const SymbolTable& symbols, const ASTNode& node) {
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderBuildFromTokenTypeTag)
+namespace ska {
+
+    TypeHierarchy TypeBuilderBuildFromTokenType(const SymbolTable& symbols, const ASTNode& node) {
 
         switch(node.tokenType()) {
             case TokenType::SYMBOL:
@@ -24,24 +29,14 @@ namespace ska {
 				return isDecimal ? Type::MakeBuiltIn<ExpressionType::FLOAT>() : Type::MakeBuiltIn<ExpressionType::INT>();
             }
 
-            case TokenType::IDENTIFIER: {
-                const auto symbol = symbols[node.name()];
+			case TokenType::IDENTIFIER: {
+				auto* symbol = symbols[node.name()];
 				if (symbol != nullptr) {
-					if (symbol->getType().hasSymbol()) {
-						return symbol->getType();
-					}			
-					const auto* finalSymbol = (*symbol)[node.name()];
-					switch (symbol->getType().type()) {
-					case ExpressionType::OBJECT:
-						return Type::MakeCustom<ExpressionType::OBJECT>(finalSymbol);
-					case ExpressionType::FUNCTION:
-						return Type::MakeCustom<ExpressionType::FUNCTION>(finalSymbol);
-					default:
-						return symbol->getType();
-					}
+					return *symbol;
 				}
 				return Type{};
-            }
+			}
+
 			case TokenType::BOOLEAN:
 				return Type::MakeBuiltIn<ExpressionType::BOOLEAN>();
 
@@ -86,7 +81,7 @@ namespace ska {
 				return Type::MakeBuiltIn<ExpressionType::ARRAY>();
 
             default:
-				assert(!"Unhandled type for this node");
+				throw std::runtime_error("Unhandled type for this node");
                 break;
         }
 

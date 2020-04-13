@@ -13,7 +13,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::Script);
 ska::bytecode::Operand ska::bytecode::Script::findBytecodeMemoryFromSymbol(const Symbol& symbol) const {
 	auto bytecodeSymbol = m_serviceGen.getSymbol(symbol);
 	if (bytecodeSymbol.has_value()) {
-		throw std::runtime_error("unable to find generated symbol \"" + symbol.getName() + "\" in script \"" + astScript().name() + "\"");
+		throw std::runtime_error("unable to find generated symbol \"" + symbol.name() + "\" in script \"" + astScript().name() + "\"");
 	}
 	return bytecodeSymbol.value();
 }
@@ -28,15 +28,15 @@ const ska::Symbol& ska::bytecode::Script::findSymbolFromString(const std::string
 }
 
 const ska::Symbol* ska::bytecode::Script::findFieldSymbol(const Symbol* constructor, const BridgeField& field) const {
-	if (field.type.symbol() == nullptr) {
+	if (field.symbol == nullptr) {
 		return nullptr;
 	}
 
 	if (constructor != nullptr) {
-		return (*constructor)[field.type.symbol()->getName()];
+		return (*constructor)(field.symbol->name());
 	}
 
-	return &findSymbolFromString(field.type.symbol()->getName());
+	return &findSymbolFromString(field.symbol->name());
 }
 
 void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr astRoot, Interpreter& interpreter) {
@@ -48,18 +48,19 @@ void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr a
 	/* Because it still targets the template script type, not the bound script one ! */
 	/* (remember, one is - almost - the copy of the other) */
 	/* so here we have to iterate through the bound script symbols instead of the template one */
-	const Symbol* constructorBoundSymbol = constructor.type() != ExpressionType::VOID ? &findSymbolFromString(constructor.name()) : nullptr;
+	const Symbol* constructorBoundSymbol = !constructor.isVoid() ? &findSymbolFromString(constructor.name()) : nullptr;
 	std::size_t bindingId = 0;
 	for (const auto& field : constructor.fields()) {
 		const Symbol* newerSymbol = findFieldSymbol(constructorBoundSymbol, field);
 		if(newerSymbol == nullptr) {
 			auto ss = std::stringstream {};
-			ss << "%14cNo symbol attached to type " << field.type;
+			assert(field.symbol != nullptr);
+			ss << "%14cNo symbol attached to type " << field.symbol->type();
 			LOG_ERROR << ss.str();
 			throw std::runtime_error(ss.str());
 		}
 
-		LOG_INFO << "%14cAttaching binding to symbol " << newerSymbol->getName();
+		LOG_INFO << "%14cAttaching binding to symbol " << newerSymbol->name();
 		auto info = m_cache.getSymbolInfoOrNew(m_serviceGen.id(), *newerSymbol);
 		auto bindingRef = ScriptVariableRef{ bindingId++, m_serviceGen.id() };
 		m_cache.storeBinding(std::make_shared<NativeFunction>(field.callback), bindingRef);

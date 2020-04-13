@@ -22,14 +22,15 @@ ska::StatementParser::StatementParser(const ReservedKeywordsPool& reservedKeywor
 	m_expressionParser(reservedKeywordsPool, *this),
 	m_matcherBlock(m_reservedKeywordsPool, *this),
 	m_matcherFor(m_reservedKeywordsPool, *this),
-	m_matcherIfElse(m_reservedKeywordsPool, *this),
+	m_matcherIfElse(m_reservedKeywordsPool, *this, m_matcherBlock),
 	m_matcherVar(m_reservedKeywordsPool, *this),
 	m_matcherReturn(m_reservedKeywordsPool, *this),
-	m_matcherImport(m_reservedKeywordsPool, *this) {
+	m_matcherImport(m_reservedKeywordsPool, *this),
+	m_matcherFilter(m_reservedKeywordsPool, *this, m_matcherBlock) {
 }
 
 ska::StatementParser::ASTNodePtr ska::StatementParser::parse(ScriptAST& input) {
-  if(input.reader().empty()) {
+	if (input.reader().empty()) {
 		return nullptr;
 	}
 
@@ -39,12 +40,10 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::parse(ScriptAST& input) {
 			auto optionalStatement = optstatement(input);
 			if (optionalStatement != nullptr && !optionalStatement->logicalEmpty()) {
 				blockNodeStatements.push_back(std::move(optionalStatement));
-			} else {
-				break;
 			}
 		}
 		return ASTFactory::MakeNode<Operator::BLOCK>(std::move(blockNodeStatements));
-	} catch(std::exception& e) {
+	} catch (std::exception& e) {
 		throw LangError(input.name(), e);
 	}
 }
@@ -54,16 +53,15 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::statement(ScriptAST& inpu
 		return nullptr;
 	}
 
-
-		const auto token = input.reader().actual();
+	const auto token = input.reader().actual();
 	try {
 		switch (token.type()) {
 		case TokenType::RESERVED:
 			return matchReservedKeyword(input, std::get<std::size_t>(token.content()));
 
 		case TokenType::RANGE:
-			return m_matcherBlock.match(input, std::get<std::string>(token.content()));
-
+			return m_matcherBlock.match(input);
+		
 		default:
 			return matchExpressionStatement(input);
 		}
@@ -78,8 +76,18 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::matchExpressionStatement(
 	SLOG(ska::LogLevel::Info) << "Expression-statement found";
 
 	auto expressionResult = expr(input);
-	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
-	if(expressionResult == nullptr) {
+
+	if (input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::FILTER>())) {
+		return m_matcherFilter.match(input, std::move(expressionResult));
+	}
+
+	if (input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>())) {
+		input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
+	} else if (!input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>())) {
+		error("expected block-end statement");
+	}
+
+	if (expressionResult == nullptr) {
 			SLOG(ska::LogLevel::Info) << "NOP statement";
 			return nullptr;
 	}
@@ -102,9 +110,6 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::matchReservedKeyword(Scri
 
 	case static_cast<std::size_t>(TokenGrammar::RETURN):
 		return m_matcherReturn.match(input);
-
-	case static_cast<std::size_t>(TokenGrammar::EXPORT) :
-		return m_matcherImport.matchExport(input);
 
 	default: {
 			std::stringstream ss;
@@ -137,11 +142,14 @@ ska::ScriptASTPtr ska::StatementParser::subParse(ScriptCacheAST& scriptCache, co
 		(std::istreambuf_iterator<char>())
 	);
 
-	auto tokenizer = Tokenizer{ m_reservedKeywordsPool, std::move(content)};
-	auto tokens = tokenizer.tokenize();
-
 	const auto scriptAlreadyExists = scriptCache.find(name) != scriptCache.end();
 	SLOG(ska::LogLevel::Info) << "SubParsing script " << name << " : " << (scriptAlreadyExists ? "not " : "") << "in cache";
+	if (scriptAlreadyExists) {
+		return std::make_unique<ScriptAST>(scriptCache.at(name));
+	}
+
+	auto tokenizer = Tokenizer{ m_reservedKeywordsPool, std::move(content) };
+	auto tokens = tokenizer.tokenize();
 	auto script = ScriptASTPtr{std::make_unique<ScriptAST>( scriptCache, name, tokens )};
 	script->parse(*this);
 	return script;

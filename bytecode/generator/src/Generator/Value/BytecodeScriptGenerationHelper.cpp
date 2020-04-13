@@ -13,10 +13,6 @@ ska::bytecode::ScriptGenerationHelper::ScriptGenerationHelper(std::size_t index,
 
 ska::bytecode::ScriptGenerationHelper::ScriptGenerationHelper(ScriptCache& cache, const ScriptAST& script) {
 	const auto& name = script.name();
-  /*if (cache.find(name) != cache.end()) {
-		throw std::runtime_error("the script \"" + name + "\" already exists");
-	}
-*/
 	m_script = script.handle();
 	m_index = cache.id(name);
 }
@@ -41,7 +37,7 @@ const std::string& ska::bytecode::ScriptGenerationHelper::name() const {
 }
 
 ska::bytecode::Register ska::bytecode::ScriptGenerationHelper::queryNextRegister() {
-	return { ScriptVariableRef { m_register++ }, OperandType::REG };
+	return { ScriptVariableRef { m_register++, m_index }, OperandType::REG };
 }
 
 ska::bytecode::Operand ska::bytecode::ScriptGenerationHelper::querySymbolOrOperand(const ASTNode& node) {
@@ -52,19 +48,22 @@ ska::bytecode::Operand ska::bytecode::ScriptGenerationHelper::querySymbol(const 
 	return VariableGetter::query(m_index, symbol).first;
 }
 
+void ska::bytecode::ScriptGenerationHelper::declareSymbol(const Symbol& symbol, const Operand& operand) {
+	VariableGetter::declare(m_index, symbol, operand);
+}
+
 std::optional<ska::bytecode::Operand> ska::bytecode::ScriptGenerationHelper::getSymbol(const Symbol& symbol) const {
 	return VariableGetter::get(m_index, symbol);
 }
 
-std::vector<ska::bytecode::Operand> ska::bytecode::ScriptGenerationHelper::generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const {
-	auto result = std::vector<Operand>{};
-	result.reserve(symbolsInfo.size());
+ska::bytecode::ExportSymbolContainer ska::bytecode::ScriptGenerationHelper::generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const {
+	auto result = ska::bytecode::ExportSymbolContainer{};
 
 	while (!symbolsInfo.empty()) {
 		const auto& symbolWithInfo = symbolsInfo.top();
 		auto operand = VariableGetter::get(m_index, *symbolWithInfo.symbol);
 		if (operand.has_value()) {
-			result.push_back(std::move(operand.value()));
+			result.emplace(symbolWithInfo.symbol, ExportSymbol{ std::move(operand.value()), symbolWithInfo.symbol });
 		}
 		symbolsInfo.pop();
 	}

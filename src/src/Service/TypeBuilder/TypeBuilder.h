@@ -11,6 +11,8 @@
 #include "Event/ReturnTokenEvent.h"
 #include "Event/ArrayTokenEvent.h"
 #include "Event/ScriptLinkTokenEvent.h"
+#include "Event/FilterTokenEvent.h"
+
 #include "TypeBuildersContainer.h"
 
 namespace ska {
@@ -23,18 +25,22 @@ namespace ska {
 		public subobserver_priority_queue<VarTokenEvent>,
 		public subobserver_priority_queue<ReturnTokenEvent>,
 		public subobserver_priority_queue<ArrayTokenEvent>,
-		public subobserver_priority_queue<ScriptLinkTokenEvent> {
+		public subobserver_priority_queue<ScriptLinkTokenEvent>,
+        public subobserver_priority_queue<FilterTokenEvent> {
         public:
             TypeBuilder(StatementParser& parser, const TypeCrosser& typeCrosser);
             virtual ~TypeBuilder() = default;
             
         private:
-            bool matchVariable(VarTokenEvent& token) const;
-            bool matchFunction(FunctionTokenEvent& event) const;
-            bool matchExpression(ExpressionTokenEvent& event) const;
-			bool matchReturn(ReturnTokenEvent& event) const;
-			bool matchArray(ArrayTokenEvent& event) const;
-			bool matchScriptLink(ScriptLinkTokenEvent& event) const;
+            void buildType(ASTNode& node, ScriptAST& script);
+
+            bool matchVariable(VarTokenEvent& token);
+            bool matchFunction(FunctionTokenEvent& event);
+            bool matchExpression(ExpressionTokenEvent& event);
+			bool matchReturn(ReturnTokenEvent& event);
+			bool matchArray(ArrayTokenEvent& event);
+			bool matchScriptLink(ScriptLinkTokenEvent& event);
+            bool matchFilter(FilterTokenEvent& event);
 
 			TypeBuildersContainer m_typeBuilder;
     };

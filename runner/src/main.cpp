@@ -11,7 +11,6 @@
 #include "Interpreter/ScriptCache.h"
 #include "Service/StatementParser.h"
 #include "Service/SemanticTypeChecker.h"
-#include "Service/SymbolTableUpdater.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
 #include "Service/ScriptNameBuilder.h"
@@ -105,11 +104,10 @@ const auto reservedKeywords = ska::ReservedKeywordsPool{};
 	auto typeCrosser = ska::TypeCrosser{};
 	auto parser = ska::StatementParser {reservedKeywords};
 	auto typeBuilder = ska::TypeBuilder {parser, typeCrosser };
-	auto symbolsTypeUpdater = ska::SymbolTableUpdater {parser};
 	auto typeChecker = ska::SemanticTypeChecker {parser, typeCrosser };
 	auto interpreter = ska::Interpreter {reservedKeywords, typeCrosser };
 
-	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::Interpreter> {scriptCache.astCache, typeBuilder, symbolsTypeUpdater, typeChecker, reservedKeywords, parser, scriptCache, interpreter};
+	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::Interpreter> {scriptCache.astCache, typeBuilder, typeChecker, reservedKeywords, parser, scriptCache, interpreter};
 
 	try {
 

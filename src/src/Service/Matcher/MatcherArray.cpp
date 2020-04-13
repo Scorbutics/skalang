@@ -21,16 +21,25 @@ ska::ASTNodePtr ska::MatcherArray::matchDeclaration(ScriptAST& input) {
 			SLOG(ska::LogLevel::Debug) << "array entry detected, reading expression : ";
 			
 			auto expression = input.expr(m_parser);
-			arrayNode.push_back(std::move(expression));
+			if (expression != nullptr) {
+				arrayNode.push_back(std::move(expression));
+			}
 			isComma = input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
 			if (isComma) {
 				input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>());
 			}
 		}
 	}
+    
+	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 
-    input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
-	auto declarationNode = ASTFactory::MakeNode<ska::Operator::ARRAY_DECLARATION>(std::move(arrayNode));
+	auto arrayOptionalType = ASTFactory::MakeEmptyNode();
+	if (arrayNode.empty()) {
+		input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>());
+		arrayOptionalType = m_matcherType.match(input.reader());
+	}
+
+	auto declarationNode = ASTFactory::MakeNode<ska::Operator::ARRAY_TYPE_DECLARATION>(ASTFactory::MakeNode<ska::Operator::ARRAY_DECLARATION>(std::move(arrayNode)), std::move(arrayOptionalType));
 	auto event = ArrayTokenEvent{ *declarationNode, input, ArrayTokenEventType::DECLARATION };
 	m_parser.observable_priority_queue<ArrayTokenEvent>::notifyObservers(event);
 	return declarationNode;

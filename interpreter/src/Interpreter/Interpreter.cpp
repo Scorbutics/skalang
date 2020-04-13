@@ -43,8 +43,8 @@ std::vector<std::unique_ptr<ska::InterpreterOperatorUnit>> ska::Interpreter::bui
 	InterpreterOperatorDeclare<ska::Operator::FIELD_ACCESS>(*this, result );
 	InterpreterOperatorDeclare<ska::Operator::RETURN>(*this, result );
 	InterpreterOperatorDeclare<ska::Operator::USER_DEFINED_OBJECT>(*this, result );
-	InterpreterOperatorDeclare<ska::Operator::VARIABLE_DECLARATION>(*this, result );
 	InterpreterOperatorDeclare<ska::Operator::VARIABLE_AFFECTATION>(*this, result );
+	InterpreterOperatorDeclare<ska::Operator::AFFECTATION>(*this, result );
 	InterpreterOperatorDeclare<ska::Operator::BLOCK>(*this, result );
 	InterpreterOperatorDeclare<ska::Operator::BINARY>(*this, result, m_typeCrosser );
 	InterpreterOperatorDeclare<ska::Operator::LITERAL>(*this, result );

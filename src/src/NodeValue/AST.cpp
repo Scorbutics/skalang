@@ -1,15 +1,18 @@
+#include "Config/LoggerConfigLang.h"
 #include "AST.h"
 #include "Service/ASTFactory.h"
 #include "NodeValue/ScriptAST.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
+#include "Service/TypeBuilder/TypeBuildersContainer.h"
 
-ska::ASTNode::ASTNode(): 
-	m_type(Type::MakeBuiltIn(ExpressionType::VOID)) {
-}
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ASTNode)
+
+ska::ASTNode::ASTNode() :
+	m_type(Type::MakeBuiltIn(ExpressionType::VOID)) {}
 
 ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
 	m_op(l != nullptr && r != nullptr ? Operator::BINARY : Operator::UNARY),
-	token(std::move(t)) {
+	m_token(std::move(t)) {
 	if (l != nullptr) {
     	m_children.push_back(std::move(l));
 	}
@@ -18,7 +21,7 @@ ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
     	m_children.push_back(std::move(r));
 	}
 
-	if(token.isLiteral()) {
+	if(m_token.isLiteral()) {
     	assert(m_op == Operator::UNARY);
     	m_op = Operator::LITERAL;
 	}
@@ -26,7 +29,7 @@ ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
 
 ska::ASTNode:: ASTNode(Operator o, Token identifierToken, std::vector<ASTNodePtr> children) : 
 	m_op(o),
-	token(std::move(identifierToken)) {
+	m_token(std::move(identifierToken)) {
 	if(!children.empty()) {
     	m_children.reserve(children.size());
     	for(auto& child : children) {
@@ -39,18 +42,37 @@ ska::ASTNode:: ASTNode(Operator o, Token identifierToken, std::vector<ASTNodePtr
 
 ska::ASTNode::ASTNode(Operator o, Token identifierToken) :
 	m_op(std::move(o)),
-	token(std::move(identifierToken)) {
+	m_token(std::move(identifierToken)) {
 }
 
-void ska::ASTNode::buildType(const TypeBuildersContainer& typeBuilders, const ScriptAST& script) {
-	if (m_type.has_value()) {
-		return;
-	}
+const ska::Symbol* ska::ASTNode::typeSymbol() const { 
+	SLOG(ska::LogLevel::Debug) << "Accessing type symbol of node \"" << m_token << "\" with type \"" << m_type.value_or(Type{}) << "\"";
+	return m_symbol == nullptr ? nullptr : m_symbol->master(); 
+	//return !m_type.has_value() ? nullptr : TypeSymbolAccess(m_type.value());
+}
 
-	for(auto& child : m_children) {
-    	child->buildType(typeBuilders, script);
+const std::optional<ska::Type>& ska::ASTNode::type() const {
+	return m_type;
+}
+
+void ska::ASTNode::linkSymbol(Symbol& symbol) {
+	m_symbol = &symbol;
+	refreshSymbolType();
+	SLOG(ska::LogLevel::Info) << "Linking symbol \"" << &symbol << "\" in node \"" << m_token << "\"";
+}
+
+void ska::ASTNode::refreshSymbolType() {
+	if (m_symbol != nullptr && m_type.has_value() && m_symbol->changeTypeIfRequired(m_type.value())) {
+		SLOG(ska::LogLevel::Debug) << "Symbol \"" << m_symbol->name() << "\" in node \"" << m_token << "\" has type updated \"" << m_symbol->type() << "\"";
 	}
-	auto& typeBuilder = typeBuilders[static_cast<std::size_t>(op())];
-	assert(typeBuilder != nullptr && "Cannot calculate the node type (it might be an empty node)");
-	m_type = typeBuilder->build(script, *this);
+}
+
+bool ska::ASTNode::updateType(Type type) {
+	m_type = std::move(type);
+	refreshSymbolType();
+	return true;
+}
+
+bool ska::ASTNode::isSymbolicLeaf() const { 
+	return m_symbol != nullptr && m_children.size() < 2;
 }

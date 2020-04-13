@@ -25,11 +25,12 @@ TEST_CASE("[TypeBuilderBinary]") {
 	result[static_cast<std::size_t>(ska::Operator::BINARY)] = std::make_unique<ska::TypeBuilderOperator<ska::Operator::BINARY>>(typeCrosser);
 	result[static_cast<std::size_t>(ska::Operator::UNARY)] = std::make_unique<ska::TypeBuilderOperator<ska::Operator::UNARY>>();
 	result[static_cast<std::size_t>(ska::Operator::LITERAL)] = std::make_unique<ska::TypeBuilderOperator<ska::Operator::LITERAL>>();
-
-	(*node)[0].buildType(result, script);
-	(*node)[1].buildType(result, script);
+	
+	for(auto& child : *node) {
+		child->updateType(result[static_cast<std::size_t>(child->op())]->build(script, *child).type);
+	}
 	
 	//This one makes a "crossType"
-	auto type = typeBuilder.build(script, *node);
+	auto type = typeBuilder.build(script, *node).type;
 	CHECK(type == ska::ExpressionType::STRING);
 }

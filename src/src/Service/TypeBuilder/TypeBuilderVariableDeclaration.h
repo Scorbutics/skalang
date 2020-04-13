@@ -4,5 +4,5 @@
 #include "Operation/OperationTypeVariableDeclaration.h"
 
 namespace ska {
-    SKALANG_BUILDER_TYPE_OPERATOR_DEFINE(Operator::VARIABLE_DECLARATION);
+    SKALANG_BUILDER_TYPE_OPERATOR_DEFINE(Operator::VARIABLE_AFFECTATION);
 }

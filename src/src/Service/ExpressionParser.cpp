@@ -12,7 +12,8 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ExpressionParser)
 ska::ExpressionParser::ExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, StatementParser& parser) :
 	m_reservedKeywordsPool(reservedKeywordsPool),
 	m_parser(parser),
-	m_matcherArray(m_reservedKeywordsPool, m_parser),
+	m_matcherType(m_reservedKeywordsPool),
+	m_matcherArray(m_reservedKeywordsPool, m_parser, m_matcherType),
 	m_matcherFunction(m_reservedKeywordsPool, m_parser),
 	m_matcherVar(m_reservedKeywordsPool, m_parser),
 	m_matcherImport(m_reservedKeywordsPool, m_parser) {
@@ -21,6 +22,16 @@ ska::ExpressionParser::ExpressionParser(const ReservedKeywordsPool& reservedKeyw
 ska::ASTNodePtr ska::ExpressionParser::parse(ScriptAST& input) {
 	auto data = expression_stack<Token, ASTNodePtr>{};
 	return expression(input, data);
+}
+
+ska::ASTNodePtr ska::ExpressionParser::matchVariable(ScriptAST& input, const Token& token) {	
+	auto varNode = ASTFactory::MakeLogicalNode(input.reader().match(token.type()));
+	if (input.reader().actual() == m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>()) {
+		return m_matcherVar.matchAffectation(input, std::move(varNode));
+	}
+	auto event = VarTokenEvent::MakeUse(*varNode, input);
+	m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
+	return varNode;
 }
 
 std::pair<bool, int> ska::ExpressionParser::parseTokenExpression(ScriptAST& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
@@ -44,10 +55,7 @@ std::pair<bool, int> ska::ExpressionParser::parseTokenExpression(ScriptAST& inpu
 
 	case TokenType::IDENTIFIER: {
 		SLOG(ska::LogLevel::Info) << "\tPushing var operand " << token;
-		auto varNode = ASTFactory::MakeLogicalNode(input.reader().match(token.type()));
-		auto event = VarTokenEvent::MakeUse(*varNode, input);
-		m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
-		expressions.push(std::move(varNode));
+		expressions.push(matchVariable(input, token));
 	} break;
 
 	case TokenType::ARRAY: {
@@ -73,7 +81,7 @@ std::pair<bool, int> ska::ExpressionParser::parseTokenExpression(ScriptAST& inpu
 		return { matchSymbol(input, expressions, token, isDoingOperation), rangeCounterOffsetPostMatching };
 
 	default:
-		error("Expected a symbol, a literal, an identifier or a reserved keyword, but got the token : " + token.name());
+		error("Expected a symbol, a literal, an identifier or a reserved keyword, but got the token \"" + token.name() + "\"");
 	}
 
 	return { false, rangeCounterOffsetPostMatching };
@@ -109,7 +117,7 @@ int ska::ExpressionParser::matchRange(ScriptAST& input, ExpressionStack& express
 	} return 0;
 
 	default:
-    	error("Unexpected token (range type) : " + token.name());
+    	error("Unexpected token (range type) \"" + token.name() + "\"");
 		return 0;
 	}
 }
@@ -152,7 +160,7 @@ int ska::ExpressionParser::matchParenthesis(ScriptAST& input, ExpressionStack& e
 			//We have to pop it, then matching the function call as the new operand.
 			expressions.push(m_matcherFunction.matchCall(input, std::move(functionNameOperand)));
 			return -1;
-		} else if(functionNameOperand->type().has_value()) {
+		} else if (functionNameOperand->type().has_value()) {
 			auto ss = std::stringstream{};
 			ss << "expected a function as identifier but got a \"" << functionNameOperand->type().value() << "\"";
 			error(ss.str());
@@ -165,17 +173,30 @@ int ska::ExpressionParser::matchParenthesis(ScriptAST& input, ExpressionStack& e
 }
 
 ska::ASTNodePtr ska::ExpressionParser::matchObjectFieldAccess(ScriptAST& input, ASTNodePtr objectAccessed) {
-	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::METHOD_CALL_OPERATOR>());
+	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::FIELD_ACCESS_OPERATOR>());
 	auto fieldAccessedIdentifier = input.reader().match(TokenType::IDENTIFIER);
+	auto fieldAccessed = ASTFactory::MakeLogicalNode(fieldAccessedIdentifier);
 
-	return ASTFactory::MakeNode<Operator::FIELD_ACCESS>(std::move(objectAccessed), ASTFactory::MakeLogicalNode(fieldAccessedIdentifier));
+	if (OperatorTraits::isNamed(objectAccessed->op())) {
+		auto objectEvent = VarTokenEvent::MakeUse(*objectAccessed, input);
+		m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(objectEvent);
+	}
+
+	SLOG(ska::LogLevel::Info) << "\tField access ! symbol \"" << (objectAccessed->symbol() == nullptr ? "" : objectAccessed->symbol()->name()) << "\"";
+
+	return ASTFactory::MakeNode<Operator::FIELD_ACCESS>(std::move(objectAccessed), std::move(fieldAccessed));
 }
 
 bool ska::ExpressionParser::isAtEndOfExpression(ScriptAST& input) const {
-	return input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()) ||
-        	input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>()) ||
-        	input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()) ||
-        	input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
+	return input.reader().expectOneType({
+		TokenGrammar::STATEMENT_END,
+		TokenGrammar::ARGUMENT_DELIMITER,
+		TokenGrammar::BLOCK_BEGIN,
+		TokenGrammar::BLOCK_END,
+		TokenGrammar::OBJECT_BLOCK_END,
+		TokenGrammar::FILTER,
+		TokenGrammar::BRACKET_END 
+	});
 }
 
 ska::ASTNodePtr ska::ExpressionParser::expression(ScriptAST& input, ExpressionStack& expressions) {

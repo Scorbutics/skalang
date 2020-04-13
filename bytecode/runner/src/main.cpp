@@ -14,7 +14,6 @@
 #include "BytecodeInterpreter/BytecodeScript.h"
 #include "Generator/BytecodeGenerator.h"
 #include "Generator/Value/BytecodeScriptCache.h"
-#include "Service/SymbolTableUpdater.h"
 #include "BytecodeInterpreter/Value/BytecodeInterpreterTypes.h"
 #include "BytecodeInterpreter/BytecodeInterpreter.h"
 #include "Serializer/BytecodeSerializer.h"
@@ -30,9 +29,9 @@ static ska::bytecode::ScriptGenerationHelper BasicProgramScriptStarter(ska::lang
 	auto scriptFileName = std::string{ argv[1] };
 	auto scriptName = scriptFileName.substr(0, scriptFileName.find_last_of('.'));
 
-	const auto scriptStarter = "var Script = import \"wd:" + scriptName + "\";"
-	"var ParametersGenerator = import \"bind:std.native.function.parameter\";"
-	"Script.run(ParametersGenerator.Fcty(\"" + scriptName + "\"));";
+	const auto scriptStarter = "Script = import \"wd:" + scriptName + "\"\n"
+	"ParametersGenerator = import \"bind:std.native.function.parameter\"\n"
+	"Script.run(ParametersGenerator.Fcty(\"" + scriptName + "\"))\n";
 
 	return { module.scriptCache, module.parser, "main", ska::Tokenizer{ module.reservedKeywords, scriptStarter}.tokenize() };
 }
@@ -63,7 +62,6 @@ int main(int argc, char* argv[]) {
 	auto typeCrosser = ska::TypeCrosser{};
 	auto parser = ska::StatementParser {reservedKeywords};
 	auto typeBuilder = ska::TypeBuilder {parser, typeCrosser };
-	auto symbolsTypeUpdater = ska::SymbolTableUpdater {parser};
 	auto typeChecker = ska::SemanticTypeChecker {parser, typeCrosser };
 	
 	auto mainCache = ska::bytecode::ScriptCache {};
@@ -73,7 +71,6 @@ int main(int argc, char* argv[]) {
 	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> {
 		mainCache.astCache,
 		typeBuilder,
-		symbolsTypeUpdater,
 		typeChecker,
 		reservedKeywords,
 		parser,
@@ -83,21 +80,20 @@ int main(int argc, char* argv[]) {
 
 	try {
 		auto serializer = ska::bytecode::Serializer{};
-		auto failedToRead = serializer.deserialize(mainCache, "main", ska::bytecode::DeserializationStrategyType::PerScript());	
-
 		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);
 		auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
-
 		auto parameterValues = std::vector<ska::NodeValue>{};
-
 		auto parameterModule = BasicParameterModuleBuilder(moduleConfiguration, parameterValues, argc, argv);
-		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
-		auto& gen = generator.generate(mainCache, std::move(script));
 
-		auto interpreted = interpreter.interpret(gen.id(), mainCache);
+		auto failedToRead = serializer.deserialize(moduleConfiguration.scriptCache, "main", ska::bytecode::DeserializationStrategyType::PerScript(), {"main"});
+		
+		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
+		auto& gen = generator.generate(moduleConfiguration.scriptCache, std::move(script));
+
+		auto interpreted = interpreter.interpret(gen.id(), moduleConfiguration.scriptCache);
 
 		if (!failedToRead.empty()) {
-			assert(serializer.serialize(mainCache, ska::bytecode::SerializationStrategyType::PerScript()));
+			assert(serializer.serialize(moduleConfiguration.scriptCache, ska::bytecode::SerializationStrategyType::PerScript()));
 		}
 
 	} catch (std::exception& e) {

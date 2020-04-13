@@ -6,7 +6,6 @@
 #include "Service/SemanticTypeChecker.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
-#include "Service/SymbolTableUpdater.h"
 #include "Service/ReservedKeywordsPool.h"
 #include "Generator/BytecodeGenerator.h"
 #include "Generator/Value/BytecodeScriptCache.h"
@@ -15,7 +14,6 @@ struct BytecodeGeneratorDataTestContainer {
 	using ParserPtr = std::unique_ptr<ska::StatementParser>;
 	using SemanticTypeCheckerPtr = std::unique_ptr<ska::SemanticTypeChecker>;
 	using TypeBuilderPtr = std::unique_ptr<ska::TypeBuilder>;
-	using SymbolTableUpdaterPtr = std::unique_ptr<ska::SymbolTableUpdater>;
 	using BytecodeGeneratorPtr = std::unique_ptr<ska::bytecode::Generator>;
 	using ScriptCachePtr = std::unique_ptr<ska::bytecode::ScriptCache>;
 
@@ -24,6 +22,5 @@ struct BytecodeGeneratorDataTestContainer {
 	ParserPtr parser;
 	SemanticTypeCheckerPtr typeChecker;
 	TypeBuilderPtr typeBuilder;
-	SymbolTableUpdaterPtr symbolsTypeUpdater;
 	ScriptCachePtr storage;
 };

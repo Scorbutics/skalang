@@ -5,27 +5,21 @@
 #include "Service/ReservedKeywordsPool.h"
 #include "Service/SymbolTable.h"
 #include "Service/TypeBuilder/TypeBuilder.h"
-#include "Service/SymbolTableUpdater.h"
 #include "Service/ASTFactory.h"
 #include "BridgeASTBuilder.h"
 #include "NodeValue/ScriptAST.h"
-
 #include "Service/ScriptNameBuilder.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::BridgeASTBuilder)
 
-ska::BridgeASTBuilder::BridgeASTBuilder(TypeBuilder& typeBuilder, SymbolTableUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved) :
+ska::BridgeASTBuilder::BridgeASTBuilder(TypeBuilder& typeBuilder, const ReservedKeywordsPool& reserved) :
 	m_reserved(reserved),
 	m_typeBuilder(typeBuilder),
-	m_symbolTypeUpdater(symbolTypeUpdater),
 	m_matcherType(reserved) {
 	observable_priority_queue<VarTokenEvent>::addObserver(m_typeBuilder);
 	observable_priority_queue<ReturnTokenEvent>::addObserver(m_typeBuilder);
 	observable_priority_queue<FunctionTokenEvent>::addObserver(m_typeBuilder);
 	observable_priority_queue<ScriptLinkTokenEvent>::addObserver(m_typeBuilder);
-
-	observable_priority_queue<FunctionTokenEvent>::addObserver(m_symbolTypeUpdater);
-	observable_priority_queue<VarTokenEvent>::addObserver(m_symbolTypeUpdater);
 }
 
 void ska::BridgeASTBuilder::internalListen(SymbolTable& symbolTable) {
@@ -60,9 +54,6 @@ void ska::BridgeASTBuilder::internalUnlisten(SymbolTable& symbolTable) {
 }
 
 ska::BridgeASTBuilder::~BridgeASTBuilder() {
-	observable_priority_queue<VarTokenEvent>::removeObserver(m_symbolTypeUpdater);
-	observable_priority_queue<FunctionTokenEvent>::removeObserver(m_symbolTypeUpdater);
-
 	observable_priority_queue<ScriptLinkTokenEvent>::removeObserver(m_typeBuilder);
 	observable_priority_queue<FunctionTokenEvent>::removeObserver(m_typeBuilder);
 	observable_priority_queue<ReturnTokenEvent>::removeObserver(m_typeBuilder);
@@ -106,13 +97,20 @@ std::vector<ska::ASTNodePtr> ska::BridgeASTBuilder::makeFunctionInputOutput(Scri
 std::vector<ska::ASTNodePtr> ska::BridgeASTBuilder::makeFunctionInputOutput(ScriptAST& script, const Type& fullTypeFunction) {
 	auto parametersAndReturn = std::vector<ASTNodePtr>{};
 	SLOG(LogLevel::Info) << " 4 - Making function parameters and return type";
-	for (std::size_t index = 0u; index < fullTypeFunction.compound().size(); index++) {
-		auto& type = fullTypeFunction.compound()[index];
-		auto isReturnType = index == fullTypeFunction.compound().size() - 1;
+	std::size_t index = 0u;
+	for (const auto& type : fullTypeFunction) {
+		auto isReturnType = index == fullTypeFunction.size() - 1;
 		SLOG(LogLevel::Info) << (isReturnType ? "return" : "parameter") << " : " << type;
-		auto t = m_matcherType.match(type);
+		ASTNodePtr typeNode;
+		if (type == ExpressionType::OBJECT && type.name() == fullTypeFunction.name()) {
+			typeNode = ASTFactory::MakeLogicalNode(m_reserved.pattern<TokenGrammar::VARIABLE>());
+		} else {
+			typeNode = m_matcherType.match(type);
+		}
+		
 		SLOG(LogLevel::Debug) << " Deduced." ;
-		parametersAndReturn.push_back(std::move(makeFunctionParameterOrReturnType(script, std::move(t), index, fullTypeFunction.compound().size() - 1)));
+		parametersAndReturn.push_back(std::move(makeFunctionParameterOrReturnType(script, std::move(typeNode), index, fullTypeFunction.size() - 1)));
+		index++;
 	}
 	return parametersAndReturn;
 }
@@ -139,8 +137,8 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeVariable(ScriptAST& script, const std
 	auto lock = BridgeASTBuilderSymbolTableLock{*this, script.symbols() };
 	SLOG(LogLevel::Info) << " 8 - Making variable \"" << name << "\"";
 	auto tokenField = Token {name, TokenType::IDENTIFIER, {} };
-	auto variable = ASTFactory::MakeNode<Operator::VARIABLE_DECLARATION>(std::move(tokenField), std::move(value));
-	auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_DECLARATION> (*variable, script);
+	auto variable = ASTFactory::MakeNode<Operator::VARIABLE_AFFECTATION>(std::move(tokenField), std::move(value));
+	auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_AFFECTATION> (*variable, script);
 	observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 	return variable;
 }
@@ -192,15 +190,13 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionDeclaration(ScriptAST& script
 	return functionDeclarationNode;
 }
 
-ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionPrototype(ScriptAST& script, const Type& fullTypeFunction) {
+ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionPrototype(ScriptAST& script, const Type& fullTypeFunction, const std::string& name) {
 	auto lock = BridgeASTBuilderSymbolTableLock{*this, script.symbols() };
-	const auto* functionSymbol = fullTypeFunction.symbol();
 	SLOG(LogLevel::Info) << " 2 - Making function prototype \"" << fullTypeFunction << "\"";
 
-	if(functionSymbol == nullptr || functionSymbol->getName().empty()) { std::stringstream ss; ss << "type is not named : " << fullTypeFunction; throw std::runtime_error(ss.str()); };
-	if(fullTypeFunction.type() != ExpressionType::FUNCTION) { std::stringstream ss; ss << "type is not a function : " << fullTypeFunction; throw std::runtime_error(ss.str()); };
+	if(fullTypeFunction.type() != ExpressionType::FUNCTION) { std::stringstream ss; ss << "type is not a function : " << name; throw std::runtime_error(ss.str()); };
 
-	auto functionNameNode = makeFunctionName(script, functionSymbol->getName());
+	auto functionNameNode = makeFunctionName(script, name);
 	auto parametersAndReturn = makeFunctionInputOutput(script, fullTypeFunction);
 	return makeFunctionPrototype(script, std::move(functionNameNode), std::move(parametersAndReturn));
 }
@@ -215,7 +211,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionPrototype(ScriptAST& script, 
 
 ska::ASTNodePtr ska::BridgeASTBuilder::makeFunction(ScriptAST& script, const BridgeFunction& data) {
 	SLOG(LogLevel::Info) << " 1 - Making function \"" << data.name() << "\"";
-	auto prototype = makeFunctionPrototype(script, data.type());	
+	auto prototype = makeFunctionPrototype(script, data.symbol().type(), data.name());	
 	auto functionDeclaration = makeFunctionDeclaration(script, std::move(prototype), data);
 	return makeVariable(script, data.name(), std::move(functionDeclaration));
 }

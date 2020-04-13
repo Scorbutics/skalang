@@ -8,8 +8,10 @@
 #include "Event/ReturnTokenEvent.h"
 #include "Event/ScriptLinkTokenEvent.h"
 #include "Event/ImportTokenEvent.h"
+#include "Event/FilterTokenEvent.h"
 
 #include "ScopedSymbolTable.h"
+#include "SymbolTableOperation.h"
 
 namespace ska {
    
@@ -37,7 +39,9 @@ namespace ska {
     	public PriorityObserver<FunctionTokenEvent>,
     	public PriorityObserver<ReturnTokenEvent>, 
 		public PriorityObserver<ImportTokenEvent>,
-		public PriorityObserver<ScriptLinkTokenEvent> {
+		public PriorityObserver<ScriptLinkTokenEvent>,
+		public PriorityObserver<FilterTokenEvent>,
+		public SymbolFactory {
 
     	using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 		friend class ParserListenerLock;
@@ -49,26 +53,47 @@ namespace ska {
 		[[nodiscard]]
 		ParserListenerLock listenParser(StatementParser& parser);
 
-		auto* operator[](const std::string& key) { return (*m_currentTable)[key]; }
-    	const auto* operator[](const std::string& key) const { return (*m_currentTable)[key]; }
+		Symbol* operator[](std::size_t index) { return (*m_currentTable)[index]; }
+		const Symbol* operator[](std::size_t index) const { return (*m_currentTable)[index];  }
 
-		ScopedSymbolTable::ChildrenScopedSymbolTable& nested() { return m_currentTable->children(); }
-		const ScopedSymbolTable::ChildrenScopedSymbolTable& nested() const { return m_currentTable->children(); }
+		Symbol* operator[](const std::string& key) { return (*m_currentTable)[key]; }
+		const Symbol* operator[](const std::string& key) const { return (*m_currentTable)[key]; }
 
-		ScopedSymbolTable* current() { return m_currentTable; }
-		const ScopedSymbolTable* current() const { return m_currentTable; }
+		Symbol* operator()(const std::string& key) { return (*m_currentTable)(key); }
+		const Symbol* operator()(const std::string& key) const { return (*m_currentTable)(key); }
 
-		const Symbol* enclosingType() const { 
+		const Symbol* enclosingType() const {
 			return m_currentTable->owner();
 		}
 
+		std::size_t size() const {
+			return m_currentTable->size();
+		}
+
+		std::size_t scopes() const {
+			return m_currentTable->scopes();
+		}
+
+		bool changeTypeIfRequired(const std::string& symbolName, const Type& value);
+		const Symbol* lookup(SymbolTableLookup strategy, SymbolTableNested depth = SymbolTableNested::current()) const;
+		Symbol* lookup(SymbolTableLookup strategy, SymbolTableNested depth = SymbolTableNested::current());
+
+		auto begin() { return m_rootTable->begin(); }
+		auto end() { return m_rootTable->end(); }
+		auto begin() const { return m_rootTable->begin(); }
+		auto end() const  { return m_rootTable->end(); }
+
+		ScopedSymbolTable& root() { return *m_rootTable; }
+		const ScopedSymbolTable& root() const { return *m_rootTable; }
+
 	private:
-		bool match(const VarTokenEvent&);
+		bool match(VarTokenEvent&);
 		bool nestedTable(const BlockTokenEvent&);
-		bool matchFunction(const FunctionTokenEvent&);
+		bool matchFunction(FunctionTokenEvent&);
 		bool matchReturn(const ReturnTokenEvent&);
 		bool matchImport(const ImportTokenEvent&);
 		bool matchScriptLink(const ScriptLinkTokenEvent&);
+		bool matchFilter(const FilterTokenEvent&);
 
 		void internalListenParser(StatementParser& parser);
 		void internalUnlistenParser();

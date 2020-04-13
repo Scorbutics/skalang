@@ -8,62 +8,73 @@
 #include "Operation/OperationTypeType.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
+#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
+#define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
+#define LOG_WARN SLOG_STATIC(ska::LogLevel::Warn, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
 
 namespace ska {
-	Type TypeBuilderFunctionPrototypeDeclarationDeduceReturnType(const ASTNode& node, const SymbolTable& symbolTable, const Symbol* symbolFunction) {
+	TypeHierarchy TypeBuilderFunctionPrototypeDeclarationDeduceReturnType(const ASTNode& node, const SymbolTable& symbolTable, const Symbol* symbolFunction) {
 		const auto type = node.type().value();
 		const auto objectIsVar = type == ExpressionType::OBJECT;
 		if (objectIsVar) {
-			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function prototype declaration has an OBJECT return type \""<< (symbolFunction != nullptr ? symbolFunction->getName() : "") << "\"";
-			const auto objectDoesntRefersToItself = type.hasSymbol();
+			LOG_INFO << "function prototype declaration has an OBJECT return type \""<< (symbolFunction != nullptr ? symbolFunction->name() : "") << "\"";
+			const auto objectDoesntRefersToItself = node.typeSymbol() != nullptr;
 			if (!objectDoesntRefersToItself) {
-				return Type::MakeCustom<ExpressionType::OBJECT>(symbolFunction);
+				LOG_WARN << "Linking current function return type to master symbol \"" << (symbolFunction != nullptr ? symbolFunction->name() : "") << "\"";
+				return { Type::MakeCustom<ExpressionType::OBJECT>(symbolFunction), node.symbol() == nullptr ? symbolFunction : node.symbol() };
 			}
-			const auto operateOnType = OperationType<Operator::TYPE>{node};
-			const auto* symbol = operateOnType.GetSymbol(symbolTable);
-			assert(symbol != nullptr);
-			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function symbol type deduced from type \""<<  symbol->getType() << "\"";
-			if(symbol->getType() == ExpressionType::VOID) {
-				return Type::MakeCustom<ExpressionType::OBJECT>(symbolFunction);
+			
+			const auto symbolType = node.typeSymbol() == nullptr ? std::optional<Type>{} : node.typeSymbol()->type();
+			if (!symbolType.has_value()) {
+				throw std::runtime_error("unable to find type symbol type of function");
 			}
-			assert(!symbol->getType().compound().empty());
-			return symbol->getType().compound().back();
 
-			/*
-			const auto* returnSymbol = objectDoesntRefersToItself ? (node.size() == 1 ? (type)[node[0].name()] : type[node.name()]) : symbolFunction;
-			return Type::MakeCustom<ExpressionType::OBJECT>(returnSymbol);
-			*/
+			LOG_INFO << "function symbol type deduced from type \""<<  symbolType.value() << "\"";
+			if (symbolType.value() == ExpressionType::VOID) {
+				assert(node.symbol() != nullptr);
+				LOG_WARN << "Linking current function return type to master symbol \"" << (symbolFunction != nullptr ? symbolFunction->name() : "") << "\"";
+				return { Type::MakeCustom<ExpressionType::OBJECT>(symbolFunction), node.symbol() == nullptr ? symbolFunction : node.symbol() };
+			}
+
+			if (symbolType.value().empty()) {
+				auto ss = std::stringstream{};
+				ss << "bad function type encountered \"" << symbolType.value() << "\": could not deduce its return value";
+				throw std::runtime_error(ss.str());
+			}
+			return { symbolType.value().back(), node.typeSymbol() };
 		}
 		
-		if(type == ExpressionType::FUNCTION) {
-			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function prototype declaration has a FUNCTION return type \""<< (symbolFunction != nullptr ? symbolFunction->getName() : "") << "\"";
-			assert(!type.compound().empty());
-			return type.compound().back();
+		if (type == ExpressionType::FUNCTION) {
+			LOG_INFO << "function prototype declaration has a FUNCTION return type \""<< (symbolFunction != nullptr ? symbolFunction->name() : "") << "\"";
+			assert(!type.empty());
+			return type.back();
 		}
 
-		SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function prototype declaration has a return type \"" << type << "\" for function \"" << (symbolFunction != nullptr ? symbolFunction->getName() : "") << "\"";
+		LOG_INFO << "function prototype declaration has a return type \"" << type << "\" for function \"" << (symbolFunction != nullptr ? symbolFunction->name() : "") << "\"";
 		return type;
 	}
 }
 
-ska::Type ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::build(const ScriptAST& script, OperateOn node) {
+ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::build(const ScriptAST& script, OperateOn node) {
 	auto functionName = node.GetFunctionName();
     auto& symbols = script.symbols();
-	const auto* symbolFunction = symbols[functionName];
-	auto functionType = Type::MakeCustom<ExpressionType::FUNCTION>(symbolFunction);
+	auto* symbolFunction = symbols[functionName];
+	const Symbol* returnSymbol = nullptr;
+	auto functionType = Type::MakeCustom<ExpressionType::FUNCTION>(nullptr);
 	std::size_t index = 0;
     for (auto& paramNode : node) {
-			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << paramNode->name();
+			LOG_INFO << paramNode->name();
 		if (index == node.GetParameterSize()) {
-			functionType.add(TypeBuilderFunctionPrototypeDeclarationDeduceReturnType(*paramNode, script.symbols(), symbolFunction));
+			auto hierarchy = TypeBuilderFunctionPrototypeDeclarationDeduceReturnType(*paramNode, script.symbols(), symbolFunction);
+			returnSymbol = hierarchy.link();
+			functionType.add(std::move(hierarchy.type));
 		} else {
 			auto type = paramNode->type().value();
-			functionType.add(type);
+			functionType.add(std::move(type));
 		}
 		index++;
     }
-	
-    //SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>) << "function prototype declaration \""<< node <<"\" with type "<< functionType;
 
-    return functionType;
+		LOG_DEBUG << "function prototype declaration \""<< node.GetFunctionName() <<"\" with type "<< functionType;
+	return { functionType, returnSymbol };
 }

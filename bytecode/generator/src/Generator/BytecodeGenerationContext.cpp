@@ -72,6 +72,17 @@ void ska::bytecode::GenerationContext::setSymbolInfo(const ASTNode& node, Symbol
 const ska::bytecode::SymbolInfo* ska::bytecode::GenerationContext::getSymbolInfo(const Symbol& symbol) const { return m_generated.getSymbolInfo(symbol); }
 const ska::bytecode::SymbolInfo* ska::bytecode::GenerationContext::getSymbolInfo(const ASTNode& node) const { return m_generated.getSymbolInfo(node); }
 
+std::size_t ska::bytecode::GenerationContext::exportId(const Symbol& symbol) const {
+	auto& script = scriptOfSymbol(symbol);
+	auto& exports = m_generated.getExportedSymbols(script.id());
+
+	if (exports.atOrNull(&symbol) == nullptr) {
+		throw std::runtime_error("unable to find symbol \"" + symbol.name() + "\" in exports of script \"" + script.name() + "\"");
+	}
+
+	return exports.id(&symbol);
+}
+
 ska::bytecode::Operand ska::bytecode::GenerationContext::querySymbolOrOperand(const ASTNode& node) {
 	if (node.symbol() == nullptr) {
 		return helper().querySymbolOrOperand(node);

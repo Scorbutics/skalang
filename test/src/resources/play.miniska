@@ -1,6 +1,6 @@
-var Character = import "character";
+Character = import "character"
 
-var run = function(ch: Character::build()) {
-	ch.age;
-};
+run = function(ch: Character::build()) do
+	ch.age
+end
 

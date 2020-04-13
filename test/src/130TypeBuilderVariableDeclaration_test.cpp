@@ -16,7 +16,7 @@ TEST_CASE("[TypeBuilderVariableDeclaration]") {
 	DataTestContainer data;
 	auto script = TypeBuilderTestCommonBuildAST(scriptCache, "", data, false);
 	script.parse(*data.parser);
-		auto typeBuilder = ska::TypeBuilderOperator<ska::Operator::VARIABLE_DECLARATION>{};
+		auto typeBuilder = ska::TypeBuilderOperator<ska::Operator::VARIABLE_AFFECTATION>{};
 	
 	auto nameToken = ska::Token{"toto", ska::TokenType::IDENTIFIER, {} };
 	auto valueToken = ska::Token{ "1", ska::TokenType::DIGIT, {} };
@@ -28,10 +28,14 @@ TEST_CASE("[TypeBuilderVariableDeclaration]") {
 	result[static_cast<std::size_t>(ska::Operator::UNARY)] = std::make_unique<ska::TypeBuilderOperator<ska::Operator::UNARY>>();
 	result[static_cast<std::size_t>(ska::Operator::LITERAL)] = std::make_unique<ska::TypeBuilderOperator<ska::Operator::LITERAL>>();
 
-	valueNode->buildType(result, script);
+	for(auto& child : *valueNode) {
+		child->updateType(result[static_cast<std::size_t>(child->op())]->build(script, *child).type);
+	}
+
+	valueNode->updateType(result[static_cast<std::size_t>(valueNode->op())]->build(script, *valueNode).type);
 	auto children = std::vector<ska::ASTNodePtr>{ };
 	children.push_back(std::move(valueNode));
-	auto node = ska::ASTFactory::MakeNode<ska::Operator::VARIABLE_DECLARATION>(std::move(nameToken), std::move(children));
-	auto type = typeBuilder.build(script, *node);
+	auto node = ska::ASTFactory::MakeNode<ska::Operator::VARIABLE_AFFECTATION>(std::move(nameToken), std::move(children));
+	auto type = typeBuilder.build(script, *node).type;
 	CHECK(type == ska::ExpressionType::INT);
 }

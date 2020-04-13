@@ -5,7 +5,6 @@ std::string ska::VarTokenEvent::name() const
 {
 		switch (m_type) {
 		case VarTokenEventType::AFFECTATION:
-		//case VarTokenEventType::USE:
 			return m_node[0].name();
 		default:
 			return m_node.name();
@@ -29,4 +28,20 @@ std::string ska::VarTokenEvent::value() const {
 		return m_node[0].name();
 	}
 	return "";
+}
+
+const ska::ASTNode& ska::VarTokenEvent::var() const {
+	switch (m_type) {
+		case VarTokenEventType::AFFECTATION:
+			return m_node[0];
+		default:
+			return m_node;
+	}
+}
+
+const ska::ASTNode* ska::VarTokenEvent::val() const {
+	if (m_node.size() >= 2) {
+		return &m_node[1];
+	}
+	return m_node.size() > 0 ? &m_node[0] : nullptr;
 }

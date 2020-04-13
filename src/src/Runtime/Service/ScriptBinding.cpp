@@ -11,7 +11,7 @@ ska::ScriptBindingAST::ScriptBindingAST(
 	std::string scriptName,
 	std::string templateName) :
 	m_parser(config.parser),
-	m_functionBuilder(config.typeBuilder, config.symbolTableUpdater, config.reservedKeywords),
+	m_functionBuilder(config.typeBuilder, config.reservedKeywords),
 	m_name(ScriptNameDeduce("", "bind:" + scriptName)),
 	m_templateName(ScriptNameDeduce("", templateName)),
 	m_scriptAst(config.scriptAstCache, m_name, std::vector<Token>{}),
@@ -19,11 +19,10 @@ ska::ScriptBindingAST::ScriptBindingAST(
 	queryAST();
 }
 
-void ska::ScriptBindingAST::bindFunction(Type functionType, decltype(NativeFunction::function) f) {
-	SLOG(LogLevel::Debug) << "Binding function \"" << functionType;
-	auto field = BridgeField {std::move(functionType)};
+void ska::ScriptBindingAST::bindFunction(const Symbol& function, decltype(NativeFunction::function) f) {
+	SLOG(LogLevel::Debug) << "Binding function \"" << function;
+	auto field = BridgeField { function };
 	field.callback = std::move(f);
-	assert(functionType.symbol() != nullptr);
 	m_bindings.push_back(std::move(field));
 }
 
@@ -52,7 +51,7 @@ ska::ASTNodePtr ska::ScriptBindingAST::buildFunctionsAST(BridgeFunction& constru
 	SLOG(LogLevel::Info) << "Current constructor is : " << constructor.name();
 	fillConstructorWithBindings(constructor);
 
-	if (constructor.type() == ExpressionType::VOID) {
+	if (constructor.isVoid()) {
 		return ASTFactory::MakeNode<Operator::BLOCK>(m_functionBuilder.makeFieldList(m_scriptAst, constructor));
 	} 
 

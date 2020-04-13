@@ -18,7 +18,8 @@ namespace ska {
 			std::pair<Operand, bool> query(std::size_t script, const ASTNode& node);
 			std::pair<Operand, bool> query(std::size_t script, const Symbol& symbol);
 			std::optional<Operand> get(std::size_t script, const Symbol& symbol) const;
-				
+			void declare(std::size_t script, const Symbol& symbol, Operand operand);
+
 			SymbolUIDContainer m_container;
 			std::size_t m_count = 0;
 			char m_symbol = '_';

@@ -21,20 +21,20 @@ TEST_CASE("test") {
 	DataTestContainer data;
 	auto scriptCache = ska::ScriptCacheAST{};
 
-	auto astPtr = ASTFromInput(scriptCache, "var i = 0; var titi = \"llllll\"; { var toto = 2; var i = 9; }", data);
+	auto astPtr = ASTFromInput(scriptCache, "i = 0\n titi = \"llllll\"\n do toto = 2\n i = 9\n end", data);
 	auto& table = reader->symbols();
 	
-	CHECK(table.nested().size() == 1);
-	auto nestedI = (*table.nested()[0])["i"];
+	CHECK(table.scopes() == 1);
+	const auto* nestedI = table.lookup(ska::SymbolTableLookup::hierarchical("i"), ska::SymbolTableNested::lastChild());
 	auto i = table["i"];
-	auto nestedToto = (*table.nested()[0])["toto"];
+	const auto* nestedToto = table.lookup(ska::SymbolTableLookup::hierarchical("toto"), ska::SymbolTableNested::firstChild());
 	auto toto = table["toto"];
 	auto titi = table["titi"];
-	auto nestedTiti = (*table.nested()[0])["titi"];
+	auto nestedTiti = table.lookup(ska::SymbolTableLookup::hierarchical("titi"), ska::SymbolTableNested::firstChild());
 
 	CHECK(i != nullptr);
 	CHECK(nestedI  != nullptr);
-	CHECK(i != nestedI);
+	CHECK(i == nestedI);
 	CHECK(toto == nullptr);
 	CHECK(nestedToto != nullptr);
 	CHECK(nestedTiti != nullptr);
@@ -45,68 +45,84 @@ TEST_CASE("test") {
 TEST_CASE("Matching") {
 	
 	SUBCASE("Matching OK") {
-	DataTestContainer data;
+		DataTestContainer data;
 		auto scriptCache = ska::ScriptCacheAST{};
-	SUBCASE("Overriding into subscope") {
-			auto astPtr = ASTFromInput(scriptCache, "var i = 0; i = 123; { i = 9; }", data);
+		SUBCASE("Overriding into subscope") {
+			auto astPtr = ASTFromInput(scriptCache, "i = 0\n i = 123\n do i = 9\n end", data);
 			auto& table = reader->symbols();
 			
-			CHECK(table.nested().size() == 1);
-			auto nestedI = (*table.nested()[0])["i"];
+			CHECK(table.scopes() == 1);
+			auto nestedI = table.lookup(ska::SymbolTableLookup::hierarchical("i"), ska::SymbolTableNested::firstChild());
 			auto i = table["i"];
 
 			CHECK(i != nullptr);
 		}
 
-	SUBCASE("var in upper scope used into inner function scope") {
-	ASTFromInput(scriptCache, "var test59 = 21; var func59 = function() { test59 = 123; };", data);
-	}
+		SUBCASE("var in upper scope used into inner function scope") {
+			auto astPtr = ASTFromInput(scriptCache, "test59 = 21\n func59 = function() do test59 = 123\n end\n", data);
+			auto& table = reader->symbols();
 
-	SUBCASE("function parameter use into function") {
-	ASTFromInput(scriptCache, "var func63 = function(test63:int) { test63 = 123; };", data);
-	}
+			CHECK(table.scopes() == 1);
+			auto nestedVar = table.lookup(ska::SymbolTableLookup::hierarchical("test59"), ska::SymbolTableNested::firstChild());
+			auto var = table["test59"];
+
+			CHECK(nestedVar == var);
+		}
+
+		SUBCASE("outer scope, then inner, then outer again") {
+			auto astPtr = ASTFromInput(scriptCache, 
+				"test73 = 21\n"
+				"do\n"
+				"test76 = 123\n"
+				"end\n"
+				"test78 = 11\n", data);
+			auto& table = reader->symbols();
+
+			CHECK(table.scopes() == 1);
+			CHECK(table.size() == 2);
+			auto nestedVar = table.lookup(ska::SymbolTableLookup::hierarchical("test76"), ska::SymbolTableNested::firstChild());
+			CHECK(nestedVar != nullptr);
+
+			CHECK(table("test73") != nullptr);
+			CHECK(table("test78") != nullptr);
+		}
+
+		SUBCASE("function parameter use into function") {
+			auto astPtr = ASTFromInput(scriptCache, "func63 = function(test63:int) do test63 = 123\n end\n", data);
+			auto& table = reader->symbols();
+
+			CHECK(table.scopes() == 1);
+			auto nestedVar = table.lookup(ska::SymbolTableLookup::hierarchical("test63"), ska::SymbolTableNested::firstChild());
+			auto var = table["test63"];
+
+			CHECK(var == nullptr);
+			CHECK(nestedVar != nullptr);
+		}
 	
-	SUBCASE("function declared in another function with upper variable") {
-	ASTFromInput(scriptCache, "var func67 = function(testParam67:int) { var toutou67 = function(blurp:string) { testParam67 = 123; }; testParam67 = 78; };", data);
-	}
+		SUBCASE("function declared in another function with upper variable") {
+			//TODO étoffer
+			ASTFromInput(scriptCache, "func67 = function(testParam67:int) do toutou67 = function(blurp:string) do testParam67 = 123\n end\n testParam67 = 78\n end\n", data);
+		}
 
-	SUBCASE("shadowing variable into inner function") {
-	ASTFromInput(scriptCache, "var test71 = 3; var func71 = function(test71:string) { test71; };", data);
-	}
+		SUBCASE("shadowing variable into inner function") {
+			//TODO étoffer
+			ASTFromInput(scriptCache, "test71 = 3\n func71 = function(test71:string) do test71\n end\n", data);
+		}
 	
+		SUBCASE("filter") {
+			auto astPtr = ASTFromInput(scriptCache, "array113 = [0, 2, 3] \n array113 | (iterator, index) do end\n", data);
+			auto& table = reader->symbols();
+
+			CHECK(table.scopes() == 1);
+			auto parameterIterator = table.lookup(ska::SymbolTableLookup::direct("iterator"), ska::SymbolTableNested::firstChild());
+			CHECK(parameterIterator != nullptr);
+
+			auto parameterIndex = table.lookup(ska::SymbolTableLookup::direct("index"), ska::SymbolTableNested::firstChild());
+			CHECK(parameterIndex != nullptr);
+
+			const auto expectScope = table.root().child(0) != nullptr && table.root().child(0)->scopes() == 1;
+			CHECK(expectScope);
+		}
 	}
 
-	SUBCASE("Matching failed") {
-		DataTestContainer data;
-		auto scriptCache = ska::ScriptCacheAST{};
-	{
-			SUBCASE("Because of unknown symbol") {
-				try {
-					ASTFromInput(scriptCache, "var i81 = 0; var titi81 = \"llllll\"; { ti81 = 9; }", data);
-					CHECK(false);
-	} catch (std::exception& e) {
-					CHECK(true);
-				}
-			}
-
-			SUBCASE("Unknown symbol outside when declared as function parameter") {
-				try {
-					ASTFromInput(scriptCache, "var func90 = function(test90:int) {}; test90 = 123;", data);
-					CHECK(false);
-	} catch (std::exception& e) {
-					CHECK(true);
-				}
-			}
-
-	SUBCASE("used out of function scope") {
-	try {
-	ASTFromInput(scriptCache, "var func99 = function(test99:int) { var tout99 = function(blurp99:string) {};}; tout99 = 332;", data);
-	CHECK(false);
-	} catch (std::exception& e) {
-					CHECK(true);
-				}
-	}
-	}   
-		reader = nullptr;
-	}
 }

@@ -1,66 +1,181 @@
+#include "Config/LoggerConfigLang.h"
 #include "NodeValue/Symbol.h"
 #include "Service/ScopedSymbolTable.h"
 #include "NodeValue/ScriptAST.h"
 
-const ska::Symbol* ska::Symbol::operator[](const std::string& fieldSymbolName) const {
-	if(std::holds_alternative<ScopedSymbolTable*>(m_data)) {
-		auto* scopedTable = std::get<ScopedSymbolTable*>(m_data);
-		assert(scopedTable != nullptr);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Symbol)
 
-		for(const auto& innerSymbolTable : scopedTable->children()) {
-			if(!innerSymbolTable->children().empty()) {
-				const auto* lastInnerSymbolElement = innerSymbolTable->children().back().get();
-				assert(lastInnerSymbolElement != nullptr && (std::string{"symbol \""} + fieldSymbolName + "\" doesn't exists for element ").c_str());
-				const auto* result = (*lastInnerSymbolElement)[fieldSymbolName];
-				if(result != nullptr) {
-					return result;
-				}
-			}
+#define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::Symbol)
+
+ska::Symbol::Symbol(std::size_t tableIndex, std::string name, SymbolFieldResolver fields) :
+	m_master(this),
+	m_name(std::move(name)),
+	m_data(std::move(fields)),
+	m_tableIndex(tableIndex) {
+}
+
+template <class Return, class Data, class Master>
+static Return Lookup(Data& data, Master* master, const std::string& fieldSymbolName) {
+	auto* table = data.lookup();
+	if (table != nullptr) {
+		auto* found = (*table)(fieldSymbolName);
+		if (found != nullptr) {
+			return found;
 		}
-
-		SLOG(ska::LogLevel::Info) << "Unable to find " << fieldSymbolName << " in this symbol";
-		return nullptr;
 	}
 
-	assert(std::holds_alternative<const ScriptHandleAST*>(m_data));
-	auto* script = std::get<const ScriptHandleAST*>(m_data);
-	assert(script != nullptr);
-
-	SLOG(ska::LogLevel::Debug) << "Looking for " << fieldSymbolName << " in the targetted script";
-
-	const auto* result = (script->symbols())[fieldSymbolName];
-	if(result != nullptr) {
-		return result;
+	if(master != nullptr) {
+		LOG_INFO << "Symbol \"" << fieldSymbolName << "\" not found here, looking into master symbol \"" << master->name() << "\"";
+		return (*master)(fieldSymbolName);
 	}
-
-	SLOG(ska::LogLevel::Info) << "Unable to find " << fieldSymbolName << " in this symbol";
 	return nullptr;
 }
 
-ska::Symbol* ska::Symbol::operator[](const std::string& fieldSymbolName) {
-	return const_cast<Symbol*>(static_cast<const Symbol*>(this)->operator[](fieldSymbolName));
+template <class Return, class Data, class Master>
+static Return Lookup(Data& data, Master* master, std::size_t index) {
+	auto* table = data.lookup();
+	if (table != nullptr) {
+		auto* found = (*table)[index];
+		if (found != nullptr) {
+			return found;
+		}
+		LOG_INFO << "Symbol index \"" << index << "\" not found here";
+		if (table->size() > index) {
+			index -= table->size();
+		}
+	} else {
+		LOG_INFO << "Symbol index \"" << index << "\" not found here";
+	}
+
+	if (master != nullptr) {
+		LOG_INFO << "looking into master symbol \"" << master->name() << "\"";
+		return (*master)[index];
+	}
+	return nullptr;
 }
 
 std::size_t ska::Symbol::size() const {
-	return m_category.compound().size();
+	auto* table = m_data.lookup();
+	return table == nullptr ? 0 : table->size();
+}
+
+/*
+ska::Symbol::Symbol(const Symbol& s) {
+	*this = s;
+}
+*/
+
+ska::Symbol::Symbol(Symbol&& s) noexcept {
+	*this = std::move(s);
+}
+/*
+ska::Symbol& ska::Symbol::operator=(const Symbol& s) {
+	m_data = s.m_data;
+	m_name = s.m_name;
+	m_tableIndex = s.m_tableIndex;
+	m_category = s.m_category;
+	SLOG(ska::LogLevel::Debug) << "   Copy, Symbol " << s.name() << " " << s.m_category << " copied to " << m_name << " " << m_category;
+	return *this;
+}
+*/
+
+ska::Symbol& ska::Symbol::operator=(Symbol&& s) noexcept {
+	m_data = std::move(s.m_data);
+	m_name = std::move(s.m_name);
+	m_tableIndex = std::move(s.m_tableIndex);
+	m_category = std::move(s.m_category);
+	SLOG(ska::LogLevel::Debug) << "   Move, Symbol " << s.name() << " " << s.m_category << " moved to " << m_name << " " << m_category;
+	return *this;
 }
 
 bool ska::Symbol::operator==(const Symbol& sym) const {
-	
-	const auto compareData = (std::holds_alternative<ScopedSymbolTable*>(m_data) ?
-		std::holds_alternative<ScopedSymbolTable*>(sym.m_data) && std::get<ScopedSymbolTable*>(sym.m_data) == std::get<ScopedSymbolTable*>(m_data) :
-		std::holds_alternative<const ScriptHandleAST*>(sym.m_data) && std::get<const ScriptHandleAST*>(sym.m_data) == std::get<const ScriptHandleAST*>(m_data));
+	const auto compareData = m_data == sym.m_data;
+	if (!compareData) {
+		return m_master != this && (*m_master) == sym || sym.m_master != &sym && (*sym.m_master) == *this;
+	}
 
-	return m_name == sym.m_name && /*
-		m_category== sym.m_category */
-		
-	compareData
-		
-		;
-	
+	return m_name == sym.m_name &&
+		m_tableIndex == sym.m_tableIndex;
 }
 
-void ska::Symbol::forceType(Type t) {
-	m_category = t;
-	//m_category.m_symbol = this;
+bool ska::Symbol::changeTypeIfRequired(const Type& type) {
+	if (m_category == ExpressionType::VOID || m_category.type() == type.type()) {
+		m_category = type;
+		return true;
+	}
+
+	return m_category.tryChangeSymbol(type);
+}
+
+void ska::Symbol::implement(Symbol& symbol) {
+	if (symbol.m_master == this || &symbol == this) {
+		return;
+	}
+	SLOG(ska::LogLevel::Info) << "Implementing symbol " << symbol << " into " << m_name << " type (" << m_category << ")";
+
+	symbol.m_master->m_implementationReferences.erase(&symbol);	
+	symbol.m_master = this;
+	m_implementationReferences.insert(&symbol);
+}
+
+const ska::Symbol* ska::Symbol::operator[](std::size_t index) const {
+	return Lookup<const Symbol*>(m_data, m_master != this ? m_master : nullptr, index);
+}
+
+ska::Symbol* ska::Symbol::operator[](std::size_t index) {
+	return Lookup<Symbol*>(m_data, m_master != this ? m_master : nullptr, index);
+}
+
+const ska::Symbol* ska::Symbol::operator()(const std::string& symbolName) const {
+	return Lookup<const Symbol*>(m_data, m_master != this ? m_master : nullptr, symbolName);
+}
+
+ska::Symbol* ska::Symbol::operator()(const std::string& symbolName) {
+	return Lookup<Symbol*>(m_data, m_master != this ? m_master : nullptr, symbolName);
+}
+
+const ska::Symbol* ska::Symbol::back() const {
+	auto* table = m_data.lookup();
+	return table == nullptr ? nullptr : table->back();
+}
+
+ska::Symbol* ska::Symbol::back() {
+	auto* table = m_data.lookup();
+	return table == nullptr ? nullptr : table->back();
+}
+
+std::ostream& ska::operator<<(std::ostream& stream, const Symbol& symbol) {
+	stream << symbol.m_name << " (" << symbol.m_category << ")";
+	return stream;
+}
+
+bool ska::Symbol::empty() const {
+	return size() == 0;
+}
+
+void ska::Symbol::open() {
+	m_closed = false;
+	m_data.open();
+}
+
+void ska::Symbol::close() {
+	m_closed = true; 
+	m_data.close();
+}
+
+std::size_t ska::Symbol::id(const Symbol& field) const {
+	auto* table = m_data.lookup();
+	if (table != nullptr) {
+		auto found = table->id(field);
+		if (found.has_value()) {
+			return found.value();
+		}
+	}
+
+	if (m_master != nullptr) {
+		LOG_INFO << "Symbol \"" << field.name() << "\" not found here, looking into master symbol \"" << m_master->name() << "\"";
+		return m_master->id(field);
+	}
+
+	throw std::runtime_error("field \"" + field.name() + "\" id lookup failed in object \"" + m_name + "\"");
 }

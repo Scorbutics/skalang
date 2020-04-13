@@ -4,7 +4,6 @@
 
 namespace ska {
   class TypeBuilder;
-  class SymbolTableUpdater;
   class SemanticTypeChecker;
   struct ReservedKeywordsPool;
   class StatementParser;
@@ -15,7 +14,6 @@ namespace ska {
       struct BaseModuleConfiguration {
           ScriptCacheAST& scriptAstCache;
           TypeBuilder& typeBuilder;
-          SymbolTableUpdater& symbolTableUpdater;
           SemanticTypeChecker& typeChecker;
           const ReservedKeywordsPool& reservedKeywords;
           StatementParser& parser;
@@ -25,13 +23,12 @@ namespace ska {
     struct ModuleConfiguration : public BaseModuleConfiguration {
         ModuleConfiguration(ScriptCacheAST& scriptAstCache,
             TypeBuilder& typeBuilder,
-            SymbolTableUpdater& symbolTableUpdater,
             SemanticTypeChecker& typeChecker,
             const ReservedKeywordsPool& reservedKeywords,
             StatementParser& parser,
             typename InterpreterTypes<Interpreter>::ScriptCache& scriptCache,
             Interpreter& interpreter) : 
-            BaseModuleConfiguration{scriptAstCache, typeBuilder, symbolTableUpdater, typeChecker, reservedKeywords, parser},
+            BaseModuleConfiguration{scriptAstCache, typeBuilder, typeChecker, reservedKeywords, parser},
             scriptCache(scriptCache),
             interpreter(interpreter){}
 

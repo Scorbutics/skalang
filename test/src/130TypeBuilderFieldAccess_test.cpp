@@ -8,12 +8,12 @@
 TEST_CASE("[TypeBuilderFieldAccess]") {
 	DataTestContainer data;
 	auto scriptCache = ska::ScriptCacheAST{};
-	auto script = TypeBuilderTestCommonBuildAST(scriptCache, "var Factory = function() : var { var pdv = 0; return { pdv : pdv }; }; var obj = Factory(); obj.pdv;", data);
+	auto script = TypeBuilderTestCommonBuildAST(scriptCache, "Factory = function() : var do pdv1 = 0\n return { pdv = pdv1 }\n end\n obj = Factory()\n obj.pdv\n", data);
 	script.parse(*data.parser);
 
 	const auto& node = (script.rootNode())[2];
 
 	auto typeBuilder = ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>{};
-	auto type = typeBuilder.build(script, node);
+	auto type = typeBuilder.build(script, node).type;
 	CHECK(type == ska::ExpressionType::INT);
 }

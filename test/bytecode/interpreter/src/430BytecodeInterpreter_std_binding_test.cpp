@@ -18,13 +18,13 @@ static ska::bytecode::ScriptGenerationHelper Interpret(BytecodeInterpreterDataTe
 }
 
 static ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> BuildModuleConfFromData(BytecodeInterpreterDataTestContainer& data) {
-	return ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { data.storage->astCache, * data.typeBuilder, * data.symbolsTypeUpdater, *data.typeChecker, reservedKeywords, * data.parser, * data.storage, * data.interpreter};
+	return ska::lang::ModuleConfiguration<ska::bytecode::Interpreter> { data.storage->astCache, * data.typeBuilder, *data.typeChecker, reservedKeywords, * data.parser, * data.storage, * data.interpreter};
 }
 
 TEST_CASE("[BytecodeInterpreter] Binding std : path import only") {
 	constexpr auto progStr =
-	"var PathFcty = import \"bind:std.native.io.path\";"
-	"var path = PathFcty.Fcty(\"" SKALANG_TEST_DIR "\");";
+	"PathFcty = import \"bind:std.native.io.path\"\n"
+	"path = PathFcty.Fcty(\"" SKALANG_TEST_DIR "\")\n";
 
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(progStr, data);
@@ -32,6 +32,7 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path import only") {
 	auto moduleConfiguration = BuildModuleConfFromData(data);
 	auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
 
+std::cout << "coucou" << std::endl;;
 	auto script = Interpret(data, progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -39,9 +40,9 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path import only") {
 
 TEST_CASE("[BytecodeInterpreter] Binding std : path + bridge function call") {
 	constexpr auto progStr =
-	"var PathFcty = import \"bind:std.native.io.path\";"
-	"var path = PathFcty.Fcty(\"\");"
-	"var last = path.canonical();";
+	"PathFcty = import \"bind:std.native.io.path\"\n"
+	"path = PathFcty.Fcty(\"\")\n"
+	"last = path.canonical()\n";
 
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(progStr, data);
@@ -59,8 +60,8 @@ TEST_CASE("[BytecodeInterpreter] Binding std : path + bridge function call") {
 
 TEST_CASE("[BytecodeInterpreter] Binding std : log + bridge function call") {
 	constexpr auto progStr =
-		"var Logger = import \"bind:std.native.io.log\";"
-		"Logger.print(\"test63\");";
+		"Logger = import \"bind:std.native.io.log\"\n"
+		"Logger.print(\"test63\")\n";
 
 	auto data = BytecodeInterpreterDataTestContainer{};
 	ASTFromInputBytecodeInterpreterNoParse(progStr, data);

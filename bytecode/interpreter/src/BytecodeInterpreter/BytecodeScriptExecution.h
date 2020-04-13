@@ -35,6 +35,7 @@ namespace ska {
 			void jumpRelative(long value);
 
 			std::size_t id() const;
+			const std::string& name() const;
 
 			ScriptVariableRef getRelativeInstruction(long relativeValue) const {
 				return ScriptVariableRef{ executionPointer + relativeValue, scriptIndex };

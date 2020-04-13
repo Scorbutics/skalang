@@ -43,10 +43,12 @@ std::string ska::bytecode::Operand::toString() const {
 	}
 
 	auto output = std::string {};
-	std::visit([&output](const auto& operand) {
+	auto script = std::string {};
+	std::visit([&output, &script](const auto& operand) {
 		using TypeT = std::decay_t<decltype(operand)>;
 		if constexpr (std::is_same_v<ScriptVariableRef, TypeT>) {
-			output = std::to_string(operand.variable) /*+ ":" + std::to_string(operand.script)*/;
+			output = std::to_string(operand.variable);
+			script = std::to_string(operand.script);
 		} else if constexpr (!std::is_same_v<StringShared, TypeT>) {
 			output = std::to_string(operand);
 		}
@@ -55,11 +57,11 @@ std::string ska::bytecode::Operand::toString() const {
 
 	switch(m_type) {
 	case OperandType::VAR:
-		output = "V" + output;
+		output = "V" + output + ":" + script;
 		break;
 
 	case OperandType::REG:
-		output = "R" + output;
+		output = "R" + output + ":" + script;
 		break;
 
 	default:

@@ -6,23 +6,23 @@
 namespace ska {	
 	
 	template<>
-	class OperationType<Operator::VARIABLE_DECLARATION> {
+	class OperationType<Operator::VARIABLE_AFFECTATION> {
 	private:
 		const ASTNode& node;
 	public:
 		OperationType(const ASTNode& node) : node(node) {}
 
-		inline auto GetVariableName() {
+		inline auto GetVariableName() const {
 			assert(!node.name().empty());
 			return node.name();
 		}
 		
-		inline const auto& GetVariableValueNode() {
+		inline auto& GetVariableValueNode() const {
 			assert(node.size() != 0);
 			return node[0];
 		}
 
-		inline const auto& GetVariableNameNode() {
+		inline const auto& GetVariableNameNode() const {
 			return node;
 		}
 	};

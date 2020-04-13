@@ -4,35 +4,34 @@
 #include "Service/ReservedKeywordsPool.h"
 
 TEST_CASE("test") {
-	const auto inputStr = std::string("for(var i = 0; i < 5; i++) { lol(\"mdr\", 12); }");
+	const auto inputStr = std::string("for(i = 0\n i < 5\n i++) do lol(\"mdr\", 12) end");
 	const auto keywords = ska::ReservedKeywordsPool{};
 	auto t = ska::Tokenizer {keywords, inputStr};
 	auto tokens = t.tokenize();
 
-	CHECK(tokens.size() == 23);
-	CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::FOR>());
-	CHECK(tokens[1] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_BEGIN>());
-	CHECK(tokens[2] == keywords.pattern<ska::TokenGrammar::VARIABLE>());
-	CHECK(tokens[3] == ska::Token{"i", ska::TokenType::IDENTIFIER, {}});
-	CHECK(tokens[4] == ska::Token{"=", ska::TokenType::SYMBOL, {}});
-	CHECK(tokens[5] == ska::Token{"0", ska::TokenType::DIGIT, {}});
-	CHECK(tokens[6] == keywords.pattern<ska::TokenGrammar::STATEMENT_END>());
-	CHECK(tokens[7] == ska::Token{"i", ska::TokenType::IDENTIFIER, {}});
-	CHECK(tokens[8] == ska::Token{"<", ska::TokenType::SYMBOL, {}});
-	CHECK(tokens[9] == ska::Token{"5", ska::TokenType::DIGIT, {}});
-	CHECK(tokens[10] == keywords.pattern<ska::TokenGrammar::STATEMENT_END>());
-	CHECK(tokens[11] == ska::Token{"i", ska::TokenType::IDENTIFIER, {}});
-	CHECK(tokens[12] == ska::Token{"++", ska::TokenType::SYMBOL, {}});
-	CHECK(tokens[13] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_END>());
-	CHECK(tokens[14] == keywords.pattern<ska::TokenGrammar::BLOCK_BEGIN>());
-	CHECK(tokens[15] == ska::Token { "lol", ska::TokenType::IDENTIFIER, {}});
-	CHECK(tokens[16] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_BEGIN>());
-	CHECK(tokens[17] == ska::Token { "mdr", ska::TokenType::STRING, {}});
-	CHECK(tokens[18] == keywords.pattern<ska::TokenGrammar::ARGUMENT_DELIMITER>());
-	CHECK(tokens[19] == ska::Token { "12", ska::TokenType::DIGIT, {}});
-	CHECK(tokens[20] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_END>());
-	CHECK(tokens[21] == keywords.pattern<ska::TokenGrammar::STATEMENT_END>());
-	CHECK(tokens[22] == keywords.pattern<ska::TokenGrammar::BLOCK_END>());
+	CHECK(tokens.size() == 21);
+	auto index = 0u;
+	CHECK(tokens[index++] == keywords.pattern<ska::TokenGrammar::FOR>());
+	CHECK(tokens[index++] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_BEGIN>());
+	CHECK(tokens[index++] == ska::Token{"i", ska::TokenType::IDENTIFIER, {}});
+	CHECK(tokens[index++] == ska::Token{"=", ska::TokenType::SYMBOL, {}});
+	CHECK(tokens[index++] == ska::Token{"0", ska::TokenType::DIGIT, {}});
+	CHECK(tokens[index++] == keywords.pattern<ska::TokenGrammar::STATEMENT_END>());
+	CHECK(tokens[index++] == ska::Token{"i", ska::TokenType::IDENTIFIER, {}});
+	CHECK(tokens[index++] == ska::Token{"<", ska::TokenType::SYMBOL, {}});
+	CHECK(tokens[index++] == ska::Token{"5", ska::TokenType::DIGIT, {}});
+	CHECK(tokens[index++] == keywords.pattern<ska::TokenGrammar::STATEMENT_END>());
+	CHECK(tokens[index++] == ska::Token{"i", ska::TokenType::IDENTIFIER, {}});
+	CHECK(tokens[index++] == ska::Token{"++", ska::TokenType::SYMBOL, {}});
+	CHECK(tokens[index++] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_END>());
+	CHECK(tokens[index++] == keywords.pattern<ska::TokenGrammar::BLOCK_BEGIN>());
+	CHECK(tokens[index++] == ska::Token { "lol", ska::TokenType::IDENTIFIER, {}});
+	CHECK(tokens[index++] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_BEGIN>());
+	CHECK(tokens[index++] == ska::Token { "mdr", ska::TokenType::STRING, {}});
+	CHECK(tokens[index++] == keywords.pattern<ska::TokenGrammar::ARGUMENT_DELIMITER>());
+	CHECK(tokens[index++] == ska::Token { "12", ska::TokenType::DIGIT, {}});
+	CHECK(tokens[index++] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_END>());
+	CHECK(tokens[index++] == keywords.pattern<ska::TokenGrammar::BLOCK_END>());
 }
 
 TEST_CASE("Symbol by symbol") {
@@ -129,7 +128,7 @@ TEST_CASE("Symbol by symbol") {
 	}
 
 	SUBCASE("end statement symbol") {
-		const auto input = std::string(";");
+		const auto input = std::string("\n");
 		auto t = ska::Tokenizer {keywords, input};
 		auto tokens = t.tokenize();
 
@@ -138,7 +137,7 @@ TEST_CASE("Symbol by symbol") {
 	}
 
 	SUBCASE("block begin symbol") {
-		const auto input = std::string("{");
+		const auto input = std::string("do");
 		auto t = ska::Tokenizer {keywords, input};
 		auto tokens = t.tokenize();
 
@@ -147,12 +146,39 @@ TEST_CASE("Symbol by symbol") {
 	}
 
 	SUBCASE("block end symbol") {
-		const auto input = std::string("}");
+		const auto input = std::string("end");
 		auto t = ska::Tokenizer {keywords, input};
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.size() == 1);
 		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::BLOCK_END>());
+	}
+
+	SUBCASE("object block begin symbol") {
+		const auto input = std::string("{");
+		auto t = ska::Tokenizer{ keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 1);
+		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::OBJECT_BLOCK_BEGIN>());
+	}
+
+	SUBCASE("object block end symbol") {
+		const auto input = std::string("}");
+		auto t = ska::Tokenizer{ keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 1);
+		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::OBJECT_BLOCK_END>());
+	}
+
+	SUBCASE("filter symbol") {
+		const auto input = std::string("|");
+		auto t = ska::Tokenizer{ keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 1);
+		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::FILTER>());
 	}
 
 	SUBCASE("parenthesis begin") {
@@ -200,13 +226,31 @@ TEST_CASE("Symbol by symbol") {
 		CHECK(tokens[0] == ska::Token {"32.1", ska::TokenType::DIGIT, {}});
 	}
 
-	SUBCASE("Dot symbol (for method call)") {
+	SUBCASE("Dot symbol (for field access)") {
 		const auto input = std::string(".");
 		auto t = ska::Tokenizer {keywords, input};
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.size() == 1);
-		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::METHOD_CALL_OPERATOR>());
+		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::FIELD_ACCESS_OPERATOR>());
+	}
+
+	SUBCASE("End statement") {
+		const auto input = std::string("\n");
+		auto t = ska::Tokenizer{ keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 1);
+		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::STATEMENT_END>());
+	}
+
+	SUBCASE("Several end statements") {
+		const auto input = std::string("\n\n\n \n \n\n \n\n");
+		auto t = ska::Tokenizer{ keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 1);
+		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::STATEMENT_END>());
 	}
 
 	SUBCASE("string") {
@@ -225,14 +269,14 @@ TEST_CASE("Symbol by symbol") {
 
 		CHECK(tokens.size() == 5);
 		CHECK(tokens[0] == ska::Token { "test", ska::TokenType::IDENTIFIER, {}});
-		CHECK(tokens[1] == keywords.pattern<ska::TokenGrammar::METHOD_CALL_OPERATOR>());
+		CHECK(tokens[1] == keywords.pattern<ska::TokenGrammar::FIELD_ACCESS_OPERATOR>());
 		CHECK(tokens[2] == ska::Token { "call", ska::TokenType::IDENTIFIER, {}});
 		CHECK(tokens[3] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_BEGIN>());
 		CHECK(tokens[4] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_END>());
 	}
 
 	SUBCASE("only spaces") {
-		const auto input = std::string("  \t \n ");
+		const auto input = std::string("  \t ");
 		auto t = ska::Tokenizer { keywords, input };
 		auto tokens = t.tokenize();
 
@@ -240,7 +284,7 @@ TEST_CASE("Symbol by symbol") {
 	}
 
 	SUBCASE("spaces with not space in middle") {
-		const auto input = std::string("  \t o \n ");
+		const auto input = std::string("  \t o  ");
 		auto t = ska::Tokenizer { keywords, input };
 		auto tokens = t.tokenize();
 
@@ -290,11 +334,20 @@ TEST_CASE("Symbol by symbol") {
 	}
 
 	SUBCASE("lot of spaces and whitespaces characters") {
-		const auto input = std::string("       \t     \n");
+		const auto input = std::string("       \t     ");
 		auto t = ska::Tokenizer { keywords, input };
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.empty());
+	}
+
+	SUBCASE("string litteral with spaces at end : not trimed") {
+		const auto input = std::string("\"test   \"");
+		auto t = ska::Tokenizer{ keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 1);
+		CHECK(tokens[0] == ska::Token{ "test   ", ska::TokenType::STRING, {} });
 	}
 	
 	SUBCASE("unterminated string") {

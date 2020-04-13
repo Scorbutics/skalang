@@ -15,10 +15,10 @@ ska::TypeBuildersContainer ska::BuildTypeBuildersContainer(const TypeCrosser& ty
 	TypeBuilderMakeBuilder<Operator::BINARY>(result, typeCrosser);
 	TypeBuilderMakeBuilder<Operator::UNARY>(result);
 	TypeBuilderMakeBuilder<Operator::LITERAL>(result);
-	TypeBuilderMakeBuilder<Operator::VARIABLE_DECLARATION>(result);
-	TypeBuilderMakeBuilder<Operator::VARIABLE_DECLARATION>(result);
 	TypeBuilderMakeBuilder<Operator::VARIABLE_AFFECTATION>(result);
+	TypeBuilderMakeBuilder<Operator::AFFECTATION>(result);
 	TypeBuilderMakeBuilder<Operator::PARAMETER_DECLARATION>(result);
+	TypeBuilderMakeBuilder<Operator::ARRAY_TYPE_DECLARATION>(result);
 	TypeBuilderMakeBuilder<Operator::ARRAY_DECLARATION>(result);
 	TypeBuilderMakeBuilder<Operator::ARRAY_USE>(result);
 	TypeBuilderMakeBuilder<Operator::USER_DEFINED_OBJECT>(result);
@@ -35,6 +35,9 @@ ska::TypeBuildersContainer ska::BuildTypeBuildersContainer(const TypeCrosser& ty
 	TypeBuilderMakeBuilder<Operator::RETURN>(result);
 	TypeBuilderMakeBuilder<Operator::SCRIPT_LINK>(result);
 	TypeBuilderMakeBuilder<Operator::TYPE>(result);
+	TypeBuilderMakeBuilder<Operator::FILTER>(result);
+	TypeBuilderMakeBuilder<Operator::FILTER_DECLARATION>(result);
+	TypeBuilderMakeBuilder<Operator::FILTER_PARAMETER_DECLARATION>(result);
 
 	for (std::size_t i = 0; i < MaxOperatorSize; i++) {
 		assert(result[i] != nullptr);

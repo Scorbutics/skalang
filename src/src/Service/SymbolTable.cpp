@@ -47,6 +47,7 @@ ska::SymbolTable::SymbolTable() :
 	PriorityObserver<FunctionTokenEvent>(5, std::bind(&ska::SymbolTable::matchFunction, this, std::placeholders::_1)),
 	PriorityObserver<ReturnTokenEvent>(5, std::bind(&ska::SymbolTable::matchReturn, this, std::placeholders::_1)),
 	PriorityObserver<ImportTokenEvent>(5, std::bind(&ska::SymbolTable::matchImport, this, std::placeholders::_1)),
+	PriorityObserver<FilterTokenEvent>(5, std::bind(&ska::SymbolTable::matchFilter, this, std::placeholders::_1)),
 	PriorityObserver<ScriptLinkTokenEvent>(5, std::bind(&ska::SymbolTable::matchScriptLink, this, std::placeholders::_1)) {
 	m_rootTable = std::make_unique<ScopedSymbolTable>();
 	m_currentTable = m_rootTable.get();
@@ -67,7 +68,8 @@ void ska::SymbolTable::internalListenParser(StatementParser& parser) {
 		VarTokenEvent, 
 		BlockTokenEvent, 
 		FunctionTokenEvent, 
-		ReturnTokenEvent, 
+		ReturnTokenEvent,
+		FilterTokenEvent,
 		ImportTokenEvent, 
 		ScriptLinkTokenEvent
 	> (*m_parser, *this);
@@ -79,7 +81,8 @@ void ska::SymbolTable::internalUnlistenParser() {
 			VarTokenEvent, 
 			BlockTokenEvent, 
 			FunctionTokenEvent, 
-			ReturnTokenEvent, 
+			ReturnTokenEvent,
+			FilterTokenEvent,
 			ImportTokenEvent, 
 			ScriptLinkTokenEvent
 		> (*m_parser, *this);
@@ -91,19 +94,19 @@ bool ska::SymbolTable::nestedTable(const BlockTokenEvent& event) {
 	assert(m_currentTable != nullptr);
 
 	switch(event.type()) {
-		case BlockTokenEventType::START:
-			SLOG(ska::LogLevel::Debug) << "\tNew block : adding a nested symbol table";
-			m_currentTable = &m_currentTable->createNested();
-			break;
+	case BlockTokenEventType::START:
+		SLOG(ska::LogLevel::Debug) << "\tNew block : adding a nested symbol table";
+		m_currentTable = &m_currentTable->createNested();
+		break;
 		
-		case BlockTokenEventType::END:
-			SLOG(ska::LogLevel::Debug) << "\tBlock end : going up in nested symbol table hierarchy";
-			assert(m_currentTable != nullptr);
-			m_currentTable = &m_currentTable->parent();
-			break;
+	case BlockTokenEventType::END:
+		SLOG(ska::LogLevel::Debug) << "\tBlock end : going up in nested symbol table hierarchy";
+		assert(m_currentTable != nullptr);
+		m_currentTable = &m_currentTable->parent();
+		break;
 
-		default:
-			break;
+	default:
+		break;
 	}
 	return true;
 }
@@ -112,63 +115,146 @@ bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
 	assert(m_currentTable != nullptr);
 
 	switch(token.type()) {
-		case ReturnTokenEventType::START: {
-			SLOG(ska::LogLevel::Debug) << "\t\tNew Return : adding a nested symbol table";
-        	const auto actualNameSymbol = m_currentTable->directOwner();
-        	if (actualNameSymbol == nullptr) {
-            	throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
-        	}
-        	m_currentTable = &m_currentTable->createNested();
-        	SLOG(ska::LogLevel::Info) << "\tReturn : nested named symbol table with name : " << actualNameSymbol->getName();
-    	}
+	case ReturnTokenEventType::START: {
+		SLOG(ska::LogLevel::Debug) << "\t\tNew Return : adding a nested symbol table";
+        const auto* actualNameSymbol = m_currentTable->directOwner();
+        if (actualNameSymbol == nullptr) {
+            throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
+        }
+        m_currentTable = &m_currentTable->createNested(nullptr, true);
+        SLOG(ska::LogLevel::Info) << "\tReturn : nested named symbol table with name : " << actualNameSymbol->name();
+    }
   	break;
 
-    	default:
-			SLOG(ska::LogLevel::Debug) << "\t\tReturn end: going up in nested symbol table hierarchy";
-        	m_currentTable = &m_currentTable->parent();
-    	break;
+    default:
+		SLOG(ska::LogLevel::Debug) << "\t\tReturn end: going up in nested symbol table hierarchy";
+		m_currentTable = &m_currentTable->parent();
+		auto* actualNameSymbol = m_currentTable->directOwner();
+		if (actualNameSymbol == nullptr) {
+			throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
+		}
+		actualNameSymbol->close();
+    break;
 	}
 	return true;
 }
 
-bool ska::SymbolTable::matchFunction(const FunctionTokenEvent& token) {
+bool ska::SymbolTable::matchFilter(const FilterTokenEvent& event) {
 	assert(m_currentTable != nullptr);
+	switch (event.type()) {
+	case FilterTokenEventType::DECLARATION: {
+		SLOG(ska::LogLevel::Info) << "\t\tNew filter-foreach-function : adding a nested unnamed symbol table";
+		m_currentTable = &m_currentTable->createNested();
+		m_currentTable->emplace(event.elementIterator().name());
+		if (!event.indexIterator().logicalEmpty()) {
+			m_currentTable->emplace(event.indexIterator().name());
+		}
+	} break;
 
-	switch(token.type()) {
+	case FilterTokenEventType::DEFINITION: {
+		SLOG(ska::LogLevel::Debug) << "\t\tFilter end";
+		m_currentTable = &m_currentTable->parent();
+	} break;
 
-		case FunctionTokenEventType::DECLARATION_NAME: {
-			auto& symbol = m_currentTable->emplace(token.name());
-			SLOG(ska::LogLevel::Info) << "\t\tNew function : adding a nested symbol table named \"" << token.name() << "\"";
-        	m_currentTable = &m_currentTable->createNested(&symbol);
-    	} break;
-
-    	case FunctionTokenEventType::DECLARATION_STATEMENT:
-			SLOG(ska::LogLevel::Debug) << "\t\tFunction end: going up in nested symbol table hierarchy";
-        	m_currentTable = &m_currentTable->parent();
-    	break;
-
-		default:
+	default:
 		break;
 	}
+
+	return true;
+
+}
+
+bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
+	assert(m_currentTable != nullptr);
+
+	switch(token.type()) {
+	case FunctionTokenEventType::DECLARATION_NAME: {
+		auto& symbol = m_currentTable->emplace(token.name());
+		SLOG(ska::LogLevel::Info) << "\t\tNew function : adding a nested symbol table named \"" << token.name() << "\"";
+		m_currentTable = &m_currentTable->createNested(&symbol);
+		symbol.open();
+		token.rootNode().linkSymbol(symbol);
+    } break;
+
+    case FunctionTokenEventType::DECLARATION_STATEMENT: {
+		SLOG(ska::LogLevel::Debug) << "\t\tFunction end: going up in nested symbol table hierarchy";
+		m_currentTable = &m_currentTable->parent();
+		auto * symbol = (*m_currentTable)[token.name()];
+		assert(symbol != nullptr);
+		symbol->close();
+		token.rootNode().linkSymbol(*symbol);
+	} break;
+
+	default:
+	break;
+	}
 	
 	return true;
 }
 
-bool ska::SymbolTable::match(const VarTokenEvent& token) {
+bool ska::SymbolTable::changeTypeIfRequired(const std::string& symbolName, const Type& value) {
+	return m_currentTable->changeTypeIfRequired(symbolName, value);
+}
+
+template <class ThisType, class Return>
+static Return Lookup(ThisType& currentTable, ska::SymbolTableLookup strategy, ska::SymbolTableNested depth) {
+	if (!depth.childName.empty()) {
+		auto* symbol = currentTable[depth.childName];
+		if (symbol == nullptr) { return nullptr; }
+		return (*symbol)(std::move(strategy.symbolName));
+	}
+
+	auto* selectedTable = &currentTable;
+	while (depth.depth < 0) {
+		selectedTable = &selectedTable->parent();
+		depth.depth++;
+	}
+
+	while (depth.depth > 0 && selectedTable != nullptr && selectedTable->scopes() > 0) {
+		if (depth.childIndex >= selectedTable->scopes()) {
+			depth.childIndex = selectedTable->scopes() - 1;
+		}
+		selectedTable = selectedTable->child(depth.childIndex);
+		depth.depth--;
+	}
+
+	assert(selectedTable != nullptr);
+
+	switch (strategy.type) {
+	case ska::SymbolTableLookupType::Hierarchical:
+		return (*selectedTable)[std::move(strategy.symbolName)];
+	case ska::SymbolTableLookupType::Direct:
+		return (*selectedTable)(std::move(strategy.symbolName));
+	default:
+		throw std::runtime_error("unhandled enum value");
+		return nullptr;
+	}
+}
+
+const ska::Symbol* ska::SymbolTable::lookup(SymbolTableLookup strategy, SymbolTableNested depth) const {
+	return Lookup<const ScopedSymbolTable&, const Symbol*>(*m_currentTable, std::move(strategy), std::move(depth));
+}
+
+ska::Symbol* ska::SymbolTable::lookup(SymbolTableLookup strategy, SymbolTableNested depth) {
+	return Lookup<ScopedSymbolTable&, Symbol*>(*m_currentTable, std::move(strategy), std::move(depth));
+}
+
+bool ska::SymbolTable::match(VarTokenEvent& token) {
 	assert(m_currentTable != nullptr);
 	
 	switch(token.type()) {
-		case VarTokenEventType::VARIABLE_DECLARATION:
+		case VarTokenEventType::VARIABLE_AFFECTATION:
 		case VarTokenEventType::PARAMETER_DECLARATION: {
 			const auto variableName = token.name();
-			SLOG(ska::LogLevel::Info) << "Matching new variable : " << variableName;
-			auto symbolInCurrentTable = (*m_currentTable)(variableName);
+			SLOG(ska::LogLevel::Info) << "Matching variable : " << variableName;
+			auto symbolInCurrentTable = m_currentTable->exported() ? (*m_currentTable)(variableName) : (*m_currentTable)[variableName];
 			if (symbolInCurrentTable == nullptr) {
-				m_currentTable->emplace(variableName);
-			} else if(
-				symbolInCurrentTable->getType() != ExpressionType::FUNCTION && 
-				symbolInCurrentTable->getType() != ExpressionType::VOID) {
-				throw std::runtime_error("Symbol already defined : " + variableName);
+				SLOG(ska::LogLevel::Info) << " that was a new variable";
+				auto& symbol = m_currentTable->emplace(variableName);
+				token.rootNode().linkSymbol(symbol);
+			} else {
+				SLOG(ska::LogLevel::Info) << " that was an existing variable";
+				token.rootNode().linkSymbol(*symbolInCurrentTable);
 			}
     	} break;
 
@@ -178,11 +264,17 @@ bool ska::SymbolTable::match(const VarTokenEvent& token) {
 			const auto symbol = (*this)[variableName];
 			if(symbol == nullptr) {
 				throw std::runtime_error("Symbol not found : " + variableName);
-			}       
+			}
+			token.rootNode().linkSymbol(*symbol);
 		}
 		break;
-			case VarTokenEventType::AFFECTATION:
-			case VarTokenEventType::FUNCTION_DECLARATION:
+
+		case VarTokenEventType::FUNCTION_DECLARATION: {
+			auto* symbol = (*m_currentTable)[token.name()];
+			assert(symbol != nullptr);
+			token.rootNode().linkSymbol(*symbol);
+		} break;
+		case VarTokenEventType::AFFECTATION:
 			break;
 		default:
 			throw std::runtime_error("Unmanaged variable event");

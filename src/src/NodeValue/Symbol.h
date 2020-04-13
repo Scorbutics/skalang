@@ -1,94 +1,75 @@
 #pragma once
-#include <variant>
+#include <optional>
+#include <unordered_set>
 #include "Type.h"
+#include "Service/SymbolFieldResolver.h"
 
 namespace ska {
 	class Symbol;
-}
-
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Symbol)
-
-namespace ska {
 	class ScopedSymbolTable;
 	struct ScriptHandleAST;
+	class SymbolFactory;
+}
+
+namespace ska {
 
 	class Symbol {
-    	friend class ScopedSymbolTable;
-    	private:
-			Symbol(){}
+	private:
+		friend class SymbolFactory;
+		Symbol() = default;
 
-			Symbol(std::string name, ScopedSymbolTable& symbolTable) :
-				m_name(std::move(name)), 
-				m_data(&symbolTable) {
-				SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" from table";
-        	}
+		Symbol(std::size_t tableIndex, std::string name, SymbolFieldResolver fields);
 
-        	Symbol(std::string name, const ScriptHandleAST* script) :
-				m_name(std::move(name)), 
-				m_data(script) {
-				SLOG(ska::LogLevel::Debug) << "Creating Symbol \"" << m_name << "\" from script";
-        	}
-    	public:
-        	Symbol(const Symbol& s) {
-            	*this = s;
-        	}
+	public:
+		Symbol(const Symbol& s) = delete;
+		Symbol(Symbol&& s) noexcept;
 
-        	Symbol(Symbol&& s) noexcept {
-            	*this = std::move(s);
-        	}
+		Symbol& operator=(const Symbol& s) = delete;
+		Symbol& operator=(Symbol&& s) noexcept;
 
-        	Symbol& operator=(const Symbol& s) {
-            	m_data = s.m_data;
-            	m_name = s.m_name;
-            	m_category = s.m_category;
-				SLOG(ska::LogLevel::Debug) << "   Copy, Symbol " << s.getName() << " " << s.m_category << " copied to " << m_name << " " << m_category;
-            	return *this;
-        	}
+		const std::string& name() const { return m_name; }
+		ExpressionType nativeType() const { return m_category.type(); }
+		const Type& type() const { return m_category; }
+		bool changeTypeIfRequired(const Type& type);
 
-        	Symbol& operator=(Symbol&& s) noexcept {
-            	m_data = std::move(s.m_data);
-            	m_name = std::move(s.m_name);
-            	m_category = std::move(s.m_category);
-				SLOG(ska::LogLevel::Debug) << "   Move, Symbol " << s.getName() << " " << s.m_category << " moved to " << m_name << " " << m_category;
-            	return *this;
-        	}
+		void open();
+		void close();
 
-        	const Type& operator()(std::size_t index) const {
-            	return m_category.compound()[index];
-        	}
+		std::size_t size() const;
+		bool empty() const;
 
-			Type operator()(std::size_t index) {
-				return m_category.compound()[index];
-			}
+		void implement(Symbol& symbol);
+		const Symbol* master() const { return m_master; }
 
-        	const std::string& getName() const {
-            	return m_name;
-        	}
+		std::size_t id(const Symbol& field) const;
 
-        	const Type& getType() const {
-            	return m_category;
-        	}
+		const Symbol* back() const;
+		Symbol* back();
 
-			void forceType(Type t);
+		auto begin() const { return m_data.begin(); }
+		auto begin() { return m_data.begin(); }
+		auto end() const { return m_data.end(); }
+		auto end() { return m_data.end(); }
 
-        	bool empty() const {
-            	return m_category.compound().empty();
-        	}
+		const Symbol* operator[](std::size_t index) const;
+		Symbol* operator[](std::size_t index);
 
-        	const Symbol* operator[](const std::string& fieldSymbolName) const;
-        	Symbol* operator[](const std::string& fieldSymbolName);
+		const Symbol* operator()(const std::string& fieldSymbolName) const;
+		Symbol* operator()(const std::string& fieldSymbolName);
 
-        	std::size_t size() const;
+		bool operator==(const Symbol& sym) const;
+		bool operator!=(const Symbol& sym) const {	return !(*this == sym);	}
 
-			bool operator==(const Symbol& sym) const;
-
-			bool operator!=(const Symbol& sym) const {
-				return !(*this == sym);
-			}
-
-    	private:
-			std::variant<ScopedSymbolTable*, const ScriptHandleAST* > m_data = static_cast<ScopedSymbolTable*>(nullptr);
-        	std::string m_name;
-        	Type m_category;
+	private:
+		friend std::ostream& operator<<(std::ostream& stream, const Symbol& symbol);
+		std::string m_name;
+		std::size_t m_tableIndex = 0;
+		SymbolFieldResolver m_data = SymbolFieldResolver{m_name, m_tableIndex, static_cast<ScopedSymbolTable*>(nullptr)};
+		Type m_category;
+		std::unordered_set<Symbol*> m_implementationReferences;
+		Symbol* m_master = this;
+		bool m_closed = true;
+		
 	};
+	std::ostream& operator<<(std::ostream& stream, const Symbol& symbol);
 }

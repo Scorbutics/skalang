@@ -16,7 +16,7 @@ const ska::Token& ska::TokenReader::match(const TokenType type) {
 	}
 	auto ss = std::stringstream {};
 	ss << "a token with type \"" << TokenTypeSTR[static_cast<std::size_t>(type)] << "\"" ;
-	auto t = Token { ss.str(), TokenType::IDENTIFIER, (m_lookAhead != nullptr ? m_lookAhead->position() : Cursor {}) };
+	auto t = Token{ ss.str(), TokenType::IDENTIFIER, (m_lookAhead != nullptr ? m_lookAhead->position() : Cursor {}), TokenGrammar::UNUSED_Last_Length };
 	error(&t);
 	throw std::runtime_error("unexpected error");
 }
@@ -35,16 +35,38 @@ ska::Token ska::TokenReader::actual() const {
 	return Token {};
 }
 
+bool ska::TokenReader::expectOneType(const std::unordered_set<TokenGrammar>& inList) const {
+	return m_lookAhead != nullptr && inList.count(m_lookAhead->grammar()) > 0;
+}
+
+void ska::TokenReader::checkNotEof() const {
+	if (m_lookAhead == nullptr) {
+		auto ss = std::stringstream{};
+		ss << "unexpected end of stream (at position l." << m_input.back().position().line << ", c." << m_input.back().position().column << ")";
+		throw std::runtime_error(ss.str());
+	}
+}
+
 bool ska::TokenReader::expect(const Token& token) const {
-	return m_lookAhead != nullptr && (*m_lookAhead) == token;
+	checkNotEof();
+	return (*m_lookAhead) == token;
+}
+
+const ska::Token* ska::TokenReader::mightMatch(const Token& token) {
+	return expect(token) ? &match(token) : nullptr;
 }
 
 bool ska::TokenReader::expect(const TokenType& tokenType) const {
-	return m_lookAhead != nullptr && m_lookAhead->type() == tokenType;
+	checkNotEof();
+	return m_lookAhead->type() == tokenType;
 }
 
 bool ska::TokenReader::empty() const {
 	return m_lookAhead == nullptr || m_lookAhead->type() == ska::TokenType::EMPTY;
+}
+
+bool ska::TokenReader::emptyTokens() const {
+	return m_input.empty();
 }
 
 bool ska::TokenReader::canReadPrevious(std::size_t offset) const {
@@ -67,4 +89,8 @@ void ska::TokenReader::error(const Token* token) {
 
 void ska::TokenReader::nextToken() {
 	m_lookAhead = (m_lookAheadIndex + 1) < m_input.size() ? &m_input[++m_lookAheadIndex] : nullptr;
+}
+
+const ska::Token* ska::TokenReader::nextToken(std::size_t offset) const {
+	return (m_lookAheadIndex + offset) < m_input.size() ? &m_input[m_lookAheadIndex + offset] : nullptr;
 }

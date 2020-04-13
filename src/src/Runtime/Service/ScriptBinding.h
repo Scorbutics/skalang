@@ -31,7 +31,7 @@ namespace ska {
 	public:
 		virtual ~ScriptBindingAST() = default;
 
-		void bindFunction(Type functionType, decltype(NativeFunction::function) f);
+		void bindFunction(const Symbol& function, decltype(NativeFunction::function) f);
 
 		auto& templateScript() { return *m_templateScript; }
 

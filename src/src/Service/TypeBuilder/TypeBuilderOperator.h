@@ -1,6 +1,6 @@
 #pragma once
 
-#include "NodeValue/Type.h"
+#include "NodeValue/TypeHierarchy.h"
 #include "TypeBuildUnit.h"
 #include "Operation/OperationType.h"
 
@@ -11,10 +11,10 @@
 	private:\
 		using OperateOn = OperationType<OperatorType>;\
 	public:\
-        Type build(const ScriptAST& script, const ASTNode& node) override final {\
+        TypeHierarchy build(const ScriptAST& script, ASTNode& node) override final {\
 			return build(script, OperateOn{node});\
 		}\
-		Type build(const ScriptAST& script, OperateOn node);\
+		TypeHierarchy build(const ScriptAST& script, OperateOn node);\
     };
 
 namespace ska {
@@ -23,7 +23,7 @@ namespace ska {
 
     template <Operator O>
     struct TypeBuilderOperator : public TypeBuildUnit {
-        Type build(const ScriptAST& script, const ASTNode& node) override {
+        TypeHierarchy build(const ScriptAST& script, ASTNode& node) override {
 			return Type{ };
         }
     };
@@ -47,3 +47,4 @@ namespace ska {
 #include "Service/TypeBuilder/TypeBuilderFieldAccess.h"
 #include "Service/TypeBuilder/TypeBuilderType.h"
 #include "Service/TypeBuilder/TypeBuilderUserDefinedObject.h"
+#include "Service/TypeBuilder/TypeBuilderFilterParameterDeclaration.h"

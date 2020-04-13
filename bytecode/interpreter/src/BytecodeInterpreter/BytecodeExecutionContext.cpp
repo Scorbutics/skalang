@@ -23,7 +23,7 @@ ska::bytecode::ScriptExecutionOutput ska::bytecode::ExecutionContext::generateEx
 		auto result = std::make_shared<NodeValueArrayRaw>();
 		const auto& exportedSymbolsVariables = m_in.getExportedSymbols(scriptIndex);
 		for (const auto& variable : exportedSymbolsVariables) {
-			result->push_back(getCell(variable));
+			result->push_back(getCell(variable.value().value));
 		}
 		scriptExecution->setExportsSection(result);
 		return result;
@@ -96,9 +96,12 @@ const ska::NativeFunction& ska::bytecode::ExecutionContext::getBinding(ScriptVar
 
 void ska::bytecode::ExecutionContext::generate(StatementParser& parser, Generator& generator) {
 	if (!m_in.exist(currentScriptId())) {
-		auto name = m_in.findName(currentScriptId());
-		auto file = std::ifstream { name };
-		auto scriptAst = parser.subParse(m_in.astCache, name, file);
+		auto* name = m_in.findKey(currentScriptId());
+		if (name == nullptr) {
+			throw std::runtime_error("bad script id (key not found) : " + std::to_string(currentScriptId()));
+		}
+		auto file = std::ifstream { *name };
+		auto scriptAst = parser.subParse(m_in.astCache, *name, file);
 		generator.generate(m_in, ScriptGenerationHelper{ m_in, *scriptAst });
 	} else {
 		generator.generate(m_in, currentScriptId());

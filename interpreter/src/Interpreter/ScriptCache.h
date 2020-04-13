@@ -4,11 +4,12 @@
 #include <string>
 #include "Interpreter/Value/ScriptHandle.h"
 #include "NodeValue/ScriptCacheAST.h"
+#include "Container/order_indexed_string_map.h"
 
 namespace ska {
 	class ScriptCache {
 	public:
 		ScriptCacheAST astCache;
-		ScriptCacheBase<std::unique_ptr<ScriptHandle>> cache;
+		order_indexed_string_map<std::unique_ptr<ScriptHandle>> cache;
 	};
 }

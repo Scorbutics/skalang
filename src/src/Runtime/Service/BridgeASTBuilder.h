@@ -52,7 +52,7 @@ namespace ska {
 		public observable_priority_queue<ReturnTokenEvent> {
 		friend class BridgeASTBuilderSymbolTableLock;
 	public:
-		BridgeASTBuilder(TypeBuilder& typeBuilder, SymbolTableUpdater& symbolTypeUpdater, const ReservedKeywordsPool& reserved);
+		BridgeASTBuilder(TypeBuilder& typeBuilder, const ReservedKeywordsPool& reserved);
 		virtual ~BridgeASTBuilder();
 
 		ASTNodePtr makeFunction(ScriptAST& script, const BridgeFunction& data);
@@ -64,7 +64,7 @@ namespace ska {
 		// TODO Deprecated
 		std::vector<ASTNodePtr> makeFunctionInputOutput(ScriptAST& script, const std::vector<std::string>& typeNames);
 
-		ASTNodePtr makeFunctionPrototype(ScriptAST& script, const Type& fullTypeFunction);
+		ASTNodePtr makeFunctionPrototype(ScriptAST& script, const Type& fullTypeFunction, const std::string& name);
 		ASTNodePtr makeFunctionDeclaration(ScriptAST& script, ASTNodePtr prototype, const BridgeFunction& data);
 		ASTNodePtr makeFunctionParameterOrReturnType(ScriptAST& script, ASTNodePtr nodeType, std::size_t parameterIndex, std::size_t totalParameters);
 		ASTNodePtr makeFunctionName(ScriptAST& script, const std::string& name);
@@ -79,7 +79,6 @@ namespace ska {
 
 		std::unordered_map<const SymbolTable*, int> m_symbolTableLockCounter;
 		TypeBuilder& m_typeBuilder;
-		SymbolTableUpdater& m_symbolTypeUpdater;
 		const ReservedKeywordsPool& m_reserved;
 		MatcherType m_matcherType;
 	};

@@ -2,7 +2,7 @@
 #include "Interpreter.h"
 #include "InterpreterOperatorVariableAffectation.h"
 
-ska::NodeCell ska::InterpreterOperator<ska::Operator::VARIABLE_AFFECTATION>::interpret(OperateOn node) {
+ska::NodeCell ska::InterpreterOperator<ska::Operator::AFFECTATION>::interpret(OperateOn node) {
 	auto memCell = m_interpreter.interpret({ node.parent, node.GetVariableNameNode() });
 	auto memCellLValue = memCell.asLvalue();
 	auto value = m_interpreter.interpret({ node.parent, node.GetVariableValueNode() }).asRvalue();

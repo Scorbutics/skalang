@@ -10,17 +10,12 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::O
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::BLOCK>::generate(OperateOn node, GenerationContext& context) {
 	auto group = InstructionOutput{ };
 
-	auto fields = std::make_shared<FieldsReferencesRaw>();
-
 	std::size_t childIndex = 0;
 	for (const auto& child : node) {
 		auto childCellGroup = generateNext({ context, *child, 1});
-		if(child->symbol() != nullptr && childCellGroup.operand().type() == OperandType::VAR) {
-			auto fieldRef = childCellGroup.operand().as<ScriptVariableRef>();
-			fields->emplace(std::move(fieldRef), fields->size());
-
+		if(child->isSymbolicLeaf() && childCellGroup.operand().type() == OperandType::VAR) {
 			auto* oldSymbolInfo = context.getSymbolInfo(*child);
-			auto symbolInfo = SymbolInfo { context.scope() + 1, child->name(), fields, context.scriptIndex() };
+			auto symbolInfo = SymbolInfo { context.scope() + 1, child->name(), context.scriptIndex() };
 			if (oldSymbolInfo != nullptr) {
 				symbolInfo.binding = oldSymbolInfo->binding;
 				symbolInfo.bindingPassThrough = oldSymbolInfo->bindingPassThrough;
