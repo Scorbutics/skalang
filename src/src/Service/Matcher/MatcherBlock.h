@@ -1,6 +1,9 @@
 #pragma once
 #include <memory>
 #include <string>
+#include <unordered_set>
+
+#include "NodeValue/TokenGrammar.h"
 
 namespace ska {
 	struct ReservedKeywordsPool;
@@ -16,7 +19,8 @@ namespace ska {
 		MatcherBlock(const ReservedKeywordsPool& pool, StatementParser& parser) :
 			m_reservedKeywordsPool(pool), m_parser(parser) {}
 	
-		ASTNodePtr match(ScriptAST& input, const std::string& content);
+		ASTNodePtr match(ScriptAST& input);
+		ASTNodePtr matchNoBoundaries(ScriptAST& input, std::unordered_set<TokenGrammar> stopToken);
 	
 	private:
 		const ReservedKeywordsPool& m_reservedKeywordsPool;

@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <functional>
+#include <unordered_set>
 #include "NodeValue/Token.h"
 
 namespace ska {
@@ -44,13 +45,13 @@ namespace ska {
 		bool expect(const TokenType& type) const;
 		bool empty() const;
 		Token actual() const;
-    	const Token& readPrevious(std::size_t offset) const;
+		bool expectOneType(const std::unordered_set<TokenGrammar>& inList) const;
+		const Token& readPrevious(std::size_t offset) const;
 		bool canReadPrevious(std::size_t offset) const;
 		void rewind();
-		bool ahead(const TokenReaderExpectCallback& callback, std::size_t offset = 1u) const;
-		bool ahead(const Token& expected, std::size_t offset = 1u) const;
 
 	private:
+		void checkNotEof() const;
     	void nextToken();
 		[[nodiscard]]
 		const Token* nextToken(std::size_t offset) const;

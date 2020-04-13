@@ -30,7 +30,7 @@ ska::Tokenizer::Tokenizer(const ReservedKeywordsPool& reserved, std::string inpu
 	m_input(std::move(input)) {
 }
 
-std::pair<ska::Token, ska::Token> ska::Tokenizer::stackToken(TokenType currentType, Token token, std::vector<Token>& stackSymbol) {
+std::pair<ska::Token, ska::Token> ska::Tokenizer::stackToken(TokenType currentType, Token token, std::vector<Token>& stackSymbol) const {
 	if (currentType == ska::TokenType::SYMBOL) {
 		const auto charToken = token.name()[0];
 		switch (isFinalizedSymbol(charToken, stackSymbol)) {
@@ -54,7 +54,7 @@ std::pair<ska::Token, ska::Token> ska::Tokenizer::stackToken(TokenType currentTy
 	return std::make_pair(group(stackSymbol), std::move(token));
 }
 
-ska::Cursor ska::Tokenizer::computeTokenPositionCursor(std::size_t index, const Token& readToken, bool wasRequired, const Cursor& lastCursor) {
+ska::Cursor ska::Tokenizer::computeTokenPositionCursor(std::size_t index, const Token& readToken, bool wasRequired, const Cursor& lastCursor) const {
 	const auto rawIndex = (wasRequired ? 0 : 1 ) + index;
 	const auto isEOL = std::holds_alternative<std::string>(readToken.content()) &&  std::get<std::string>(readToken.content()) == "\n";
 	const auto tokenLength = readToken.name().size();
@@ -99,7 +99,7 @@ std::vector<ska::Token> ska::Tokenizer::tokenize() const {
 	return result;
 }
 
-ska::Token ska::Tokenizer::group(std::vector<Token>& symbolStack) {
+ska::Token ska::Tokenizer::group(std::vector<Token>& symbolStack) const {
 	if (symbolStack.empty()) {
 		return {};
 	}
@@ -110,13 +110,15 @@ ska::Token ska::Tokenizer::group(std::vector<Token>& symbolStack) {
 	}
 	auto tokenValueStr = ss.str();
 	SLOG_STATIC(LogLevel::Info, Tokenizer) << "Pushing compound symbol \"" <<  tokenValueStr << "\"";
-	auto symbolToken = ska::Token {std::move(tokenValueStr) , TokenType::SYMBOL, symbolStack.empty() ? Cursor {} : symbolStack[0].position() };
+
+	auto grammar = m_reserved.grammar(tokenValueStr);
+	auto symbolToken = ska::Token {std::move(tokenValueStr) , TokenType::SYMBOL, symbolStack.empty() ? Cursor {} : symbolStack[0].position(), grammar };
 	symbolStack.clear();
 	return symbolToken;
 	
 }
 
-void ska::Tokenizer::push(Token t, std::vector<Token>& output) {
+void ska::Tokenizer::push(Token t, std::vector<Token>& output) const {
 	if (!t.empty()) {
 		output.push_back(std::move(t));
 	}
@@ -266,14 +268,14 @@ std::string ska::Tokenizer::getInputStringTokenOrThrow(const TokenType& tokenTyp
 		throw ParserError("unterminated token " + std::string{TokenTypeSTR[static_cast<std::size_t>(tokenType)]}, lastCursor);
 	}
 
-	return rtrim(m_input.substr(lastCursor.rawIndex + offset, index - lastCursor.rawIndex - 2 * offset));
+	return m_input.substr(lastCursor.rawIndex + offset, index - lastCursor.rawIndex - 2 * offset);
 }
 
 ska::Token ska::Tokenizer::postComputing(std::size_t index, const ska::RequiredToken& requiredToken, const Cursor& lastCursor) const {
 	std::string value;
 	switch (requiredToken.current) {
 	case TokenType::IDENTIFIER:
-		value = getInputStringTokenOrThrow(requiredToken.current, index, lastCursor, 0);
+		value = rtrim(getInputStringTokenOrThrow(requiredToken.current, index, lastCursor, 0));
 		if(m_reserved.pool.find(value) != m_reserved.pool.end()) { 
 			return Token{ m_reserved.pool.at(value).token, lastCursor};
 		}
@@ -286,11 +288,13 @@ ska::Token ska::Tokenizer::postComputing(std::size_t index, const ska::RequiredT
 	
 
 	default:
-		value = getInputStringTokenOrThrow(requiredToken.current, index, lastCursor, 0);
+		value = rtrim(getInputStringTokenOrThrow(requiredToken.current, index, lastCursor, 0));
 		break;
 		
 	}
-	return Token{ std::move(value), requiredToken.current, lastCursor };
+
+	auto grammar = m_reserved.grammar(value);
+	return Token{ std::move(value), requiredToken.current, lastCursor, grammar };
 }
 
 ska::Token ska::Tokenizer::finalizeToken(std::size_t index, const ska::RequiredToken& requiredToken, const Cursor& lastCursor) const {

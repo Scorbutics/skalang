@@ -22,18 +22,21 @@ ska::ASTNodePtr ska::MatcherIfElse::match(ScriptAST& input) {
         auto conditionExpression = input.expr(m_parser);
         SLOG(ska::LogLevel::Debug) << "Matching if - expression done";
 
-        auto conditionStatement = input.statement(m_parser);
+        const auto elseToken = m_reservedKeywordsPool.pattern<TokenGrammar::ELSE>();
+        const auto endToken = m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>();
+
+        auto conditionStatement = m_matcherBlock.matchNoBoundaries(input, { TokenGrammar::ELSE, TokenGrammar::BLOCK_END });
         SLOG(ska::LogLevel::Debug) << "Matching if - if statement done";
 
-        const auto elseToken = m_reservedKeywordsPool.pattern<TokenGrammar::ELSE>();
         if (input.reader().expect(elseToken)) {
             SLOG(ska::LogLevel::Debug) << "Matching if - else statement done";
             input.reader().match(elseToken);
-            auto elseBlockStatement = input.statement(m_parser);
+            auto elseBlockStatement = m_matcherBlock.matchNoBoundaries(input, { TokenGrammar::BLOCK_END });
             ifNode = ASTFactory::MakeNode<Operator::IF_ELSE>(std::move(conditionExpression), std::move(conditionStatement), std::move(elseBlockStatement));
         } else {
             ifNode = ASTFactory::MakeNode<Operator::IF>(std::move(conditionExpression), std::move(conditionStatement));
         }
+        input.reader().match(endToken);
     }
     SLOG(ska::LogLevel::Debug) << "if matching done";
     auto event = IfElseTokenEvent {*ifNode};

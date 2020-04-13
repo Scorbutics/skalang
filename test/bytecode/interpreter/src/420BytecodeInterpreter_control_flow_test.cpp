@@ -6,7 +6,7 @@
 TEST_CASE("[BytecodeInterpreter] if : if body") {
 	static constexpr auto progStr =
 	"t = false\n"
-	"if ([18] == [18]) do "
+	"if ([18] == [18]) \n "
 	"t = true "
 	"end";
 	auto [script, data] = Interpret(progStr);
@@ -20,9 +20,9 @@ TEST_CASE("[BytecodeInterpreter] if : if body") {
 TEST_CASE("[BytecodeInterpreter] if : else body") {
 	static constexpr auto progStr =
 	"t = 0\n"
-	"if ([18] == [1124]) do\n"
+	"if ([18] == [1124])\n"
 	"t = 1\n"
-	"end else do\n"
+	"else\n"
 	"t = 2 "
 	"end\n";
 	auto [script, data] = Interpret(progStr);

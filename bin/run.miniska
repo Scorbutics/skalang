@@ -3,7 +3,7 @@ Parameters = import "bind:std.native.function.parameter"
 PathFcty = import "bind:std.native.io.path"
 
 run = function (parameters: Parameters::Fcty()) do
-	if parameters.size() > 0 do
+	if parameters.size() > 0
 		path = PathFcty.Fcty(parameters.asString(0))
 		Log.print(path.canonical())
 
@@ -20,7 +20,7 @@ run = function (parameters: Parameters::Fcty()) do
 
 		Log.print("size : " + all.size())
 
-	end else do
+	else
 		Log.print("No argument provided")
 	end
 end

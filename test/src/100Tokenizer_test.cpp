@@ -340,6 +340,15 @@ TEST_CASE("Symbol by symbol") {
 
 		CHECK(tokens.empty());
 	}
+
+	SUBCASE("string litteral with spaces at end : not trimed") {
+		const auto input = std::string("\"test   \"");
+		auto t = ska::Tokenizer{ keywords, input };
+		auto tokens = t.tokenize();
+
+		CHECK(tokens.size() == 1);
+		CHECK(tokens[0] == ska::Token{ "test   ", ska::TokenType::STRING, {} });
+	}
 	
 	SUBCASE("unterminated string") {
 		const auto input = std::string(" \"   1234 eetr ;");

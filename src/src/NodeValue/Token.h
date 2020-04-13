@@ -56,15 +56,17 @@ namespace ska {
 			m_position = std::move(position);
 		}
 
-		Token(std::string c, TokenType t, Cursor position) :
+		Token(std::string c, TokenType t, Cursor position, TokenGrammar grammar = TokenGrammar::UNUSED_Last_Length) :
 			m_type(std::move(t)),
-			m_position(std::move(position)) {
+			m_position(std::move(position)),
+			m_grammar(grammar) {
 			init(c, m_type);
 		}
 
-		Token(std::size_t c, TokenType t, Cursor position) :
+		Token(std::size_t c, TokenType t, Cursor position, TokenGrammar grammar) :
 			m_type(std::move(t)),
-			m_position(std::move(position)) {
+			m_position(std::move(position)),
+			m_grammar(grammar) {
 			if (m_type == TokenType::EMPTY) {
 				m_content = "";
 			} else {
@@ -106,6 +108,10 @@ namespace ska {
 			return m_position;
 		}
 
+		TokenGrammar grammar() const {
+			return m_grammar;
+		}
+
 		bool operator==(const Token& t1) const {
 			return m_type == t1.m_type && m_content == t1.m_content;
 		}
@@ -129,6 +135,7 @@ namespace ska {
 
 		Variant m_content = std::string{};
 		TokenType m_type = TokenType::EMPTY;
+		TokenGrammar m_grammar = TokenGrammar::UNUSED_Last_Length;
 		Cursor m_position;
 
 		friend std::ostream& operator<<(std::ostream& stream, const Token& token);

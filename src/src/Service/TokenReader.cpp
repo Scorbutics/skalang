@@ -16,19 +16,9 @@ const ska::Token& ska::TokenReader::match(const TokenType type) {
 	}
 	auto ss = std::stringstream {};
 	ss << "a token with type \"" << TokenTypeSTR[static_cast<std::size_t>(type)] << "\"" ;
-	auto t = Token { ss.str(), TokenType::IDENTIFIER, (m_lookAhead != nullptr ? m_lookAhead->position() : Cursor {}) };
+	auto t = Token{ ss.str(), TokenType::IDENTIFIER, (m_lookAhead != nullptr ? m_lookAhead->position() : Cursor {}), TokenGrammar::UNUSED_Last_Length };
 	error(&t);
 	throw std::runtime_error("unexpected error");
-}
-
-bool ska::TokenReader::ahead(const TokenReaderExpectCallback& callback, std::size_t offset) const {
-	const auto* token = nextToken(offset);	
-	return token != nullptr && callback(*token);
-}
-
-bool ska::TokenReader::ahead(const Token& expected, std::size_t offset) const {
-	const auto* token = nextToken(offset);
-	return token != nullptr && *token == expected;
 }
 
 void ska::TokenReader::rewind() {
@@ -45,8 +35,21 @@ ska::Token ska::TokenReader::actual() const {
 	return Token {};
 }
 
+bool ska::TokenReader::expectOneType(const std::unordered_set<TokenGrammar>& inList) const {
+	return m_lookAhead != nullptr && inList.count(m_lookAhead->grammar()) > 0;
+}
+
+void ska::TokenReader::checkNotEof() const {
+	if (m_lookAhead == nullptr) {
+		auto ss = std::stringstream{};
+		ss << "unexpected end of stream (at position l." << m_input.back().position().line << ", c." << m_input.back().position().column << ")";
+		throw std::runtime_error(ss.str());
+	}
+}
+
 bool ska::TokenReader::expect(const Token& token) const {
-	return m_lookAhead != nullptr && (*m_lookAhead) == token;
+	checkNotEof();
+	return (*m_lookAhead) == token;
 }
 
 const ska::Token* ska::TokenReader::mightMatch(const Token& token) {
@@ -54,7 +57,8 @@ const ska::Token* ska::TokenReader::mightMatch(const Token& token) {
 }
 
 bool ska::TokenReader::expect(const TokenType& tokenType) const {
-	return m_lookAhead != nullptr && m_lookAhead->type() == tokenType;
+	checkNotEof();
+	return m_lookAhead->type() == tokenType;
 }
 
 bool ska::TokenReader::empty() const {

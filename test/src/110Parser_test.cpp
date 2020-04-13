@@ -128,7 +128,7 @@ TEST_CASE("If keyword pattern") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	auto scriptCache = ska::ScriptCacheAST{};
 	SUBCASE("If only with cond and block statement") {
-		auto astPtr = ASTFromInput(scriptCache, "if (test) do end", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "if (test)\n end", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::IF);
 		CHECK(ast.size() == 2);
@@ -137,7 +137,7 @@ TEST_CASE("If keyword pattern") {
 	}
 
 	SUBCASE("If without parenthesis") {
-		auto astPtr = ASTFromInput(scriptCache, "if test do end", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "if test\n end", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::IF);
 		CHECK(ast.size() == 2);
@@ -164,7 +164,7 @@ TEST_CASE("function") {
 	}
 	//TODO rework : doesn't properly work (doesn't detect a good function returning type)
 	SUBCASE("with 2 return placements (early return support)") {
-		auto astPtr = ASTFromInput(scriptCache, "f_parser154 = function(titi:int) : int do if(titi == 0) do return 1\n end return 0\n end\n int_parser154 = f_parser154(1)\n", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "f_parser154 = function(titi:int) : int do if(titi == 0) \n return 1\n end return 0\n end\n int_parser154 = f_parser154(1)\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
 	CHECK(ast.op() == ska::Operator::VARIABLE_AFFECTATION);
 	const auto& astFunc157 = ast[0];

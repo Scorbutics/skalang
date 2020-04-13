@@ -6,7 +6,7 @@
 using namespace ska::bytecode;
 
 TEST_CASE("[BytecodeGenerator] empty if") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("if( true ) do end");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("if( true )\n end");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -15,7 +15,7 @@ TEST_CASE("[BytecodeGenerator] empty if") {
 }
 
 TEST_CASE("[BytecodeGenerator] if with body") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("if( true ) do toto = 5\n end");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("if( true ) \n toto = 5\n end");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
@@ -25,7 +25,7 @@ TEST_CASE("[BytecodeGenerator] if with body") {
 }
 
 TEST_CASE("[BytecodeGenerator] if else with body") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("if( 3 > 2 ) do toto = 1 + 3\n end else do toto = 4 + 2 + 1\n tt = toto\n end tete = 444\n");
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("if( 3 > 2 )\n toto = 1 + 3\n else\n toto = 4 + 2 + 1\n tt = toto\n end tete = 444\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {

@@ -5,35 +5,36 @@
 std::unordered_map<std::string, ska::ReservedKeywordsPool::TokenInfo> ska::ReservedKeywordsPool::BuildPool() {
 	auto pool = std::unordered_map<std::string, TokenInfo>{};
 	
-	const auto emplacer = [&](std::size_t index, TokenType type) {
+	const auto emplacer = [&](TokenGrammar grammar, TokenType type) {
+		const auto index = static_cast<std::size_t>(grammar);
 		if(type == TokenType::RESERVED) {
-			pool.emplace(TokenGrammarSTR[index], TokenInfo { TokenGrammarSTR[index], Token{ index, TokenType::RESERVED, {} } });
+			pool.emplace(TokenGrammarSTR[index], TokenInfo { TokenGrammarSTR[index], Token{ index, TokenType::RESERVED, {}, grammar } });
 		} else {
-			pool.emplace(TokenGrammarSTR[index], TokenInfo { TokenGrammarSTR[index], Token{ TokenGrammarSTR[index], std::move(type), {} } });
+			pool.emplace(TokenGrammarSTR[index], TokenInfo { TokenGrammarSTR[index], Token{ TokenGrammarSTR[index], std::move(type), {}, grammar } });
 		}
 	};
 
 	for(auto index = 0u; index < static_cast<std::size_t>(TokenGrammar::FIELD_ACCESS_OPERATOR); index++) {
-		emplacer(index, TokenType::RESERVED);
+		emplacer(static_cast<TokenGrammar>(index), TokenType::RESERVED);
 	}
 
-	emplacer(static_cast<std::size_t>(TokenGrammar::FIELD_ACCESS_OPERATOR), TokenType::DOT_SYMBOL);
-	emplacer(static_cast<std::size_t>(TokenGrammar::AFFECTATION), TokenType::SYMBOL);
-	emplacer(static_cast<std::size_t>(TokenGrammar::BLOCK_BEGIN), TokenType::RANGE);
-	emplacer(static_cast<std::size_t>(TokenGrammar::BLOCK_END), TokenType::RANGE);
-	emplacer(static_cast<std::size_t>(TokenGrammar::OBJECT_BLOCK_BEGIN), TokenType::RANGE);
-	emplacer(static_cast<std::size_t>(TokenGrammar::OBJECT_BLOCK_END), TokenType::RANGE);
-	emplacer(static_cast<std::size_t>(TokenGrammar::PARENTHESIS_BEGIN), TokenType::RANGE);
-	emplacer(static_cast<std::size_t>(TokenGrammar::PARENTHESIS_END), TokenType::RANGE);
-	emplacer(static_cast<std::size_t>(TokenGrammar::BRACKET_BEGIN), TokenType::ARRAY);
-	emplacer(static_cast<std::size_t>(TokenGrammar::BRACKET_END), TokenType::ARRAY);
-	emplacer(static_cast<std::size_t>(TokenGrammar::STRING_DELIMITER), TokenType::SYMBOL);
-	emplacer(static_cast<std::size_t>(TokenGrammar::STATEMENT_END), TokenType::END_STATEMENT);
-	emplacer(static_cast<std::size_t>(TokenGrammar::ARGUMENT_DELIMITER), TokenType::SYMBOL);
-	emplacer(static_cast<std::size_t>(TokenGrammar::TYPE_DELIMITER), TokenType::SYMBOL);
-	emplacer(static_cast<std::size_t>(TokenGrammar::FILTER), TokenType::SYMBOL);
-	emplacer(static_cast<std::size_t>(TokenGrammar::TRUE), TokenType::BOOLEAN);
-	emplacer(static_cast<std::size_t>(TokenGrammar::FALSE), TokenType::BOOLEAN);
+	emplacer(TokenGrammar::FIELD_ACCESS_OPERATOR, TokenType::DOT_SYMBOL);
+	emplacer(TokenGrammar::AFFECTATION, TokenType::SYMBOL);
+	emplacer(TokenGrammar::BLOCK_BEGIN, TokenType::RANGE);
+	emplacer(TokenGrammar::BLOCK_END, TokenType::RANGE);
+	emplacer(TokenGrammar::OBJECT_BLOCK_BEGIN, TokenType::RANGE);
+	emplacer(TokenGrammar::OBJECT_BLOCK_END, TokenType::RANGE);
+	emplacer(TokenGrammar::PARENTHESIS_BEGIN, TokenType::RANGE);
+	emplacer(TokenGrammar::PARENTHESIS_END, TokenType::RANGE);
+	emplacer(TokenGrammar::BRACKET_BEGIN, TokenType::ARRAY);
+	emplacer(TokenGrammar::BRACKET_END, TokenType::ARRAY);
+	emplacer(TokenGrammar::STRING_DELIMITER, TokenType::SYMBOL);
+	emplacer(TokenGrammar::STATEMENT_END, TokenType::END_STATEMENT);
+	emplacer(TokenGrammar::ARGUMENT_DELIMITER, TokenType::SYMBOL);
+	emplacer(TokenGrammar::TYPE_DELIMITER, TokenType::SYMBOL);
+	emplacer(TokenGrammar::FILTER, TokenType::SYMBOL);
+	emplacer(TokenGrammar::TRUE, TokenType::BOOLEAN);
+	emplacer(TokenGrammar::FALSE, TokenType::BOOLEAN);
 	return pool;
 	
 }
@@ -55,4 +56,12 @@ std::vector<ska::ReservedKeywordsPool::TokenInfo> ska::ReservedKeywordsPool::Bui
 	}
 
 	return patterns;
+}
+
+ska::TokenGrammar ska::ReservedKeywordsPool::grammar(const std::string& tokenValueStr) const{
+	const auto inReservedPoolIt = pool.find(tokenValueStr);
+	if (inReservedPoolIt != pool.end()) {
+		return inReservedPoolIt->second.token.grammar();
+	}
+	return TokenGrammar::UNUSED_Last_Length;
 }

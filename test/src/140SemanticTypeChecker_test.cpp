@@ -233,7 +233,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 
 			SUBCASE("bad return : not placed in direct function-constructor") {
 				try {
-					ASTFromInputSemanticTC(scriptCache, "testReturn148 = function() : int do if(true) do return 2543\n end end\n", data);
+					ASTFromInputSemanticTC(scriptCache, "testReturn148 = function() : int do if(true) \n return 2543\n end end\n", data);
 					CHECK(false);
 				} catch (std::exception& e) {
 					CHECK(std::string{e.what()}.find("bad user-defined return placing : custom return must be set in a named function-constructor") != std::string::npos);
@@ -262,7 +262,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 		SUBCASE("Conditions") {
 			SUBCASE("bad type : not a bool") {
 				try {
-					ASTFromInputSemanticTC(scriptCache, "testIf188 = 3\n if(testIf188) do end", data);
+					ASTFromInputSemanticTC(scriptCache, "testIf188 = 3\n if(testIf188) \n end", data);
 					CHECK(false);
 				} catch (std::exception& e) {
 					CHECK(std::string{e.what()}.find("expression condition is not a boolean (it's a \"int\")") != std::string::npos);
@@ -270,7 +270,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 			}
 
 			SUBCASE("type OK : bool") {
-				auto astPtr = ASTFromInputSemanticTC(scriptCache, "testIf188 = true\n if(testIf188) do end", data);
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "testIf188 = true\n if(testIf188) \n end", data);
 				auto& ast = astPtr.rootNode();
 				CHECK(ast.size() == 2);
 				CHECK(ast[0][0].type() == ska::ExpressionType::BOOLEAN);
@@ -278,7 +278,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 			}
 
 			SUBCASE("type OK : bool indirect") {
-				auto astPtr = ASTFromInputSemanticTC(scriptCache, "testIf188 = 3 == 3\n if(testIf188) do end", data);
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "testIf188 = 3 == 3\n if(testIf188) \n end", data);
 				auto& ast = astPtr.rootNode();
 				CHECK(ast.size() == 2);
 				CHECK(ast[1][0].type() == ska::ExpressionType::BOOLEAN);
@@ -484,7 +484,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 						auto astPtr = ASTFromInputSemanticTC(scriptCache, "toto457 = [0]\n toto457.size() = 123\n", data);
 						CHECK(false);
 					} catch (std::exception & e) {
-						CHECK(std::string{ e.what() }.find("The left part of assignation is a read-only value, therefore cannot be assigned") != std::string::npos);
+						CHECK(std::string{ e.what() }.find("is not an lvalue, therefore cannot be assigned") != std::string::npos);
 					}
 				}
 
@@ -635,7 +635,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 					"end"
 				"}\n"
 			"end\n"
-			"if (Fcty230().size() > 0) do end", data);
+			"if (Fcty230().size() > 0) \n end", data);
 		}
 
 		SUBCASE("constructor complex with contained function NOT USING the current type and calling member function with a wrong type...") {

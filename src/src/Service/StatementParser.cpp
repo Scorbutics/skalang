@@ -22,7 +22,7 @@ ska::StatementParser::StatementParser(const ReservedKeywordsPool& reservedKeywor
 	m_expressionParser(reservedKeywordsPool, *this),
 	m_matcherBlock(m_reservedKeywordsPool, *this),
 	m_matcherFor(m_reservedKeywordsPool, *this),
-	m_matcherIfElse(m_reservedKeywordsPool, *this),
+	m_matcherIfElse(m_reservedKeywordsPool, *this, m_matcherBlock),
 	m_matcherVar(m_reservedKeywordsPool, *this),
 	m_matcherReturn(m_reservedKeywordsPool, *this),
 	m_matcherImport(m_reservedKeywordsPool, *this),
@@ -60,7 +60,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::statement(ScriptAST& inpu
 			return matchReservedKeyword(input, std::get<std::size_t>(token.content()));
 
 		case TokenType::RANGE:
-			return m_matcherBlock.match(input, std::get<std::string>(token.content()));
+			return m_matcherBlock.match(input);
 		
 		default:
 			return matchExpressionStatement(input);

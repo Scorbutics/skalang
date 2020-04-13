@@ -51,7 +51,7 @@ ska::ASTNodePtr ska::MatcherFilter::match(ScriptAST& input, ASTNodePtr collectio
 		throw std::runtime_error("bad token detected (expected a block start token)");
 	}
 
-	auto filterDefinitionNode = m_matcherBlock.match(input, std::get<std::string>(blockStartToken.content()));
+	auto filterDefinitionNode = m_matcherBlock.match(input);
 
 	SLOG(ska::LogLevel::Info) << "filter application parsed with success";
 

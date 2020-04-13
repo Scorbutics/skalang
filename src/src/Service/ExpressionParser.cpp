@@ -188,13 +188,15 @@ ska::ASTNodePtr ska::ExpressionParser::matchObjectFieldAccess(ScriptAST& input, 
 }
 
 bool ska::ExpressionParser::isAtEndOfExpression(ScriptAST& input) const {
-	return input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>()) ||
-			input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::ARGUMENT_DELIMITER>()) ||
-			input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>()) ||
-			input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()) ||
-			input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::OBJECT_BLOCK_END>()) ||
-			input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::FILTER>()) ||
-			input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
+	return input.reader().expectOneType({
+		TokenGrammar::STATEMENT_END,
+		TokenGrammar::ARGUMENT_DELIMITER,
+		TokenGrammar::BLOCK_BEGIN,
+		TokenGrammar::BLOCK_END,
+		TokenGrammar::OBJECT_BLOCK_END,
+		TokenGrammar::FILTER,
+		TokenGrammar::BRACKET_END 
+	});
 }
 
 ska::ASTNodePtr ska::ExpressionParser::expression(ScriptAST& input, ExpressionStack& expressions) {

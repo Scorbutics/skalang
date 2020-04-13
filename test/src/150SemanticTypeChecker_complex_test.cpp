@@ -284,7 +284,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	SUBCASE("for with empty statement in if") {
 		ASTFromInputSemanticComplexTC(scriptCache, 
 			"size = function() : int do return 10\n end\n"
-			"if (size() > 0) do\n"
+			"if (size() > 0) \n"
 				"for(i = 0\n i < size()\n i = i + 1)\n"
 			"end\n", data);
 	}
