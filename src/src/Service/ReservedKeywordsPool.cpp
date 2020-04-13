@@ -13,11 +13,11 @@ std::unordered_map<std::string, ska::ReservedKeywordsPool::TokenInfo> ska::Reser
 		}
 	};
 
-	for(auto index = 0u; index < static_cast<std::size_t>(TokenGrammar::METHOD_CALL_OPERATOR); index++) {
+	for(auto index = 0u; index < static_cast<std::size_t>(TokenGrammar::FIELD_ACCESS_OPERATOR); index++) {
 		emplacer(index, TokenType::RESERVED);
 	}
 
-	emplacer(static_cast<std::size_t>(TokenGrammar::METHOD_CALL_OPERATOR), TokenType::DOT_SYMBOL);
+	emplacer(static_cast<std::size_t>(TokenGrammar::FIELD_ACCESS_OPERATOR), TokenType::DOT_SYMBOL);
 	emplacer(static_cast<std::size_t>(TokenGrammar::AFFECTATION), TokenType::SYMBOL);
 	emplacer(static_cast<std::size_t>(TokenGrammar::BLOCK_BEGIN), TokenType::RANGE);
 	emplacer(static_cast<std::size_t>(TokenGrammar::BLOCK_END), TokenType::RANGE);
@@ -50,7 +50,7 @@ std::vector<ska::ReservedKeywordsPool::TokenInfo> ska::ReservedKeywordsPool::Bui
 	}
 
 	const auto enumLength = static_cast<std::size_t>(TokenGrammar::UNUSED_Last_Length);
-	for(auto index = static_cast<std::size_t>(TokenGrammar::METHOD_CALL_OPERATOR); index < enumLength; index++) {
+	for(auto index = static_cast<std::size_t>(TokenGrammar::FIELD_ACCESS_OPERATOR); index < enumLength; index++) {
 		patterns[index] = pool.at(TokenGrammarSTR[index]);
 	}
 

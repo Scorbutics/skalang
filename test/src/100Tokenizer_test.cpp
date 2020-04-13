@@ -226,13 +226,13 @@ TEST_CASE("Symbol by symbol") {
 		CHECK(tokens[0] == ska::Token {"32.1", ska::TokenType::DIGIT, {}});
 	}
 
-	SUBCASE("Dot symbol (for method call)") {
+	SUBCASE("Dot symbol (for field access)") {
 		const auto input = std::string(".");
 		auto t = ska::Tokenizer {keywords, input};
 		auto tokens = t.tokenize();
 
 		CHECK(tokens.size() == 1);
-		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::METHOD_CALL_OPERATOR>());
+		CHECK(tokens[0] == keywords.pattern<ska::TokenGrammar::FIELD_ACCESS_OPERATOR>());
 	}
 
 	SUBCASE("End statement") {
@@ -269,7 +269,7 @@ TEST_CASE("Symbol by symbol") {
 
 		CHECK(tokens.size() == 5);
 		CHECK(tokens[0] == ska::Token { "test", ska::TokenType::IDENTIFIER, {}});
-		CHECK(tokens[1] == keywords.pattern<ska::TokenGrammar::METHOD_CALL_OPERATOR>());
+		CHECK(tokens[1] == keywords.pattern<ska::TokenGrammar::FIELD_ACCESS_OPERATOR>());
 		CHECK(tokens[2] == ska::Token { "call", ska::TokenType::IDENTIFIER, {}});
 		CHECK(tokens[3] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_BEGIN>());
 		CHECK(tokens[4] == keywords.pattern<ska::TokenGrammar::PARENTHESIS_END>());

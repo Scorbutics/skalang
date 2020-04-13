@@ -173,7 +173,7 @@ int ska::ExpressionParser::matchParenthesis(ScriptAST& input, ExpressionStack& e
 }
 
 ska::ASTNodePtr ska::ExpressionParser::matchObjectFieldAccess(ScriptAST& input, ASTNodePtr objectAccessed) {
-	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::METHOD_CALL_OPERATOR>());
+	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::FIELD_ACCESS_OPERATOR>());
 	auto fieldAccessedIdentifier = input.reader().match(TokenType::IDENTIFIER);
 	auto fieldAccessed = ASTFactory::MakeLogicalNode(fieldAccessedIdentifier);
 

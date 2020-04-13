@@ -16,7 +16,7 @@ namespace ska {
 		STRING,
 		VOID,
 		//Reserved symbols
-		METHOD_CALL_OPERATOR,
+		FIELD_ACCESS_OPERATOR,
 		AFFECTATION,
 		BLOCK_BEGIN,
 		BLOCK_END,
