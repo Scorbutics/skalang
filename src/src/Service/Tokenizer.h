@@ -34,8 +34,8 @@ namespace ska {
 		RequiredToken determineCurrentToken(const std::size_t startIndex) const;
 		std::pair<Cursor, Token> tokenizeNext(const RequiredToken& requiredToken, const Cursor& lastCursor) const;
 		RequiredToken initializeCharType(const TokenType charTokenType) const;
-		Token finalizeToken(std::size_t index, const RequiredToken& requiredToken, const Cursor& lastCursor) const;
-		Token postComputing(std::size_t index, const RequiredToken& requiredToken, const Cursor& lastCursor) const;
+		std::string finalizeRawToken(std::size_t index, const RequiredToken& requiredToken, const Cursor& lastCursor) const;
+		std::string postComputing(std::size_t index, const RequiredToken& requiredToken, const Cursor& lastCursor) const;
 		TokenType calculateCharacterTokenType(const char c) const;
 		std::pair<ska::Token, ska::Token> stackToken(TokenType currentType, Token token, std::vector<Token>& stackSymbol) const;
 
@@ -48,7 +48,7 @@ namespace ska {
 				token != ska::TokenType::SPACE;
 		}
 
-		Cursor computeTokenPositionCursor(std::size_t index, const Token& readToken, bool wasRequired, const Cursor& lastCursor) const;
+		Cursor computeTokenPositionCursor(std::size_t index, const std::string& readToken, TokenGrammar grammar, bool wasRequired, const Cursor& lastCursor) const;
 
 		Token group(std::vector<Token>& symbolStack) const;
 		void push(Token t, std::vector<Token>& output) const;
