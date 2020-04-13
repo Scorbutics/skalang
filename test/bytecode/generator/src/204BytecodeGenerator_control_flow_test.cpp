@@ -92,3 +92,71 @@ TEST_CASE("[BytecodeGenerator] for with body") {
 		{ Command::MOV, "V2", "1234"}
 	});
 }
+
+TEST_CASE("[BytecodeGenerator] array filter without index but with body") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("array97 = [0, 2, 3]\n array97 | (iteratorArray97) do \n iteratorArray97 = iteratorArray97 + 1\n end");
+	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
+
+	BytecodeCompare(res, {
+		// Initialization part
+		//	Array
+		{ Command::PUSH, "0", "2", "3" },
+		{ Command::POP_IN_ARR, "R0", "3" },
+		{ Command::MOV, "V0", "R0" },
+
+		//	Iterator & array length
+		{ Command::ARR_LENGTH, "R1", "V0" },
+		{ Command::MOV, "R2", "0"},
+
+		// Loop init
+		{ Command::SUB_I, "R3", "R2", "R1" },
+		{ Command::TEST_L, "R3", "R3" },
+		{ Command::JUMP_NIF, "5", "R3" },
+		
+		//	Pre-body (element access)
+		{ Command::ARR_ACCESS, "V1", "V0", "R2"},
+
+		// Body part
+		{ Command::ADD_I, "R4", "V1", "1" },
+		{ Command::MOV, "V1", "R4" },
+
+		// Increment part
+		{ Command::ADD_I, "R2", "R2", "1"},
+		{ Command::JUMP_REL, "-8" },
+
+	});
+}
+
+TEST_CASE("[BytecodeGenerator] array filter with index with body") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("array97 = [0, 2, 3]\n array97 | (iteratorArray97, index) do \n iteratorArray97 = iteratorArray97 + index\n end");
+	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
+
+	BytecodeCompare(res, {
+		// Initialization part
+		//	Array
+		{ Command::PUSH, "0", "2", "3" },
+		{ Command::POP_IN_ARR, "R0", "3" },
+		{ Command::MOV, "V0", "R0" },
+
+		//	Iterator, index & array length
+		{ Command::ARR_LENGTH, "R1", "V0" },
+		{ Command::MOV, "V1", "0"},
+
+		// Loop init
+		{ Command::SUB_I, "R2", "V1", "R1" },
+		{ Command::TEST_L, "R2", "R2" },
+		{ Command::JUMP_NIF, "5", "R2" },
+
+		//	Pre-body (element access)
+		{ Command::ARR_ACCESS, "V2", "V0", "V1"},
+
+		// Body part
+		{ Command::ADD_I, "R3", "V2", "V1" },
+		{ Command::MOV, "V2", "R3" },
+
+		// Increment part
+		{ Command::ADD_I, "V1", "V1", "1"},
+		{ Command::JUMP_REL, "-8" },
+
+		});
+}

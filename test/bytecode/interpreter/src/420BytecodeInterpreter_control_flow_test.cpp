@@ -52,3 +52,23 @@ TEST_CASE("[BytecodeInterpreter] for with body") {
 	auto cellValue = res.nodeval<long>();
   CHECK(cellValue == 213);
 }
+
+TEST_CASE("[BytecodeInterpreter] filter with body without iterator index") {
+	static constexpr auto progStr = "tmp = 0\n [0, 2, 3] | (iteratorArray97) do \n tmp = tmp + iteratorArray97\n end test = tmp\n";
+	auto [script, data] = Interpret(progStr);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
+	auto res = interpreted->variable(0);
+	auto cellValue = res.nodeval<long>();
+	CHECK(cellValue == 5);
+}
+
+TEST_CASE("[BytecodeInterpreter] filter with body with iterator index") {
+	static constexpr auto progStr = "tmp = 0\n [0, 2, 3] | (iteratorArray97, index) do \n tmp = tmp + iteratorArray97 + index\n end test = tmp\n";
+	auto [script, data] = Interpret(progStr);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
+	auto res = interpreted->variable(0);
+	auto cellValue = res.nodeval<long>();
+	CHECK(cellValue == 8);
+}
