@@ -2,28 +2,22 @@ Log = import "bind:std.native.io.log"
 Parameters = import "bind:std.native.function.parameter"
 PathFcty = import "bind:std.native.io.path"
 
-ArrayFcty = import "std:std.value.array"
-
 run = function (parameters: Parameters::Fcty()) do
 	if parameters.size() > 0 do
 		path = PathFcty.Fcty(parameters.asString(0))
 		Log.print(path.canonical())
 
-		all = ArrayFcty.FctyInteger()
-
+		all = []:int
 		for(i = 1
 				i < parameters.size()
 				i = i + 1) do
-			all.add(parameters.asInt(i) + i * i)
+			all = all + (parameters.asInt(i) + i * i)
 		end
 
-		for(i = 0
-				i < all.size()
-				i = i + 1) do
-			Log.print(all.get(i))
+		all | (element) do
+			Log.print(element)
 		end
 
-		Log.print("size : " + all.size())
 	end else do
 		Log.print("No argument provided")
 	end

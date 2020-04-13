@@ -293,10 +293,31 @@ TEST_CASE("[SemanticTypeChecker]") {
 		}
 
 		SUBCASE("Array") {
+			
+			SUBCASE("empty : explicit type") {
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "str298 = []: string\n", data);
+				auto& astArrayType = astPtr.rootNode();
+				CHECK(astArrayType.size() == 1);
+				auto& ast = astArrayType[0];
+				CHECK(ast.size() == 1);
+				CHECK(ast[0].type() == ska::ExpressionType::ARRAY);
+				CHECK(ast[0].type().value().size() == 1);
+				CHECK(ast[0].type().value()[0] == ska::ExpressionType::STRING);
+			}
+
+			SUBCASE("empty : explicit type and add a cell") {
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "str298 = []: string\n str298 = str298 + \"4\"\n", data);
+				auto& ast = astPtr.rootNode();
+				CHECK(ast.size() == 2);
+				CHECK(ast[1].type() == ska::Type::MakeBuiltInArray(ska::ExpressionType::STRING));
+			}
+
 
 			SUBCASE("string") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "str152 = [\"tt\", \"titi\"]\n", data);
-				auto& ast = astPtr.rootNode();
+				auto& astArrayType = astPtr.rootNode();
+				CHECK(astArrayType.size() == 1);
+				auto& ast = astArrayType[0];
 				CHECK(ast.size() == 1);
 				CHECK(ast[0].type() == ska::ExpressionType::ARRAY);
 				CHECK(ast[0].type().value().size() == 1);

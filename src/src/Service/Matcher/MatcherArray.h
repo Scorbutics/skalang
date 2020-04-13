@@ -9,6 +9,7 @@ namespace ska {
 	struct ReservedKeywordsPool;
 	class ScriptAST;
 	class StatementParser;
+	class MatcherType;
 
 	class ASTNode;
 	using ASTNodePtr = std::unique_ptr<ASTNode>;
@@ -17,8 +18,8 @@ namespace ska {
 		using ExpressionStack = expression_stack<Token, ASTNodePtr>;
 	public:
 		~MatcherArray() = default;
-		MatcherArray(const ReservedKeywordsPool& pool, StatementParser& parser) :
-			m_reservedKeywordsPool(pool), m_parser(parser) {}
+		MatcherArray(const ReservedKeywordsPool& pool, StatementParser& parser, MatcherType& matcherType) :
+			m_reservedKeywordsPool(pool), m_parser(parser), m_matcherType(matcherType) {}
 		
 		[[nodiscard]]
 		ASTNodePtr match(ScriptAST& input, ExpressionStack& operands, char token, bool isDoingOperation);
@@ -29,5 +30,6 @@ namespace ska {
 
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		StatementParser& m_parser;
+		MatcherType& m_matcherType;
 	};
 }

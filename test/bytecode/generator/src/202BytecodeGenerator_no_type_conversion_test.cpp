@@ -121,3 +121,13 @@ TEST_CASE("[BytecodeGenerator] no type conversion float / float") {
 		{ska::bytecode::Command::MOV, "V0", "R0"}
 	});
 }
+
+TEST_CASE("[BytecodeGenerator] no type conversion array explicit declaration") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = []:int\n");
+	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::POP_IN_ARR, "R0", "0"},
+		{ska::bytecode::Command::MOV, "V0", "R0"}
+	});
+}

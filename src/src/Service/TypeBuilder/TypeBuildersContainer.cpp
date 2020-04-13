@@ -18,6 +18,7 @@ ska::TypeBuildersContainer ska::BuildTypeBuildersContainer(const TypeCrosser& ty
 	TypeBuilderMakeBuilder<Operator::VARIABLE_AFFECTATION>(result);
 	TypeBuilderMakeBuilder<Operator::AFFECTATION>(result);
 	TypeBuilderMakeBuilder<Operator::PARAMETER_DECLARATION>(result);
+	TypeBuilderMakeBuilder<Operator::ARRAY_TYPE_DECLARATION>(result);
 	TypeBuilderMakeBuilder<Operator::ARRAY_DECLARATION>(result);
 	TypeBuilderMakeBuilder<Operator::ARRAY_USE>(result);
 	TypeBuilderMakeBuilder<Operator::USER_DEFINED_OBJECT>(result);

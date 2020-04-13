@@ -14,6 +14,7 @@
 #include "Matcher/MatcherFunction.h"
 #include "Matcher/MatcherVar.h"
 #include "Matcher/MatcherImport.h"
+#include "Matcher/MatcherType.h"
 
 namespace ska {
 	class ASTNode;
@@ -49,6 +50,7 @@ namespace ska {
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		StatementParser& m_parser;
 
+		MatcherType m_matcherType;
 		MatcherArray m_matcherArray;
 		MatcherFunction m_matcherFunction;
 		MatcherVar m_matcherVar;

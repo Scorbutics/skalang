@@ -12,7 +12,8 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ExpressionParser)
 ska::ExpressionParser::ExpressionParser(const ReservedKeywordsPool& reservedKeywordsPool, StatementParser& parser) :
 	m_reservedKeywordsPool(reservedKeywordsPool),
 	m_parser(parser),
-	m_matcherArray(m_reservedKeywordsPool, m_parser),
+	m_matcherType(m_reservedKeywordsPool),
+	m_matcherArray(m_reservedKeywordsPool, m_parser, m_matcherType),
 	m_matcherFunction(m_reservedKeywordsPool, m_parser),
 	m_matcherVar(m_reservedKeywordsPool, m_parser),
 	m_matcherImport(m_reservedKeywordsPool, m_parser) {

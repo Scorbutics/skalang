@@ -261,6 +261,27 @@ TEST_CASE("filter") {
 
 }
 
+TEST_CASE("array : explicit type") {
+	const auto keywords = ska::ReservedKeywordsPool{};
+	auto scriptCache = ska::ScriptCacheAST{};
+
+	auto astPtr = ASTFromInput(scriptCache, "[]: string\n", keywords);
+	CHECK(astPtr.rootNode().size() == 1);
+
+	auto& arrayTypeDecl = astPtr.rootNode()[0];
+	CHECK(arrayTypeDecl.size() == 2);
+	CHECK(arrayTypeDecl.op() == ska::Operator::ARRAY_TYPE_DECLARATION);
+
+	auto& arrayDecl = arrayTypeDecl[0];
+	CHECK(arrayDecl.op() == ska::Operator::ARRAY_DECLARATION);
+	CHECK(arrayDecl.size() == 0);
+
+	auto& arrayExplicitType = arrayTypeDecl[1];
+	CHECK(arrayExplicitType.size() == 3);
+	CHECK(arrayExplicitType.op() == ska::Operator::TYPE);
+}
+
+
 TEST_CASE("User defined object") {
 	const auto keywords = ska::ReservedKeywordsPool {};
 	auto scriptCache = ska::ScriptCacheAST{};

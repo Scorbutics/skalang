@@ -119,3 +119,14 @@ TEST_CASE("[BytecodeInterpreter] no type conversion float / float") {
   const auto check = firstCellValue + 0.000001 >= 0.68181818181 && firstCellValue - 0.000001 <= 0.68181818181;
 	CHECK(check);
 }
+
+TEST_CASE("[BytecodeInterpreter] no type conversion array explicit declaration") {
+	static constexpr auto progStr = "result = []:int\n";
+	auto [script, data] = Interpret(progStr);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
+	auto res = interpreted->variable(0);
+	auto value = res.as<ska::NodeValueArray>();
+	const auto check = value != nullptr && value->empty();
+	CHECK(check);
+}

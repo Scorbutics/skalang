@@ -108,13 +108,16 @@ bool ska::SemanticTypeChecker::matchIfElse(const IfElseTokenEvent& token) {
 bool ska::SemanticTypeChecker::matchArray(const ArrayTokenEvent& token) {
 	switch (token.type()) {
 	case ArrayTokenEventType::DECLARATION: {
-		auto arrayDeclarationOperation = OperationType<Operator::ARRAY_DECLARATION>{token.rootNode()};
-		const auto arraySubType = arrayDeclarationOperation.GetArraySubType();
-		for (const auto& arrayElementNode : arrayDeclarationOperation) {
-			if (arraySubType != arrayElementNode->type()) {
-				auto ss = std::stringstream{};
-				ss << "array has not uniform types in it : \"" << arraySubType << "\" and \"" << arrayElementNode->type().value() << "\"";
-				throw std::runtime_error(ss.str());
+		// If and only if an explicit array type does not exists, we have array content. So semantic checks are required.
+		if (token.rootNode()[1].logicalEmpty()) {
+			auto arrayDeclarationOperation = OperationType<Operator::ARRAY_DECLARATION>{token.rootNode()[0]};
+			const auto arraySubType = arrayDeclarationOperation.GetArraySubType();
+			for (const auto& arrayElementNode : arrayDeclarationOperation) {
+				if (arraySubType != arrayElementNode->type()) {
+					auto ss = std::stringstream{};
+					ss << "array has not uniform types in it : \"" << arraySubType << "\" and \"" << arrayElementNode->type().value() << "\"";
+					throw std::runtime_error(ss.str());
+				}
 			}
 		}
 	} break;
