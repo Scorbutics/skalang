@@ -42,6 +42,7 @@
 #include "Units/InterpreterCommandConvDStr.h"
 #include "Units/InterpreterCommandConvIStr.h"
 #include "Units/InterpreterCommandArrAccess.h"
+#include "Units/InterpreterCommandArrLength.h"
 #include "Units/InterpreterCommandScript.h"
 #include "Units/InterpreterCommandJumpNif.h"
 #include "InterpreterDeclarer.h"
@@ -101,6 +102,7 @@ ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build
 	InterpreterCommandDeclare<Command::JUMP_NIF>(*this, result, generator);
 
 	InterpreterCommandDeclare<Command::ARR_ACCESS>(*this, result, generator);
+	InterpreterCommandDeclare<Command::ARR_LENGTH>(*this, result, generator);
 	InterpreterCommandDeclare<Command::SCRIPT>(*this, result, generator);
 
 	return result;
