@@ -11,16 +11,30 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::O
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>::generate(OperateOn node, GenerationContext& context) {
 	const auto& fieldName = node.GetFieldNameNode().name();
+
 	const auto* objectTypeSymbol = node.GetObjectNameNode().typeSymbol();
 	if (objectTypeSymbol == nullptr) {
 		throw std::runtime_error("unable to retrieve object type");
 	}
 
+	// Handling built-in direct fields
+	const auto typeObject = node.GetObjectType();
+	if (typeObject == ExpressionType::ARRAY) {
+		if (fieldName == "size") {
+			auto objectValue = generateNext({ context, node.GetObjectNameNode() });
+			return { Instruction{ Command::ARR_LENGTH, context.queryNextRegister(), objectValue.operand() } };
+		}
+		auto ss = std::stringstream{};
+		ss << "trying to access an undeclared built-in field \"" << fieldName << "\" of the type \"" << typeObject << "\"";
+		throw std::runtime_error(ss.str());
+	}
+
+	// Handling custom types
 	const auto* symbolField = (*objectTypeSymbol)(fieldName);
 	if (symbolField == nullptr) {
 		auto ss = std::stringstream{};
 		ss << "trying to access to an undeclared field : \"" << fieldName << "\" of \"" << node.GetObjectNameNode().name() << "\"";
-	throw std::runtime_error(ss.str());
+		throw std::runtime_error(ss.str());
 	}
 
 	const auto* objectSymbolInfo = context.getSymbolInfo(*symbolField);

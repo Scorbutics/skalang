@@ -453,6 +453,13 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(ast[2][0].type() == ska::ExpressionType::INT);
 			}
 
+	SUBCASE("array built-in field size") {
+		auto astPtr = ASTFromInputSemanticTC(scriptCache, "toto457 = [0]\n toto457.size\n", data);
+		auto& ast = astPtr.rootNode();
+		CHECK(ast.size() == 2);
+		CHECK(ast[1].type() == ska::ExpressionType::INT);
+	}
+
 			SUBCASE("Fail") {
 				SUBCASE("not an array") {
 					try {
@@ -460,6 +467,24 @@ TEST_CASE("[SemanticTypeChecker]") {
 						CHECK(false);
 					} catch (std::exception& e) {
 						CHECK(std::string{e.what()}.find("expression is not an array (it's a \"int\")") != std::string::npos);
+					}
+				}
+
+				SUBCASE("array undeclared built-in field") {
+					try {
+						auto astPtr = ASTFromInputSemanticTC(scriptCache, "toto457 = [0]\n toto457.turlututu\n", data);
+						CHECK(false);
+					} catch (std::exception & e) {
+						CHECK(std::string{ e.what() }.find("trying to access an undeclared built-in field \"turlututu\" of the type \"array (int)\"") != std::string::npos);
+					}
+				}
+
+				SUBCASE("array trying to assign a value to built-in readonly field size") {
+					try {
+						auto astPtr = ASTFromInputSemanticTC(scriptCache, "toto457 = [0]\n toto457.size = 123\n", data);
+						CHECK(false);
+					} catch (std::exception & e) {
+						CHECK(std::string{ e.what() }.find("The left part of assignation is a read-only value, therefore cannot be assigned") != std::string::npos);
 					}
 				}
 

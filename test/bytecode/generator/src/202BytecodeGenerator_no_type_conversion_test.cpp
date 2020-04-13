@@ -131,3 +131,15 @@ TEST_CASE("[BytecodeGenerator] no type conversion array explicit declaration") {
 		{ska::bytecode::Command::MOV, "V0", "R0"}
 	});
 }
+
+TEST_CASE("[BytecodeGenerator] no type conversion array field size access") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = []:int\n test = result.size\n");
+	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::POP_IN_ARR, "R0", "0"},
+		{ska::bytecode::Command::MOV, "V0", "R0"},
+		{ska::bytecode::Command::ARR_LENGTH, "R1", "V0"},
+		{ska::bytecode::Command::MOV, "V1", "R1"}
+	});
+}

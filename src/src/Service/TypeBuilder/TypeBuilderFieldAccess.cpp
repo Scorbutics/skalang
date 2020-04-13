@@ -9,7 +9,22 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator:
 
 ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(const ScriptAST& script, OperateOn node) {
 	const auto typeObject = node.GetObjectType();
+
+	const auto& fieldName = node.GetFieldNameNode().name();
+
+	// Handling built-in direct fields
+	if (typeObject == ExpressionType::ARRAY) {
+		if (fieldName == "size") {
+			return Type::MakeBuiltIn<ExpressionType::INT>();
+		}
+		auto ss = std::stringstream{};
+		ss << "trying to access an undeclared built-in field \"" << fieldName << "\" of the type \"" << typeObject << "\"";
+		throw std::runtime_error(ss.str());
+	}
+
 	const auto* symbolObject = node.GetObjectSymbol();
+
+	// Handling custom objects
 	if (symbolObject == nullptr || typeObject != ExpressionType::OBJECT) {
 		auto error = std::stringstream {};
 		if (typeObject == ExpressionType::VOID) {
@@ -20,7 +35,6 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(
 		throw std::runtime_error(error.str());
 	}
 
-	const auto& fieldName = node.GetFieldNameNode().name();
 	const auto* symbolField = (*symbolObject)(fieldName);
 	if (symbolField == nullptr) {
 		auto ss = std::stringstream{};

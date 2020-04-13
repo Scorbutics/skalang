@@ -220,6 +220,12 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 			throw std::runtime_error(ss.str());
 		}
 
+		if (variable.var().symbol() == nullptr) {
+			auto ss = std::stringstream{};
+			ss << "The left part of assignation is a read-only value, therefore cannot be assigned";
+			throw std::runtime_error(ss.str());
+		}
+
 		if (variable.valType().has_value()) {
 			const auto tokenNodeExpressionType = variable.valType().value();
 			const auto newTokenType = type.crossTypes(m_typeCrosser, "=", tokenNodeExpressionType);
