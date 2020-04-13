@@ -1,41 +1,41 @@
 # skalang
 
-Basic scripting language, syntax looking like Javascript.
+Basic scripting language, syntax inspired from Ruby and some other scripting languages.
 
 ### Features
 * Has a compilation phase ("one pass" to bytecode)
 * Static typing
 * Object paradigm (classes, no polymorphism)
-* No "null" value or uninitialized variables (memory safety), but accessing an array out of bounds is still possible...
+* No "null" value or uninitialized variables (memory safety), but accessing an array out of bounds is still possible
 * C++ binding
 * No manual memory management (reference counting system), but doesn't support cyclic references
-* Only one way to do a thing (loops are only made with "for")
+* Only one way to do a thing
 * Variable-based syntax : functions are variables, import are variables, variables... are variables ;)
 
 ### Example
 
 ```javascript
-var Coldragon = function(): var { 
-	return { 
-		data: 500
-	}; 
-};
-
-var Scorbutics = function(): var {
-	var power = 88;
+Foo = function(): var do 
 	return {
-		attack : function(target: Coldragon()) {
+		data = 500
+	}
+end
+
+Bar = function(): var do
+	power = 88
+	return {
+		attack = function (target: Foo()) do
 			target.data = target.data - power;
-		}
-	};
-}; 
+		end
+	}
+end 
 
-var coldragon = Coldragon();
-Scorbutics().attack(coldragon);
+foo = Foo();
+Bar().attack(foo);
 
-var Runner = import "runner_lib";
-Runner.print(coldragon);
+Runner = import "runner_lib";
+Runner.print(foo);
 
 ```
 
-This code displays "412" in the console, because Runner.print prints the data field of "Coldragon".
+This code displays "412" in the console, because Runner.print prints the data field of a "Foo" instance.
