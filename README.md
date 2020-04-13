@@ -25,16 +25,16 @@ Bar = function(): var do
 	power = 88
 	return {
 		attack = function (target: Foo()) do
-			target.data = target.data - power;
+			target.data = target.data - power
 		end
 	}
 end 
 
-foo = Foo();
-Bar().attack(foo);
+foo = Foo()
+Bar().attack(foo)
 
-Runner = import "runner_lib";
-Runner.print(foo);
+Runner = import "runner_lib"
+Runner.print(foo)
 
 ```
 
