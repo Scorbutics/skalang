@@ -15,5 +15,10 @@ namespace ska {
 			assert(node.size() == 1);
 			return node[0].type().value_or(Type{});
 		}
+
+		std::string GetIteratorName() const {
+			return node.name();
+		}
+
 	};
 }

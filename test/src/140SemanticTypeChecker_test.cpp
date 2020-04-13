@@ -379,6 +379,16 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(ast[1][1].size() == 2);
 				CHECK(ast[1][1][0].type() == ska::ExpressionType::INT);
 			}
+			
+			SUBCASE("filter applied on array with use of iterator & index") {
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "array358 = [\"bup\", \"bip\", \"bap\"]\n array358 | (iteratorOnArray358, index) do iteratorOnArray358 = iteratorOnArray358 + \".\"\n index = index + 1\n end\n", data);
+				auto& ast = astPtr.rootNode();
+				CHECK(ast.size() == 2);
+				CHECK(ast[1].size() == 3);
+				CHECK(ast[1][1].size() == 2);
+				CHECK(ast[1][1][0].type() == ska::ExpressionType::STRING);
+			}
+
 
 	SUBCASE("expression-array with use in expression") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "var193 = function() : var do toto = [0]\n return { toto = toto }\n end\n 2 * 3 + var193().toto[0]\n", data);

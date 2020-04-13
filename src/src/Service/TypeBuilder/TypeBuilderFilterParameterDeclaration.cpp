@@ -8,11 +8,11 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FILTER_PARAMETER_DECL
 	auto collectionType = node.GetCollectionType();
 
 	if (collectionType == ExpressionType::VOID) {
-		return Type::MakeBuiltIn<ExpressionType::INT>();
+		return { Type::MakeBuiltIn<ExpressionType::INT>(), script.symbols()[node.GetIteratorName()] };
 	} 
 	
 	if (collectionType == ExpressionType::ARRAY) {
-		return collectionType[0];
+		return { collectionType[0], script.symbols()[node.GetIteratorName()] };
 	}
 
 	auto ss = std::stringstream{};
