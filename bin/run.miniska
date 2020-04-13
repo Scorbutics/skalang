@@ -2,6 +2,18 @@ Log = import "bind:std.native.io.log"
 Parameters = import "bind:std.native.function.parameter"
 PathFcty = import "bind:std.native.io.path"
 
+testFcty = function(): var do
+	return {
+		toto = "lol"
+		titi = "lil"
+		tutu = 2
+
+		:int = function():int do
+			return tutu
+		end
+	}
+end
+
 run = function (parameters: Parameters::Fcty()) do
 	if parameters.size() > 0
 		path = PathFcty.Fcty(parameters.asString(0))

@@ -57,16 +57,23 @@ std::pair<ska::Token, ska::Token> ska::Tokenizer::stackToken(TokenType currentTy
 ska::Cursor ska::Tokenizer::computeTokenPositionCursor(std::size_t index, const std::string& readToken, TokenGrammar grammar, bool wasRequired, const Cursor& lastCursor) const {
 	const auto rawIndex = (wasRequired ? 0 : 1 ) + index;
 	const auto isEOL = grammar == TokenGrammar::STATEMENT_END;
-	const auto tokenLength = readToken.size();
-	
-	const auto column =  
-		isEOL ? 1u : 
-		(lastCursor.line == 1 ? 
-			(static_cast<unsigned int>(rawIndex) + 1) : 
-			lastCursor.column + static_cast<unsigned int>(tokenLength));
 
-	const auto line = isEOL ? (lastCursor.line + static_cast<LineIndex>(readToken.size())) : lastCursor.line;
-	
+	ColumnIndex column = 0;
+	LineIndex line = 0;
+
+	if (isEOL) {
+		column = 1u;
+		line = lastCursor.line + static_cast<LineIndex>(std::count(readToken.begin(), readToken.end(), '\n'));
+	} else {
+		const auto tokenLength = readToken.size();
+		column =
+			(lastCursor.line == 1 ?
+			(static_cast<unsigned int>(rawIndex) + 1) :
+				lastCursor.column + static_cast<unsigned int>(tokenLength));
+
+		line = lastCursor.line;
+	}
+
 	SLOG_STATIC(LogLevel::Debug, Tokenizer) << "Token calculated \"" << readToken << "\" at (l." << line << ", c. " << column << ")";
 
 	return { 
