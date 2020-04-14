@@ -1,6 +1,6 @@
 # skalang
 
-Basic scripting language, syntax inspired from Ruby and some other scripting languages.
+Basic scripting language, syntax inspired from Ruby, JavaScript and one or two ideas picked-up from other scripting languages.
 
 ### Features
 * Has a compilation phase ("one pass" to bytecode)
