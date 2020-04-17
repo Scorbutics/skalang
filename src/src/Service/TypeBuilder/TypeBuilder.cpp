@@ -16,7 +16,8 @@ ska::TypeBuilder::TypeBuilder(StatementParser& parser, const TypeCrosser& typeCr
 	subobserver_priority_queue<ReturnTokenEvent>(std::bind(&TypeBuilder::matchReturn, this, std::placeholders::_1), parser, 6),
 	subobserver_priority_queue<ArrayTokenEvent>(std::bind(&TypeBuilder::matchArray, this, std::placeholders::_1), parser, 6),
 	subobserver_priority_queue<FilterTokenEvent>(std::bind(&TypeBuilder::matchFilter, this, std::placeholders::_1), parser, 6),
-	subobserver_priority_queue<ScriptLinkTokenEvent>(std::bind(&TypeBuilder::matchScriptLink, this, std::placeholders::_1), parser, 6){
+	subobserver_priority_queue<ScriptLinkTokenEvent>(std::bind(&TypeBuilder::matchScriptLink, this, std::placeholders::_1), parser, 6),
+	subobserver_priority_queue<ConverterTokenEvent>(std::bind(&TypeBuilder::matchConverter, this, std::placeholders::_1), parser, 6) {
 	m_typeBuilder = BuildTypeBuildersContainer(typeCrosser);
 }
 
@@ -112,4 +113,9 @@ bool ska::TypeBuilder::matchFunction(FunctionTokenEvent& event) {
   return true;
 }
 
-
+bool ska::TypeBuilder::matchConverter(ConverterTokenEvent& event) {
+	SLOG(LogLevel::Debug) << "Building type for converter / call \"" << event.rootNode() << "\" (Operator " << event.rootNode().op() << ")";
+	buildType(event.rootNode(), event.script());
+	SLOG(LogLevel::Info) << "Type built for converter call \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value_or(Type {}) << "\" (Operator " << event.rootNode().op() << ")";
+	return true;
+}

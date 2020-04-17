@@ -31,6 +31,7 @@ namespace ska {
 
 }
 
+#include "Service/TypeBuilder/TypeBuilderConverterCall.h"
 #include "Service/TypeBuilder/TypeBuilderFunctionCall.h"
 #include "Service/TypeBuilder/TypeBuilderFunctionPrototypeDeclaration.h"
 #include "Service/TypeBuilder/TypeBuilderFunctionDeclaration.h"

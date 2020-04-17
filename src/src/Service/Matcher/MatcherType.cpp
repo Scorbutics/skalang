@@ -8,24 +8,37 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherType)
 
-ska::ASTNodePtr ska::MatcherType::match(TokenReader& input) {
+ska::ASTNodePtr ska::MatcherType::match(TokenReader& input, std::string* typeStr) {
 	const auto& typeDelimiterToken = m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>();
 
 	bool isBuiltIn = true;
 	auto nodes = std::vector<ASTNodePtr> {};
 	if (input.expect(TokenType::IDENTIFIER)) {
 		auto typeNamespaceToken = input.match(TokenType::IDENTIFIER);
+
+		if (typeStr != nullptr) {
+			*typeStr += typeNamespaceToken.name();
+		}
+
 		//Handles script namespace
 		auto complexTypeToken = Token{};
 		if (input.expect(typeDelimiterToken)) {
 			input.match(typeDelimiterToken);
 			input.match(typeDelimiterToken);
 			complexTypeToken = input.match(TokenType::IDENTIFIER);
+
+			if (typeStr != nullptr) {
+				*typeStr += typeDelimiterToken.name() + typeDelimiterToken.name() + complexTypeToken.name();
+			}
 		}
 		nodes.push_back(ASTFactory::MakeLogicalNode(std::move(typeNamespaceToken), complexTypeToken.empty() ? nullptr : ASTFactory::MakeLogicalNode(std::move(complexTypeToken))));
 		isBuiltIn = false;
 	} else {
-		nodes.push_back(ASTFactory::MakeLogicalNode(input.match(TokenType::RESERVED)));
+		auto reservedTokenType = input.match(TokenType::RESERVED);
+		if (typeStr != nullptr) {
+			*typeStr += reservedTokenType.name();
+		}
+		nodes.push_back(ASTFactory::MakeLogicalNode(std::move(reservedTokenType)));
 	}
 
 	//handle objects
@@ -37,6 +50,10 @@ ska::ASTNodePtr ska::MatcherType::match(TokenReader& input) {
 			throw std::runtime_error("syntax error : \"" + nodes[0]->name() + "\" is used as a function-object but is a built-in type");
 		}
 
+		if (typeStr != nullptr) {
+			*typeStr += m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_BEGIN>().name() + m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>().name();
+		}
+
 		nodes.push_back(ASTFactory::MakeLogicalNode(Token{ "", TokenType::RANGE, firstParenthesis.position() }));
 	} else {
 		nodes.push_back(ASTFactory::MakeEmptyNode());
@@ -46,6 +63,10 @@ ska::ASTNodePtr ska::MatcherType::match(TokenReader& input) {
 	if (input.expect(TokenType::ARRAY)) {
 		const auto firstBracket = input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>());
 		input.match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
+
+		if (typeStr != nullptr) {
+			*typeStr += m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_BEGIN>().name() + m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>().name();
+		}
 
 		nodes.push_back(ASTFactory::MakeLogicalNode(Token{ "", TokenType::ARRAY, firstBracket.position()}));
 	} else {

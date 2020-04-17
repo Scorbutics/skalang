@@ -178,6 +178,7 @@ namespace ska {
 		result.emplace("-", 100);
 		result.emplace("*", 200);
 		result.emplace("/", 200);
+		result.emplace(":", 300);
 
 		return result;
 	}

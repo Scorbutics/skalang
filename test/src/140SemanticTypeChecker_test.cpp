@@ -73,6 +73,121 @@ TEST_CASE("[SemanticTypeChecker]") {
 	auto scriptCache = ska::ScriptCacheAST{};
 
 	SUBCASE("OK") {
+
+		SUBCASE("function with invalid converter operator name") {
+
+			try {
+				static constexpr auto progStr =
+					"testFcty189 = function() :var do\n"
+					"return {\n"
+					":intuiutututut do\n"
+					"return 1\n"
+					"end\n"
+					"}\n"
+					"end\n";
+				ASTFromInputSemanticTC(scriptCache, progStr, data);
+				CHECK(false);
+			} catch (std::exception & e) {
+				CHECK(std::string{ e.what() }.find("undeclared custom type \"intuiutututut\"") != std::string::npos);
+			}
+		}
+		
+		SUBCASE("function with incompatible return for a converter operator") {
+			try {
+				static constexpr auto progStr =
+					"testFcty189 = function() :var do\n"
+					"return {\n"
+					":float do\n"
+					"return \"1\"\n"
+					"end\n"
+					"}\n"
+					"end\n";
+				ASTFromInputSemanticTC(scriptCache, progStr, data);
+				CHECK(false);
+			} catch (std::exception & e) {
+				CHECK(std::string{ e.what() }.find("bad return type : expected \"float\" on function declaration but got \"string\"") != std::string::npos);
+			}
+		}
+
+		SUBCASE("unable to call a converter as a normal function call") {
+			try {
+				static constexpr auto progStr =
+					"testFcty189 = function() :var do\n"
+					"return {\n"
+					":int do\n"
+					"return 1\n"
+					"end\n"
+					"}\n"
+					"end\n"
+					"testFcty189().:int()\n";
+				ASTFromInputSemanticTC(scriptCache, progStr, data);
+				CHECK(false);
+			} catch (std::exception & e) {
+				CHECK(std::string{ e.what() }.find("bad token matching : expected \"a token with type \"IDENTIFIER\"\" but got \":\"") != std::string::npos);
+			}
+		}
+
+		SUBCASE("call a converter as type conversion call") {
+			static constexpr auto progStr =
+				"testFcty189 = function() :var do\n"
+				"return {\n"
+				":int do\n"
+				"return 1\n"
+				"end\n"
+				"}\n"
+				"end\n"
+				"testFcty189()\n"
+				"testFcty189(): int\n";
+			auto astPtr = ASTFromInputSemanticTC(scriptCache, progStr, data);
+			auto& ast = astPtr.rootNode();
+			CHECK(ast.size() == 3);
+			CHECK(ast[1].type() == ska::ExpressionType::OBJECT);
+			CHECK(ast[2].type() == ska::ExpressionType::INT);
+		}
+
+		SUBCASE("call a native converter (on a built-in type)") {
+			static constexpr auto progStr =
+				"\"123\": int\n";
+			auto astPtr = ASTFromInputSemanticTC(scriptCache, progStr, data);
+			auto& ast = astPtr.rootNode();
+			CHECK(ast.size() == 1);
+			CHECK(ast[0].type() == ska::ExpressionType::INT);
+		}
+
+		SUBCASE("trying to call a converter without declaring it") {
+			try {
+				static constexpr auto progStr =
+					"testFcty189 = function() :var do\n"
+					"return {\n"
+					"}\n"
+					"end\n"
+					"testFcty189()\n"
+					"testFcty189(): int\n";
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, progStr, data);
+				CHECK(false);
+			} catch (std::exception& e) {
+				CHECK(std::string{ e.what() }.find("trying to access to an undeclared field : \":int\" of") != std::string::npos);
+			}
+		}
+
+		SUBCASE("trying to convert a built-in type to a custom one") {
+			try {
+				static constexpr auto progStr =
+					"testFcty189 = function() :var do\n"
+					"return {\n"
+					":int do\n"
+					"return 1\n"
+					"end\n"
+					"}\n"
+					"end\n"
+					"123: testFcty189()\n";
+				ASTFromInputSemanticTC(scriptCache, progStr, data);
+				CHECK(false);
+			} catch (std::exception& e) {
+				CHECK(std::string{ e.what() }.find("invalid conversion from a built-in type \"int\" to type \"var testFcty189\"") != std::string::npos);
+			}
+		}
+
 	SUBCASE("boolean") {
 	auto astPtr = ASTFromInputSemanticTC(scriptCache, "titi = 3 == 3\n", data);
 	auto& ast = astPtr.rootNode();

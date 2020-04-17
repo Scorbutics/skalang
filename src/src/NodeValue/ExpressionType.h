@@ -34,6 +34,18 @@ namespace ska {
 
 	class ScopedSymbolTable;
 
+	static inline bool ExpressionTypeIsBuiltIn(ExpressionType type) {
+		switch (type) {
+		case ExpressionType::BOOLEAN:
+		case ExpressionType::FLOAT:
+		case ExpressionType::INT:
+		case ExpressionType::STRING:
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	static std::unordered_map<std::string, ExpressionType> ExpressionTypeMapBuild() {
     	auto result = std::unordered_map<std::string, ExpressionType>{};
     	static constexpr auto ExpressionTypeSize = static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length);

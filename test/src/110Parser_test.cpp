@@ -106,6 +106,38 @@ TEST_CASE("Block") {
 	}
 }
 
+TEST_CASE("explicit type conversion") {
+	const auto keywords = ska::ReservedKeywordsPool{};
+	auto scriptCache = ska::ScriptCacheAST{};
+
+	auto astPtr = ASTFromInput(scriptCache, "titi: int\n", keywords);
+	/*
+	CHECK(astPtr.rootNode().size() == 1);
+
+	auto& arrayTypeDecl = astPtr.rootNode()[0];
+	CHECK(arrayTypeDecl.size() == 2);
+	CHECK(arrayTypeDecl.op() == ska::Operator::BINARY);
+
+	auto& arrayDecl = arrayTypeDecl[0];
+	CHECK(arrayDecl.op() == ska::Operator::UNARY);
+	CHECK(arrayDecl.size() == 0);
+
+
+	auto& arrayExplicitConverterCall = arrayTypeDecl[1];
+	CHECK(arrayExplicitConverterCall.size() == 1);
+	CHECK(arrayExplicitConverterCall.op() == ska::Operator::FUNCTION_CALL);
+	*/
+
+	/*
+	CHECK(arrayExplicitConverterCall.size() == 2);
+	CHECK(arrayExplicitConverterCall.op() == ska::Operator::CONVERTER_CALL);
+
+	CHECK(arrayExplicitConverterCall[0].name() == ":int");
+	CHECK(arrayExplicitConverterCall[1].size() == 3);
+	CHECK(arrayExplicitConverterCall[1].op() == ska::Operator::TYPE);
+	*/
+}
+
 TEST_CASE("booleans") {
 	const auto keywords = ska::ReservedKeywordsPool{};
 	auto scriptCache = ska::ScriptCacheAST{};
@@ -182,6 +214,18 @@ TEST_CASE("function") {
 
 	SUBCASE("Empty statement-function") {
 		ASTFromInput(scriptCache, "test255 = function() do \n end\n test255()\n", keywords);
+	}
+
+	SUBCASE("function with converter operator") {
+		static constexpr auto progStr =
+			"testFcty189 = function() :var do\n"
+				"return {\n"
+					":int do\n"
+						"return 1\n"
+					"end\n"
+				"}\n"
+			"end\n";
+		ASTFromInput(scriptCache, progStr, keywords);
 	}
 }
 
