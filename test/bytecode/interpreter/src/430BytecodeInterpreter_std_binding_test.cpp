@@ -73,3 +73,22 @@ TEST_CASE("[BytecodeInterpreter] Binding std : log + bridge function call") {
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 }
+
+TEST_CASE("[BytecodeInterpreter] Binding std log into a function") {
+	constexpr auto progStr =
+		"run = function(param : string) do\n"
+			"Logger = import \"bind:std.native.io.log\"\n"
+			"Logger.print(param)\n"
+		"end\n"
+		"run(\"test83\")\n";
+
+	auto data = BytecodeInterpreterDataTestContainer{};
+	ASTFromInputBytecodeInterpreterNoParse(progStr, data);
+
+	auto moduleConfiguration = BuildModuleConfFromData(data);
+	auto logModule = ska::lang::IOLogModule(moduleConfiguration);
+
+	auto script = Interpret(data, progStr);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
+}
