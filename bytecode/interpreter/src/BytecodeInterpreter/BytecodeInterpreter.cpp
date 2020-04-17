@@ -41,6 +41,8 @@
 #include "Units/InterpreterCommandConvDI.h"
 #include "Units/InterpreterCommandConvDStr.h"
 #include "Units/InterpreterCommandConvIStr.h"
+#include "Units/InterpreterCommandConvStrD.h"
+#include "Units/InterpreterCommandConvStrI.h"
 #include "Units/InterpreterCommandArrAccess.h"
 #include "Units/InterpreterCommandArrLength.h"
 #include "Units/InterpreterCommandScript.h"
@@ -80,6 +82,8 @@ ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build
 	InterpreterCommandDeclare<Command::CONV_I_D>(*this, result, generator);
 	InterpreterCommandDeclare<Command::CONV_I_STR>(*this, result, generator);
 	InterpreterCommandDeclare<Command::CONV_D_STR>(*this, result, generator);
+	InterpreterCommandDeclare<Command::CONV_STR_I>(*this, result, generator);
+	InterpreterCommandDeclare<Command::CONV_STR_D>(*this, result, generator);
 
 	InterpreterCommandDeclare<Command::CMP_STR>(*this, result, generator);
 	InterpreterCommandDeclare<Command::CMP_ARR>(*this, result, generator);

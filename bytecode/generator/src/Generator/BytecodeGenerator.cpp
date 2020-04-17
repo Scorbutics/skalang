@@ -19,6 +19,7 @@
 #include "GeneratorOperatorFieldAccess.h"
 #include "GeneratorOperatorScriptLink.h"
 #include "GeneratorOperatorFilter.h"
+#include "GeneratorOperatorConverterCall.h"
 
 #include "GeneratorDeclarer.h"
 
@@ -41,6 +42,7 @@ std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode
 	GeneratorOperatorDeclare<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::FUNCTION_DECLARATION>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::FUNCTION_CALL>(*this, result);
+	GeneratorOperatorDeclare<ska::Operator::CONVERTER_CALL>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::RETURN>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::ARRAY_TYPE_DECLARATION>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::ARRAY_USE>(*this, result);

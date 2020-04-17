@@ -7,34 +7,24 @@
 
 namespace ska {
 	namespace bytecode {
-	enum class OperationType {
-		SPLIT,
-		FULL_FIRST
-	};
 
-	template <Command cmd1, Command cmd2>
-	struct CommandPackOr { static constexpr auto first = cmd1; static constexpr auto second = cmd2; };
+		template <Command cmd1, Command cmd2>
+		struct CommandPackOr { static constexpr auto first = cmd1; static constexpr auto second = cmd2; };
 
-	struct TypeConversionData {
-		Command command;
-		Command commandReverse;
-	};
+		struct TypeConversionData {
+			Command command;
+			Command commandReverse;
+		};
 
-	template <class T>
-	struct OperationList {
-		OperationType type = OperationType::FULL_FIRST;
-		std::vector<T> container;
-	};
-
-	/*
-	using TypeToInstructionConverterCallback = std::function<Command(bool)>;
-	using TypeToInstructionConverter = std::variant<Command, TypeToInstructionConverterCallback>;
-	*/
-	using TypeToInstructionConverter = OperationList<TypeConversionData>;
-	using CommandList = OperationList<Command>;
-	using TypeToInstructionConverterContainer = std::array<TypeToInstructionConverter, static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length)>;
-	using TwoTypesConverterContainer = std::array<TypeToInstructionConverterContainer, static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length)>;
-	using TypeConvertToInstructionContainer = std::array<TwoTypesConverterContainer, static_cast<std::size_t>(LogicalOperator::UNUSED_Last_Length)>;
+		/*
+		using TypeToInstructionConverterCallback = std::function<Command(bool)>;
+		using TypeToInstructionConverter = std::variant<Command, TypeToInstructionConverterCallback>;
+		*/
+		using TypeToInstructionConverter = OperationList<TypeConversionData>;
+	
+		using TypeToInstructionConverterContainer = std::array<TypeToInstructionConverter, static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length)>;
+		using TwoTypesConverterContainer = std::array<TypeToInstructionConverterContainer, static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length)>;
+		using TypeConvertToInstructionContainer = std::array<TwoTypesConverterContainer, static_cast<std::size_t>(LogicalOperator::UNUSED_Last_Length)>;
 
 		template <Command cmd>
 		struct CommandComplex : std::false_type {};
@@ -103,6 +93,13 @@ namespace ska {
 			EnqueueConverterItem<OperationType::FULL_FIRST, Command::CMP_STR, Command::TEST_EQ>::enqueue(result, LogicalOperator::EQUALITY, ExpressionType::STRING, ExpressionType::STRING);
 			EnqueueConverterItem<OperationType::FULL_FIRST, Command::CMP_ARR, Command::TEST_EQ>::enqueue(result, LogicalOperator::EQUALITY, ExpressionType::ARRAY, ExpressionType::ARRAY);
 
+			EnqueueConverterItem<OperationType::FULL_FIRST, Command::CONV_D_I>::enqueue(result, LogicalOperator::EQUAL, ExpressionType::FLOAT, ExpressionType::INT);
+			EnqueueConverterItem<OperationType::FULL_FIRST, Command::CONV_I_D>::enqueue(result, LogicalOperator::EQUAL, ExpressionType::INT, ExpressionType::FLOAT);
+			EnqueueConverterItem<OperationType::FULL_FIRST, Command::CONV_I_STR>::enqueue(result, LogicalOperator::EQUAL, ExpressionType::INT, ExpressionType::STRING);
+			EnqueueConverterItem<OperationType::FULL_FIRST, Command::CONV_STR_I>::enqueue(result, LogicalOperator::EQUAL, ExpressionType::STRING, ExpressionType::INT);
+			EnqueueConverterItem<OperationType::FULL_FIRST, Command::CONV_D_STR>::enqueue(result, LogicalOperator::EQUAL, ExpressionType::FLOAT, ExpressionType::STRING);
+			EnqueueConverterItem<OperationType::FULL_FIRST, Command::CONV_STR_D>::enqueue(result, LogicalOperator::EQUAL, ExpressionType::STRING, ExpressionType::FLOAT);
+
 			EnqueueConverterItem<OperationType::FULL_FIRST, Command::SUB_I, Command::TEST_NEQ>::enqueue(result, LogicalOperator::INEQUALITY, ExpressionType::INT, ExpressionType::INT);
 			EnqueueConverterItem<OperationType::FULL_FIRST, Command::SUB_D, Command::TEST_NEQ>::enqueue(result, LogicalOperator::INEQUALITY, ExpressionType::FLOAT, ExpressionType::FLOAT);
 			EnqueueConverterItem<OperationType::FULL_FIRST, Command::CMP_STR, Command::TEST_NEQ>::enqueue(result, LogicalOperator::INEQUALITY, ExpressionType::STRING, ExpressionType::STRING);
@@ -154,7 +151,7 @@ namespace ska {
 			return node1.type == destinationType ? node2 : node1;
 		}
 
-		static CommandList TypeConversion(LogicalOperator logicalOperator, const Type& operandType, const Type& operand2Type, bool reverseOrder) {
+		CommandList TypeConversion(LogicalOperator logicalOperator, const Type& operandType, const Type& operand2Type, bool reverseOrder) {
 			static TypeConvertToInstructionContainer typeConverter = BuildTypeConverter();
 
 			const auto operatorIndex = static_cast<std::size_t>(logicalOperator);

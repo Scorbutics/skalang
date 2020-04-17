@@ -149,7 +149,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 		auto functionCallOperation = OperationType<Operator::FUNCTION_CALL>{ token.rootNode() };
 		const auto functionFullRequiredType = functionCallOperation.GetFunctionType();
 
-		if (functionFullRequiredType != ExpressionType::FUNCTION && functionFullRequiredType != ExpressionType::CONVERTER) {
+		if (functionFullRequiredType != ExpressionType::FUNCTION) {
 			auto ss = std::stringstream{};
 			ss << "function \"" << functionFullRequiredType << "\" is called before being declared (or has a bad declaration)";
 			throw std::runtime_error(ss.str());

@@ -7,7 +7,9 @@ namespace ska {
 		enum class Command {
 			MOV,
 			CONV_I_STR,
+			CONV_STR_I,
 			CONV_D_STR,
+			CONV_STR_D,
 			CONV_I_D,
 			CONV_D_I,
 			PUSH_F_ARR,
@@ -58,7 +60,9 @@ namespace ska {
 		static constexpr const char* CommandSTR[] = {
 			"MOV",
 			"CONV_I_STR",
+			"CONV_STR_I",
 			"CONV_D_STR",
+			"CONV_STR_D",
 			"CONV_I_D",
 			"CONV_D_I",
 			"PUSH_F_ARR",
