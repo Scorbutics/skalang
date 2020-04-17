@@ -1,29 +1,16 @@
 Log = import "bind:std.native.io.log"
-Parameters = import "bind:std.native.function.parameter"
 PathFcty = import "bind:std.native.io.path"
 
-testFcty = function(): var do
-	return {
-		toto = "lol"
-		titi = "lil"
-		tutu = 2
-
-		:int = function():int do
-			return tutu
-		end
-	}
-end
-
-run = function (parameters: Parameters::Fcty()) do
+run = function (parameters: string[]) do
 	if parameters.size() > 0
-		path = PathFcty.Fcty(parameters.asString(0))
+		path = PathFcty.Fcty(parameters[0]: string)
 		Log.print(path.canonical())
 
 		all = []:int
-		for(i = 1
-				i < parameters.size()
-				i = i + 1) do
-			all = all + (parameters.asInt(i) + i * i)
+		parameters | (parameter, index) do
+			if index > 0
+				all = all + (parameter: int + index * index)
+			end
 		end
 
 		all | (element) do
