@@ -16,7 +16,7 @@ namespace ska {
 		MatcherType(const ReservedKeywordsPool& pool) :
 			m_reservedKeywordsPool(pool) {}
 	
-		ASTNodePtr match(TokenReader& input);
+		ASTNodePtr match(TokenReader& input, std::string* typeStr = nullptr);
 		ASTNodePtr match(const Type& input);
 	
 	private:

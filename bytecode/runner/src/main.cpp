@@ -31,14 +31,14 @@ static ska::bytecode::ScriptGenerationHelper BasicProgramScriptStarter(ska::lang
 
 	const auto scriptStarter = "Script = import \"wd:" + scriptName + "\"\n"
 	"ParametersGenerator = import \"bind:std.native.function.parameter\"\n"
-	"Script.run(ParametersGenerator.Fcty(\"" + scriptName + "\"))\n";
+	"Script.run(ParametersGenerator.Get(\"" + scriptName + "\"))\n";
 
 	return { module.scriptCache, module.parser, "main", ska::Tokenizer{ module.reservedKeywords, scriptStarter}.tokenize() };
 }
 
-static ska::lang::ParameterModule<ska::bytecode::Interpreter> BasicParameterModuleBuilder(ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>& module, std::vector<ska::NodeValue>& parameters, int argc, char* argv[]) {
+static ska::lang::ParameterModule<ska::bytecode::Interpreter> BasicParameterModuleBuilder(ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>& module, ska::NodeValueArray& parameters, int argc, char* argv[]) {
 	for(auto i = 2; i < argc; i++) {
-		parameters.push_back(std::make_shared<std::string>(argv[i]));
+		parameters->push_back(std::make_shared<std::string>(argv[i]));
 	}
 
 	return ska::lang::ParameterModule(module, parameters);
@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 		auto serializer = ska::bytecode::Serializer{};
 		auto logmodule = ska::lang::IOLogModule(moduleConfiguration);
 		auto pathmodule = ska::lang::IOPathModule(moduleConfiguration);
-		auto parameterValues = std::vector<ska::NodeValue>{};
+		auto parameterValues = std::make_shared<ska::NodeValueArrayRaw>();
 		auto parameterModule = BasicParameterModuleBuilder(moduleConfiguration, parameterValues, argc, argv);
 
 		auto failedToRead = serializer.deserialize(moduleConfiguration.scriptCache, "main", ska::bytecode::DeserializationStrategyType::PerScript(), {"main"});

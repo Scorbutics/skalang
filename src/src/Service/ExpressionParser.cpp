@@ -16,7 +16,8 @@ ska::ExpressionParser::ExpressionParser(const ReservedKeywordsPool& reservedKeyw
 	m_matcherArray(m_reservedKeywordsPool, m_parser, m_matcherType),
 	m_matcherFunction(m_reservedKeywordsPool, m_parser),
 	m_matcherVar(m_reservedKeywordsPool, m_parser),
-	m_matcherImport(m_reservedKeywordsPool, m_parser) {
+	m_matcherImport(m_reservedKeywordsPool, m_parser),
+	m_matcherConverter(m_reservedKeywordsPool, m_parser, m_matcherType) {
 }
 
 ska::ASTNodePtr ska::ExpressionParser::parse(ScriptAST& input) {
@@ -124,9 +125,21 @@ int ska::ExpressionParser::matchRange(ScriptAST& input, ExpressionStack& express
 
 bool ska::ExpressionParser::matchSymbol(ScriptAST& input, ExpressionStack& expressions, const Token& token, bool isDoingOperation) {
 	const auto& value = std::get<std::string>(token.content());
+	// TODO Pattern matching
+
+	ASTNodePtr toPush;
 	if (value == "=") {
 		//We must check that the token before the '=' is an lvalue : done in the semantic check pass.
 		expressions.push(m_matcherVar.matchAffectation(input, expressions.popOperandIfNoOperator(isDoingOperation)));
+		return false;
+	} 
+
+	if (value == ":") {
+		auto expressionObject = expressions.popOperandIfNoOperator(isDoingOperation);
+		if (expressionObject == nullptr) {
+			throw std::runtime_error("invalid converter placement");
+		}
+		expressions.push(m_matcherConverter.matchCall(input, std::move(expressionObject)));
 		return false;
 	}
 
@@ -145,6 +158,7 @@ bool ska::ExpressionParser::matchSymbol(ScriptAST& input, ExpressionStack& expre
 	} else {
 		expressions.push(Token{ input.reader().match(TokenType::SYMBOL) });
 	}
+
 	return true;
 }
 

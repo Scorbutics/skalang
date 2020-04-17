@@ -22,6 +22,7 @@ ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser, const Typ
 	subobserver_priority_queue<ArrayTokenEvent>(std::bind(&SemanticTypeChecker::matchArray, this, std::placeholders::_1), parser, 9),
 	subobserver_priority_queue<ReturnTokenEvent>(std::bind(&SemanticTypeChecker::matchReturn, this, std::placeholders::_1), parser, 9),
 	subobserver_priority_queue<IfElseTokenEvent>(std::bind(&SemanticTypeChecker::matchIfElse, this, std::placeholders::_1), parser, 9),
+	subobserver_priority_queue<ConverterTokenEvent>(std::bind(&SemanticTypeChecker::matchConverter, this, std::placeholders::_1), parser, 9),
 	m_typeCrosser(typeCrosser) {
 }
 
@@ -242,6 +243,19 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 		if (OperatorTraits::isNamed(variable.var().op()) && name.empty()) {
 			throw std::runtime_error("invalid symbol affectation");
 		}
+	}
+
+	return true;
+}
+
+bool ska::SemanticTypeChecker::matchConverter(const ConverterTokenEvent& token) {
+	const auto& sourceType = token.object().type().value();
+	const auto& destinationType = token.type().type().value();
+
+	if (ExpressionTypeIsBuiltIn(sourceType.type()) && !ExpressionTypeIsBuiltIn(destinationType.type())) {
+		auto ss = std::stringstream{};
+		ss << "invalid conversion from a built-in type \"" << sourceType << "\" to type \"" << destinationType << "\"";
+		throw std::runtime_error(ss.str());
 	}
 
 	return true;

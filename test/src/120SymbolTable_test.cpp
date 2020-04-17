@@ -123,6 +123,23 @@ TEST_CASE("Matching") {
 			const auto expectScope = table.root().child(0) != nullptr && table.root().child(0)->scopes() == 1;
 			CHECK(expectScope);
 		}
+
+		SUBCASE("function with converter operator name") {
+			static constexpr auto progStr =
+				"testFcty189 = function() :var do\n"
+				"return {\n"
+				":int do\n"
+				"return 1\n"
+				"end\n"
+				"}\n"
+				"end\n";
+			auto astPtr = ASTFromInput(scriptCache, progStr, data);
+			auto& table = reader->symbols();
+
+			CHECK(table.scopes() == 1);
+			auto converter = table.lookup(ska::SymbolTableLookup::direct(":int"), ska::SymbolTableNested::firstChild(2));
+			CHECK(converter != nullptr);
+		}
 	}
 
 }

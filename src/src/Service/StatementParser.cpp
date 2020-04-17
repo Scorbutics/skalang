@@ -24,7 +24,9 @@ ska::StatementParser::StatementParser(const ReservedKeywordsPool& reservedKeywor
 	m_matcherFor(m_reservedKeywordsPool, *this),
 	m_matcherIfElse(m_reservedKeywordsPool, *this, m_matcherBlock),
 	m_matcherVar(m_reservedKeywordsPool, *this),
-	m_matcherReturn(m_reservedKeywordsPool, *this),
+	m_matcherType(m_reservedKeywordsPool),
+	m_matcherConverter(m_reservedKeywordsPool, *this, m_matcherType),
+	m_matcherReturn(m_reservedKeywordsPool, *this, m_matcherConverter),
 	m_matcherImport(m_reservedKeywordsPool, *this),
 	m_matcherFilter(m_reservedKeywordsPool, *this, m_matcherBlock) {
 }

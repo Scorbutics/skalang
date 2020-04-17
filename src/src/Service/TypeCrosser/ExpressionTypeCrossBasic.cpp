@@ -22,7 +22,7 @@ namespace ska {
 				{ 0, 0, 0, 0, 0, 0, 6, 0 },
 				{ 0, 0, 0, 0, 0, 0, 0, 0 },
 				{ 0, 0, 0, 3, 4, 5, 6, 0 },
-				{ 0, 0, 0, 4, 4, 0, 6, 0 },
+				{ 0, 0, 0, 4, 4, 5, 6, 0 },
 				{ 0, 0, 0, 5, 0, 5, 6, 0 },
 				{ 0, 6, 0, 6, 6, 6, 6, 6 },
 				{ 0, 0, 0, 0, 0, 0, 6, 0 }
@@ -105,12 +105,24 @@ namespace ska {
 				{ 0, 0, 0, 0, 0, 0, 0, 7 }
 			};
 
+			static int typeMapOperatorConvert[TypeMapSize][TypeMapSize] = {
+				{ 0, 0, 0, 0, 0, 0, 0, 0 },
+				{ 0, 1, 0, 1, 1, 1, 1, 1 },
+				{ 0, 0, 2, 0, 0, 0, 0, 0 },
+				{ 0, 0, 0, 3, 4, 5, 0, 0 },
+				{ 0, 0, 0, 3, 4, 5, 0, 0 },
+				{ 0, 0, 0, 3, 4, 5, 0, 0 },
+				{ 0, 0, 0, 0, 0, 0, 6, 0 },
+				{ 0, 0, 0, 0, 0, 0, 0, 7 }
+			};
+
 			static auto typeMap = std::unordered_map<std::string, int(*)[TypeMapSize][TypeMapSize]> {};
 			typeMap.emplace("+", &typeMapOperatorPlus);
 			typeMap.emplace("-", &typeMapOperatorMinus);
 			typeMap.emplace("*", &typeMapOperatorMul);
 			typeMap.emplace("/", &typeMapOperatorDiv);
 			typeMap.emplace("=", &typeMapOperatorEqual);
+			typeMap.emplace(":", &typeMapOperatorConvert);
 			typeMap.emplace("==", &typeMapOperatorEquality);
 			typeMap.emplace("!=", &typeMapOperatorEquality);
 			typeMap.emplace("&&", &typeMapOperatorLogicalBool);

@@ -36,6 +36,7 @@ ska::TypeBuildersContainer ska::BuildTypeBuildersContainer(const TypeCrosser& ty
 	TypeBuilderMakeBuilder<Operator::SCRIPT_LINK>(result);
 	TypeBuilderMakeBuilder<Operator::TYPE>(result);
 	TypeBuilderMakeBuilder<Operator::FILTER>(result);
+	TypeBuilderMakeBuilder<Operator::CONVERTER_CALL>(result);
 	TypeBuilderMakeBuilder<Operator::FILTER_DECLARATION>(result);
 	TypeBuilderMakeBuilder<Operator::FILTER_PARAMETER_DECLARATION>(result);
 
