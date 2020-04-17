@@ -29,6 +29,14 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	DataTestContainer data;
 	auto scriptCache = ska::ScriptCacheAST{};
 
+	SUBCASE("use of inline empty array declaration and as return value of function") {
+		ASTFromInputSemanticComplexTC(scriptCache,
+		"Get = function() : string[] do\n"
+			"return[]: string\n"
+		"end\n"
+		, data);
+	}
+
 	SUBCASE("constructor with function field accessed through variable") {
 		ASTFromInputSemanticComplexTC(scriptCache,
 			"JoueurClass = function(nom:string) : var do "

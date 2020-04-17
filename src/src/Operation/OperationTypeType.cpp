@@ -12,6 +12,11 @@ const ska::Symbol* ska::OperationType<ska::Operator::TYPE>::GetTypeSymbol(const 
 	return symbolTable[typeNameNode.name()];
 }
 
+const ska::Type& ska::OperationType<ska::Operator::TYPE>::GetType() const {
+	assert(node.size() > 0);
+	return node[0].type().value();
+}
+
 bool ska::OperationType<ska::Operator::TYPE>::IsBuiltIn() const {
 	return node.size() > 0 && node[0].size() == 0 && ExpressionTypeMap.find(node[0].name()) != ExpressionTypeMap.end();
 }

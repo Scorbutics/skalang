@@ -20,6 +20,7 @@ namespace ska {
 		bool IsObject() const;
 		std::string GetName() const;
 		std::string GetTypeName() const;
+		const Type& GetType() const;
 
 		bool IsArray() const  {
 			return node.size() > 2 && !node[2].logicalEmpty();

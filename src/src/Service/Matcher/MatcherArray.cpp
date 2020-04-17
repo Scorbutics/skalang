@@ -70,7 +70,7 @@ ska::ASTNodePtr ska::MatcherArray::match(ScriptAST& input, ExpressionStack& oper
 	case '[': {
 		if (input.reader().canReadPrevious(1)) {
 			auto lastToken = input.reader().readPrevious(1);
-			const auto& value = std::get<std::string>(lastToken.content());
+			const auto& value = lastToken.name();
 			if (value != "=") {
 				auto arrayNode = operands.popOperandIfNoOperator(isDoingOperation);
 				if (arrayNode != nullptr) {

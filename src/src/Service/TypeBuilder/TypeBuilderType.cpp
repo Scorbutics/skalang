@@ -15,15 +15,16 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::TYPE>::build(const Sc
 		auto* typeSymbol = node.GetTypeSymbol(script.symbols());
 		if (typeSymbol != nullptr) {
 			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::TYPE>) << "Type-node looked \"" << typeSymbol->type() << "\" for node \"" << node.GetName() << "\"";
+			resultSymbol = typeSymbol;
+			if (node.IsObject()) {
+				result = Type::MakeCustom<ExpressionType::OBJECT>(nullptr);
+			} else {
+				result = typeSymbol->type();
+			}
+		} else if (node.IsArray()) {
+			result = node.GetType();
 		} else {
 			throw std::runtime_error("undeclared custom type \"" + node.GetName() + "\" (when trying to look on token type \"" + node.GetTypeName() + "\")");
-		}
-
-		resultSymbol = typeSymbol;
-		if(node.IsObject()) {
-			result = Type::MakeCustom<ExpressionType::OBJECT>(nullptr);
-		} else {
-			result = typeSymbol->type();
 		}
 
    } else { 
