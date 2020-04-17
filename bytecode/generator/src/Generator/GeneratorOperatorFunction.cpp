@@ -9,47 +9,6 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::O
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>) << "%01c"
 
-/*
-
-var toto = function() : var {
-	var priv_test = 1;
-	return {
-		test : priv_test,
-		say : function(more : string) : string {
-			var s = "lol" + priv_test + more;
-			return s;
-		}
-	};
-};
-
-var test = toto();
-___________________________________________________________________________________
-
-JUMP...
-LABEL toto //label 0
-	MOV V0 1
-
-	PUSH V0
-
-JUMP 10
-LABEL toto say //label 1
-	POP V1
-	CONV_I_STR R0 V0
-	ADD_STR R1 "lol" R0
-	ADD_STR R2 R1 V1
-	MOV V2 R2
-	END V2
-
-	LABEL_REF V3, toto say
-	PUSH V3
-
-	END_STACK 2
-
-CALL toto
-POP_IN_VAR V3, 2
-
-*/
-
 namespace ska {
 	namespace bytecode {
 		static InstructionOutput AddRelativeJumpInstruction(InstructionOutput output) {

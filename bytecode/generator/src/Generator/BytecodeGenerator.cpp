@@ -82,8 +82,9 @@ const ska::bytecode::ScriptGeneration& ska::bytecode::Generator::generate(Script
 
 const ska::bytecode::ScriptGeneration& ska::bytecode::Generator::generate(ScriptCache& cache, std::size_t scriptIndex) {
 	auto& scriptGen = cache.at(scriptIndex);
-	auto scriptName = scriptGen.name();
 	scriptGen.generate(cache, *this);
-	LOG_DEBUG << "Final generation " << scriptGen << " for script " << scriptName;
+	for (const auto& script : cache) {
+		LOG_DEBUG << "Final generation " << *script << " for script " << script->name();
+	}
 	return scriptGen;
 }
