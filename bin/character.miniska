@@ -1,21 +1,22 @@
-var Position = import "point";
-var InputComponent = import "input_component";
-var CharacterCommands = import "bind:character_commands_lib";
-var Callback = import "callback";
+Position = import "point"
+InputComponent = import "input_component"
+Callback = import "callback"
+Log = import "bind:std.native.io.log"
 
-var Fcty = function(id: int) : var {
-	var defaultPos = Position.Fcty(0, 0);
-	var input = InputComponent.Fcty(id);
+Fcty = function(id: int) : var do
+	defaultPos = Position.Fcty(0, 0)
+	input = InputComponent.Fcty(id)
 	return {
-		id : id,
-	direction : 0,
-	pos : defaultPos,
-		input : input,
-		jump : CharacterCommands.jump,
-		move : function(direction: int, power: int, t: int, callback: Callback::Default) {
-			CharacterCommands.move(direction, power, t);
-			callback();
-		}
-	};
-};
-
+		id = id
+		direction = 0
+		pos = defaultPos
+		input = input
+		jump = function(test: int) do 
+		end
+		move = function(direction: int, power: int, t: int, callback: Callback::Default) do
+			Log.print("before callback")
+			callback()
+			Log.print("after callback")
+		end
+	}
+end

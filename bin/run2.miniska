@@ -1,14 +1,12 @@
 Coldragon = function(): var do 
-	array = [20, 150, 2]
-	
 	return { 
-		data = 500
-		array = array
+		data = 0
+		array = [20, 150, 2]
 	} 
 end
 
-Scorbutics = function(): var do
-	power = 88
+Scorbutics = function(pow: int): var do
+	power = pow
 	i = 0
 	return {
 		attack = function(target: Coldragon()) do
@@ -23,7 +21,7 @@ end
 
 run = function(params : string[]) do
 	coldragon = Coldragon()
-	scor = Scorbutics()
+	scor = Scorbutics(params[0]: int)
 	scor.attack(coldragon)
 
 	Log = import "bind:std.native.io.log"

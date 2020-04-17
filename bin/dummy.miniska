@@ -1,5 +1,5 @@
-var Fcty = function() : var {
+Fcty = function() : var do
 	return {
-		data : 0
-	};
-};
+		data = 0
+	}
+end

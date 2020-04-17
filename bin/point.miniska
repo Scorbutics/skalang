@@ -1,7 +1,6 @@
-var Fcty = function(x: int, y: int): var {
+Fcty = function(x: int, y: int): var do
 	return {
-	x: x,
-	y: y
-	};
-};
-
+		x = x
+		y = y
+	}
+end

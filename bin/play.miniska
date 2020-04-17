@@ -1,10 +1,9 @@
-var Character = import "character";
-var Runner = import "std:runner_lib";
-var Parameters = import "std:std.parameters";
+Character = import "character"
+Log = import "bind:std.native.io.log"
 
-var run = function(origin: Character::Fcty(), parameters: Parameters::Fcty()) {
-	Runner.printInt(origin.id);
-	origin.input.setMovePower(1234);
-	Runner.printInt(origin.input.movePower());
-};
-
+run = function(parameters: string[]) do
+	origin = Character.Fcty(007)
+	Log.print(origin.id: string)
+	origin.input.setMovePower(1234)
+	Log.print(origin.input.movePower(): string)
+end
