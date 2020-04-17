@@ -1,14 +1,6 @@
 Callback = import "callback"
-IO = import "bind:std.native.io.log"
-Fcty = function() : var do
-	return {
-		defer = function(t1: int, t2: int, t3: int, callback: Callback::Default) do
-			
-			IO.print(t1 : string)
-			IO.print(t2 : string)
-			IO.print(t3 : string)
-			
-			callback()
-		end
-	}
+IOLog = import "bind:std.native.io.log"
+
+defer = function(t1: int, t2: int, t3: int, callback: Callback::Integer) do	
+	callback(t1 + t2 + t3)
 end
