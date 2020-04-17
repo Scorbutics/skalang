@@ -1,0 +1,12 @@
+IO = import "bind:std.native.io.log"
+Defer = import "defer_test"
+
+run = function(parameters: string[]) do
+	defer = Defer.Fcty()
+
+	emptyCallback = function() do
+		IO.print("test")
+	end
+	defer.defer(12, 30, 1, emptyCallback)
+end
+

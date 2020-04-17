@@ -50,7 +50,9 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	auto result = InstructionOutput{ };
-	applyGenerator(ApplyNOperations<Command::POP, OperateOn&>, result, context, node, node.GetParameterSize());
+	// Obvisouly we pop in reverse order, because that's how a stack works (we previously pushed parameters in order in generation of Operator::FUNCTION_CALL)
+	// Also, we avoid index 0, which is return type in reverse order
+	applyGenerator(ApplyNOperations<Command::POP, decltype(node.rbegin())>, result, context, node.rbegin() + 1, node.rend());
 	LOG_DEBUG << "\tParameters : " << result;
 	return result;
 }
@@ -80,7 +82,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	}
 	auto result = std::move(preCallValue);
 
-	applyGenerator(ApplyNOperations<Command::PUSH, OperateOn&>, result, context, node, node.GetFunctionParameterSize());
+	applyGenerator(ApplyNOperations<Command::PUSH, decltype(node.begin())>, result, context, node.begin(), node.end());
 	LOG_DEBUG << " PUSH result : " << result;
 
 	result.push(std::move(callInstruction));

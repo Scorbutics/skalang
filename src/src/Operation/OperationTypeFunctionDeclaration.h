@@ -56,5 +56,13 @@ namespace ska {
 			return node.end();
 		}
 
+		auto rbegin() const {
+			return node.rbegin();
+		}
+
+		auto rend() const {
+			return node.rend();
+		}
+
 	};
 }

@@ -5,7 +5,7 @@
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::ARRAY_TYPE_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	auto result = InstructionOutput{ };
-	auto totalPushedElements = applyGenerator(ApplyNOperations<Command::PUSH, const ASTNode&>, result, context, node.GetArrayContent(), std::numeric_limits<std::size_t>::max());
+	auto totalPushedElements = applyGenerator(ApplyNOperations<Command::PUSH, decltype(node.GetArrayContent().begin())>, result, context, node.GetArrayContent().begin(), node.GetArrayContent().end());
 	result.push(Instruction { Command::POP_IN_ARR, context.queryNextRegister(), Operand { static_cast<long>(totalPushedElements), OperandType::PURE} });
 	return result;
 }

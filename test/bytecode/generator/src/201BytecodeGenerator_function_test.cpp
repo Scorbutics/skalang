@@ -39,6 +39,23 @@ TEST_CASE("[BytecodeGenerator] Empty function with 4 parameters (> 3)") {
 	});
 }
 
+TEST_CASE("[BytecodeGenerator] Empty function with 4 parameters (> 3) + use") {
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator("toto = function(t: int, t1: int, t2: int, t3: int) do test=t\ntest=t1\ntest=t2\ntest=t3\n end\n");
+	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::JUMP_REL, "7"},
+		{ska::bytecode::Command::POP, "V0", "V1", "V2"},
+		{ska::bytecode::Command::POP, "V3" },
+		{ska::bytecode::Command::MOV, "V4", "V3" },
+		{ska::bytecode::Command::MOV, "V4", "V2" },
+		{ska::bytecode::Command::MOV, "V4", "V1" },
+		{ska::bytecode::Command::MOV, "V4", "V0" },
+		{ska::bytecode::Command::RET},
+		{ska::bytecode::Command::END, "V5", "-8"}
+	});
+}
+
 TEST_CASE("[BytecodeGenerator] Basic function with 1 return type") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("toto = function(): int do return 0\n end\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));

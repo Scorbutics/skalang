@@ -3,6 +3,28 @@
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeInterpreterTest.h"
 
+TEST_CASE("[BytecodeInterpreter] function with 4 parameters (> 3) + use") {
+	auto [script, data] = Interpret(
+		"test1 = 0-1\n"
+		"test2 = 0-1\n"
+		"test3 = 0-1\n"
+		"test4 = 0-1\n"
+		"toto = function(t: int, t1: int, t2: int, t3: int) do\n"
+			"test1 = t\n"
+			"test2 = t1\n"
+			"test3 = t2\n"
+			"test4 = t3\n"
+		"end\n"
+		"toto(1, 2, 3, 4)\n"
+		"final = test1: string + test2: string + test3: string + test4: string\n");
+
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
+	auto res = interpreted->variable(0);
+	auto firstCellValue = res.nodeval<ska::StringShared>();
+	CHECK(*firstCellValue == "1234");
+}
+
 TEST_CASE("[BytecodeInterpreter] Custom object creation (field access)") {
 	constexpr auto progStr =
 		"toto = function() : var do\n"

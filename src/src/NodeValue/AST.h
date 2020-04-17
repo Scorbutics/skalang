@@ -40,8 +40,14 @@ namespace ska {
 		const auto begin() const { return std::begin(m_children); }
 		const auto end() const { return std::end(m_children); }
 
+		const auto rbegin() const { return std::rbegin(m_children); }
+		const auto rend() const { return std::rend(m_children); }
+
 		auto begin() { return std::begin(m_children); }
 		auto end() { return std::end(m_children); }
+
+		auto rbegin() { return std::rbegin(m_children); }
+		auto rend() { return std::rend(m_children); }
 
 		const auto& op() const { return m_op; }
 
