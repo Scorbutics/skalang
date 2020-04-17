@@ -80,7 +80,7 @@ ska::bytecode::ScriptExecution& ska::bytecode::ExecutionContext::scriptFromOpera
 const ska::bytecode::ScriptExecution& ska::bytecode::ExecutionContext::scriptFromOperand(const Operand& v) const {
 	if (std::holds_alternative<ScriptVariableRef>(v.content())) {
 		const auto scriptIndex = v.as<ScriptVariableRef>().script;
-		auto* result = m_out.script(scriptIndex);
+		auto* result = m_out.script(scriptIndex, m_in);
 		if(result == nullptr) {
 			throw std::runtime_error("not a valid script at index " + std::to_string(scriptIndex));
 		}
