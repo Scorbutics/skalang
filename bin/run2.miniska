@@ -1,36 +1,34 @@
-var Coldragon = function(): var { 
-	var array = [20, 150, 2];
+Coldragon = function(): var do 
+	array = [20, 150, 2]
 	
 	return { 
-		data: 500,
-		array : array
-	}; 
-};
+		data = 500
+		array = array
+	} 
+end
 
-var Scorbutics = function(): var {
-	var power = 88;
-	var i = 0;
+Scorbutics = function(): var do
+	power = 88
+	i = 0
 	return {
-		attack : function(target: Coldragon()) {
-			target.data = target.array[i] - power;
-			i = i + 1;
-			if( i >= 3 ) {
-				i = 0;
-			}
-		}
-	};
-}; 
+		attack = function(target: Coldragon()) do
+			target.data = target.array[i] - power
+			i = i + 1
+			if i >= 3
+				i = 0
+			end
+		end
+	}
+end
 
-var Parameter = import "bind:std.native.function.parameter";
+run = function(params : string[]) do
+	coldragon = Coldragon()
+	scor = Scorbutics()
+	scor.attack(coldragon)
 
-var run = function(params : Parameter::Fcty()) {
-	var coldragon = Coldragon();
-	var scor = Scorbutics();
-	scor.attack(coldragon);
-
-	var Log = import "bind:std.native.io.log";
-	Log.print(coldragon.data);
+	Log = import "bind:std.native.io.log"
+	Log.print(coldragon.data)
 	
-	scor.attack(coldragon);
-	Log.print(coldragon.data);
-};
+	scor.attack(coldragon)
+	Log.print(coldragon.data)
+end
