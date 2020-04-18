@@ -49,6 +49,8 @@ namespace ska {
 			auto begin() { return m_pack.begin(); }
 			auto end() { return m_pack.end(); }
 
+			const Instruction* back() const { return m_pack.empty() ? nullptr : &m_pack.back(); }
+
 			Operand operand() const {	return m_operand.empty() ? packAsOperand() : m_operand;	}
 
 			const Instruction& operator[](std::size_t index) const { assert(index < m_pack.size()); return m_pack[index]; }

@@ -57,18 +57,31 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	return result;
 }
 
+static bool IsInstructionCommandClosed(const ska::bytecode::InstructionOutput& pack) {
+	if (pack.back() == nullptr) {
+		return false;
+	}
+
+	switch (pack.back()->command()) {
+	case ska::bytecode::Command::ARR_LENGTH:
+		return true;
+	default:
+		return false;
+	}
+}
+
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>::generate(OperateOn node, GenerationContext& context) {
 	auto preCallValue = generateNext({context, node.GetFunctionNameNode()});
 	LOG_DEBUG << "Function call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
 
-	// Handle built-in type functions : no symbol provided
+	// Handle built-in type functions traduced directly to a bytecode instruction 
 	const auto* functionTypeSymbol = node.GetFunctionNameNode().typeSymbol();
-	if (functionTypeSymbol == nullptr) {
+	if (IsInstructionCommandClosed(preCallValue)) {
 		return preCallValue;
 	}
 
 	// Handle custom type functions
-	const auto* functionSymbolInfo = context.getSymbolInfo(*functionTypeSymbol);
+	const auto* functionSymbolInfo = functionTypeSymbol == nullptr ? nullptr : context.getSymbolInfo(*functionTypeSymbol);
 	LOG_DEBUG << "Function Call symbol info : " << (functionSymbolInfo == nullptr || functionSymbolInfo->binding == std::numeric_limits<std::size_t>::max() ? "none" : "with binding");
 
 	auto callInstruction = InstructionOutput {};
