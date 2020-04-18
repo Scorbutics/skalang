@@ -18,34 +18,6 @@
     };
 
 namespace ska {
-    class ASTNode;
-    class ScriptAST;
-
     template <Operator O>
-    struct TypeBuilderOperator : public TypeBuildUnit {
-        TypeHierarchy build(const ScriptAST& script, ASTNode& node) override {
-			return Type{ };
-        }
-    };
-
-
+    struct TypeBuilderOperator;
 }
-
-#include "Service/TypeBuilder/TypeBuilderConverterCall.h"
-#include "Service/TypeBuilder/TypeBuilderFunctionCall.h"
-#include "Service/TypeBuilder/TypeBuilderFunctionPrototypeDeclaration.h"
-#include "Service/TypeBuilder/TypeBuilderFunctionDeclaration.h"
-#include "Service/TypeBuilder/TypeBuilderParameterDeclaration.h"
-#include "Service/TypeBuilder/TypeBuilderArrayDeclaration.h"
-#include "Service/TypeBuilder/TypeBuilderArrayUse.h"
-#include "Service/TypeBuilder/TypeBuilderVariableAffectation.h"
-#include "Service/TypeBuilder/TypeBuilderVariableDeclaration.h"
-#include "Service/TypeBuilder/TypeBuilderImport.h"
-#include "Service/TypeBuilder/TypeBuilderExport.h"
-#include "Service/TypeBuilder/TypeBuilderBinary.h"
-#include "Service/TypeBuilder/TypeBuilderScriptLink.h"
-#include "Service/TypeBuilder/TypeBuilderLiteral.h"
-#include "Service/TypeBuilder/TypeBuilderFieldAccess.h"
-#include "Service/TypeBuilder/TypeBuilderType.h"
-#include "Service/TypeBuilder/TypeBuilderUserDefinedObject.h"
-#include "Service/TypeBuilder/TypeBuilderFilterParameterDeclaration.h"

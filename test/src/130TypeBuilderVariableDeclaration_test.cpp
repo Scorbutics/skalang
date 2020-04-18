@@ -10,6 +10,10 @@
 #include "Service/ASTFactory.h"
 #include "NodeValue/ScriptAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
+#include "Service/TypeBuilder/TypeBuilderVariableDeclaration.h"
+#include "Service/TypeBuilder/TypeBuilderBinary.h"
+#include "Service/TypeBuilder/TypeBuilderLiteral.h"
+#include "Service/TypeBuilder/TypeBuilderDefaults.h"
 
 TEST_CASE("[TypeBuilderVariableDeclaration]") {
 	auto scriptCache = ska::ScriptCacheAST {};

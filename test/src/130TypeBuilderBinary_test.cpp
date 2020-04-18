@@ -7,6 +7,9 @@
 #include "NodeValue/ScriptAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 
+#include "Service/TypeBuilder/TypeBuilderBinary.h"
+#include "Service/TypeBuilder/TypeBuilderLiteral.h"
+
 TEST_CASE("[TypeBuilderBinary]") {
 	auto scriptCache = ska::ScriptCacheAST{};
 	DataTestContainer data;
