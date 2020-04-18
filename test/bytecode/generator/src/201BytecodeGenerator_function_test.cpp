@@ -276,3 +276,32 @@ TEST_CASE("[BytecodeGenerator] Field access affectation") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(astPtr));
 }
+
+TEST_CASE("[BytecodeGenerator] callback array") {
+	constexpr auto progStr =
+		"Default = function() do end\n"
+
+		"call = function(callback: Default[]) do\n"
+			"callback[0]()\n"
+		"end\n"
+
+		"call([Default])\n";
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
+	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
+
+	BytecodeCompare(res, {
+		{ska::bytecode::Command::JUMP_REL, "1" },
+		{ska::bytecode::Command::RET },
+		{ska::bytecode::Command::END, "V0", "-2" },
+		{ska::bytecode::Command::JUMP_REL, "4" },
+		{ska::bytecode::Command::POP, "V1" },
+		{ska::bytecode::Command::ARR_ACCESS, "R0", "V1", "0" },
+		{ska::bytecode::Command::JUMP_ABS, "R0" },
+		{ska::bytecode::Command::RET },
+		{ska::bytecode::Command::END, "V2", "-5" },
+		{ska::bytecode::Command::PUSH, "V0" },
+		{ska::bytecode::Command::POP_IN_ARR, "R1", "1" },
+		{ska::bytecode::Command::PUSH, "R1" },
+		{ska::bytecode::Command::JUMP_ABS, "V2" }
+	});
+}
