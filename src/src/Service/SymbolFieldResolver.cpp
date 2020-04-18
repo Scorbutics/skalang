@@ -61,7 +61,7 @@ ska::SymbolFieldResolver& ska::SymbolFieldResolver::operator=(const SymbolFieldR
 }
 
 template<class Variant>
-static ska::ScopedSymbolTable* GetTable(Variant& variant, const std::string name, std::size_t tableIndex) {
+static ska::ScopedSymbolTable* GetTable(Variant& variant, const std::string& name, std::size_t tableIndex) {
 	if (std::holds_alternative<ska::ScopedSymbolTable*>(variant)) {
 		auto* containingTable = std::get<ska::ScopedSymbolTable*>(variant);
 		if (containingTable != nullptr && containingTable->scopes() > tableIndex) {

@@ -12,6 +12,6 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::VARIABLE_AFFECTATION>
     }
 
     auto resultType = node.GetVariableValueNode().type().value();
-    const Symbol* symbolLink = (resultType == ExpressionType::OBJECT || resultType == ExpressionType::FUNCTION) ? node.GetVariableValueNode().symbol() : nullptr;
+    const Symbol* symbolLink = ExpressionTypeIsBuiltIn(resultType.type()) ? nullptr : node.GetVariableValueNode().symbol();
     return { std::move(resultType), std::move(symbolLink) };
 }
