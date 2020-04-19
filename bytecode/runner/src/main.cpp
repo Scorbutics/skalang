@@ -92,9 +92,8 @@ int main(int argc, char* argv[]) {
 
 		auto interpreted = interpreter.interpret(gen.id(), moduleConfiguration.scriptCache);
 
-		if (!failedToRead.empty()) {
-			assert(serializer.serialize(moduleConfiguration.scriptCache, ska::bytecode::SerializationStrategyType::PerScript()));
-		}
+		serializer.serialize(moduleConfiguration.scriptCache, ska::bytecode::SerializationStrategyType::PerScript());
+		
 
 	} catch (std::exception& e) {
 		std::cerr << "Error : " << e.what() << std::endl;
