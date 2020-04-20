@@ -1,6 +1,6 @@
 # skalang
 
-![Example](https://github.com/Scorbutics/skalang/doc/skalang_script_example.gif)
+![Example](https://github.com/Scorbutics/skalang/blob/master/doc/skalang_script_example.gif)
 
 ## Motivation
 ### Why making another 'scripting' language ? Isn't Python / Ruby / TypeScript / LUA / AngelScript enough ?
