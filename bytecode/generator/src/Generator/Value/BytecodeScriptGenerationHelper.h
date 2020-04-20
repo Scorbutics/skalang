@@ -36,7 +36,6 @@ namespace ska {
 		class ScriptCache;
 
 		class ScriptGenerationHelper :
-			public MovableNonCopyable,
 			private UniqueSymbolGetter<'V'>{
 			using VariableGetter = UniqueSymbolGetter<'V'>;
 		public:
@@ -44,8 +43,10 @@ namespace ska {
 			ScriptGenerationHelper(ScriptCache& cache, const ScriptAST& script);
 			ScriptGenerationHelper(ScriptCache& cache, StatementParser& parser, const std::string& scriptName, std::vector<Token> tokens);
 
-			ScriptGenerationHelper(ScriptGenerationHelper&&) = default;
-			ScriptGenerationHelper& operator=(ScriptGenerationHelper&&) = default;
+			ScriptGenerationHelper(ScriptGenerationHelper&&) noexcept = default;
+			ScriptGenerationHelper(const ScriptGenerationHelper&) = delete;
+			ScriptGenerationHelper& operator=(ScriptGenerationHelper&&) noexcept = default;
+			ScriptGenerationHelper& operator=(const ScriptGenerationHelper&) = delete;
 
 			ska::ScriptAST program() const;
 			const ASTNode& rootASTNode() const;

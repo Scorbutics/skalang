@@ -11,6 +11,10 @@
 #include "BytecodeScriptGenerationHelper.h"
 #include "NodeValue/ScriptAST.h"
 
+#ifndef NDEBUG
+#include "Generator/Debug/InstructionsDebugInfo.h"
+#endif
+
 namespace ska {
 	class ASTNode;
 	namespace bytecode {
@@ -27,9 +31,9 @@ namespace ska {
 			ScriptGeneration(ScriptGenerationHelper origin, InstructionOutput instruction = {}, ExportSymbolContainer symbols = {});
 			ScriptGeneration(ScriptCache& cache, std::vector<ska::Token> tokens, const std::string& name);
 
-			ScriptGeneration(ScriptGeneration&&) = default;
+			ScriptGeneration(ScriptGeneration&&) noexcept = default;
 			ScriptGeneration(const ScriptGeneration&) = delete;
-			ScriptGeneration& operator=(ScriptGeneration&&) = default;
+			ScriptGeneration& operator=(ScriptGeneration&&) noexcept = default;
 			ScriptGeneration& operator=(const ScriptGeneration&) = delete;
 			~ScriptGeneration() = default;
 
@@ -64,15 +68,22 @@ namespace ska {
 			void generate(ScriptCache& cache, Generator& generator);
 			void generate(ScriptCache& cache, InstructionOutput instructions);
 
+			#ifndef NDEBUG
+			void printDebugInfo(std::ostream& stream) { m_debugInfo.print(stream, m_generated); }
+			#endif
+
 		private:
 			friend std::ostream& operator<<(std::ostream& stream, const ScriptGeneration&);
 			friend bool operator==(const ScriptGeneration& left, const ScriptGeneration& right);
 			friend bool operator!=(const ScriptGeneration& left, const ScriptGeneration& right);
-			//void push(ScriptGeneration output);
 
 			ScriptGenerationHelper m_origin;
 			ExportSymbolContainer m_exports;
 			InstructionOutput m_generated;
+
+			#ifndef NDEBUG
+			InstructionsDebugInfo m_debugInfo;
+			#endif
 		};
 
 		std::ostream& operator<<(std::ostream& stream, const ScriptGeneration&);

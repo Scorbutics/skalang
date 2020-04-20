@@ -72,6 +72,29 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation 2 (field function call)"
 	CHECK(*firstCellValue == "lol123titi4");
 }
 
+TEST_CASE("[BytecodeInterpreter] everything inside factory function return is relative to object instance") {
+	constexpr auto progStr =
+	"TestFcty = function(value_: string): var do\n"
+		"return {\n"
+			"value = function(): string do\n"
+				"return value_\n"
+			"end\n"
+		"}\n"
+	"end\n"
+
+	"toto = TestFcty(\"toto\")\n"
+	"titi = TestFcty(\"titi\")\n"
+    
+	"toto.value() + titi.value()\n";
+
+	auto [script, data] = Interpret(progStr);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
+	auto res = interpreted->variable(0);
+	auto firstCellValue = res.nodeval<ska::StringShared>();
+	CHECK(*firstCellValue == "tototiti");
+}
+
 // We have to check that calling a function several times with different parameters
 // still refers to the same function and the resulting value is different
 TEST_CASE("[BytecodeInterpreter] Custom object creation 3 (double field function call)") {

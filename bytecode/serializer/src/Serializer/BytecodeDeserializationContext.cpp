@@ -56,7 +56,7 @@ void ska::bytecode::DeserializationContext::declare(const std::string& scriptNam
 		output.push(std::move(ins));
 	}
 	auto helper = std::move(m_cache.at(scriptName).helper());
-	m_cache.at(scriptName) = ScriptGeneration{ std::move(helper), std::move(output) };
+	m_cache.at(scriptName) = std::move(ScriptGeneration{ std::move(helper), std::move(output) });
 	LOG_INFO << "Script \"" << scriptName << "\" has index " << m_cache.id(scriptName);
 }
 

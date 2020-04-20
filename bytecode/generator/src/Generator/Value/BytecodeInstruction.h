@@ -24,6 +24,11 @@ namespace ska {
 
 			Instruction() = default;
 
+			Instruction(Instruction&&) noexcept = default;
+			Instruction(const Instruction&) = default;
+			Instruction& operator=(Instruction&&) noexcept = default;
+			Instruction& operator=(const Instruction&) = default;
+
 			auto command() const { return m_command; }
 			const auto& left() const { return m_left; }
 			const auto& right() const { return m_right;	}

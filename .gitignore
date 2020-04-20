@@ -1,8 +1,9 @@
 ﻿**/CMakeFiles
 **/lib
-**/Debug
+bin/Debug
 bin/Release
 bin/RelWithDebInfo
+Win32/
 x64/
 **.cmake
 **.vcxproj

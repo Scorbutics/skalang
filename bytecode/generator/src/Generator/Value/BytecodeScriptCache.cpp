@@ -88,3 +88,12 @@ const ska::NativeFunction& ska::bytecode::ScriptCache::getBinding(ScriptVariable
 	}
 	return *binding;
 }
+
+void ska::bytecode::ScriptCache::printDebugInfo(std::ostream& stream) const {
+#ifndef NDEBUG
+	for (const auto& script : *this) {
+		stream << "Debug \"" << script->name() << std::endl << "\" info : ";
+		script->printDebugInfo(stream);
+	}
+#endif
+}

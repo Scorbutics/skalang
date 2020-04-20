@@ -120,6 +120,8 @@ namespace ska {
 			return m_type != t1.m_type || m_content != t1.m_content;
 		}
 
+		//void print(std::ostream& stream, const ReservedKeywordsPool& pool);
+
 	private:
 		void init(std::size_t c, TokenType t) {
 			m_type = t;
@@ -141,17 +143,6 @@ namespace ska {
 		friend std::ostream& operator<<(std::ostream& stream, const Token& token);
 	};
 
-	inline std::ostream& operator<<(std::ostream& stream, const Token& token) {
-		if (token.m_type == TokenType::EMPTY) {
-			return stream;
-		}
-
-		if (token.m_type == TokenType::RESERVED) {				
-			stream << TokenGrammarSTR[std::get<std::size_t>(token.m_content)];
-		}
-
-		stream << (std::holds_alternative<std::string>(token.m_content) ? std::get<std::string>(token.m_content) : "error variant");
-		return stream;
-	}
+	std::ostream& operator<<(std::ostream& stream, const Token& token);
 
 }

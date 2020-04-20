@@ -5,7 +5,8 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::Operand);
 
 ska::bytecode::Operand::Operand(const ASTNode& node) :
-	m_type(OperandType::PURE) {
+	m_type(OperandType::PURE),
+	m_positionInScript(node.positionInScript()) {
 
 	SLOG(LogLevel::Info) << "Converting \"" << node.name() << "\" to \"" << node.type().value() << "\"";
 

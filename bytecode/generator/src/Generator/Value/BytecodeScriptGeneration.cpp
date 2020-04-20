@@ -13,13 +13,17 @@ static ska::bytecode::ScriptGenerationHelper AddScript(ska::bytecode::ScriptCach
 }
 
 ska::bytecode::ScriptGeneration::ScriptGeneration(ScriptCache& cache, std::vector<ska::Token> tokens, const std::string& name) :
-	ScriptGeneration(AddScript(cache, std::move(tokens), name)) {
+	ScriptGeneration(std::move(AddScript(cache, std::move(tokens), name))) {
 }
 
 ska::bytecode::ScriptGeneration::ScriptGeneration(ScriptGenerationHelper origin, InstructionOutput instruction, ExportSymbolContainer symbols) :
 	m_origin(std::move(origin)),
 	m_generated(std::move(instruction)),
-	m_exports(std::move(symbols)) {
+	m_exports(std::move(symbols))
+#ifndef NDEBUG
+	, m_debugInfo(*this)
+#endif
+	{
 }
 
 const ska::ASTNode& ska::bytecode::ScriptGeneration::rootASTNode() const {

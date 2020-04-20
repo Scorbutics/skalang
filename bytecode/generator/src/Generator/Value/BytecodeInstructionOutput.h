@@ -17,6 +17,11 @@ namespace ska {
 
 		class InstructionOutput {
 		public:
+			InstructionOutput(InstructionOutput&&) noexcept = default;
+			InstructionOutput(const InstructionOutput&) = delete;
+			InstructionOutput& operator=(InstructionOutput&&) noexcept = default;
+			InstructionOutput& operator=(const InstructionOutput&) = delete;
+			~InstructionOutput() = default;
 
 			InstructionOutput(ScriptGeneration script);
 

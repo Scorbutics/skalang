@@ -29,6 +29,8 @@ namespace ska {
 
         ScriptCacheAST astCache;
 
+        void printDebugInfo(std::ostream& stream) const;
+
     private:
       SymbolInfosContainer m_symbolInfo;
       order_indexed_string_map<NativeFunctionPtr> m_bindings;

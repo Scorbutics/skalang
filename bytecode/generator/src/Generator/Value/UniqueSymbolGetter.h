@@ -2,21 +2,30 @@
 
 #include <unordered_map>
 #include <tuple>
+#include <memory>
 #include <optional>
 #include "BytecodeOperand.h"
 
 namespace ska {
   namespace bytecode {
     class UniqueSymbolGetterBase {
-			using SymbolUIDContainer = std::unordered_map<const Symbol*, std::size_t>;
+			//MSVC 2017 does not like noexcept move constructor with unordered_map contained,
+			//because it thinks unordered_map move constructor is not noexcept...
+			//so we wrap the map into a std::unique_ptr as a workaround
+			using SymbolUIDContainer = std::unique_ptr<std::unordered_map<const Symbol*, std::size_t>>;
 		public:
 			virtual ~UniqueSymbolGetterBase() = default;
 
 		protected:
-			UniqueSymbolGetterBase(char symbol) : m_symbol(symbol) {}
+			UniqueSymbolGetterBase(char symbol) : m_symbol(symbol), m_container(std::make_unique<std::unordered_map<const Symbol*, std::size_t>>()) {}
+
+			UniqueSymbolGetterBase(UniqueSymbolGetterBase&&) noexcept = default;
+			UniqueSymbolGetterBase& operator=(UniqueSymbolGetterBase&&) noexcept = default;
+			UniqueSymbolGetterBase& operator=(const UniqueSymbolGetterBase&) = delete;
+			UniqueSymbolGetterBase(const UniqueSymbolGetterBase&) = delete;
 
 			std::pair<Operand, bool> query(std::size_t script, const ASTNode& node);
-			std::pair<Operand, bool> query(std::size_t script, const Symbol& symbol);
+			std::pair<Operand, bool> query(std::size_t script, const Symbol& symbol, Cursor positionInScript = {});
 			std::optional<Operand> get(std::size_t script, const Symbol& symbol) const;
 			void declare(std::size_t script, const Symbol& symbol, Operand operand);
 
@@ -31,6 +40,10 @@ namespace ska {
 
 		public:
 			UniqueSymbolGetter() : UniqueSymbolGetterBase(SymbolChar) {}
+			UniqueSymbolGetter(UniqueSymbolGetter&&) noexcept = default;
+			UniqueSymbolGetter& operator=(UniqueSymbolGetter&&) noexcept = default;
+			UniqueSymbolGetter& operator=(const UniqueSymbolGetter&) = delete;
+			UniqueSymbolGetter(const UniqueSymbolGetter&) = delete;
 			~UniqueSymbolGetter() override = default;
 		};
   }

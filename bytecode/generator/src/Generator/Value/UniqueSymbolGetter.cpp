@@ -11,14 +11,14 @@ std::pair<ska::bytecode::Operand, bool> ska::bytecode::UniqueSymbolGetterBase::q
 		return std::make_pair(Operand { node }, false);
 	}
 
-	return query(script, *node.symbol());
+	return query(script, *node.symbol(), node.positionInScript());
 }
 
-std::pair<ska::bytecode::Operand, bool> ska::bytecode::UniqueSymbolGetterBase::query(std::size_t script, const Symbol& symbol) {
+std::pair<ska::bytecode::Operand, bool> ska::bytecode::UniqueSymbolGetterBase::query(std::size_t script, const Symbol& symbol, Cursor positionInScript) {
 	bool isNew = false;
-	auto varCount = m_container.find(&symbol);
-	if (varCount == m_container.end()) {
-		varCount = m_container.emplace(&symbol, m_count++).first;
+	auto varCount = m_container->find(&symbol);
+	if (varCount == m_container->end()) {
+		varCount = m_container->emplace(&symbol, m_count++).first;
 		isNew = true;
 	}
 	auto ss = std::stringstream{};
@@ -26,12 +26,12 @@ std::pair<ska::bytecode::Operand, bool> ska::bytecode::UniqueSymbolGetterBase::q
 
 	SLOG(ska::LogLevel::Debug) << "Querying symbol node \"" << symbol.name() << "\" with value " << ss.str() << (isNew ? " (new)" : "") << " address " << &symbol;
 
-	return std::make_pair(Operand { ScriptVariableRef{ varCount->second, script }, OperandType::VAR}, isNew);
+	return std::make_pair(Operand { ScriptVariableRef{ varCount->second, script }, OperandType::VAR, std::move(positionInScript)}, isNew);
 }
 
 std::optional<ska::bytecode::Operand> ska::bytecode::UniqueSymbolGetterBase::get(std::size_t script, const Symbol& symbol) const {
-	auto varCount = m_container.find(&symbol);
-	if (varCount == m_container.end()) {
+	auto varCount = m_container->find(&symbol);
+	if (varCount == m_container->end()) {
 		SLOG(ska::LogLevel::Debug) << "No symbol \"" << symbol.name() << "\" found in script id " << script << ", returning new operand";
 		return {};
 	}
@@ -39,7 +39,7 @@ std::optional<ska::bytecode::Operand> ska::bytecode::UniqueSymbolGetterBase::get
 }
 
 void ska::bytecode::UniqueSymbolGetterBase::declare(std::size_t script, const Symbol& symbol, Operand operand) {
-	auto varCount = m_container.find(&symbol);
+	auto varCount = m_container->find(&symbol);
 
 	if (!std::holds_alternative<ScriptVariableRef>(operand.content())) {
 		auto ss = std::stringstream{};
@@ -48,8 +48,8 @@ void ska::bytecode::UniqueSymbolGetterBase::declare(std::size_t script, const Sy
 	}
 
 	const auto wantedSymbolId = operand.as<ScriptVariableRef>().variable;
-	if (varCount == m_container.end()) {
-		varCount = m_container.emplace(&symbol, wantedSymbolId).first;
+	if (varCount == m_container->end()) {
+		varCount = m_container->emplace(&symbol, wantedSymbolId).first;
 	} else if (varCount->second != wantedSymbolId) {
 		auto ss = std::stringstream{}; 
 		ss << "already existing symbol id for the symbol \"" << symbol.name() << "\"";

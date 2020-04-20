@@ -1,3 +1,4 @@
+#include <iostream>
 #include <doctest.h>
 #include <tuple>
 #include "Config/LoggerConfigLang.h"
@@ -275,6 +276,32 @@ TEST_CASE("[BytecodeGenerator] Field access affectation") {
 		"t.test = 1122\n";
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(astPtr));
+}
+
+TEST_CASE("[BytecodeGenerator] everything inside factory function return is relative to object instance") {
+	constexpr auto progStr =
+	"TestFcty = function(value_: string): var do\n"
+		"return {\n"
+			"value = function(): string do\n"
+				"return value_\n"
+			"end\n"
+		"}\n"
+	"end\n"
+
+	"toto = TestFcty(\"toto\")\n"
+	"titi = TestFcty(\"titi\")\n"
+    
+	"toto.value()\n"
+	"titi.value()\n";
+
+	// We expect toto.value() == "toto" and titi.value() == "titi"
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
+	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
+
+	ska::bytecode::InstructionsDebugInfo{ progStr, 50 }.print(std::cout, *data.storage, res.id());
+
+	BytecodeCompare(res, {
+	});
 }
 
 TEST_CASE("[BytecodeGenerator] callback array") {

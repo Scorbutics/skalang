@@ -7,30 +7,7 @@
 #include "Generator/BytecodeCommand.h"
 #include "Runtime/Value/StringShared.h"
 #include "Runtime/Value/ScriptVariableRef.h"
-
-/*
-Opcode : enum (MOV, SUB, ADD, MUL, DIV...)
-
-Operand :
-	- std::string
-	- Type
-
-Register : operand
-
-Instruction :
-	- opcode
-	- left operand
-	- right operand
-	- dest operand
-	(- debug infos :
-		- line
-		- column) -> not for now...
-
-
-
-InstructionOutput :
-	- std::vector<Instruction>
-*/
+#include "NodeValue/Cursor.h"
 
 namespace ska {
 	class ASTNode;
@@ -73,16 +50,23 @@ namespace ska {
 			
 			Operand() = default;
 
+			Operand(Operand&&) noexcept = default;
+			Operand(const Operand&) = default;
+			Operand& operator=(Operand&&) noexcept = default;
+			Operand& operator=(const Operand&) = default;
+
 			Operand(const ASTNode& node);
 
-			Operand(OperandVariant var, OperandType type) :
+			Operand(OperandVariant var, OperandType type, Cursor position = {}) :
 				m_content(std::move(var)),
-				m_type(type){
+				m_type(type),
+				m_positionInScript(std::move(position)) {
 			}
 
 			bool empty() const { return m_type == OperandType::EMPTY; }
 			const auto& content() const { return m_content; }
 			const auto type() const { return m_type; }
+			const auto& position() const { return m_positionInScript; }
 
 			std::string toString() const;
 
@@ -103,6 +87,7 @@ namespace ska {
 
 			OperandVariant m_content {};
 			OperandType m_type = OperandType::EMPTY;
+			Cursor m_positionInScript;
 		};
 
 		using Register = Operand;
