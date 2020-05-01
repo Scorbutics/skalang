@@ -4,6 +4,7 @@
 #include "ASTNodePtr.h"
 #include "Service/SymbolTable.h"
 #include "Service/TokenReader.h"
+#include "ParsingContext.h"
 #include "Token.h"
 
 namespace ska {
@@ -30,6 +31,7 @@ namespace ska {
 		friend class ScriptAST;
 
 		ScriptCacheAST& m_cache;
+		ParsingContextStack m_parsingContexts;
 		TokenReader m_input;
 		SymbolTable m_symbols;
 		ASTNodePtr m_ast;

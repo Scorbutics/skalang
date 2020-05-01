@@ -68,8 +68,13 @@ ska::ASTNodePtr ska::MatcherReturn::matchBuiltIn(ScriptAST& input) {
 
 ska::ASTNodePtr ska::MatcherReturn::matchField(ScriptAST& input) {
     auto field = input.reader().match(TokenType::IDENTIFIER);
+
+    input.pushContext({ ParsingContextType::AFFECTATION, field });
+
     input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
     auto fieldValue = input.expr(m_parser);
+
+    input.popContext();
 
     SLOG(ska::LogLevel::Info) << "Constructor with field \"" << field << "\" and field value \"" << (*fieldValue) << "\"";
 

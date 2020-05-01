@@ -81,3 +81,21 @@ ska::ASTNodePtr ska::ScriptAST::optexpr(StatementParser& parser, const Token& mu
 	return parser.optexpr(*this, mustNotBe);
 }
 
+void ska::ScriptAST::pushContext(ParsingContext context) {
+	m_handle->m_parsingContexts.push_back(std::move(context));
+}
+
+void ska::ScriptAST::popContext() {
+	if (!m_handle->m_parsingContexts.empty()) {
+		m_handle->m_parsingContexts.pop_back();
+	}
+}
+
+ska::Token* ska::ScriptAST::contextOf(ParsingContextType type) const {
+	for (auto it = m_handle->m_parsingContexts.rbegin(); it != m_handle->m_parsingContexts.rend(); it++) {
+		if (it->type == type) {
+			return &it->owner;
+		}
+	}
+	return nullptr;
+}
