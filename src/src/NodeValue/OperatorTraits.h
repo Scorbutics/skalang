@@ -25,6 +25,7 @@ namespace ska {
 			case Operator::FUNCTION_DECLARATION:
 			case Operator::AFFECTATION:
 			case Operator::VARIABLE_AFFECTATION:
+			case Operator::PARAMETER_DECLARATION:
 			case Operator::ARRAY_USE:
 			case Operator::ARRAY_DECLARATION:
 				return true;

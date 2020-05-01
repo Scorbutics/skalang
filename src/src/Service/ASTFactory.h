@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <variant>
+#include <deque>
 #include <memory>
 
 #include "Service/TypeBuilder/TypeBuilderOperator.h"
@@ -53,6 +54,17 @@ namespace ska {
 		template<Operator o>
 		static ASTNodePtr MakeNode(std::vector<ASTNodePtr> children) {
 			return ASTFactory::template MakeNode<o>(Token {}, std::move(children));
+		}
+
+		template<Operator o>
+		static ASTNodePtr MakeNode(std::deque<ASTNodePtr> children) {
+			return ASTFactory::template MakeNode<o>(Token{}, std::move(children));
+		}
+		
+		template<Operator o>
+		static ASTNodePtr MakeNode(Token token, std::deque<ASTNodePtr> children) {
+			ASTFactory::template CheckTokenAssociatedWithOperator<o>(token);
+			return std::unique_ptr<ASTNode>(new ASTNode(o, std::move(token), std::move(children)));
 		}
 
 		template <Operator o>

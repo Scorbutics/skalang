@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <deque>
 #include <variant>
 #include <memory>
 #include <optional>
@@ -69,6 +70,7 @@ namespace ska {
     	explicit ASTNode(Token t, ASTNodePtr l = nullptr, ASTNodePtr r = nullptr);
 
     	ASTNode(Operator o, Token identifierToken = Token{}, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{});
+		ASTNode(Operator o, Token identifierToken, std::deque<ASTNodePtr> children);
     	ASTNode(Operator o, Token identifierToken = Token{});
 
 		void refreshSymbolType();
