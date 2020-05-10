@@ -38,7 +38,7 @@ ska::ASTNodePtr ska::MatcherBlock::matchNoBoundaries(ScriptAST& input, std::unor
 	m_parser.observable_priority_queue<BlockTokenEvent>::notifyObservers(startEvent);
 
 	auto blockNodeStatements = std::vector<ASTNodePtr>{};
-	while (!input.reader().expectOneType(stopToken)) {
+	while (!input.reader().expectOneType(stopToken) && !input.reader().empty()) {
 		auto optionalStatement = input.optstatement(m_parser, Token{});
 		if (!optionalStatement->logicalEmpty()) {
 			blockNodeStatements.push_back(std::move(optionalStatement));

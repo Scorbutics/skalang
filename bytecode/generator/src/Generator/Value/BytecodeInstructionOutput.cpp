@@ -21,9 +21,12 @@ void ska::bytecode::InstructionOutput::push(InstructionOutput operand) {
 	} else {
 		m_operand = operand.m_operand;
 	}
+
+	m_generatedRegisters.insert(m_generatedRegisters.end(), std::make_move_iterator(operand.m_generatedRegisters.begin()), std::make_move_iterator(operand.m_generatedRegisters.end()));
+	m_generatedVariables.insert(m_generatedVariables.end(), std::make_move_iterator(operand.m_generatedVariables.begin()), std::make_move_iterator(operand.m_generatedVariables.end()));
 }
 
-void ska::bytecode::InstructionOutput::push(Operand operand) {
+void ska::bytecode::InstructionOutput::push(OperandUse operand) {
 	push(InstructionOutput {std::move(operand) });
 }
 

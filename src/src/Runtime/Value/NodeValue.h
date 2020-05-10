@@ -10,12 +10,14 @@
 #include "TokenVariant.h"
 #include "NodeValueArray.h"
 #include "NodeValueMap.h"
+#include "NodeValueFunctionMember.h"
 
 namespace ska {
 	class NodeValue;
 
 	using NodeValueVariant_ = std::variant<
 		TokenVariant,
+		NodeValueFunctionMember,
 		NodeValueArray,
 		NodeValueMap,
 		NodeValue*
@@ -68,6 +70,8 @@ namespace ska {
 			m_emptyVariant = arg.m_emptyVariant;
 			return *this;
 		}
+		
+		void release();
 
 		NodeValue(const NodeValue&) = default;
 		~NodeValue() = default;
@@ -123,6 +127,7 @@ namespace ska {
 
 		NodeValueVariant_ m_variant;
 		bool m_emptyVariant = false;
+		bool m_dirty = false;
 	};
 
 	bool operator==(const NodeValue& lhs, const NodeValue& rhs);

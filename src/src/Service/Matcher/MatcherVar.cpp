@@ -35,14 +35,22 @@ ska::ASTNodePtr ska::MatcherVar::matchDeclaration(ScriptAST& input) {
 
 ska::ASTNodePtr ska::MatcherVar::matchAffectation(ScriptAST& input, ASTNodePtr varAffectedNode) {
 	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>());
+	
+	const auto isVariableAffectation = varAffectedNode->size() == 0 && varAffectedNode->tokenType() == TokenType::IDENTIFIER;
+	if (isVariableAffectation) {
+		input.pushContext({ ParsingContextType::AFFECTATION, Token{ varAffectedNode->name(), varAffectedNode->tokenType(), varAffectedNode->positionInScript() } });
+	}
+
 	auto expressionNode = input.expr(m_parser);
 	if (expressionNode == nullptr) {
 		throw std::runtime_error("syntax error : Affectation incomplete : no expression");
 	}
 
 	auto affectationNode = ASTNodePtr{};
-	if (varAffectedNode->size() == 0 && varAffectedNode->tokenType() == TokenType::IDENTIFIER) {
-		affectationNode = ASTFactory::MakeNode<Operator::VARIABLE_AFFECTATION>(Token{ varAffectedNode->name(), varAffectedNode->tokenType(), varAffectedNode->positionInScript() }, std::move(expressionNode));
+	if (isVariableAffectation) {
+		input.popContext();
+		auto nodeName = Token{ varAffectedNode->name(), varAffectedNode->tokenType(), varAffectedNode->positionInScript() };
+		affectationNode = ASTFactory::MakeNode<Operator::VARIABLE_AFFECTATION>(std::move(nodeName), std::move(expressionNode));
 		auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_AFFECTATION>(*affectationNode, input);
 		m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 	} else {

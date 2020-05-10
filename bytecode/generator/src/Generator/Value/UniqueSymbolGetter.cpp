@@ -5,16 +5,16 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::UniqueSymbolGetterBase);
 
-std::pair<ska::bytecode::Operand, bool> ska::bytecode::UniqueSymbolGetterBase::query(std::size_t script, const ASTNode& node) {
+ska::bytecode::OperandUse ska::bytecode::UniqueSymbolGetterBase::query(std::size_t script, const ASTNode& node) {
 	if (node.symbol() == nullptr) {
 		SLOG(ska::LogLevel::Debug) << "Querying symbol node with value \"" << node.name() << "\" (no symbol)";
-		return std::make_pair(Operand { node }, false);
+		return OperandUse { node };
 	}
 
 	return query(script, *node.symbol(), node.positionInScript());
 }
 
-std::pair<ska::bytecode::Operand, bool> ska::bytecode::UniqueSymbolGetterBase::query(std::size_t script, const Symbol& symbol, Cursor positionInScript) {
+ska::bytecode::OperandUse ska::bytecode::UniqueSymbolGetterBase::query(std::size_t script, const Symbol& symbol, Cursor positionInScript) {
 	bool isNew = false;
 	auto varCount = m_container->find(&symbol);
 	if (varCount == m_container->end()) {
@@ -26,7 +26,9 @@ std::pair<ska::bytecode::Operand, bool> ska::bytecode::UniqueSymbolGetterBase::q
 
 	SLOG(ska::LogLevel::Debug) << "Querying symbol node \"" << symbol.name() << "\" with value " << ss.str() << (isNew ? " (new)" : "") << " address " << &symbol;
 
-	return std::make_pair(Operand { ScriptVariableRef{ varCount->second, script }, OperandType::VAR, std::move(positionInScript)}, isNew);
+	auto result = OperandUse{ ScriptVariableRef{ varCount->second, script }, OperandType::VAR, std::move(positionInScript) };
+	result.isFirstTimeUsed = isNew;
+	return result;
 }
 
 std::optional<ska::bytecode::Operand> ska::bytecode::UniqueSymbolGetterBase::get(std::size_t script, const Symbol& symbol) const {

@@ -55,7 +55,7 @@ namespace ska {
 
 		void pushContext(ParsingContext context);
 		void popContext();
-		Token* contextOf(ParsingContextType type) const;
+		Token* contextOf(ParsingContextType type, std::size_t maxDepth = 0) const;
 
 		const auto& rootNode() const {
 			assert(m_handle->m_ast != nullptr);

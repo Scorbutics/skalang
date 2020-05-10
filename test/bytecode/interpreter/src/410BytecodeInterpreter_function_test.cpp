@@ -1,5 +1,6 @@
 #include <doctest.h>
 #include <tuple>
+#include <iostream>
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeInterpreterTest.h"
 
@@ -70,29 +71,6 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation 2 (field function call)"
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<ska::StringShared>();
 	CHECK(*firstCellValue == "lol123titi4");
-}
-
-TEST_CASE("[BytecodeInterpreter] everything inside factory function return is relative to object instance") {
-	constexpr auto progStr =
-	"TestFcty = function(value_: string): var do\n"
-		"return {\n"
-			"value = function(): string do\n"
-				"return value_\n"
-			"end\n"
-		"}\n"
-	"end\n"
-
-	"toto = TestFcty(\"toto\")\n"
-	"titi = TestFcty(\"titi\")\n"
-    
-	"toto.value() + titi.value()\n";
-
-	auto [script, data] = Interpret(progStr);
-	auto& gen = data.generator->generate(*data.storage, std::move(script));
-	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
-	auto res = interpreted->variable(0);
-	auto firstCellValue = res.nodeval<ska::StringShared>();
-	CHECK(*firstCellValue == "tototiti");
 }
 
 // We have to check that calling a function several times with different parameters
@@ -183,4 +161,29 @@ TEST_CASE("[BytecodeInterpreter] using a callback function as a parameter withou
 	auto res = data.interpreter->interpret(gen.id(), *data.storage)->variable(0);
 	auto firstCellValue = res.nodeval<long>();
 	CHECK(firstCellValue == 789);
+}
+
+TEST_CASE("[BytecodeInterpreter] everything inside factory function is relative to object instance") {
+	constexpr auto progStr =
+		"TestFcty = function(value_: string): var do\n"
+		"return {\n"
+		"value = function(): string do\n"
+		"return value_\n"
+		"end\n"
+		"}\n"
+		"end\n"
+
+		"toto = TestFcty(\"toto\")\n"
+		"titi = TestFcty(\"titi\")\n"
+		"out = toto.value() + titi.value()\n";
+
+	// We expect toto.value() == "toto" and titi.value() == "titi"
+	auto [script, data] = Interpret(progStr);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	
+	ska::bytecode::InstructionsDebugInfo{ progStr, 50 }.print(std::cout, *data.storage, gen.id());
+
+	auto res = data.interpreter->interpret(gen.id(), *data.storage)->variable(0);
+	auto firstCellValue = res.nodeval<ska::StringShared>();
+	CHECK(*firstCellValue == "tototiti");
 }

@@ -133,7 +133,7 @@ bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
 		if (actualNameSymbol == nullptr) {
 			throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
 		}
-		actualNameSymbol->close();
+		actualNameSymbol->closeTable();
     break;
 	}
 	return true;
@@ -172,16 +172,17 @@ bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
 		auto& symbol = m_currentTable->emplace(token.name());
 		SLOG(ska::LogLevel::Info) << "\t\tNew function : adding a nested symbol table named \"" << token.name() << "\"";
 		m_currentTable = &m_currentTable->createNested(&symbol);
-		symbol.open();
+		symbol.openTable();
 		token.rootNode().linkSymbol(symbol);
     } break;
 
+	case FunctionTokenEventType::FACTORY_DECLARATION_STATEMENT:
     case FunctionTokenEventType::DECLARATION_STATEMENT: {
 		SLOG(ska::LogLevel::Debug) << "\t\tFunction end: going up in nested symbol table hierarchy";
 		m_currentTable = &m_currentTable->parent();
 		auto * symbol = (*m_currentTable)[token.name()];
 		assert(symbol != nullptr);
-		symbol->close();
+		symbol->closeTable();
 		token.rootNode().linkSymbol(*symbol);
 	} break;
 

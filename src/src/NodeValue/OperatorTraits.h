@@ -7,6 +7,7 @@ namespace ska {
 
 		static constexpr bool isNamed(Operator o) {
 			switch (o) {
+				case Operator::FACTORY_PROTOTYPE_DECLARATION:
 				case Operator::FUNCTION_PROTOTYPE_DECLARATION:
 				case Operator::FUNCTION_DECLARATION:
 				case Operator::VARIABLE_AFFECTATION:

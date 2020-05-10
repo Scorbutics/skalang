@@ -278,7 +278,7 @@ TEST_CASE("[BytecodeGenerator] Field access affectation") {
 	auto& gen = data.generator->generate(*data.storage, std::move(astPtr));
 }
 
-TEST_CASE("[BytecodeGenerator] everything inside factory function return is relative to object instance") {
+TEST_CASE("[BytecodeGenerator] everything inside factory function is relative to object instance") {
 	constexpr auto progStr =
 	"TestFcty = function(value_: string): var do\n"
 		"return {\n"
@@ -290,9 +290,12 @@ TEST_CASE("[BytecodeGenerator] everything inside factory function return is rela
 
 	"toto = TestFcty(\"toto\")\n"
 	"titi = TestFcty(\"titi\")\n"
-    
-	"toto.value()\n"
-	"titi.value()\n";
+
+	"toutou = toto.value\n"
+	"if true\n"
+	"toutou = titi.value\n"
+	"end\n"
+	"toutou()\n";
 
 	// We expect toto.value() == "toto" and titi.value() == "titi"
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
@@ -301,6 +304,41 @@ TEST_CASE("[BytecodeGenerator] everything inside factory function return is rela
 	ska::bytecode::InstructionsDebugInfo{ progStr, 50 }.print(std::cout, *data.storage, res.id());
 
 	BytecodeCompare(res, {
+		{ska::bytecode::Command::JUMP_REL, "18"},
+		{ska::bytecode::Command::POP, "V0"},
+		{ska::bytecode::Command::JUMP_REL, "3"},
+		{ska::bytecode::Command::PUSH, "V0"},
+		{ska::bytecode::Command::POP_IN_VAR, "R0", "1"},
+		{ska::bytecode::Command::RET, "R0" },
+		{ska::bytecode::Command::END, "V1", "-4" },
+		{ska::bytecode::Command::JUMP_ABS, "V1" },
+		{ska::bytecode::Command::POP, "R1" },
+		{ska::bytecode::Command::MOV, "V2", "R1" },
+		{ska::bytecode::Command::PUSH, "V2" },
+		{ska::bytecode::Command::JUMP_REL, "3" },
+		{ska::bytecode::Command::POP, "V2" },
+		{ska::bytecode::Command::ARR_ACCESS, "R2", "V2", "0" },
+		{ska::bytecode::Command::RET, "R2" },
+		{ska::bytecode::Command::END, "V3", "-4" },
+		{ska::bytecode::Command::PUSH, "V3" },
+		{ska::bytecode::Command::POP_IN_VAR, "R3", "2" },
+		{ska::bytecode::Command::RET, "R3" },
+		{ska::bytecode::Command::END, "V4", "-19" },
+		{ska::bytecode::Command::PUSH, "toto" },
+		{ska::bytecode::Command::JUMP_ABS, "V4" },
+		{ska::bytecode::Command::POP, "R4" },
+		{ska::bytecode::Command::MOV, "V5", "R4" },
+		{ska::bytecode::Command::PUSH, "titi" },
+		{ska::bytecode::Command::JUMP_ABS, "V4" },
+		{ska::bytecode::Command::POP, "R5" },
+		{ska::bytecode::Command::MOV, "V6", "R5" },
+		{ska::bytecode::Command::ARR_MEMBER_ACCESS, "R6", "V5", "1" },
+		{ska::bytecode::Command::MOV, "V7", "R6" },
+		{ska::bytecode::Command::JUMP_NIF, "2", "1" },
+		{ska::bytecode::Command::ARR_MEMBER_ACCESS, "R7", "V6", "1" },
+		{ska::bytecode::Command::MOV, "V7", "R7" },
+		{ska::bytecode::Command::JUMP_MEMBER, "V7" },
+		{ska::bytecode::Command::POP, "R8" }
 	});
 }
 

@@ -37,15 +37,17 @@ const std::string& ska::bytecode::ScriptGenerationHelper::name() const {
 }
 
 ska::bytecode::Register ska::bytecode::ScriptGenerationHelper::queryNextRegister() {
-	return { ScriptVariableRef { m_register++, m_index }, OperandType::REG };
+	auto result = Register{ ScriptVariableRef { m_register++, m_index }, OperandType::REG };
+	result.isFirstTimeUsed = true;
+	return result;
 }
 
-ska::bytecode::Operand ska::bytecode::ScriptGenerationHelper::querySymbolOrOperand(const ASTNode& node) {
-	return VariableGetter::query(m_index, node).first;
+ska::bytecode::OperandUse ska::bytecode::ScriptGenerationHelper::querySymbolOrOperand(const ASTNode& node) {
+	return VariableGetter::query(m_index, node);
 }
 
-ska::bytecode::Operand ska::bytecode::ScriptGenerationHelper::querySymbol(const Symbol& symbol) {
-	return VariableGetter::query(m_index, symbol).first;
+ska::bytecode::OperandUse ska::bytecode::ScriptGenerationHelper::querySymbol(const Symbol& symbol) {
+	return VariableGetter::query(m_index, symbol);
 }
 
 void ska::bytecode::ScriptGenerationHelper::declareSymbol(const Symbol& symbol, const Operand& operand) {

@@ -13,7 +13,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	initGroup.push(Instruction{ Command::ARR_LENGTH, collectionLengthVariable, collectionContainer });
 	
 	auto iteratorRegister = node.GetCollectionIteratorIndex().logicalEmpty() ? context.queryNextRegister() : context.querySymbolOrOperand(node.GetCollectionIteratorIndex());
-	initGroup.push(Instruction{ Command::MOV, iteratorRegister, Operand{ 0l, OperandType::PURE} });
+	initGroup.push(Instruction{ Command::MOV, iteratorRegister, OperandUse{ 0l, OperandType::PURE} });
 
 	auto conditionGroup = InstructionOutput{ Instruction{ Command::SUB_I, context.queryNextRegister(), iteratorRegister, collectionLengthVariable} };
 	conditionGroup.push(Instruction { Command::TEST_L, conditionGroup.operand(), conditionGroup.operand() });

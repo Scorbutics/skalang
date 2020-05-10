@@ -153,12 +153,12 @@ bool ska::Symbol::empty() const {
 	return size() == 0;
 }
 
-void ska::Symbol::open() {
+void ska::Symbol::openTable() {
 	m_closed = false;
 	m_data.open();
 }
 
-void ska::Symbol::close() {
+void ska::Symbol::closeTable() {
 	m_closed = true; 
 	m_data.close();
 }
@@ -172,7 +172,7 @@ std::size_t ska::Symbol::id(const Symbol& field) const {
 		}
 	}
 
-	if (m_master != nullptr) {
+	if (m_master != nullptr && m_master != this) {
 		LOG_INFO << "Symbol \"" << field.name() << "\" not found here, looking into master symbol \"" << m_master->name() << "\"";
 		return m_master->id(field);
 	}

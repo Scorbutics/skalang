@@ -91,11 +91,13 @@ void ska::ScriptAST::popContext() {
 	}
 }
 
-ska::Token* ska::ScriptAST::contextOf(ParsingContextType type) const {
-	for (auto it = m_handle->m_parsingContexts.rbegin(); it != m_handle->m_parsingContexts.rend(); it++) {
+ska::Token* ska::ScriptAST::contextOf(ParsingContextType type, std::size_t maxDepth) const {
+	std::size_t index = 0;
+	for (auto it = m_handle->m_parsingContexts.rbegin(); it != m_handle->m_parsingContexts.rend() && (maxDepth == 0 || index < maxDepth); it++) {
 		if (it->type == type) {
 			return &it->owner;
 		}
+		index++;
 	}
 	return nullptr;
 }

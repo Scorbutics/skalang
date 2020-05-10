@@ -115,11 +115,8 @@ ska::ASTNodePtr ska::MatcherType::match(const Type& input) {
 			case ExpressionType::FUNCTION:
 			case ExpressionType::OBJECT: {
 				auto symbol = input.name();
-				if (symbol.empty()) {
-					malformedType(input, " : no symbol in a variable/function type");
-				}
 				SLOG(LogLevel::Info) << "Type " << input << " is an object/function named " << symbol;
-				auto token = Token { symbol, TokenType::IDENTIFIER, {}};
+				auto token = symbol.empty() ? m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>() : Token{ symbol, TokenType::IDENTIFIER, {} };
 				nodes.push_back(ASTFactory::MakeLogicalNode(std::move(token)));
 				nodes.push_back(input.type() == ExpressionType::OBJECT ? ASTFactory::MakeLogicalNode(Token { "", TokenType::RANGE, {}}) : ASTFactory::MakeEmptyNode());
 				nodes.push_back(ASTFactory::MakeEmptyNode());

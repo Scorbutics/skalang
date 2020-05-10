@@ -32,8 +32,8 @@ namespace ska {
 		const Type& type() const { return m_category; }
 		bool changeTypeIfRequired(const Type& type);
 
-		void open();
-		void close();
+		void openTable();
+		void closeTable();
 
 		std::size_t size() const;
 		bool empty() const;

@@ -9,7 +9,10 @@ namespace ska {
 	enum class FunctionTokenEventType {
 		DECLARATION_NAME,		
     	DECLARATION_STATEMENT,
-		CALL
+		FACTORY_PROTOTYPE,
+		FACTORY_DECLARATION_STATEMENT,
+		CALL,
+		MEMBER_CALL
 	};
 
 	class FunctionTokenEvent {

@@ -8,18 +8,18 @@ namespace ska {
 
 		class Instruction {
 		public:
-			Instruction(Command command, Operand dest, Operand left = {}, Operand right = {}) :
+			Instruction(Command command, OperandUse dest, OperandUse left = {}, OperandUse right = {}) :
 				m_command(std::move(command)),
 				m_dest(std::move(dest)),
 				m_left(std::move(left)),
 				m_right(std::move(right)) {
 			}
 
-			Instruction(Command command, std::vector<Operand> operands) :
+			Instruction(Command command, std::vector<OperandUse> operands) :
 				m_command(std::move(command)),
-				m_dest(operands.size() >= 1 ? std::move(operands[0]) : Operand{}),
-				m_left(operands.size() >= 2 ? std::move(operands[1]) : Operand{}),
-				m_right(operands.size() >= 3 ? std::move(operands[2]) : Operand{}) {
+				m_dest(operands.size() >= 1 ? std::move(operands[0]) : OperandUse{}),
+				m_left(operands.size() >= 2 ? std::move(operands[1]) : OperandUse{}),
+				m_right(operands.size() >= 3 ? std::move(operands[2]) : OperandUse{}) {
 			}
 
 			Instruction() = default;
@@ -43,9 +43,9 @@ namespace ska {
 			friend bool operator!=(const Instruction& left, const Instruction& right);
 		private:
 			Command m_command = Command::NOP;
-			Operand m_dest;
-			Operand m_left;
-			Operand m_right;
+			OperandUse m_dest;
+			OperandUse m_left;
+			OperandUse m_right;
 		};
 
 		std::ostream& operator<<(std::ostream& stream, const Instruction&);

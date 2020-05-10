@@ -9,7 +9,7 @@ namespace ska {
   namespace bytecode {
 	template <Command command, class NodeIterator, size_t Modulo = 3>
 		std::size_t ApplyNOperations(Generator& generator, InstructionOutput& output, GenerationContext& script, NodeIterator start, NodeIterator end) {
-			auto temporaryContainer = std::vector<Operand> {};
+			auto temporaryContainer = std::vector<OperandUse> {};
 
 			std::size_t index = 0u;
 			for (auto paramNodeIt = start; paramNodeIt != end; paramNodeIt++) {

@@ -76,6 +76,10 @@ namespace ska {
 				scriptFromOperand(dest).set(dest, std::forward<T>(src));
 			}
 
+			void release(const Operand& dest) {
+				scriptFromOperand(dest).release(dest);
+			}
+
 			ScriptExecutionOutput generateExportedVariables(std::size_t scriptIndex);
 
 			void generate(StatementParser& parser, Generator& generator);

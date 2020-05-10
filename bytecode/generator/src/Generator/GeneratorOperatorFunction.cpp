@@ -18,8 +18,28 @@ namespace ska {
 			return result;
 		}
 
+		static Instruction ClearRange(const std::vector<Operand>& range, const Operand& exception) {
+			if (range.empty()) {
+				return {};
+			}
+
+			if (range.size() == 1 && range[0] != exception) {
+				return Instruction{ Command::CLEAR_RANGE, range[0], range[0] };
+			}
+
+			if (range.back() == exception) {
+				if (range.size() >= 2) {
+					return Instruction{ Command::CLEAR_RANGE, range[0], range[range.size() - 2] };
+				}
+				return Instruction{ Command::CLEAR_RANGE, range[0], range[0] };
+			}
+
+			return Instruction{ Command::CLEAR_RANGE, range[0], range.back() };
+		}
+
 	}
 }
+
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	LOG_DEBUG << "Generating prototype of \"" << node.GetFunctionName() << "\"...";
@@ -34,10 +54,25 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	LOG_DEBUG << "\nGenerated " << valueGroup << " with value " << valueGroup.operand();
 
+	auto cleanUpInstructions = InstructionOutput{};
+	// Function variables Clean-up part
+	auto registerRange = ClearRange(valueGroup.generatedRegisters(), valueGroup.operand());
+	if (registerRange.command() != Command::NOP) {
+		cleanUpInstructions.push(std::move(registerRange));
+	}
+	
+	auto variableRange = ClearRange(valueGroup.generatedVariables(), valueGroup.operand());
+	if (variableRange.command() != Command::NOP) {
+		cleanUpInstructions.push(std::move(variableRange));
+	}
+
 	const auto returningFunctionType = node.GetFunctionPrototype().type().value().back();
 
 	const auto isVoidReturningFunction = returningFunctionType == ExpressionType::VOID;
-	valueGroup.push(Instruction{ Command::RET, isVoidReturningFunction ? Operand{} : valueGroup.operand() });
+
+	auto returnValueOperand = valueGroup.operand();
+	valueGroup.push(std::move(cleanUpInstructions));
+	valueGroup.push(Instruction{ Command::RET, isVoidReturningFunction ? Operand{} : returnValueOperand });
 
 	auto fullFunction = AddRelativeJumpInstruction(std::move(valueGroup));
 	fullFunction.push(Instruction{
@@ -70,6 +105,27 @@ static bool IsInstructionCommandClosed(const ska::bytecode::InstructionOutput& p
 	}
 }
 
+ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_MEMBER_CALL>::generate(OperateOn node, GenerationContext& context) {
+	auto preCallValue = generateNext({context, node.GetFunctionNameNode()});
+	LOG_DEBUG << "Function member call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
+	
+	auto callInstruction = InstructionOutput {};
+	callInstruction.push(Instruction { Command::JUMP_MEMBER, std::move(preCallValue.operand()) });
+	
+	auto result = std::move(preCallValue);
+
+	applyGenerator(ApplyNOperations<Command::PUSH, decltype(node.begin())>, result, context, node.begin(), node.end());
+	LOG_DEBUG << " PUSH result : " << result;
+
+	result.push(std::move(callInstruction));
+	if (node.GetFunctionType().back() != ExpressionType::VOID) {
+		result.push(Instruction{ Command::POP, context.queryNextRegister()});
+	}
+
+	LOG_DEBUG << "Output : " << result;
+	return result;
+}
+
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>::generate(OperateOn node, GenerationContext& context) {
 	auto preCallValue = generateNext({context, node.GetFunctionNameNode()});
 	LOG_DEBUG << "Function call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
@@ -91,7 +147,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 			callInstruction.push(Instruction{ Command::JUMP_ABS, std::move(preCallValue.operand()) });
 		}
 	} else {
-		callInstruction.push(Instruction { Command::JUMP_ABS, std::move(preCallValue.operand()) });
+		callInstruction.push(Instruction { Command::JUMP_ABS, std::move(preCallValue.operand()) });		
 	}
 	auto result = std::move(preCallValue);
 
@@ -99,7 +155,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	LOG_DEBUG << " PUSH result : " << result;
 
 	result.push(std::move(callInstruction));
-	if(node.GetFunctionType().back() != ExpressionType::VOID) {
+	if (node.GetFunctionType().back() != ExpressionType::VOID) {
 		result.push(Instruction{ Command::POP, context.queryNextRegister()});
 	}
 

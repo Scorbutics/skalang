@@ -1,6 +1,0 @@
-Callback = import "callback"
-IOLog = import "bind:std.native.io.log"
-
-defer = function(t1: int, t2: int, t3: int, callback: Callback::Integer) do	
-	callback(t1 + t2 + t3)
-end
