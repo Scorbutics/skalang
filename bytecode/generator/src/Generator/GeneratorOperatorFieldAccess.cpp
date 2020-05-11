@@ -22,7 +22,8 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	if (typeObject == ExpressionType::ARRAY) {
 		if (fieldName == "size") {
 			auto objectValue = generateNext({ context, node.GetObjectNameNode() });
-			return { Instruction{ Command::ARR_LENGTH, context.queryNextRegister(), objectValue.operand() } };
+			objectValue.push({ Instruction{ Command::ARR_LENGTH, context.queryNextRegister(), objectValue.operand() } });
+			return objectValue;
 		}
 		auto ss = std::stringstream{};
 		ss << "trying to access an undeclared built-in field \"" << fieldName << "\" of the type \"" << typeObject << "\"";
