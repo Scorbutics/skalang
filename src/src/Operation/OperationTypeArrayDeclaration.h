@@ -19,6 +19,10 @@ namespace ska {
 			assert(HasArrayType());
         	return node[0].type().value();
     	}
+
+		inline auto* GetArraySymbol() {
+			return node[0].symbol();
+		}
 		
 		auto begin() const {
 			return node.begin();
@@ -43,6 +47,10 @@ namespace ska {
 		inline auto GetArraySubType() const {
 			assert(HasExplicitArrayType());
 			return node[1].type().value();
+		}
+
+		inline auto* GetArraySymbol() {
+			return node[0].symbol();
 		}
 
 		inline auto& GetArrayContent() const {

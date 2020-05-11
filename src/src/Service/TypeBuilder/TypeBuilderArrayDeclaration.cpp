@@ -11,15 +11,15 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::ARRAY_DECLARATION>::b
 	auto type = Type::MakeBuiltIn<ExpressionType::ARRAY>();
 	const auto& subType = node.GetArraySubType();
 	type.add(subType);
-	return type;
+	return { type, node.GetArraySymbol() };
 }
 
 ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::ARRAY_TYPE_DECLARATION>::build(const ScriptAST& script, OperateOn node) {
 	if (!node.HasExplicitArrayType()) {
-		return node.GetArrayContent().type().value();
+		return { node.GetArrayContent().type().value(), node.GetArraySymbol() };
 	}
 	auto type = Type::MakeBuiltIn<ExpressionType::ARRAY>();
 	const auto& subType = node.GetArraySubType();
 	type.add(subType);
-	return type;
+	return { type, node.GetArraySymbol() };
 }
