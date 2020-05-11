@@ -95,7 +95,11 @@ ska::NodeValue& ska::NodeValue::dereference(const NodeValueVariant_& variant) {
 
 void ska::NodeValue::transferValueToOwned(NodeValueVariant_ arg) {
 	if (m_dirty) {
-		m_variant = std::move(arg);
+		if (isReference(arg)) {
+			m_variant = dereference(arg).m_variant;
+		} else {
+			m_variant = std::move(arg);
+		}
 		m_dirty = false;
 		return;
 	}
