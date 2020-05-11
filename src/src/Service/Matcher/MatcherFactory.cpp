@@ -12,14 +12,20 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherFactory)
 
 static constexpr const auto* ThisPrivateName = "this.private";
-static constexpr const auto* ThisName = "this.";
+static constexpr const auto* ThisPrivateMemberName = "this.private.member";
 static constexpr const auto* ThisPrivateFactoryName = "this.private.fcty";
 
 ska::ASTNodePtr ska::MatcherFactory::buildThisObject(ScriptAST& input) {
 	auto* privateThisObject = input.symbols()[ThisPrivateName];
-	auto privateThisObjectNode = ASTFactory::MakeNode<Operator::PARAMETER_DECLARATION>(std::move(Token{ ThisPrivateName + std::string{".member"}, TokenType::IDENTIFIER, {} }), ASTFactory::MakeEmptyNode());
-	(*privateThisObjectNode)[0].updateType(privateThisObject->type());
-	(*privateThisObjectNode)[0].linkSymbol(*privateThisObject);
+	auto privateThisObjectNode = ASTFactory::MakeNode<Operator::PARAMETER_DECLARATION>(std::move(Token{ ThisPrivateMemberName, TokenType::IDENTIFIER, {} }), ASTFactory::MakeEmptyNode());
+	
+	if (privateThisObject != nullptr) {
+		(*privateThisObjectNode)[0].updateType(privateThisObject->type());
+		(*privateThisObjectNode)[0].linkSymbol(*privateThisObject);
+	} else {
+		auto* privateThisFcty = input.symbols()[ThisPrivateFactoryName];
+		(*privateThisObjectNode)[0].updateType(Type::MakeCustom<ExpressionType::OBJECT>(privateThisFcty));
+	}
 
 	auto event = VarTokenEvent::MakeParameter(*privateThisObjectNode, (*privateThisObjectNode)[0], input);
 	m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
@@ -54,7 +60,7 @@ std::vector<ska::ASTNodePtr> ska::MatcherFactory::matchDeclarationBody(ScriptAST
     return statements;
 }
 
-ska::ASTNodePtr ska::MatcherFactory::matchPrivateFactory(ScriptAST& input, std::deque<ASTNodePtr> parameters) {
+ska::ASTNodePtr ska::MatcherFactory::matchPrivateFactory(ScriptAST& input, const ASTNode& functionPrototype) {
 	auto functionPrivateObjectToken = Token{ ThisPrivateFactoryName, TokenType::IDENTIFIER, input.reader().actual().position() };
 
 	auto emptyNode = ASTFactory::MakeEmptyNode();
@@ -70,13 +76,26 @@ ska::ASTNodePtr ska::MatcherFactory::matchPrivateFactory(ScriptAST& input, std::
 	auto privateReturnEventStart = ReturnTokenEvent{input};
     m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(privateReturnEventStart);
 
-	for (auto& parameter : parameters) {
-		auto event = VarTokenEvent::Make<VarTokenEventType::VARIABLE_AFFECTATION>(*parameter, input);
-		m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
+	auto returnNodes = std::vector<ASTNodePtr>{};
+	auto parameterIndex = std::size_t{ 0 };
+	for (auto& parameter : functionPrototype) {
+		if (parameterIndex != functionPrototype.size() - 1) {
+			auto parameterName = Token{ parameter->name(), TokenType::IDENTIFIER, {} };
+			auto parameterValue = ASTFactory::MakeLogicalNode(parameterName);
+			if (parameter->symbol() != nullptr) {
+				parameterValue->updateType(parameter->type().value());
+				parameterValue->linkSymbol(*parameter->symbol());
+			}
+			returnNodes.push_back(ASTFactory::MakeNode<Operator::VARIABLE_AFFECTATION>(parameterName, std::move(parameterValue)));
+
+			auto event = VarTokenEvent::Make<VarTokenEventType::VARIABLE_AFFECTATION>(*returnNodes.back(), input);
+			m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
+		}
+		parameterIndex++;
 	}
 	
 	auto tmpFunctionBodyPrivateNodeList = matchDeclarationBody(input, m_reservedKeywordsPool.pattern<TokenGrammar::RETURN>());
-	auto privateNodes = std::move(parameters);
+	auto privateNodes = std::move(returnNodes);
 	std::move(tmpFunctionBodyPrivateNodeList.begin(), tmpFunctionBodyPrivateNodeList.end(), std::back_inserter(privateNodes));
 
 	auto privateNodeObj = ASTFactory::MakeNode<Operator::RETURN>(ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(privateNodes)));
@@ -91,7 +110,7 @@ ska::ASTNodePtr ska::MatcherFactory::matchPrivateFactory(ScriptAST& input, std::
 	return functionPrivateObject;
 }
 
-ska::ASTNodePtr ska::MatcherFactory::matchPublicObject(ScriptAST& input, const Token& functionName) {
+ska::ASTNodePtr ska::MatcherFactory::matchPublicObject(ScriptAST& input) {
 	auto publicStartReturnTokenEvent = ReturnTokenEvent{ input };
 	m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(publicStartReturnTokenEvent);
 
@@ -108,17 +127,6 @@ ska::ASTNodePtr ska::MatcherFactory::matchPublicObject(ScriptAST& input, const T
 		publicFields.push_back(std::move(field));
 	}
 
-	/*
-	for (auto& fields : (*publicNodes[0])[0]) {
-		if (fields->symbol() != nullptr) {
-			auto* functionNameSymbol = input.symbols()[functionName.name()];
-			assert(functionNameSymbol != nullptr);
-			fields->symbol()->makeField(*functionNameSymbol);
-		}
-	}
-	*/
-
-
 	auto publicNodeObj = ASTFactory::MakeNode<Operator::RETURN>(ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(publicFields)));
 	auto publicNodeObjReturnEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT>(*publicNodeObj, input);
 	m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(publicNodeObjReturnEvent);
@@ -131,28 +139,26 @@ ska::ASTNodePtr ska::MatcherFactory::matchDeclaration(ScriptAST& input, const To
 
 	SLOG(ska::LogLevel::Debug) << "factory matching private object part";
 
-	auto blockParameters = std::vector<ASTNodePtr>{};
-	for (const auto& parameter : parameters) {
-		blockParameters.push_back(ASTFactory::MakeLogicalNode(Token{ parameter->name(), TokenType::IDENTIFIER, parameter->positionInScript() }));
+	for (auto& parameter : parameters) {
+		auto event = VarTokenEvent::MakeParameter(*parameter, (*parameter)[0], input);
+		m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 	}
+	parameters.push_back(std::move(returnType));
+	auto functionPrototypeNode = ASTFactory::MakeNode<Operator::FUNCTION_PROTOTYPE_DECLARATION>(functionName, std::move(parameters));
 
-	auto privateFunctionFactory = matchPrivateFactory(input, std::move(parameters));
+	auto functionEvent = VarTokenEvent::MakeFunction(*functionPrototypeNode, input);
+	m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(functionEvent);
 
-	for (auto& parameter : blockParameters) {
-		auto* param = (*privateFunctionFactory->symbol())(parameter->name());
-		if (param != nullptr) {
-			parameter->linkSymbol(*param);
-		}
-	}
+	auto privateFunctionFactory = matchPrivateFactory(input, *functionPrototypeNode);
 
 	SLOG(ska::LogLevel::Debug) << "factory matching public object part";
 		
-	auto factoryPrototypeNode = ASTFactory::MakeNode<Operator::FACTORY_PROTOTYPE_DECLARATION>(functionName, std::move(privateFunctionFactory), ASTFactory::MakeNode<Operator::BLOCK>(std::move(blockParameters)), std::move(returnType));
+	auto factoryPrototypeNode = ASTFactory::MakeNode<Operator::FACTORY_PROTOTYPE_DECLARATION>(functionName, std::move(functionPrototypeNode), std::move(privateFunctionFactory));
 
 	auto prototypeFactoryEvent = FunctionTokenEvent{ *factoryPrototypeNode, FunctionTokenEventType::FACTORY_PROTOTYPE, input, functionName.name() };
 	m_parser.observable_priority_queue<FunctionTokenEvent>::notifyObservers(prototypeFactoryEvent);
 
-	auto publicThisObjectReturnNode = matchPublicObject(input, functionName);
+	auto publicThisObjectReturnNode = matchPublicObject(input);
 
 	SLOG(ska::LogLevel::Debug) << "factory synthetizing node";
 	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
@@ -166,8 +172,9 @@ ska::ASTNodePtr ska::MatcherFactory::matchDeclaration(ScriptAST& input, const To
 }
 
 ska::ASTNodePtr ska::MatcherFactory::matchPrivateFieldUse(ScriptAST& input, ASTNodePtr varNode) {
-	const auto thisPrivateMember = ThisPrivateName + std::string{".member"};
-	if ((*input.symbols()[thisPrivateMember])(varNode->name()) == nullptr) {
+	const auto thisPrivateMember = ThisPrivateMemberName;
+	const auto* thisPrivateMemberSymbol = input.symbols()[thisPrivateMember];
+	if (thisPrivateMemberSymbol == nullptr || (*thisPrivateMemberSymbol)(varNode->name()) == nullptr) {
 		return varNode;
 	}
 	auto privateThisObjectNode = ASTFactory::MakeLogicalNode(Token{thisPrivateMember , TokenType::IDENTIFIER, input.reader().actual().position() });

@@ -23,14 +23,7 @@ namespace ska {
 				return {};
 			}
 
-			if (range.size() == 1 && range[0] != exception) {
-				return Instruction{ Command::CLEAR_RANGE, range[0], range[0] };
-			}
-
-			if (range.back() == exception) {
-				if (range.size() >= 2) {
-					return Instruction{ Command::CLEAR_RANGE, range[0], range[range.size() - 2] };
-				}
+			if (range.size() == 1) {
 				return Instruction{ Command::CLEAR_RANGE, range[0], range[0] };
 			}
 
@@ -87,7 +80,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	auto result = InstructionOutput{ };
 	// Obvisouly we pop in reverse order, because that's how a stack works (we previously pushed parameters in order in generation of Operator::FUNCTION_CALL)
 	// Also, we avoid index 0, which is return type in reverse order
-	applyGenerator(ApplyNOperations<Command::POP, decltype(node.rbegin())>, result, context, node.rbegin() + 1, node.rend());
+	applyGenerator(ApplyNOperations<Command::POP, decltype(node.begin())>, result, context, node.begin(), node.end() - 1);
 	LOG_DEBUG << "\tParameters : " << result;
 	return result;
 }
@@ -109,12 +102,22 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	auto preCallValue = generateNext({context, node.GetFunctionNameNode()});
 	LOG_DEBUG << "Function member call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
 	
-	auto callInstruction = InstructionOutput {};
-	callInstruction.push(Instruction { Command::JUMP_MEMBER, std::move(preCallValue.operand()) });
-	
-	auto result = std::move(preCallValue);
+	const auto* functionTypeSymbol = node.GetFunctionNameNode().typeSymbol();
+	// Handle custom type functions
+	const auto* functionSymbolInfo = functionTypeSymbol == nullptr ? nullptr : context.getSymbolInfo(*functionTypeSymbol);
+	LOG_DEBUG << "Function Member Call symbol info : " << (functionSymbolInfo == nullptr || functionSymbolInfo->binding == std::numeric_limits<std::size_t>::max() ? "none" : "with binding");
 
-	applyGenerator(ApplyNOperations<Command::PUSH, decltype(node.begin())>, result, context, node.begin(), node.end());
+	auto callInstruction = InstructionOutput{};
+	if (functionSymbolInfo != nullptr && functionSymbolInfo->binding != std::numeric_limits<std::size_t>::max()) {
+		callInstruction.push(Instruction{ Command::BIND, Operand { ScriptVariableRef{ functionSymbolInfo->binding, functionSymbolInfo->script}, OperandType::BIND_NATIVE}, Operand {static_cast<long>(node.GetFunctionParameterSize()), OperandType::PURE} });
+		if (functionSymbolInfo->bindingPassThrough) {
+			callInstruction.push(Instruction { Command::JUMP_MEMBER, std::move(preCallValue.operand()) });
+		}
+	} else {
+		callInstruction.push(Instruction{ Command::JUMP_MEMBER, std::move(preCallValue.operand()) });
+	}
+	auto result = std::move(preCallValue);
+	applyGenerator(ApplyNOperations<Command::PUSH, decltype(node.rbegin())>, result, context, node.rbegin(), node.rend());
 	LOG_DEBUG << " PUSH result : " << result;
 
 	result.push(std::move(callInstruction));
@@ -151,7 +154,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	}
 	auto result = std::move(preCallValue);
 
-	applyGenerator(ApplyNOperations<Command::PUSH, decltype(node.begin())>, result, context, node.begin(), node.end());
+	applyGenerator(ApplyNOperations<Command::PUSH, decltype(node.rbegin())>, result, context, node.rbegin(), node.rend());
 	LOG_DEBUG << " PUSH result : " << result;
 
 	result.push(std::move(callInstruction));

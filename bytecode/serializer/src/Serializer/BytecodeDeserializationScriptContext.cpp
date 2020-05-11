@@ -82,7 +82,7 @@ void ska::bytecode::DeserializationScriptContext::readSymbolTable() {
 }
 
 void ska::bytecode::DeserializationScriptContext::operator>>(Instruction& value) {
-	auto operands = std::vector<Operand>{};
+	auto operands = std::vector<OperandUse>{};
 	auto safeZone = m_input.acquireMemory<sizeof(uint16_t) + sizeof(uint8_t)>("Instruction");
 
 	const auto command = safeZone.read<uint16_t>();

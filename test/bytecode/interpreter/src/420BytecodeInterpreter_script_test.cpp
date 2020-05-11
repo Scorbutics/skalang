@@ -58,3 +58,37 @@ TEST_CASE("[BytecodeInterpreter] Use 2x same script and modifying a value in fir
 	auto cellValue = res.nodeval<long>();
 	CHECK(cellValue == 123);
 }
+
+
+TEST_CASE("[BytecodeInterpreter] Complex use of factory instances inside itself") {
+	constexpr auto progStr =
+	"JSON = function(v : string) : var do\n"
+		"child = [] : JSON()\n"
+		"return { \n"
+			"Size = function() : int do\n"
+				"return child.size()\n"
+			"end\n"
+			"Get = function(key : int) : JSON() do\n"
+				"return child[key]\n"
+			"end\n"
+			"Add = function(c : JSON()) do\n"
+				"child = child + c\n"
+			"end\n"
+			"Value = function() : string do\n"
+				"return v\n"
+			"end\n"
+		"}\n"
+	"end\n"
+
+	"json = JSON(\"toto\")\n"
+	"json.Add(JSON(\"titi\"))\n"
+
+	"out = json.Get(0).Value() + json.Value()\n";
+
+	auto [script, data] = Interpret(progStr);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
+	auto res = interpreted->variable(0);
+	auto cellValue = *res.nodeval<ska::StringShared>();
+	CHECK(cellValue == "tititoto");
+}

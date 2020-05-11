@@ -67,6 +67,9 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation 2 (field function call)"
 
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	
+	ska::bytecode::InstructionsDebugInfo{ progStr, 50 }.print(std::cout, *data.storage, gen.id());
+
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 	auto res = interpreted->variable(0);
 	auto firstCellValue = res.nodeval<ska::StringShared>();

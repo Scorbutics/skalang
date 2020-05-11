@@ -756,17 +756,17 @@ TEST_CASE("[SemanticTypeChecker]") {
 		SUBCASE("constructor complex with contained function NOT USING the current type and calling member function with a wrong type...") {
 			try {
 				ASTFromInputSemanticTC(scriptCache,
-				"Joueur = function(nom:string) : var do "
-					"puissance = 10\n"
+				"Joueur = function(nom_:string) : var do\n"
+					"puissance_ = 10\n"
 
-					"attaquer = function(cible:Joueur()) do\n"
+					"attaquer_ = function(cible:Joueur()) do\n"
 					"end\n"
 
-					"return {"
-						"nom= nom\n"
-						"puissance = puissance\n"
+					"return {\n"
+						"nom= nom_\n"
+						"puissance = puissance_\n"
 						"pv = 100\n"
-						"attaquer = attaquer"
+						"attaquer = attaquer_"
 					"}\n"
 				"end\n"
 				"joueur1 = Joueur(\"joueur1\")\n"

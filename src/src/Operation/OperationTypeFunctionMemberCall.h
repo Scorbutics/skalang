@@ -28,6 +28,14 @@ namespace ska {
 			return node.end();
 		}
 
+		auto rbegin() const {
+			return node.rbegin();
+		}
+
+		auto rend() const {
+			return node.rend() - 2;
+		}
+
 		inline std::size_t GetFunctionParameterSize() const {
 			return node.size() - 2;
 		}

@@ -20,9 +20,10 @@ JSON = function(v: string): var do
 end
 
 run = function(parameters: string[]) do
-    json = JSON("toto")
-    json.Add(JSON("titi"))
+    data = JSON("name")
+    data.Add(JSON("Inja"))
     
-    IOLog.print(json.Value())
-    IOLog.print(json.Get(0).Value())
+    IOLog.print(data.Value())
+    IOLog.print(data.Get(0).Value())
+
 end

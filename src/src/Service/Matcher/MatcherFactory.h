@@ -29,9 +29,9 @@ namespace ska {
 		bool isFunctionMember(const Symbol& symbol) const;
 		ASTNodePtr matchPrivateFieldUse(ScriptAST& input, ASTNodePtr varNode);
     private:
-		ASTNodePtr matchPrivateFactory(ScriptAST& input, std::deque<ASTNodePtr> parameters);
+		ASTNodePtr matchPrivateFactory(ScriptAST& input, const ASTNode& functionPrototype);
 		ASTNodePtr matchPrivateObject(ScriptAST& input, const Token& privateFactoryName);
-		ASTNodePtr matchPublicObject(ScriptAST& input, const Token& functionName);
+		ASTNodePtr matchPublicObject(ScriptAST& input);
 
         std::vector<ASTNodePtr> matchDeclarationBody(ScriptAST& input, const Token& endToken);
 

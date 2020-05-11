@@ -8,8 +8,12 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FACTORY_PROTOTYPE_DEC
 	auto& functionParametersListNode = node.GetFunctionParametersList();
 
 	auto result = Type::MakeCustom<ExpressionType::FUNCTION>(nullptr);
+	auto index = std::size_t{ 0 };
 	for (const auto& parameterNode : functionParametersListNode) {
-		result.add(node.GetPrivateFunctionFactoryField(parameterNode->name())->type());
+		if (index != node.GetFunctionParametersSize()) {
+			result.add(node.GetPrivateFunctionFactoryField(parameterNode->name())->type());
+		}
+		index++;
 	}
 
 	result.add(node.GetFunctionReturnType());

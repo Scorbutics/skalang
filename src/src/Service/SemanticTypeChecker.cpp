@@ -76,8 +76,13 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 			throw std::runtime_error("\"" + symbol->name() + "\" is not a function");
 		}
 
+		if (returnedValue.type().value() == ExpressionType::VOID) {
+			throw std::runtime_error("return cannot be used for the void type");
+		}
+
 		if (symbol->type().empty()) {
-			throw std::runtime_error("\"" + symbol->name() + "\" is an empty function");
+			//throw std::runtime_error("\"" + symbol->name() + "\" is an empty function");
+			break;
 		}
 
 		const auto expectedReturnType = symbol->type().back();
@@ -87,11 +92,6 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 			ss << "bad return type : expected \"" << expectedReturnType << "\" on function declaration but got \"" << returnedValue.type().value() << "\" on return";
 			throw std::runtime_error(ss.str());
 		}
-
-		if(returnedValue.type().value() == ExpressionType::VOID) {
-			throw std::runtime_error("return cannot be used for the void type");
-		}
-
 	} break;
 
 	default:

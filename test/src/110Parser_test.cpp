@@ -343,26 +343,39 @@ TEST_CASE("User defined object") {
 	CHECK(astFunc154.op() == ska::Operator::FUNCTION_DECLARATION);
 		CHECK(astFunc154.size() == 2);
 	const auto& astFuncParameters154 = astFunc154[0];
+
+	//Joueur factory block is inside "astFuncParameters154"
 	CHECK(astFuncParameters154.size() == 2);
 
-	//Checks the parameter name and type
-	CHECK(astFuncParameters154[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
-	CHECK(astFuncParameters154[0].size() == 1);
-		CHECK(astFuncParameters154[0][0].size() == 3);
-	CHECK(astFuncParameters154[0][0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
+	//Checks the parameters
+	CHECK(astFuncParameters154[0][0].size() == 1);
+	CHECK(astFuncParameters154[0][0][0].size() == 3);
+	CHECK(astFuncParameters154[0][0][0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
 
 	//Checks the return type
-	CHECK(astFuncParameters154[1][0].has(keywords.pattern<ska::TokenGrammar::VARIABLE>()));
+	CHECK(astFuncParameters154[0][astFuncParameters154.size() - 1][0].has(keywords.pattern<ska::TokenGrammar::VARIABLE>()));
+
+	//Checks the parameter name and type : in the private factory block
+	auto& parametersAsReturnInPrivateFactory = astFuncParameters154[1][1][0][0];
+	CHECK(parametersAsReturnInPrivateFactory.size() == 1);
+	CHECK(parametersAsReturnInPrivateFactory[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
+
 
 	//Checks the function body
 	CHECK(astFunc154[1].size() == 1);
 
-	const auto& userDefinedObjectNode = astFunc154[1][0][0];
-		CHECK(astFunc154[1][0].op() == ska::Operator::RETURN);
+	const auto& userDefinedObjectNode = astFunc154[1][0];
+	CHECK(astFunc154[1].op() == ska::Operator::RETURN);
 	CHECK(userDefinedObjectNode.op() == ska::Operator::USER_DEFINED_OBJECT);
-	CHECK(userDefinedObjectNode.size() == 1);
 
-	const auto& returnNomNode = userDefinedObjectNode[0];
+	//2, because : "this" private object at index 0, "nom" at index 1
+	CHECK(userDefinedObjectNode.size() == 2);
+
+	const auto& returnThisNode = userDefinedObjectNode[0];
+	CHECK(returnThisNode.size() == 1);
+	CHECK(returnThisNode.has(ska::Token{ "this.private", ska::TokenType::IDENTIFIER, {} }));
+
+	const auto& returnNomNode = userDefinedObjectNode[1];
 	CHECK(returnNomNode.size() == 1);
 	CHECK(returnNomNode.has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
 

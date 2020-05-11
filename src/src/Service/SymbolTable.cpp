@@ -212,10 +212,11 @@ static Return Lookup(ThisType& currentTable, ska::SymbolTableLookup strategy, sk
 	}
 
 	while (depth.depth > 0 && selectedTable != nullptr && selectedTable->scopes() > 0) {
-		if (depth.childIndex >= selectedTable->scopes()) {
-			depth.childIndex = selectedTable->scopes() - 1;
+		auto currentDepth = depth.childIndex;
+		if (currentDepth >= selectedTable->scopes()) {
+			currentDepth = selectedTable->scopes() - 1;
 		}
-		selectedTable = selectedTable->child(depth.childIndex);
+		selectedTable = selectedTable->child(currentDepth);
 		depth.depth--;
 	}
 
