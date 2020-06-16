@@ -4,6 +4,7 @@
 #include "NodeValue/Symbol.h"
 
 bool ska::BridgeFunction::isVoid() const { return m_function.symbol == nullptr || m_function.symbol->nativeType() ==  ExpressionType::VOID; }
+bool ska::BridgeFunction::isFactory() const { return m_function.symbol != nullptr && m_function.symbol->nativeType() == ExpressionType::OBJECT; }
 
 std::string ska::BridgeField::name() const {
 	return symbol == nullptr ? "" : symbol->name();

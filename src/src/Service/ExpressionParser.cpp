@@ -30,6 +30,11 @@ ska::ASTNodePtr ska::ExpressionParser::matchVariable(ScriptAST& input, const Tok
 	if (input.reader().actual() == m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>()) {
 		return m_matcherVar.matchAffectation(input, std::move(varNode));
 	}
+
+	if (input.contextOf(ParsingContextType::FUNCTION_MEMBER_DECLARATION, 1) != nullptr) {
+		return m_matcherFunction.matchPrivateFieldUse(input, std::move(varNode));
+	}
+
 	auto event = VarTokenEvent::MakeUse(*varNode, input);
 	m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 	return varNode;

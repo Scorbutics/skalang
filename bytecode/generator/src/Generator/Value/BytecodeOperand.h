@@ -90,11 +90,30 @@ namespace ska {
 			Cursor m_positionInScript;
 		};
 
-		using Register = Operand;
 
 		bool operator==(const Operand& lhs, const Operand& rhs);
 		bool operator!=(const Operand& lhs, const Operand& rhs);
 
+		struct OperandUse : public Operand {
+			OperandUse() = default;
+			~OperandUse() = default;
+			
+			OperandUse& operator=(OperandUse&& op) = default;
+			OperandUse& operator=(const OperandUse& op) = default;
+			
+			OperandUse(const OperandUse& op) = default;
+			OperandUse(OperandUse&& op) = default;
+			
+
+			OperandUse(OperandVariant var, OperandType type, Cursor position = {}) :
+				Operand(std::move(var), type, position){
+			}
+			OperandUse(Operand op) : Operand(std::move(op)) {}
+
+			bool isFirstTimeUsed = false;
+		};
+
+		using Register = OperandUse;
 	}
 
 

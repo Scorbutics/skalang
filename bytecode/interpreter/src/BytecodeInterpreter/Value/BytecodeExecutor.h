@@ -13,14 +13,14 @@ namespace ska {
 			PlainMemoryTable callstack;
 
 			void pop(NodeValue& dest) {
-				dest = stack.back();
+				dest = std::move(stack.back());
 				stack.pop_back();
 			}
 
 			void pop(NodeValueArrayRaw& dest, long count) {
 				assert(stack.size() >= count);
 				for (auto i = 0; i < count && stack.size() > 0; i++) {
-					dest.push_front(stack.back());
+					dest.push_front(std::move(stack.back()));
 					stack.pop_back();
 				}
 			}

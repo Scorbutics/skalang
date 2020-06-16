@@ -137,7 +137,7 @@ TEST_CASE("Matching") {
 			auto& table = reader->symbols();
 
 			CHECK(table.scopes() == 1);
-			auto converter = table.lookup(ska::SymbolTableLookup::direct(":int"), ska::SymbolTableNested::firstChild(2));
+			auto converter = table.lookup(ska::SymbolTableLookup::direct(":int"), ska::SymbolTableNested::lastChild(2));
 			CHECK(converter != nullptr);
 		}
 	}

@@ -55,5 +55,10 @@ ska::ASTNodePtr ska::ScriptBindingAST::buildFunctionsAST(BridgeFunction& constru
 		return ASTFactory::MakeNode<Operator::BLOCK>(m_functionBuilder.makeFieldList(m_scriptAst, constructor));
 	} 
 
+	/*
+	if (constructor.isFactory()) {
+		return ASTFactory::MakeNode<Operator::BLOCK>(m_functionBuilder.makeFactory(m_scriptAst, constructor));
+	}
+	*/
 	return ASTFactory::MakeNode<Operator::BLOCK>(m_functionBuilder.makeFunction(m_scriptAst, constructor));
 }

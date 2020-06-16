@@ -40,6 +40,19 @@ ska::ASTNode:: ASTNode(Operator o, Token identifierToken, std::vector<ASTNodePtr
 	}
 }
 
+ska::ASTNode::ASTNode(Operator o, Token identifierToken, std::deque<ASTNodePtr> children) :
+	m_op(o),
+	m_token(std::move(identifierToken)) {
+	if (!children.empty()) {
+		m_children.reserve(children.size());
+		for (auto& child : children) {
+			if (child != nullptr) {
+				m_children.push_back(std::move(child));
+			}
+		}
+	}
+}
+
 ska::ASTNode::ASTNode(Operator o, Token identifierToken) :
 	m_op(std::move(o)),
 	m_token(std::move(identifierToken)) {

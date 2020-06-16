@@ -83,14 +83,14 @@ std::size_t ska::bytecode::GenerationContext::exportId(const Symbol& symbol) con
 	return exports.id(&symbol);
 }
 
-ska::bytecode::Operand ska::bytecode::GenerationContext::querySymbolOrOperand(const ASTNode& node) {
+ska::bytecode::OperandUse ska::bytecode::GenerationContext::querySymbolOrOperand(const ASTNode& node) {
 	if (node.symbol() == nullptr) {
 		return helper().querySymbolOrOperand(node);
 	}
 	return scriptOfSymbol(*node.symbol()).querySymbolOrOperand(node);
 }
 
-ska::bytecode::Operand ska::bytecode::GenerationContext::querySymbol(const Symbol& symbol) {
+ska::bytecode::OperandUse ska::bytecode::GenerationContext::querySymbol(const Symbol& symbol) {
 	return scriptOfSymbol(symbol).querySymbol(symbol);
 }
 

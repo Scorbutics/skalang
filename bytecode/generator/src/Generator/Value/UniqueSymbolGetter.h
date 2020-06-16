@@ -24,8 +24,8 @@ namespace ska {
 			UniqueSymbolGetterBase& operator=(const UniqueSymbolGetterBase&) = delete;
 			UniqueSymbolGetterBase(const UniqueSymbolGetterBase&) = delete;
 
-			std::pair<Operand, bool> query(std::size_t script, const ASTNode& node);
-			std::pair<Operand, bool> query(std::size_t script, const Symbol& symbol, Cursor positionInScript = {});
+			OperandUse query(std::size_t script, const ASTNode& node);
+			OperandUse query(std::size_t script, const Symbol& symbol, Cursor positionInScript = {});
 			std::optional<Operand> get(std::size_t script, const Symbol& symbol) const;
 			void declare(std::size_t script, const Symbol& symbol, Operand operand);
 

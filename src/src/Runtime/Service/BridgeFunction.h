@@ -40,6 +40,7 @@ namespace ska {
     const Symbol& symbol() const { if(m_function.symbol == nullptr) throw std::runtime_error("bad function symbol"); return *m_function.symbol; }
 
     bool isVoid() const;
+    bool isFactory() const;
 
     const BridgeField::Callback& callback() const { return m_function.callback; }
     const std::vector<BridgeField>& fields() const { return m_fields; }

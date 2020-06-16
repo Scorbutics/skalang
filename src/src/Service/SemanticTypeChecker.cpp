@@ -10,6 +10,7 @@
 
 #include "Operation/OperationTypeFunctionDeclaration.h"
 #include "Operation/OperationTypeFunctionCall.h"
+#include "Operation/OperationTypeFunctionMemberCall.h"
 #include "Operation/OperationTypeIfElse.h"
 #include "Operation/OperationTypeArrayDeclaration.h"
 #include "Operation/OperationTypeReturn.h"
@@ -71,8 +72,17 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 
 		auto operationReturn = OperationType<Operator::RETURN>{token.rootNode()};
 		const auto& returnedValue = operationReturn.GetValue();
-		if (symbol->type().empty() || !returnedValue.type().has_value()) {
+		if (!returnedValue.type().has_value()) {
 			throw std::runtime_error("\"" + symbol->name() + "\" is not a function");
+		}
+
+		if (returnedValue.type().value() == ExpressionType::VOID) {
+			throw std::runtime_error("return cannot be used for the void type");
+		}
+
+		if (symbol->type().empty()) {
+			//throw std::runtime_error("\"" + symbol->name() + "\" is an empty function");
+			break;
 		}
 
 		const auto expectedReturnType = symbol->type().back();
@@ -82,11 +92,6 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 			ss << "bad return type : expected \"" << expectedReturnType << "\" on function declaration but got \"" << returnedValue.type().value() << "\" on return";
 			throw std::runtime_error(ss.str());
 		}
-
-		if(returnedValue.type().value() == ExpressionType::VOID) {
-			throw std::runtime_error("return cannot be used for the void type");
-		}
-
 	} break;
 
 	default:
@@ -142,43 +147,61 @@ bool ska::SemanticTypeChecker::matchArray(const ArrayTokenEvent& token) {
 	return true;
 }
 
+template <class Operation>
+static void CommonMatchFunctionCall(const ska::TypeCrosser& typeCrosser, Operation functionCallOperation, unsigned int parametersSize) {
+	const auto functionFullRequiredType = functionCallOperation.GetFunctionType();
+
+	if (functionFullRequiredType != ska::ExpressionType::FUNCTION) {
+		auto ss = std::stringstream{};
+		ss << "function \"" << functionFullRequiredType << "\" is called before being declared (or has a bad declaration)";
+		throw std::runtime_error(ss.str());
+	}
+
+	const auto functionRequiredTypeParameterSize = functionFullRequiredType.size() - parametersSize;
+	const auto callNodeParameterSize = functionCallOperation.GetFunctionParameterSize();
+	if (functionRequiredTypeParameterSize != callNodeParameterSize) {
+		auto ss = std::stringstream{};
+		ss << "bad function call : the function \"" << functionFullRequiredType << "\" needs "
+			<< functionRequiredTypeParameterSize << " parameters but is being called with " << callNodeParameterSize
+			<< " parameters";
+		throw std::runtime_error(ss.str());
+	}
+
+	SLOG_STATIC(ska::LogLevel::Debug, ska::SemanticTypeChecker) << functionFullRequiredType << " function has the following arguments types during its call : ";
+	auto index = static_cast<std::size_t>(parametersSize - 1);
+	for (auto& arg : functionCallOperation) {
+		const auto calculatedArgumentType = arg->type().value();
+		const auto requiredParameterType = functionFullRequiredType[index];
+
+		if (requiredParameterType.crossTypes(typeCrosser, "=", calculatedArgumentType) == ska::ExpressionType::VOID) {
+			auto ss = std::stringstream{};
+			ss << "Type \"" << calculatedArgumentType << "\" is encountered while a type convertible to \""
+				<< requiredParameterType << "\" is required";
+			throw std::runtime_error(ss.str());
+		}
+		index++;
+	}
+}
+
+void ska::SemanticTypeChecker::matchFunctionCall(const FunctionTokenEvent& token) {
+	auto functionCallOperation = OperationType<Operator::FUNCTION_CALL>{ token.rootNode() };
+	CommonMatchFunctionCall(m_typeCrosser, functionCallOperation, 1);
+}
+
+void ska::SemanticTypeChecker::matchFunctionMemberCall(const FunctionTokenEvent& token) {
+	auto functionCallOperation = OperationType<Operator::FUNCTION_MEMBER_CALL>{ token.rootNode() };
+	CommonMatchFunctionCall(m_typeCrosser, functionCallOperation, 2);
+}
+
 bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 	switch(token.type()) {
 
 	case FunctionTokenEventType::CALL: {
-		auto functionCallOperation = OperationType<Operator::FUNCTION_CALL>{ token.rootNode() };
-		const auto functionFullRequiredType = functionCallOperation.GetFunctionType();
+		matchFunctionCall(token);
+	} break;
 
-		if (functionFullRequiredType != ExpressionType::FUNCTION) {
-			auto ss = std::stringstream{};
-			ss << "function \"" << functionFullRequiredType << "\" is called before being declared (or has a bad declaration)";
-			throw std::runtime_error(ss.str());
-		}
-
-		const auto functionRequiredTypeParameterSize = functionFullRequiredType.size() - 1;
-		const auto callNodeParameterSize = functionCallOperation.GetFunctionParameterSize();
-		if (functionRequiredTypeParameterSize != callNodeParameterSize) {
-			auto ss = std::stringstream {};
-			ss << "bad function call : the function \"" << functionFullRequiredType << "\" needs " 
-			<< functionRequiredTypeParameterSize << " parameters but is being called with " << callNodeParameterSize 
-			<< " parameters";
-			throw std::runtime_error(ss.str());
-		}
-
-		SLOG(ska::LogLevel::Debug) << functionFullRequiredType << " function has the following arguments types during its call : ";
-		auto index = 0u;
-		for (auto& arg : functionCallOperation) {		
-			const auto calculatedArgumentType = arg->type().value();
-			const auto requiredParameterType = functionFullRequiredType[index];
-
-			if(requiredParameterType.crossTypes(m_typeCrosser, "=", calculatedArgumentType) == ExpressionType::VOID) {
-				auto ss = std::stringstream {};
-				ss << "Type \"" << calculatedArgumentType << "\" is encountered while a type convertible to \"" 
-				<< requiredParameterType << "\" is required";
-				throw std::runtime_error(ss.str());
-			}
-			index++;
-		}
+	case FunctionTokenEventType::MEMBER_CALL: {
+		matchFunctionMemberCall(token);
 	} break;
 
 	case FunctionTokenEventType::DECLARATION_STATEMENT: {

@@ -22,7 +22,8 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	if (typeObject == ExpressionType::ARRAY) {
 		if (fieldName == "size") {
 			auto objectValue = generateNext({ context, node.GetObjectNameNode() });
-			return { Instruction{ Command::ARR_LENGTH, context.queryNextRegister(), objectValue.operand() } };
+			objectValue.push({ Instruction{ Command::ARR_LENGTH, context.queryNextRegister(), objectValue.operand() } });
+			return objectValue;
 		}
 		auto ss = std::stringstream{};
 		ss << "trying to access an undeclared built-in field \"" << fieldName << "\" of the type \"" << typeObject << "\"";
@@ -55,7 +56,12 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	auto objectValue = generateNext({ context, node.GetObjectNameNode()});
 
 	LOG_DEBUG << "This field has index " << index << " in the object";
+	
+	auto command = Command::ARR_ACCESS;
+	if (symbolField->type() == ExpressionType::FUNCTION && symbolField->type()[0].name() == "this.private.fcty") {
+		command = Command::ARR_MEMBER_ACCESS;
+	}
 
-	objectValue.push({ Instruction { Command::ARR_ACCESS, context.queryNextRegister(), objectValue.operand(), Operand {static_cast<long>(index), OperandType::PURE } }});
+	objectValue.push({ Instruction { command, context.queryNextRegister(), objectValue.operand(), Operand {static_cast<long>(index), OperandType::PURE } }});
 	return objectValue;
 }

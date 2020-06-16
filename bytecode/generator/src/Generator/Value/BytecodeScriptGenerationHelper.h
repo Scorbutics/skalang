@@ -55,8 +55,8 @@ namespace ska {
 
 			ska::ScriptASTPtr useImport(const std::string& scriptImported);
 			Register queryNextRegister();
-			Operand querySymbolOrOperand(const ASTNode& node);
-			Operand querySymbol(const Symbol& symbol);
+			OperandUse querySymbolOrOperand(const ASTNode& node);
+			OperandUse querySymbol(const Symbol& symbol);
 			void declareSymbol(const Symbol& symbol, const Operand& operand);
 			std::optional<Operand> getSymbol(const Symbol& symbol) const;
 			ExportSymbolContainer generateExportedSymbols(std::priority_queue<SymbolWithInfo> symbolsInfo) const;

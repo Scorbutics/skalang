@@ -14,10 +14,12 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	LOG_DEBUG << "Returning " << node.GetValue().size() << " fields";
 
+	auto registerV = context.queryNextRegister();
 	if(node.GetValue().op() == Operator::USER_DEFINED_OBJECT)  {
-		auto registerV = context.queryNextRegister();
 		const auto numberOfItemsReturned = static_cast<long>(node.GetValue().size());
 		objectResult.push(Instruction { Command::POP_IN_VAR, registerV, Operand { numberOfItemsReturned, OperandType::PURE} });
+	} else if (objectResult.size() == 0) {
+		objectResult.push(Instruction{ Command::MOV, registerV, objectResult.operand() });
 	}
 
 	LOG_DEBUG << "Returning : " << objectResult;

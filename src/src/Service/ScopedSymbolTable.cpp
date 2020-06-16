@@ -59,9 +59,14 @@ bool ska::ScopedSymbolTable::changeTypeIfRequired(const std::string& symbolName,
 }
 
 const ska::Symbol* ska::ScopedSymbolTable::operator[](const std::string& key) const {
-	const auto valueIt = m_symbols.find(key);
+	auto valueIt = m_symbols.find(key);
 	if (valueIt == m_symbols.end()) {
-		return &m_parent == this ? nullptr : m_parent[key];
+		auto* privateData = m_symbols.atOrNull("this.private");
+		auto* symbol = privateData == nullptr ? nullptr : (*privateData)(key);
+		if (symbol == nullptr) {
+			return &m_parent == this ? nullptr : m_parent[key];
+		}
+		return symbol;
 	}
 	return valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
 }
@@ -69,7 +74,12 @@ const ska::Symbol* ska::ScopedSymbolTable::operator[](const std::string& key) co
 ska::Symbol* ska::ScopedSymbolTable::operator[](const std::string& key) {
 	auto valueIt = m_symbols.find(key);
 	if (valueIt == m_symbols.end()) {
-		return &m_parent == this ? nullptr : m_parent[key];
+		auto* privateData = m_symbols.atOrNull("this.private");
+		auto* symbol = privateData == nullptr ? nullptr : (*privateData)(key);
+		if (symbol == nullptr) {
+			return &m_parent == this ? nullptr : m_parent[key];
+		}
+		return symbol;
 	}
 	return valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
 }
@@ -84,12 +94,22 @@ ska::Symbol* ska::ScopedSymbolTable::operator[](std::size_t index) {
 
 const ska::Symbol* ska::ScopedSymbolTable::operator()(const std::string& key) const {
 	const auto valueIt = m_symbols.find(key);
-	return valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
+	auto* symbol = valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
+	if (symbol == nullptr) {
+		auto* privateData = m_symbols.atOrNull("this.private");
+		return privateData == nullptr ? nullptr : (*privateData)(key);					
+	}
+	return symbol;
 }
 
 ska::Symbol* ska::ScopedSymbolTable::operator()(const std::string& key) {
 	auto valueIt = m_symbols.find(key);
-	return valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
+	auto* symbol = valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
+	if (symbol == nullptr) {
+		auto* privateData = m_symbols.atOrNull("this.private");
+		return privateData == nullptr ? nullptr : (*privateData)(key);					
+	}
+	return symbol;
 }
 
 std::optional<std::size_t> ska::ScopedSymbolTable::id(const Symbol& field) const {

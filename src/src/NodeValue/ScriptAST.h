@@ -53,6 +53,10 @@ namespace ska {
 			return *m_handle->m_ast;
 		}
 
+		void pushContext(ParsingContext context);
+		void popContext();
+		Token* contextOf(ParsingContextType type, std::size_t maxDepth = 0) const;
+
 		const auto& rootNode() const {
 			assert(m_handle->m_ast != nullptr);
 			return *m_handle->m_ast;

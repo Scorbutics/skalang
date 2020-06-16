@@ -21,6 +21,7 @@
 #include "Service/TypeBuilder/TypeBuilderType.h"
 #include "Service/TypeBuilder/TypeBuilderUserDefinedObject.h"
 #include "Service/TypeBuilder/TypeBuilderFilterParameterDeclaration.h"
+#include "Service/TypeBuilder/TypeBuilderFactoryPrototypeDeclaration.h"
 
 #include "Service/TypeBuilder/TypeBuilderDefaults.h"
 
@@ -46,6 +47,8 @@ ska::TypeBuildersContainer ska::BuildTypeBuildersContainer(const TypeCrosser& ty
 	TypeBuilderMakeBuilder<Operator::FUNCTION_CALL>(result);
 	TypeBuilderMakeBuilder<Operator::FUNCTION_PROTOTYPE_DECLARATION>(result);
 	TypeBuilderMakeBuilder<Operator::FUNCTION_DECLARATION>(result);
+	TypeBuilderMakeBuilder<Operator::FACTORY_PROTOTYPE_DECLARATION>(result);
+	TypeBuilderMakeBuilder<Operator::FUNCTION_MEMBER_CALL>(result);
 	TypeBuilderMakeBuilder<Operator::FIELD_ACCESS>(result);
 	TypeBuilderMakeBuilder<Operator::FOR_LOOP>(result);
 	TypeBuilderMakeBuilder<Operator::IMPORT>(result);
@@ -60,9 +63,10 @@ ska::TypeBuildersContainer ska::BuildTypeBuildersContainer(const TypeCrosser& ty
 	TypeBuilderMakeBuilder<Operator::CONVERTER_CALL>(result);
 	TypeBuilderMakeBuilder<Operator::FILTER_DECLARATION>(result);
 	TypeBuilderMakeBuilder<Operator::FILTER_PARAMETER_DECLARATION>(result);
-
+#ifndef NDEBUG
 	for (std::size_t i = 0; i < MaxOperatorSize; i++) {
 		assert(result[i] != nullptr);
 	}
+#endif
 	return result;
 }

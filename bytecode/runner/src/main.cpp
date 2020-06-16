@@ -90,11 +90,11 @@ int main(int argc, char* argv[]) {
 		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
 		auto& gen = generator.generate(moduleConfiguration.scriptCache, std::move(script));
 		
-		moduleConfiguration.scriptCache.printDebugInfo(std::cout);
+		//moduleConfiguration.scriptCache.printDebugInfo(std::cout);
 
 		auto interpreted = interpreter.interpret(gen.id(), moduleConfiguration.scriptCache);
 
-		serializer.serialize(moduleConfiguration.scriptCache, ska::bytecode::SerializationStrategyType::PerScript());
+		//serializer.serialize(moduleConfiguration.scriptCache, ska::bytecode::SerializationStrategyType::PerScript());
 		
 
 	} catch (std::exception& e) {

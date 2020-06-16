@@ -41,6 +41,10 @@ double ska::NodeValue::convertNumeric() const {
 	return numeric;
 }
 
+void ska::NodeValue::release() {
+	m_dirty = true;
+}
+
 std::string ska::NodeValue::convertString() const {
 	auto result = std::string{};
 	if(empty()) {
@@ -90,6 +94,16 @@ ska::NodeValue& ska::NodeValue::dereference(const NodeValueVariant_& variant) {
 }
 
 void ska::NodeValue::transferValueToOwned(NodeValueVariant_ arg) {
+	if (m_dirty) {
+		if (isReference(arg)) {
+			m_variant = dereference(arg).m_variant;
+		} else {
+			m_variant = std::move(arg);
+		}
+		m_dirty = false;
+		return;
+	}
+
 	if(isReference(m_variant)) {
 		SLOG(LogLevel::Debug) << "%11cReference detected, reassigning refered value";
 		if (isReference(arg)) {
@@ -102,14 +116,18 @@ void ska::NodeValue::transferValueToOwned(NodeValueVariant_ arg) {
 			SLOG(LogLevel::Error) << "a value ref cannot refer to itself. Aborting assignation.";
 			return;
 		}
-		m_variant = std::move(arg);
+		if (isReference(arg)) {
+			m_variant = dereference(arg).m_variant;
+		} else {
+			m_variant = std::move(arg);
+		}
 
 		SLOG(LogLevel::Debug) << "%10cAssigning direct value " << convertString();
 	}
 }
 
 bool ska::NodeValue::isReference(const NodeValueVariant_& arg) {
-	return std::holds_alternative<NodeValue*>(arg);
+	return std::holds_alternative<NodeValue*>(arg) && std::get<NodeValue*>(arg) != nullptr;
 }
 
 namespace ska {
