@@ -17,7 +17,7 @@ namespace ska {
 			ScriptExecution(ScriptExecution&&) = default;
 			ScriptExecution(const ScriptExecution&) = delete;
 			ScriptExecution& operator=(const ScriptExecution&) = delete;
-			ScriptExecution& operator=(ScriptExecution&&) = default;
+			ScriptExecution& operator=(ScriptExecution&&) = delete;
 
 			const Instruction& currentInstruction() const {
 				assert(instructions.isGenerated(scriptIndex));

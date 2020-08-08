@@ -1,4 +1,5 @@
 #include <string>
+#include <unordered_map>
 #include <fstream>
 #include "BytecodeSerializationStrategy.h"
 #include "Service/ScriptNameBuilder.h"

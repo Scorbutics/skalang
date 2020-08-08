@@ -27,7 +27,7 @@ namespace ska {
 			Script(Script&&) = default;
 			Script(const Script&) = delete;
 			Script& operator=(const Script&) = delete;
-			Script& operator=(Script&&) = default;
+			Script& operator=(Script&&) = delete;
 
 			ScriptAST astScript() const { return m_serviceGen.program(); }
 
