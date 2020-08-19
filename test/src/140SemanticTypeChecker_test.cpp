@@ -475,14 +475,21 @@ TEST_CASE("[SemanticTypeChecker]") {
 			}
 
 			SUBCASE("double array string : cell") {
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "str167 = [[0, 1], [2, 3]]\n str167[0][0]\n", data);
+				auto& ast = astPtr.rootNode();
+				CHECK(ast.size() == 2);
+				CHECK(ast[1].type() == ska::ExpressionType::INT);
 
-	auto astPtr = ASTFromInputSemanticTC(scriptCache, "str167 = [[0, 1], [2, 3]]\n str167[0]\n str167[0][0]\n", data);
+			}
+
+			SUBCASE("double array string : array cell") {
+				auto astPtr = ASTFromInputSemanticTC(scriptCache, "str486 = [[0, 1], [2, 3]]\n str486[0]\n str486[1][2]\n", data);
 				auto& ast = astPtr.rootNode();
 				CHECK(ast.size() == 3);
 				CHECK(ast[1].type() == ska::ExpressionType::ARRAY);
 				CHECK(ast[2].type() == ska::ExpressionType::INT);
 
-	}
+			}
 
 			SUBCASE("function call : array") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "titi131 = function(test131:string[]) do end\n strArray131 = [\"lol\", \"toto\"]\n titi131(strArray131)\n", data);

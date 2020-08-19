@@ -45,11 +45,11 @@ ska::ASTNodePtr ska::MatcherArray::matchDeclaration(ScriptAST& input) {
 	return declarationNode;
 }
 
-ska::ASTNodePtr ska::MatcherArray::matchUse(ScriptAST& input, ASTNodePtr identifierArrayAffected) {
+ska::ASTNodePtr ska::MatcherArray::matchUse(ScriptAST& input, ASTNodePtr nodeExpressionArrayAffected) {
 	//Ensures array expression before the index access
-	assert(identifierArrayAffected != nullptr);
-	SLOG(ska::LogLevel::Debug) << "expression-array : " << *identifierArrayAffected;	
-    auto expressionEvent = ArrayTokenEvent{ *identifierArrayAffected, input, ArrayTokenEventType::EXPRESSION };
+	assert(nodeExpressionArrayAffected != nullptr);
+	SLOG(ska::LogLevel::Debug) << "expression-array : " << *nodeExpressionArrayAffected << " with type " << nodeExpressionArrayAffected->type().value_or(Type{});	
+    auto expressionEvent = ArrayTokenEvent{ *nodeExpressionArrayAffected, input, ArrayTokenEventType::EXPRESSION };
 	m_parser.observable_priority_queue<ArrayTokenEvent>::notifyObservers(expressionEvent);
 
     //Gets the index part with bracket syntax
@@ -57,7 +57,7 @@ ska::ASTNodePtr ska::MatcherArray::matchUse(ScriptAST& input, ASTNodePtr identif
 	auto indexNode = input.expr(m_parser);
 	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::BRACKET_END>());
 
-	auto declarationNode = ASTFactory::MakeNode<ska::Operator::ARRAY_USE>(std::move(identifierArrayAffected), std::move(indexNode));
+	auto declarationNode = ASTFactory::MakeNode<ska::Operator::ARRAY_USE>(std::move(nodeExpressionArrayAffected), std::move(indexNode));
 	
     //Notifies the outside that we use the array
     auto event = ArrayTokenEvent{ *declarationNode, input, ArrayTokenEventType::USE };
@@ -74,7 +74,7 @@ ska::ASTNodePtr ska::MatcherArray::match(ScriptAST& input, ExpressionStack& oper
 			if (value != "=") {
 				auto arrayNode = operands.popOperandIfNoOperator(isDoingOperation);
 				if (arrayNode != nullptr) {
-					SLOG(ska::LogLevel::Debug) << "\tArray begin use";
+					SLOG(ska::LogLevel::Debug) << "\tArray begin use (previous token \"" << value << "\")";
 					auto result = matchUse(input, std::move(arrayNode));
 					SLOG(ska::LogLevel::Debug) << "\tArray end";
 					return result;

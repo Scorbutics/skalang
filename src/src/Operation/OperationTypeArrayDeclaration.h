@@ -21,7 +21,7 @@ namespace ska {
     	}
 
 		inline auto* GetArraySymbol() {
-			return node[0].symbol();
+			return HasArrayType() ? node[0].symbol() : nullptr;
 		}
 		
 		auto begin() const {

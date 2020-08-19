@@ -75,8 +75,12 @@ void ska::ASTNode::linkSymbol(Symbol& symbol) {
 }
 
 void ska::ASTNode::refreshSymbolType() {
-	if (m_symbol != nullptr && m_type.has_value() && m_symbol->changeTypeIfRequired(m_type.value())) {
-		SLOG(ska::LogLevel::Debug) << "Symbol \"" << m_symbol->name() << "\" in node \"" << m_token << "\" has type updated \"" << m_symbol->type() << "\"";
+	if (m_symbol != nullptr && m_type.has_value()) {
+		SLOG(ska::LogLevel::Debug) << "Current symbol \"" << m_symbol->name() << "\" has type \"" << m_symbol->type() << "\"";
+		if (m_symbol->changeTypeIfRequired(m_type.value())) { 
+			SLOG(ska::LogLevel::Debug) << "%12cSymbol \"" << m_symbol->name() << "\" in node \"" << m_token << "\" has type updated \"" << m_symbol->type() << "\"";
+	
+		}
 	}
 }
 
