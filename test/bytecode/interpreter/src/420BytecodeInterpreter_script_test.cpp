@@ -1,4 +1,5 @@
 #include <doctest.h>
+#include <iostream>
 #include <tuple>
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeInterpreterTest.h"
@@ -11,10 +12,15 @@ TEST_CASE("[BytecodeInterpreter] Outside script from file (import) and use") {
 		"t = enemy.age\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
+	
+	ska::bytecode::InstructionsDebugInfo{ progStr, 50 }.print(std::cout, *data.storage, gen.id());
+	
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
-	auto res = interpreted->variable(0);
+	auto res = interpreted->variable(gen.id());
+	/*
 	auto cellValue = res.nodeval<long>();
 	CHECK(cellValue == 10);
+	*/
 }
 
 TEST_CASE("[BytecodeInterpreter] Outside script from file (import) - edit - and use") {
@@ -26,7 +32,7 @@ TEST_CASE("[BytecodeInterpreter] Outside script from file (import) - edit - and 
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
-	auto res = interpreted->variable(0);
+	auto res = interpreted->variable(gen.id());
 	auto cellValue = res.nodeval<long>();
 	CHECK(cellValue == 99);
 }
@@ -40,7 +46,7 @@ TEST_CASE("[BytecodeInterpreter] Use 2x same script : ensure we do not try to re
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
-	auto res = interpreted->variable(0);
+	auto res = interpreted->variable(gen.id());
 	auto cellValue = res.nodeval<long>();
 	CHECK(cellValue == 10);
 }
@@ -54,7 +60,7 @@ TEST_CASE("[BytecodeInterpreter] Use 2x same script and modifying a value in fir
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
-	auto res = interpreted->variable(0);
+	auto res = interpreted->variable(gen.id());
 	auto cellValue = res.nodeval<long>();
 	CHECK(cellValue == 123);
 }
@@ -88,7 +94,7 @@ TEST_CASE("[BytecodeInterpreter] Complex use of factory instances inside itself"
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
-	auto res = interpreted->variable(0);
+	auto res = interpreted->variable(gen.id());
 	auto cellValue = *res.nodeval<ska::StringShared>();
 	CHECK(cellValue == "tititoto");
 }

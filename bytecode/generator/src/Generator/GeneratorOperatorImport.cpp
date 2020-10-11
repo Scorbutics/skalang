@@ -7,7 +7,7 @@
 
 using GeneratorOperatorCurrent = ska::bytecode::GeneratorOperator<ska::Operator::IMPORT>;
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, GeneratorOperatorCurrent);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, GeneratorOperatorCurrent);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, GeneratorOperatorCurrent)
 
@@ -25,6 +25,8 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 		scriptContext.generate(std::move(instructionsOutput));
 		LOG_DEBUG << "%10cGenerated script " << scriptImportedName;
 		std::tie(importedScriptIndex, importedScript) = context.script(scriptImportedName);
+	} else {
+		LOG_DEBUG << "%10cScript " << scriptImportedName << " was already generated";
 	}
 
 	assert(importedScriptIndex != std::numeric_limits<std::size_t>::max());

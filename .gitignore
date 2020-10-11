@@ -37,3 +37,4 @@ LogError.txt
 *.log.txt
 /bytecode/runner/mainb
 *.miniskab
+*.so

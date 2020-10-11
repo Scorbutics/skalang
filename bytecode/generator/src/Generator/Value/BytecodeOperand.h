@@ -90,6 +90,10 @@ namespace ska {
 			Cursor m_positionInScript;
 		};
 
+		static inline std::ostream& operator<<(std::ostream& stream, const Operand& val) {
+			stream << val.toString();
+			return stream;
+		}
 
 		bool operator==(const Operand& lhs, const Operand& rhs);
 		bool operator!=(const Operand& lhs, const Operand& rhs);

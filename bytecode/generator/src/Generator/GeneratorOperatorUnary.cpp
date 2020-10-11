@@ -6,7 +6,7 @@
 #include "BytecodeCommand.h"
 #include "Generator/Value/BytecodeScriptGenerationHelper.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::UNARY>);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::UNARY>);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::UNARY>)
 
 namespace ska {
