@@ -28,15 +28,17 @@ TEST_CASE("[BytecodeGenerator] Empty function with 1 parameter") {
 }
 
 TEST_CASE("[BytecodeGenerator] Empty function with 4 parameters (> 3)") {
-	auto [astPtr, data] = ASTFromInputBytecodeGenerator("toto = function(t: int, t1: string, t2: int, t3: int) do end\n");
+	static constexpr auto progStr = "toto = function(t: int, t1: string, t2: int, t3: int) do end\n";
+	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP_REL, "3"},
+		{ska::bytecode::Command::JUMP_REL, "4"},
 		{ska::bytecode::Command::POP, "V0", "V1", "V2"},
 		{ska::bytecode::Command::POP, "V3" },
+		{ska::bytecode::Command::CLEAR_RANGE, "V0", "V3" },
 		{ska::bytecode::Command::RET},
-		{ska::bytecode::Command::END, "V4", "-4"}
+		{ska::bytecode::Command::END, "V4", "-5"}
 	});
 }
 
@@ -45,15 +47,16 @@ TEST_CASE("[BytecodeGenerator] Empty function with 4 parameters (> 3) + use") {
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP_REL, "7"},
+		{ska::bytecode::Command::JUMP_REL, "8"},
 		{ska::bytecode::Command::POP, "V0", "V1", "V2"},
 		{ska::bytecode::Command::POP, "V3" },
-		{ska::bytecode::Command::MOV, "V4", "V3" },
-		{ska::bytecode::Command::MOV, "V4", "V2" },
-		{ska::bytecode::Command::MOV, "V4", "V1" },
 		{ska::bytecode::Command::MOV, "V4", "V0" },
+		{ska::bytecode::Command::MOV, "V4", "V1" },
+		{ska::bytecode::Command::MOV, "V4", "V2" },
+		{ska::bytecode::Command::MOV, "V4", "V3" },
+		{ska::bytecode::Command::CLEAR_RANGE, "V0", "V4" },
 		{ska::bytecode::Command::RET},
-		{ska::bytecode::Command::END, "V5", "-8"}
+		{ska::bytecode::Command::END, "V5", "-9"}
 	});
 }
 
@@ -62,9 +65,11 @@ TEST_CASE("[BytecodeGenerator] Basic function with 1 return type") {
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP_REL, "1"},
-		{ska::bytecode::Command::RET, "0"},
-		{ska::bytecode::Command::END, "V0", "-2" }
+		{ska::bytecode::Command::JUMP_REL, "3"},
+		{ska::bytecode::Command::MOV, "R0", "0"},
+		{ska::bytecode::Command::CLEAR_RANGE, "R0", "R0"},
+		{ska::bytecode::Command::RET, "R0"},
+		{ska::bytecode::Command::END, "V0", "-4" }
 	});
 }
 
@@ -73,10 +78,13 @@ TEST_CASE("[BytecodeGenerator] Basic function with 1 parameter 1 return type") {
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP_REL, "2"},
+		{ska::bytecode::Command::JUMP_REL, "5"},
 		{ska::bytecode::Command::POP, "V0"},
-		{ska::bytecode::Command::RET, "0"},
-		{ska::bytecode::Command::END, "V1", "-3" }
+		{ska::bytecode::Command::MOV, "R0", "0"},
+		{ska::bytecode::Command::CLEAR_RANGE, "R0", "R0"},
+		{ska::bytecode::Command::CLEAR_RANGE, "V0", "V0"},
+		{ska::bytecode::Command::RET, "R0"},
+		{ska::bytecode::Command::END, "V1", "-6" }
 	});
 }
 
@@ -85,12 +93,15 @@ TEST_CASE("[BytecodeGenerator] Function with 1 parameter and some computing insi
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP_REL, "4"},
+		{ska::bytecode::Command::JUMP_REL, "7"},
 		{ska::bytecode::Command::POP, "V0"},
 		{ska::bytecode::Command::ADD_I, "R0", "V0", "3"},
 		{ska::bytecode::Command::MOV, "V1", "R0"},
-		{ska::bytecode::Command::RET, "V1"},
-		{ska::bytecode::Command::END, "V2", "-5" }
+		{ska::bytecode::Command::MOV, "R1", "V1"},
+		{ska::bytecode::Command::CLEAR_RANGE, "R1", "R1"},
+		{ska::bytecode::Command::CLEAR_RANGE, "V0", "V1"},
+		{ska::bytecode::Command::RET, "R1"},
+		{ska::bytecode::Command::END, "V2", "-8" }
 	});
 }
 
@@ -113,25 +124,42 @@ TEST_CASE("[BytecodeGenerator] Custom object creation") {
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
 	BytecodeCompare(res, {
-		{ska::bytecode::Command::JUMP_REL, "14"},
-		{ska::bytecode::Command::MOV, "V0", "1"},
-		{ska::bytecode::Command::MOV, "V1", "V0"},
-		{ska::bytecode::Command::PUSH, "V1"},
+		{ska::bytecode::Command::JUMP_REL, "31"},
 		{ska::bytecode::Command::JUMP_REL, "6"},
-		{ska::bytecode::Command::POP, "V2"},
-		{ska::bytecode::Command::CONV_I_STR, "R0", "V0"},
-		{ska::bytecode::Command::ADD_STR, "R0", "R0", "V2"},
-		{ska::bytecode::Command::ADD_STR, "R1", "lol", "R0"},
-		{ska::bytecode::Command::MOV, "V3", "R1"},
-		{ska::bytecode::Command::RET, "V3"},
-		{ska::bytecode::Command::END, "V4", "-7"},
-		{ska::bytecode::Command::PUSH, "V4"},
-		{ska::bytecode::Command::POP_IN_VAR, "R2", "2"},
-		{ska::bytecode::Command::RET, "R2"},
-		{ska::bytecode::Command::END, "V5", "-15"},
-		{ska::bytecode::Command::JUMP_ABS, "V5"},
-		{ska::bytecode::Command::POP, "R3"},
-		{ska::bytecode::Command::MOV, "V6", "R3"}
+		{ska::bytecode::Command::MOV, "V0", "1"},
+		{ska::bytecode::Command::PUSH, "V0"},
+		{ska::bytecode::Command::POP_IN_VAR, "R0", "1"},
+		{ska::bytecode::Command::CLEAR_RANGE, "R0", "R0"},
+		{ska::bytecode::Command::CLEAR_RANGE, "V0", "V0"},
+		{ska::bytecode::Command::RET, "R0"},
+		{ska::bytecode::Command::END, "V1", "-7"},
+		{ska::bytecode::Command::JUMP_ABS, "V1"},
+		{ska::bytecode::Command::POP, "R1"},
+		{ska::bytecode::Command::MOV, "V2", "R1"},
+		{ska::bytecode::Command::PUSH, "V2"},
+		{ska::bytecode::Command::MOV, "V3", "V0"},
+		{ska::bytecode::Command::PUSH, "V3"},
+		{ska::bytecode::Command::JUMP_REL, "10"},
+		{ska::bytecode::Command::POP, "V4", "V5"},
+		{ska::bytecode::Command::ARR_ACCESS, "R2", "V4", "0"},
+		{ska::bytecode::Command::CONV_I_STR, "R3", "R2"},
+		{ska::bytecode::Command::ADD_STR, "R3", "R3", "V5"},
+		{ska::bytecode::Command::ADD_STR, "R4", "lol", "R3"},
+		{ska::bytecode::Command::MOV, "V6", "R4"},
+		{ska::bytecode::Command::MOV, "R5", "V6"},
+		{ska::bytecode::Command::CLEAR_RANGE, "R2", "R5"},
+		{ska::bytecode::Command::CLEAR_RANGE, "V4", "V6"},
+		{ska::bytecode::Command::RET, "R5"},
+		{ska::bytecode::Command::END, "V7", "-11"},
+		{ska::bytecode::Command::PUSH, "V7"},
+		{ska::bytecode::Command::POP_IN_VAR, "R6", "3"},
+		{ska::bytecode::Command::CLEAR_RANGE, "R0", "R6"},
+		{ska::bytecode::Command::CLEAR_RANGE, "V0", "V7"},
+		{ska::bytecode::Command::RET, "R6"},
+		{ska::bytecode::Command::END, "V8", "-32"},
+		{ska::bytecode::Command::JUMP_ABS, "V8"},
+		{ska::bytecode::Command::POP, "R7"},
+		{ska::bytecode::Command::MOV, "V9", "R7"}
 	});
 }
 

@@ -5,7 +5,7 @@
 
 using namespace ska::bytecode;
 
-TEST_CASE("[BytecodeGenerator] import ") {
+TEST_CASE("[BytecodeGenerator] import") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("Player = import \"" SKALANG_TEST_DIR "/src/resources/play\"\n");
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 	BytecodeCompare(res, {
