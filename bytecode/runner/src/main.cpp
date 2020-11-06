@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
 		auto parameterValues = std::make_shared<ska::NodeValueArrayRaw>();
 		auto parameterModule = BasicParameterModuleBuilder(moduleConfiguration, parameterValues, argc, argv);
 
-		auto failedToRead = serializer.deserialize(moduleConfiguration.scriptCache, "main", ska::bytecode::DeserializationStrategyType::PerScript(), {"main"});
+		//auto failedToRead = serializer.deserialize(moduleConfiguration.scriptCache, "main", ska::bytecode::DeserializationStrategyType::PerScript(), {"main"});
 		
 		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
 		auto& gen = generator.generate(moduleConfiguration.scriptCache, std::move(script));
