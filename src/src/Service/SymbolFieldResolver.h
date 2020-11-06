@@ -1,6 +1,7 @@
 #pragma once
 #include <variant>
 #include <mutex>
+#include <memory>
 
 namespace ska {
 	class ScopedSymbolTable;
