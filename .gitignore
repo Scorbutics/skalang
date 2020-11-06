@@ -38,3 +38,4 @@ LogError.txt
 /bytecode/runner/mainb
 *.miniskab
 *.so
+*.swp
