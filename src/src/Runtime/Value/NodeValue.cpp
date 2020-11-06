@@ -116,11 +116,7 @@ void ska::NodeValue::transferValueToOwned(NodeValueVariant_ arg) {
 			SLOG(LogLevel::Error) << "a value ref cannot refer to itself. Aborting assignation.";
 			return;
 		}
-		if (isReference(arg)) {
-			m_variant = dereference(arg).m_variant;
-		} else {
-			m_variant = std::move(arg);
-		}
+		m_variant = std::move(arg);
 
 		SLOG(LogLevel::Debug) << "%10cAssigning direct value " << convertString();
 	}
