@@ -5,22 +5,21 @@
 #include "BytecodeInterpreterTest.h"
 
 TEST_CASE("[BytecodeInterpreter] Outside script from file (import) and use") {
-	constexpr auto progStr = 
+	constexpr auto progStr =
 		"Character184 = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
 		"player = Character184.build(\"Player\")\n"
 		"enemy = Character184.default\n"
 		"t = enemy.age\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
-	
+
 	ska::bytecode::InstructionsDebugInfo{ progStr, 50 }.print(std::cout, *data.storage, gen.id());
-	
+
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 	auto res = interpreted->variable(gen.id());
-	/*
+
 	auto cellValue = res.nodeval<long>();
 	CHECK(cellValue == 10);
-	*/
 }
 
 TEST_CASE("[BytecodeInterpreter] Outside script from file (import) - edit - and use") {
