@@ -1,6 +1,8 @@
-Fcty = function(x: int, y: int): var do
+IOLog = import "bind:std.native.io.log"
+Fcty = function(x_: int, y_: int): var do
+	
 	return {
-		x = x
-		y = y
+		x = x_
+		y = y_
 	}
 end
