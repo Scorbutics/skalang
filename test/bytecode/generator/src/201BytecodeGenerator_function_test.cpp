@@ -376,7 +376,9 @@ TEST_CASE("[BytecodeGenerator] everything inside factory function is relative to
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator(progStr);
 	auto& res = data.generator->generate(*data.storage, std::move(astPtr));
 
+#ifndef NDEBUG
 	ska::bytecode::InstructionsDebugInfo{ progStr, 50 }.print(std::cout, *data.storage, res.id());
+#endif
 
 	BytecodeCompare(res, {
 		{ska::bytecode::Command::JUMP_REL, "25"},

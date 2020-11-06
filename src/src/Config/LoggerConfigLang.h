@@ -5,10 +5,14 @@
 
 namespace ska {
 	namespace detail {
+#if defined(NDEBUG)
 		using SkaLangLogger = ska::MultiLogger<
 			ska::Logger<ska::LogLevel::Debug, ska::LogLevel::Error, ska::LogAsync>,
 			ska::Logger<ska::LogLevel::Debug, ska::LogLevel::Error, ska::LogSync>
 		>;
+#else
+		using SkaLangLogger = ska::Logger<ska::LogLevel::Error, ska::LogLevel::Error, ska::LogSync>;
+#endif
 		SkaLangLogger BuildLangLogger(const char* filename);
 
 		SkaLangLogger& LangLogger();

@@ -12,9 +12,9 @@ TEST_CASE("[BytecodeInterpreter] Outside script from file (import) and use") {
 		"t = enemy.age\n";
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
-
+#ifndef NDEBUG
 	ska::bytecode::InstructionsDebugInfo{ progStr, 50 }.print(std::cout, *data.storage, gen.id());
-
+#endif
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
 	auto res = interpreted->variable(gen.id());
 

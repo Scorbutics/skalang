@@ -3,8 +3,6 @@
 #include "LoggerConfigLang.h"
 #include <Signal/SignalHandler.h>
 
-#define SKALANG_LOGGING
-
 ska::detail::SkaLangLogger& ska::detail::LangLogger() {
 	static auto logger = ska::detail::BuildLangLogger("Log.txt");
 	return logger;
@@ -25,7 +23,7 @@ namespace ska {
 ska::detail::SkaLangLogger ska::detail::BuildLangLogger(const char * filename) {
 	static auto TypeBuilderLogFileOutput = std::ofstream { filename };
 	auto logger = SkaLangLogger{};
-#ifdef SKALANG_LOGGING
+#if defined(SKALANG_LOGGING) && defined(NDEBUG)
 	logger.get<0>().addOutputTarget(TypeBuilderLogFileOutput);
 	logger.get<1>().addOutputTarget(std::cout);
 

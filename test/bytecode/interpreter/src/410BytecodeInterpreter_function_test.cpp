@@ -183,9 +183,9 @@ TEST_CASE("[BytecodeInterpreter] everything inside factory function is relative 
 	// We expect toto.value() == "toto" and titi.value() == "titi"
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
-	
+#ifndef NDEBUG
 	ska::bytecode::InstructionsDebugInfo{ progStr, 50 }.print(std::cout, *data.storage, gen.id());
-
+#endif
 	auto res = data.interpreter->interpret(gen.id(), *data.storage)->variable(0);
 	auto firstCellValue = res.nodeval<ska::StringShared>();
 	CHECK(*firstCellValue == "tototiti");
