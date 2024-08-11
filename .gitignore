@@ -3,6 +3,7 @@
 bin/Debug
 bin/Release
 bin/RelWithDebInfo
+build/
 Win32/
 x64/
 **.cmake
@@ -31,7 +32,6 @@ Log.txt
 LogError.txt
 **/LogError.txt
 *.log
-.vscode
 **/*.dir
 *.dir
 *.log.txt
