@@ -32,10 +32,5 @@ ska::detail::SkaLangSerializerLogger ska::detail::BuildLangSerializerLogger(cons
 	UpdatePatterns(logger.get<0>());
 	UpdatePatterns(logger.get<1>());
 #endif
-	ska::process::SignalHandlerAddAction([](int signalCode) {
-			detail::LangSerializerLogger().terminate();
-			LogFileOutput.close();
-	});
-
 	return logger;
 }

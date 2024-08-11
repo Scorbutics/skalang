@@ -30,10 +30,6 @@ ska::detail::SkaLangLogger ska::detail::BuildLangLogger(const char * filename) {
 	UpdatePatterns(logger.get<0>());
 	UpdatePatterns(logger.get<1>());
 #endif
-	ska::process::SignalHandlerAddAction([](int signalCode) {
-			detail::LangLogger().terminate();
-			TypeBuilderLogFileOutput.close();
-	});
 
 	return logger;
 }
