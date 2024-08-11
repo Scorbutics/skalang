@@ -22,7 +22,7 @@ namespace ska {
 			InstructionsDebugInfo& operator=(const InstructionsDebugInfo&) = delete;
 
 			void print(std::ostream& stream, ScriptCache& cache, std::size_t id) const;
-			void print(std::ostream& stream, InstructionOutput& generation) const;
+			void print(std::ostream& stream, const InstructionOutput& generation) const;
 		private:
 			std::string m_scriptFileContent;
 			std::size_t m_columnWidth;

@@ -16,14 +16,14 @@ namespace ska {
 
 	class ASTNode;
 	using ASTNodePtr = std::unique_ptr<ASTNode>;
-	
+
 	class MatcherFactory {
 	public:
         ~MatcherFactory() = default;
 		MatcherFactory(const ReservedKeywordsPool& pool, StatementParser& parser) :
 			m_reservedKeywordsPool(pool), m_parser(parser), m_matcherType(pool),
 			m_matcherConverter(pool, parser, m_matcherType), m_matcherReturn(pool, parser, m_matcherConverter) {}
-	
+
 		ASTNodePtr matchDeclaration(ScriptAST& input, const Token& functionName, std::deque<ASTNodePtr> parameters, ASTNodePtr returnType);
 		ASTNodePtr buildThisObject(ScriptAST& input);
 		bool isFunctionMember(const Symbol& symbol) const;
@@ -31,7 +31,6 @@ namespace ska {
     private:
 		ASTNodePtr matchPrivateFactory(ScriptAST& input, const ASTNode& functionPrototype);
 		ASTNodePtr matchPrivateObject(ScriptAST& input, const Token& privateFactoryName);
-		ASTNodePtr matchPublicObject(ScriptAST& input);
 
         std::vector<ASTNodePtr> matchDeclarationBody(ScriptAST& input, const Token& endToken);
 

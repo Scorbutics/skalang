@@ -20,6 +20,19 @@ set(SKALANG_BYTECODE_SER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bytecode/serializer)
 set(SKALANG_BYTECODE_INT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bytecode/interpreter)
 set(SKALANG_BYTECODE_RUN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/bytecode/runner)
 
+if( NOT CMAKE_BUILD_TYPE )
+  set( CMAKE_BUILD_TYPE Debug CACHE STRING
+       "Choose the type of build, options are: None Debug Release RelWithDebInfo
+MinSizeRel."
+       FORCE )
+endif()
+
+string( TOLOWER "${CMAKE_BUILD_TYPE}" build_type_lower )
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND build_type_lower STREQUAL "debug")
+    MESSAGE("Clang compiler detected in debug mode. Using -fstandalone-debug flag.")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fstandalone-debug")
+endif()
+
 include_directories(${SKA_BASE_DIR})
 include_directories(${SKA_LOG_DIR})
 include_directories(src/src)

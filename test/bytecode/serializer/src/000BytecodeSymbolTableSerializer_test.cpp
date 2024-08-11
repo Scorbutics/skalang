@@ -80,7 +80,7 @@ TEST_CASE("[BytecodeSymbolTableSerializer] 2 scopes levels test") {
 		CHECK(deserializedSymbolTable.lookup(ska::SymbolTableLookup::direct("toto")) != nullptr);
 		CHECK(deserializedSymbolTable.lookup(ska::SymbolTableLookup::direct("tata")) != nullptr);
 		CHECK(deserializedSymbolTable.lookup(ska::SymbolTableLookup::direct("toutou")) != nullptr);
-		
+
 		const auto* childScope = deserializedSymbolTable.root().child(0);
 		CHECK(childScope != nullptr);
 		CHECK(childScope->scopes() == 0);
@@ -180,7 +180,7 @@ TEST_CASE("[BytecodeSymbolTableSerializer] function var factory test + type chec
 
 		CHECK(deserializedSymbolTable.lookup(ska::SymbolTableLookup::direct("test"), ska::SymbolTableNested::firstChild()) != nullptr);
 		CHECK(deserializedSymbolTable.lookup(ska::SymbolTableLookup::direct("tata"), ska::SymbolTableNested::firstChild()) == nullptr);
-		
+
 		CHECK(deserializedSymbolTable.lookup(ska::SymbolTableLookup::direct("test"), ska::SymbolTableNested::firstChild(2)) != nullptr);
 		CHECK(deserializedSymbolTable.lookup(ska::SymbolTableLookup::direct("tata"), ska::SymbolTableNested::firstChild(2)) != nullptr);
 

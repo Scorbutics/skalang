@@ -41,6 +41,8 @@ namespace ska {
 		void implement(Symbol& symbol);
 		const Symbol* master() const { return m_master; }
 
+		bool isField() const;
+
 		std::size_t id(const Symbol& field) const;
 
 		const Symbol* back() const;
@@ -69,7 +71,7 @@ namespace ska {
 		std::unordered_set<Symbol*> m_implementationReferences;
 		Symbol* m_master = this;
 		bool m_closed = true;
-		
+
 	};
 	std::ostream& operator<<(std::ostream& stream, const Symbol& symbol);
 }

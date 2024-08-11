@@ -28,13 +28,13 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclaration(ScriptAST& input) {
 	auto startEvent = FunctionTokenEvent{ *emptyNode, FunctionTokenEventType::DECLARATION_NAME, input, functionName.name() };
 	m_parser.observable_priority_queue<FunctionTokenEvent>::notifyObservers(startEvent);
 
-	auto parameterListNode = fillDeclarationParameters(input);	
+	auto parameterListNode = fillDeclarationParameters(input);
 	auto returnTypeNode = matchDeclarationReturnType(input);
-	
+
 	if (returnTypeNode->size() > 0 && (*returnTypeNode)[0].name() == m_reservedKeywordsPool.pattern<TokenGrammar::VARIABLE>().name()) {
 		SLOG(ska::LogLevel::Debug) << "factory detected (" << functionName.name() << ")";
 		return m_matcherFactory.matchDeclaration(input, functionName, std::move(parameterListNode), std::move(returnTypeNode));
-	} 
+	}
 
 	SLOG(ska::LogLevel::Debug) << "free-function detected (" << functionName.name() << ")";
 	return matchClassicFunctionDeclaration(input, functionName, std::move(parameterListNode), std::move(returnTypeNode));
@@ -44,7 +44,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchClassicFunctionDeclaration(ScriptAST&
 	if (input.contextOf(ParsingContextType::FACTORY_DECLARATION) != nullptr) {
 		SLOG(ska::LogLevel::Debug) << "function \"" << functionName.name() << "\" is a function member";
 		input.pushContext({ParsingContextType::FUNCTION_MEMBER_DECLARATION, functionName});
-		parameters.push_front(m_matcherFactory.buildThisObject(input));
+		//parameters.push_front(m_matcherFactory.buildThisObject(input));
 	} else {
 		input.pushContext({ParsingContextType::FUNCTION_DECLARATION, functionName});
 	}
@@ -65,9 +65,9 @@ ska::ASTNodePtr ska::MatcherFunction::matchClassicFunctionDeclaration(ScriptAST&
 	auto functionBodyNode = ASTFactory::MakeNode<Operator::BLOCK>(matchDeclarationBody(input, m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>()));
 	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
 	SLOG(ska::LogLevel::Debug) << "function read.";
-	
+
 	auto functionDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(prototypeNode), std::move(functionBodyNode));
-	
+
 	auto statementEvent = FunctionTokenEvent {*functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, input, functionName.name() };
 	m_parser.observable_priority_queue<FunctionTokenEvent>::notifyObservers(statementEvent);
 
@@ -127,7 +127,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchCall(ScriptAST& input, ASTNodePtr ide
 	} else {
 		functionCallNodeContent.push_front(std::move(identifierFunctionName));
 		functionCallNode = ASTFactory::MakeNode<Operator::FUNCTION_CALL>(std::move(functionCallNodeContent));
-		functionEventType = FunctionTokenEventType::CALL;		
+		functionEventType = FunctionTokenEventType::CALL;
 	}
 
 	auto event = FunctionTokenEvent { *functionCallNode, functionEventType, input };
@@ -146,9 +146,9 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationParameter(ScriptAST& input
 
 	const auto& typeDelimiterToken = m_reservedKeywordsPool.pattern<TokenGrammar::TYPE_DELIMITER>();
     input.reader().match(typeDelimiterToken);
-	
+
 	auto typeNameNode = m_matcherType.match(input.reader());
-		
+
 	SLOG(ska::LogLevel::Debug) << id.name();
 	return ASTFactory::MakeNode<Operator::PARAMETER_DECLARATION>(id, std::move(typeNameNode));
 }
@@ -172,7 +172,7 @@ std::deque<ska::ASTNodePtr> ska::MatcherFunction::fillDeclarationParameters(Scri
 		isRightParenthesis = input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
 	}
 	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::PARENTHESIS_END>());
-	
+
 	return parameters;
 }
 
@@ -182,7 +182,7 @@ ska::ASTNodePtr ska::MatcherFunction::matchDeclarationReturnType(ScriptAST& inpu
 		auto typeNode = m_matcherType.match(input.reader());
 		SLOG(ska::LogLevel::Debug) << "function type detected : " << typeNode->name();
 		return typeNode;
-	} 
+	}
 
 	SLOG(ska::LogLevel::Debug) << "void function detected";
 	return ASTFactory::MakeLogicalNode(ska::Token{ "", ska::TokenType::IDENTIFIER, input.reader().actual().position() });

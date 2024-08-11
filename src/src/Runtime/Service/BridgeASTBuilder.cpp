@@ -10,10 +10,8 @@
 #include "NodeValue/ScriptAST.h"
 #include "Service/ScriptNameBuilder.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::BridgeASTBuilder)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::BridgeASTBuilder)
 
-static constexpr const auto* ThisPrivateName = "this.private";
-static constexpr const auto* ThisPrivateMemberName = "this.private.member";
 static constexpr const auto* ThisPrivateFactoryName = "this.private.fcty";
 
 ska::BridgeASTBuilder::BridgeASTBuilder(TypeBuilder& typeBuilder, const ReservedKeywordsPool& reserved) :
@@ -97,7 +95,7 @@ std::deque<ska::ASTNodePtr> ska::BridgeASTBuilder::makeFunctionInputOutput(Scrip
 		} else {
 			typeNode = m_matcherType.match(type);
 		}
-		
+
 		SLOG(LogLevel::Debug) << " Deduced." ;
 		parametersAndReturn.push_back(std::move(makeFunctionParameterOrReturnType(script, std::move(typeNode), index, fullTypeFunction.size() - 1)));
 		index++;
@@ -161,7 +159,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionDeclaration(ScriptAST& script
 	auto lock = BridgeASTBuilderSymbolTableLock{*this, script.symbols() };
 	const std::string& functionName = prototype->name();
 	SLOG(LogLevel::Info) << " 6 - Making function declaration " << functionName;
-	
+
 	auto bodyNode = ASTNodePtr {};
 	auto fieldList = data.makeFunctions();
 	if (!fieldList.empty()) {
@@ -171,7 +169,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionDeclaration(ScriptAST& script
 	}
 	auto functionNameToken = Token{ functionName, TokenType::IDENTIFIER, {} };
 	auto functionDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionNameToken, std::move(prototype), std::move(bodyNode));
-	
+
 	auto event = FunctionTokenEvent{ *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, script, functionNameToken.name() };
 	observable_priority_queue<FunctionTokenEvent>::notifyObservers(event);
 	SLOG(LogLevel::Info) << " Function building finished \"" << functionName << "\"";
@@ -182,7 +180,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionDeclaration(ScriptAST& script
 ska::ASTNodePtr ska::BridgeASTBuilder::makeFactoryDeclaration(ScriptAST& script, ASTNodePtr prototype, const BridgeFunction& data) {
 	auto lock = BridgeASTBuilderSymbolTableLock{ *this, script.symbols() };
 	const auto functionName = Token{ prototype->name(), TokenType::IDENTIFIER, prototype->positionInScript() };
-	
+
 	auto fieldList = data.makeFunctions();
 	auto bodyNode = ASTNodePtr{};
 	if (!fieldList.empty()) {
@@ -203,49 +201,9 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFactoryDeclaration(ScriptAST& script,
 
 ska::ASTNodePtr ska::BridgeASTBuilder::makeFactoryPrivateFactory(ScriptAST& input, const ASTNode& functionPrototype) {
 	auto lock = BridgeASTBuilderSymbolTableLock{ *this, input.symbols() };
-	auto functionPrivateObjectToken = Token{ ThisPrivateFactoryName, TokenType::IDENTIFIER, input.reader().actual().position() };
 
 	auto emptyNode = ASTFactory::MakeEmptyNode();
-	auto startEvent = FunctionTokenEvent{ *emptyNode, FunctionTokenEventType::DECLARATION_NAME, input, functionPrivateObjectToken.name() };
-	observable_priority_queue<FunctionTokenEvent>::notifyObservers(startEvent);
-
-	auto returnTypeNode = m_matcherType.match(Type::MakeCustom<ExpressionType::OBJECT>(nullptr));
-	auto prototypeNode = ASTFactory::MakeNode<Operator::FUNCTION_PROTOTYPE_DECLARATION>(functionPrivateObjectToken, std::move(returnTypeNode));
-
-	auto functionEvent = VarTokenEvent::MakeFunction(*prototypeNode, input);
-	observable_priority_queue<VarTokenEvent>::notifyObservers(functionEvent);
-
-	auto privateReturnEventStart = ReturnTokenEvent{ input };
-	observable_priority_queue<ReturnTokenEvent>::notifyObservers(privateReturnEventStart);
-
-	auto returnNodes = std::vector<ASTNodePtr>{};
-	auto parameterIndex = std::size_t{ 0 };
-	for (auto& parameter : functionPrototype) {
-		if (parameterIndex != functionPrototype.size() - 1) {
-			auto parameterName = Token{ parameter->name(), TokenType::IDENTIFIER, {} };
-			auto parameterValue = ASTFactory::MakeLogicalNode(parameterName);
-			if (parameter->symbol() != nullptr) {
-				parameterValue->updateType(parameter->type().value());
-				parameterValue->linkSymbol(*parameter->symbol());
-			}
-			returnNodes.push_back(ASTFactory::MakeNode<Operator::VARIABLE_AFFECTATION>(parameterName, std::move(parameterValue)));
-
-			auto event = VarTokenEvent::Make<VarTokenEventType::VARIABLE_AFFECTATION>(*returnNodes.back(), input);
-			observable_priority_queue<VarTokenEvent>::notifyObservers(event);
-		}
-		parameterIndex++;
-	}
-
-	auto privateNodeObj = ASTFactory::MakeNode<Operator::RETURN>(ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(returnNodes)));
-	auto privateReturnEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT>(*privateNodeObj, input);
-	observable_priority_queue<ReturnTokenEvent>::notifyObservers(privateReturnEvent);
-
-	auto functionPrivateObject = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionPrivateObjectToken, std::move(prototypeNode), ASTFactory::MakeNode<Operator::BLOCK>(std::move(privateNodeObj)));
-
-	auto statementEvent = FunctionTokenEvent{ *functionPrivateObject, FunctionTokenEventType::DECLARATION_STATEMENT, input, functionPrivateObject->name() };
-	observable_priority_queue<FunctionTokenEvent>::notifyObservers(statementEvent);
-
-	return functionPrivateObject;
+	return emptyNode;
 }
 
 ska::ASTNodePtr ska::BridgeASTBuilder::makeFactoryPrototype(ScriptAST& script, ASTNodePtr nameNode, std::deque<ASTNodePtr> parameters) {
@@ -267,11 +225,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFactoryPrototype(ScriptAST& script, A
 	auto functionEvent = VarTokenEvent::MakeFunction(*functionPrototypeNode, script);
 	observable_priority_queue<VarTokenEvent>::notifyObservers(functionEvent);
 
-	auto privateFunctionFactory = makeFactoryPrivateFactory(script, *functionPrototypeNode);
-
-	SLOG(ska::LogLevel::Debug) << "factory matching public object part";
-
-	auto factoryPrototypeNode = ASTFactory::MakeNode<Operator::FACTORY_PROTOTYPE_DECLARATION>(functionName, std::move(functionPrototypeNode), std::move(privateFunctionFactory));
+	auto factoryPrototypeNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(functionPrototypeNode), std::move(functionPrototypeNode));
 
 	auto prototypeFactoryEvent = FunctionTokenEvent{ *factoryPrototypeNode, FunctionTokenEventType::FACTORY_PROTOTYPE, script, functionName.name() };
 	observable_priority_queue<FunctionTokenEvent>::notifyObservers(prototypeFactoryEvent);

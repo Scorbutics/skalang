@@ -23,7 +23,7 @@ TEST_CASE("[BytecodeInterpreter] Outside script from file (import) and use") {
 }
 
 TEST_CASE("[BytecodeInterpreter] Outside script from file (import) - edit - and use") {
-	constexpr auto progStr = 
+	constexpr auto progStr =
 		"Character260 = import \"" SKALANG_TEST_DIR "/src/resources/character\"\n"
 		"enemy = Character260.default\n"
 		"enemy.age = 99\n"

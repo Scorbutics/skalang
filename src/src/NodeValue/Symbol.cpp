@@ -18,7 +18,7 @@ template <class Return, class Data, class Master>
 static Return Lookup(Data& data, Master* master, const std::string& fieldSymbolName) {
 	auto* table = data.lookup();
 	if (table != nullptr) {
-		auto* found = (*table)(fieldSymbolName);
+		auto* found = (*table)[fieldSymbolName];
 		if (found != nullptr) {
 			return found;
 		}
@@ -113,9 +113,14 @@ void ska::Symbol::implement(Symbol& symbol) {
 	}
 	SLOG(ska::LogLevel::Info) << "Implementing symbol " << symbol << " into " << m_name << " type (" << m_category << ")";
 
-	symbol.m_master->m_implementationReferences.erase(&symbol);	
+	symbol.m_master->m_implementationReferences.erase(&symbol);
 	symbol.m_master = this;
 	m_implementationReferences.insert(&symbol);
+}
+
+bool ska::Symbol::isField() const {
+	auto* table = m_data.lookup();
+	return table != nullptr && table->exported();
 }
 
 const ska::Symbol* ska::Symbol::operator[](std::size_t index) const {
@@ -159,7 +164,7 @@ void ska::Symbol::openTable() {
 }
 
 void ska::Symbol::closeTable() {
-	m_closed = true; 
+	m_closed = true;
 	m_data.close();
 }
 

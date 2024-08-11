@@ -203,7 +203,7 @@ TEST_CASE("function") {
 	CHECK(astFunc157.op() == ska::Operator::FUNCTION_DECLARATION);
 		CHECK(astFunc157.size() == 2);
 	}
-	
+
 	SUBCASE("Empty statement") {
 		ASTFromInput(scriptCache, "\n", keywords);
 	}
@@ -237,7 +237,7 @@ TEST_CASE("filter") {
 		auto astPtr = ASTFromInput(scriptCache, "array193 | (iterator) do end\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
 		CHECK(ast.op() == ska::Operator::FILTER);
-		
+
 		CHECK(ast[0].op() == ska::Operator::UNARY);
 
 		const auto& astArray193Declaration = ast[1];
@@ -291,7 +291,7 @@ TEST_CASE("filter") {
 			CHECK(false);
 		} catch (std::runtime_error & e) {
 			CHECK(std::string{ e.what() }.find("bad token detected (expected a block start token)") != std::string::npos);
-		}	
+		}
 	}
 
 	SUBCASE("missing filter declaration + body") {
@@ -332,65 +332,86 @@ TEST_CASE("User defined object") {
 
 	SUBCASE("constructor with 1 parameter") {
 
-	auto astPtr = ASTFromInput(scriptCache, "Joueur = function(nom:string) : var do return { nom = nom }\n end\n joueur1 = Joueur(\"joueur 1\")\n joueur1.nom\n", keywords);
+		auto astPtr = ASTFromInput(scriptCache, "Joueur = function(nom:string) : var do return { nom = nom }\n end\n joueur1 = Joueur(\"joueur 1\")\n joueur1.nom\n", keywords);
 		CHECK(astPtr.rootNode().size() == 3);
-	CHECK(astPtr.rootNode().op() == ska::Operator::BLOCK);
+		CHECK(astPtr.rootNode().op() == ska::Operator::BLOCK);
 
-	auto& varJoueurNode = astPtr.rootNode()[0];
-	CHECK(varJoueurNode.size() == 1);
-	CHECK(varJoueurNode.op() == ska::Operator::VARIABLE_AFFECTATION);
-	const auto& astFunc154 = varJoueurNode[0];
-	CHECK(astFunc154.op() == ska::Operator::FUNCTION_DECLARATION);
-		CHECK(astFunc154.size() == 2);
-	const auto& astFuncParameters154 = astFunc154[0];
+		auto& varJoueurNode = astPtr.rootNode()[0];
+		CHECK(varJoueurNode.size() == 1);
+		CHECK(varJoueurNode.op() == ska::Operator::VARIABLE_AFFECTATION);
+		const auto& astFunc154 = varJoueurNode[0];
+		CHECK(astFunc154.op() == ska::Operator::FUNCTION_DECLARATION);
+			CHECK(astFunc154.size() == 2);
+		const auto& astFuncParameters154 = astFunc154[0];
 
-	//Joueur factory block is inside "astFuncParameters154"
-	CHECK(astFuncParameters154.size() == 2);
+		//Joueur factory block is inside "astFuncParameters154"
+		CHECK(astFuncParameters154.size() == 2);
 
-	//Checks the parameters
-	CHECK(astFuncParameters154[0][0].size() == 1);
-	CHECK(astFuncParameters154[0][0][0].size() == 3);
-	CHECK(astFuncParameters154[0][0][0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
+		//Checks the parameters
+		CHECK(astFuncParameters154[0][0].size() == 1);
+		CHECK(astFuncParameters154[0][0][0].size() == 3);
+		CHECK(astFuncParameters154[0][0][0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
 
-	//Checks the return type
-	CHECK(astFuncParameters154[0][astFuncParameters154.size() - 1][0].has(keywords.pattern<ska::TokenGrammar::VARIABLE>()));
+		//Checks the return type
+		CHECK(astFuncParameters154[0][astFuncParameters154.size() - 1][0].has(keywords.pattern<ska::TokenGrammar::VARIABLE>()));
 
-	//Checks the parameter name and type : in the private factory block
-	auto& parametersAsReturnInPrivateFactory = astFuncParameters154[1][1][0][0];
-	CHECK(parametersAsReturnInPrivateFactory.size() == 1);
-	CHECK(parametersAsReturnInPrivateFactory[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
+		//Checks the parameter name and type : in the private factory block
+		auto& parametersAsReturnInPrivateFactory = astFuncParameters154[1][1][0][0];
+		CHECK(parametersAsReturnInPrivateFactory.size() == 1);
+		CHECK(parametersAsReturnInPrivateFactory[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
 
 
-	//Checks the function body
-	CHECK(astFunc154[1].size() == 1);
+		//Checks the function body
+		CHECK(astFunc154[1].size() == 1);
 
-	const auto& userDefinedObjectNode = astFunc154[1][0];
-	CHECK(astFunc154[1].op() == ska::Operator::RETURN);
-	CHECK(userDefinedObjectNode.op() == ska::Operator::USER_DEFINED_OBJECT);
+		const auto& userDefinedObjectNode = astFunc154[1][0];
+		CHECK(astFunc154[1].op() == ska::Operator::RETURN);
+		CHECK(userDefinedObjectNode.op() == ska::Operator::USER_DEFINED_OBJECT);
 
-	//2, because : "this" private object at index 0, "nom" at index 1
-	CHECK(userDefinedObjectNode.size() == 2);
+		//2, because : "this" private object at index 0, "nom" at index 1
+		CHECK(userDefinedObjectNode.size() == 2);
 
-	const auto& returnThisNode = userDefinedObjectNode[0];
-	CHECK(returnThisNode.size() == 1);
-	CHECK(returnThisNode.has(ska::Token{ "this.private", ska::TokenType::IDENTIFIER, {} }));
+		const auto& returnThisNode = userDefinedObjectNode[0];
+		CHECK(returnThisNode.size() == 1);
+		CHECK(returnThisNode.has(ska::Token{ "this.private", ska::TokenType::IDENTIFIER, {} }));
 
-	const auto& returnNomNode = userDefinedObjectNode[1];
-	CHECK(returnNomNode.size() == 1);
-	CHECK(returnNomNode.has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
+		const auto& returnNomNode = userDefinedObjectNode[1];
+		CHECK(returnNomNode.size() == 1);
+		CHECK(returnNomNode.has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
 
-	//Checks the variable declaration and the function call
-	const auto& varJoueur1Node = astPtr.rootNode()[1];
-	CHECK(varJoueur1Node.op() == ska::Operator::VARIABLE_AFFECTATION);
-	CHECK(varJoueur1Node.has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER, {}} ));
+		//Checks the variable declaration and the function call
+		const auto& varJoueur1Node = astPtr.rootNode()[1];
+		CHECK(varJoueur1Node.op() == ska::Operator::VARIABLE_AFFECTATION);
+		CHECK(varJoueur1Node.has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER, {}} ));
 
-	//Checks the field access
-	const auto& nomJoueur1FieldNode = astPtr.rootNode()[2];
-	CHECK(nomJoueur1FieldNode.op() == ska::Operator::FIELD_ACCESS);
+		//Checks the field access
+		const auto& nomJoueur1FieldNode = astPtr.rootNode()[2];
+		CHECK(nomJoueur1FieldNode.op() == ska::Operator::FIELD_ACCESS);
 		CHECK(nomJoueur1FieldNode.size() == 2);
 		CHECK(nomJoueur1FieldNode[0].has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER, {}} ));
 		CHECK(nomJoueur1FieldNode[1].has(ska::Token{ "nom", ska::TokenType::IDENTIFIER, {}}));
 
+	}
+
+	SUBCASE("with badly configured scope") {
+		auto astPtr = ASTFromInput(scriptCache ,R"script(
+Wrapper = function(i: int): var do
+	return {
+		value = 1
+		more_value = value + 1
+	}
+end
+)script", keywords);
+		CHECK(astPtr.rootNode().size() == 3);
+		CHECK(astPtr.rootNode().op() == ska::Operator::BLOCK);
+
+		auto& varJoueurNode = astPtr.rootNode()[0];
+		CHECK(varJoueurNode.size() == 1);
+		CHECK(varJoueurNode.op() == ska::Operator::VARIABLE_AFFECTATION);
+		const auto& astFunc154 = varJoueurNode[0];
+		CHECK(astFunc154.op() == ska::Operator::FUNCTION_DECLARATION);
+			CHECK(astFunc154.size() == 2);
+		const auto& astFuncParameters154 = astFunc154[0];
 	}
 
 }

@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 	auto parser = ska::StatementParser {reservedKeywords};
 	auto typeBuilder = ska::TypeBuilder {parser, typeCrosser };
 	auto typeChecker = ska::SemanticTypeChecker {parser, typeCrosser };
-	
+
 	auto mainCache = ska::bytecode::ScriptCache {};
 	auto generator = ska::bytecode::Generator{ reservedKeywords };
 	auto interpreter = ska::bytecode::Interpreter { parser, generator, reservedKeywords };
@@ -86,16 +86,16 @@ int main(int argc, char* argv[]) {
 		auto parameterModule = BasicParameterModuleBuilder(moduleConfiguration, parameterValues, argc, argv);
 
 		//auto failedToRead = serializer.deserialize(moduleConfiguration.scriptCache, "main", ska::bytecode::DeserializationStrategyType::PerScript(), {"main"});
-		
+
 		auto script = BasicProgramScriptStarter(moduleConfiguration, argv);
 		auto& gen = generator.generate(moduleConfiguration.scriptCache, std::move(script));
-		
+
 		//moduleConfiguration.scriptCache.printDebugInfo(std::cout);
 
 		auto interpreted = interpreter.interpret(gen.id(), moduleConfiguration.scriptCache);
 
 		//serializer.serialize(moduleConfiguration.scriptCache, ska::bytecode::SerializationStrategyType::PerScript());
-		
+
 
 	} catch (std::exception& e) {
 		std::cerr << "Error : " << e.what() << std::endl;

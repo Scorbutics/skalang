@@ -22,7 +22,7 @@ namespace ska {
 ska::detail::SkaLangLogger ska::detail::BuildLangLogger(const char * filename) {
 	static auto TypeBuilderLogFileOutput = std::ofstream { filename };
 	auto logger = SkaLangLogger{};
-#if defined(SKALANG_LOGGING) && defined(NDEBUG)
+#ifndef NDEBUG
 	logger.get<0>().addOutputTarget(TypeBuilderLogFileOutput);
 	logger.get<1>().addOutputTarget(std::cout);
 

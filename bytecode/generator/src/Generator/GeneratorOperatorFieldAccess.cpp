@@ -6,7 +6,7 @@
 #include "BytecodeCommand.h"
 #include "Generator/Value/BytecodeScriptGenerationHelper.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>)
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>::generate(OperateOn node, GenerationContext& context) {
@@ -56,7 +56,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	auto objectValue = generateNext({ context, node.GetObjectNameNode()});
 
 	LOG_DEBUG << "This field has index " << index << " in the object";
-	
+
 	auto command = Command::ARR_ACCESS;
 	if (symbolField->type() == ExpressionType::FUNCTION && symbolField->type()[0].name() == "this.private.fcty") {
 		command = Command::ARR_MEMBER_ACCESS;

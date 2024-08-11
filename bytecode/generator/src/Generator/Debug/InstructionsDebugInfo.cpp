@@ -24,7 +24,7 @@ ska::bytecode::InstructionsDebugInfo::InstructionsDebugInfo(std::string scriptDa
 }
 
 static void PrintInstructions(std::vector<std::string>& stream, std::size_t tokenIndex, std::deque<ska::bytecode::Instruction>& instruction) {
-	while (!instruction.empty() && (tokenIndex >= instruction.front().dest().position().rawIndex 
+	while (!instruction.empty() && (tokenIndex >= instruction.front().dest().position().rawIndex
 		|| instruction.front().left().position().rawIndex != 0 && tokenIndex >= instruction.front().left().position().rawIndex
 		|| instruction.front().right().position().rawIndex != 0 && tokenIndex >= instruction.front().right().position().rawIndex
 		)) {
@@ -88,7 +88,7 @@ void ska::bytecode::InstructionsDebugInfo::print(std::ostream& stream, ScriptCac
 	PrintDequeInstructions(stream, m_columnWidth, m_scriptFileContent, instructions);
 }
 
-void ska::bytecode::InstructionsDebugInfo::print(std::ostream& stream, InstructionOutput& generation) const {
+void ska::bytecode::InstructionsDebugInfo::print(std::ostream& stream, const InstructionOutput& generation) const {
 	if (m_scriptFileContent.empty()) {
 		return;
 	}

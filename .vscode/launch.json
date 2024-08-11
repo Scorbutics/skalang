@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "C++ Launch",
+            "name": "C++ Runner Launch",
             "type": "lldb",
-            "program": "${cmake.testProgram}",
-            "args": [ "${cmake.testArgs}" ],
+            "program": "./bin/skalang_bytecode_runner",
+            "args": ["${fileBasename}"],
             "request": "launch",
             "cwd": "${workspaceFolder}"
           }

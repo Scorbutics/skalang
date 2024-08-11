@@ -69,7 +69,7 @@ namespace ska {
 			void generate(ScriptCache& cache, InstructionOutput instructions);
 
 			#ifndef NDEBUG
-			void printDebugInfo(std::ostream& stream) { m_debugInfo.print(stream, m_generated); }
+			void printDebugInfo(std::ostream& stream) const { m_debugInfo.print(stream, m_generated); }
 			#endif
 
 		private:

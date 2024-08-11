@@ -5,7 +5,7 @@
 
 namespace ska {
 	namespace detail {
-#if defined(NDEBUG)
+#ifndef NDEBUG
 		using SkaLangLogger = ska::MultiLogger<
 			ska::Logger<ska::LogLevel::Debug, ska::LogLevel::Error, ska::LogAsync>,
 			ska::Logger<ska::LogLevel::Debug, ska::LogLevel::Error, ska::LogSync>

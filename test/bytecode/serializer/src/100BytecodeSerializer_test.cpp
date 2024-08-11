@@ -43,7 +43,7 @@ TEST_CASE("[BytecodeSerializer] literal alone") {
 
 TEST_CASE("[BytecodeSerializer] function + field access + floating point value + integer value + string value") {
 	ska::SerializerValidator::DisableAbort();
-	
+
 	auto [scriptIn, dataIn] = Serialize("toto = function(): var do return { bark = \"bibi\" }\n end\n toto().bark\n \"test\"\n 3.4\n 3\n");
 	auto& gen = dataIn.generator->generate(*dataIn.storage, std::move(scriptIn));
 	auto res = dataIn.serializer->serialize(*dataIn.storage, SerializeInStream());
@@ -52,7 +52,7 @@ TEST_CASE("[BytecodeSerializer] function + field access + floating point value +
 	auto [scriptOut, dataOut] = Serialize("");
 	auto original = dataOut.serializer->deserialize(*dataOut.storage, "main", DeserializeInStream());
 	CHECK(original.empty());
-	
+
 	CHECK(dataIn.storage->at(0) == dataOut.storage->at(0));
 }
 
@@ -82,20 +82,47 @@ TEST_CASE("[BytecodeSerializer] concrete external script use") {
 	CHECK(equality);
 }
 
+
+// TODO make it pass
+TEST_CASE("[BytecodeSerializer] unique variable per instance in subfunctions") {
+	ska::SerializerValidator::DisableAbort();
+	auto [script, dataIn] = Serialize(R"script(
+
+Wrapper = function(i: int): var do
+    return {
+        value = 1
+		numValue = function(): int do
+			return value
+		end
+    }
+end
+
+)script");
+	auto& gen = dataIn.generator->generate(*dataIn.storage, std::move(script));
+	auto res = dataIn.serializer->serialize(*dataIn.storage, SerializeInStream());
+	CHECK(res);
+
+	auto [scriptOut, dataOut] = Serialize("");
+	auto original = dataOut.serializer->deserialize(*dataOut.storage, "main", DeserializeInStream());
+	CHECK(original.empty());
+
+	CHECK(dataIn.storage->at(0) == dataOut.storage->at(0));
+}
+
 TEST_CASE("[BytecodeSerializer] binded external script use") {
 	ska::SerializerValidator::DisableAbort();
 	constexpr auto progStr =
 		"Logger = import \"bind:std.native.io.log\"\n"
 		"Logger.print(\"test63\")\n";
 
-	
+
 	auto data = BytecodeSerializerDataTestContainer {};
 	ASTFromInputBytecodeSerializerNoParse(progStr, data);
-	
+
 	auto interpreter = ska::bytecode::Interpreter{ *data.parser, *data.generator, data.reservedKeywords };
 	auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>{ data.storage->astCache, *data.typeBuilder, *data.typeChecker, reservedKeywords, *data.parser, *data.storage, interpreter };
 	auto logModule = ska::lang::IOLogModule<ska::bytecode::Interpreter>(moduleConfiguration);
-	
+
 	readerI->parse(*data.parser);
 	auto script = ska::bytecode::ScriptGenerationHelper{ *data.storage, *readerI };
 
@@ -108,7 +135,7 @@ TEST_CASE("[BytecodeSerializer] binded external script use") {
 
 	CHECK(destinationCache.size() == 2);
 	/*
-	TODO : test faux car le script id est inversé : main dans le destinationCache est à l'index 0 alors que dans l'initial il est à 1
+	TODO : test faux car le script id est inversï¿½ : main dans le destinationCache est ï¿½ l'index 0 alors que dans l'initial il est ï¿½ 1
 
 	const auto equalityForMain = destinationCache.at(0) == data.storage->at(1);
 	const auto equality = equalityForMain && destinationCache.at(1).size() == 0;
@@ -141,7 +168,7 @@ TEST_CASE("[BytecodeSerializer] external script use other stack triggers rebuild
 		ASTFromInputBytecodeSerializerNoParse(progStr, data);
 
 		auto interpreter = ska::bytecode::Interpreter{ *data.parser, *data.generator, data.reservedKeywords };
-	
+
 		auto moduleConfiguration = ska::lang::ModuleConfiguration<ska::bytecode::Interpreter>{ data.storage->astCache, *data.typeBuilder, *data.typeChecker, reservedKeywords, *data.parser, *data.storage, interpreter };
 		auto logModule = ska::lang::IOLogModule<ska::bytecode::Interpreter>(moduleConfiguration);
 

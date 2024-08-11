@@ -8,7 +8,7 @@
 #include "Event/ScriptLinkTokenEvent.h"
 #include "NodeValue/ScriptAST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::SymbolTable)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::SymbolTable)
 
 namespace ska::detail::symbol {
 	template <bool remove, class Event>
@@ -19,13 +19,13 @@ namespace ska::detail::symbol {
 			parser.ska::observable_priority_queue<Event>::addObserver(symbol);
 		}
 	}
-	
+
 	template <class ... Events>
 	inline void addAsObserver(ska::StatementParser& parser, ska::SymbolTable& symbol) {
 		int _[] = { 0, (manageObs<false, Events>(parser, symbol), 0)... };
 		static_cast<void>(_);
 	}
-	
+
 
 	template <class ... Events>
 	inline void removeAsObserver(ska::StatementParser& parser, ska::SymbolTable& symbol) {
@@ -34,7 +34,7 @@ namespace ska::detail::symbol {
 	}
 }
 
-ska::SymbolTable::SymbolTable(StatementParser& parser) : 
+ska::SymbolTable::SymbolTable(StatementParser& parser) :
 	SymbolTable() {
 	m_rootTable = std::make_unique<ScopedSymbolTable>();
 	m_currentTable = m_rootTable.get();
@@ -65,12 +65,12 @@ void ska::SymbolTable::internalListenParser(StatementParser& parser) {
 	internalUnlistenParser();
 	m_parser = &parser;
 	detail::symbol::addAsObserver<
-		VarTokenEvent, 
-		BlockTokenEvent, 
-		FunctionTokenEvent, 
+		VarTokenEvent,
+		BlockTokenEvent,
+		FunctionTokenEvent,
 		ReturnTokenEvent,
 		FilterTokenEvent,
-		ImportTokenEvent, 
+		ImportTokenEvent,
 		ScriptLinkTokenEvent
 	> (*m_parser, *this);
 }
@@ -78,12 +78,12 @@ void ska::SymbolTable::internalListenParser(StatementParser& parser) {
 void ska::SymbolTable::internalUnlistenParser() {
 	if(m_parser != nullptr) {
 		detail::symbol::removeAsObserver<
-			VarTokenEvent, 
-			BlockTokenEvent, 
-			FunctionTokenEvent, 
+			VarTokenEvent,
+			BlockTokenEvent,
+			FunctionTokenEvent,
 			ReturnTokenEvent,
 			FilterTokenEvent,
-			ImportTokenEvent, 
+			ImportTokenEvent,
 			ScriptLinkTokenEvent
 		> (*m_parser, *this);
 		m_parser = nullptr;
@@ -98,7 +98,7 @@ bool ska::SymbolTable::nestedTable(const BlockTokenEvent& event) {
 		SLOG(ska::LogLevel::Debug) << "\tNew block : adding a nested symbol table";
 		m_currentTable = &m_currentTable->createNested();
 		break;
-		
+
 	case BlockTokenEventType::END:
 		SLOG(ska::LogLevel::Debug) << "\tBlock end : going up in nested symbol table hierarchy";
 		assert(m_currentTable != nullptr);
@@ -122,7 +122,7 @@ bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
             throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
         }
         m_currentTable = &m_currentTable->createNested(nullptr, true);
-        SLOG(ska::LogLevel::Info) << "\tReturn : nested named symbol table with name : " << actualNameSymbol->name();
+        SLOG(ska::LogLevel::Info) << "\t\twith name : " << actualNameSymbol->name();
     }
   	break;
 
@@ -189,7 +189,7 @@ bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
 	default:
 	break;
 	}
-	
+
 	return true;
 }
 
@@ -243,7 +243,7 @@ ska::Symbol* ska::SymbolTable::lookup(SymbolTableLookup strategy, SymbolTableNes
 
 bool ska::SymbolTable::match(VarTokenEvent& token) {
 	assert(m_currentTable != nullptr);
-	
+
 	switch(token.type()) {
 		case VarTokenEventType::VARIABLE_AFFECTATION:
 		case VarTokenEventType::PARAMETER_DECLARATION: {
@@ -295,12 +295,12 @@ bool ska::SymbolTable::matchScriptLink(const ScriptLinkTokenEvent& token) {
 	if (token.bound() != nullptr && token.bound()->isBridged()) {
 		//Binds the current memory table script to the bridge-script (only if it's a bridged script)
 		m_currentTable->emplace(token.name(), *token.bound());
-	}	
+	}
 	return true;
 }
 
 ska::ParserListenerLock::ParserListenerLock(ParserListenerLock&& pll) noexcept :
-	m_symbolTable(pll.m_symbolTable), 
+	m_symbolTable(pll.m_symbolTable),
 	m_freed(pll.m_freed) {
 	pll.m_freed = true;
 }

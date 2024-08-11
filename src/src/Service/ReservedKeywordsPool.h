@@ -38,6 +38,6 @@ namespace ska {
 		const std::vector<TokenInfo> patterns;
 
 		static std::vector<TokenInfo> BuildPatterns(const std::unordered_map<std::string, TokenInfo>& pool);
-		static std::unordered_map<std::string, TokenInfo> BuildPool(); 	
+		static std::unordered_map<std::string, TokenInfo> BuildPool();
 	};
 }

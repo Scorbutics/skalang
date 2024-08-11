@@ -3,6 +3,7 @@
 bin/Debug
 bin/Release
 bin/RelWithDebInfo
+*.ninja*
 build/
 Win32/
 x64/
