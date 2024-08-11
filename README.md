@@ -109,7 +109,7 @@ It has **no** dependency excluding the C++ standard library, excluding my own sk
 It has been tested sucessfully on Windows (10), Linux (18.04) and on an Android (5+) based device with the Termux app to have an in-device terminal.
 
 Clone this repository with the external git submodules :
-`git clone --recurse-submodules https://github.com/Scorbutics/skalang`
+`git clone --recurse-submodules git@github.com:Scorbutics/skalang.git`
 Then you just have to start CMake and compile the project from the root folder :
 `cmake .`
 And
@@ -135,6 +135,6 @@ To contribute, you can either :
 		- Serialization (lib skalang_bytecode_serializer)
 		- Interpretation, by the virtual machine (VM) (lib skalang_bytecode_interpreter)
 		- Runner (facultative executable script starter)
-	
+
 ## Benchmarks
 No benchmarks on the interpreter (VM) have been done for now (I aim to add some to compare runtime executions with other known major scripting languages)

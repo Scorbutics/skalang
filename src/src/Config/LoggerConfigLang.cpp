@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include "LoggerConfigLang.h"
-#include <Signal/SignalHandler.h>
 
 ska::detail::SkaLangLogger& ska::detail::LangLogger() {
 	static auto logger = ska::detail::BuildLangLogger("Log.txt");

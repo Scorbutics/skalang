@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include "LoggerSerializer.h"
-#include <Signal/SignalHandler.h>
 
 #define SKALANG_SERIALIZER_LOGGING
 
