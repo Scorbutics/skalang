@@ -27,7 +27,7 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::TYPE>::build(const Sc
 			throw std::runtime_error("undeclared custom type \"" + node.GetName() + "\" (when trying to look on token type \"" + node.GetTypeName() + "\")");
 		}
 
-   } else { 
+   } else {
 		assert(!node.IsObject());
 	   result = ExpressionTypeMap.at(node.GetName());
 	   SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::TYPE>) << "Type-node is a built-in : \"" << node.GetName() << "\"";
@@ -37,7 +37,7 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::TYPE>::build(const Sc
 	if (node.IsArray()) {
 		result = Type::MakeBuiltIn<ExpressionType::ARRAY>().add(result);
 	}
-		
+
 	SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::TYPE>) << "Resulting type : \"" << result << "\"";
 
 	return TypeHierarchy{result, resultSymbol};

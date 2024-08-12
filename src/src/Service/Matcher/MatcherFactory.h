@@ -25,13 +25,7 @@ namespace ska {
 			m_matcherConverter(pool, parser, m_matcherType), m_matcherReturn(pool, parser, m_matcherConverter) {}
 
 		ASTNodePtr matchDeclaration(ScriptAST& input, const Token& functionName, std::deque<ASTNodePtr> parameters, ASTNodePtr returnType);
-		ASTNodePtr buildThisObject(ScriptAST& input);
-		bool isFunctionMember(const Symbol& symbol) const;
-		ASTNodePtr matchPrivateFieldUse(ScriptAST& input, ASTNodePtr varNode);
     private:
-		ASTNodePtr matchPrivateFactory(ScriptAST& input, const ASTNode& functionPrototype);
-		ASTNodePtr matchPrivateObject(ScriptAST& input, const Token& privateFactoryName);
-
         std::vector<ASTNodePtr> matchDeclarationBody(ScriptAST& input, const Token& endToken);
 
     	const ReservedKeywordsPool& m_reservedKeywordsPool;

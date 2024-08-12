@@ -45,9 +45,6 @@ namespace ska {
 
 		std::size_t id(const Symbol& field) const;
 
-		const Symbol* back() const;
-		Symbol* back();
-
 		auto begin() const { return m_data.begin(); }
 		auto begin() { return m_data.begin(); }
 		auto end() const { return m_data.end(); }

@@ -65,12 +65,9 @@ static ska::ScopedSymbolTable* GetTable(Variant& variant, const std::string& nam
 	if (std::holds_alternative<ska::ScopedSymbolTable*>(variant)) {
 		auto* containingTable = std::get<ska::ScopedSymbolTable*>(variant);
 		if (containingTable != nullptr && containingTable->scopes() > tableIndex) {
-			auto* tableSymbol = containingTable->child(tableIndex);
-			if (tableSymbol != nullptr && tableSymbol->scopes() > 0) {
-				return tableSymbol->child(tableSymbol->scopes() - 1);
-			}
-		} 
-		SLOG_STATIC(ska::LogLevel::Warn, ska::SymbolFieldResolver) << "Unable to the enclosing table of the current symbol \"" << name << "\"";	
+			return containingTable->child(tableIndex);
+		}
+		SLOG_STATIC(ska::LogLevel::Warn, ska::SymbolFieldResolver) << "Unable to the enclosing table of the current symbol \"" << name << "\"";
 		return nullptr;
 	}
 

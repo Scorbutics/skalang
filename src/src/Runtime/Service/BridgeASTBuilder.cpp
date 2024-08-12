@@ -96,7 +96,7 @@ std::deque<ska::ASTNodePtr> ska::BridgeASTBuilder::makeFunctionInputOutput(Scrip
 			typeNode = m_matcherType.match(type);
 		}
 
-		SLOG(LogLevel::Debug) << " Deduced." ;
+		SLOG(LogLevel::Debug) << " Deduced '" << *typeNode << "'";
 		parametersAndReturn.push_back(std::move(makeFunctionParameterOrReturnType(script, std::move(typeNode), index, fullTypeFunction.size() - 1)));
 		index++;
 	}
@@ -114,7 +114,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionName(ScriptAST& script, const
 
 ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionPrototype(ScriptAST& script, ASTNodePtr nameNode, std::deque<ASTNodePtr> parametersAndReturn) {
 	auto lock = BridgeASTBuilderSymbolTableLock{ *this, script.symbols() };
-	SLOG(LogLevel::Info) << " 5 - Making function prototype \"" << nameNode->name() << "\"";
+	SLOG(LogLevel::Info) << " 5 - Making function prototype (not a factory) \"" << nameNode->name() << "\"";
 	auto functionPrototype = ASTFactory::MakeNode<Operator::FUNCTION_PROTOTYPE_DECLARATION>(Token { nameNode->name(), nameNode->tokenType(), {} }, std::move(parametersAndReturn));
 	auto event = VarTokenEvent::MakeFunction(*functionPrototype, script);
 	observable_priority_queue<VarTokenEvent>::notifyObservers(event);

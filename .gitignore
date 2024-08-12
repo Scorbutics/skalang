@@ -40,3 +40,5 @@ LogError.txt
 *.miniskab
 *.so
 *.swp
+compile_commands.json
+

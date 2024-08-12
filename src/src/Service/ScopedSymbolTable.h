@@ -10,7 +10,7 @@ namespace ska {
 	class SymbolTable;
 	class ScriptAST;
 
-	class ScopedSymbolTable : 
+	class ScopedSymbolTable :
 		public SymbolFactory {
 	using ChildrenScopedSymbolTable = std::vector<std::unique_ptr<ScopedSymbolTable>>;
 
@@ -30,12 +30,12 @@ namespace ska {
 		Symbol& emplace(std::string name, const ScriptAST& script);
 
 		const Symbol* owner() const {
-			return m_parentSymbol == nullptr && &m_parent != this ? m_parent.owner() : m_parentSymbol;
+			return m_symbol == nullptr && &m_parent != this ? m_parent.owner() : m_symbol;
 		}
 
-		const Symbol* directOwner() const { return m_parentSymbol; }
+		const Symbol* directOwner() const { return m_symbol; }
 
-		Symbol* directOwner() { return m_parentSymbol; }
+		Symbol* directOwner() { return m_symbol; }
 
 		bool exported() const { return m_exported; }
 
@@ -71,7 +71,7 @@ namespace ska {
 		order_indexed_string_map<Symbol> m_symbols;
 		ChildrenScopedSymbolTable m_children;
 		ScopedSymbolTable& m_parent = *this;
-		Symbol* m_parentSymbol = nullptr;
+		Symbol* m_symbol = nullptr;
 		bool m_exported = false;
 	};
 }

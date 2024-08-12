@@ -25,11 +25,13 @@
         "tuple": "cpp",
         "compare": "cpp",
         "*.def": "cpp",
-        "stdexcept": "cpp"
+        "stdexcept": "cpp",
+        "system_error": "cpp"
     },
     "cmake.debugConfig": {
         "type": "lldb"
     },
     "cmake.buildDirectory": "${workspaceFolder}",
     "testMate.cpp.test.executables": "{build,Build,BUILD,out,Out,OUT,bin}/**/*{test,Test,TEST}*",
+    "cmake.options.statusBarVisibility": "visible",
 }

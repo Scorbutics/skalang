@@ -15,7 +15,7 @@ namespace ska {
 
 	class ASTNode;
 	using ASTNodePtr = std::unique_ptr<ASTNode>;
-	
+
 	class MatcherFunction {
 	public:
 		~MatcherFunction() = default;
@@ -23,12 +23,11 @@ namespace ska {
 			m_reservedKeywordsPool(pool), m_parser(parser), m_matcherType(pool),
 			m_matcherConverter(pool, parser, m_matcherType), m_matcherReturn(pool, parser, m_matcherConverter),
 			m_matcherFactory(pool, parser) {}
-	
+
 		ASTNodePtr matchCall(ScriptAST& input, ASTNodePtr identifierFunctionName);
 		ASTNodePtr matchDeclaration(ScriptAST& input);
-		
-		ASTNodePtr matchPrivateFieldUse(ScriptAST& input, ASTNodePtr varNode);
-	private:	
+
+	private:
 		ASTNodePtr matchClassicFunctionDeclaration(ScriptAST& input, const Token& functionName, std::deque<ASTNodePtr> parameters, ASTNodePtr returnType);
 
 		std::vector<ASTNodePtr> matchDeclarationBody(ScriptAST& input, const Token& until);

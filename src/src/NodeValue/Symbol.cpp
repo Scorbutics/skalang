@@ -18,7 +18,7 @@ template <class Return, class Data, class Master>
 static Return Lookup(Data& data, Master* master, const std::string& fieldSymbolName) {
 	auto* table = data.lookup();
 	if (table != nullptr) {
-		auto* found = (*table)[fieldSymbolName];
+		auto* found = (*table)(fieldSymbolName);
 		if (found != nullptr) {
 			return found;
 		}
@@ -137,16 +137,6 @@ const ska::Symbol* ska::Symbol::operator()(const std::string& symbolName) const 
 
 ska::Symbol* ska::Symbol::operator()(const std::string& symbolName) {
 	return Lookup<Symbol*>(m_data, m_master != this ? m_master : nullptr, symbolName);
-}
-
-const ska::Symbol* ska::Symbol::back() const {
-	auto* table = m_data.lookup();
-	return table == nullptr ? nullptr : table->back();
-}
-
-ska::Symbol* ska::Symbol::back() {
-	auto* table = m_data.lookup();
-	return table == nullptr ? nullptr : table->back();
 }
 
 std::ostream& ska::operator<<(std::ostream& stream, const Symbol& symbol) {

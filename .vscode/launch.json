@@ -11,6 +11,14 @@
             "args": ["${fileBasename}"],
             "request": "launch",
             "cwd": "${workspaceFolder}"
-          }
+        },
+        {
+        "name": "C++ Launch test.miniska",
+        "type": "lldb",
+        "program": "./bin/skalang_bytecode_runner",
+        "args": ["test.miniska"],
+        "request": "launch",
+        "cwd": "${workspaceFolder}"
+        }
     ]
 }

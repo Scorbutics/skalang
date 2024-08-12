@@ -7,7 +7,7 @@
 
 #include "Operation/OperationTypeType.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
 #define LOG_WARN SLOG_STATIC(ska::LogLevel::Warn, ska::TypeBuilderOperator<ska::Operator::FUNCTION_PROTOTYPE_DECLARATION>)
@@ -23,7 +23,7 @@ namespace ska {
 				LOG_WARN << "Linking current function return type to master symbol \"" << (symbolFunction != nullptr ? symbolFunction->name() : "") << "\"";
 				return { Type::MakeCustom<ExpressionType::OBJECT>(symbolFunction), node.symbol() == nullptr ? symbolFunction : node.symbol() };
 			}
-			
+
 			const auto symbolType = node.typeSymbol() == nullptr ? std::optional<Type>{} : node.typeSymbol()->type();
 			if (!symbolType.has_value()) {
 				throw std::runtime_error("unable to find type symbol type of function");
@@ -38,12 +38,12 @@ namespace ska {
 
 			if (symbolType.value().empty()) {
 				auto ss = std::stringstream{};
-				ss << "bad function type encountered \"" << symbolType.value() << "\": could not deduce its return value";
+				ss << "bad function type encountered \"" << symbolType.value() << "\": could not deduce its return value because it's empty";
 				throw std::runtime_error(ss.str());
 			}
 			return { symbolType.value().back(), node.typeSymbol() };
 		}
-		
+
 		if (type == ExpressionType::FUNCTION) {
 			LOG_INFO << "function prototype declaration has a FUNCTION return type \""<< (symbolFunction != nullptr ? symbolFunction->name() : "") << "\"";
 			assert(!type.empty());

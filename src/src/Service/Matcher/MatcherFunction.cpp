@@ -75,10 +75,6 @@ ska::ASTNodePtr ska::MatcherFunction::matchClassicFunctionDeclaration(ScriptAST&
 	return functionDeclarationNode;
 }
 
-ska::ASTNodePtr ska::MatcherFunction::matchPrivateFieldUse(ScriptAST& input, ASTNodePtr varNode) {
-	return m_matcherFactory.matchPrivateFieldUse(input, std::move(varNode));
-}
-
 std::deque<ska::ASTNodePtr> ska::MatcherFunction::matchParameters(ScriptAST& input) {
 	auto functionCallNodeContent = std::deque<ASTNodePtr>{};
 
@@ -115,20 +111,9 @@ ska::ASTNodePtr ska::MatcherFunction::matchCall(ScriptAST& input, ASTNodePtr ide
 	auto functionCallNode = ASTNodePtr{};
 	auto functionEventType = FunctionTokenEventType{};
 
-	// If it is a member function, we add an additionnal "this" parameter materialized by a fake field access (with no children)
-	if (identifierFunctionName->symbol() != nullptr && m_matcherFactory.isFunctionMember(*identifierFunctionName->symbol())) {
-		auto thisAccess = ASTFactory::MakeNode<Operator::FIELD_ACCESS>();
-		thisAccess->linkSymbol(*identifierFunctionName->symbol());
-		thisAccess->updateType(identifierFunctionName->symbol()->type()[0]);
-		functionCallNodeContent.push_front(std::move(thisAccess));
-		functionCallNodeContent.push_front(std::move(identifierFunctionName));
-		functionCallNode = ASTFactory::MakeNode<Operator::FUNCTION_MEMBER_CALL>(std::move(functionCallNodeContent));
-		functionEventType = FunctionTokenEventType::MEMBER_CALL;
-	} else {
-		functionCallNodeContent.push_front(std::move(identifierFunctionName));
-		functionCallNode = ASTFactory::MakeNode<Operator::FUNCTION_CALL>(std::move(functionCallNodeContent));
-		functionEventType = FunctionTokenEventType::CALL;
-	}
+	functionCallNodeContent.push_front(std::move(identifierFunctionName));
+	functionCallNode = ASTFactory::MakeNode<Operator::FUNCTION_CALL>(std::move(functionCallNodeContent));
+	functionEventType = FunctionTokenEventType::CALL;
 
 	auto event = FunctionTokenEvent { *functionCallNode, functionEventType, input };
 	m_parser.observable_priority_queue<FunctionTokenEvent>::notifyObservers(event);

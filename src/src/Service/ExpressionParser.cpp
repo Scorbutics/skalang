@@ -25,15 +25,16 @@ ska::ASTNodePtr ska::ExpressionParser::parse(ScriptAST& input) {
 	return expression(input, data);
 }
 
-ska::ASTNodePtr ska::ExpressionParser::matchVariable(ScriptAST& input, const Token& token) {	
+ska::ASTNodePtr ska::ExpressionParser::matchVariable(ScriptAST& input, const Token& token) {
 	auto varNode = ASTFactory::MakeLogicalNode(input.reader().match(token.type()));
 	if (input.reader().actual() == m_reservedKeywordsPool.pattern<TokenGrammar::AFFECTATION>()) {
 		return m_matcherVar.matchAffectation(input, std::move(varNode));
 	}
 
-	if (input.contextOf(ParsingContextType::FUNCTION_MEMBER_DECLARATION, 1) != nullptr) {
+	// TODO closure support instead
+	/*if (input.contextOf(ParsingContextType::FUNCTION_MEMBER_DECLARATION, 1) != nullptr) {
 		return m_matcherFunction.matchPrivateFieldUse(input, std::move(varNode));
-	}
+	}*/
 
 	auto event = VarTokenEvent::MakeUse(*varNode, input);
 	m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
@@ -137,7 +138,7 @@ bool ska::ExpressionParser::matchSymbol(ScriptAST& input, ExpressionStack& expre
 		//We must check that the token before the '=' is an lvalue : done in the semantic check pass.
 		expressions.push(m_matcherVar.matchAffectation(input, expressions.popOperandIfNoOperator(isDoingOperation)));
 		return false;
-	} 
+	}
 
 	if (value == ":") {
 		auto expressionObject = expressions.popOperandIfNoOperator(isDoingOperation);
@@ -214,7 +215,7 @@ bool ska::ExpressionParser::isAtEndOfExpression(ScriptAST& input) const {
 		TokenGrammar::BLOCK_END,
 		TokenGrammar::OBJECT_BLOCK_END,
 		TokenGrammar::FILTER,
-		TokenGrammar::BRACKET_END 
+		TokenGrammar::BRACKET_END
 	});
 }
 

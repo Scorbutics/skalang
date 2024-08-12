@@ -40,11 +40,11 @@ ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, const ScriptAST& 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(Symbol* s, bool isExported) {
 	m_children.push_back(std::make_unique<ska::ScopedSymbolTable>(*this));
 	auto& lastChild = *m_children.back();
-	lastChild.m_parentSymbol = s;
+	lastChild.m_symbol = s;
 	lastChild.m_exported = isExported;
-	
+
 	//No bad memory access possible when unique_ptr are moved, that's why it's safe to return the address of contained item
-	//even if we move the vector or if the vector moves its content automatically 
+	//even if we move the vector or if the vector moves its content automatically
 	return lastChild;
 }
 
@@ -61,27 +61,17 @@ bool ska::ScopedSymbolTable::changeTypeIfRequired(const std::string& symbolName,
 const ska::Symbol* ska::ScopedSymbolTable::operator[](const std::string& key) const {
 	auto valueIt = m_symbols.find(key);
 	if (valueIt == m_symbols.end()) {
-		auto* privateData = m_symbols.atOrNull("this.private");
-		auto* symbol = privateData == nullptr ? nullptr : (*privateData)(key);
-		if (symbol == nullptr) {
-			return &m_parent == this ? nullptr : m_parent[key];
-		}
-		return symbol;
+		return &m_parent == this ? nullptr : m_parent[key];
 	}
-	return valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
+	return *valueIt == nullptr ? nullptr : (*valueIt).get();
 }
 
 ska::Symbol* ska::ScopedSymbolTable::operator[](const std::string& key) {
 	auto valueIt = m_symbols.find(key);
 	if (valueIt == m_symbols.end()) {
-		auto* privateData = m_symbols.atOrNull("this.private");
-		auto* symbol = privateData == nullptr ? nullptr : (*privateData)(key);
-		if (symbol == nullptr) {
-			return &m_parent == this ? nullptr : m_parent[key];
-		}
-		return symbol;
+		return &m_parent == this ? nullptr : m_parent[key];
 	}
-	return valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
+	return *valueIt == nullptr ? nullptr : (*valueIt).get();
 }
 
 const ska::Symbol* ska::ScopedSymbolTable::operator[](std::size_t index) const {
@@ -97,7 +87,7 @@ const ska::Symbol* ska::ScopedSymbolTable::operator()(const std::string& key) co
 	auto* symbol = valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
 	if (symbol == nullptr) {
 		auto* privateData = m_symbols.atOrNull("this.private");
-		return privateData == nullptr ? nullptr : (*privateData)(key);					
+		return privateData == nullptr ? nullptr : (*privateData)(key);
 	}
 	return symbol;
 }
@@ -107,7 +97,7 @@ ska::Symbol* ska::ScopedSymbolTable::operator()(const std::string& key) {
 	auto* symbol = valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
 	if (symbol == nullptr) {
 		auto* privateData = m_symbols.atOrNull("this.private");
-		return privateData == nullptr ? nullptr : (*privateData)(key);					
+		return privateData == nullptr ? nullptr : (*privateData)(key);
 	}
 	return symbol;
 }
