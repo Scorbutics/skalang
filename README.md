@@ -119,6 +119,23 @@ To run an example script :
 `./bin/skalang_bytecode_runner example.miniska`
 (If you build with MSVC, you will probably have to add a target folder (Debug / Release / RelWithDebInfo) after the "bin" folder)
 
+### Advice: the environment of development for this C++ project
+
+This is a really complex topic and usually a hot one. While some people are advocating from using vi, emacs... I think this is important to get less friction as possible from using a development environement daily.
+
+The C++ language environment is usually a bit tricky to setup and does not always provide every quality of life tools we can encounter more easily in other ecosystems.
+
+At the time of writing (2020), there were a lot of benefits from using Visual Studio (Community or Professional), because of its native support of the C++ ecosystem. Everything is relatively easy, from autocompletion, intellisense, profiling and debugging.
+
+Now in 2024, I would suggest to go with VSCode instead which benefits from being available on almost any platform.
+In order to be efficient, you can install the following extensions:
+
+- CMake Tools Microsoft extension
+- C++ TestMate (compatibility with Doctest allows running test suites from UI almost as easily as in a Java ecosystem)
+- C/C++ Microsoft extension (for Intellisense)
+
+I also encourage you to move out the "Testing" tab from the left pane in order to be able to see it while debugging.
+
 ## Contributing
 Currently, I made this project alone.
 I do not usually work on my projects with other people, but I am totally open to it !
