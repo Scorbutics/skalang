@@ -40,7 +40,7 @@ ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, const ScriptAST& 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(Symbol* s, bool isExported) {
 	m_children.push_back(std::make_unique<ska::ScopedSymbolTable>(*this));
 	auto& lastChild = *m_children.back();
-	lastChild.m_symbol = s;
+	lastChild.m_parentSymbol = s;
 	lastChild.m_exported = isExported;
 
 	//No bad memory access possible when unique_ptr are moved, that's why it's safe to return the address of contained item
@@ -84,22 +84,12 @@ ska::Symbol* ska::ScopedSymbolTable::operator[](std::size_t index) {
 
 const ska::Symbol* ska::ScopedSymbolTable::operator()(const std::string& key) const {
 	const auto valueIt = m_symbols.find(key);
-	auto* symbol = valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
-	if (symbol == nullptr) {
-		auto* privateData = m_symbols.atOrNull("this.private");
-		return privateData == nullptr ? nullptr : (*privateData)(key);
-	}
-	return symbol;
+	return valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
 }
 
 ska::Symbol* ska::ScopedSymbolTable::operator()(const std::string& key) {
 	auto valueIt = m_symbols.find(key);
-	auto* symbol = valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
-	if (symbol == nullptr) {
-		auto* privateData = m_symbols.atOrNull("this.private");
-		return privateData == nullptr ? nullptr : (*privateData)(key);
-	}
-	return symbol;
+	return valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
 }
 
 std::optional<std::size_t> ska::ScopedSymbolTable::id(const Symbol& field) const {

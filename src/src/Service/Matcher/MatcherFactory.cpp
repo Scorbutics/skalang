@@ -54,11 +54,11 @@ ska::ASTNodePtr ska::MatcherFactory::matchDeclaration(ScriptAST& input, const To
 
 	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
 
-	auto factoryPrototypeNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(prototypeNode), std::move(functionBodyNode));
+	auto factoryNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(prototypeNode), std::move(functionBodyNode));
 
-	auto prototypeFactoryEvent = FunctionTokenEvent{ *factoryPrototypeNode, FunctionTokenEventType::FACTORY_DECLARATION_STATEMENT, input, functionName.name() };
+	auto prototypeFactoryEvent = FunctionTokenEvent{ *factoryNode, FunctionTokenEventType::FACTORY_DECLARATION_STATEMENT, input, functionName.name() };
 	m_parser.observable_priority_queue<FunctionTokenEvent>::notifyObservers(prototypeFactoryEvent);
 
 	input.popContext();
-	return factoryPrototypeNode;
+	return factoryNode;
 }

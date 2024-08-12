@@ -33,7 +33,7 @@ const ska::Symbol* ska::bytecode::Script::findFieldSymbol(const Symbol* construc
 	}
 
 	if (constructor != nullptr) {
-		return (*constructor)(field.symbol->name());
+		return field.symbol;
 	}
 
 	return &findSymbolFromString(field.symbol->name());
@@ -42,7 +42,7 @@ const ska::Symbol* ska::bytecode::Script::findFieldSymbol(const Symbol* construc
 void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr astRoot, Interpreter& interpreter) {
 	m_serviceGen.program().fromBridge(std::move(astRoot));
 
-	LOG_DEBUG << "%14cGenerating bindings for script " << m_serviceGen.name();
+	LOG_DEBUG << "Generating bindings for script " << m_serviceGen.name();
 
 	/* Why don't we use the symbol stored directly in constructor.type().symbol() ? */
 	/* Because it still targets the template script type, not the bound script one ! */
@@ -55,12 +55,12 @@ void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr a
 		if(newerSymbol == nullptr) {
 			auto ss = std::stringstream {};
 			assert(field.symbol != nullptr);
-			ss << "%14cNo symbol attached to type " << field.symbol->type();
+			ss << "No symbol attached to type " << field.symbol->type();
 			LOG_ERROR << ss.str();
 			throw std::runtime_error(ss.str());
 		}
 
-		LOG_INFO << "%14cAttaching binding to symbol " << newerSymbol->name();
+		LOG_INFO << "Attaching binding to symbol " << newerSymbol->name();
 		auto info = m_cache.getSymbolInfoOrNew(m_serviceGen.id(), *newerSymbol);
 		auto bindingRef = ScriptVariableRef{ bindingId++, m_serviceGen.id() };
 		m_cache.storeBinding(std::make_shared<NativeFunction>(field.callback), bindingRef);
@@ -76,9 +76,9 @@ void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr a
 		auto constructorInfo = m_cache.getSymbolInfoOrNew(m_serviceGen.id(), *constructorBoundSymbol);
 		auto bindingRef = ScriptVariableRef{ bindingId++, m_serviceGen.id() };
 		m_cache.storeBinding(std::make_shared<NativeFunction>([&constructor](std::vector<NodeValue> params) {
-			LOG_INFO << "%14cParameters of constructor " << constructor.name() << " : ";
+			LOG_INFO << "Parameters of constructor " << constructor.name() << " : ";
 			for (const auto& param : params) {
-				LOG_INFO << "%14c" << param.convertString();
+				LOG_INFO << param.convertString();
 			}
 			constructor.setAdditionalParams(std::move(params));
 			return NodeValue{};
@@ -89,7 +89,7 @@ void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr a
 	}
 
 	m_serviceGen.generate(m_cache, interpreter.generator());
-	LOG_DEBUG << "%14cGeneration done for script " << m_serviceGen.name();
+	LOG_DEBUG << "Generation done for script " << m_serviceGen.name();
 }
 
 std::unique_ptr<ska::bytecode::Executor> ska::bytecode::Script::execute(Interpreter& interpreter) {

@@ -17,27 +17,23 @@ namespace ska {
 		}
 
 		inline auto& GetFunctionParametersList() {
-			return node[0];
+			return node;
 		}
 
 		inline auto GetFunctionParametersSize() {
-			return node[0].size() - 1;
+			return node.size() - 1;
 		}
 
 		inline const auto* GetPrivateFunctionFactoryField(const std::string& fieldName) {
-			return (*node[1].symbol())(fieldName);
-		}
-
-		inline auto& GetPrivateFunctionFactoryNode() {
-			return node[1];
+			return (*node.symbol())(fieldName);
 		}
 
 		inline auto GetFunctionReturnType() {
-			return (*node[0].rbegin())->type().value();
+			return (*node.rbegin())->type().value();
 		}
 
-		inline auto rbegin() { return node[0].rbegin(); }
-		inline auto rend() { return node[0].rend(); }
+		inline auto begin() { return node.begin(); }
+		inline auto end() { return node.end(); }
 
 	};
 }

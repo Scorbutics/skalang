@@ -15,9 +15,8 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
     // Obvisouly we pop in reverse order, because that's how a stack works (we previously pushed parameters in order in generation of Operator::FUNCTION_CALL)
 	// Also, we avoid index 0, which is return type in reverse order, and the reverse-last (= first in the right order) that is dedicated to the private factory block
 	// See Node::rend and Node::rbegin for details
-    applyGenerator(ApplyNOperations<Command::POP, decltype(node.rbegin())>, result, context, node.rbegin() + 1, node.rend());
+    applyGenerator(ApplyNOperations<Command::POP, decltype(node.begin())>, result, context, node.begin(), node.end() - 1);
 
-	result.push(generateNext({ context, node.GetPrivateFunctionFactoryNode() }));
 	LOG_DEBUG << "\tParameters : " << result;
 	return result;
 }

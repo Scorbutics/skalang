@@ -4,7 +4,7 @@
 #include "NodeValue/AST.h"
 
 namespace ska {
-	
+
 	template<>
 	class OperationType<Operator::FUNCTION_DECLARATION> {
 	private:
@@ -28,7 +28,7 @@ namespace ska {
 			return node[1];
 		}
 	};
-	
+
 	template<>
 	class OperationType<Operator::FUNCTION_PROTOTYPE_DECLARATION> {
 	private:

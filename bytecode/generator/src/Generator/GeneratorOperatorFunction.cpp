@@ -53,7 +53,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	if (registerRange.command() != Command::NOP) {
 		cleanUpInstructions.push(std::move(registerRange));
 	}
-	
+
 	auto variableRange = ClearRange(valueGroup.generatedVariables(), valueGroup.operand());
 	if (variableRange.command() != Command::NOP) {
 		cleanUpInstructions.push(std::move(variableRange));
@@ -101,7 +101,7 @@ static bool IsInstructionCommandClosed(const ska::bytecode::InstructionOutput& p
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_MEMBER_CALL>::generate(OperateOn node, GenerationContext& context) {
 	auto preCallValue = generateNext({context, node.GetFunctionNameNode()});
 	LOG_DEBUG << "Function member call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
-	
+
 	const auto* functionTypeSymbol = node.GetFunctionNameNode().typeSymbol();
 	// Handle custom type functions
 	const auto* functionSymbolInfo = functionTypeSymbol == nullptr ? nullptr : context.getSymbolInfo(*functionTypeSymbol);
@@ -133,7 +133,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	auto preCallValue = generateNext({context, node.GetFunctionNameNode()});
 	LOG_DEBUG << "Function call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
 
-	// Handle built-in type functions traduced directly to a bytecode instruction 
+	// Handle built-in type functions traduced directly to a bytecode instruction
 	const auto* functionTypeSymbol = node.GetFunctionNameNode().typeSymbol();
 	if (IsInstructionCommandClosed(preCallValue)) {
 		return preCallValue;
@@ -150,7 +150,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 			callInstruction.push(Instruction{ Command::JUMP_ABS, std::move(preCallValue.operand()) });
 		}
 	} else {
-		callInstruction.push(Instruction { Command::JUMP_ABS, std::move(preCallValue.operand()) });		
+		callInstruction.push(Instruction { Command::JUMP_ABS, std::move(preCallValue.operand()) });
 	}
 	auto result = std::move(preCallValue);
 

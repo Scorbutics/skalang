@@ -11,7 +11,7 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FACTORY_PROTOTYPE_DEC
 	auto index = std::size_t{ 0 };
 	for (const auto& parameterNode : functionParametersListNode) {
 		if (index != node.GetFunctionParametersSize()) {
-			result.add(node.GetPrivateFunctionFactoryField(parameterNode->name())->type());
+			result.add(parameterNode->type().value());
 		}
 		index++;
 	}

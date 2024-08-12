@@ -189,7 +189,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFactoryDeclaration(ScriptAST& script,
 		bodyNode = makeFactoryEmptyBody();
 	}
 
-	SLOG(ska::LogLevel::Debug) << "factory synthetizing node";
+	SLOG(ska::LogLevel::Debug) << "factory declaration node";
 	auto factoryDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(prototype), std::move(bodyNode));
 
 	auto statementEvent = FunctionTokenEvent{ *factoryDeclarationNode, FunctionTokenEventType::FACTORY_DECLARATION_STATEMENT, script, functionName.name() };
@@ -220,29 +220,25 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFactoryPrototype(ScriptAST& script, A
 		}
 		index++;
 	}
-	auto functionPrototypeNode = ASTFactory::MakeNode<Operator::FUNCTION_PROTOTYPE_DECLARATION>(functionName, std::move(parameters));
+	auto factoryPrototypeNode = ASTFactory::MakeNode<Operator::FACTORY_PROTOTYPE_DECLARATION>(functionName, std::move(parameters));
 
-	auto functionEvent = VarTokenEvent::MakeFunction(*functionPrototypeNode, script);
+	auto functionEvent = VarTokenEvent::MakeFunction(*factoryPrototypeNode, script);
 	observable_priority_queue<VarTokenEvent>::notifyObservers(functionEvent);
 
-	auto factoryPrototypeNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(functionPrototypeNode), std::move(functionPrototypeNode));
-
-	auto prototypeFactoryEvent = FunctionTokenEvent{ *factoryPrototypeNode, FunctionTokenEventType::FACTORY_PROTOTYPE, script, functionName.name() };
-	observable_priority_queue<FunctionTokenEvent>::notifyObservers(prototypeFactoryEvent);
 
 	return factoryPrototypeNode;
 }
 
-ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionPrototype(ScriptAST& script, const Type& fullTypeFunction, const std::string& name) {
+ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionFactoryPrototype(ScriptAST& script, const Type& fullTypeFunction, const std::string& name) {
 	auto lock = BridgeASTBuilderSymbolTableLock{*this, script.symbols() };
-	SLOG(LogLevel::Info) << " 2 - Making function prototype \"" << fullTypeFunction << "\"";
+	SLOG(LogLevel::Info) << " 2 - Making function/factory prototype \"" << fullTypeFunction << "\"";
 
 	if(fullTypeFunction.type() != ExpressionType::FUNCTION) { std::stringstream ss; ss << "type is not a function : " << name; throw std::runtime_error(ss.str()); };
 
 	auto functionNameNode = makeFunctionName(script, name);
 	auto parametersAndReturn = makeFunctionInputOutput(script, fullTypeFunction);
 	const auto& returnTypeNode = parametersAndReturn.back();
-	if (returnTypeNode->size() > 0 && (*returnTypeNode)[0].name() == m_reserved.pattern<TokenGrammar::VARIABLE>().name()) {
+	if (returnTypeNode->name() == m_reserved.pattern<TokenGrammar::VARIABLE>().name()) {
 		return makeFactoryPrototype(script, std::move(functionNameNode), std::move(parametersAndReturn));
 	}
 
@@ -250,8 +246,8 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionPrototype(ScriptAST& script, 
 }
 
 ska::ASTNodePtr ska::BridgeASTBuilder::makeFunction(ScriptAST& script, const BridgeFunction& data) {
-	SLOG(LogLevel::Info) << " 1 - Making function \"" << data.name() << "\"";
-	auto prototype = makeFunctionPrototype(script, data.symbol().type(), data.name());
+	SLOG(LogLevel::Info) << " 1 - Making function/factory \"" << data.name() << "\"";
+	auto prototype = makeFunctionFactoryPrototype(script, data.symbol().type(), data.name());
 
 	auto functionDeclaration = ASTNodePtr{};
 	if (prototype->op() == Operator::FACTORY_PROTOTYPE_DECLARATION) {

@@ -28,7 +28,7 @@ ska::bytecode::Operand::Operand(const ASTNode& node) :
 		break;
 		default: {
 			auto ss = std::stringstream {};
-			ss << "unsupported conversion of node type \"" << node.type().value() << "\"";
+			ss << "unsupported conversion of node type \"" << node.type().value() << "\" for \"" << node.name() << "\"";
 			throw std::runtime_error(ss.str());
 		}
 	}
@@ -75,7 +75,7 @@ std::string ska::bytecode::Operand::toString() const {
 bool ska::bytecode::operator==(const Operand& lhs, const Operand& rhs) {
 	if (std::holds_alternative<StringShared>(lhs.m_content)) {
 		if (!std::holds_alternative<StringShared>(rhs.m_content)) return false;
-		
+
 		const auto& leftContent = std::get<StringShared>(lhs.m_content);
 		const auto& rightContent = std::get<StringShared>(rhs.m_content);
 		if (leftContent == rightContent) return true;
