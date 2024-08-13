@@ -25,7 +25,7 @@ std::vector<ska::ASTNodePtr> ska::MatcherFactory::matchDeclarationBody(ScriptAST
 ska::ASTNodePtr ska::MatcherFactory::matchDeclaration(ScriptAST& input, const Token& functionName, std::deque<ASTNodePtr> parameters, ASTNodePtr returnType) {
 	input.pushContext({ParsingContextType::FACTORY_DECLARATION, functionName});
 
-	SLOG(ska::LogLevel::Debug) << "factory matching declaration and parameters part";
+	SLOG(ska::LogLevel::Debug) << "factory \"" << functionName << "\" matching declaration and parameters part";
 	// Match the function name declaration
 	// e.g. function(i: int): var
 	for (auto& parameter : parameters) {
@@ -45,13 +45,16 @@ ska::ASTNodePtr ska::MatcherFactory::matchDeclaration(ScriptAST& input, const To
 	SLOG(ska::LogLevel::Debug) << "factory matching body part";
 	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_BEGIN>());
 	auto bodyNodes = matchDeclarationBody(input, m_reservedKeywordsPool.pattern<TokenGrammar::RETURN>());
-	auto functionBodyNode = ASTFactory::MakeNode<Operator::BLOCK>(std::move(bodyNodes));
 
 	// Match the return part of the factory, where the object is built
 	// e.g. return { toto = 1 }
 	SLOG(ska::LogLevel::Debug) << "factory matching generated object part";
 	auto returnNode = m_matcherReturn.match(input, true);
 
+	// Append return node to the body
+	bodyNodes.push_back(std::move(returnNode));
+
+	auto functionBodyNode = ASTFactory::MakeNode<Operator::BLOCK>(std::move(bodyNodes));
 	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::BLOCK_END>());
 
 	auto factoryNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionName, std::move(prototypeNode), std::move(functionBodyNode));
