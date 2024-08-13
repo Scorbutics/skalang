@@ -58,9 +58,11 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	LOG_DEBUG << "This field has index " << index << " in the object";
 
 	auto command = Command::ARR_ACCESS;
-	if (symbolField->type() == ExpressionType::FUNCTION && symbolField->type()[0].name() == "this.private.fcty") {
+
+	// TODO change this
+	/*if (symbolField->type() == ExpressionType::FUNCTION && symbolField->type()[0].name() == "this.private.fcty") {
 		command = Command::ARR_MEMBER_ACCESS;
-	}
+	}*/
 
 	objectValue.push({ Instruction { command, context.queryNextRegister(), objectValue.operand(), Operand {static_cast<long>(index), OperandType::PURE } }});
 	return objectValue;

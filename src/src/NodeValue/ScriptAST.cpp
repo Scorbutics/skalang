@@ -7,12 +7,22 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptAST)
 
+std::ostream& ska::operator<<(std::ostream& stream, const ScriptAST& ast) {
+	if (ast.m_handle == nullptr) {
+		stream << "(empty AST)";
+	} else {
+		auto& rootNode = ast.m_handle->rootNode();
+		stream << rootNode << std::endl;
+	}
+	return stream;
+}
+
 ska::ScriptAST::ScriptAST(ScriptCacheAST& scriptCache, const std::string& name, std::vector<Token> input, std::size_t startIndex, std::size_t scriptId) :
 	m_cache(&scriptCache) {
 	if(m_cache->find(name) == m_cache->end()) {
 		auto handle = std::unique_ptr<ScriptHandleAST>(new ScriptHandleAST{ *m_cache, std::move(input), startIndex, name });
 		SLOG(LogLevel::Info) << "Adding script AST " << name << " in cache";
-		m_cache->emplace(name, std::move(handle), true);		
+		m_cache->emplace(name, std::move(handle), true);
 	} else {
 		auto& scriptWanted = m_cache->at(name);
 		if (!input.empty() && scriptWanted.m_input.emptyTokens()) {
@@ -20,7 +30,7 @@ ska::ScriptAST::ScriptAST(ScriptCacheAST& scriptCache, const std::string& name, 
 				throw std::runtime_error("invalid ast script instantiation : tokens were provided but ast is already built");
 			}
 			scriptWanted.m_input = TokenReader{ std::move(input) };
-			
+
 			//m_inCache = true;
 		} else {
 			SLOG(LogLevel::Info) << "Script AST " << name << " is already in cache";

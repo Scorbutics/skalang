@@ -11,14 +11,14 @@ namespace ska {
 
 	class ScriptAST {
 	public:
-		ScriptAST(ScriptHandleAST& handle) : 
+		ScriptAST(ScriptHandleAST& handle) :
 			m_cache(&handle.m_cache) {
 			m_handle = &handle;
 		}
 
 		ScriptAST(ScriptCacheAST& scriptCache, const std::string& name, std::vector<Token> input, std::size_t startIndex = 0, std::size_t scriptId = std::numeric_limits<std::size_t>::max());
 		virtual ~ScriptAST() = default;
-	
+
 		bool existsInCache(const std::string& name) const {
 			return m_cache->find(name) != m_cache->end();
 		}
@@ -65,6 +65,8 @@ namespace ska {
 		bool isBridged() const { return m_handle != nullptr && m_handle->m_bridged; }
 
 		std::size_t id() const { return m_handle->id(); }
+
+		friend std::ostream& operator<<(std::ostream& stream, const ScriptAST&);
 
 	private:
 		ScriptHandleAST* m_handle = nullptr;

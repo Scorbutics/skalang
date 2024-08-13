@@ -10,9 +10,7 @@
 #include "NodeValue/ScriptAST.h"
 #include "Service/ScriptNameBuilder.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::BridgeASTBuilder)
-
-static constexpr const auto* ThisPrivateFactoryName = "this.private.fcty";
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::BridgeASTBuilder)
 
 ska::BridgeASTBuilder::BridgeASTBuilder(TypeBuilder& typeBuilder, const ReservedKeywordsPool& reserved) :
 	m_reserved(reserved),

@@ -14,29 +14,29 @@ ska::ASTNode::ASTNode(Token t, ASTNodePtr l, ASTNodePtr r) :
 	m_op(l != nullptr && r != nullptr ? Operator::BINARY : Operator::UNARY),
 	m_token(std::move(t)) {
 	if (l != nullptr) {
-    	m_children.push_back(std::move(l));
+		m_children.push_back(std::move(l));
 	}
 
 	if (r != nullptr) {
-    	m_children.push_back(std::move(r));
+		m_children.push_back(std::move(r));
 	}
 
 	if(m_token.isLiteral()) {
-    	assert(m_op == Operator::UNARY);
-    	m_op = Operator::LITERAL;
+		assert(m_op == Operator::UNARY);
+		m_op = Operator::LITERAL;
 	}
 }
 
-ska::ASTNode:: ASTNode(Operator o, Token identifierToken, std::vector<ASTNodePtr> children) : 
+ska::ASTNode:: ASTNode(Operator o, Token identifierToken, std::vector<ASTNodePtr> children) :
 	m_op(o),
 	m_token(std::move(identifierToken)) {
 	if(!children.empty()) {
-    	m_children.reserve(children.size());
-    	for(auto& child : children) {
-        	if(child != nullptr) {
-            	m_children.push_back(std::move(child));
-        	}
-    	}
+		m_children.reserve(children.size());
+		for(auto& child : children) {
+			if(child != nullptr) {
+				m_children.push_back(std::move(child));
+			}
+		}
 	}
 }
 
@@ -58,9 +58,9 @@ ska::ASTNode::ASTNode(Operator o, Token identifierToken) :
 	m_token(std::move(identifierToken)) {
 }
 
-const ska::Symbol* ska::ASTNode::typeSymbol() const { 
+const ska::Symbol* ska::ASTNode::typeSymbol() const {
 	SLOG(ska::LogLevel::Debug) << "Accessing type symbol of node \"" << m_token << "\" with type \"" << m_type.value_or(Type{}) << "\"";
-	return m_symbol == nullptr ? nullptr : m_symbol->master(); 
+	return m_symbol == nullptr ? nullptr : m_symbol->master();
 	//return !m_type.has_value() ? nullptr : TypeSymbolAccess(m_type.value());
 }
 
@@ -77,9 +77,8 @@ void ska::ASTNode::linkSymbol(Symbol& symbol) {
 void ska::ASTNode::refreshSymbolType() {
 	if (m_symbol != nullptr && m_type.has_value()) {
 		SLOG(ska::LogLevel::Debug) << "Current symbol \"" << m_symbol->name() << "\" has type \"" << m_symbol->type() << "\"";
-		if (m_symbol->changeTypeIfRequired(m_type.value())) { 
-			SLOG(ska::LogLevel::Debug) << "%12cSymbol \"" << m_symbol->name() << "\" in node \"" << m_token << "\" has type updated \"" << m_symbol->type() << "\"";
-	
+		if (m_symbol->changeTypeIfRequired(m_type.value())) {
+			SLOG(ska::LogLevel::Debug) << "Symbol \"" << m_symbol->name() << "\" in node \"" << m_token << "\" has type updated \"" << m_symbol->type() << "\"";
 		}
 	}
 }
@@ -90,6 +89,34 @@ bool ska::ASTNode::updateType(Type type) {
 	return true;
 }
 
-bool ska::ASTNode::isSymbolicLeaf() const { 
+bool ska::ASTNode::isSymbolicLeaf() const {
 	return m_symbol != nullptr && m_children.size() < 2;
+}
+
+void ska::ASTNode::prettyPrint(std::ostream& os, int depth) const {
+	const auto& node = *this;
+	// Print the current node with indentation based on its depth
+	for (int i = 0; i < depth; i++) {
+		os << "| ";
+	}
+
+	os << node.m_op << " - ";
+	if (node.m_symbol != nullptr) {
+		os << *node.m_symbol;
+	} else if (node.m_type.has_value()) {
+		os << node.m_type.value();
+	} else {
+		os << node.m_token;
+	}
+
+	os << std::endl;
+	// Recursively print each child node, increasing the depth
+	for (const auto& child : node.m_children) {
+		child->prettyPrint(os, depth + 1);
+	}
+}
+
+std::ostream& ska::operator<<(std::ostream& stream, const ASTNode& node) {
+	node.prettyPrint(stream);
+	return stream;
 }

@@ -54,7 +54,7 @@ namespace ska {
 
 		void linkSymbol(Symbol& symbol);
 		const std::optional<Type>& type() const;
-		
+
 		bool updateType(Type type);
 
 		const Symbol* typeSymbol() const;
@@ -66,7 +66,7 @@ namespace ska {
 	private:
 		friend class ASTFactory;
 		ASTNode();
-    	
+
     	explicit ASTNode(Token t, ASTNodePtr l = nullptr, ASTNodePtr r = nullptr);
 
     	ASTNode(Operator o, Token identifierToken = Token{}, std::vector<ASTNodePtr> children = std::vector<ASTNodePtr>{});
@@ -83,11 +83,8 @@ namespace ska {
 		std::vector<ASTNodePtr> m_children;
 
 		friend std::ostream& operator<<(std::ostream& stream, const ASTNode& node);
+		void prettyPrint(std::ostream& os, int depth = 0) const;
 	};
 
-	inline std::ostream& operator<<(std::ostream& stream, const ASTNode& node) {
-		stream << node.m_token;
-		return stream;
-	}
 }
 

@@ -11,8 +11,6 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherFunction)
 
-static constexpr const auto* ThisPrivateFactoryName = "this.private.fcty";
-
 ska::ASTNodePtr ska::MatcherFunction::matchDeclaration(ScriptAST& input) {
 	SLOG(ska::LogLevel::Debug) << "function declaration";
 	input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::FUNCTION>());

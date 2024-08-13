@@ -31,6 +31,8 @@ const ska::ASTNode& ska::bytecode::ScriptGeneration::rootASTNode() const {
 }
 
 std::ostream& ska::bytecode::operator<<(std::ostream& stream, const ScriptGeneration& output) {
+	stream << output.m_origin.program();
+	stream << std::endl;
 	stream << output.m_generated;
 	return stream;
 }
