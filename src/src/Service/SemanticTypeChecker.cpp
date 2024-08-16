@@ -27,7 +27,7 @@ ska::SemanticTypeChecker::SemanticTypeChecker(StatementParser& parser, const Typ
 	m_typeCrosser(typeCrosser) {
 }
 
-bool ska::SemanticTypeChecker::statementHasReturnOnAllControlPath(const ASTNode& node) {	
+bool ska::SemanticTypeChecker::statementHasReturnOnAllControlPath(const ASTNode& node) {
 	switch (node.op()) {
 	case Operator::FUNCTION_DECLARATION:
 	case Operator::FUNCTION_PROTOTYPE_DECLARATION:
@@ -64,29 +64,29 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 
 	case ReturnTokenEventType::BUILTIN:
 	case ReturnTokenEventType::OBJECT: {
-		const auto symbol = token.script().symbols().enclosingType();
+		const auto symbolTable = token.script().symbols().enclosingType();
 		//auto* finalSymbol = token.script().symbols()[symbol->name()];
-		if (symbol == nullptr || symbol->name().empty()) {
+		if (symbolTable == nullptr || symbolTable->name().empty()) {
 			throw std::runtime_error("return must be place in a function block or a nested one");
 		}
 
 		auto operationReturn = OperationType<Operator::RETURN>{token.rootNode()};
 		const auto& returnedValue = operationReturn.GetValue();
 		if (!returnedValue.type().has_value()) {
-			throw std::runtime_error("\"" + symbol->name() + "\" is not a function");
+			throw std::runtime_error("\"" + symbolTable->name() + "\" is not a function");
 		}
 
 		if (returnedValue.type().value() == ExpressionType::VOID) {
 			throw std::runtime_error("return cannot be used for the void type");
 		}
 
-		if (symbol->type().empty()) {
+		if (symbolTable->symbol()->type().empty()) {
 			//throw std::runtime_error("\"" + symbol->name() + "\" is an empty function");
 			break;
 		}
 
-		const auto expectedReturnType = symbol->type().back();
-		if (((returnedValue.op() == Operator::USER_DEFINED_OBJECT) && (expectedReturnType != ExpressionType::OBJECT)) || 
+		const auto expectedReturnType = symbolTable->symbol()->type().back();
+		if (((returnedValue.op() == Operator::USER_DEFINED_OBJECT) && (expectedReturnType != ExpressionType::OBJECT)) ||
 			(returnedValue.op() != Operator::USER_DEFINED_OBJECT && expectedReturnType != returnedValue.type())) {
 			auto ss = std::stringstream{};
 			ss << "bad return type : expected \"" << expectedReturnType << "\" on function declaration but got \"" << returnedValue.type().value() << "\" on return";
@@ -130,7 +130,7 @@ bool ska::SemanticTypeChecker::matchArray(const ArrayTokenEvent& token) {
 
 	case ArrayTokenEventType::EXPRESSION: {
 		if(token.rootNode().type() != ExpressionType::ARRAY) {
-			auto ss = std::stringstream {}; 
+			auto ss = std::stringstream {};
 			ss << "expression is not an array (it's a \"" << token.rootNode().type().value_or(Type {}) << "\")";
 			throw std::runtime_error(ss.str());
 		}
@@ -207,7 +207,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 	case FunctionTokenEventType::DECLARATION_STATEMENT: {
 		auto operation = OperationType<Operator::FUNCTION_DECLARATION>{ token.rootNode() };
 		auto functionReturnType = operation.GetFunctionPrototype().type().value().back();
-		if (functionReturnType != ExpressionType::VOID && 
+		if (functionReturnType != ExpressionType::VOID &&
 			!childrenHasReturnOnAllControlPath(operation.GetFunctionBody())) {
 			throw std::runtime_error("function lacks of return in one of its code path");
 		}
@@ -216,7 +216,7 @@ bool ska::SemanticTypeChecker::matchFunction(const FunctionTokenEvent& token) {
 	default:
 		break;
 	}
-		
+
 	return true;
 }
 
@@ -225,7 +225,7 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 	const auto value = variable.value();
 	const auto name = variable.name();
 	const auto type = variable.varType().value();
-		
+
 	SLOG(ska::LogLevel::Debug) << name << " = " << value << ";\tsymbol = " << type;
 
 	if(type == ExpressionType::VOID) {

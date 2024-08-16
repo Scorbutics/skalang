@@ -3,7 +3,7 @@
 #include <sstream>
 
 namespace ska {
-	class Symbol;
+	class ScopedSymbolTable;
 	struct Type;
 	class SerializerOutput;
 
@@ -11,7 +11,7 @@ namespace ska {
 	public:
 		ScriptTypeSerializer() = default;
 		virtual ~ScriptTypeSerializer() = default;
-		
-		virtual void write(SerializerOutput& output, const Symbol* symbol, const Type& type) = 0;
+
+		virtual void write(SerializerOutput& output, const ScopedSymbolTable* symbol, const Type& type) = 0;
 	};
 }

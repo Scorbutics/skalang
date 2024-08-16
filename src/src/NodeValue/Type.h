@@ -6,7 +6,7 @@
 #include "ExpressionType.h"
 
 namespace ska {
-	class Symbol;
+	class ScopedSymbolTable;
 	class SymbolTable;
 	class TypeCrosser;
 	class SerializerOutput;
@@ -50,28 +50,28 @@ namespace ska {
 			return Type{ t };
 		}
 
-		static Type MakeBuiltIn(ExpressionType t, const Symbol* symbol = nullptr) {
-			return Type{ symbol, t };
+		static Type MakeBuiltIn(ExpressionType t, const ScopedSymbolTable* symbolTable = nullptr) {
+			return Type{ symbolTable, t };
 		}
 
 		template<ExpressionType t>
-		static Type MakeCustom(const Symbol* symbol) {
+		static Type MakeCustom(const ScopedSymbolTable* symbolTable) {
 			static_assert(isNamed(t));
-			return Type{ symbol, t };
+			return Type{ symbolTable, t };
 		}
 
-		static Type Override(Type t, const Symbol* symbol) {
-			t.m_symbol = symbol;
+		static Type Override(Type t, const ScopedSymbolTable* symbolTable) {
+			t.m_symbolTable = symbolTable;
 			return t;
 		}
 
 		Type() = default;
 		Type(Type&& t) noexcept = default;
 		Type(const Type& t) = default;
-    	
+
 		Type& operator=(Type&& t) noexcept = default;
 		Type& operator=(const Type& t) = default;
-	
+
 		~Type() = default;
 
 		ExpressionType type() const {
@@ -108,14 +108,14 @@ namespace ska {
 		bool structuralEquality(const Type&) const;
 
 		Type crossTypes(const TypeCrosser& crosser, std::string op, const Type& type2) const;
-		
+
 		std::size_t size() const { return m_compound.size(); }
 		bool empty() const { return m_compound.empty(); }
 
 		const Type& back() const { return m_compound.back(); }
 
 		std::string name() const;
-		
+
 		auto begin() const { return m_compound.begin(); }
 		auto end() const { return m_compound.end(); }
 		auto begin() { return m_compound.begin(); }
@@ -132,14 +132,14 @@ namespace ska {
 			m_type(std::move(t)) {
 		}
 
-		Type(const Symbol* symbol, ExpressionType t);
+		Type(const ScopedSymbolTable* symbolTable, ExpressionType t);
 
 		ExpressionType m_type = ExpressionType::VOID;
-    	const Symbol* m_symbol = nullptr;
+    	const ScopedSymbolTable* m_symbolTable = nullptr;
 		std::vector<Type> m_compound;
 
 		friend std::ostream& operator<<(std::ostream& stream, const Type& type);
 	};
-	
+
 	std::ostream& operator<<(std::ostream& stream, const Type& type);
 }

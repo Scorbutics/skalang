@@ -1,20 +1,20 @@
 #pragma once
-
 #include "OperationType.h"
 #include "NodeValue/AST.h"
 
 namespace ska {
+	class ScopedSymbolTable;
 	class SymbolTable;
 	class ASTNode;
-	
+
 	template<>
 	class OperationType<Operator::TYPE> {
 	private:
 		const ASTNode& node;
 	public:
-		OperationType(const ASTNode& node) : node(node) { assert(node.size() == 3); }		
+		OperationType(const ASTNode& node) : node(node) { assert(node.size() == 3); }
 
-		const Symbol* GetTypeSymbol(const SymbolTable& symbolTable) const;
+		const ScopedSymbolTable* GetTypeSymbol(const SymbolTable& symbolTable) const;
 
 		bool IsBuiltIn() const;
 		bool IsObject() const;

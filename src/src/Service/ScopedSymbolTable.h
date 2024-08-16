@@ -15,63 +15,70 @@ namespace ska {
 	using ChildrenScopedSymbolTable = std::vector<std::unique_ptr<ScopedSymbolTable>>;
 
 	public:
+		ScopedSymbolTable(ScopedSymbolTable& parent, Symbol symbol) :
+			m_parent(parent),
+			m_symbol(std::move(symbol)) {
+		}
+
 		ScopedSymbolTable(ScopedSymbolTable& parent) :
 			m_parent(parent) {
 		}
 
-		ScopedSymbolTable() = default;
+		ScopedSymbolTable(std::string rootName);
+
 		~ScopedSymbolTable() = default;
 
 		ScopedSymbolTable& parent();
 		const ScopedSymbolTable& parent() const;
 
-		ScopedSymbolTable& createNested(Symbol* s = nullptr, bool isExported = false);
-		Symbol& emplace(std::string name);
-		Symbol& emplace(std::string name, const ScriptAST& script);
+		ScopedSymbolTable& createNested(std::optional<Symbol> symbol);
+		ScopedSymbolTable& createNested(std::string name = "", const ScriptAST* script = nullptr);
 
-		const Symbol* owner() const {
-			return m_parentSymbol == nullptr && &m_parent != this ? m_parent.owner() : m_parentSymbol;
+		const ScopedSymbolTable* owner() const {
+			return &m_parent != this ? m_parent.owner() : &m_parent;
 		}
 
-		const Symbol* directOwner() const { return m_parentSymbol; }
+		const ScopedSymbolTable* directOwner() const { return m_parent.m_symbol.has_value() ? &m_parent : nullptr; }
+		ScopedSymbolTable* directOwner() { return m_parent.m_symbol.has_value() ? &m_parent : nullptr; }
 
-		Symbol* directOwner() { return m_parentSymbol; }
-
-		bool exported() const { return m_exported; }
-
-		bool changeTypeIfRequired(const std::string& symbol, const Type& value);
+		bool changeTypeIfRequired(const Type& value);
 
 		std::optional<std::size_t> id(const Symbol& field) const;
 
-		const Symbol* operator[](const std::string& key) const;
-		Symbol* operator[](const std::string& key);
+		const ScopedSymbolTable* operator[](const std::string& key) const;
+		ScopedSymbolTable* operator[](const std::string& key);
 
-		const Symbol* operator()(const std::string& key) const;
-		Symbol* operator()(const std::string& key);
+		const ScopedSymbolTable* operator()(const std::string& key) const;
+		ScopedSymbolTable* operator()(const std::string& key);
 
-		const Symbol* operator[](std::size_t index) const;
-		Symbol* operator[](std::size_t index);
+		const ScopedSymbolTable* operator[](std::size_t index) const;
+		ScopedSymbolTable* operator[](std::size_t index);
 
-		auto end() const { return m_symbols.end(); }
-		auto begin() const { return m_symbols.begin(); }
-		auto end() { return m_symbols.end(); }
-		auto begin() { return m_symbols.begin(); }
+		auto end() const { return m_children.end(); }
+		auto begin() const { return m_children.begin(); }
+		auto end() { return m_children.end(); }
+		auto begin() { return m_children.begin(); }
 
-		ScopedSymbolTable* child(std::size_t index) { return index < m_children.size() ? m_children[index].get() : nullptr; }
-		const ScopedSymbolTable* child(std::size_t index) const { return index < m_children.size() ? m_children[index].get() : nullptr; }
+		const ScopedSymbolTable* back() const { return m_children.empty() ? nullptr : &m_children.back(); }
+		ScopedSymbolTable* back() { return m_children.empty() ? nullptr : &m_children.back(); }
+		std::size_t size() const { return m_children.size(); }
+		bool empty() const { return m_children.empty(); }
 
-		const Symbol* back() const { return m_symbols.empty() ? nullptr : &m_symbols.back(); }
-		Symbol* back() { return m_symbols.empty() ? nullptr : &m_symbols.back(); }
-		std::size_t size() const { return m_symbols.size(); }
-		bool empty() const { return m_symbols.empty(); }
-		std::size_t scopes() const { return m_children.size(); }
+		const Symbol* symbol() const { return m_symbol.has_value() ? &m_symbol.value() : nullptr; }
+		Symbol* symbol() { return m_symbol.has_value() ? &m_symbol.value() : nullptr; }
+
+		void implement(ScopedSymbolTable& classSymbolTable);
+
+		const ScopedSymbolTable* classTable() const { return m_classTable; }
+
+		const std::string& name() const { return m_symbol.has_value() ? m_symbol.value().name() : EMPTY_STR; }
 	private:
+		static const std::string EMPTY_STR;
 		Symbol& emplace(Symbol symbol);
 
-		order_indexed_string_map<Symbol> m_symbols;
-		ChildrenScopedSymbolTable m_children;
+		order_indexed_string_map<ScopedSymbolTable> m_children;
 		ScopedSymbolTable& m_parent = *this;
-		Symbol* m_parentSymbol = nullptr;
-		bool m_exported = false;
+		ScopedSymbolTable* m_classTable = nullptr;
+		std::optional<Symbol> m_symbol;
 	};
 }

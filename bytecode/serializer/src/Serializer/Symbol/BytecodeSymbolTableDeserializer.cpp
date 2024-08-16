@@ -27,11 +27,11 @@ void ska::bytecode::SymbolTableDeserializer::readFull(SerializerOutput output) {
 	output.validateOrThrow();
 }
 
-ska::Symbol* ska::bytecode::SymbolTableDeserializer::read(SerializerOutput& output) {
-	auto symbolSerializer = SerializerType<ska::Symbol*, SymbolTableDeserializerHelper&>{output};
-	Symbol* symbol;
-	symbolSerializer.read(symbol, m_helper);
-	return symbol;
+ska::ScopedSymbolTable* ska::bytecode::SymbolTableDeserializer::read(SerializerOutput& output) {
+	auto symbolSerializer = SerializerType<ska::ScopedSymbolTable*, SymbolTableDeserializerHelper&>{output};
+	ScopedSymbolTable* symbolTable;
+	symbolSerializer.read(symbolTable, m_helper);
+	return symbolTable;
 }
 
 ska::SymbolizedType ska::bytecode::SymbolTableDeserializer::readPart(SerializerOutput& output) {
@@ -48,8 +48,8 @@ ska::SymbolizedType ska::bytecode::SymbolTableDeserializer::readPart(SerializerO
 		symbolizedType.type.add(std::move(childSymbolizedType.type));
 	}
 
-	if (symbolizedType.symbol != nullptr) {
-		symbolizedType.symbol->changeTypeIfRequired(symbolizedType.type);
+	if (symbolizedType.symbolTable != nullptr) {
+		symbolizedType.symbolTable->changeTypeIfRequired(symbolizedType.type);
 	}
 
 	return symbolizedType;

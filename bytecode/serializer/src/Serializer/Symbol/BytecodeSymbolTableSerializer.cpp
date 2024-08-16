@@ -30,27 +30,27 @@ void ska::bytecode::SymbolTableSerializer::writeFull(SerializerOutput& output, c
 	}
 }
 
-void ska::bytecode::SymbolTableSerializer::writeFullTypeIfExists(SerializerOutput& output, const Symbol* value) {
-	if (value == nullptr) {
+void ska::bytecode::SymbolTableSerializer::writeFullTypeIfExists(SerializerOutput& output, const ScopedSymbolTable* value) {
+	if (value == nullptr || value->symbol() == nullptr) {
 		throw std::runtime_error("cannot serialize a null symbol");
 	}
 
-	write(output ,value, value->type());
+	write(output, value, value->symbol()->type());
 }
 
-void ska::bytecode::SymbolTableSerializer::writeSymbolOnlyIfExists(SerializerOutput& output, const Symbol* value) {
+void ska::bytecode::SymbolTableSerializer::writeSymbolOnlyIfExists(SerializerOutput& output, const ScopedSymbolTable* value) {
 	if (value == nullptr) {
 		throw std::runtime_error("cannot serialize a null symbol");
 	}
 
-	auto symbolSerializer = SerializerType<ska::Symbol*, SymbolTableSerializerHelper&>{ output };
+	auto symbolSerializer = SerializerType<ska::ScopedSymbolTable*, SymbolTableSerializerHelper&>{ output };
 	symbolSerializer.write(*value, m_helper);
 }
 
-void ska::bytecode::SymbolTableSerializer::write(SerializerOutput& output, const Symbol* symbol, const Type& type) {
+void ska::bytecode::SymbolTableSerializer::write(SerializerOutput& output, const ScopedSymbolTable* symbolTable, const Type& type) {
 	auto symbolizedTypeSerializer = SerializerType<CSymbolizedType, SymbolTableSerializerHelper&>{ output };
-	symbolizedTypeSerializer.write(CSymbolizedType { type, symbol }, m_helper);
-	
+	symbolizedTypeSerializer.write(CSymbolizedType { type, symbolTable }, m_helper);
+
 	for (auto& childType : type) {
 		LOG_INFO << "\t\tChild type " << childType;
 		LOG_INFO << "%13c\t\twith Raw type : " << ExpressionTypeSTR[static_cast<std::size_t>(childType.type())];

@@ -16,6 +16,7 @@
 #include "Service/TypeBuilder/TypeBuilderExport.h"
 #include "Service/TypeBuilder/TypeBuilderBinary.h"
 #include "Service/TypeBuilder/TypeBuilderScriptLink.h"
+#include "Service/TypeBuilder/TypeBuilderScriptObject.h"
 #include "Service/TypeBuilder/TypeBuilderLiteral.h"
 #include "Service/TypeBuilder/TypeBuilderFieldAccess.h"
 #include "Service/TypeBuilder/TypeBuilderType.h"
@@ -58,6 +59,7 @@ ska::TypeBuildersContainer ska::BuildTypeBuildersContainer(const TypeCrosser& ty
 	TypeBuilderMakeBuilder<Operator::IF_ELSE>(result);
 	TypeBuilderMakeBuilder<Operator::RETURN>(result);
 	TypeBuilderMakeBuilder<Operator::SCRIPT_LINK>(result);
+	TypeBuilderMakeBuilder<Operator::SCRIPT_OBJECT>(result);
 	TypeBuilderMakeBuilder<Operator::TYPE>(result);
 	TypeBuilderMakeBuilder<Operator::FILTER>(result);
 	TypeBuilderMakeBuilder<Operator::CONVERTER_CALL>(result);

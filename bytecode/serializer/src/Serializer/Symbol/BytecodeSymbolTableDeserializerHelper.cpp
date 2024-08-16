@@ -28,8 +28,8 @@ ska::bytecode::TreeMapSymbolTableBuilder& ska::bytecode::SymbolTableDeserializer
 	return *m_symbolTableBuilder[scriptName];
 }
 
-ska::Symbol& ska::bytecode::SymbolTableDeserializerHelper::buildSymbol(detail::SerializerSafeZone& zone, const std::string& absoluteScriptKey, std::string symbolName, const Operand& operand) {
-	Symbol* symbol = nullptr;
+ska::ScopedSymbolTable& ska::bytecode::SymbolTableDeserializerHelper::buildSymbol(detail::SerializerSafeZone& zone, const std::string& absoluteScriptKey, std::string symbolName, const Operand& operand) {
+	ScopedSymbolTable* symbolTable = nullptr;
 	std::size_t scriptId;
 
 	if (!absoluteScriptKey.empty()) {
@@ -41,34 +41,34 @@ ska::Symbol& ska::bytecode::SymbolTableDeserializerHelper::buildSymbol(detail::S
 			scriptNativeStrId = std::atoi(absoluteScriptKey.c_str());
 		}
 		const auto& scriptName = zone.ref(scriptNativeStrId);
-		symbol = getSymbolTableBuilder(scriptName).value(absoluteScriptKey, symbolName);
+		symbolTable = getSymbolTableBuilder(scriptName).value(absoluteScriptKey, symbolName);
 		scriptId = m_cache->id(scriptName);
 	} else {
 		LOG_ERROR << "Empty symbol script key provided";
 	}
-	
-	if (symbol == nullptr) {
+
+	if (symbolTable == nullptr || symbolTable->symbol() == nullptr) {
 		auto ss = std::stringstream{};
 		ss << "bad symbol key provided \"" << absoluteScriptKey << "\"";
 		throw std::runtime_error(ss.str());
 	}
 
-	LOG_DEBUG << "Got symbol \"" << symbol->name() << "\" from absolute script key \"" << absoluteScriptKey << "\"";
+	LOG_DEBUG << "Got symbol \"" << symbolTable->name() << "\" from absolute script key \"" << absoluteScriptKey << "\"";
 
-	m_cache->at(scriptId).helper().declareSymbol(*symbol, operand);
-	LOG_INFO << "Declared symbol as VAR \"" << symbol->name() << "\" with operand \"" << operand << "\"";
+	m_cache->at(scriptId).helper().declareSymbol(*symbolTable->symbol(), operand);
+	LOG_INFO << "Declared symbol as VAR \"" << symbolTable->name() << "\" with operand \"" << operand << "\"";
 
-	const auto* oldSymbolInfo = m_cache->getSymbolInfo(*symbol);
+	const auto* oldSymbolInfo = m_cache->getSymbolInfo(*symbolTable->symbol());
 	auto scopeIndex = std::count(absoluteScriptKey.begin(), absoluteScriptKey.end(), '.');
 	scopeIndex = scopeIndex == 0 ? 0 : (scopeIndex - 1);
 	auto symbolInfo = SymbolInfo{ static_cast<std::size_t>(scopeIndex + 1), symbolName, scriptId };
 
 	if (oldSymbolInfo != nullptr) {
-		LOG_INFO << "Symbol \"" << symbol->name() << "\" already has symbol info (it should be a binded symbol)";
+		LOG_INFO << "Symbol \"" << symbolTable->name() << "\" already has symbol info (it should be a binded symbol)";
 		symbolInfo.binding = oldSymbolInfo->binding;
 		symbolInfo.bindingPassThrough = oldSymbolInfo->bindingPassThrough;
 	}
-	
+
 	const auto childIndexDelimiter = absoluteScriptKey.find_last_of('.');
 	if (childIndexDelimiter != std::string::npos) {
 		symbolInfo.childIndex = std::atoi(absoluteScriptKey.substr(childIndexDelimiter + 1).c_str());
@@ -78,11 +78,11 @@ ska::Symbol& ska::bytecode::SymbolTableDeserializerHelper::buildSymbol(detail::S
 
 	symbolInfo.exported = scopeIndex == 0;
 
-	LOG_INFO << "%12cRegistering symbol info " << symbolInfo << " for symbol " << *symbol << (symbolInfo.exported ? "(exported symbol)" : " (this symbol is not exported)");
+	LOG_INFO << "%12cRegistering symbol info " << symbolInfo << " for symbol " << *symbolTable << (symbolInfo.exported ? "(exported symbol)" : " (this symbol is not exported)");
 
-	m_cache->setSymbolInfo(*symbol, std::move(symbolInfo));
+	m_cache->setSymbolInfo(*symbolTable->symbol(), std::move(symbolInfo));
 
-	return *symbol;
+	return *symbolTable;
 }
 
 ska::bytecode::Operand ska::bytecode::SymbolTableDeserializerHelper::readOperand(SerializerSafeZone<17> safeZone) {

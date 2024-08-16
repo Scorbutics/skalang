@@ -4,6 +4,7 @@
 #include "NodeValue/ScriptAST.h"
 #include "Service/TypeBuilder/TypeBuildUnit.h"
 #include "Service/TypeBuilder/TypeBuildersContainer.h"
+#include "Service/ScopedSymbolTable.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ASTNode)
 
@@ -58,29 +59,33 @@ ska::ASTNode::ASTNode(Operator o, Token identifierToken) :
 	m_token(std::move(identifierToken)) {
 }
 
-const ska::Symbol* ska::ASTNode::typeSymbol() const {
-	SLOG(ska::LogLevel::Debug) << "Accessing type symbol of node \"" << m_token << "\" with type \"" << m_type.value_or(Type{}) << "\"";
-	return m_symbol == nullptr ? nullptr : m_symbol->master();
-	//return !m_type.has_value() ? nullptr : TypeSymbolAccess(m_type.value());
-}
-
 const std::optional<ska::Type>& ska::ASTNode::type() const {
 	return m_type;
 }
 
-void ska::ASTNode::linkSymbol(Symbol& symbol) {
-	m_symbol = &symbol;
+void ska::ASTNode::linkSymbol(ScopedSymbolTable& symbolTable) {
+	m_symbolTable = &symbolTable;
+	assert(m_symbolTable->symbol() != nullptr);
 	refreshSymbolType();
-	SLOG(ska::LogLevel::Info) << "Linking symbol \"" << &symbol << "\" in node \"" << m_token << "\"";
+	SLOG(ska::LogLevel::Info) << "Linking symbol \"" << *m_symbolTable->symbol() << "\" in node \"" << m_token << "\"";
 }
 
 void ska::ASTNode::refreshSymbolType() {
-	if (m_symbol != nullptr && m_type.has_value()) {
-		SLOG(ska::LogLevel::Debug) << "Current symbol \"" << m_symbol->name() << "\" has type \"" << m_symbol->type() << "\"";
-		if (m_symbol->changeTypeIfRequired(m_type.value())) {
-			SLOG(ska::LogLevel::Debug) << "Symbol \"" << m_symbol->name() << "\" in node \"" << m_token << "\" has type updated \"" << m_symbol->type() << "\"";
+	auto* sym = symbol();
+	if (sym != nullptr && m_type.has_value()) {
+		SLOG(ska::LogLevel::Debug) << "Current symbol \"" << sym->name() << "\" has type \"" << sym->type() << "\"";
+		if (sym->changeTypeIfRequired(m_type.value())) {
+			SLOG(ska::LogLevel::Debug) << "Symbol \"" << sym->name() << "\" in node \"" << m_token << "\" has type updated \"" << sym->type() << "\"";
 		}
 	}
+}
+
+const ska::Symbol* ska::ASTNode::symbol() const {
+	return m_symbolTable == nullptr ? nullptr : m_symbolTable->symbol();
+}
+
+ska::Symbol* ska::ASTNode::symbol() {
+	return m_symbolTable == nullptr ? nullptr : m_symbolTable->symbol();
 }
 
 bool ska::ASTNode::updateType(Type type) {
@@ -90,7 +95,7 @@ bool ska::ASTNode::updateType(Type type) {
 }
 
 bool ska::ASTNode::isSymbolicLeaf() const {
-	return m_symbol != nullptr && m_children.size() < 2;
+	return m_symbolTable != nullptr && m_children.size() < 2;
 }
 
 void ska::ASTNode::prettyPrint(std::ostream& os, int depth) const {
@@ -101,8 +106,8 @@ void ska::ASTNode::prettyPrint(std::ostream& os, int depth) const {
 	}
 
 	os << node.m_op << " - ";
-	if (node.m_symbol != nullptr) {
-		os << *node.m_symbol;
+	if (node.symbol() != nullptr) {
+		os << *node.symbol();
 	} else if (node.m_type.has_value()) {
 		os << node.m_type.value();
 	} else {

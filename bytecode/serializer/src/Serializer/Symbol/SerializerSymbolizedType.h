@@ -6,6 +6,7 @@
 #include "Serializer/BytecodeChunk.h"
 #include "SerializerSymbol.h"
 namespace ska {
+	class ScopedSymbolTable;
 	class Symbol;
 
 	namespace bytecode {
@@ -15,24 +16,24 @@ namespace ska {
 
 	struct CSymbolizedType {
 		const Type& type;
-		const Symbol* symbol = nullptr;
+		const ScopedSymbolTable* symbolTable = nullptr;
 	};
-	
+
 	struct SymbolizedType {
 		Type type {};
-		Symbol* symbol = nullptr;
+		ScopedSymbolTable* symbolTable = nullptr;
 		std::size_t compoundTypes = 0;
 	};
-	
+
 	template <>
 	struct SerializerTypeTraits<CSymbolizedType> {
-		static constexpr std::size_t BytesRequired = 2 * sizeof(uint8_t) + sizeof(uint32_t) + SerializerTypeTraits<Symbol*>::BytesRequired;
+		static constexpr std::size_t BytesRequired = 2 * sizeof(uint8_t) + sizeof(uint32_t) + SerializerTypeTraits<ScopedSymbolTable*>::BytesRequired;
 		static constexpr const char* Name = "CSymbolizedType";
 
 		static void Read(SerializerSafeZone<BytesRequired>& zone, CSymbolizedType& symbolizedType, bytecode::SymbolTableDeserializerHelper&) { assert(false); }
 		static void Write(SerializerSafeZone<BytesRequired>& zone, const CSymbolizedType& symbolizedType, bytecode::SymbolTableSerializerHelper&);
 	};
-	
+
 	template <>
 	struct SerializerTypeTraits<SymbolizedType> {
 		static constexpr std::size_t BytesRequired = SerializerTypeTraits<CSymbolizedType>::BytesRequired;

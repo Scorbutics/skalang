@@ -2,6 +2,7 @@
 #include "SerializerSymbolizedType.h"
 #include "NodeValue/Symbol.h"
 
+#include "Service/ScopedSymbolTable.h"
 #include "SerializerSymbol.h"
 
 namespace ska {
@@ -19,18 +20,18 @@ void ska::SerializerTypeTraits<ska::SymbolizedType>::Read(SerializerSafeZone<Byt
 
 	auto hasSymbol = zone.read<uint8_t>();
 	if (hasSymbol) {
-		auto symbolSerializer = SerializerType<Symbol*, bytecode::SymbolTableDeserializerHelper&>{ zone };
-		symbolSerializer.read(symbolizedType.symbol, helper);
+		auto symbolSerializer = SerializerType<ScopedSymbolTable*, bytecode::SymbolTableDeserializerHelper&>{ zone };
+		symbolSerializer.read(symbolizedType.symbolTable, helper);
 	} else {
-		static constexpr auto BytesSymbol = SerializerType<Symbol*, bytecode::SymbolTableDeserializerHelper&>::BytesRequired;
+		static constexpr auto BytesSymbol = SerializerType<ScopedSymbolTable*, bytecode::SymbolTableDeserializerHelper&>::BytesRequired;
 		zone.acquireMemory<BytesSymbol>("No symbol (byte padding)").readNull<BytesSymbol>();
 	}
-	
+
 	symbolizedType.compoundTypes = zone.read<uint32_t>();
 
-	if (symbolizedType.symbol != nullptr) {
-		symbolizedType.type = Type::Override(symbolizedType.type, symbolizedType.symbol);
-		symbolizedType.symbol->changeTypeIfRequired(symbolizedType.type);
+	if (symbolizedType.symbolTable != nullptr) {
+		symbolizedType.type = Type::Override(symbolizedType.type, symbolizedType.symbolTable);
+		symbolizedType.symbolTable->changeTypeIfRequired(symbolizedType.type);
 	}
 
 	LOG_INFO << "Type \"" << symbolizedType.type << "\" is being deserialized with " << symbolizedType.type.size() << " compound types";
@@ -42,13 +43,13 @@ void ska::SerializerTypeTraits<ska::CSymbolizedType>::Write(SerializerSafeZone<B
 
 	LOG_INFO << "Type \"" << symbolizedType.type << "\" is being serialized with " << symbolizedType.type.size() << " compound types";
 
-	if (symbolizedType.symbol != nullptr) {
+	if (symbolizedType.symbolTable != nullptr) {
 		zone.write(static_cast<uint8_t>(1));
-		auto symbolSerializer = SerializerType<Symbol*, bytecode::SymbolTableSerializerHelper&>{ zone };
-		symbolSerializer.write(*symbolizedType.symbol, helper);
+		auto symbolSerializer = SerializerType<ScopedSymbolTable*, bytecode::SymbolTableSerializerHelper&>{ zone };
+		symbolSerializer.write(*symbolizedType.symbolTable, helper);
 	} else {
 		zone.write(static_cast<uint8_t>(0));
-		static constexpr auto BytesSymbol = SerializerType<Symbol*, bytecode::SymbolTableSerializerHelper&>::BytesRequired;
+		static constexpr auto BytesSymbol = SerializerType<ScopedSymbolTable*, bytecode::SymbolTableSerializerHelper&>::BytesRequired;
 		zone.acquireMemory<BytesSymbol>("No symbol (byte padding)").writeNull<BytesSymbol>();
 	}
 

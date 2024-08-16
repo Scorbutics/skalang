@@ -44,7 +44,10 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::parse(ScriptAST& input) {
 				blockNodeStatements.push_back(std::move(optionalStatement));
 			}
 		}
-		return ASTFactory::MakeNode<Operator::BLOCK>(std::move(blockNodeStatements));
+		auto scriptNode = ASTFactory::MakeNode<Operator::SCRIPT_OBJECT>(std::move(blockNodeStatements));
+		auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT> (*scriptNode, input);
+		observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnEndEvent);
+		return scriptNode;
 	} catch (std::exception& e) {
 		throw LangError(input.name(), e);
 	}
@@ -63,7 +66,7 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::statement(ScriptAST& inpu
 
 		case TokenType::RANGE:
 			return m_matcherBlock.match(input);
-		
+
 		default:
 			return matchExpressionStatement(input);
 		}

@@ -25,33 +25,36 @@ ska::bytecode::TreeSymbolTableMapBuilder& ska::bytecode::SymbolTableSerializerHe
 	return *m_mapBuilder[id];
 }
 
-std::size_t ska::bytecode::SymbolTableSerializerHelper::scriptOfSymbol(const Symbol& symbol) {
+std::size_t ska::bytecode::SymbolTableSerializerHelper::scriptOfSymbol(const ScopedSymbolTable& symbolTable) {
+	assert(symbolTable.symbol() != nullptr);
+
 	std::size_t scriptId;
-	auto* info = m_cache->getSymbolInfo(symbol);
+	auto* info = m_cache->getSymbolInfo(*symbolTable.symbol());
 	if (info == nullptr) {
-		auto scriptIt = m_cache->find(symbol.name());
+		auto scriptIt = m_cache->find(symbolTable.name());
 		if (scriptIt == m_cache->end()) {
-			throw std::runtime_error("unknown ast symbol \"" + symbol.name() + "\" detected during script bytecode serialization");
+			throw std::runtime_error("unknown ast Symbol \"" + symbolTable.name() + "\" detected during script bytecode serialization");
 		}
 		scriptId = (*scriptIt)->id();
 	} else {
 		scriptId = info->script;
 	}
-	LOG_DEBUG << "Symbol \"" << symbol.name() << "\" is in script \"" << scriptId << "\"";
+	LOG_DEBUG << "Symbol \"" << symbolTable.name() << "\" is in script \"" << scriptId << "\"";
 
 	return scriptId;
 }
 
-ska::bytecode::Operand ska::bytecode::SymbolTableSerializerHelper::operandOfSymbol(const Symbol& symbol) {
-	auto scriptId = scriptOfSymbol(symbol);
+ska::bytecode::Operand ska::bytecode::SymbolTableSerializerHelper::operandOfSymbol(const ScopedSymbolTable& symbolTable) {
+	assert(symbolTable.symbol() != nullptr);
+	auto scriptId = scriptOfSymbol(symbolTable);
 	auto& script = (*m_cache)[scriptId];
 
-	auto operand = script.getSymbol(symbol);
+	auto operand = script.getSymbol(*symbolTable.symbol());
 	if (!operand.has_value()) {
 		operand = Operand{ ScriptVariableRef{ scriptId, scriptId }, OperandType::BIND_SCRIPT };
 		//throw std::runtime_error("unable to find the matching operand for symbol \"" + symbol.name() + "\" detected during script bytecode serialization");
 	}
-	LOG_DEBUG << "Symbol \"" << symbol.name() << "\" has operand \"" << operand.value() << "\"";
+	LOG_DEBUG << "Symbol \"" << symbolTable.name() << "\" has operand \"" << operand.value() << "\"";
 	return operand.value();
 }
 
@@ -59,7 +62,7 @@ const std::string& ska::bytecode::SymbolTableSerializerHelper::getScriptName(con
 	return m_cache->at(scriptId).name();
 }
 
-std::string ska::bytecode::SymbolTableSerializerHelper::getRelativeScriptKey(std::size_t scriptId, const Symbol& value) {
+std::string ska::bytecode::SymbolTableSerializerHelper::getRelativeScriptKey(std::size_t scriptId, const ScopedSymbolTable& value) {
 	auto relativeScriptKey = getMapBuilder(scriptId).key(value);
 	LOG_DEBUG << "Getting symbol \"" << value.name() << "\" relative script key \"" << relativeScriptKey << "\"";
 	return relativeScriptKey;

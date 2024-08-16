@@ -25,7 +25,7 @@ bool ska::TypeBuilder::matchFilter(FilterTokenEvent& event) {
 	auto& node = event.rootNode();
 	SLOG(LogLevel::Debug) << "Building type for variable \"" << event.rootNode() << "\" (Operator " << event.rootNode().op() << ")";
 	buildType(node, event.script());
-	SLOG(LogLevel::Info) << "Type built for variable \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value_or(Type {}) << "\" (Operator " << event.rootNode().op() << ")";	
+	SLOG(LogLevel::Info) << "Type built for variable \"" << event.rootNode() << "\" = \"" << event.rootNode().type().value_or(Type {}) << "\" (Operator " << event.rootNode().op() << ")";
 	return true;
 }
 
@@ -52,18 +52,18 @@ void ska::TypeBuilder::buildType(ASTNode& node, ScriptAST& script) {
 
 	// We have to const_cast here, because the whole TypeBuilder system doesn't modify any value, including symbol table, while computing operations.
 	// So we cannot have a Symbol* in return (TypeHierarchy) type, but only a const Symbol*, even if the original stored SymbolTable is still mutable.
-	auto* computedSymbol = const_cast<Symbol*>(typeHierarchy.link());
-	auto* currentSymbol = node.symbol();
-	if (computedSymbol != nullptr) {
-		if (currentSymbol == nullptr) {
-			SLOG(LogLevel::Warn) << "Symbol link \"" << computedSymbol->type() << "\" for node with OP \"" << node.op() << "\"";
-			node.updateType(Type::Override(std::move(typeHierarchy.type), computedSymbol));
-			node.linkSymbol(*computedSymbol);
+	auto* computedSymbolTable = const_cast<ScopedSymbolTable*>(typeHierarchy.link());
+	auto* currentSymbolTable = node.symbolTable();
+	if (computedSymbolTable != nullptr && computedSymbolTable->symbol() != nullptr) {
+		if (currentSymbolTable == nullptr) {
+			SLOG(LogLevel::Warn) << "Symbol link \"" << computedSymbolTable->symbol()->type() << "\" for node with OP \"" << node.op() << "\"";
+			node.updateType(Type::Override(std::move(typeHierarchy.type), computedSymbolTable));
+			node.linkSymbol(*computedSymbolTable);
 			return;
-		} else if (computedSymbol != currentSymbol) {
-			SLOG(LogLevel::Warn) << "%14cSymbol link \"" << computedSymbol->name() << "\" now implements \"" << currentSymbol->name() << "\"";
+		} else if (computedSymbolTable != currentSymbolTable) {
+			SLOG(LogLevel::Warn) << "%14cSymbol link \"" << computedSymbolTable->name() << "\" now implements \"" << currentSymbolTable->name() << "\"";
 			node.updateType(typeHierarchy.type);
-			computedSymbol->implement(*currentSymbol);
+			computedSymbolTable->implement(*computedSymbolTable);
 			return;
 		}
 	}
@@ -103,7 +103,7 @@ bool ska::TypeBuilder::matchExpression(ExpressionTokenEvent& event) {
   return true;
 }
 
-bool ska::TypeBuilder::matchFunction(FunctionTokenEvent& event) {	
+bool ska::TypeBuilder::matchFunction(FunctionTokenEvent& event) {
 	if (event.type() != FunctionTokenEventType::DECLARATION_NAME) {
 		auto& node = event.rootNode();
 		SLOG(LogLevel::Debug) << "Building type for function parameter declaration / call \"" << event.rootNode() << "\" (Operator " << event.rootNode().op() << ")";

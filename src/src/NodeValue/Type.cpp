@@ -12,21 +12,21 @@ ska::Type ska::Type::crossTypes(const TypeCrosser& crosser, std::string op, cons
 	return crosser.cross(op, *this, type2);
 }
 
-ska::Type::Type(const Symbol* symbol, ExpressionType t) :
+ska::Type::Type(const ScopedSymbolTable* symbolTable, ExpressionType t) :
 	m_type(t),
-	m_symbol(symbol) {
+	m_symbolTable(symbolTable == nullptr || symbolTable->symbol() == nullptr ? nullptr : symbolTable) {
 }
 
-bool ska::Type::operator==(const Type& t) const {	
-	if (m_symbol != nullptr && t.m_symbol != nullptr) {
-		return *m_symbol == *t.m_symbol;
+bool ska::Type::operator==(const Type& t) const {
+	if (m_symbolTable != nullptr && t.m_symbolTable != nullptr) {
+		return *m_symbolTable->symbol() == *t.m_symbolTable->symbol();
 	}
 
 	return structuralEquality(t);
 }
 
 std::string ska::Type::name() const {
-	return m_symbol == nullptr ? "" : m_symbol->name();
+	return m_symbolTable == nullptr ? "" : m_symbolTable->name();
 }
 
 bool ska::Type::structuralEquality(const Type& t) const {
@@ -34,8 +34,8 @@ bool ska::Type::structuralEquality(const Type& t) const {
 }
 
 bool ska::Type::tryChangeSymbol(const Type& type) {
-	if (type.m_symbol != nullptr && m_symbol != type.m_symbol) {
-		m_symbol = type.m_symbol;
+	if (type.m_symbolTable != nullptr && m_symbolTable != type.m_symbolTable) {
+		m_symbolTable = type.m_symbolTable;
 		return true;
 	}
 	return false;
@@ -43,7 +43,7 @@ bool ska::Type::tryChangeSymbol(const Type& type) {
 
 std::ostream& ska::operator<<(std::ostream& stream, const ska::Type& type) {
 	const auto mainType = ExpressionTypeSTR[static_cast<std::size_t>(type.m_type)];
-	auto addedSymbolPart = (type.m_symbol == nullptr ? "" : (" " + type.m_symbol->name()));
+	auto addedSymbolPart = (type.m_symbolTable == nullptr ? "" : (" " + type.m_symbolTable->name()));
 	if (type.m_compound.empty()) {
 		stream << mainType << addedSymbolPart;
 	} else {
@@ -60,6 +60,6 @@ std::ostream& ska::operator<<(std::ostream& stream, const ska::Type& type) {
 }
 
 void ska::Type::serialize(SerializerOutput& output, ScriptTypeSerializer& serializer, bool writeSymbol) const {
-	serializer.write(output, writeSymbol ? m_symbol : nullptr, *this);
+	serializer.write(output, writeSymbol ? m_symbolTable : nullptr, *this);
 }
 

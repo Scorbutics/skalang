@@ -30,9 +30,9 @@ namespace ska {
             }
 
 			case TokenType::IDENTIFIER: {
-				auto* symbol = symbols[node.name()];
-				if (symbol != nullptr) {
-					return *symbol;
+				auto* symbolTable = symbols[node.name()];
+				if (symbolTable != nullptr) {
+					return { *symbolTable };
 				}
 				return Type{};
 			}
@@ -76,7 +76,7 @@ namespace ska {
 
 				return type;
             }
-			
+
 			case TokenType::ARRAY:
 				return Type::MakeBuiltIn<ExpressionType::ARRAY>();
 
@@ -88,8 +88,8 @@ namespace ska {
         SLOG_STATIC(ska::LogLevel::Error, TypeBuilderBuildFromTokenTypeTag) << "default type returned for node \"" << node.name() << "\" of type " << TokenTypeSTR[static_cast<std::size_t>(node.tokenType())];
 
 		return Type{ };
-            
+
     }
-       
- 
+
+
 }

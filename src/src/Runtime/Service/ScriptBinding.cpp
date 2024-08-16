@@ -19,7 +19,7 @@ ska::ScriptBindingAST::ScriptBindingAST(
 	queryAST();
 }
 
-void ska::ScriptBindingAST::bindFunction(const Symbol& function, decltype(NativeFunction::function) f) {
+void ska::ScriptBindingAST::bindFunction(const ScopedSymbolTable& function, decltype(NativeFunction::function) f) {
 	SLOG(LogLevel::Debug) << "Binding function \"" << function;
 	auto field = BridgeField { function };
 	field.callback = std::move(f);
@@ -51,14 +51,12 @@ ska::ASTNodePtr ska::ScriptBindingAST::buildFunctionsAST(BridgeFunction& constru
 	SLOG(LogLevel::Info) << "Current constructor is : " << constructor.name();
 	fillConstructorWithBindings(constructor);
 
-	if (constructor.isVoid()) {
-		return ASTFactory::MakeNode<Operator::BLOCK>(m_functionBuilder.makeFieldList(m_scriptAst, constructor));
-	} 
+	auto result = std::vector<ASTNodePtr> {};
 
-	/*
-	if (constructor.isFactory()) {
-		return ASTFactory::MakeNode<Operator::BLOCK>(m_functionBuilder.makeFactory(m_scriptAst, constructor));
+	if (constructor.isVoid()) {
+		result = m_functionBuilder.makeFieldList(m_scriptAst, constructor);
+	} else {
+		result.push_back(m_functionBuilder.makeFunction(m_scriptAst, constructor));
 	}
-	*/
-	return ASTFactory::MakeNode<Operator::BLOCK>(m_functionBuilder.makeFunction(m_scriptAst, constructor));
+	return m_functionBuilder.makeScript(m_scriptAst, std::move(result));
 }

@@ -12,8 +12,8 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Oper
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>::generate(OperateOn node, GenerationContext& context) {
 	const auto& fieldName = node.GetFieldNameNode().name();
 
-	const auto* objectTypeSymbol = node.GetObjectNameNode().typeSymbol();
-	if (objectTypeSymbol == nullptr) {
+	const auto* objectTypeSymbolTable = node.GetObjectNameNode().symbolTable();
+	if (objectTypeSymbolTable == nullptr) {
 		throw std::runtime_error("unable to retrieve object type");
 	}
 
@@ -31,14 +31,14 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	}
 
 	// Handling custom types
-	const auto* symbolField = (*objectTypeSymbol)(fieldName);
+	const auto* symbolField = (*objectTypeSymbolTable)(fieldName);
 	if (symbolField == nullptr) {
 		auto ss = std::stringstream{};
 		ss << "trying to access to an undeclared field : \"" << fieldName << "\" of \"" << node.GetObjectNameNode().name() << "\"";
 		throw std::runtime_error(ss.str());
 	}
 
-	const auto* objectSymbolInfo = context.getSymbolInfo(*symbolField);
+	const auto* objectSymbolInfo = context.getSymbolInfo(*symbolField->symbol());
 	if (objectSymbolInfo == nullptr) {
 		auto ss = std::stringstream { };
 		ss << "invalid bytecode : the dereferenced object \"" << node.GetObjectNameNode() << "\" is not registered in script ";
@@ -48,9 +48,9 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	std::size_t index;
 	if (objectSymbolInfo->exported) {
-		index = context.exportId(*symbolField);
+		index = context.exportId(*symbolField->symbol());
 	} else {
-		index = objectTypeSymbol->id(*symbolField);
+		index = objectTypeSymbolTable->id(*symbolField->symbol()).value();
 	}
 
 	auto objectValue = generateNext({ context, node.GetObjectNameNode()});

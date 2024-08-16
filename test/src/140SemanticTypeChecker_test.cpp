@@ -36,7 +36,6 @@ TEST_CASE("[SymbolTableUpdater] update node symbol") {
 
 	auto& table = astPtr.symbols();
 
-	CHECK(table.scopes() == 1);
 	const auto* i = table["i"];
 	const auto* nestedToto = table.lookup(ska::SymbolTableLookup::hierarchical("toto"), ska::SymbolTableNested::firstChild());
 	const auto* toto = table["toto"];
@@ -44,11 +43,11 @@ TEST_CASE("[SymbolTableUpdater] update node symbol") {
 	const auto* nestedI = table.lookup(ska::SymbolTableLookup::hierarchical("i"), ska::SymbolTableNested::firstChild());
 
 	auto& ast = astPtr.rootNode();
-	CHECK(i == ast[0].symbol());
-	CHECK(titi == ast[1].symbol());
+	CHECK(i == ast[0].symbolTable());
+	CHECK(titi == ast[1].symbolTable());
 	CHECK(ast[1].symbol() != ast[0].symbol());
-	CHECK(nestedToto == ast[2][0].symbol());
-	CHECK(nestedI == ast[2][1].symbol());
+	CHECK(nestedToto == ast[2][0].symbolTable());
+	CHECK(nestedI == ast[2][1].symbolTable());
 	CHECK(nestedI == i);
 }
 
@@ -64,8 +63,8 @@ TEST_CASE("[SymbolTableUpdater] function declaration") {
 
 	auto& ast = astPtr.rootNode();
 	CHECK(toto != nullptr);
-	CHECK(toto == ast[0].symbol());
-	CHECK(toto == ast[0][0].symbol());
+	CHECK(toto == ast[0].symbolTable());
+	CHECK(toto == ast[0][0].symbolTable());
 }
 
 TEST_CASE("[SemanticTypeChecker]") {
@@ -91,7 +90,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(std::string{ e.what() }.find("undeclared custom type \"intuiutututut\"") != std::string::npos);
 			}
 		}
-		
+
 		SUBCASE("function with incompatible return for a converter operator") {
 			try {
 				static constexpr auto progStr =
@@ -408,7 +407,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 		}
 
 		SUBCASE("Array") {
-			
+
 			SUBCASE("empty : explicit type") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "str298 = []: string\n", data);
 				auto& astArrayType = astPtr.rootNode();
@@ -522,7 +521,7 @@ TEST_CASE("[SemanticTypeChecker]") {
 				CHECK(ast[1][1].size() == 2);
 				CHECK(ast[1][1][0].type() == ska::ExpressionType::INT);
 			}
-			
+
 			SUBCASE("filter applied on array with use of iterator & index") {
 				auto astPtr = ASTFromInputSemanticTC(scriptCache, "array358 = [\"bup\", \"bip\", \"bap\"]\n array358 | (iteratorOnArray358, index) do iteratorOnArray358 = iteratorOnArray358 + \".\"\n index = index + 1\n end\n", data);
 				auto& ast = astPtr.rootNode();

@@ -9,14 +9,17 @@
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::VARIABLE_AFFECTATION>);
 
 ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::VARIABLE_AFFECTATION>::build(const ScriptAST& script, OperateOn node) {
-    const auto* symbol = script.symbols()[node.GetVariableName()];
-    if (symbol != nullptr && symbol->type() != ExpressionType::VOID) {
-	SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::VARIABLE_AFFECTATION>) << "%02cVariable declaration has already type \"" << symbol->type() << "\"";
-	    return symbol->type();
+    const auto* symbolTable = script.symbols()[node.GetVariableName()];
+    if (symbolTable != nullptr && symbolTable->symbol() != nullptr && symbolTable->symbol()->type() != ExpressionType::VOID) {
+	SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::VARIABLE_AFFECTATION>) << "%02cVariable declaration has already type \"" << symbolTable->symbol()->type() << "\"";
+	    return symbolTable->symbol()->type();
     }
 
     auto resultType = node.GetVariableValueNode().type().value();
-    const Symbol* symbolLink = ExpressionTypeIsBuiltIn(resultType.type()) ? nullptr : node.GetVariableValueNode().symbol();
-    SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::VARIABLE_AFFECTATION>) << "%02cVariable declaration type \"" << resultType << "\"" << (symbolLink == nullptr ? "" : (" for symbol \"" + symbolLink->name() + "\""));
-    return { std::move(resultType), std::move(symbolLink) };
+    const auto* nodeValue = ExpressionTypeIsBuiltIn(resultType.type()) ? nullptr : &node.GetVariableValueNode();
+    SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::VARIABLE_AFFECTATION>) << "%02cVariable declaration type \"" << resultType << "\"";
+    if (nodeValue != nullptr) {
+        SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::VARIABLE_AFFECTATION>) << " for node \"" << (*nodeValue) << "\"";
+    }
+    return { std::move(resultType), nodeValue };
 }

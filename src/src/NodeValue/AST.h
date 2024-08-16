@@ -52,14 +52,16 @@ namespace ska {
 
 		const auto& op() const { return m_op; }
 
-		void linkSymbol(Symbol& symbol);
+		void linkSymbol(ScopedSymbolTable& symbolTable);
 		const std::optional<Type>& type() const;
 
 		bool updateType(Type type);
 
-		const Symbol* typeSymbol() const;
-		const auto* symbol() const { return m_symbol; }
-		auto* symbol() { return m_symbol; }
+		const Symbol* symbol() const;
+		Symbol* symbol();
+
+		const auto* symbolTable() const { return m_symbolTable; }
+		auto* symbolTable() { return m_symbolTable; }
 
 		bool isSymbolicLeaf() const;
 
@@ -77,7 +79,7 @@ namespace ska {
 
 		Operator m_op = Operator::UNARY;
 		std::optional<Type> m_type;
-		Symbol* m_symbol = nullptr;
+		ScopedSymbolTable* m_symbolTable = nullptr;
 
 		Token m_token;
 		std::vector<ASTNodePtr> m_children;

@@ -204,6 +204,8 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFactoryPrivateFactory(ScriptAST& inpu
 	return emptyNode;
 }
 
+// TODO revoir la façon dont cet AST est build, il me paraît faux
+
 ska::ASTNodePtr ska::BridgeASTBuilder::makeFactoryPrototype(ScriptAST& script, ASTNodePtr nameNode, std::deque<ASTNodePtr> parameters) {
 	auto lock = BridgeASTBuilderSymbolTableLock{ *this, script.symbols() };
 	SLOG(LogLevel::Info) << " 5b - Making factory prototype \"" << nameNode->name() << "\"";
@@ -245,7 +247,7 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionFactoryPrototype(ScriptAST& s
 
 ska::ASTNodePtr ska::BridgeASTBuilder::makeFunction(ScriptAST& script, const BridgeFunction& data) {
 	SLOG(LogLevel::Info) << " 1 - Making function/factory \"" << data.name() << "\"";
-	auto prototype = makeFunctionFactoryPrototype(script, data.symbol().type(), data.name());
+	auto prototype = makeFunctionFactoryPrototype(script, data.symbolTable().symbol()->type(), data.name());
 
 	auto functionDeclaration = ASTNodePtr{};
 	if (prototype->op() == Operator::FACTORY_PROTOTYPE_DECLARATION) {
@@ -266,6 +268,13 @@ std::vector<ska::ASTNodePtr> ska::BridgeASTBuilder::makeFieldList(ScriptAST& scr
 		scriptNodes.push_back(std::move(fieldVariable));
 	}
 	return scriptNodes;
+}
+
+ska::ASTNodePtr ska::BridgeASTBuilder::makeScript(ScriptAST& script, std::vector<ASTNodePtr> body) {
+	auto result = ASTFactory::MakeNode<Operator::SCRIPT_OBJECT>(std::move(body));
+	auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT> (*result, script);
+	observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnEndEvent);
+	return result;
 }
 
 ska::BridgeASTBuilderSymbolTableLock::BridgeASTBuilderSymbolTableLock(BridgeASTBuilder& factory, SymbolTable& table) :

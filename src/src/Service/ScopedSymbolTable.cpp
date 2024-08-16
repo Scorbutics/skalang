@@ -1,9 +1,15 @@
 #include "Config/LoggerConfigLang.h"
 #include "ScopedSymbolTable.h"
-#include "Service/SymbolFieldResolver.h"
 #include "NodeValue/ScriptAST.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScopedSymbolTable)
+
+const std::string ska::ScopedSymbolTable::EMPTY_STR = "";
+
+ska::ScopedSymbolTable::ScopedSymbolTable(std::string rootName):
+	m_symbol(make(0, std::move(rootName), *this)) {
+	//m_symbol.value().changeTypeIfRequired(Type::MakeCustom<ska::ExpressionType::FUNCTION>(this));
+}
 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
 	return m_parent;
@@ -13,89 +19,128 @@ const ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() const {
 	return m_parent;
 }
 
-ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name) {
-	SLOG(ska::LogLevel::Info) << "\tSymbol Created \"" << name << "\" with scoped table";
-	return emplace(make(m_children.size(), std::move(name), *this));
+ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(std::string name, const ScriptAST* script) {
+	if (script != nullptr) {
+		auto& table = createNested(std::make_optional(make(m_children.size(), std::move(name), script->handle()->symbols().root())));
+		//table.changeTypeIfRequired(script->handle()->symbols().root().symbol()->type());
+		return table;
+	}
+	return createNested(name.empty() ? std::optional<Symbol>{} : std::make_optional(make(m_children.size(), name, *this)));
 }
 
-ska::Symbol& ska::ScopedSymbolTable::emplace(Symbol symbol) {
-	auto name = symbol.name();
-	SLOG(ska::LogLevel::Debug) << "\tSymbol \"" << name << "\" \"" <<  symbol.type() << "\"";
-	if(m_symbols.find(name) == m_symbols.end()) {
-		m_symbols.emplace(name, std::move(symbol));
-	} else {
-		throw std::runtime_error("Symbol already exists : " + name);
+ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(std::optional<Symbol> optSymbol) {
+	if (!optSymbol.has_value()) {
+		// Create an unnamed nested symbol table (in case of blocks of code for example)
+		// Generate a name which is in fact an id (the index)
+		m_children.emplace(std::to_string(m_children.size()), std::make_unique<ska::ScopedSymbolTable>(*this));
+		return m_children.back();
+	}
+	auto symbol = std::move(optSymbol.value());
+
+	if(m_children.find(symbol.name()) != m_children.end()) {
+		throw std::runtime_error("Symbol already exists : " + symbol.name());
 	}
 
-	auto& s = m_symbols.at(name);
-	SLOG(ska::LogLevel::Info) << "\tSymbol Inserted \"" << name << "\" \"" << s.type() << "\"";
-	return s;
+	SLOG(ska::LogLevel::Debug) << "\tSymbol created \"" << symbol.name() << "\"";
+
+	// Need to copy the name before symbol is moved
+	const auto name = symbol.name();
+	auto table = std::make_unique<ska::ScopedSymbolTable>(*this, std::move(symbol));
+
+	// Preserve the future newly created symbol table in a reference in order to return it
+	auto& result = *table;
+
+	// Now we can move the owner pointer
+	m_children.emplace(name, std::move(table));
+
+	SLOG(ska::LogLevel::Info) << "\tSymbol inserted \"" << name << "\" \"" << result.m_symbol.value().type() << "\"";
+	return result;
 }
 
-ska::Symbol& ska::ScopedSymbolTable::emplace(std::string name, const ScriptAST& script) {
-	SLOG(ska::LogLevel::Info) << "\tSymbol Created \"" << name << "\" with script \"" << script.name() << "\"";
-	return emplace(make(m_children.size(), name, *script.handle()));
-}
-
-ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(Symbol* s, bool isExported) {
-	m_children.push_back(std::make_unique<ska::ScopedSymbolTable>(*this));
-	auto& lastChild = *m_children.back();
-	lastChild.m_parentSymbol = s;
-	lastChild.m_exported = isExported;
-
-	//No bad memory access possible when unique_ptr are moved, that's why it's safe to return the address of contained item
-	//even if we move the vector or if the vector moves its content automatically
-	return lastChild;
-}
-
-bool ska::ScopedSymbolTable::changeTypeIfRequired(const std::string& symbolName, const Type& value) {
-	auto* symbol = (*this)[symbolName];
-	if (symbol == nullptr) {
+bool ska::ScopedSymbolTable::changeTypeIfRequired(const Type& value) {
+	if (!m_symbol.has_value()) {
 		auto ss = std::stringstream{};
-		ss << "bad symbol \"" << symbolName << "\" : cannot assign type \"" << value << "\"";
+		ss << "bad symbol: cannot assign type \"" << value << "\"";
 		throw std::runtime_error(ss.str());
 	}
-	return symbol->changeTypeIfRequired(value);
+	return m_symbol.value().changeTypeIfRequired(value);
 }
 
-const ska::Symbol* ska::ScopedSymbolTable::operator[](const std::string& key) const {
-	auto valueIt = m_symbols.find(key);
-	if (valueIt == m_symbols.end()) {
-		return &m_parent == this ? nullptr : m_parent[key];
+template<class Children, class Table>
+static Table* HierarchicalLookup(Table* classTable, const Table& current, Children& children, Table& parent, const std::string& key) {
+	// First, direct lookup in parent class table, if it exists
+	if (classTable != nullptr) {
+		auto result = (*classTable)(key);
+		if (result != nullptr) {
+			return result;
+		}
+	}
+
+	// Then look into direct children symbols
+	auto valueIt = children.find(key);
+	if (valueIt == children.end()) {
+		// If still not found, look into parent table
+		return &parent == &current ? nullptr : parent[key];
 	}
 	return *valueIt == nullptr ? nullptr : (*valueIt).get();
 }
 
-ska::Symbol* ska::ScopedSymbolTable::operator[](const std::string& key) {
-	auto valueIt = m_symbols.find(key);
-	if (valueIt == m_symbols.end()) {
-		return &m_parent == this ? nullptr : m_parent[key];
+template<class Children, class Table>
+static Table* DirectLookup(Table* classTable, Children& children, const std::string& key) {
+	// First, direct lookup in parent class table, if it exists
+	if (classTable != nullptr) {
+		auto result = (*classTable)(key);
+		if (result != nullptr) {
+			return result;
+		}
 	}
-	return *valueIt == nullptr ? nullptr : (*valueIt).get();
+
+	// Then look into direct children symbols
+	auto valueIt = children.find(key);
+	return valueIt == children.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
 }
 
-const ska::Symbol* ska::ScopedSymbolTable::operator[](std::size_t index) const {
-	return index < m_symbols.size() ? &m_symbols.at(index) : nullptr;
+const ska::ScopedSymbolTable* ska::ScopedSymbolTable::operator[](const std::string& key) const {
+	return HierarchicalLookup(m_classTable, *this, m_children, m_parent, key);
 }
 
-ska::Symbol* ska::ScopedSymbolTable::operator[](std::size_t index) {
-	return index < m_symbols.size() ? &m_symbols.at(index) : nullptr;
+ska::ScopedSymbolTable* ska::ScopedSymbolTable::operator[](const std::string& key) {
+	return HierarchicalLookup(m_classTable, *this, m_children, m_parent, key);
 }
 
-const ska::Symbol* ska::ScopedSymbolTable::operator()(const std::string& key) const {
-	const auto valueIt = m_symbols.find(key);
-	return valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
+const ska::ScopedSymbolTable* ska::ScopedSymbolTable::operator[](std::size_t index) const {
+	return index < m_children.size() ? &m_children.at(index) : nullptr;
 }
 
-ska::Symbol* ska::ScopedSymbolTable::operator()(const std::string& key) {
-	auto valueIt = m_symbols.find(key);
-	return valueIt == m_symbols.end() || *valueIt == nullptr ? nullptr : (*valueIt).get();
+ska::ScopedSymbolTable* ska::ScopedSymbolTable::operator[](std::size_t index) {
+	return index < m_children.size() ? &m_children.at(index) : nullptr;
+}
+
+const ska::ScopedSymbolTable* ska::ScopedSymbolTable::operator()(const std::string& key) const {
+	return DirectLookup(m_classTable, m_children, key);
+}
+
+ska::ScopedSymbolTable* ska::ScopedSymbolTable::operator()(const std::string& key) {
+	return DirectLookup(m_classTable, m_children, key);
 }
 
 std::optional<std::size_t> ska::ScopedSymbolTable::id(const Symbol& field) const {
-	if (m_symbols.atOrNull(field.name()) == nullptr || &m_symbols.at(field.name()) != &field) {
+	if (m_children.atOrNull(field.name()) == nullptr || m_children.at(field.name()).symbol() != &field) {
 		return {};
 	}
 
-	return m_symbols.id(field.name());
+	return m_children.id(field.name());
+}
+
+void ska::ScopedSymbolTable::implement(ScopedSymbolTable& classSymbolTable) {
+	if (!m_symbol.has_value()) {
+		throw std::runtime_error("cannot implement data from a class symbol table without having any current symbol");
+	}
+
+	if (&classSymbolTable == m_classTable) {
+		return;
+	}
+	SLOG(ska::LogLevel::Info) << "Implementing class symbol table " << classSymbolTable << " into " << m_symbol.value();
+
+	m_classTable = &classSymbolTable;
 }

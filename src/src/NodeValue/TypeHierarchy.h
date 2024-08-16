@@ -1,22 +1,25 @@
 #pragma once
+#include <utility>
 #include "Type.h"
 #include "Symbol.h"
 
 namespace ska {
-	
+	class ASTNode;
+	class ScopedSymbolTable;
+	class SymbolTable;
 	struct TypeHierarchy {
-		TypeHierarchy(Type t, const Symbol* link = nullptr) :
-			type(std::move(t)),
-			m_link(link) {}
+		TypeHierarchy(Type t);
+		TypeHierarchy(Type t, const ASTNode* symbolNode);
+		TypeHierarchy(const SymbolTable& table);
+		TypeHierarchy(Type t, const SymbolTable& table);
+		TypeHierarchy(const ScopedSymbolTable& table);
+		TypeHierarchy(Type t, const ScopedSymbolTable& table);
 
-		TypeHierarchy(const Symbol& symbol) :
-			type(symbol.type()),
-			m_link(&symbol) {}
+		const ScopedSymbolTable* link() { return m_link; }
 
-		const Symbol* link() { return m_link; }
-
-		Type type;
 	private:
-		const Symbol* m_link = nullptr;
+		const ScopedSymbolTable* m_link = nullptr;
+	public:
+		Type type;
 	};
 }

@@ -13,36 +13,37 @@ void ska::bytecode::TreeSymbolTableMapBuilder::store(const SymbolTable& table, c
 }
 
 void ska::bytecode::TreeSymbolTableMapBuilder::store(const ScopedSymbolTable& table, const std::string& depth) {
-	auto childIndex = std::size_t{ 0 };	
-	for (const auto& symbol : table) {
-		store(*symbol, depth, childIndex++);
-	}
-
-	const auto childrenScopes = table.scopes();
-	for (std::size_t index = 0; index < childrenScopes; index++) {
-		const auto* childTable = table.child(index);
+	auto index = std::size_t {0};
+	for (const auto& childTable : table) {
 		if (childTable == nullptr) {
-			throw std::runtime_error("invalid symbol table \"" + std::to_string(index) + "\"");
+			throw std::runtime_error("invalid child symbol table (index " + std::to_string(index) + ") of parent \"" + table.name() + "\"");
 		}
 
-		const auto* owner = childTable->directOwner();
-		if (owner == nullptr) {
+		// TODO check if this still works
+
+		if (childTable->symbol() != nullptr) {
+			// Store child table direct data (symbol)
+			store(*childTable, depth, index++);
+		}
+
+		// Store child table children data
+		const auto* ownerTable = childTable->directOwner();
+		if (ownerTable == nullptr) {
 			// Either a non owned symbol table => we enqueue it after all children indexes
-			auto nextDepth = buildKey(depth, index + childIndex);
+			auto nextDepth = buildKey(depth, index);
 			store(*childTable, nextDepth);
 		} else {
 			// Or a symbol related symbol table, therefore here we query the depth of the already existing symbol
-			auto seekOwnerIt = m_symbols.find(owner);
+			auto seekOwnerIt = m_symbols.find(ownerTable);
 			if (seekOwnerIt == m_symbols.end()) {
 				throw std::runtime_error("invalid symbol table : a child scoped symbol table has an owner in its script that is not currently known.");
 			}
 			store(*childTable, seekOwnerIt->second);
 		}
-		
 	}
 }
 
-void ska::bytecode::TreeSymbolTableMapBuilder::store(const Symbol& symbol, const std::string& depth, std::size_t childIndex) {
+void ska::bytecode::TreeSymbolTableMapBuilder::store(const ScopedSymbolTable& symbol, const std::string& depth, std::size_t childIndex) {
 	const auto existingSymbolIt = m_symbols.find(&symbol);
 	if (existingSymbolIt == m_symbols.end()) {
 		auto key = buildKey(depth, childIndex);
@@ -56,7 +57,7 @@ std::string ska::bytecode::TreeSymbolTableMapBuilder::buildKey(const std::string
 	return depth.empty() ? strChildIndex : depth + "." + strChildIndex;
 }
 
-std::string ska::bytecode::TreeSymbolTableMapBuilder::key(const Symbol& symbol) const {
+std::string ska::bytecode::TreeSymbolTableMapBuilder::key(const ScopedSymbolTable& symbol) const {
 	auto symbolSeekIt = m_symbols.find(&symbol);
 	return symbolSeekIt == m_symbols.end() ? "" : symbolSeekIt->second;
 }

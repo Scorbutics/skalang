@@ -24,10 +24,10 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(
 		throw std::runtime_error(ss.str());
 	}
 
-	const auto* symbolObject = node.GetObjectSymbol();
+	const auto* symbolObjectTable = node.GetObjectSymbolTable();
 
 	// Handling custom objects
-	if (symbolObject == nullptr || typeObject != ExpressionType::OBJECT) {
+	if (symbolObjectTable == nullptr || typeObject != ExpressionType::OBJECT) {
 		auto error = std::stringstream {};
 		if (typeObject == ExpressionType::VOID) {
 			error << "the class symbol table \"" << node.GetObjectNameNode().name() << "\" is not registered. Maybe you're trying to use the type you're defining in its definition...";
@@ -37,20 +37,20 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>::build(
 		throw std::runtime_error(error.str());
 	}
 
-	const auto* symbolField = (*symbolObject)(fieldName);
-	if (symbolField == nullptr) {
+	const auto* symbolFieldTable = (*symbolObjectTable)(fieldName);
+	if (symbolFieldTable == nullptr || symbolFieldTable->symbol() == nullptr) {
 		auto ss = std::stringstream{};
 		ss << "trying to access to an undeclared field : \"" << fieldName << "\" of \"" << node.GetObjectNameNode().name() << "\"";
         throw std::runtime_error(ss.str());
     }
 
-    SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Field accessed \"" << fieldName << "\" (type \"" << symbolField->type() << "\") of \"" << node.GetObjectNameNode().name() << "\"";
+    SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>) << "Field accessed \"" << fieldName << "\" (type \"" << symbolFieldTable->symbol()->type() << "\") of \"" << node.GetObjectNameNode().name() << "\"";
 
-	if (symbolField->type() == ExpressionType::VOID) {
+	if (symbolFieldTable->symbol()->type() == ExpressionType::VOID) {
 		auto ss = std::stringstream{};
 		ss << "field \"" << node.GetFieldNameNode().name() << "\" of \"" << node.GetObjectNameNode().name() << "\" has a void type, which is invalid";
 		throw std::runtime_error(ss.str());
 	}
 
-	return *symbolField;
+	return { *symbolFieldTable };
 }

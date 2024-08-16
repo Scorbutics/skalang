@@ -15,6 +15,7 @@
 #include "GeneratorOperatorIf.h"
 #include "GeneratorOperatorFor.h"
 #include "GeneratorOperatorUserDefinedObject.h"
+#include "GeneratorOperatorScriptObject.h"
 #include "GeneratorOperatorImport.h"
 #include "GeneratorOperatorFieldAccess.h"
 #include "GeneratorOperatorScriptLink.h"
@@ -57,6 +58,7 @@ std::vector<std::unique_ptr<ska::bytecode::GeneratorOperatorUnit>> ska::bytecode
 	GeneratorOperatorDeclare<ska::Operator::FILTER>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::IMPORT>(*this, result);
 	GeneratorOperatorDeclare<ska::Operator::SCRIPT_LINK>(*this, result);
+	GeneratorOperatorDeclare<ska::Operator::SCRIPT_OBJECT>(*this, result);
 
 	return result;
 }

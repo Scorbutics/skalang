@@ -11,6 +11,6 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator:
 
 ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::PARAMETER_DECLARATION>::build(const ScriptAST& script, OperateOn node) {
     const auto& typeNode = node.GetTypeValueNode();
-	return { typeNode.type().value(), node.GetTypeValueNode().symbol() };
+	return { typeNode.type().value(), &node.GetTypeValueNode() };
 }
 

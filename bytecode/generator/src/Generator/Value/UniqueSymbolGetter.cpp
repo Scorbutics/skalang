@@ -53,7 +53,7 @@ void ska::bytecode::UniqueSymbolGetterBase::declare(std::size_t script, const Sy
 	if (varCount == m_container->end()) {
 		varCount = m_container->emplace(&symbol, wantedSymbolId).first;
 	} else if (varCount->second != wantedSymbolId) {
-		auto ss = std::stringstream{}; 
+		auto ss = std::stringstream{};
 		ss << "already existing symbol id for the symbol \"" << symbol.name() << "\"";
 		throw std::runtime_error(ss.str());
 	}

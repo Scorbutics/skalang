@@ -102,7 +102,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	auto preCallValue = generateNext({context, node.GetFunctionNameNode()});
 	LOG_DEBUG << "Function member call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
 
-	const auto* functionTypeSymbol = node.GetFunctionNameNode().typeSymbol();
+	const auto* functionTypeSymbol = node.GetFunctionNameNode().symbol();
 	// Handle custom type functions
 	const auto* functionSymbolInfo = functionTypeSymbol == nullptr ? nullptr : context.getSymbolInfo(*functionTypeSymbol);
 	LOG_DEBUG << "Function Member Call symbol info : " << (functionSymbolInfo == nullptr || functionSymbolInfo->binding == std::numeric_limits<std::size_t>::max() ? "none" : "with binding");
@@ -134,7 +134,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	LOG_DEBUG << "Function call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
 
 	// Handle built-in type functions traduced directly to a bytecode instruction
-	const auto* functionTypeSymbol = node.GetFunctionNameNode().typeSymbol();
+	const auto* functionTypeSymbol = node.GetFunctionNameNode().symbol();
 	if (IsInstructionCommandClosed(preCallValue)) {
 		return preCallValue;
 	}

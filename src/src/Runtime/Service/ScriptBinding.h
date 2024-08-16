@@ -18,6 +18,7 @@
 
 namespace ska {
 	class ScriptBindingAST;
+	class ScopedSymbolTable;
 }
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptBindingAST);
@@ -31,7 +32,7 @@ namespace ska {
 	public:
 		virtual ~ScriptBindingAST() = default;
 
-		void bindFunction(const Symbol& function, decltype(NativeFunction::function) f);
+		void bindFunction(const ScopedSymbolTable& function, decltype(NativeFunction::function) f);
 
 		auto& templateScript() { return *m_templateScript; }
 
@@ -93,8 +94,8 @@ namespace ska {
 			std::string templateScriptName) :
 			ScriptBindingAST(
 				moduleConf,
-				scriptName, 
-				std::move(templateScriptName)), 
+				scriptName,
+				std::move(templateScriptName)),
 			m_interpreter(moduleConf.interpreter),
 			m_script(moduleConf.scriptCache, ScriptBindingAST::name(), std::vector<Token>{}) {
 			if (ScriptBindingAST::id() != m_script.astScript().id()) {

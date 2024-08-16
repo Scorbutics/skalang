@@ -9,17 +9,17 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator:
 
 ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::TYPE>::build(const ScriptAST& script, OperateOn node) {
 	auto result = Type{};
-	const Symbol* resultSymbol = nullptr;
+	const ScopedSymbolTable* resultSymbolTable = nullptr;
 	const auto isBuiltIn = node.IsBuiltIn();
     if (!isBuiltIn) {
-		auto* typeSymbol = node.GetTypeSymbol(script.symbols());
-		if (typeSymbol != nullptr) {
-			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::TYPE>) << "Type-node looked \"" << typeSymbol->type() << "\" for node \"" << node.GetName() << "\"";
-			resultSymbol = typeSymbol;
+		auto typeSymbolTable = node.GetTypeSymbol(script.symbols());
+		if (typeSymbolTable != nullptr && typeSymbolTable->symbol() != nullptr) {
+			SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::TYPE>) << "Type-node looked \"" << typeSymbolTable->symbol()->type() << "\" for node \"" << node.GetName() << "\"";
+			resultSymbolTable = typeSymbolTable;
 			if (node.IsObject()) {
 				result = Type::MakeCustom<ExpressionType::OBJECT>(nullptr);
 			} else {
-				result = typeSymbol->type();
+				result = resultSymbolTable->symbol()->type();
 			}
 		} else if (node.IsArray()) {
 			result = node.GetType();
@@ -40,5 +40,5 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::TYPE>::build(const Sc
 
 	SLOG_STATIC(ska::LogLevel::Info, ska::TypeBuilderOperator<ska::Operator::TYPE>) << "Resulting type : \"" << result << "\"";
 
-	return TypeHierarchy{result, resultSymbol};
+	return resultSymbolTable == nullptr ? TypeHierarchy{ result } : TypeHierarchy{result, *resultSymbolTable};
 }

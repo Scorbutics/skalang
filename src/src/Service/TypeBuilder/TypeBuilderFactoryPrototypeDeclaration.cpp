@@ -18,8 +18,8 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FACTORY_PROTOTYPE_DEC
 
 	result.add(node.GetFunctionReturnType());
 
-	const auto* functionTypeSymbol = script.symbols()[node.GetFunctionName()];
-	if (functionTypeSymbol == nullptr) {
+	const auto* functionTypeSymbolTable = script.symbols()[node.GetFunctionName()];
+	if (functionTypeSymbolTable == nullptr) {
 		throw std::runtime_error("bad lookup in symbol table: unable to find function '" + node.GetFunctionName() + "'");
 	}
 
@@ -27,5 +27,5 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FACTORY_PROTOTYPE_DEC
 		throw std::runtime_error("bad return in '" + node.GetFunctionName() + "', should return object");
 	}
 
-	return { result, functionTypeSymbol };
+	return { result, *functionTypeSymbolTable };
 }

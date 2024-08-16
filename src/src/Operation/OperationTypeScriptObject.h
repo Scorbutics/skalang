@@ -1,19 +1,16 @@
 #pragma once
-#include <cassert>
+
 #include "OperationType.h"
 #include "NodeValue/AST.h"
 
 namespace ska {
+	class ASTNode;
 	template<>
-	class OperationType<Operator::USER_DEFINED_OBJECT> {
+	class OperationType<Operator::SCRIPT_OBJECT> {
 	private:
 		const ASTNode& node;
 	public:
 		OperationType(const ASTNode& node) : node(node) {}
-
-		auto empty() {
-			return node.size() == 0;
-		}
 
 		auto begin() {
 			return node.begin();

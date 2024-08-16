@@ -10,7 +10,7 @@ namespace ska {
 		const ASTNode& node;
 	public:
 		OperationType(const ASTNode& node) : node(node) {}
-		
+
 		inline auto HasArrayType() {
 			return node.size() > 0;
 		}
@@ -20,10 +20,14 @@ namespace ska {
         	return node[0].type().value();
     	}
 
+		inline auto* GetArrayNode() {
+			return HasArrayType() ? &node[0] : nullptr;
+		}
+
 		inline auto* GetArraySymbol() {
 			return HasArrayType() ? node[0].symbol() : nullptr;
 		}
-		
+
 		auto begin() const {
 			return node.begin();
 		}

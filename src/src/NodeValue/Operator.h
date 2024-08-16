@@ -32,6 +32,7 @@ namespace ska {
 		IF_ELSE,
 		RETURN,
 		SCRIPT_LINK,
+		SCRIPT_OBJECT,
 		TYPE,
 		UNUSED_Last_Length
 	};
@@ -65,6 +66,7 @@ namespace ska {
 		"IF_ELSE",
 		"RETURN",
 		"SCRIPT_LINK",
+		"SCRIPT_OBJECT",
 		"TYPE"
 	};
 

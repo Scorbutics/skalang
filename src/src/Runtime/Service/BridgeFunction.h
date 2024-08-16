@@ -5,26 +5,26 @@
 #include "Runtime/Value/NodeValue.h"
 
 namespace ska {
-  class Symbol;
+  class ScopedSymbolTable;
   struct BridgeField {
     using Callback = typename NativeFunction::Callback;
 
     BridgeField() = default;
     ~BridgeField() = default;
 
-    BridgeField(const Symbol& fullType) : symbol(&fullType) {}
+    BridgeField(const ScopedSymbolTable& fullType) : symbolTable(&fullType) {}
 
     std::string name() const;
 
   public:
-    const Symbol* symbol = nullptr;
+    const ScopedSymbolTable* symbolTable = nullptr;
     Callback callback;
   };
 
   class BridgeFunction {
   public:
     BridgeFunction() = default;
-    BridgeFunction(const Symbol& fullType) : m_function(fullType) {}
+    BridgeFunction(const ScopedSymbolTable& fullType) : m_function(fullType) {}
     BridgeFunction(BridgeField function) : m_function(std::move(function)) {}
 
     void bindField(BridgeField field) {
@@ -36,8 +36,8 @@ namespace ska {
     std::vector<BridgeFunction> makeFunctions() const;
 
     std::string name() const { return m_function.name(); }
-    
-    const Symbol& symbol() const { if(m_function.symbol == nullptr) throw std::runtime_error("bad function symbol"); return *m_function.symbol; }
+
+    const ScopedSymbolTable& symbolTable() const;
 
     bool isVoid() const;
     bool isFactory() const;

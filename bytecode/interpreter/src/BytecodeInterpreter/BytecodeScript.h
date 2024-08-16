@@ -34,9 +34,9 @@ namespace ska {
 			void fromBridge(BridgeFunction& constructor, ASTNodePtr astRoot, Interpreter& interpreter);
 
 		private:
-			Operand findBytecodeMemoryFromSymbol(const Symbol& symbol) const;
-			const Symbol& findSymbolFromString(const std::string& key) const;
-			const Symbol* findFieldSymbol(const Symbol* constructor, const BridgeField& field) const;
+			Operand findBytecodeMemoryFromSymbol(const ScopedSymbolTable& symbol) const;
+			const ScopedSymbolTable& findSymbolFromString(const std::string& key) const;
+			const ScopedSymbolTable* findFieldSymbol(const ScopedSymbolTable* constructor, const BridgeField& field) const;
 
 			ScriptCache& m_cache;
 			ScriptGeneration& m_serviceGen;

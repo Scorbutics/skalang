@@ -8,24 +8,23 @@
 #include "ScriptBinding.h"
 
 namespace ska {
-  class SymbolTable;
-  class Symbol;
+  class ScopedSymbolTable;
 	class StatementParser;
 
   class BridgeBuilderASTTemplateLooker {
   public:
     BridgeBuilderASTTemplateLooker(const ScriptAST& templateParent, std::string constructorName);
 
-    const Symbol& field(const std::string& name) const;
+    const ScopedSymbolTable& field(const std::string& name) const;
     bool hasField(const std::string& name) const;
-    const Symbol* constructor() const;
+    const ScopedSymbolTable* constructor() const;
 
   private:
-    const Symbol& variable(const std::string& name) const;
+    const ScopedSymbolTable& variable(const std::string& name) const;
 
     std::string m_name;
     ScriptHandleAST* m_parent;
-    const Symbol* m_template;
+    const ScopedSymbolTable* m_templateTable;
   };
 
   template <class Interpreter>

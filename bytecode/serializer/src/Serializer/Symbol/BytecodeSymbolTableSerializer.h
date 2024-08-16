@@ -12,7 +12,7 @@
 #include "Serializer/BytecodeChunk.h"
 
 namespace ska {
-	class Symbol;
+	class ScopedSymbolTable;
 	class SerializerOutput;
 
 	namespace bytecode {
@@ -28,13 +28,13 @@ namespace ska {
 			SymbolTableSerializer& operator=(const SymbolTableSerializer&) = delete;
 			~SymbolTableSerializer() = default;
 
-			void writeSymbolOnlyIfExists(SerializerOutput& output, const Symbol* value);
+			void writeSymbolOnlyIfExists(SerializerOutput& output, const ScopedSymbolTable* value);
 			void writeFull(SerializerOutput output, std::size_t id);
-			void writeFull(SerializerOutput& output, const TreeSymbolTableMapBuilder::ReverseIndexSymbolMapWrite& reversedMap);		
+			void writeFull(SerializerOutput& output, const TreeSymbolTableMapBuilder::ReverseIndexSymbolMapWrite& reversedMap);
 
-			void write(SerializerOutput& output, const Symbol* value, const Type& type) override;
+			void write(SerializerOutput& output, const ScopedSymbolTable* value, const Type& type) override;
 		private:
-			void writeFullTypeIfExists(SerializerOutput& output, const Symbol* value);
+			void writeFullTypeIfExists(SerializerOutput& output, const ScopedSymbolTable* value);
 
 			SymbolTableSerializerHelper m_helper;
 		};

@@ -7,8 +7,9 @@
 #include "BytecodeOperand.h"
 
 namespace ska {
-  namespace bytecode {
-    class UniqueSymbolGetterBase {
+	class Symbol;
+	namespace bytecode {
+		class UniqueSymbolGetterBase {
 			//MSVC 2017 does not like noexcept move constructor with unordered_map contained,
 			//because it thinks unordered_map move constructor is not noexcept...
 			//so we wrap the map into a std::unique_ptr as a workaround

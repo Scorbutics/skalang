@@ -12,13 +12,13 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator:
 template <class OperateOn>
 ska::TypeHierarchy CommonBuild(const ska::ScriptAST& script, OperateOn& node) {
 	auto type = node.GetFunctionType();
-	auto* symbol = node.GetFunctionNameNode().symbol();
-    
+	auto* functionNameNode = &node.GetFunctionNameNode();
+
 	if (type.size() == 0) {
         throw std::runtime_error("Unable to get function return type");
     }
-	
-	return { type.back(), symbol };
+
+	return { type.back(), functionNameNode };
 }
 
 ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::FUNCTION_CALL>::build(const ScriptAST& script, OperateOn node) {

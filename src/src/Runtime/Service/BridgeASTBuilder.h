@@ -57,6 +57,7 @@ namespace ska {
 
 		ASTNodePtr makeFunction(ScriptAST& script, const BridgeFunction& data);
 		std::vector<ASTNodePtr> makeFieldList(ScriptAST& script, const BridgeFunction& data);
+		ASTNodePtr makeScript(ScriptAST& script, std::vector<ASTNodePtr> body);
 
 	private:
 		ASTNodePtr makeFunctionFactoryPrototype(ScriptAST& script, const Type& fullTypeFunction, const std::string& name);

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Container/sorted_observable.h"
 
 #include "NodeValue/AST.h"
@@ -14,7 +15,7 @@
 #include "SymbolTableOperation.h"
 
 namespace ska {
-   
+
 	class StatementParser;
 
 	class SymbolTable;
@@ -25,7 +26,7 @@ namespace ska {
 		ParserListenerLock(const ParserListenerLock&) = delete;
 		ParserListenerLock& operator=(ParserListenerLock&&) = delete;
 		ParserListenerLock& operator=(const ParserListenerLock&) = delete;
-		
+
 		~ParserListenerLock();
 		void release();
 	private:
@@ -37,7 +38,7 @@ namespace ska {
     	public PriorityObserver<VarTokenEvent>,
    		public PriorityObserver<BlockTokenEvent>,
     	public PriorityObserver<FunctionTokenEvent>,
-    	public PriorityObserver<ReturnTokenEvent>, 
+    	public PriorityObserver<ReturnTokenEvent>,
 		public PriorityObserver<ImportTokenEvent>,
 		public PriorityObserver<ScriptLinkTokenEvent>,
 		public PriorityObserver<FilterTokenEvent>,
@@ -46,37 +47,37 @@ namespace ska {
     	using ASTNodePtr = std::unique_ptr<ska::ASTNode>;
 		friend class ParserListenerLock;
 	public:
-		SymbolTable();
-		SymbolTable(StatementParser& parser);
+		SymbolTable(std::string name);
+		SymbolTable(std::string name, StatementParser& parser);
 		virtual ~SymbolTable();
-		
+
 		[[nodiscard]]
 		ParserListenerLock listenParser(StatementParser& parser);
 
-		Symbol* operator[](std::size_t index) { return (*m_currentTable)[index]; }
-		const Symbol* operator[](std::size_t index) const { return (*m_currentTable)[index];  }
+		ScopedSymbolTable* operator[](std::size_t index) { return (*m_currentTable)[index]; }
+		const ScopedSymbolTable* operator[](std::size_t index) const { return (*m_currentTable)[index];  }
 
-		Symbol* operator[](const std::string& key) { return (*m_currentTable)[key]; }
-		const Symbol* operator[](const std::string& key) const { return (*m_currentTable)[key]; }
+		ScopedSymbolTable* operator[](const std::string& key) { return (*m_currentTable)[key]; }
+		const ScopedSymbolTable* operator[](const std::string& key) const { return (*m_currentTable)[key]; }
 
-		Symbol* operator()(const std::string& key) { return (*m_currentTable)(key); }
-		const Symbol* operator()(const std::string& key) const { return (*m_currentTable)(key); }
+		ScopedSymbolTable* operator()(const std::string& key) { return (*m_currentTable)(key); }
+		const ScopedSymbolTable* operator()(const std::string& key) const { return (*m_currentTable)(key); }
 
-		const Symbol* enclosingType() const {
+		const ScopedSymbolTable* enclosingType() const {
 			return m_currentTable->owner();
+		}
+
+		const ScopedSymbolTable& current() const {
+			return *m_currentTable;
 		}
 
 		std::size_t size() const {
 			return m_currentTable->size();
 		}
 
-		std::size_t scopes() const {
-			return m_currentTable->scopes();
-		}
-
-		bool changeTypeIfRequired(const std::string& symbolName, const Type& value);
-		const Symbol* lookup(SymbolTableLookup strategy, SymbolTableNested depth = SymbolTableNested::current()) const;
-		Symbol* lookup(SymbolTableLookup strategy, SymbolTableNested depth = SymbolTableNested::current());
+		bool changeTypeIfRequired(const Type& value);
+		const ScopedSymbolTable* lookup(SymbolTableLookup strategy, SymbolTableNested depth = SymbolTableNested::current()) const;
+		ScopedSymbolTable* lookup(SymbolTableLookup strategy, SymbolTableNested depth = SymbolTableNested::current());
 
 		auto begin() { return m_rootTable->begin(); }
 		auto end() { return m_rootTable->end(); }

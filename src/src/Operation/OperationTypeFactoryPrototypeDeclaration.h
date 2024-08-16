@@ -24,10 +24,6 @@ namespace ska {
 			return node.size() - 1;
 		}
 
-		inline const auto* GetPrivateFunctionFactoryField(const std::string& fieldName) {
-			return (*node.symbol())(fieldName);
-		}
-
 		inline auto GetFunctionReturnType() {
 			return (*node.rbegin())->type().value();
 		}
