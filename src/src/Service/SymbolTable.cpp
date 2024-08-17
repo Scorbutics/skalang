@@ -190,11 +190,11 @@ bool ska::SymbolTable::changeTypeIfRequired(const Type& value) {
 
 template <class ThisType, class Return>
 static Return Lookup(ThisType& currentTable, ska::SymbolTableLookup strategy, ska::SymbolTableNested depth) {
+	auto* selectedTable = &currentTable;
 	if (!depth.childName.empty()) {
-		return currentTable(std::move(strategy.symbolName));
+		selectedTable = currentTable(std::move(depth.childName));
 	}
 
-	auto* selectedTable = &currentTable;
 	while (depth.depth < 0) {
 		selectedTable = &selectedTable->parent();
 		depth.depth++;

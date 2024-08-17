@@ -67,7 +67,7 @@ namespace ska {
 		const Symbol* symbol() const { return m_symbol.has_value() ? &m_symbol.value() : nullptr; }
 		Symbol* symbol() { return m_symbol.has_value() ? &m_symbol.value() : nullptr; }
 
-		void implement(ScopedSymbolTable& classSymbolTable);
+		void implement(ScopedSymbolTable& childInstanceSymbolTable);
 
 		const ScopedSymbolTable* classTable() const { return m_classTable; }
 
@@ -75,10 +75,12 @@ namespace ska {
 	private:
 		static const std::string EMPTY_STR;
 		Symbol& emplace(Symbol symbol);
+		void ensureNotLocked() const;
 
 		order_indexed_string_map<ScopedSymbolTable> m_children;
 		ScopedSymbolTable& m_parent = *this;
 		ScopedSymbolTable* m_classTable = nullptr;
 		std::optional<Symbol> m_symbol;
+		bool m_locked = false;
 	};
 }

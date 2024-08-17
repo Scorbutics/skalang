@@ -40,8 +40,19 @@ ska::ScriptAST::ScriptAST(ScriptCacheAST& scriptCache, const std::string& name, 
 	m_handle = &m_cache->at(name);
 }
 
+const ska::ScopedSymbolTable& ska::ScriptAST::link(const std::string& name) const {
+	// First, try to ensure we have the authorization by checking if the import has been done in the current script
+	const auto hasBeenImported = m_links.find(name) != m_links.end();
+	if (!hasBeenImported) {
+		throw std::runtime_error("cannot access script \"" + name + "\" from \"" + m_handle->m_name + "\" because it has not been imported");
+	}
+	return m_cache->at(name).m_symbols.root();
+}
+
 ska::ScriptASTPtr ska::ScriptAST::useImport(const std::string& name) {
-	return existsInCache(name) ? std::make_unique<ScriptAST>(*m_cache, name, std::vector<Token>{}) : nullptr;
+	auto result = existsInCache(name) ? std::make_unique<ScriptAST>(*m_cache, name, std::vector<Token>{}) : nullptr;
+	m_links.emplace(name);
+	return result;
 }
 
 ska::ASTNode& ska::ScriptAST::fromBridge(ASTNodePtr astRoot) {

@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <unordered_set>
 #include <unordered_map>
 #include "ScriptASTPtr.h"
 #include "ScriptHandleAST.h"
@@ -39,6 +40,8 @@ namespace ska {
 		ScriptASTPtr subParse(StatementParser& parser, const std::string& name, std::ifstream& file);
 		ScriptASTPtr useImport(const std::string& name);
 
+		const ScopedSymbolTable& link(const std::string& name) const;
+
 		ASTNode& fromBridge(ASTNodePtr root);
 
 		const auto& handle() const { return m_handle; }
@@ -69,6 +72,7 @@ namespace ska {
 		friend std::ostream& operator<<(std::ostream& stream, const ScriptAST&);
 
 	private:
+		std::unordered_set<std::string> m_links;
 		ScriptHandleAST* m_handle = nullptr;
 		ScriptCacheAST* m_cache;
 		bool m_inCache = false;
