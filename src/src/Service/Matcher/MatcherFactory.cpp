@@ -9,7 +9,7 @@
 #include "NodeValue/ScriptAST.h"
 #include "Event/ReturnTokenEvent.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::MatcherFactory)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherFactory)
 
 std::vector<ska::ASTNodePtr> ska::MatcherFactory::matchDeclarationBody(ScriptAST& input, const Token& endToken) {
     auto statements = std::vector<ASTNodePtr>{};

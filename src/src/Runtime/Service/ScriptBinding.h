@@ -21,7 +21,7 @@ namespace ska {
 	class ScopedSymbolTable;
 }
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScriptBindingAST);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ScriptBindingAST);
 
 namespace ska {
 	class SymbolTable;

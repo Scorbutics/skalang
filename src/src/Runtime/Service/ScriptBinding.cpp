@@ -20,7 +20,7 @@ ska::ScriptBindingAST::ScriptBindingAST(
 }
 
 void ska::ScriptBindingAST::bindFunction(const ScopedSymbolTable& function, decltype(NativeFunction::function) f) {
-	SLOG(LogLevel::Debug) << "Binding function \"" << function;
+	SLOG(LogLevel::Debug) << "Binding function \"" << *function.symbol();
 	auto field = BridgeField { function };
 	field.callback = std::move(f);
 	m_bindings.push_back(std::move(field));

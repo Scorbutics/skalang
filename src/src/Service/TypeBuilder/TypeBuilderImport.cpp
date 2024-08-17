@@ -15,5 +15,5 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::IMPORT>::build(const 
 	assert(symbols.size() > 0);
 	auto symbolTable = symbols.lookup(SymbolTableLookup::hierarchical(node.GetScriptPathNode().name()), SymbolTableNested::lastChild());
 	// TODO use destination script instead?
-	return { Type::MakeCustom<ExpressionType::OBJECT>(nullptr), *symbolTable };
+	return { Type::MakeCustom<ExpressionType::OBJECT>(symbolTable), *symbolTable };
 }

@@ -65,7 +65,6 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 	case ReturnTokenEventType::BUILTIN:
 	case ReturnTokenEventType::OBJECT: {
 		const auto symbolTable = token.script().symbols().enclosingType();
-		//auto* finalSymbol = token.script().symbols()[symbol->name()];
 		if (symbolTable == nullptr || symbolTable->name().empty()) {
 			throw std::runtime_error("return must be place in a function block or a nested one");
 		}
@@ -81,11 +80,13 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 		}
 
 		if (symbolTable->symbol()->type().empty()) {
-			//throw std::runtime_error("\"" + symbol->name() + "\" is an empty function");
 			break;
 		}
 
-		const auto expectedReturnType = symbolTable->symbol()->type().back();
+		// Script objects are directly containing all fields
+		// Classic returned objects expect the last compound type as return type
+		const auto expectedReturnType = returnedValue.op() == Operator::SCRIPT_OBJECT ? symbolTable->symbol()->type() : symbolTable->symbol()->type().back();
+
 		if (((returnedValue.op() == Operator::USER_DEFINED_OBJECT) && (expectedReturnType != ExpressionType::OBJECT)) ||
 			(returnedValue.op() != Operator::USER_DEFINED_OBJECT && expectedReturnType != returnedValue.type())) {
 			auto ss = std::stringstream{};

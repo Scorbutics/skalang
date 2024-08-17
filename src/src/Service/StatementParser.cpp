@@ -44,9 +44,10 @@ ska::StatementParser::ASTNodePtr ska::StatementParser::parse(ScriptAST& input) {
 				blockNodeStatements.push_back(std::move(optionalStatement));
 			}
 		}
-		auto scriptNode = ASTFactory::MakeNode<Operator::SCRIPT_OBJECT>(std::move(blockNodeStatements));
+		auto scriptNode = ASTFactory::MakeNode<Operator::RETURN>(ASTFactory::MakeNode<Operator::SCRIPT_OBJECT>(std::move(blockNodeStatements)));
 		auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT> (*scriptNode, input);
 		observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnEndEvent);
+		SLOG(ska::LogLevel::Debug) << "Script built: " << *scriptNode;
 		return scriptNode;
 	} catch (std::exception& e) {
 		throw LangError(input.name(), e);

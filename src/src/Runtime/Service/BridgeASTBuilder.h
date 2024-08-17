@@ -69,7 +69,6 @@ namespace ska {
 		ASTNodePtr makeFactoryPrototype(ScriptAST& script, ASTNodePtr nameNode, std::deque<ASTNodePtr> parametersAndReturn);
 		ASTNodePtr makeVariable(ScriptAST& script, const std::string& name, ASTNodePtr value);
 		ASTNodePtr makeFactoryEmptyBody() const;
-		ASTNodePtr makeFactoryPrivateFactory(ScriptAST& input, const ASTNode& functionPrototype);
 		ASTNodePtr makeFactoryReturnObject(ScriptAST& script, std::vector<BridgeFunction> fieldList);
 		std::deque<ASTNodePtr> makeFunctionInputOutput(ScriptAST& script, const Type& fullTypeFunction);
 

@@ -137,10 +137,10 @@ void ska::ScopedSymbolTable::implement(ScopedSymbolTable& classSymbolTable) {
 		throw std::runtime_error("cannot implement data from a class symbol table without having any current symbol");
 	}
 
-	if (&classSymbolTable == m_classTable) {
+	if (classSymbolTable.m_classTable == this) {
 		return;
 	}
 	SLOG(ska::LogLevel::Info) << "Implementing class symbol table " << classSymbolTable << " into " << m_symbol.value();
 
-	m_classTable = &classSymbolTable;
+	classSymbolTable.m_classTable = this;
 }

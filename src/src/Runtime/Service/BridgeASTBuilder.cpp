@@ -10,7 +10,7 @@
 #include "NodeValue/ScriptAST.h"
 #include "Service/ScriptNameBuilder.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::BridgeASTBuilder)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::BridgeASTBuilder)
 
 ska::BridgeASTBuilder::BridgeASTBuilder(TypeBuilder& typeBuilder, const ReservedKeywordsPool& reserved) :
 	m_reserved(reserved),
@@ -163,14 +163,14 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionDeclaration(ScriptAST& script
 	if (!fieldList.empty()) {
 		throw std::runtime_error("No function factory type specified in script \"" + script.name() + "\" despite trying to bind C++ field-functions");
 	} else {
-		bodyNode = makeFactoryEmptyBody();
+		bodyNode = ASTFactory::MakeNode<Operator::BLOCK>();
 	}
 	auto functionNameToken = Token{ functionName, TokenType::IDENTIFIER, {} };
 	auto functionDeclarationNode = ASTFactory::MakeNode<Operator::FUNCTION_DECLARATION>(functionNameToken, std::move(prototype), std::move(bodyNode));
 
 	auto event = FunctionTokenEvent{ *functionDeclarationNode, FunctionTokenEventType::DECLARATION_STATEMENT, script, functionNameToken.name() };
 	observable_priority_queue<FunctionTokenEvent>::notifyObservers(event);
-	SLOG(LogLevel::Info) << " Function building finished \"" << functionName << "\"";
+	SLOG(LogLevel::Info) << " Function building finished \"" << *functionDeclarationNode << "\"";
 	return functionDeclarationNode;
 }
 
@@ -193,15 +193,8 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFactoryDeclaration(ScriptAST& script,
 	auto statementEvent = FunctionTokenEvent{ *factoryDeclarationNode, FunctionTokenEventType::FACTORY_DECLARATION_STATEMENT, script, functionName.name() };
 	observable_priority_queue<FunctionTokenEvent>::notifyObservers(statementEvent);
 
-	SLOG(LogLevel::Info) << " Factory building finished \"" << functionName << "\"";
+	SLOG(LogLevel::Info) << " Factory building finished \"" << *factoryDeclarationNode << "\"";
 	return factoryDeclarationNode;
-}
-
-ska::ASTNodePtr ska::BridgeASTBuilder::makeFactoryPrivateFactory(ScriptAST& input, const ASTNode& functionPrototype) {
-	auto lock = BridgeASTBuilderSymbolTableLock{ *this, input.symbols() };
-
-	auto emptyNode = ASTFactory::MakeEmptyNode();
-	return emptyNode;
 }
 
 // TODO revoir la façon dont cet AST est build, il me paraît faux

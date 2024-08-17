@@ -63,7 +63,7 @@ void ska::TypeBuilder::buildType(ASTNode& node, ScriptAST& script) {
 		} else if (computedSymbolTable != currentSymbolTable) {
 			SLOG(LogLevel::Warn) << "%14cSymbol link \"" << computedSymbolTable->name() << "\" now implements \"" << currentSymbolTable->name() << "\"";
 			node.updateType(typeHierarchy.type);
-			computedSymbolTable->implement(*computedSymbolTable);
+			computedSymbolTable->implement(*currentSymbolTable);
 			return;
 		}
 	}

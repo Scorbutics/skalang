@@ -14,13 +14,13 @@ namespace ska {
 	class ReturnTokenEvent {
 	public:
     	ReturnTokenEvent(ScriptAST& s) : m_type(ReturnTokenEventType::START), m_script(s) {}
-		
+
     	template<ReturnTokenEventType type>
     	static ReturnTokenEvent Make(ASTNode& node, ScriptAST& s) {
         	static_assert(type != ReturnTokenEventType::START);
         	return ReturnTokenEvent { node, type, s };
     	}
-		
+
     	auto& rootNode() {
 			assert(m_node != nullptr);
         	return *m_node;
