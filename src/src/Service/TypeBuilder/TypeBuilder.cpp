@@ -52,6 +52,7 @@ void ska::TypeBuilder::buildType(ASTNode& node, ScriptAST& script) {
 
 	// We have to const_cast here, because the whole TypeBuilder system doesn't modify any value, including symbol table, while computing operations.
 	// So we cannot have a Symbol* in return (TypeHierarchy) type, but only a const Symbol*, even if the original stored SymbolTable is still mutable.
+	// TODO : find a way to avoid the const_cast, maybe by maintaining an unordered_map<const Symbol*, Symbol*>?
 	auto* computedSymbolTable = const_cast<ScopedSymbolTable*>(typeHierarchy.link());
 	auto* currentSymbolTable = node.symbolTable();
 	if (computedSymbolTable != nullptr && computedSymbolTable->symbol() != nullptr) {
