@@ -25,9 +25,9 @@ ska::ASTNodePtr ska::MatcherVar::matchDeclaration(ScriptAST& input) {
 
 	SLOG(ska::LogLevel::Info) << "expression end as statement end";
 
-    auto varNode = ASTFactory::MakeNode<Operator::VARIABLE_AFFECTATION>(std::move(varNodeIdentifier), std::move(varNodeExpression));
+    auto varNode = ASTFactory::MakeNode<Operator::DECLARATION>(std::move(varNodeIdentifier), std::move(varNodeExpression));
 
-    auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_AFFECTATION> (*varNode, input);
+    auto event = VarTokenEvent::template Make<VarTokenEventType::DECLARATION> (*varNode, input);
 	m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 
     return varNode;
@@ -56,8 +56,8 @@ ska::ASTNodePtr ska::MatcherVar::matchAffectation(ScriptAST& input, ASTNodePtr v
 */
 		input.popContext();
 		auto nodeName = Token{ varAffectedNode->name(), varAffectedNode->tokenType(), varAffectedNode->positionInScript() };
-		affectationNode = ASTFactory::MakeNode<Operator::VARIABLE_AFFECTATION>(std::move(nodeName), std::move(expressionNode));
-		auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_AFFECTATION>(*affectationNode, input);
+		affectationNode = ASTFactory::MakeNode<Operator::DECLARATION>(std::move(nodeName), std::move(expressionNode));
+		auto event = VarTokenEvent::template Make<VarTokenEventType::DECLARATION>(*affectationNode, input);
 		m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 	} else {
 		affectationNode = ASTFactory::MakeNode<Operator::AFFECTATION>(std::move(varAffectedNode), std::move(expressionNode));

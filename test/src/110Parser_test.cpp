@@ -28,7 +28,7 @@ TEST_CASE("[Parser]") {
 
 	CHECK(tree.size() == 4);
 	const auto& declaration = tree[0];
-	CHECK(declaration.op() == ska::Operator::VARIABLE_AFFECTATION);
+	CHECK(declaration.op() == ska::Operator::DECLARATION);
 	CHECK(declaration.size() == 1);
 	CHECK(declaration.has(ska::Token { "i", ska::TokenType::IDENTIFIER, {} }));
 	CHECK(declaration[0].has(ska::Token { "0", ska::TokenType::DIGIT, {} }));
@@ -184,7 +184,7 @@ TEST_CASE("function") {
 	SUBCASE("with 2 arguments built-in types and no return type") {
 		auto astPtr = ASTFromInput(scriptCache, "f = function(titi:int, toto:string) do end\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-	CHECK(ast.op() == ska::Operator::VARIABLE_AFFECTATION);
+	CHECK(ast.op() == ska::Operator::DECLARATION);
 	const auto& astFunc133 = ast[0];
 	CHECK(astFunc133.op() == ska::Operator::FUNCTION_DECLARATION);
 		CHECK(astFunc133.size() == 2);
@@ -198,7 +198,7 @@ TEST_CASE("function") {
 	SUBCASE("with 2 return placements (early return support)") {
 		auto astPtr = ASTFromInput(scriptCache, "f_parser154 = function(titi:int) : int do if(titi == 0) \n return 1\n end return 0\n end\n int_parser154 = f_parser154(1)\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-	CHECK(ast.op() == ska::Operator::VARIABLE_AFFECTATION);
+	CHECK(ast.op() == ska::Operator::DECLARATION);
 	const auto& astFunc157 = ast[0];
 	CHECK(astFunc157.op() == ska::Operator::FUNCTION_DECLARATION);
 		CHECK(astFunc157.size() == 2);
@@ -338,7 +338,7 @@ TEST_CASE("User defined object") {
 
 		auto& varJoueurNode = astPtr.rootNode()[0];
 		CHECK(varJoueurNode.size() == 1);
-		CHECK(varJoueurNode.op() == ska::Operator::VARIABLE_AFFECTATION);
+		CHECK(varJoueurNode.op() == ska::Operator::DECLARATION);
 		const auto& astFunc154 = varJoueurNode[0];
 		CHECK(astFunc154.op() == ska::Operator::FUNCTION_DECLARATION);
 			CHECK(astFunc154.size() == 2);
@@ -382,7 +382,7 @@ TEST_CASE("User defined object") {
 
 		//Checks the variable declaration and the function call
 		const auto& varJoueur1Node = astPtr.rootNode()[1];
-		CHECK(varJoueur1Node.op() == ska::Operator::VARIABLE_AFFECTATION);
+		CHECK(varJoueur1Node.op() == ska::Operator::DECLARATION);
 		CHECK(varJoueur1Node.has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER, {}} ));
 
 		//Checks the field access
@@ -408,7 +408,7 @@ end
 
 		auto& varJoueurNode = astPtr.rootNode()[0];
 		CHECK(varJoueurNode.size() == 1);
-		CHECK(varJoueurNode.op() == ska::Operator::VARIABLE_AFFECTATION);
+		CHECK(varJoueurNode.op() == ska::Operator::DECLARATION);
 		const auto& astFunc154 = varJoueurNode[0];
 		CHECK(astFunc154.op() == ska::Operator::FUNCTION_DECLARATION);
 			CHECK(astFunc154.size() == 2);

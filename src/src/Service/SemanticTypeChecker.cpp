@@ -233,12 +233,12 @@ bool ska::SemanticTypeChecker::matchVariable(const VarTokenEvent& variable) {
 		throw std::runtime_error("The symbol \"" + name + "\" cannot be declared as a void type");
 	}
 
-	if (variable.type() == VarTokenEventType::VARIABLE_AFFECTATION &&
+	if (variable.type() == VarTokenEventType::DECLARATION &&
 		OperatorTraits::isNamed(variable.rootNode().op()) && name.empty()) {
 		throw std::runtime_error("invalid symbol declaration");
 	}
 
-	if(variable.type() == VarTokenEventType::AFFECTATION || variable.type() == VarTokenEventType::VARIABLE_AFFECTATION) {
+	if(variable.type() == VarTokenEventType::AFFECTATION || variable.type() == VarTokenEventType::DECLARATION) {
 		if (!OperatorTraits::isLvalueCompatible(variable.var().op())) {
 			auto ss = std::stringstream{};
 			ss << "The symbol \"" << name << "\" is not an lvalue, therefore cannot be assigned";

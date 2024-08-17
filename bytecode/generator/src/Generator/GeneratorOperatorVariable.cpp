@@ -4,8 +4,8 @@
 #include "BytecodeCommand.h"
 #include "Generator/Value/BytecodeScriptGenerationHelper.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_AFFECTATION>);
-#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_AFFECTATION>)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::DECLARATION>);
+#define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::DECLARATION>)
 
 namespace ska {
 	namespace bytecode {
@@ -31,7 +31,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	return CommonGenerate(*this, node.GetVariableNameNode(), node.GetVariableValueNode(), context);
 }
 
-ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::VARIABLE_AFFECTATION>::generate(OperateOn node, GenerationContext& context) {
+ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	return CommonGenerate(*this, node.GetVariableNameNode(), node.GetVariableValueNode(), context);
 }
 

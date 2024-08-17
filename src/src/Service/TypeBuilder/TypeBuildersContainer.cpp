@@ -38,7 +38,7 @@ ska::TypeBuildersContainer ska::BuildTypeBuildersContainer(const TypeCrosser& ty
 	TypeBuilderMakeBuilder<Operator::BINARY>(result, typeCrosser);
 	TypeBuilderMakeBuilder<Operator::UNARY>(result);
 	TypeBuilderMakeBuilder<Operator::LITERAL>(result);
-	TypeBuilderMakeBuilder<Operator::VARIABLE_AFFECTATION>(result);
+	TypeBuilderMakeBuilder<Operator::DECLARATION>(result);
 	TypeBuilderMakeBuilder<Operator::AFFECTATION>(result);
 	TypeBuilderMakeBuilder<Operator::PARAMETER_DECLARATION>(result);
 	TypeBuilderMakeBuilder<Operator::ARRAY_TYPE_DECLARATION>(result);

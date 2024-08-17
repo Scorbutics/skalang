@@ -88,9 +88,9 @@ ska::ASTNodePtr ska::MatcherReturn::matchField(ScriptAST& input) {
 
     SLOG(ska::LogLevel::Info) << "Constructor with field \"" << field << "\" and field value \"" << (*fieldValue) << "\"";
 
-    auto node = ASTFactory::MakeNode<Operator::VARIABLE_AFFECTATION>(std::move(field), std::move(fieldValue));
+    auto node = ASTFactory::MakeNode<Operator::DECLARATION>(std::move(field), std::move(fieldValue));
 
-    auto event = VarTokenEvent::template Make<VarTokenEventType::VARIABLE_AFFECTATION>(*node, input);
+    auto event = VarTokenEvent::template Make<VarTokenEventType::DECLARATION>(*node, input);
     m_parser.observable_priority_queue<VarTokenEvent>::notifyObservers(event);
 
     return node;

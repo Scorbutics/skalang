@@ -10,7 +10,7 @@ namespace ska {
 				case Operator::FACTORY_PROTOTYPE_DECLARATION:
 				case Operator::FUNCTION_PROTOTYPE_DECLARATION:
 				case Operator::FUNCTION_DECLARATION:
-				case Operator::VARIABLE_AFFECTATION:
+				case Operator::DECLARATION:
 				case Operator::PARAMETER_DECLARATION:
 				case Operator::FILTER_PARAMETER_DECLARATION:
 					return true;
@@ -25,7 +25,7 @@ namespace ska {
 			case Operator::FIELD_ACCESS:
 			case Operator::FUNCTION_DECLARATION:
 			case Operator::AFFECTATION:
-			case Operator::VARIABLE_AFFECTATION:
+			case Operator::DECLARATION:
 			case Operator::PARAMETER_DECLARATION:
 			case Operator::ARRAY_USE:
 			case Operator::ARRAY_DECLARATION:

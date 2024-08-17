@@ -234,7 +234,7 @@ bool ska::SymbolTable::match(VarTokenEvent& token) {
 	assert(m_currentTable != nullptr);
 
 	switch(token.type()) {
-		case VarTokenEventType::VARIABLE_AFFECTATION:
+		case VarTokenEventType::DECLARATION:
 		case VarTokenEventType::PARAMETER_DECLARATION: {
 			const auto variableName = token.name();
 			SLOG(ska::LogLevel::Info) << "Matching variable : " << variableName;

@@ -9,7 +9,7 @@ namespace ska {
 	enum class VarTokenEventType {
 		FUNCTION_DECLARATION,
 		PARAMETER_DECLARATION,
-		VARIABLE_AFFECTATION,
+		DECLARATION,
 		AFFECTATION,
 		USE
 	};
@@ -75,7 +75,7 @@ namespace ska {
 
 	private:
 		VarTokenEvent(ASTNode& node, ScriptAST& s, ASTNode& typeNode, VarTokenEventType type) : m_node(node), m_typeNode(&typeNode), m_type(type), m_script(s) {}
-		VarTokenEvent(ASTNode& node, ScriptAST& s, VarTokenEventType type = VarTokenEventType::VARIABLE_AFFECTATION) : m_node(node), m_type(type), m_script(s) {}
+		VarTokenEvent(ASTNode& node, ScriptAST& s, VarTokenEventType type = VarTokenEventType::DECLARATION) : m_node(node), m_type(type), m_script(s) {}
 
 		ASTNode& m_node;
 		ASTNode* m_typeNode = nullptr;
