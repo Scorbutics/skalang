@@ -98,26 +98,33 @@ bool ska::ASTNode::isSymbolicLeaf() const {
 	return m_symbolTable != nullptr && m_children.size() < 2;
 }
 
-void ska::ASTNode::prettyPrint(std::ostream& os, int depth) const {
+void ska::ASTNode::prettyPrint(std::ostream& os, int depth, const ScopedSymbolTable* parentNodeSymbolTable) const {
 	const auto& node = *this;
+	// Compute the change of symbol table in current level to represent the symbol table directly inside the ast pretty-printing
+	const auto changedScope = node.symbolTable() != nullptr && parentNodeSymbolTable != nullptr && node.symbolTable() != parentNodeSymbolTable;
 	// Print the current node with indentation based on its depth
-	for (int i = 0; i < depth; i++) {
+	for (int i = 0; i < depth - (changedScope ? 1 : 0); i++) {
 		os << "| ";
+	}
+	// If scope changed, print a '+' as last char instead of the classic '|'
+	if (changedScope) {
+		os << "+ ";
 	}
 
 	os << node.m_op << " - ";
 	if (node.symbol() != nullptr) {
 		os << *node.symbol();
-	} else if (node.m_type.has_value()) {
-		os << node.m_type.value();
 	} else {
-		os << node.m_token;
+		if (node.m_type.has_value()) {
+			os << node.m_type.value() << " ";
+		}
+		os << "\"" << node.m_token << "\"";
 	}
 
 	os << std::endl;
 	// Recursively print each child node, increasing the depth
 	for (const auto& child : node.m_children) {
-		child->prettyPrint(os, depth + 1);
+		child->prettyPrint(os, depth + 1, node.symbolTable());
 	}
 }
 

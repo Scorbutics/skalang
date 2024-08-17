@@ -85,7 +85,7 @@ namespace ska {
 		std::vector<ASTNodePtr> m_children;
 
 		friend std::ostream& operator<<(std::ostream& stream, const ASTNode& node);
-		void prettyPrint(std::ostream& os, int depth = 0) const;
+		void prettyPrint(std::ostream& os, int depth = 0, const ScopedSymbolTable* parentNodeSymbolTable = nullptr) const;
 	};
 
 }
