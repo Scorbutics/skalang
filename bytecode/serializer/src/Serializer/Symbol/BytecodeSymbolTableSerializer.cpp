@@ -7,6 +7,8 @@
 #include "SerializerSymbol.h"
 #include "SerializerSymbolizedType.h"
 
+#include "Service/ScopedSymbolTable.h"
+
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::SymbolTableSerializer);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::SymbolTableSerializer)
@@ -51,7 +53,8 @@ void ska::bytecode::SymbolTableSerializer::write(SerializerOutput& output, const
 	auto symbolizedTypeSerializer = SerializerType<CSymbolizedType, SymbolTableSerializerHelper&>{ output };
 	symbolizedTypeSerializer.write(CSymbolizedType { type, symbolTable }, m_helper);
 
-	for (auto& childType : type) {
+	for (std::size_t index = 0u; index < type.size(); index++) {
+		const auto& childType = type[index];
 		LOG_INFO << "\t\tChild type " << childType;
 		LOG_INFO << "%13c\t\twith Raw type : " << ExpressionTypeSTR[static_cast<std::size_t>(childType.type())];
 		LOG_INFO << "%13c\t\twith " << childType.size() << " children";

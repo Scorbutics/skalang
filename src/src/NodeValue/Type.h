@@ -87,10 +87,6 @@ namespace ska {
 		bool operator!=(const ExpressionType& t) const {
 			return m_type != t;
 		}
-
-		Type& operator[](std::size_t index) { return m_compound[index]; }
-		const Type& operator[](std::size_t index) const { return m_compound[index]; }
-
 		Type& operator=(ExpressionType t) {
 			m_type = std::move(t);
 			return *this;
@@ -109,17 +105,14 @@ namespace ska {
 
 		Type crossTypes(const TypeCrosser& crosser, std::string op, const Type& type2) const;
 
-		std::size_t size() const { return m_compound.size(); }
-		bool empty() const { return m_compound.empty(); }
+		std::size_t size() const;
+		bool empty() const;
 
-		const Type& back() const { return m_compound.back(); }
+		const Type& back() const;
+
+		const Type& operator[](std::size_t index) const;
 
 		std::string name() const;
-
-		auto begin() const { return m_compound.begin(); }
-		auto end() const { return m_compound.end(); }
-		auto begin() { return m_compound.begin(); }
-		auto end() { return m_compound.end(); }
 
 		bool tryChangeSymbol(const Type& type);
 
@@ -127,6 +120,7 @@ namespace ska {
 
 	private:
 		friend class TypeCrosser;
+		friend class TypeHierarchy;
 
 		explicit Type(ExpressionType t) :
 			m_type(std::move(t)) {

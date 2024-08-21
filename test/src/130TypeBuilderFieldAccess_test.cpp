@@ -11,7 +11,7 @@ TEST_CASE("[TypeBuilderFieldAccess]") {
 	auto script = TypeBuilderTestCommonBuildAST(scriptCache,
 	R"script(
 
-Factory = function() : var
+Factory = function() : var do
 	pdv1 = 0
 	return {
 		pdv = pdv1
@@ -24,7 +24,7 @@ obj.pdv
 )script", data);
 	script.parse(*data.parser);
 
-	const auto& node = (script.rootNode())[2];
+	const auto& node = (script.rootNode())[0][2];
 
 	auto typeBuilder = ska::TypeBuilderOperator<ska::Operator::FIELD_ACCESS>{};
 	auto type = typeBuilder.build(script, node).type;

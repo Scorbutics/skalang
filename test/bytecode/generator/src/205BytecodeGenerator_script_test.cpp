@@ -2,6 +2,7 @@
 #include <tuple>
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeGeneratorTest.h"
+#include "NodeValue/ScriptHandleAST.h"
 
 using namespace ska::bytecode;
 

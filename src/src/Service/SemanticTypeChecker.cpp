@@ -64,28 +64,32 @@ bool ska::SemanticTypeChecker::matchReturn(const ReturnTokenEvent& token) {
 
 	case ReturnTokenEventType::BUILTIN:
 	case ReturnTokenEventType::OBJECT: {
-		const auto symbolTable = token.script().symbols().enclosingType();
-		if (symbolTable == nullptr || symbolTable->name().empty()) {
-			throw std::runtime_error("return must be place in a function block or a nested one");
-		}
-
 		auto operationReturn = OperationType<Operator::RETURN>{token.rootNode()};
 		const auto& returnedValue = operationReturn.GetValue();
+
+		// Latest declared children symbol table correspond to either function scope or inner return scope
+		const auto* lastScopedSymbolTable = returnedValue.op() == Operator::SCRIPT_OBJECT ? &token.script().symbols().current() :
+			token.script().symbols().current().back();
+		// Get the return function owner (original function symbol)
+		const auto* owner = lastScopedSymbolTable == nullptr ? nullptr : lastScopedSymbolTable->owner();
+		if (owner == nullptr || owner->name().empty()) {
+			throw std::runtime_error("return must be place in a function block or a nested one");
+		}
 		if (!returnedValue.type().has_value()) {
-			throw std::runtime_error("\"" + symbolTable->name() + "\" is not a function");
+			throw std::runtime_error("\"" + owner->name() + "\" is not a function");
 		}
 
 		if (returnedValue.type().value() == ExpressionType::VOID) {
 			throw std::runtime_error("return cannot be used for the void type");
 		}
 
-		if (symbolTable->symbol()->type().empty()) {
+		if (owner->symbol()->type().empty()) {
 			break;
 		}
 
 		// Script objects are directly containing all fields
 		// Classic returned objects expect the last compound type as return type
-		const auto expectedReturnType = returnedValue.op() == Operator::SCRIPT_OBJECT ? symbolTable->symbol()->type() : symbolTable->symbol()->type().back();
+		const auto expectedReturnType = returnedValue.op() == Operator::SCRIPT_OBJECT ? owner->symbol()->type() : owner->symbol()->type().back();
 
 		if (((returnedValue.op() == Operator::USER_DEFINED_OBJECT) && (expectedReturnType != ExpressionType::OBJECT)) ||
 			(returnedValue.op() != Operator::USER_DEFINED_OBJECT && expectedReturnType != returnedValue.type())) {

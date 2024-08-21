@@ -4,6 +4,7 @@
 #include "Generator/Value/BytecodeScriptGenerationHelper.h"
 #include "Generator/Value/BytecodeGenerationOutput.h"
 #include "NodeValue/ScriptAST.h"
+#include "NodeValue/Symbol.h"
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationOutput& output, ScriptGenerationHelper script) :
 	m_generated(output),

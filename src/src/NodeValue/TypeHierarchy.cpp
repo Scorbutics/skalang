@@ -4,7 +4,7 @@
 #include "NodeValue/AST.h"
 
 ska::TypeHierarchy::TypeHierarchy(Type t):
-	m_link(nullptr),
+	m_link(t.m_symbolTable),
 	type(std::move(t)) {
 }
 

@@ -23,7 +23,7 @@ namespace ska {
     const ScopedSymbolTable& variable(const std::string& name) const;
 
     std::string m_name;
-    ScriptHandleAST* m_parent;
+    const ScriptHandleAST* m_parent;
     const ScopedSymbolTable* m_templateTable;
   };
 

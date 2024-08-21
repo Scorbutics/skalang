@@ -12,11 +12,11 @@ ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::SCRIPT_OBJECT>::build
 	auto& symbols = script.symbols();
 	auto scriptType = Type::MakeCustom<ExpressionType::FUNCTION>(nullptr);
 
-	std::size_t index = 0;
 	for (auto& fieldNode : node) {
 		LOG_INFO << fieldNode->name();
-		scriptType.add(fieldNode->symbol()->type());
-		index++;
+		if (fieldNode->symbol() != nullptr) {
+			scriptType.add(fieldNode->symbol()->type());
+		}
 	}
 
 	LOG_DEBUG << "Script object declaration \""<< script.name() <<"\" with type "<< scriptType;

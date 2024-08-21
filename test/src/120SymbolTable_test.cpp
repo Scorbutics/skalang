@@ -6,6 +6,7 @@
 #include "Service/StatementParser.h"
 #include "DataTestContainer.h"
 #include "NodeValue/ScriptAST.h"
+#include "NodeValue/ScriptHandleAST.h"
 
 auto reader = std::unique_ptr<ska::ScriptAST>{};
 ska::ScriptAST ASTFromInput(ska::ScriptCacheAST& scriptCache, const std::string& input, DataTestContainer& data) {
@@ -17,7 +18,7 @@ ska::ScriptAST ASTFromInput(ska::ScriptCacheAST& scriptCache, const std::string&
 	return *reader;
 }
 
-TEST_CASE("test") {
+TEST_CASE("Lookup tests (hierarchical and direct)") {
 	DataTestContainer data;
 	auto scriptCache = ska::ScriptCacheAST{};
 
@@ -26,7 +27,7 @@ TEST_CASE("test") {
 
 	const auto nestedI = table.lookup(ska::SymbolTableLookup::hierarchical("i"), ska::SymbolTableNested::lastChild());
 	auto i = table["i"];
-	const auto nestedToto = table.lookup(ska::SymbolTableLookup::hierarchical("toto"), ska::SymbolTableNested::firstChild());
+	const auto nestedToto = table.lookup(ska::SymbolTableLookup::direct("toto"), ska::SymbolTableNested::lastChild());
 	auto toto = table["toto"];
 	auto titi = table["titi"];
 	auto nestedTiti = table.lookup(ska::SymbolTableLookup::hierarchical("titi"), ska::SymbolTableNested::firstChild());
@@ -68,15 +69,19 @@ TEST_CASE("Matching") {
 
 		SUBCASE("outer scope, then inner, then outer again") {
 			auto astPtr = ASTFromInput(scriptCache,
-				"test73 = 21\n"
-				"do\n"
-				"test76 = 123\n"
-				"end\n"
-				"test78 = 11\n", data);
+			R"script(
+				test73 = 21
+				do
+					test76 = 123
+				end
+				test78 = 11
+			)script", data);
 			auto& table = reader->symbols();
-
-			CHECK(table.size() == 2);
-			auto nestedVar = table.lookup(ska::SymbolTableLookup::hierarchical("test76"), ska::SymbolTableNested::firstChild());
+			CHECK(table.size() == 3);
+			CHECK(table[0]->symbol() != nullptr);
+			CHECK(table[1]->symbol() == nullptr);
+			CHECK(table[2]->symbol() != nullptr);
+			auto nestedVar = table.lookup(ska::SymbolTableLookup::hierarchical("test76"), ska::SymbolTableNested::child(1));
 			CHECK(nestedVar != nullptr);
 
 			CHECK(table("test73") != nullptr);
@@ -95,12 +100,12 @@ TEST_CASE("Matching") {
 		}
 
 		SUBCASE("function declared in another function with upper variable") {
-			//TODO �toffer
+			//TODO étoffer
 			ASTFromInput(scriptCache, "func67 = function(testParam67:int) do toutou67 = function(blurp:string) do testParam67 = 123\n end\n testParam67 = 78\n end\n", data);
 		}
 
 		SUBCASE("shadowing variable into inner function") {
-			//TODO �toffer
+			//TODO étoffer
 			ASTFromInput(scriptCache, "test71 = 3\n func71 = function(test71:string) do test71\n end\n", data);
 		}
 
@@ -108,14 +113,11 @@ TEST_CASE("Matching") {
 			auto astPtr = ASTFromInput(scriptCache, "array113 = [0, 2, 3] \n array113 | (iterator, index) do end\n", data);
 			auto& table = reader->symbols();
 
-			auto parameterIterator = table.lookup(ska::SymbolTableLookup::direct("iterator"), ska::SymbolTableNested::firstChild());
+			auto parameterIterator = table.lookup(ska::SymbolTableLookup::direct("iterator"), ska::SymbolTableNested::lastChild());
 			CHECK(parameterIterator != nullptr);
 
-			auto parameterIndex = table.lookup(ska::SymbolTableLookup::direct("index"), ska::SymbolTableNested::firstChild());
+			auto parameterIndex = table.lookup(ska::SymbolTableLookup::direct("index"), ska::SymbolTableNested::lastChild());
 			CHECK(parameterIndex != nullptr);
-
-			const auto expectScope = table.root()(0) != nullptr;
-			CHECK(expectScope);
 		}
 
 		SUBCASE("function with converter operator name") {

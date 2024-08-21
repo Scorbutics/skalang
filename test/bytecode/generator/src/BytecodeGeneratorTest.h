@@ -10,6 +10,7 @@
 #include "Service/TypeBuilder/TypeBuildUnit.h"
 #include "NodeValue/ScriptAST.h"
 #include "NodeValue/ScriptCacheAST.h"
+#include "NodeValue/ScriptHandleAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 #include "Generator/Value/BytecodeScriptGenerationHelper.h"
 
@@ -22,7 +23,7 @@ static auto typeCrosserI = ska::TypeCrosser{};
 static void ASTFromInputBytecodeGeneratorNoParse(const std::string& input, BytecodeGeneratorDataTestContainer& data) {
   tokenizer = std::make_unique<ska::Tokenizer>(reservedKeywords, input);
   tokens = tokenizer->tokenize();
-	
+
   data.storage = std::make_unique<ska::bytecode::ScriptCache>();
   data.parser = std::make_unique<ska::StatementParser>(reservedKeywords);
 	data.typeBuilder = std::make_unique<ska::TypeBuilder>(*data.parser, typeCrosserI);

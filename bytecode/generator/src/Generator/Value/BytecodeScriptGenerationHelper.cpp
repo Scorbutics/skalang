@@ -3,6 +3,7 @@
 #include "BytecodeScriptGenerationHelper.h"
 #include "NodeValue/ScriptAST.h"
 #include "BytecodeScriptCache.h"
+#include "NodeValue/ScriptHandleAST.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::ScriptGenerationHelper);
 

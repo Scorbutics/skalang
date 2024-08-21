@@ -116,9 +116,6 @@ bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
 	case ReturnTokenEventType::START: {
 		SLOG(ska::LogLevel::Debug) << "\t\tNew Return : adding a nested symbol table";
 		const auto* actualNameSymbol = m_currentTable;
-		if (actualNameSymbol == nullptr) {
-			throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
-		}
 		m_currentTable = &m_currentTable->createNested(actualNameSymbol->name());
 		SLOG(ska::LogLevel::Info) << "\t\twith name : " << actualNameSymbol->name();
 	}
@@ -126,12 +123,11 @@ bool ska::SymbolTable::matchReturn(const ReturnTokenEvent& token) {
 
 	default:
 		SLOG(ska::LogLevel::Debug) << "\t\tReturn end: going up in nested symbol table hierarchy";
-		m_currentTable = &m_currentTable->parent();
-		auto* actualNameSymbol = m_currentTable->directOwner();
-		if (actualNameSymbol == nullptr) {
+		auto* actualNameSymbol = m_currentTable->owner();
+		if (token.rootNode()[0].op() != Operator::SCRIPT_OBJECT && (actualNameSymbol == nullptr || actualNameSymbol == m_rootTable.get())) {
 			throw std::runtime_error("bad user-defined return placing : custom return must be set in a named function-constructor");
 		}
-		//actualNameSymbol->closeTable();
+		m_currentTable = &m_currentTable->parent();
 	break;
 	}
 	return true;
@@ -142,7 +138,11 @@ bool ska::SymbolTable::matchFilter(const FilterTokenEvent& event) {
 	switch (event.type()) {
 	case FilterTokenEventType::DECLARATION: {
 		SLOG(ska::LogLevel::Info) << "\t\tNew filter-foreach-function : adding a nested unnamed symbol table";
-		m_currentTable = &m_currentTable->createNested(!event.indexIterator().logicalEmpty() ? event.elementIterator().name() : "");
+		m_currentTable = &m_currentTable->createNested();
+		m_currentTable->createNested(event.elementIterator().name());
+		if (!event.indexIterator().logicalEmpty()) {
+			m_currentTable->createNested(event.indexIterator().name());
+		}
 	} break;
 
 	case FilterTokenEventType::DEFINITION: {
@@ -165,7 +165,6 @@ bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
 	case FunctionTokenEventType::DECLARATION_NAME: {
 		m_currentTable = &m_currentTable->createNested(token.name());
 		SLOG(ska::LogLevel::Info) << "\t\tNew function : adding a nested symbol table named \"" << m_currentTable->name() << "\"";
-		//symbolTable.openTable();
 		token.rootNode().linkSymbol(*m_currentTable);
 	} break;
 

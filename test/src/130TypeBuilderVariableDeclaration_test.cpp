@@ -9,6 +9,7 @@
 #include "TypeBuilderTestCommon.h"
 #include "Service/ASTFactory.h"
 #include "NodeValue/ScriptAST.h"
+#include "NodeValue/ScriptHandleAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 #include "Service/TypeBuilder/TypeBuilderVariableDeclaration.h"
 #include "Service/TypeBuilder/TypeBuilderBinary.h"

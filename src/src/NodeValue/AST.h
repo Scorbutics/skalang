@@ -35,8 +35,8 @@ namespace ska {
 
 		TokenType tokenType() const { return m_token.type(); }
 
-		auto& operator[](const std::size_t index) { return *m_children[index]; }
-		const auto& operator[](const std::size_t index) const { return *m_children[index]; }
+		auto& operator[](const std::size_t index) { assert(index < m_children.size()); return *m_children[index]; }
+		const auto& operator[](const std::size_t index) const { assert(index < m_children.size()); return *m_children[index]; }
 
 		const auto begin() const { return std::begin(m_children); }
 		const auto end() const { return std::end(m_children); }

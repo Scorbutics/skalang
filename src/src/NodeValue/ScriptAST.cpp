@@ -1,6 +1,8 @@
 #include "Config/LoggerConfigLang.h"
 #include <memory>
 #include "ScriptAST.h"
+#include "ScriptHandleAST.h"
+#include "ScriptCacheAST.h"
 #include "Service/StatementParser.h"
 #include "Service/ASTFactory.h"
 #include "Runtime/Value/NativeFunction.h"
@@ -16,6 +18,11 @@ std::ostream& ska::operator<<(std::ostream& stream, const ScriptAST& ast) {
 	}
 	return stream;
 }
+
+ska::ScriptAST::ScriptAST(ScriptHandleAST& handle) :
+			m_cache(&handle.m_cache) {
+			m_handle = &handle;
+		}
 
 ska::ScriptAST::ScriptAST(ScriptCacheAST& scriptCache, const std::string& name, std::vector<Token> input, std::size_t startIndex, std::size_t scriptId) :
 	m_cache(&scriptCache) {
@@ -124,3 +131,35 @@ ska::Token* ska::ScriptAST::contextOf(ParsingContextType type, std::size_t maxCo
 	}
 	return nullptr;
 }
+
+ska::SymbolTable &ska::ScriptAST::symbols() {
+	return m_handle->m_symbols;
+}
+
+const ska::SymbolTable& ska::ScriptAST::symbols() const { return m_handle->m_symbols; }
+
+const std::string& ska::ScriptAST::name() const { return m_handle->name(); }
+
+const ska::ASTNode& ska::ScriptAST::rootNode() const {
+	assert(m_handle->m_ast != nullptr);
+	return *m_handle->m_ast;
+}
+
+ska::ASTNode& ska::ScriptAST::rootNode() {
+	assert(m_handle->m_ast != nullptr);
+	return *m_handle->m_ast;
+}
+
+bool ska::ScriptAST::isBridged() const { return m_handle != nullptr && m_handle->m_bridged; }
+
+std::size_t ska::ScriptAST::id() const { return m_handle->id(); }
+
+bool ska::ScriptAST::existsInCache(const std::string& name) const {
+	return m_cache->find(name) != m_cache->end();
+}
+
+void ska::ScriptAST::rewind() {
+	return m_handle->m_input.rewind();
+}
+
+ska::TokenReader& ska::ScriptAST::reader() { return m_handle->m_input; }

@@ -3,6 +3,7 @@
 #include <tuple>
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeGeneratorTest.h"
+#include "NodeValue/ScriptHandleAST.h"
 
 TEST_CASE("[BytecodeGenerator] Empty function only void") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("toto = function() do end\n");

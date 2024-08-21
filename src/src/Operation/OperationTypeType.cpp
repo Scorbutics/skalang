@@ -4,12 +4,13 @@
 
 const ska::ScopedSymbolTable* ska::OperationType<ska::Operator::TYPE>::GetTypeSymbol(const SymbolTable& symbolTable) const {
 	assert(node.size() > 0);
-	auto* typeNameNode = &node[0];
-	if (typeNameNode->size() == 1) {
-		typeNameNode = &(*typeNameNode)[0];
+	auto& typeNameNode = node[0];
+	auto* type = symbolTable[typeNameNode.name()];
+	if (type != nullptr && typeNameNode.size() >= 1) {
+		const std::string& field = typeNameNode[0].name();
+		return (*type)[field];
 	}
-
-	return symbolTable.lookup(SymbolTableLookup::hierarchical(typeNameNode->name()), SymbolTableNested::current());
+	return type;
 }
 
 const ska::Type& ska::OperationType<ska::Operator::TYPE>::GetType() const {

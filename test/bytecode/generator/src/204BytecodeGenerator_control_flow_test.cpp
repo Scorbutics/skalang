@@ -51,14 +51,14 @@ TEST_CASE("[BytecodeGenerator] for with empty body") {
 	BytecodeCompare(res, {
 		// Initialization part
 		{ Command::MOV, "V0", "0" },
-		
+
 		// Check part
 		{ Command::SUB_I, "R0", "V0", "10" },
 		{ Command::TEST_L, "R0", "R0" },
 		{ Command::JUMP_NIF, "3", "R0" },
-		
+
 		// Body part
-		
+
 		// Increment part
 		{ Command::ADD_I, "R1", "V0", "1"},
 		{ Command::MOV, "V0", "R1" },
@@ -78,7 +78,7 @@ TEST_CASE("[BytecodeGenerator] for with body") {
 		{ Command::SUB_I, "R0", "V0", "10" },
 		{ Command::TEST_L, "R0", "R0" },
 		{ Command::JUMP_NIF, "5", "R0" },
-		
+
 		// Body part
 		{ Command::MOV, "V1", "123" },
 		{ Command::ADD_I, "R1", "V1", "V0" },
@@ -112,7 +112,7 @@ TEST_CASE("[BytecodeGenerator] array filter without index but with body") {
 		{ Command::SUB_I, "R3", "R2", "R1" },
 		{ Command::TEST_L, "R3", "R3" },
 		{ Command::JUMP_NIF, "5", "R3" },
-		
+
 		//	Pre-body (element access)
 		{ Command::ARR_ACCESS, "V1", "V0", "R2"},
 

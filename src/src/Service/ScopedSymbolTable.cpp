@@ -1,14 +1,14 @@
 #include "Config/LoggerConfigLang.h"
 #include "ScopedSymbolTable.h"
 #include "NodeValue/ScriptAST.h"
+#include "NodeValue/ScriptHandleAST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScopedSymbolTable)
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ScopedSymbolTable)
 
 const std::string ska::ScopedSymbolTable::EMPTY_STR = "";
 
 ska::ScopedSymbolTable::ScopedSymbolTable(std::string rootName):
 	m_symbol(make(0, std::move(rootName), *this)) {
-	//m_symbol.value().changeTypeIfRequired(Type::MakeCustom<ska::ExpressionType::FUNCTION>(this));
 }
 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
@@ -34,7 +34,7 @@ void ska::ScopedSymbolTable::ensureNotLocked() const {
 }
 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(std::string name, const ScriptAST* script) {
-	ensureNotLocked();
+	//ensureNotLocked();
 	if (script != nullptr) {
 		auto& table = createNested(std::make_optional(make(m_children.size(), std::move(name), script->handle()->symbols().root())));
 		//table.changeTypeIfRequired(script->handle()->symbols().root().symbol()->type());
@@ -44,7 +44,7 @@ ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(std::string name, c
 }
 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(std::optional<Symbol> optSymbol) {
-	ensureNotLocked();
+	//ensureNotLocked();
 	if (!optSymbol.has_value()) {
 		// Create an unnamed nested symbol table (in case of blocks of code for example)
 		// Generate a name which is in fact an id (the index)
@@ -167,17 +167,10 @@ void ska::ScopedSymbolTable::implement(ScopedSymbolTable& childInstanceSymbolTab
 		throw std::runtime_error("cannot implement data from a class symbol table without having any current symbol");
 	}
 
-	if (!childInstanceSymbolTable.m_children.empty()) {
-		auto ss = std::stringstream {};
-		ss << "current child symbol \"" << childInstanceSymbolTable.m_symbol.value() <<
-			"\" already has children, so it cannot implement the current symbol \"" << m_symbol.value() << "\"";
-		throw std::runtime_error(ss.str());
-	}
-
 	if (childInstanceSymbolTable.m_classTable == this) {
 		return;
 	}
-	SLOG(ska::LogLevel::Info) << "Implementing class symbol table " << m_symbol.value() << " into " << *childInstanceSymbolTable.m_classTable;
+	SLOG(ska::LogLevel::Info) << "Implementing class symbol table " << m_symbol.value() << " into " << childInstanceSymbolTable.m_symbol.value();
 
 	childInstanceSymbolTable.m_classTable = this;
 	m_locked = true;

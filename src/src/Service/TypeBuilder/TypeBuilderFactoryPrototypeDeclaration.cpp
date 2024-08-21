@@ -1,5 +1,7 @@
 #include "TypeBuilderFactoryPrototypeDeclaration.h"
 
+#include <limits>
+#include "Service/SymbolTable.h"
 #include "NodeValue/AST.h"
 #include "NodeValue/ScriptAST.h"
 

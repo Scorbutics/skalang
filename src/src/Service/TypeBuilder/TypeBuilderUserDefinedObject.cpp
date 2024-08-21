@@ -2,6 +2,7 @@
 #include <fstream>
 #include "TypeBuilderUserDefinedObject.h"
 
+#include "Service/SymbolTable.h"
 #include "NodeValue/AST.h"
 #include "NodeValue/ScriptAST.h"
 

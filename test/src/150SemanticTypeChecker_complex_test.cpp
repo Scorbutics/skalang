@@ -10,6 +10,7 @@
 #include "Service/TypeBuilder/TypeBuildUnit.h"
 #include "NodeValue/ScriptAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
+#include "NodeValue/ScriptHandleAST.h"
 
 ska::ScriptAST ASTFromInputSemanticComplexTC(ska::ScriptCacheAST& scriptCache, const std::string& input, DataTestContainer& data) {
 	const auto reservedKeywords = ska::ReservedKeywordsPool{};
@@ -207,10 +208,10 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	SUBCASE("after field access, not an lvalue") {
 		try {
 			ASTFromInputSemanticComplexTC(scriptCache,
-				"lvalFunc137 = function() : var do\n" 
-					"test137_ = function() : int do \n return 0\n end\n" 
-					"return { test = test137_}\n" 
-				"end\n" 
+				"lvalFunc137 = function() : var do\n"
+					"test137_ = function() : int do \n return 0\n end\n"
+					"return { test = test137_}\n"
+				"end\n"
 				"object = lvalFunc137()\n"
 				"object.test() = 1234\n", data);
 			CHECK(false);
@@ -237,12 +238,8 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	}
 
 	SUBCASE("Function 0 parameter creating custom object but forget to use it as a factory (direct use of function)") {
-		try {
-			auto astPtr = ASTFromInputSemanticComplexTC(scriptCache, "Dummy = function() : var do\n return { data= 3 }\n end\n Dummy.data\n ", data);
-			CHECK(false);
-		} catch (std::exception& e) {
-			CHECK(std::string{e.what()}.find("the variable \"Dummy\" is not registered as an object but as a \"function Dummy (var") != std::string::npos);
-		}
+		CHECK_THROWS_WITH(ASTFromInputSemanticComplexTC(scriptCache, "Dummy = function() : var do\n return { data= 3 }\n end\n Dummy.data\n ", data),
+		doctest::Contains("the variable \"Dummy\" is not registered as an object but as a \"function (var"));
 	}
 
 	SUBCASE("return a concrete custom type") {
@@ -290,7 +287,7 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 	}
 
 	SUBCASE("for with empty statement in if") {
-		ASTFromInputSemanticComplexTC(scriptCache, 
+		ASTFromInputSemanticComplexTC(scriptCache,
 			"size = function() : int do return 10\n end\n"
 			"if (size() > 0) \n"
 				"for(i = 0\n i < size()\n i = i + 1)\n"

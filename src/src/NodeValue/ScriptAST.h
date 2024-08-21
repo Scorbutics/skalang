@@ -3,32 +3,29 @@
 #include <unordered_set>
 #include <unordered_map>
 #include "ScriptASTPtr.h"
-#include "ScriptHandleAST.h"
-#include "ScriptCacheAST.h"
+#include "ParsingContext.h"
 #include "Runtime/Value/NativeFunction.h"
 
 namespace ska {
 	class StatementParser;
+	class ScriptHandleAST;
+	class ScriptCacheAST;
+	class ScopedSymbolTable;
+	class SymbolTable;
+	class TokenReader;
 
 	class ScriptAST {
 	public:
-		ScriptAST(ScriptHandleAST& handle) :
-			m_cache(&handle.m_cache) {
-			m_handle = &handle;
-		}
+		ScriptAST(ScriptHandleAST& handle);
 
 		ScriptAST(ScriptCacheAST& scriptCache, const std::string& name, std::vector<Token> input, std::size_t startIndex = 0, std::size_t scriptId = std::numeric_limits<std::size_t>::max());
 		virtual ~ScriptAST() = default;
 
-		bool existsInCache(const std::string& name) const {
-			return m_cache->find(name) != m_cache->end();
-		}
+		bool existsInCache(const std::string& name) const;
 
-		void rewind() {
-			return m_handle->m_input.rewind();
-		}
+		void rewind();
 
-		auto& reader() { return m_handle->m_input; }
+		TokenReader& reader();
 
 		ASTNodePtr statement(StatementParser& parser);
 		ASTNodePtr optstatement(StatementParser& parser, const Token& mustNotBe);
@@ -44,30 +41,21 @@ namespace ska {
 
 		ASTNode& fromBridge(ASTNodePtr root);
 
-		const auto& handle() const { return m_handle; }
+		ScriptHandleAST* handle() const { return m_handle; }
 
-		SymbolTable& symbols() { return m_handle->m_symbols; }
-		const SymbolTable& symbols() const { return m_handle->m_symbols; }
+		SymbolTable& symbols();
+		const SymbolTable& symbols() const;
 
-		const std::string& name() const { return m_handle->name(); }
-
-		auto& rootNode() {
-			assert(m_handle->m_ast != nullptr);
-			return *m_handle->m_ast;
-		}
+		const std::string& name() const;
+		bool isBridged() const;
+		std::size_t id() const;
 
 		void pushContext(ParsingContext context);
 		void popContext();
 		Token* contextOf(ParsingContextType type, std::size_t maxDepth = 0) const;
 
-		const auto& rootNode() const {
-			assert(m_handle->m_ast != nullptr);
-			return *m_handle->m_ast;
-		}
-
-		bool isBridged() const { return m_handle != nullptr && m_handle->m_bridged; }
-
-		std::size_t id() const { return m_handle->id(); }
+		const ASTNode& rootNode() const;
+		ASTNode& rootNode();
 
 		friend std::ostream& operator<<(std::ostream& stream, const ScriptAST&);
 

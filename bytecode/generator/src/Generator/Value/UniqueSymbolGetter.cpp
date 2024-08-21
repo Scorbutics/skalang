@@ -2,6 +2,7 @@
 #include "UniqueSymbolGetter.h"
 #include "NodeValue/AST.h"
 #include "NodeValue/ScriptAST.h"
+#include "NodeValue/Symbol.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::UniqueSymbolGetterBase);
 

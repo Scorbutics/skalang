@@ -5,6 +5,7 @@
 #include "Service/ASTFactory.h"
 
 #include "NodeValue/ScriptAST.h"
+#include "Service/ScopedSymbolTable.h"
 #include "Service/StatementParser.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, TypeBuilder)

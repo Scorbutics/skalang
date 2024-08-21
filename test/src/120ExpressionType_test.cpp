@@ -5,6 +5,7 @@
 #include "Service/SymbolTable.h"
 #include "Service/StatementParser.h"
 #include "NodeValue/ScriptAST.h"
+#include "NodeValue/ScriptHandleAST.h"
 
 using SymbolTablePtr = std::unique_ptr<ska::SymbolTable>;
 using ParserPtr = std::unique_ptr<ska::StatementParser>;
@@ -13,7 +14,7 @@ static const auto reservedKeywords = ska::ReservedKeywordsPool{};
 
 ska::ScriptAST ASTFromInputSemanticExpressionType(ska::ScriptCacheAST& scriptCache, const std::string& input, ParserPtr& parser_test) {
 	static auto refCounter = 0;
-	
+
 	auto tokenizer = ska::Tokenizer { reservedKeywords, input };
 	const auto tokens = tokenizer.tokenize();
 	auto reader = ska::ScriptAST { scriptCache, "main", std::move(tokens) };
@@ -49,7 +50,7 @@ TEST_CASE("[ExpressionType]") {
 	SUBCASE("Type Move") {
 		auto type = ska::Type::MakeCustom<ska::ExpressionType::OBJECT>((*symbol_test)["toto"]);
 		type.add(ska::Type::MakeBuiltIn<ska::ExpressionType::INT>());
-	auto typeMoved = std::move(type);        
+	auto typeMoved = std::move(type);
 	CHECK(typeMoved == ska::ExpressionType::OBJECT);
 	CHECK(!typeMoved.empty());
 	CHECK(typeMoved[0] == ska::ExpressionType::INT);

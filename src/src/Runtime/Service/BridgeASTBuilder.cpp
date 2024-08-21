@@ -83,8 +83,8 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFunctionParameterOrReturnType(ScriptA
 std::deque<ska::ASTNodePtr> ska::BridgeASTBuilder::makeFunctionInputOutput(ScriptAST& script, const Type& fullTypeFunction) {
 	auto parametersAndReturn = std::deque<ASTNodePtr>{};
 	SLOG(LogLevel::Info) << " 4 - Making function parameters and return type";
-	std::size_t index = 0u;
-	for (const auto& type : fullTypeFunction) {
+	for (std::size_t index = 0u; index < fullTypeFunction.size(); index++) {
+		const auto& type = fullTypeFunction[index];
 		auto isReturnType = index == fullTypeFunction.size() - 1;
 		SLOG(LogLevel::Info) << (isReturnType ? "return" : "parameter") << " : " << type;
 		ASTNodePtr typeNode;
@@ -96,7 +96,6 @@ std::deque<ska::ASTNodePtr> ska::BridgeASTBuilder::makeFunctionInputOutput(Scrip
 
 		SLOG(LogLevel::Debug) << " Deduced '" << *typeNode << "'";
 		parametersAndReturn.push_back(std::move(makeFunctionParameterOrReturnType(script, std::move(typeNode), index, fullTypeFunction.size() - 1)));
-		index++;
 	}
 	return parametersAndReturn;
 }
@@ -196,8 +195,6 @@ ska::ASTNodePtr ska::BridgeASTBuilder::makeFactoryDeclaration(ScriptAST& script,
 	SLOG(LogLevel::Info) << " Factory building finished \"" << *factoryDeclarationNode << "\"";
 	return factoryDeclarationNode;
 }
-
-// TODO revoir la façon dont cet AST est build, il me paraît faux
 
 ska::ASTNodePtr ska::BridgeASTBuilder::makeFactoryPrototype(ScriptAST& script, ASTNodePtr nameNode, std::deque<ASTNodePtr> parameters) {
 	auto lock = BridgeASTBuilderSymbolTableLock{ *this, script.symbols() };

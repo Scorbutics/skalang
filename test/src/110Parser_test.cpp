@@ -9,6 +9,7 @@
 #include "Service/Tokenizer.h"
 #include "NodeValue/Operator.h"
 #include "NodeValue/ScriptAST.h"
+#include "NodeValue/ScriptHandleAST.h"
 
 TEST_CASE("[Parser]") {
 	auto scriptCache = ska::ScriptCacheAST{};
@@ -24,7 +25,10 @@ TEST_CASE("[Parser]") {
 
 	CHECK(ast->size() == 1);
 
-	auto& tree = (*ast)[0];
+	auto& scriptTree = (*ast)[0];
+
+	CHECK(scriptTree.size() == 1);
+	auto& tree = scriptTree[0];
 
 	CHECK(tree.size() == 4);
 	const auto& declaration = tree[0];
@@ -67,42 +71,51 @@ TEST_CASE("Block") {
 	SUBCASE("Empty block statement") {
 		auto astPtr = ASTFromInput(scriptCache, "do end", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::BLOCK);
-		CHECK(ast.size() == 0);
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::BLOCK);
+		CHECK(tree.size() == 0);
 	}
 
 	SUBCASE("1 statement block statement") {
 		auto astPtr = ASTFromInput(scriptCache, "do test\n end", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::BLOCK);
 		CHECK(ast.size() == 1);
-		CHECK(ast[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER, {}}));
+		auto &tree = ast[0];
+		CHECK(tree.op() == ska::Operator::BLOCK);
+		CHECK(tree.size() == 1);
+		CHECK(tree[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER, {}}));
 	}
 
 	SUBCASE("1 statement block statement + no end statement (direct end block)") {
 		auto astPtr = ASTFromInput(scriptCache, "do test end", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::BLOCK);
 		CHECK(ast.size() == 1);
-		CHECK(ast[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER, {}}));
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::BLOCK);
+		CHECK(tree.size() == 1);
+		CHECK(tree[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER, {}}));
 	}
 
 	SUBCASE("1 statement block statement") {
 		auto astPtr = ASTFromInput(scriptCache, "do test\n titi\n end", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::BLOCK);
-		CHECK(ast.size() == 2);
-		CHECK(ast[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER, {}}));
-		CHECK(ast[1].has(ska::Token { "titi", ska::TokenType::IDENTIFIER, {}}));
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::BLOCK);
+		CHECK(tree.size() == 2);
+		CHECK(tree[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER, {}}));
+		CHECK(tree[1].has(ska::Token { "titi", ska::TokenType::IDENTIFIER, {}}));
 	}
 
 	SUBCASE("1 statement, then a block statement") {
 		auto& ast = ASTFromInput(scriptCache, "tititi\n do test\n titi\n end", keywords).rootNode();
-
-		CHECK(ast.op() == ska::Operator::BLOCK);
-		CHECK(ast.size() == 2);
-		CHECK(ast[1].op() == ska::Operator::BLOCK);
-		CHECK(ast[1].size() == 2);
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::SCRIPT_OBJECT);
+		CHECK(tree.size() == 2);
+		CHECK(tree[1].op() == ska::Operator::BLOCK);
+		CHECK(tree[1].size() == 2);
 	}
 }
 
@@ -144,15 +157,19 @@ TEST_CASE("booleans") {
 	SUBCASE("true") {
 		auto astPtr = ASTFromInput(scriptCache, "true\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::LITERAL);
-		CHECK(ast.has(ska::Token{ "true", ska::TokenType::BOOLEAN, {}}));
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::LITERAL);
+		CHECK(tree.has(ska::Token{ "true", ska::TokenType::BOOLEAN, {}}));
 	}
 
 	SUBCASE("false") {
 		auto astPtr = ASTFromInput(scriptCache, "false\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::LITERAL);
-		CHECK(ast.has(ska::Token{ "false", ska::TokenType::BOOLEAN, {}}));
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::LITERAL);
+		CHECK(tree.has(ska::Token{ "false", ska::TokenType::BOOLEAN, {}}));
 	}
 }
 
@@ -162,19 +179,23 @@ TEST_CASE("If keyword pattern") {
 	SUBCASE("If only with cond and block statement") {
 		auto astPtr = ASTFromInput(scriptCache, "if (test)\n end", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::IF);
-		CHECK(ast.size() == 2);
-		CHECK(ast[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER, {}}));
-		CHECK(ast[1].op() == ska::Operator::BLOCK);
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::IF);
+		CHECK(tree.size() == 2);
+		CHECK(tree[0].has(ska::Token { "test", ska::TokenType::IDENTIFIER, {}}));
+		CHECK(tree[1].op() == ska::Operator::BLOCK);
 	}
 
 	SUBCASE("If without parenthesis") {
 		auto astPtr = ASTFromInput(scriptCache, "if test\n end", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::IF);
-		CHECK(ast.size() == 2);
-		CHECK(ast[0].has(ska::Token{ "test", ska::TokenType::IDENTIFIER, {} }));
-		CHECK(ast[1].op() == ska::Operator::BLOCK);
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::IF);
+		CHECK(tree.size() == 2);
+		CHECK(tree[0].has(ska::Token{ "test", ska::TokenType::IDENTIFIER, {} }));
+		CHECK(tree[1].op() == ska::Operator::BLOCK);
 	}
 }
 
@@ -184,24 +205,27 @@ TEST_CASE("function") {
 	SUBCASE("with 2 arguments built-in types and no return type") {
 		auto astPtr = ASTFromInput(scriptCache, "f = function(titi:int, toto:string) do end\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-	CHECK(ast.op() == ska::Operator::DECLARATION);
-	const auto& astFunc133 = ast[0];
-	CHECK(astFunc133.op() == ska::Operator::FUNCTION_DECLARATION);
-		CHECK(astFunc133.size() == 2);
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::DECLARATION);
+		const auto& treeFunc133 = tree[0];
+		CHECK(treeFunc133.op() == ska::Operator::FUNCTION_DECLARATION);
+		CHECK(treeFunc133.size() == 2);
 
-	CHECK(astFunc133[0].size() == 3);
-	CHECK(astFunc133[1].size() == 0);
-	//CHECK(ast[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
-
+		CHECK(treeFunc133[0].size() == 3);
+		CHECK(treeFunc133[1].size() == 0);
+		//CHECK(tree[0].token == ska::Token { "test", ska::TokenType::IDENTIFIER});
 	}
 	//TODO rework : doesn't properly work (doesn't detect a good function returning type)
 	SUBCASE("with 2 return placements (early return support)") {
 		auto astPtr = ASTFromInput(scriptCache, "f_parser154 = function(titi:int) : int do if(titi == 0) \n return 1\n end return 0\n end\n int_parser154 = f_parser154(1)\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-	CHECK(ast.op() == ska::Operator::DECLARATION);
-	const auto& astFunc157 = ast[0];
-	CHECK(astFunc157.op() == ska::Operator::FUNCTION_DECLARATION);
-		CHECK(astFunc157.size() == 2);
+		CHECK(ast.size() >= 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::DECLARATION);
+		const auto& treeFunc157 = tree[0];
+		CHECK(treeFunc157.op() == ska::Operator::FUNCTION_DECLARATION);
+		CHECK(treeFunc157.size() == 2);
 	}
 
 	SUBCASE("Empty statement") {
@@ -236,44 +260,48 @@ TEST_CASE("filter") {
 	SUBCASE("with 1 argument") {
 		auto astPtr = ASTFromInput(scriptCache, "array193 | (iterator) do end\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::FILTER);
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::FILTER);
 
-		CHECK(ast[0].op() == ska::Operator::UNARY);
+		CHECK(tree[0].op() == ska::Operator::UNARY);
 
-		const auto& astArray193Declaration = ast[1];
-		CHECK(astArray193Declaration.op() == ska::Operator::FILTER_DECLARATION);
-		CHECK(astArray193Declaration.size() == 2);
+		const auto& treeArray193Declaration = tree[1];
+		CHECK(treeArray193Declaration.op() == ska::Operator::FILTER_DECLARATION);
+		CHECK(treeArray193Declaration.size() == 2);
 
-		CHECK(astArray193Declaration[0].name() == "iterator");
-		CHECK(astArray193Declaration[0].op() == ska::Operator::FILTER_PARAMETER_DECLARATION);
+		CHECK(treeArray193Declaration[0].name() == "iterator");
+		CHECK(treeArray193Declaration[0].op() == ska::Operator::FILTER_PARAMETER_DECLARATION);
 
-		CHECK(astArray193Declaration[1].op() == ska::Operator::UNARY);
-		CHECK(astArray193Declaration[1].tokenType() == ska::TokenType::EMPTY);
+		CHECK(treeArray193Declaration[1].op() == ska::Operator::UNARY);
+		CHECK(treeArray193Declaration[1].tokenType() == ska::TokenType::EMPTY);
 
-		const auto& astArray193Body = ast[2];
-		CHECK(astArray193Body.op() == ska::Operator::BLOCK);
-		CHECK(astArray193Body.size() == 0);
+		const auto& treeArray193Body = tree[2];
+		CHECK(treeArray193Body.op() == ska::Operator::BLOCK);
+		CHECK(treeArray193Body.size() == 0);
 	}
 
 	SUBCASE("with 2 arguments") {
 		auto astPtr = ASTFromInput(scriptCache, "array193 | (iterator, index) do end\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::FILTER);
-		CHECK(ast[0].op() == ska::Operator::UNARY);
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::FILTER);
+		CHECK(tree[0].op() == ska::Operator::UNARY);
 
-		const auto& astArray193Declaration = ast[1];
-		CHECK(astArray193Declaration.op() == ska::Operator::FILTER_DECLARATION);
-		CHECK(astArray193Declaration.size() == 2);
+		const auto& treeArray193Declaration = tree[1];
+		CHECK(treeArray193Declaration.op() == ska::Operator::FILTER_DECLARATION);
+		CHECK(treeArray193Declaration.size() == 2);
 
-		CHECK(astArray193Declaration[0].name() == "iterator");
-		CHECK(astArray193Declaration[0].op() == ska::Operator::FILTER_PARAMETER_DECLARATION);
+		CHECK(treeArray193Declaration[0].name() == "iterator");
+		CHECK(treeArray193Declaration[0].op() == ska::Operator::FILTER_PARAMETER_DECLARATION);
 
-		CHECK(astArray193Declaration[1].name() == "index");
-		CHECK(astArray193Declaration[1].op() == ska::Operator::FILTER_PARAMETER_DECLARATION);
+		CHECK(treeArray193Declaration[1].name() == "index");
+		CHECK(treeArray193Declaration[1].op() == ska::Operator::FILTER_PARAMETER_DECLARATION);
 
-		const auto& astArray193Body = ast[2];
-		CHECK(astArray193Body.op() == ska::Operator::BLOCK);
-		CHECK(astArray193Body.size() == 0);
+		const auto& treeArray193Body = tree[2];
+		CHECK(treeArray193Body.op() == ska::Operator::BLOCK);
+		CHECK(treeArray193Body.size() == 0);
 	}
 
 	SUBCASE("missing at least 1 argument") {
@@ -312,7 +340,7 @@ TEST_CASE("array : explicit type") {
 	auto astPtr = ASTFromInput(scriptCache, "[]: string\n", keywords);
 	CHECK(astPtr.rootNode().size() == 1);
 
-	auto& arrayTypeDecl = astPtr.rootNode()[0];
+	auto& arrayTypeDecl = astPtr.rootNode()[0][0];
 	CHECK(arrayTypeDecl.size() == 2);
 	CHECK(arrayTypeDecl.op() == ska::Operator::ARRAY_TYPE_DECLARATION);
 
@@ -333,60 +361,54 @@ TEST_CASE("User defined object") {
 	SUBCASE("constructor with 1 parameter") {
 
 		auto astPtr = ASTFromInput(scriptCache, "Joueur = function(nom:string) : var do return { nom = nom }\n end\n joueur1 = Joueur(\"joueur 1\")\n joueur1.nom\n", keywords);
-		CHECK(astPtr.rootNode().size() == 3);
-		CHECK(astPtr.rootNode().op() == ska::Operator::BLOCK);
+		CHECK(astPtr.rootNode().size() >= 1);
+		auto& tree = astPtr.rootNode()[0];
+		CHECK(tree.size() == 3);
+		CHECK(tree.op() == ska::Operator::SCRIPT_OBJECT);
 
-		auto& varJoueurNode = astPtr.rootNode()[0];
+		auto& varJoueurNode = tree[0];
 		CHECK(varJoueurNode.size() == 1);
 		CHECK(varJoueurNode.op() == ska::Operator::DECLARATION);
 		const auto& astFunc154 = varJoueurNode[0];
 		CHECK(astFunc154.op() == ska::Operator::FUNCTION_DECLARATION);
-			CHECK(astFunc154.size() == 2);
+		CHECK(astFunc154.size() == 2);
 		const auto& astFuncParameters154 = astFunc154[0];
 
 		//Joueur factory block is inside "astFuncParameters154"
 		CHECK(astFuncParameters154.size() == 2);
 
 		//Checks the parameters
-		CHECK(astFuncParameters154[0][0].size() == 1);
-		CHECK(astFuncParameters154[0][0][0].size() == 3);
-		CHECK(astFuncParameters154[0][0][0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
+		CHECK(astFuncParameters154[0].size() == 1);
+		CHECK(astFuncParameters154[0][0].size() == 3);
+		CHECK(astFuncParameters154[0][0][0].has(keywords.pattern<ska::TokenGrammar::STRING>()));
 
 		//Checks the return type
-		CHECK(astFuncParameters154[0][astFuncParameters154.size() - 1][0].has(keywords.pattern<ska::TokenGrammar::VARIABLE>()));
-
-		//Checks the parameter name and type : in the private factory block
-		auto& parametersAsReturnInPrivateFactory = astFuncParameters154[1][1][0][0];
-		CHECK(parametersAsReturnInPrivateFactory.size() == 1);
-		CHECK(parametersAsReturnInPrivateFactory[0].has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
-
+		CHECK(astFuncParameters154[astFuncParameters154.size() - 1][0].has(keywords.pattern<ska::TokenGrammar::VARIABLE>()));
 
 		//Checks the function body
 		CHECK(astFunc154[1].size() == 1);
 
-		const auto& userDefinedObjectNode = astFunc154[1][0];
-		CHECK(astFunc154[1].op() == ska::Operator::RETURN);
+		//Checks the return
+		const auto& returnNode = astFunc154[1][0];
+		CHECK(returnNode.op() == ska::Operator::RETURN);
+		CHECK(returnNode.size() == 1);
+
+		//Checks the object in the return
+		const auto& userDefinedObjectNode = returnNode[0];
 		CHECK(userDefinedObjectNode.op() == ska::Operator::USER_DEFINED_OBJECT);
+		CHECK(userDefinedObjectNode.size() == 1);
 
-		//2, because : "this" private object at index 0, "nom" at index 1
-		CHECK(userDefinedObjectNode.size() == 2);
-
-		const auto& returnThisNode = userDefinedObjectNode[0];
-		CHECK(returnThisNode.size() == 1);
-		// TODO change this
-		//CHECK(returnThisNode.has(ska::Token{ "this.private", ska::TokenType::IDENTIFIER, {} }));
-
-		const auto& returnNomNode = userDefinedObjectNode[1];
+		const auto& returnNomNode = userDefinedObjectNode[0];
 		CHECK(returnNomNode.size() == 1);
 		CHECK(returnNomNode.has(ska::Token { "nom", ska::TokenType::IDENTIFIER, {}}));
 
 		//Checks the variable declaration and the function call
-		const auto& varJoueur1Node = astPtr.rootNode()[1];
+		const auto& varJoueur1Node = tree[1];
 		CHECK(varJoueur1Node.op() == ska::Operator::DECLARATION);
 		CHECK(varJoueur1Node.has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER, {}} ));
 
 		//Checks the field access
-		const auto& nomJoueur1FieldNode = astPtr.rootNode()[2];
+		const auto& nomJoueur1FieldNode = tree[2];
 		CHECK(nomJoueur1FieldNode.op() == ska::Operator::FIELD_ACCESS);
 		CHECK(nomJoueur1FieldNode.size() == 2);
 		CHECK(nomJoueur1FieldNode[0].has(ska::Token { "joueur1", ska::TokenType::IDENTIFIER, {}} ));
@@ -403,15 +425,17 @@ Wrapper = function(i: int): var do
 	}
 end
 )script", keywords);
-		CHECK(astPtr.rootNode().size() == 3);
-		CHECK(astPtr.rootNode().op() == ska::Operator::BLOCK);
+		CHECK(astPtr.rootNode().size() == 1);
+		auto& tree = astPtr.rootNode()[0];
+		CHECK(tree.size() == 1);
+		CHECK(tree.op() == ska::Operator::SCRIPT_OBJECT);
 
-		auto& varJoueurNode = astPtr.rootNode()[0];
+		auto& varJoueurNode = tree[0];
 		CHECK(varJoueurNode.size() == 1);
 		CHECK(varJoueurNode.op() == ska::Operator::DECLARATION);
 		const auto& astFunc154 = varJoueurNode[0];
 		CHECK(astFunc154.op() == ska::Operator::FUNCTION_DECLARATION);
-			CHECK(astFunc154.size() == 2);
+		CHECK(astFunc154.size() == 2);
 		const auto& astFuncParameters154 = astFunc154[0];
 	}
 
@@ -422,12 +446,14 @@ TEST_CASE("Expression and priorities") {
 	auto scriptCache = ska::ScriptCacheAST{};
 	SUBCASE("Simple mul") {
 		auto astPtr = ASTFromInput(scriptCache, "5 * 2\n", keywords);
-	auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::BINARY);
-		CHECK(ast.size() == 2);
-		CHECK(ast.has(ska::Token { "*", ska::TokenType::SYMBOL, {}}));
-		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT, {}}));
-		CHECK(ast[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
+		auto& ast = astPtr.rootNode()[0];
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::BINARY);
+		CHECK(tree.size() == 2);
+		CHECK(tree.has(ska::Token { "*", ska::TokenType::SYMBOL, {}}));
+		CHECK(tree[0].has(ska::Token { "5", ska::TokenType::DIGIT, {}}));
+		CHECK(tree[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
 	}
 
 	SUBCASE("Syntax error : not an expression") {
@@ -441,53 +467,61 @@ TEST_CASE("Expression and priorities") {
 	}
 
 	SUBCASE("Syntax error : no existing operator") {
-	try {
-	ASTFromInput(scriptCache, "5 ' 3\n", keywords);
-	CHECK(false);
-	} catch(std::exception& e) {
-	CHECK(true);
-	}
+		try {
+			ASTFromInput(scriptCache, "5 ' 3\n", keywords);
+			CHECK(false);
+		} catch(std::exception& e) {
+			CHECK(true);
+		}
 	}
 
 	SUBCASE("Simple div") {
 		auto astPtr = ASTFromInput(scriptCache, "5 / 2\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::BINARY);
-		CHECK(ast.size() == 2);
-		CHECK(ast.has(ska::Token { "/", ska::TokenType::SYMBOL, {} }));
-		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
-		CHECK(ast[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::BINARY);
+		CHECK(tree.size() == 2);
+		CHECK(tree.has(ska::Token { "/", ska::TokenType::SYMBOL, {} }));
+		CHECK(tree[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
+		CHECK(tree[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
 	}
 
 	SUBCASE("Simple add") {
 		auto astPtr = ASTFromInput(scriptCache, "5 + 2\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::BINARY);
-		CHECK(ast.size() == 2);
-		CHECK(ast.has(ska::Token { "+", ska::TokenType::SYMBOL, {} }));
-		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
-		CHECK(ast[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::BINARY);
+		CHECK(tree.size() == 2);
+		CHECK(tree.has(ska::Token { "+", ska::TokenType::SYMBOL, {} }));
+		CHECK(tree[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
+		CHECK(tree[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
 	}
 
 	SUBCASE("Simple sub") {
 		auto astPtr = ASTFromInput(scriptCache, "5 - 2\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::BINARY);
-		CHECK(ast.size() == 2);
-		CHECK(ast.has(ska::Token { "-", ska::TokenType::SYMBOL, {} }));
-		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
-		CHECK(ast[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::BINARY);
+		CHECK(tree.size() == 2);
+		CHECK(tree.has(ska::Token { "-", ska::TokenType::SYMBOL, {} }));
+		CHECK(tree[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
+		CHECK(tree[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
 	}
 
 	SUBCASE("Priorization with mul before add") {
 		auto astPtr = ASTFromInput(scriptCache, "5 * 2 + 4\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::BINARY);
-		CHECK(ast.size() == 2);
-		CHECK(ast.has(ska::Token { "+", ska::TokenType::SYMBOL, {} }));
-		CHECK(ast[1].has(ska::Token { "4", ska::TokenType::DIGIT, {} }));
-		CHECK(ast[0].op() == ska::Operator::BINARY);
-		const auto& innerOp = ast[0];
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::BINARY);
+		CHECK(tree.size() == 2);
+		CHECK(tree.has(ska::Token { "+", ska::TokenType::SYMBOL, {} }));
+		CHECK(tree[1].has(ska::Token { "4", ska::TokenType::DIGIT, {} }));
+		CHECK(tree[0].op() == ska::Operator::BINARY);
+		const auto& innerOp = tree[0];
 		CHECK(innerOp[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
 		CHECK(innerOp[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
 		CHECK(innerOp.has(ska::Token { "*", ska::TokenType::SYMBOL, {} }));
@@ -496,12 +530,14 @@ TEST_CASE("Expression and priorities") {
 	SUBCASE("Priorization with mul after add") {
 		auto astPtr = ASTFromInput(scriptCache, "5 + 2 * 4\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::BINARY);
-		CHECK(ast.size() == 2);
-		CHECK(ast.has(ska::Token { "+", ska::TokenType::SYMBOL, {} }));
-		CHECK(ast[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
-		CHECK(ast[1].op() == ska::Operator::BINARY);
-		const auto& innerOp = ast[1];
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::BINARY);
+		CHECK(tree.size() == 2);
+		CHECK(tree.has(ska::Token { "+", ska::TokenType::SYMBOL, {} }));
+		CHECK(tree[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
+		CHECK(tree[1].op() == ska::Operator::BINARY);
+		const auto& innerOp = tree[1];
 		CHECK(innerOp[0].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
 		CHECK(innerOp[1].has(ska::Token { "4", ska::TokenType::DIGIT, {} }));
 		CHECK(innerOp.has(ska::Token { "*", ska::TokenType::SYMBOL, {} }));
@@ -511,12 +547,14 @@ TEST_CASE("Expression and priorities") {
 	SUBCASE("Priorization with mul after add with parenthesis") {
 		auto astPtr = ASTFromInput(scriptCache, "(5 + 2) * 4\n", keywords);
 		auto& ast = astPtr.rootNode()[0];
-		CHECK(ast.op() == ska::Operator::BINARY);
-		CHECK(ast.size() == 2);
-		CHECK(ast.has(ska::Token { "*", ska::TokenType::SYMBOL, {} }));
-		CHECK(ast[1].has(ska::Token { "4", ska::TokenType::DIGIT, {} }));
-		CHECK(ast[0].op() == ska::Operator::BINARY);
-		const auto& innerOp = ast[0];
+		CHECK(ast.size() == 1);
+		auto& tree = ast[0];
+		CHECK(tree.op() == ska::Operator::BINARY);
+		CHECK(tree.size() == 2);
+		CHECK(tree.has(ska::Token { "*", ska::TokenType::SYMBOL, {} }));
+		CHECK(tree[1].has(ska::Token { "4", ska::TokenType::DIGIT, {} }));
+		CHECK(tree[0].op() == ska::Operator::BINARY);
+		const auto& innerOp = tree[0];
 		CHECK(innerOp[0].has(ska::Token { "5", ska::TokenType::DIGIT, {} }));
 		CHECK(innerOp[1].has(ska::Token { "2", ska::TokenType::DIGIT, {} }));
 		CHECK(innerOp.has(ska::Token { "+", ska::TokenType::SYMBOL, {} }));

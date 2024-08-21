@@ -56,6 +56,10 @@ namespace ska {
 			return { 0, 0, std::move(name) };
 		}
 
+		static SymbolTableNested child(std::size_t childIndex, std::size_t depth = 1) {
+			return { static_cast<int>(depth), childIndex };
+		}
+
 		int depth = 0;
 		std::size_t childIndex = 0;
 		std::string childName;

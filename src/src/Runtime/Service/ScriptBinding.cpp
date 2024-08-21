@@ -2,6 +2,7 @@
 #include "Config/LoggerConfigLang.h"
 #include "ScriptBinding.h"
 
+#include "Service/ScopedSymbolTable.h"
 #include "Service/ASTFactory.h"
 #include "Service/ScriptNameBuilder.h"
 #include "Service/StatementParser.h"

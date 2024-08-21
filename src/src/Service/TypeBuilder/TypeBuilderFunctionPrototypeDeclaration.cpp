@@ -49,12 +49,13 @@ namespace ska {
 				ss << "bad function type encountered \"" << symbolType.value() << "\": could not deduce its return value because it's empty";
 				throw std::runtime_error(ss.str());
 			}
-			return { symbolType.value().back(), &node };
+			const auto& finalType = symbolType.value().back();
+			return { finalType, &node };
 		}
 
 		if (type == ExpressionType::FUNCTION) {
 			LOG_INFO << "function prototype declaration has a FUNCTION return type \""<< (symbolTableFunction != nullptr ? symbolTableFunction->name() : "") << "\"";
-			assert(!type.empty());
+			assert(type.size() != 0);
 			return type.back();
 		}
 

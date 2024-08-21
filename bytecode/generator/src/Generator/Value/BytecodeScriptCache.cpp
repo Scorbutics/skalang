@@ -1,6 +1,9 @@
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeScriptCache.h"
 
+#include "NodeValue/AST.h"
+#include "NodeValue/Symbol.h"
+
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::ScriptCache);
 
 
@@ -69,7 +72,7 @@ const ska::bytecode::ExportSymbolContainer& ska::bytecode::ScriptCache::getExpor
 	return (*this)[scriptIndex].exportedSymbols();
 }
 
-bool ska::bytecode::ScriptCache::isGenerated(std::size_t index) const { 
+bool ska::bytecode::ScriptCache::isGenerated(std::size_t index) const {
 	return index < size() && exist(index) && !(*this)[index].empty();
 }
 

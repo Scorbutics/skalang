@@ -2,6 +2,7 @@
 #include <tuple>
 #include "Config/LoggerConfigLang.h"
 #include "BytecodeGeneratorTest.h"
+#include "NodeValue/ScriptHandleAST.h"
 
 TEST_CASE("[BytecodeGenerator] no type conversion string + string") {
 	auto [astPtr, data] = ASTFromInputBytecodeGenerator("result = \"3\" + \"7\"\n");

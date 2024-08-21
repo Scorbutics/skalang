@@ -9,6 +9,7 @@
 #include "Service/TypeBuilder/TypeBuildUnit.h"
 #include "NodeValue/ScriptAST.h"
 #include "NodeValue/ScriptCacheAST.h"
+#include "NodeValue/ScriptHandleAST.h"
 #include "Service/TypeCrosser/TypeCrossExpression.h"
 #include "Generator/Value/BytecodeScriptGenerationHelper.h"
 

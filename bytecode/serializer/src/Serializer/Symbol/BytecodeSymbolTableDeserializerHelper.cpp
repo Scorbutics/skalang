@@ -4,6 +4,8 @@
 #include "Generator/Value/BytecodeScriptCache.h"
 #include "Base/Serialization/SerializerSafeZone.h"
 #include "Serializer/BytecodeOperandSerializer.h"
+#include "Service/ScopedSymbolTable.h"
+#include "NodeValue/ScriptHandleAST.h"
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::SymbolTableDeserializerHelper);
 

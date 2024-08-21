@@ -63,3 +63,43 @@ void ska::Type::serialize(SerializerOutput& output, ScriptTypeSerializer& serial
 	serializer.write(output, writeSymbol ? m_symbolTable : nullptr, *this);
 }
 
+static const ska::Type* AccessUnderlyingClassType(const ska::ScopedSymbolTable* symbolTable) {
+	return symbolTable == nullptr ||
+		symbolTable->classTable() == nullptr ||
+		symbolTable->classTable()->symbol() == nullptr ? nullptr : &symbolTable->classTable()->symbol()->type();
+}
+
+bool ska::Type::empty() const{
+	if (m_type != ExpressionType::OBJECT || !m_compound.empty()) {
+		return m_compound.empty();
+	}
+	const Type* classType = AccessUnderlyingClassType(m_symbolTable);
+	return m_compound.empty() && (classType == nullptr || classType->empty());
+}
+
+const ska::Type& ska::Type::back() const {
+	if (m_type != ExpressionType::OBJECT || !m_compound.empty()) {
+		return m_compound.empty() ? *this : m_compound.back();
+	}
+	const Type* classType = AccessUnderlyingClassType(m_symbolTable);
+	assert(classType != nullptr);
+	return classType->back();
+}
+
+std::size_t ska::Type::size() const {
+	if (m_type != ExpressionType::OBJECT) {
+		return m_compound.size();
+	}
+
+	const Type* classType = AccessUnderlyingClassType(m_symbolTable);
+	return (classType == nullptr ? 0 : classType->size()) + m_compound.size();
+}
+
+const ska::Type& ska::Type::operator[](std::size_t index) const {
+	if (m_type != ExpressionType::OBJECT || index < m_compound.size()) {
+		return m_compound[index];
+	}
+	const Type* classType = AccessUnderlyingClassType(m_symbolTable);
+	assert(classType != nullptr);
+	return (*classType)[index - m_compound.size()];
+}

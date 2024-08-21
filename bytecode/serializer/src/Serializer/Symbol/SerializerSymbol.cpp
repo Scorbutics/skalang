@@ -25,8 +25,7 @@ void ska::SerializerTypeTraits<ska::ScopedSymbolTable*>::Read(SerializerSafeZone
 	} else {
 		LOG_INFO << "%13c\twith master : ";
 		auto& master = ReadSymbolRefBody(zone.acquireMemory<BytesSymbolRefRequired>("Master symbol ref"), helper);
-		// TODO fixme
-		//master.implement(*symbol);
+		master.implement(*symbol);
 	}
 }
 
@@ -46,12 +45,8 @@ void ska::SerializerTypeTraits<ska::ScopedSymbolTable*>::Write(SerializerSafeZon
 	if (!hasMaster) {
 		zone.writeNull<BytesSymbolRefRequired>();
 	} else {
-		// TODO fixme
-
-		zone.writeNull<BytesSymbolRefRequired>();
-
-		//LOG_INFO << "%13c\twith master : " << symbol.classTable()->name();
-		//WriteSymbolRefBody(zone.acquireMemory<BytesSymbolRefRequired>("parent"), *symbol.classTable(), helper);
+		LOG_INFO << "%13c\twith master : " << symbolTable.classTable()->name();
+		WriteSymbolRefBody(zone.acquireMemory<BytesSymbolRefRequired>("parent"), *symbolTable.classTable(), helper);
 	}
 }
 

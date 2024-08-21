@@ -35,7 +35,7 @@ namespace ska {
 		ScopedSymbolTable& createNested(std::string name = "", const ScriptAST* script = nullptr);
 
 		const ScopedSymbolTable* owner() const {
-			return &m_parent != this ? m_parent.owner() : &m_parent;
+			return &m_parent == this || directOwner() != nullptr ? directOwner() : m_parent.owner();
 		}
 
 		const ScopedSymbolTable* directOwner() const { return m_parent.m_symbol.has_value() ? &m_parent : nullptr; }

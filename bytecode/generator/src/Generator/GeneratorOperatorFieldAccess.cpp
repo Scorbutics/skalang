@@ -3,6 +3,7 @@
 #include "NodeValue/AST.h"
 #include "GeneratorOperatorFieldAccess.h"
 #include "NodeValue/ScriptAST.h"
+#include "Service/ScopedSymbolTable.h"
 #include "BytecodeCommand.h"
 #include "Generator/Value/BytecodeScriptGenerationHelper.h"
 
@@ -47,6 +48,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	}
 
 	std::size_t index;
+	// TODO simplify all of this
 	if (objectSymbolInfo->exported) {
 		index = context.exportId(*symbolField->symbol());
 	} else {
@@ -57,13 +59,6 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	LOG_DEBUG << "This field has index " << index << " in the object";
 
-	auto command = Command::ARR_ACCESS;
-
-	// TODO change this
-	/*if (symbolField->type() == ExpressionType::FUNCTION && symbolField->type()[0].name() == "this.private.fcty") {
-		command = Command::ARR_MEMBER_ACCESS;
-	}*/
-
-	objectValue.push({ Instruction { command, context.queryNextRegister(), objectValue.operand(), Operand {static_cast<long>(index), OperandType::PURE } }});
+	objectValue.push({ Instruction { Command::ARR_ACCESS, context.queryNextRegister(), objectValue.operand(), Operand {static_cast<long>(index), OperandType::PURE } }});
 	return objectValue;
 }
