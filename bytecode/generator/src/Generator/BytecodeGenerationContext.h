@@ -6,9 +6,11 @@
 #include "Value/BytecodeScriptGenerationHelper.h"
 #include "Value/BytecodeGenerationOutput.h"
 #include "Runtime/Value/NativeFunction.h"
+#include "Value/BytecodeClosure.h"
 
 namespace ska {
 	class ASTNode;
+	class ScopedSymbolTable;
 	namespace bytecode {
 		class GeneratorOperatorUnit;
 		class GenerationContext {
@@ -36,14 +38,16 @@ namespace ska {
 			const NativeFunction& getBinding(ScriptVariableRef bindingRef) const;
 			Operand storeBinding(NativeFunctionPtr binding, ScriptVariableRef bindingRef);
 			void generate(InstructionOutput instructions);
-			OperandUse querySymbolOrOperand(const ASTNode& node);
-			OperandUse querySymbol(const Symbol& symbol);
+			InstructionOutput querySymbolOrOperand(const ASTNode& node);
+			//OperandUse querySymbol(const Symbol& symbol);
 			std::optional<Operand> getSymbol(const Symbol& symbol) const;
 			std::size_t exportId(const Symbol& symbol) const;
 
 			const auto scriptIndex() const { return m_script.id(); }
 			auto scriptName() const { return m_script.name(); }
 			const std::string scriptName(std::size_t index) const;
+
+			InstructionOutput close();
 
 		private:
 			ScriptGenerationHelper& helper();
@@ -53,7 +57,11 @@ namespace ska {
 
 			GenerationOutput& m_generated;
 			ScriptGeneration& m_script;
-			const ASTNode* m_pointer {};
+			const ASTNode* const m_pointer {};
+
+			std::unique_ptr<Closure> m_nodeClosure;
+			Closure* m_scopeClosure = nullptr;
+
 			std::size_t m_scopeLevel = 0;
 		};
 	}

@@ -56,6 +56,8 @@ namespace ska {
 			TEST_GE,
 			TEST_L,
 			TEST_LE,
+			ADD_ENV,
+			USE_ENV,
 			NOP,
 			UNUSED_Last_Length
 		};
@@ -112,6 +114,8 @@ namespace ska {
 			"TEST_GE",
 			"TEST_L",
 			"TEST_LE",
+			"ADD_ENV",
+			"USE_ENV",
 			"NOP",
 			""
 		};

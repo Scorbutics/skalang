@@ -5,26 +5,41 @@
 #include "Generator/Value/BytecodeGenerationOutput.h"
 #include "NodeValue/ScriptAST.h"
 #include "NodeValue/Symbol.h"
+#include "Service/ScopedSymbolTable.h"
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationOutput& output, ScriptGenerationHelper script) :
 	m_generated(output),
 	m_script(m_generated.emplaceNamed( ScriptGeneration{ std::move(script) } )),
-	m_pointer(&m_script.rootASTNode()) {
+	m_pointer(&m_script.rootASTNode()),
+	m_nodeClosure(m_pointer->op() == Operator::FUNCTION_DECLARATION ? std::make_unique<Closure>(*m_pointer) : nullptr),
+	m_scopeClosure(m_nodeClosure.get()) {
 }
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationOutput& output, const ScriptAST& scriptAst) :
 	m_generated(output),
 	m_script(m_generated.emplaceNamed(ScriptGeneration{ ScriptGenerationHelper{output, scriptAst} })),
-	m_pointer(&m_script.rootASTNode()) {
+	m_pointer(&m_script.rootASTNode()),
+	m_nodeClosure(m_pointer->op() == Operator::FUNCTION_DECLARATION ? std::make_unique<Closure>(*m_pointer) : nullptr),
+	m_scopeClosure(m_nodeClosure.get()) {
 }
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, const ScriptAST& scriptAst) :
 	m_generated(old.m_generated),
 	m_script(m_generated.emplaceNamed(ScriptGeneration { ScriptGenerationHelper{m_generated, scriptAst}})),
-	m_pointer(&m_script.rootASTNode()) {
+	m_pointer(&m_script.rootASTNode()),
+	m_nodeClosure(m_pointer->op() == Operator::FUNCTION_DECLARATION ? std::make_unique<Closure>(*m_pointer) : nullptr),
+	m_scopeClosure(m_nodeClosure.get()) {
+}
+
+ska::bytecode::InstructionOutput ska::bytecode::GenerationContext::close() {
+	if (m_nodeClosure == nullptr) {
+		return {};
+	}
+	return m_nodeClosure->generate(*this);
 }
 
 void ska::bytecode::GenerationContext::generate(InstructionOutput instructions) {
+	auto closedInstruction = close();
 	m_script.generate(m_generated, std::move(instructions));
 }
 
@@ -35,20 +50,26 @@ std::size_t ska::bytecode::GenerationContext::totalScripts() const {
 ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, ScriptGenerationHelper script) :
 	m_generated(old.m_generated),
 	m_script(m_generated.emplaceNamed(ScriptGeneration { std::move(script) })),
-	m_pointer(&m_script.rootASTNode()) {
+	m_pointer(&m_script.rootASTNode()),
+	m_nodeClosure(m_pointer->op() == Operator::FUNCTION_DECLARATION ? std::make_unique<Closure>(*m_pointer) : nullptr),
+	m_scopeClosure(m_nodeClosure.get()) {
 }
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old) :
 	m_generated(old.m_generated),
 	m_script(old.m_script),
-	m_pointer(&m_script.rootASTNode()) {
+	m_pointer(&m_script.rootASTNode()),
+	m_nodeClosure(m_pointer->op() == Operator::FUNCTION_DECLARATION ? std::make_unique<Closure>(*m_pointer) : nullptr),
+	m_scopeClosure(m_nodeClosure.get()) {
 }
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, const ASTNode& node, std::size_t scopeLevelOffset) :
 	m_generated(old.m_generated),
 	m_script(old.m_script),
 	m_pointer(&node),
-	m_scopeLevel(old.m_scopeLevel + scopeLevelOffset) {
+	m_scopeLevel(old.m_scopeLevel + scopeLevelOffset),
+	m_nodeClosure(m_pointer->op() == Operator::FUNCTION_DECLARATION ? std::make_unique<Closure>(*m_pointer) : nullptr),
+	m_scopeClosure(m_nodeClosure.get() != nullptr ? m_nodeClosure.get() : old.m_scopeClosure) {
 }
 
 ska::bytecode::ScriptGenerationHelper& ska::bytecode::GenerationContext::helper() {
@@ -84,16 +105,31 @@ std::size_t ska::bytecode::GenerationContext::exportId(const Symbol& symbol) con
 	return exports.id(&symbol);
 }
 
-ska::bytecode::OperandUse ska::bytecode::GenerationContext::querySymbolOrOperand(const ASTNode& node) {
-	if (node.symbol() == nullptr) {
-		return helper().querySymbolOrOperand(node);
-	}
-	return scriptOfSymbol(*node.symbol()).querySymbolOrOperand(node);
-}
+ska::bytecode::InstructionOutput ska::bytecode::GenerationContext::querySymbolOrOperand(const ASTNode& node) {
+	auto operand = OperandUse {};
 
+	if (node.symbol() == nullptr) {
+		operand = helper().querySymbolOrOperand(node);
+	} else {
+		operand = scriptOfSymbol(*node.symbol()).querySymbolOrOperand(node);
+	}
+
+	if (m_scopeClosure != nullptr) {
+		auto result = m_scopeClosure->checkAndCapture(*this, node.symbolTable(), operand);
+		if (result.operand() == Operand {}) {
+			result.push(operand);
+		} else if (result.operand() != operand) {
+			throw std::runtime_error("unable to generate valid bytecode for node symbol \"" + node.name() + "\" because closure environment didn't match operand");
+		}
+		return result;
+	}
+
+	return operand;
+}
+/*
 ska::bytecode::OperandUse ska::bytecode::GenerationContext::querySymbol(const Symbol& symbol) {
 	return scriptOfSymbol(symbol).querySymbol(symbol);
-}
+}*/
 
 std::optional<ska::bytecode::Operand> ska::bytecode::GenerationContext::getSymbol(const Symbol& symbol) const {
 	return scriptOfSymbol(symbol).getSymbol(symbol);

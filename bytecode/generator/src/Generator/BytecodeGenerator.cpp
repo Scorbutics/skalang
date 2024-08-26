@@ -72,7 +72,12 @@ ska::bytecode::InstructionOutput ska::bytecode::Generator::generatePart(Generati
 	LOG_INFO << "[" << node.scriptName() << "] Generating " << operatorNode << " " << node.pointer();
 	auto& builder = m_operatorGenerator[static_cast<std::size_t>(operatorNode)];
 	assert(builder != nullptr);
-	return builder->generate(node);
+	auto resultOperations = builder->generate(node);
+	auto closeInstructions = node.close();
+	if (closeInstructions.operand() != Operand {}) {
+		resultOperations.push(std::move(closeInstructions));
+	}
+	return resultOperations;
 }
 
 const ska::bytecode::ScriptGeneration& ska::bytecode::Generator::generate(ScriptCache& cache, ScriptGenerationHelper script) {

@@ -106,3 +106,29 @@ _____________________________
 [CLEAR_RANGE|V4:4|V6:4|]
 [RET|||]
 [END|V7:4|-13|]
+________________________________
+
+Idée pour générer ces instructions manquantes :
+
+Pour la partie détection de closure ou non:
+Exemple pour "count" avec le code source au début de ce fichier:
+On arrive sur le node binary: "count + 1":
+    => "count"
+        => symbole associé
+            => "Remonter" les nodes dans l'AST jusqu'à tomber sur un / une FUNCTION_DECLARATION / FACTORY_DECLARATION ou le root:
+                => prendre la symbol table: on tombe sur la symbol table associée à "counter".
+            => récupérer la symbole table associée à "count"
+            => on compare les deux symbol tables, si identiques => pas de closure, sinon => closure
+    => "1"
+        => pas de symbole associé => pas de traitement
+
+Note: à la place de remonter les nodes dans l'AST, on peut dans le GenerationContext, tout le temps garder la dernière symbol table qui fait référence à une FUNCTION_DECLARATION / FACTORY_DECLARATION.
+ça évite le double parcours et simplifie l'algorithme
+
+
+Pour la partie génération de bytecode:
+Je suis dans une closure et j'utilise une variable (querySymbolOrOperand) avec un symbole associé:
+    => si cette variable fait partie de la closure, je la récupère depuis l'env
+    => sinon je la récupère depuis les paramètres de la fonction ou le scope courant contenu dans la fonction
+    => je dois "tagger" la fonction comme étant une closure en ajoutant cette variable à la liste de dépendances dans l'environnement
+    => car au moment de l'appel à cette fonction, je vais devoir construire un environnement associé à cette fonction
