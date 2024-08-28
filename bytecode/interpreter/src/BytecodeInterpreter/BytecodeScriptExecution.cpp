@@ -22,6 +22,7 @@ ska::NodeValue ska::bytecode::ScriptExecution::getCell(const Operand& v) const {
 		}, v.content());
 		return output;
 	}
+	assert(memory->size() > v.as<ScriptVariableRef>().variable);
 	return (*memory)[v.as<ScriptVariableRef>().variable];
 }
 
@@ -47,4 +48,19 @@ ska::bytecode::PlainMemoryTable* ska::bytecode::ScriptExecution::selectMemory(co
 
 const ska::bytecode::PlainMemoryTable* ska::bytecode::ScriptExecution::selectMemory(const Operand& dest) const {
 	return SelectMemoryHelper<decltype(*this), const PlainMemoryTable*>(*this, dest);
+}
+
+void ska::bytecode::ScriptExecution::pushInEnv(const Operand& env, const Operand& variable) {
+	const auto envIndex = env.as<ScriptVariableRef>().variable;
+	if (envIndex >= captureEnvironment.size()) {
+		captureEnvironment.resize(envIndex + 1);
+	}
+	captureEnvironment[envIndex].push_back(getCell(variable));
+}
+
+ska::NodeValue ska::bytecode::ScriptExecution::getInEnv(const Operand& env, std::size_t indexInEnv) const {
+	const auto envIndex = env.as<ScriptVariableRef>().variable;
+	assert(envIndex < captureEnvironment.size());
+	assert(indexInEnv < captureEnvironment[envIndex].size());
+	return captureEnvironment[envIndex][indexInEnv];
 }

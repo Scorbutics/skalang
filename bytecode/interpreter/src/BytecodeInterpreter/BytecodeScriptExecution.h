@@ -42,7 +42,7 @@ namespace ska {
 			}
 
 			auto size() const {
-				if (scriptIndex >= instructions.size()) { return static_cast<std::size_t> (0u); } 
+				if (scriptIndex >= instructions.size()) { return static_cast<std::size_t> (0u); }
 				return instructions[scriptIndex].size();
 			}
 
@@ -84,12 +84,15 @@ namespace ska {
 			const NodeValueArray& exports() const { return m_exportsSection; }
 			void setExportsSection(NodeValueArray exportsSection) { m_exportsSection = std::move(exportsSection); }
 
+			void pushInEnv(const Operand& env, const Operand& variable);
+			NodeValue getInEnv(const Operand& env, std::size_t indexInEnv) const;
+
 			void release(const Operand& dest) {
 				auto* memory = selectMemory(dest);
 				if(memory == nullptr) { throw std::runtime_error("invalid bytecode destination cell"); }
 				auto index = dest.as<ScriptVariableRef>().variable;
 				if(index < memory->size()) {
-					(*memory)[index].release();	
+					(*memory)[index].release();
 				}
 			}
 
@@ -133,6 +136,7 @@ namespace ska {
 			NodeValueArray m_exportsSection;
 			PlainMemoryTable registers;
 			PlainMemoryTable variables;
+			std::vector<PlainMemoryTable> captureEnvironment;
 		};
 	}
 }

@@ -10,19 +10,19 @@ namespace ska {
 
 	class ASTNode;
 	using ASTNodePtr = std::unique_ptr<ASTNode>;
-	
+
 	class MatcherReturn {
 	public:
 		~MatcherReturn() = default;
 		MatcherReturn(const ReservedKeywordsPool& pool, StatementParser& parser, MatcherConverter& matcherConverter) :
 			m_reservedKeywordsPool(pool), m_parser(parser), m_matcherConverter(matcherConverter) {}
-	
-		ASTNodePtr match(ScriptAST& input, bool noevents = false);
-	
+
+		ASTNodePtr match(ScriptAST& input);
+
 	private:
 		ASTNodePtr matchField(ScriptAST& input);
-		ASTNodePtr matchCustomObject(ScriptAST& input, bool noevents);
-		ASTNodePtr matchBuiltIn(ScriptAST& input, bool noevents);
+		ASTNodePtr matchCustomObject(ScriptAST& input);
+		ASTNodePtr matchBuiltIn(ScriptAST& input);
 
 		const ReservedKeywordsPool& m_reservedKeywordsPool;
 		StatementParser& m_parser;

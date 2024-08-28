@@ -13,6 +13,8 @@ namespace ska {
 	class ScopedSymbolTable :
 		public SymbolFactory {
 	using ChildrenScopedSymbolTable = std::vector<std::unique_ptr<ScopedSymbolTable>>;
+	template<class T>
+	using order_indexed_string_ref_map = insertion_indexed_map<std::string, T*>;
 
 	public:
 		ScopedSymbolTable(ScopedSymbolTable& parent, Symbol symbol) :
@@ -32,7 +34,7 @@ namespace ska {
 		const ScopedSymbolTable& parent() const;
 
 		ScopedSymbolTable& createNested(std::optional<Symbol> symbol);
-		ScopedSymbolTable& createNested(std::string name = "", const ScriptAST* script = nullptr);
+		ScopedSymbolTable& createNested(std::string name = "", const ScriptAST* script = nullptr, bool exported = false);
 
 		const ScopedSymbolTable* owner() const {
 			return &m_parent == this || directOwner() != nullptr ? directOwner() : m_parent.owner();
@@ -78,6 +80,7 @@ namespace ska {
 		void ensureNotLocked() const;
 
 		order_indexed_string_map<ScopedSymbolTable> m_children;
+		order_indexed_string_ref_map<ScopedSymbolTable> m_exported;
 		ScopedSymbolTable& m_parent = *this;
 		ScopedSymbolTable* m_classTable = nullptr;
 		std::optional<Symbol> m_symbol;

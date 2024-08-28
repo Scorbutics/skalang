@@ -105,7 +105,7 @@ std::size_t ska::bytecode::GenerationContext::exportId(const Symbol& symbol) con
 	return exports.id(&symbol);
 }
 
-ska::bytecode::InstructionOutput ska::bytecode::GenerationContext::querySymbolOrOperand(const ASTNode& node) {
+ska::bytecode::InstructionOutput ska::bytecode::GenerationContext::querySymbolOrOperand(const ASTNode& node, bool capture) {
 	auto operand = OperandUse {};
 
 	if (node.symbol() == nullptr) {
@@ -114,7 +114,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GenerationContext::querySymbolOr
 		operand = scriptOfSymbol(*node.symbol()).querySymbolOrOperand(node);
 	}
 
-	if (m_scopeClosure != nullptr) {
+	if (capture && m_scopeClosure != nullptr) {
 		auto result = m_scopeClosure->checkAndCapture(*this, node.symbolTable(), operand);
 		if (result.operand() == Operand {}) {
 			result.push(operand);

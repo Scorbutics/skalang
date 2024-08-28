@@ -50,9 +50,11 @@
 #include "Units/InterpreterCommandArrMemberAccess.h"
 #include "Units/InterpreterCommandJumpMember.h"
 #include "Units/InterpreterCommandClearRange.h"
+#include "Units/InterpreterCommandAddEnv.h"
+#include "Units/InterpreterCommandUseEnv.h"
 #include "InterpreterDeclarer.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::Interpreter);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::Interpreter);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::Interpreter)
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::bytecode::Interpreter)
@@ -114,6 +116,9 @@ ska::bytecode::Interpreter::CommandInterpreter ska::bytecode::Interpreter::build
 	InterpreterCommandDeclare<Command::ARR_MEMBER_ACCESS>(*this, result, generator);
 	InterpreterCommandDeclare<Command::ARR_LENGTH>(*this, result, generator);
 	InterpreterCommandDeclare<Command::SCRIPT>(*this, result, generator);
+
+	InterpreterCommandDeclare<Command::ADD_ENV>(*this, result, generator);
+	InterpreterCommandDeclare<Command::USE_ENV>(*this, result, generator);
 
 	return result;
 }

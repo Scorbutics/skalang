@@ -47,14 +47,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 		throw std::runtime_error(ss.str());
 	}
 
-	std::size_t index;
-	// TODO simplify all of this
-	if (objectSymbolInfo->exported) {
-		index = context.exportId(*symbolField->symbol());
-	} else {
-		index = objectTypeSymbolTable->id(*symbolField->symbol()).value();
-	}
-
+	const auto index = objectTypeSymbolTable->id(*symbolField->symbol()).value();
 	auto objectValue = generateNext({ context, node.GetObjectNameNode()});
 
 	LOG_DEBUG << "This field has index " << index << " in the object";

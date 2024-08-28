@@ -11,8 +11,8 @@ namespace ska {
 		~SymbolFactory() = default;
 	protected:
 		SymbolFactory() = default;
-		
-		Symbol make(std::size_t tableIndex, std::string name, ScopedSymbolTable& table);
-		Symbol make(std::size_t tableIndex, std::string name, ScriptHandleAST& script);
+
+		Symbol make(std::size_t tableIndex, std::string name, ScopedSymbolTable& table, bool exported);
+		Symbol make(std::size_t tableIndex, std::string name, ScriptHandleAST& script, bool exported);
 	};
 }

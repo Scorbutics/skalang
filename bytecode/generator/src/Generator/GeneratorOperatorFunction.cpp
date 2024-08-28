@@ -68,7 +68,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	valueGroup.push(Instruction{ Command::RET, isVoidReturningFunction ? Operand{} : returnValueOperand });
 
 	auto fullFunction = AddRelativeJumpInstruction(std::move(valueGroup));
-	auto symbolFunction = context.querySymbolOrOperand(node.GetFunction());
+	auto symbolFunction = context.querySymbolOrOperand(node.GetFunction(), false);
 	auto functionOperand = symbolFunction.operand();
 	fullFunction.push(std::move(symbolFunction));
 	fullFunction.push(Instruction{

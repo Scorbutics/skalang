@@ -13,11 +13,13 @@ ska::bytecode::InstructionOutput ska::bytecode::Closure::checkAndCapture(Generat
 		return {};
 	}
 
-	const auto closureVariableMatch = &variable->parent() != m_scopeNode->symbolTable() && variable != m_scopeNode->symbolTable();
+	//const auto& scope = m_scopeNode->size() > 1 && (*m_scopeNode)[1].size() > 0 ? (*m_scopeNode)[1][(*m_scopeNode)[1].size() - 1] : *m_scopeNode;
+	const auto& scope = *m_scopeNode;
+	const auto closureVariableMatch = &variable->parent() != scope.symbolTable() && variable != scope.symbolTable();
 	if (closureVariableMatch && m_environment.find(variable) == m_environment.end()) {
-		auto closureOperand = context.querySymbolOrOperand(*m_scopeNode).operand();
+		auto closureOperand = context.querySymbolOrOperand(scope).operand();
 		auto result = Instruction { Command::USE_ENV, variableOperand, closureOperand, Operand { static_cast<long>(m_environment.size()), OperandType::PURE } };
-		m_environment.emplace(variable);
+		m_environment.emplace(variable, (const ScopedSymbolTable*) variable);
 		return result;
 	}
 	return {};

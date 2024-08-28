@@ -49,7 +49,7 @@ ska::ASTNodePtr ska::MatcherFactory::matchDeclaration(ScriptAST& input, const To
 	// Match the return part of the factory, where the object is built
 	// e.g. return { toto = 1 }
 	SLOG(ska::LogLevel::Debug) << "factory matching generated object part";
-	auto returnNode = m_matcherReturn.match(input, true);
+	auto returnNode = m_matcherReturn.match(input);
 
 	// Append return node to the body
 	bodyNodes.push_back(std::move(returnNode));

@@ -7,9 +7,10 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::Symbol)
 
 #define LOG_INFO SLOG_STATIC(ska::LogLevel::Info, ska::Symbol)
 
-ska::Symbol::Symbol(std::size_t tableIndex, std::string name) :
+ska::Symbol::Symbol(std::size_t tableIndex, std::string name, bool exported) :
 	m_name(std::move(name)),
-	m_tableIndex(tableIndex) {
+	m_tableIndex(tableIndex),
+	m_exported(exported) {
 }
 
 ska::Symbol::Symbol(Symbol&& s) noexcept {
@@ -20,6 +21,7 @@ ska::Symbol& ska::Symbol::operator=(Symbol&& s) noexcept {
 	m_name = std::move(s.m_name);
 	m_tableIndex = std::move(s.m_tableIndex);
 	m_category = std::move(s.m_category);
+	m_exported = std::move(s.m_exported);
 	SLOG(ska::LogLevel::Debug) << "   Move, Symbol " << s.name() << " " << s.m_category << " moved to " << m_name << " " << m_category;
 	return *this;
 }

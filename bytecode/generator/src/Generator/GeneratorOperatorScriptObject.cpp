@@ -24,6 +24,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 			symbolInfo.bindingPassThrough = oldSymbolInfo->bindingPassThrough;
 		}
 		symbolInfo.childIndex = childIndex;
+		symbolInfo.exported = true;
 		LOG_INFO << "%12cRegistering symbol info " << symbolInfo << " for field node " << *field << " (this symbol is not exported)";
 
 		context.setSymbolInfo(*field, std::move(symbolInfo));

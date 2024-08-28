@@ -69,6 +69,7 @@ void ska::bytecode::Script::fromBridge(BridgeFunction& constructor, ASTNodePtr a
 		auto bindingRef = ScriptVariableRef{ bindingId++, m_serviceGen.id() };
 		m_cache.storeBinding(std::make_shared<NativeFunction>(field.callback), bindingRef);
 		info.binding = bindingRef.variable;
+		info.exported = true;
 
 		//TODO avoid going through symbol info ?
 		// Maybe instead move this algorithm directly to generators

@@ -85,6 +85,9 @@ namespace ska {
 			void generate(StatementParser& parser, Generator& generator);
 			bool isGenerated(std::size_t scriptIndex) const;
 
+			void pushInEnv(const Operand& env, const Operand& variable);
+			NodeValue getInEnv(const Operand& env, std::size_t indexInEnv) const;
+
 			const NativeFunction& getBinding(ScriptVariableRef bindingRef) const;
 
 		private:

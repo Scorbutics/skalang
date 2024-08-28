@@ -8,7 +8,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ScopedSymbolTable)
 const std::string ska::ScopedSymbolTable::EMPTY_STR = "";
 
 ska::ScopedSymbolTable::ScopedSymbolTable(std::string rootName):
-	m_symbol(make(0, std::move(rootName), *this)) {
+	m_symbol(make(0, std::move(rootName), *this, true)) {
 }
 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::parent() {
@@ -33,14 +33,12 @@ void ska::ScopedSymbolTable::ensureNotLocked() const {
 	}
 }
 
-ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(std::string name, const ScriptAST* script) {
+ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(std::string name, const ScriptAST* script, bool exported) {
 	//ensureNotLocked();
 	if (script != nullptr) {
-		auto& table = createNested(std::make_optional(make(m_children.size(), std::move(name), script->handle()->symbols().root())));
-		//table.changeTypeIfRequired(script->handle()->symbols().root().symbol()->type());
-		return table;
+		return createNested(std::make_optional(make(m_children.size(), std::move(name), script->handle()->symbols().root(), exported)));
 	}
-	return createNested(name.empty() ? std::optional<Symbol>{} : std::make_optional(make(m_children.size(), name, *this)));
+	return createNested(name.empty() ? std::optional<Symbol>{} : std::make_optional(make(m_children.size(), name, *this, exported)));
 }
 
 ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(std::optional<Symbol> optSymbol) {
@@ -61,6 +59,7 @@ ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(std::optional<Symbo
 
 	// Need to copy the name before symbol is moved
 	const auto name = symbol.name();
+	const auto exported = symbol.exported();
 	auto table = std::make_unique<ska::ScopedSymbolTable>(*this, std::move(symbol));
 
 	// Preserve the future newly created symbol table in a reference in order to return it
@@ -68,7 +67,9 @@ ska::ScopedSymbolTable& ska::ScopedSymbolTable::createNested(std::optional<Symbo
 
 	// Now we can move the owner pointer
 	m_children.emplace(name, std::move(table));
-
+	if (exported) {
+		m_exported.emplace(name, (ScopedSymbolTable*) &m_children.back());
+	}
 	SLOG(ska::LogLevel::Info) << "\tSymbol inserted \"" << name << "\" \"" << result.m_symbol.value().type() << "\"";
 	return result;
 }
@@ -154,11 +155,11 @@ ska::ScopedSymbolTable* ska::ScopedSymbolTable::operator()(const std::string& ke
 
 std::optional<std::size_t> ska::ScopedSymbolTable::id(const Symbol& field) const {
 	std::optional<std::size_t> parentId = m_classTable != nullptr ? m_classTable->id(field) : std::optional<std::size_t>{};
-	if (m_children.atOrNull(field.name()) == nullptr || m_children.at(field.name()).symbol() != &field) {
+	if (m_exported.atOrNull(field.name()) == nullptr || m_exported.at(field.name()).symbol() != &field) {
 		return parentId;
 	}
 
-	const auto childId = m_children.id(field.name());
+	const auto childId = m_exported.id(field.name());
 	return (parentId.has_value() ? parentId.value() : 0) + childId;
 }
 

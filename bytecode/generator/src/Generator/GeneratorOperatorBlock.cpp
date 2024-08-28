@@ -20,10 +20,6 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 				symbolInfo.binding = oldSymbolInfo->binding;
 				symbolInfo.bindingPassThrough = oldSymbolInfo->bindingPassThrough;
 			}
-			if (context.scope() == 0) {
-				symbolInfo.exported = true;
-				symbolInfo.childIndex = childIndex;
-			}
 			LOG_INFO << "%12cRegistering symbol info " << symbolInfo << " for field node " << *child << " (this symbol is " << (context.scope() == 0 ? "exported" : "not exported") << ")";
 			context.setSymbolInfo(*child, std::move(symbolInfo));
 		}

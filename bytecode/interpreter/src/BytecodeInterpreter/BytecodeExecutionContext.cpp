@@ -94,6 +94,14 @@ const ska::NativeFunction& ska::bytecode::ExecutionContext::getBinding(ScriptVar
 	return m_in.getBinding(bindingRef);
 }
 
+void ska::bytecode::ExecutionContext::pushInEnv(const Operand& env, const Operand& variable) {
+	scriptFromOperand(env).pushInEnv(env, variable);
+}
+
+ska::NodeValue ska::bytecode::ExecutionContext::getInEnv(const Operand& env, std::size_t indexInEnv) const {
+	return scriptFromOperand(env).getInEnv(env, indexInEnv);
+}
+
 void ska::bytecode::ExecutionContext::generate(StatementParser& parser, Generator& generator) {
 	if (!m_in.exist(currentScriptId())) {
 		auto* name = m_in.findKey(currentScriptId());
@@ -106,5 +114,5 @@ void ska::bytecode::ExecutionContext::generate(StatementParser& parser, Generato
 	} else {
 		generator.generate(m_in, currentScriptId());
 	}
-	
+
 }

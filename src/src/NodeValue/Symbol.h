@@ -17,7 +17,7 @@ namespace ska {
 		friend class SymbolFactory;
 		Symbol() = default;
 
-		Symbol(std::size_t tableIndex, std::string name);
+		Symbol(std::size_t tableIndex, std::string name, bool exported);
 
 	public:
 		Symbol(const Symbol& s) = delete;
@@ -29,6 +29,7 @@ namespace ska {
 		const std::string& name() const { return m_name; }
 		ExpressionType nativeType() const { return m_category.type(); }
 		const Type& type() const { return m_category; }
+		bool exported() const { return m_exported; }
 		bool changeTypeIfRequired(const Type& type);
 
 		bool operator==(const Symbol& sym) const;
@@ -38,6 +39,7 @@ namespace ska {
 		friend std::ostream& operator<<(std::ostream& stream, const Symbol& symbol);
 		std::string m_name;
 		std::size_t m_tableIndex = 0;
+		bool m_exported = false;
 		Type m_category;
 		ScopedSymbolTable* m_classTable = nullptr;
 		bool m_closed = true;

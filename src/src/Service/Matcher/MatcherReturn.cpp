@@ -12,27 +12,26 @@
 
 SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::MatcherReturn)
 
-ska::ASTNodePtr ska::MatcherReturn::match(ScriptAST& input, bool noevents) {
+ska::ASTNodePtr ska::MatcherReturn::match(ScriptAST& input) {
     input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::RETURN>());
 
     auto returnNode = ASTNodePtr {};
 
-    if (!noevents) {
-        auto returnStartEvent = ReturnTokenEvent{ input };
-        m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnStartEvent);
-    }
+	auto returnStartEvent = ReturnTokenEvent{ input };
+	m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnStartEvent);
+
 
     if (input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::OBJECT_BLOCK_BEGIN>())) {
-        returnNode = matchCustomObject(input, noevents);
+        returnNode = matchCustomObject(input);
     } else {
-        returnNode = matchBuiltIn(input, noevents);
+        returnNode = matchBuiltIn(input);
     }
     input.reader().mightMatch(m_reservedKeywordsPool.pattern<TokenGrammar::STATEMENT_END>());
 
     return returnNode;
 }
 
-ska::ASTNodePtr ska::MatcherReturn::matchCustomObject(ScriptAST& input, bool noevents) {
+ska::ASTNodePtr ska::MatcherReturn::matchCustomObject(ScriptAST& input) {
     auto returnFieldNodes = std::vector<ASTNodePtr>{};
     input.reader().match(m_reservedKeywordsPool.pattern<TokenGrammar::OBJECT_BLOCK_BEGIN>());
     while (!input.reader().expect(m_reservedKeywordsPool.pattern<TokenGrammar::OBJECT_BLOCK_END>())) {
@@ -59,20 +58,18 @@ ska::ASTNodePtr ska::MatcherReturn::matchCustomObject(ScriptAST& input, bool noe
     //auto definedNode = ASTFactory::MakeLogicalNode(Token { input.symbols().enclosingType()->name(), TokenType::IDENTIFIER, {} });
     auto returnNode = ASTFactory::MakeNode<Operator::RETURN>(ASTFactory::MakeNode<Operator::USER_DEFINED_OBJECT>(std::move(returnFieldNodes)));
 
-    if (!noevents) {
-        auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT>(*returnNode, input);
-        m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnEndEvent);
-    }
+	auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::OBJECT>(*returnNode, input);
+	m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnEndEvent);
+
     return returnNode;
 }
 
-ska::ASTNodePtr ska::MatcherReturn::matchBuiltIn(ScriptAST& input, bool noevents) {
+ska::ASTNodePtr ska::MatcherReturn::matchBuiltIn(ScriptAST& input) {
     auto node = ASTFactory::MakeNode<Operator::RETURN>(input.expr(m_parser));
 
-    if (!noevents) {
-        auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::BUILTIN>(*node, input);
-        m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnEndEvent);
-    }
+	auto returnEndEvent = ReturnTokenEvent::template Make<ReturnTokenEventType::BUILTIN>(*node, input);
+	m_parser.observable_priority_queue<ReturnTokenEvent>::notifyObservers(returnEndEvent);
+
     return node;
 }
 

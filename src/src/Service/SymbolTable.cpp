@@ -163,7 +163,7 @@ bool ska::SymbolTable::matchFunction(FunctionTokenEvent& token) {
 
 	switch(token.type()) {
 	case FunctionTokenEventType::DECLARATION_NAME: {
-		m_currentTable = &m_currentTable->createNested(token.name());
+		m_currentTable = &m_currentTable->createNested(token.name(), nullptr, true);
 		SLOG(ska::LogLevel::Info) << "\t\tNew function : adding a nested symbol table named \"" << m_currentTable->name() << "\"";
 		token.rootNode().linkSymbol(*m_currentTable);
 	} break;
@@ -240,7 +240,8 @@ bool ska::SymbolTable::match(VarTokenEvent& token) {
 			auto symbolTable = (*m_currentTable)[variableName];
 			if (symbolTable == nullptr) {
 				SLOG(ska::LogLevel::Info) << " that was a new variable, added to current symbol table";
-				symbolTable = &m_currentTable->createNested(variableName);
+				//TODO add && in return context
+				symbolTable = &m_currentTable->createNested(variableName, nullptr, token.type() == VarTokenEventType::DECLARATION);
 			} else {
 				SLOG(ska::LogLevel::Info) << " that was an existing variable";
 			}

@@ -38,7 +38,7 @@ namespace ska {
 			const NativeFunction& getBinding(ScriptVariableRef bindingRef) const;
 			Operand storeBinding(NativeFunctionPtr binding, ScriptVariableRef bindingRef);
 			void generate(InstructionOutput instructions);
-			InstructionOutput querySymbolOrOperand(const ASTNode& node);
+			InstructionOutput querySymbolOrOperand(const ASTNode& node, bool capture = true);
 			//OperandUse querySymbol(const Symbol& symbol);
 			std::optional<Operand> getSymbol(const Symbol& symbol) const;
 			std::size_t exportId(const Symbol& symbol) const;
