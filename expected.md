@@ -13,7 +13,7 @@ end
 
 run = function(parameters: string[]) do
 	v1 = makeCounter(10)
-	v2 = makeCounter(10)
+	v2 = makeCounter(20)
 end
 _____________________________
 Expected bytecode:
@@ -25,23 +25,31 @@ _____________________________
     // Direct move 0 value in "count"
     [MOV|V1:4|0|]
 
+    // counter start body
     [JUMP_REL|4||]
-        // "count" is detected to be in upper function, so we use "count" from env (closure) at index "0" and place it inside R0
-        [USE_ENV|R0:4|V2:4|0]
+        // counter execution body start
+
+        // "count" is detected to be in upper function, therefore "counter" is a closure and "count" is captured
+        [USE_ENV|V1:4||]
+
         // Add 1 to "count"
-        [ADD_I|R0:4|R0:4|1]
+        [ADD_I|V1:4|V1:4|1]
         // Return "count"
-        [RET|R0:4|]
+        [RET|V1:4|]
+
+        // counter execution body end
+
+        // As this function body contains a ref to "count" (V1:4), internally add V1:4's __value__ in the capture environment of "counter" (V2:4)
+        [ADD_ENV|V2:4|V1:4|]
     // Declare this previous -3 lines block as function "counter"
+    // /!\ "counter" is a closure because its capture environment is not empty
     [END|V2:4|-3|]
+    // counter end body
 
-    // Declare "count" to be in closure V2 env as env variable index "0"
-    [ADD_ENV|V2:4|V1:4]
-
-    // Push the "counter" function on the stack
+    // Push the "counter" closure on the stack
     [PUSH|V2:4||]
 
-    // Create an object from the stack (containing the "counter" function)
+    // Create an object from the stack (containing the "counter" closure)
     [POP_IN_VAR|R1:4|1|]
 
     // Return the object "counter"
@@ -54,17 +62,21 @@ _____________________________
     [POP|V3:4||]
     // Add 10 to stack
     [PUSH|10||]
+    // We've detected during bytecode gen. that the following "makeCounter" function (V3:4) is a closure (so needing a capture environment)
+    // Therefore we've added a LOAD_ENV instruction
     // Call "makeCounter" with 10 in stack
     [JUMP_ABS|V3:4||]
     // Pop result into tmp register
+    // it contains a "counter" closure with a node value of "10" inside the captured env "count" variable
     [POP|R0:4||]
     // Move this result into "v1"
     [MOV|V4:4|R0:4|]
-    // Add 10 to stack
-    [PUSH|10||]
-    // Call "makeCounter" with 10 in stack
+    // Add 20 to stack
+    [PUSH|20||]
+    // Call "makeCounter" with 20 in stack
     [JUMP_ABS|V3:4||]
     // Pop result into tmp register
+    // it contains a "counter" closure with a node value of "20" inside the captured env "count" variable
     [POP|R1:4||]
     // Move this result into "v2"
     [MOV|V5:4|R1:4|]
