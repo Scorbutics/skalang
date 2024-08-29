@@ -76,12 +76,12 @@ bool ska::bytecode::ScriptCache::isGenerated(std::size_t index) const {
 	return index < size() && exist(index) && !(*this)[index].empty();
 }
 
-void ska::bytecode::ScriptCache::storeBinding(NativeFunctionPtr binding, ScriptVariableRef bindingRef) {
+void ska::bytecode::ScriptCache::storeBinding(NativeFunctionPtr binding, const ScriptVariableRef& bindingRef) {
 	auto finalId = std::to_string(bindingRef.variable) + " " + at(bindingRef.script).name();
 	m_bindings.emplace(std::move(finalId), std::move(binding), true);
 }
 
-const ska::NativeFunction& ska::bytecode::ScriptCache::getBinding(ScriptVariableRef bindingRef) const {
+const ska::NativeFunction& ska::bytecode::ScriptCache::getBinding(const ScriptVariableRef& bindingRef) const {
 	auto finalId = std::to_string(bindingRef.variable) + " " + at(bindingRef.script).name();
 	auto binding = m_bindings.atOrNull(finalId);
 	if (binding == nullptr) {

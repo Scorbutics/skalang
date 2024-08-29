@@ -24,8 +24,8 @@ namespace ska {
 
 	    const ExportSymbolContainer& getExportedSymbols(std::size_t scriptIndex);
 
-        void storeBinding(NativeFunctionPtr binding, ScriptVariableRef bindingRef);
-        const NativeFunction& getBinding(ScriptVariableRef bindingRef) const;
+        void storeBinding(NativeFunctionPtr binding, const ScriptVariableRef& bindingRef);
+        const NativeFunction& getBinding(const ScriptVariableRef& bindingRef) const;
 
         ScriptCacheAST astCache;
 

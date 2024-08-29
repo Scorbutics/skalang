@@ -1,14 +1,20 @@
 #pragma once
 #include <ostream>
-
+#include <memory>
 namespace ska {
+	class PlainMemoryTable;
+
 	struct VariableRef {
 		std::size_t variable = 0;
 	};
 
 	struct ScriptVariableRef {
+		ScriptVariableRef();
+		ScriptVariableRef(std::size_t variable, std::size_t script);
+		virtual ~ScriptVariableRef();
 		std::size_t variable = 0;
 		std::size_t script = 0;
+		std::shared_ptr<PlainMemoryTable> captureEnvironment;
 	};
 
 	bool operator==(const VariableRef& lhs, const VariableRef& rhs);

@@ -1,5 +1,6 @@
 #include <functional>
 #include <fstream>
+#include "Runtime/Value/PlainMemoryTable.h"
 #include "Config/LoggerConfigLang.h"
 #include "Service/Tokenizer.h"
 #include "Service/ReservedKeywordsPool.h"

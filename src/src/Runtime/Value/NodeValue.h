@@ -70,7 +70,7 @@ namespace ska {
 			m_emptyVariant = arg.m_emptyVariant;
 			return *this;
 		}
-		
+
 		void release();
 
 		NodeValue(const NodeValue&) = default;

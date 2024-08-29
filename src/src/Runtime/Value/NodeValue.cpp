@@ -1,4 +1,5 @@
 #include "Config/LoggerConfigLang.h"
+#include "Runtime/Value/PlainMemoryTable.h"
 #include "Runtime/Value/TokenVariant.h"
 #include "NodeValue.h"
 #include "StringShared.h"

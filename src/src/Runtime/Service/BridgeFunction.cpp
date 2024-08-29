@@ -1,5 +1,6 @@
 #include <cassert>
 #include <algorithm>
+#include "Runtime/Value/PlainMemoryTable.h"
 #include "Service/ScopedSymbolTable.h"
 #include "BridgeFunction.h"
 #include "NodeValue/Symbol.h"

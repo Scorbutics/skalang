@@ -1,5 +1,6 @@
 #include "Config/LoggerConfigLang.h"
 #include "NodeValue/AST.h"
+#include "Runtime/Value/PlainMemoryTable.h"
 #include "GeneratorOperatorConverterCall.h"
 #include "ComputingOperations/BytecodeTypeConversion.h"
 
@@ -10,14 +11,14 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::O
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::CONVERTER_CALL>::generate(OperateOn node, GenerationContext& context) {
 	const auto& originalType = node.GetOriginalType();
 	const auto& typeToConvertIn = node.GetCalledConverterType();
-	
+
 	auto objectNodeGeneration = generateNext({ context, node.GetObjectNode() });
 
 	if (originalType != typeToConvertIn) {
 		auto conversionResult = TypeConversion(LogicalOperator::EQUAL, originalType, typeToConvertIn);
 
 		if (conversionResult.container.empty()) {
-			auto ss = std::stringstream{}; 
+			auto ss = std::stringstream{};
 			ss << "unable to convert type \"" << originalType << "\" to \"" << typeToConvertIn << "\"";
 			throw std::runtime_error(ss.str());
 		}

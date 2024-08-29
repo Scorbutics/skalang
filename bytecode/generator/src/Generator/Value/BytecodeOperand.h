@@ -3,6 +3,7 @@
 #include <memory>
 #include <tuple>
 #include <unordered_map>
+#include "Runtime/Value/PlainMemoryTable.h"
 #include "NodeValue/Type.h"
 #include "Generator/BytecodeCommand.h"
 #include "Runtime/Value/StringShared.h"
@@ -47,7 +48,7 @@ namespace ska {
 			template<typename T, typename... ALL_T>
 			struct isVariantMember<T, std::variant<ALL_T...>>
 				: public std::disjunction<std::is_same<T, ALL_T>...> {};
-			
+
 			Operand() = default;
 
 			Operand(Operand&&) noexcept = default;
@@ -101,13 +102,13 @@ namespace ska {
 		struct OperandUse : public Operand {
 			OperandUse() = default;
 			~OperandUse() = default;
-			
+
 			OperandUse& operator=(OperandUse&& op) = default;
 			OperandUse& operator=(const OperandUse& op) = default;
-			
+
 			OperandUse(const OperandUse& op) = default;
 			OperandUse(OperandUse&& op) = default;
-			
+
 
 			OperandUse(OperandVariant var, OperandType type, Cursor position = {}) :
 				Operand(std::move(var), type, position){

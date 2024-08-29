@@ -1,3 +1,4 @@
+#include "Runtime/Value/PlainMemoryTable.h"
 #include "Config/LoggerConfigLang.h"
 #include "NodeValue/AST.h"
 #include "BytecodeGenerationContext.h"
@@ -135,12 +136,12 @@ std::optional<ska::bytecode::Operand> ska::bytecode::GenerationContext::getSymbo
 	return scriptOfSymbol(symbol).getSymbol(symbol);
 }
 
-ska::bytecode::Operand ska::bytecode::GenerationContext::storeBinding(NativeFunctionPtr binding, ScriptVariableRef bindingRef) {
+ska::bytecode::Operand ska::bytecode::GenerationContext::storeBinding(NativeFunctionPtr binding, const ScriptVariableRef& bindingRef) {
 	m_generated.storeBinding(std::move(binding), bindingRef);
 	return ska::bytecode::Operand{ bindingRef, OperandType::BIND_NATIVE };
 }
 
-const ska::NativeFunction& ska::bytecode::GenerationContext::getBinding(ScriptVariableRef bindingRef) const {
+const ska::NativeFunction& ska::bytecode::GenerationContext::getBinding(const ScriptVariableRef& bindingRef) const {
 	return m_generated.getBinding(bindingRef);
 }
 

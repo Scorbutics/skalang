@@ -11,10 +11,14 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::O
 
 namespace ska {
 	namespace bytecode {
-		static InstructionOutput AddRelativeJumpInstruction(InstructionOutput output) {
+		static InstructionOutput AddRelativeJumpInstruction(GenerationContext& context, InstructionOutput output) {
 			auto jumpInstruction = Instruction { Command::JUMP_REL, Operand { static_cast<long>(output.size()), OperandType::PURE }};
 			auto result = InstructionOutput{ std::move(jumpInstruction) };
 			result.push(std::move(output));
+			const auto retOperand = result.operand();
+			// TODO rename?
+			result.push(context.close());
+			result.push(retOperand);
 			return result;
 		}
 
@@ -67,7 +71,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	valueGroup.push(std::move(cleanUpInstructions));
 	valueGroup.push(Instruction{ Command::RET, isVoidReturningFunction ? Operand{} : returnValueOperand });
 
-	auto fullFunction = AddRelativeJumpInstruction(std::move(valueGroup));
+	auto fullFunction = AddRelativeJumpInstruction(context, std::move(valueGroup));
 	auto symbolFunction = context.querySymbolOrOperand(node.GetFunction(), false);
 	auto functionOperand = symbolFunction.operand();
 	fullFunction.push(std::move(symbolFunction));

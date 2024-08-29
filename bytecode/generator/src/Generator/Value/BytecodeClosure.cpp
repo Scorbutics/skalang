@@ -13,12 +13,12 @@ ska::bytecode::InstructionOutput ska::bytecode::Closure::checkAndCapture(Generat
 		return {};
 	}
 
-	//const auto& scope = m_scopeNode->size() > 1 && (*m_scopeNode)[1].size() > 0 ? (*m_scopeNode)[1][(*m_scopeNode)[1].size() - 1] : *m_scopeNode;
 	const auto& scope = *m_scopeNode;
 	const auto closureVariableMatch = &variable->parent() != scope.symbolTable() && variable != scope.symbolTable();
 	if (closureVariableMatch && m_environment.find(variable) == m_environment.end()) {
-		auto closureOperand = context.querySymbolOrOperand(scope).operand();
-		auto result = Instruction { Command::USE_ENV, variableOperand, closureOperand, Operand { static_cast<long>(m_environment.size()), OperandType::PURE } };
+		// TODO we might concat every USE_ENV bytecode command contents at the beginning of the function execution (after JUMP_REL)
+		// instead of having several USE_ENV dispatched in the whole function body
+		auto result = Instruction { Command::USE_ENV, variableOperand };
 		m_environment.emplace(variable, (const ScopedSymbolTable*) variable);
 		return result;
 	}
@@ -32,17 +32,11 @@ ska::bytecode::InstructionOutput ska::bytecode::Closure::generate(const Generati
 
 	auto output = InstructionOutput {};
 
-	const auto closureOperand = context.getSymbol(*m_scopeNode->symbol());
-	if (!closureOperand.has_value()) {
-		throw std::runtime_error("unable to retrieve operand for closure symbol \"" + m_scopeNode->symbol()->name() + "\"");
-	}
-
 	for (const auto& node: m_environment) {
-		// Declare "count" to be in closure V2 env as env variable index "0"
-		// [ADD_ENV|V2:4|V1:4]
+		// Ex: declare "count" to be in closure V2 env as env variable index "0"
+		// => [ADD_ENV|V2:4|V1:4]
 		auto operand = context.getSymbol(*node->symbol());
-		output.push(Instruction { Command::ADD_ENV, closureOperand.value(), operand.value() });
+		output.push(Instruction { Command::ADD_ENV, operand.value() });
 	}
-	//m_environment.clear();
 	return output;
 }

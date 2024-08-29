@@ -1,3 +1,5 @@
+#include "NodeValue.h"
+#include "PlainMemoryTable.h"
 #include "ScriptVariableRef.h"
 
 std::ostream& ska::operator<<(std::ostream& stream, const ScriptVariableRef& var) {
@@ -12,3 +14,13 @@ bool ska::operator==(const ScriptVariableRef& lhs, const ScriptVariableRef& rhs)
 bool ska::operator==(const VariableRef& lhs, const VariableRef& rhs) {
 	return lhs.variable == rhs.variable;
 }
+
+ska::ScriptVariableRef::ScriptVariableRef(std::size_t variable, std::size_t script):
+	variable(variable),
+	script(script) {
+}
+
+ska::ScriptVariableRef::ScriptVariableRef() {
+}
+
+ska::ScriptVariableRef::~ScriptVariableRef() { }

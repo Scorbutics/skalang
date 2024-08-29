@@ -1,5 +1,6 @@
 #include <fstream>
 #include "Config/LoggerConfigLang.h"
+#include "Runtime/Value/PlainMemoryTable.h"
 #include "ScriptBinding.h"
 
 #include "Service/ScopedSymbolTable.h"

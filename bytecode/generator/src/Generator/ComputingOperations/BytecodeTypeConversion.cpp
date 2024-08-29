@@ -1,5 +1,6 @@
 #include "Config/LoggerConfigLang.h"
 #include <array>
+#include "Runtime/Value/PlainMemoryTable.h"
 #include "NodeValue/AST.h"
 #include "BytecodeTypeConversion.h"
 #include "Generator/Value/BytecodeScriptGenerationHelper.h"
@@ -21,7 +22,7 @@ namespace ska {
 		using TypeToInstructionConverter = std::variant<Command, TypeToInstructionConverterCallback>;
 		*/
 		using TypeToInstructionConverter = OperationList<TypeConversionData>;
-	
+
 		using TypeToInstructionConverterContainer = std::array<TypeToInstructionConverter, static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length)>;
 		using TwoTypesConverterContainer = std::array<TypeToInstructionConverterContainer, static_cast<std::size_t>(ExpressionType::UNUSED_Last_Length)>;
 		using TypeConvertToInstructionContainer = std::array<TwoTypesConverterContainer, static_cast<std::size_t>(LogicalOperator::UNUSED_Last_Length)>;
@@ -214,6 +215,6 @@ ska::bytecode::InstructionOutput ska::bytecode::TypeConversionBinary(LogicalOper
 			return group;
 		}
 	}
-		
+
 }
 

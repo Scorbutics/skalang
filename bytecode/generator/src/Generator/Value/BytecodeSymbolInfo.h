@@ -4,6 +4,7 @@
 #include <memory>
 #include <unordered_map>
 #include <ostream>
+#include "Runtime/Value/PlainMemoryTable.h"
 #include "Runtime/Value/StringShared.h"
 #include "Runtime/Value/ScriptVariableRef.h"
 #include "Runtime/Value/NativeFunction.h"

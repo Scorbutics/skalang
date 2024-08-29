@@ -2,6 +2,7 @@
 #include <ostream>
 #include <vector>
 #include <cassert>
+#include "Runtime/Value/PlainMemoryTable.h"
 #include "NodeValue/Operator.h"
 #include "NodeValue/Type.h"
 #include "BytecodeInstruction.h"

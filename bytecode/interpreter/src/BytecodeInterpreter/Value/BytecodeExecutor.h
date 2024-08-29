@@ -10,7 +10,8 @@ namespace ska {
 		public:
 			using ScriptExecutionContainer = std::vector<std::unique_ptr<ScriptExecution>>;
 
-			PlainMemoryTable callstack;
+			std::vector<NodeValue> callstack;
+			std::vector<PlainMemoryTable*> closureEnvironment;
 
 			void pop(NodeValue& dest) {
 				dest = std::move(stack.back());
@@ -23,6 +24,15 @@ namespace ska {
 					dest.push_front(std::move(stack.back()));
 					stack.pop_back();
 				}
+			}
+
+			void pushInEnv(const ScriptVariableRef& dest, NodeValue value) {
+				environment.push(dest.variable, std::move(value));
+			}
+
+			void popEnv(ScriptVariableRef& dest) {
+				dest.captureEnvironment = std::make_shared<PlainMemoryTable>(std::move(environment));
+				environment = {};
 			}
 
 			ScriptExecution* script(std::size_t scriptIndex, const GenerationOutput& instructions) {
@@ -61,7 +71,8 @@ namespace ska {
 
 		private:
 			ScriptExecutionContainer scripts;
-			PlainMemoryTable stack;
+			std::vector<NodeValue> stack;
+			PlainMemoryTable environment;
 
 			void pushIfNotEmpty(NodeValue value) {
 				if (!value.empty()) {

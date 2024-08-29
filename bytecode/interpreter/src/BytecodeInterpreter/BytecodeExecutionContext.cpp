@@ -36,22 +36,34 @@ bool ska::bytecode::ExecutionContext::isGenerated(std::size_t scriptIndex) const
 	return m_in.isGenerated(scriptIndex);
 }
 
-ska::bytecode::ExecutionContext ska::bytecode::ExecutionContext::getContext(ScriptVariableRef value) {
+ska::bytecode::ExecutionContext ska::bytecode::ExecutionContext::getContext(const ScriptVariableRef& value) {
 	return ExecutionContext{ *this, value.script };
 }
 
-void ska::bytecode::ExecutionContext::jumpAbsolute(ScriptVariableRef value) {
+void ska::bytecode::ExecutionContext::jumpAbsolute(const ScriptVariableRef& value) {
 	auto context = getContext(value);
 	m_out.callstack.push_back(TokenVariant{ m_current->snapshot() });
+	m_out.closureEnvironment.push_back(value.captureEnvironment.get());
 	m_current = context.m_current;
 	checkCurrentExecutionOrThrow();
 	m_current->jumpAbsolute(value.variable - 1);
 }
 
-ska::ScriptVariableRef ska::bytecode::ExecutionContext::getReturn() {
+const ska::NodeValue* ska::bytecode::ExecutionContext::useFromCurrentEnv(const ScriptVariableRef& dest) const {
+	if (m_out.closureEnvironment.empty()) {
+		return nullptr;
+	}
+
+	// TODO store env in script and access it with scriptFromOperand?
+	auto* currentEnvironment = m_out.closureEnvironment.back();
+	return currentEnvironment == nullptr ? nullptr : &(*currentEnvironment)[dest.variable];
+}
+
+const ska::ScriptVariableRef& ska::bytecode::ExecutionContext::getReturn() {
 	assert(!m_out.callstack.empty());
-	auto scriptVariableRef = m_out.callstack.back().nodeval<ScriptVariableRef>();
+	const auto& scriptVariableRef = m_out.callstack.back().nodeval<ScriptVariableRef>();
 	m_out.callstack.pop_back();
+	m_out.closureEnvironment.pop_back();
 	return scriptVariableRef;
 }
 
@@ -90,16 +102,8 @@ const ska::bytecode::ScriptExecution& ska::bytecode::ExecutionContext::scriptFro
 	return *m_current;
 }
 
-const ska::NativeFunction& ska::bytecode::ExecutionContext::getBinding(ScriptVariableRef bindingRef) const {
+const ska::NativeFunction& ska::bytecode::ExecutionContext::getBinding(const ScriptVariableRef& bindingRef) const {
 	return m_in.getBinding(bindingRef);
-}
-
-void ska::bytecode::ExecutionContext::pushInEnv(const Operand& env, const Operand& variable) {
-	scriptFromOperand(env).pushInEnv(env, variable);
-}
-
-ska::NodeValue ska::bytecode::ExecutionContext::getInEnv(const Operand& env, std::size_t indexInEnv) const {
-	return scriptFromOperand(env).getInEnv(env, indexInEnv);
 }
 
 void ska::bytecode::ExecutionContext::generate(StatementParser& parser, Generator& generator) {
@@ -114,5 +118,4 @@ void ska::bytecode::ExecutionContext::generate(StatementParser& parser, Generato
 	} else {
 		generator.generate(m_in, currentScriptId());
 	}
-
 }

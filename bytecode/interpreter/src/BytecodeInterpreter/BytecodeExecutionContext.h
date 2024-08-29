@@ -46,10 +46,13 @@ namespace ska {
 			NodeValue getCell(const Operand& v) const { return scriptFromOperand(v).getCell(v); }
 
 			void pop(NodeValue& dest) { m_out.pop(dest); }
-
 			void pop(NodeValueArrayRaw& dest, long count) { m_out.pop(dest, count); }
 
-			void jumpAbsolute(ScriptVariableRef value);
+			void pushInEnv(const ScriptVariableRef& dest, NodeValue value) { m_out.pushInEnv(dest, std::move(value)); }
+			void popEnv(ScriptVariableRef& dest) { m_out.popEnv(dest); }
+			const NodeValue* useFromCurrentEnv(const ScriptVariableRef& dest) const;
+
+			void jumpAbsolute(const ScriptVariableRef& value);
 			void jumpRelative(long value) { checkCurrentExecutionOrThrow(); m_current->jumpRelative(value); }
 			void jumpReturn();
 
@@ -64,7 +67,12 @@ namespace ska {
 			}
 
 			template <class T>
-			T get(const Operand& v) {
+			T& get(Operand& v) {
+				return scriptFromOperand(v).get<T>(v);
+			}
+
+			template <class T>
+			const T& get(const Operand& v) {
 				return scriptFromOperand(v).get<T>(v);
 			}
 
@@ -85,18 +93,15 @@ namespace ska {
 			void generate(StatementParser& parser, Generator& generator);
 			bool isGenerated(std::size_t scriptIndex) const;
 
-			void pushInEnv(const Operand& env, const Operand& variable);
-			NodeValue getInEnv(const Operand& env, std::size_t indexInEnv) const;
-
-			const NativeFunction& getBinding(ScriptVariableRef bindingRef) const;
+			const NativeFunction& getBinding(const ScriptVariableRef& bindingRef) const;
 
 		private:
 			void checkCurrentExecutionOrThrow() const {
 				if (m_current == nullptr) { throw std::runtime_error("bad execution context"); }
 			}
 
-			ScriptVariableRef getReturn();
-			ExecutionContext getContext(ScriptVariableRef value);
+			const ScriptVariableRef& getReturn();
+			ExecutionContext getContext(const ScriptVariableRef& value);
 
 			Executor& m_out;
 			GenerationOutput& m_in;

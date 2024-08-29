@@ -1,4 +1,5 @@
 #include "Config/LoggerConfigLang.h"
+#include "Runtime/Value/PlainMemoryTable.h"
 #include "BytecodeOperand.h"
 #include "NodeValue/AST.h"
 

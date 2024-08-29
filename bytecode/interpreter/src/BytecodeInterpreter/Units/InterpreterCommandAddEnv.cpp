@@ -1,10 +1,10 @@
 #include "InterpreterCommandAddEnv.h"
 
 SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(ADD_ENV)(ExecutionContext& context, const Operand& left, const Operand& right) {
-	assert(left.type() == OperandType::VAR || left.type() == OperandType::REG);
+	const auto& variable = context.currentInstruction().dest();
+	assert(variable.type() == OperandType::VAR || variable.type() == OperandType::REG);
 
-	const auto& dest = context.currentInstruction().dest();
-	//SLOG(ska::LogLevel::Info) << "\tPushing in env " << left;
-	context.pushInEnv(dest, left);
+	auto addedVariable = context.getCell(variable);
+	context.pushInEnv(variable.as<ScriptVariableRef>(), std::move(addedVariable));
 	return {};
 }

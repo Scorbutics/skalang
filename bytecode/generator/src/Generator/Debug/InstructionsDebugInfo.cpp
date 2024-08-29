@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include "Runtime/Value/PlainMemoryTable.h"
 #include "InstructionsDebugInfo.h"
 #include "Base/Values/Strings/StringUtils.h"
 #include "Generator/Value/BytecodeScriptGeneration.h"

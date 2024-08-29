@@ -1,6 +1,7 @@
 #pragma once
 #include <cassert>
 #include <tuple>
+#include "Runtime/Value/PlainMemoryTable.h"
 #include "Value/BytecodeOperand.h"
 #include "Value/BytecodeSymbolInfo.h"
 #include "Value/BytecodeScriptGenerationHelper.h"
@@ -35,8 +36,8 @@ namespace ska {
 			ScriptASTPtr useImport(const std::string& scriptImported);
 			const SymbolInfo* getSymbolInfo(const Symbol& symbol) const;
 			const SymbolInfo* getSymbolInfo(const ASTNode& node) const;
-			const NativeFunction& getBinding(ScriptVariableRef bindingRef) const;
-			Operand storeBinding(NativeFunctionPtr binding, ScriptVariableRef bindingRef);
+			const NativeFunction& getBinding(const ScriptVariableRef& bindingRef) const;
+			Operand storeBinding(NativeFunctionPtr binding, const ScriptVariableRef& bindingRef);
 			void generate(InstructionOutput instructions);
 			InstructionOutput querySymbolOrOperand(const ASTNode& node, bool capture = true);
 			//OperandUse querySymbol(const Symbol& symbol);
