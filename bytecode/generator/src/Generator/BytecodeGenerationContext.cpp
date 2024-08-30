@@ -16,27 +16,27 @@ ska::bytecode::GenerationContext::GenerationContext(GenerationOutput& output, Sc
 	m_scopeClosure(m_nodeClosure.get()) {
 }
 
-ska::bytecode::GenerationContext::GenerationContext(GenerationOutput& output, const ScriptAST& scriptAst) :
-	m_generated(output),
-	m_script(m_generated.emplaceNamed(ScriptGeneration{ ScriptGenerationHelper{output, scriptAst} })),
-	m_pointer(&m_script.rootASTNode()),
-	m_nodeClosure(m_pointer->op() == Operator::FUNCTION_DECLARATION ? std::make_unique<Closure>(*m_pointer) : nullptr),
-	m_scopeClosure(m_nodeClosure.get()) {
+ska::bytecode::GenerationContext ska::bytecode::GenerationContext::next(const ASTNode &node, std::size_t scopeLevelOffset) {
+    return { *this, node, scopeLevelOffset };
+}
+
+ska::bytecode::GenerationContext ska::bytecode::GenerationContext::next(const ScriptAST& scriptAst) {
+    return { *this, scriptAst };
 }
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, const ScriptAST& scriptAst) :
 	m_generated(old.m_generated),
 	m_script(m_generated.emplaceNamed(ScriptGeneration { ScriptGenerationHelper{m_generated, scriptAst}})),
 	m_pointer(&m_script.rootASTNode()),
-	m_nodeClosure(m_pointer->op() == Operator::FUNCTION_DECLARATION ? std::make_unique<Closure>(*m_pointer) : nullptr),
+	m_nodeClosure(m_pointer->op() == Operator::FUNCTION_DECLARATION ? std::make_unique<Closure>(*m_pointer, old.m_scopeClosure) : nullptr),
 	m_scopeClosure(m_nodeClosure.get()) {
 }
 
 ska::bytecode::InstructionOutput ska::bytecode::GenerationContext::close() {
-	if (m_nodeClosure == nullptr) {
+	if (m_scopeClosure == nullptr) {
 		return {};
 	}
-	return m_nodeClosure->generate(*this);
+	return m_scopeClosure->generate(*this);
 }
 
 void ska::bytecode::GenerationContext::generate(InstructionOutput instructions) {
@@ -52,16 +52,16 @@ ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, Scri
 	m_generated(old.m_generated),
 	m_script(m_generated.emplaceNamed(ScriptGeneration { std::move(script) })),
 	m_pointer(&m_script.rootASTNode()),
-	m_nodeClosure(m_pointer->op() == Operator::FUNCTION_DECLARATION ? std::make_unique<Closure>(*m_pointer) : nullptr),
-	m_scopeClosure(m_nodeClosure.get()) {
+	m_nodeClosure(m_pointer->op() == Operator::FUNCTION_DECLARATION ? std::make_unique<Closure>(*m_pointer, old.m_scopeClosure) : nullptr),
+	m_scopeClosure(m_nodeClosure.get() != nullptr ? m_nodeClosure.get() : old.m_scopeClosure) {
 }
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old) :
 	m_generated(old.m_generated),
 	m_script(old.m_script),
 	m_pointer(&m_script.rootASTNode()),
-	m_nodeClosure(m_pointer->op() == Operator::FUNCTION_DECLARATION ? std::make_unique<Closure>(*m_pointer) : nullptr),
-	m_scopeClosure(m_nodeClosure.get()) {
+	m_nodeClosure(m_pointer->op() == Operator::FUNCTION_DECLARATION ? std::make_unique<Closure>(*m_pointer, old.m_scopeClosure) : nullptr),
+	m_scopeClosure(m_nodeClosure.get() != nullptr ? m_nodeClosure.get() : old.m_scopeClosure) {
 }
 
 ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, const ASTNode& node, std::size_t scopeLevelOffset) :
@@ -69,7 +69,7 @@ ska::bytecode::GenerationContext::GenerationContext(GenerationContext& old, cons
 	m_script(old.m_script),
 	m_pointer(&node),
 	m_scopeLevel(old.m_scopeLevel + scopeLevelOffset),
-	m_nodeClosure(m_pointer->op() == Operator::FUNCTION_DECLARATION ? std::make_unique<Closure>(*m_pointer) : nullptr),
+	m_nodeClosure(m_pointer->op() == Operator::FUNCTION_DECLARATION ? std::make_unique<Closure>(*m_pointer, old.m_scopeClosure) : nullptr),
 	m_scopeClosure(m_nodeClosure.get() != nullptr ? m_nodeClosure.get() : old.m_scopeClosure) {
 }
 

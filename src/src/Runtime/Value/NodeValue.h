@@ -14,6 +14,7 @@
 
 namespace ska {
 	class NodeValue;
+	class PlainMemoryTable;
 
 	using NodeValueVariant_ = std::variant<
 		TokenVariant,
@@ -38,13 +39,21 @@ namespace ska {
 			m_emptyVariant(true) {
 		}
 
-		template <class Arg>
+		template <class Arg, std::enable_if_t<std::is_same_v<NodeValue, std::remove_const_t<std::remove_reference_t<Arg>>>, std::nullptr_t> = nullptr>
 		NodeValue(Arg&& arg) {
-			if constexpr(std::is_same_v<NodeValue, std::remove_const_t<std::remove_reference_t<Arg>>>) {
-				*this = std::forward<Arg>(arg);
-			} else {
-				transferValueToOwned(std::forward<Arg>(arg));
-			}
+			*this = std::forward<Arg>(arg);
+		}
+
+		template <class Arg, std::enable_if_t<
+			std::is_same_v<NodeValueVariant_, std::remove_const_t<std::remove_reference_t<Arg>>> ||
+			detail::isVariantMember<std::remove_const_t<std::remove_reference_t<Arg>>, NodeValueVariant_>::value ||
+			detail::isVariantMember<std::remove_const_t<std::remove_reference_t<Arg>>, TokenVariant>::value, std::nullptr_t> = nullptr>
+		NodeValue(Arg&& arg) {
+			transferValueToOwned(std::forward<Arg>(arg));
+		}
+
+		NodeValue(float f):
+			NodeValue(static_cast<double>(f)) {
 		}
 
 		NodeValue(NodeValueArray arg) :
@@ -62,16 +71,25 @@ namespace ska {
 		NodeValue& operator=(NodeValue&& arg) noexcept {
 			transferValueToOwned(std::move(arg.m_variant));
 			m_emptyVariant = arg.m_emptyVariant;
+			captureEnvironment = std::move(arg.captureEnvironment);
 			return *this;
 		}
 
 		NodeValue& operator=(const NodeValue& arg) {
 			transferValueToOwned(arg.m_variant);
 			m_emptyVariant = arg.m_emptyVariant;
+			captureEnvironment = arg.captureEnvironment;
 			return *this;
 		}
 
 		void release();
+
+		const PlainMemoryTable* env() const;
+
+		// TODO remove this to avoid direct memory access
+		PlainMemoryTable* env();
+		void copyEnv(const NodeValue& node);
+		void ownEnv(std::shared_ptr<PlainMemoryTable> env);
 
 		NodeValue(const NodeValue&) = default;
 		~NodeValue() = default;
@@ -119,6 +137,7 @@ namespace ska {
 		}
 
 		friend bool operator==(const NodeValue& lhs, const NodeValue& rhs);
+		friend std::ostream& operator<<(std::ostream& stream, const NodeValue&);
 
 	private:
 		void transferValueToOwned(NodeValueVariant_ arg);
@@ -126,9 +145,11 @@ namespace ska {
 		static bool isReference(const NodeValueVariant_& arg);
 
 		NodeValueVariant_ m_variant;
+		std::shared_ptr<PlainMemoryTable> captureEnvironment = nullptr;
 		bool m_emptyVariant = false;
 		bool m_dirty = false;
 	};
 
 	bool operator==(const NodeValue& lhs, const NodeValue& rhs);
+	std::ostream& operator<<(std::ostream& stream, const NodeValue&);
 }

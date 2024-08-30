@@ -7,12 +7,12 @@
 
 using GeneratorOperatorCurrent = ska::bytecode::GeneratorOperator<ska::Operator::IMPORT>;
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, GeneratorOperatorCurrent);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, GeneratorOperatorCurrent);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, GeneratorOperatorCurrent)
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::IMPORT>::generate(OperateOn node, GenerationContext& context) {
-	auto importGroup = generateNext({ context, node.GetScriptPathNode(), 1 });
+	auto importGroup = generateNext(context.next(node.GetScriptPathNode(), 1));
 	const auto& scriptImportedName = *importGroup.operand().as<StringShared>();
 	auto [importedScriptIndex, importedScript] = context.script(scriptImportedName);
 
@@ -20,7 +20,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 		LOG_DEBUG << "%10cUnknown script " << scriptImportedName << ", generating it...";
 		auto scriptImported = context.useImport(scriptImportedName);
 		assert(scriptImported != nullptr);
-		auto scriptContext = GenerationContext{context, *scriptImported };
+		auto scriptContext = context.next(*scriptImported);
 		auto instructionsOutput = generateNext(scriptContext);
 		scriptContext.generate(std::move(instructionsOutput));
 		LOG_DEBUG << "%10cGenerated script " << scriptImportedName;

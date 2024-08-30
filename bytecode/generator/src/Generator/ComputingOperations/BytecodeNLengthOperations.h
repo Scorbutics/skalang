@@ -15,7 +15,7 @@ namespace ska {
 			for (auto paramNodeIt = start; paramNodeIt != end; paramNodeIt++) {
 				const auto& paramNode = *paramNodeIt;
 				if (paramNode != nullptr) {
-					auto finalGroup = generator.generatePart({ script, *paramNode });
+					auto finalGroup = generator.generatePart(script.next(*paramNode));
 					temporaryContainer.push_back(finalGroup.operand());
 					output.push(std::move(finalGroup));
 					if (temporaryContainer.size() == Modulo) {

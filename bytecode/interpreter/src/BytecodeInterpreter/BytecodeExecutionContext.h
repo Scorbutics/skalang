@@ -18,7 +18,7 @@ namespace ska {
 			ExecutionContext(Executor& container, std::size_t scriptIndex, GenerationOutput& instructions);
 
 			ExecutionContext(ExecutionContext& old, std::size_t scriptIndex) :
-				ExecutionContext(old.m_out, scriptIndex, old.m_in) { }
+			ExecutionContext(old.m_out, scriptIndex, old.m_in) { }
 
 			ExecutionContext(ExecutionContext&&) noexcept = default;
 			ExecutionContext(const ExecutionContext&) = delete;
@@ -43,18 +43,16 @@ namespace ska {
 
 			bool incInstruction() { return m_current == nullptr ? false : m_current->incInstruction(); }
 
-			NodeValue getCell(const Operand& v) const { return scriptFromOperand(v).getCell(v); }
+			NodeValue getCell(const Operand& v) const;
 
 			void pop(NodeValue& dest) { m_out.pop(dest); }
 			void pop(NodeValueArrayRaw& dest, long count) { m_out.pop(dest, count); }
 
 			void pushInEnv(const ScriptVariableRef& dest, NodeValue value) { m_out.pushInEnv(dest, std::move(value)); }
-			void popEnv(ScriptVariableRef& dest) { m_out.popEnv(dest); }
-			const NodeValue* useFromCurrentEnv(const ScriptVariableRef& dest) const;
 
-			void jumpAbsolute(const ScriptVariableRef& value);
+			void jumpAbsolute(NodeValue& value);
 			void jumpRelative(long value) { checkCurrentExecutionOrThrow(); m_current->jumpRelative(value); }
-			void jumpReturn();
+			NodeValue jumpReturn();
 
 			ScriptVariableRef getRelativeInstruction(long relativeValue) const {
 				checkCurrentExecutionOrThrow();
@@ -67,13 +65,10 @@ namespace ska {
 			}
 
 			template <class T>
-			T& get(Operand& v) {
-				return scriptFromOperand(v).get<T>(v);
-			}
-
-			template <class T>
-			const T& get(const Operand& v) {
-				return scriptFromOperand(v).get<T>(v);
+			const T& get(const Operand& variable) {
+				const auto* value = variable.type() == OperandType::VAR || variable.type() == OperandType::REG ? useFromCurrentEnv(variable.as<ScriptVariableRef>()) : nullptr;
+				return value == nullptr || value->empty() ? scriptFromOperand(variable).get<T>(variable) : value->nodeval<T>();
+				//return scriptFromOperand(variable).get<T>(variable);
 			}
 
 			ScriptExecution& scriptFromOperand(const Operand& v);
@@ -81,12 +76,22 @@ namespace ska {
 
 			template <class T>
 			void set(const Operand& dest, T&& src) {
+				if (m_out.closureEnvironment.empty()) {
+					scriptFromOperand(dest).set(dest, std::forward<T>(src));
+					return;
+				}
+
+				// TODO store env in script and access it with scriptFromOperand?
+				auto* currentEnvironment = m_out.closureEnvironment.back();
+				if (currentEnvironment != nullptr) {
+					currentEnvironment->push(dest.as<ScriptVariableRef>().variable, src);
+				}
 				scriptFromOperand(dest).set(dest, std::forward<T>(src));
 			}
 
 			void release(const Operand& dest) {
 				scriptFromOperand(dest).release(dest);
-			}
+			 }
 
 			ScriptExecutionOutput generateExportedVariables(std::size_t scriptIndex);
 
@@ -96,11 +101,12 @@ namespace ska {
 			const NativeFunction& getBinding(const ScriptVariableRef& bindingRef) const;
 
 		private:
+			const NodeValue* useFromCurrentEnv(const ScriptVariableRef& dest) const;
+
 			void checkCurrentExecutionOrThrow() const {
 				if (m_current == nullptr) { throw std::runtime_error("bad execution context"); }
 			}
-
-			const ScriptVariableRef& getReturn();
+			NodeValue  getReturn();
 			ExecutionContext getContext(const ScriptVariableRef& value);
 
 			Executor& m_out;

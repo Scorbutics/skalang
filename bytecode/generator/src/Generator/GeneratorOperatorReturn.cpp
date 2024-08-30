@@ -10,7 +10,7 @@ SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::O
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::RETURN>)
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::RETURN>::generate(OperateOn node, GenerationContext& context) {
-	auto objectResult = generateNext({context, node.GetValue() });
+	auto objectResult = generateNext(context.next(node.GetValue()));
 
 	LOG_DEBUG << "Returning " << node.GetValue().size() << " fields";
 

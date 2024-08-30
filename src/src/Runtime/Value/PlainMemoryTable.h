@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <ostream>
 #include <vector>
 #include "NodeValue.h"
 
@@ -14,21 +15,22 @@ namespace ska {
 			return m_data[index].nodeval<T>();
 		}
 
-		template <class T>
-		T& value(std::size_t index) {
-			return m_data[index].nodeval<T>();
-		}
-
 		const NodeValue& operator[](std::size_t index) const {
 			assert(m_data.size() > index);
 			return m_data[index];
 		}
 
-		NodeValue* get_if(std::size_t index) {
+		const NodeValue* get_if(std::size_t index) const {
 			if (index < m_data.size()) {
 				return &m_data[index];
 			}
 			return nullptr;
+		}
+
+		void release(std::size_t index) {
+			if (index < m_data.size()) {
+				m_data[index].release();
+			}
 		}
 
 		template <class T>
@@ -43,13 +45,16 @@ namespace ska {
 			m_data[index] = std::forward<T>(src);
 		}
 
-		auto& back() { return m_data.back(); }
 		const auto& back() const { return m_data.back(); }
 
 		bool empty() const { return m_data.empty(); }
 		auto size() const { return m_data.size(); }
+
+		friend std::ostream& operator<<(std::ostream& stream, const PlainMemoryTable&);
 	private:
 		std::vector<NodeValue> m_data;
 	};
+
+	std::ostream& operator<<(std::ostream& stream, const PlainMemoryTable& table);
 
 }

@@ -15,14 +15,17 @@ namespace ska {
 	namespace bytecode {
 		class GeneratorOperatorUnit;
 		class GenerationContext {
-		public:
-			GenerationContext(GenerationOutput& output, ScriptGenerationHelper script);
-			GenerationContext(GenerationOutput& output, const ScriptAST& scriptAst);
-			GenerationContext(GenerationContext& old);
+		private:
 			GenerationContext(GenerationContext& old, const ScriptAST& scriptAst);
 			GenerationContext(GenerationContext& old, ScriptGenerationHelper script);
-			GenerationContext(GenerationContext&& mv) = default;
 			GenerationContext(GenerationContext& old, const ASTNode& node, std::size_t scopeLevelOffset = 0);
+		public:
+			GenerationContext(GenerationContext& old);
+			GenerationContext(GenerationContext&& old) = default;
+			GenerationContext(GenerationOutput& output, ScriptGenerationHelper script);
+
+			GenerationContext next(const ScriptAST& scriptAst);
+			GenerationContext next(const ASTNode& node, std::size_t scopeLevelOffset = 0);
 
 			const ASTNode& pointer() const { assert(m_pointer != nullptr); return *m_pointer; }
 

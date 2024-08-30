@@ -7,7 +7,7 @@
 #include "BytecodeCommand.h"
 #include "Generator/Value/BytecodeScriptGenerationHelper.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>)
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FIELD_ACCESS>::generate(OperateOn node, GenerationContext& context) {
@@ -22,7 +22,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	const auto typeObject = node.GetObjectType();
 	if (typeObject == ExpressionType::ARRAY) {
 		if (fieldName == "size") {
-			auto objectValue = generateNext({ context, node.GetObjectNameNode() });
+			auto objectValue = generateNext(context.next(node.GetObjectNameNode()));
 			objectValue.push({ Instruction{ Command::ARR_LENGTH, context.queryNextRegister(), objectValue.operand() } });
 			return objectValue;
 		}
@@ -48,7 +48,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	}
 
 	const auto index = objectTypeSymbolTable->id(*symbolField->symbol()).value();
-	auto objectValue = generateNext({ context, node.GetObjectNameNode()});
+	auto objectValue = generateNext(context.next(node.GetObjectNameNode()));
 
 	LOG_DEBUG << "This field has index " << index << " in the object";
 

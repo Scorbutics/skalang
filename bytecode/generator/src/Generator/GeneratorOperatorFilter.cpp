@@ -6,7 +6,7 @@
 #include "Generator/Value/BytecodeScriptGenerationHelper.h"
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FILTER>::generate(OperateOn node, GenerationContext& context) {
-	auto initGroup = generateNext({ context, node.GetCollection() });
+	auto initGroup = generateNext(context.next(node.GetCollection()));
 
 	auto collectionContainer = initGroup.operand();
 	auto collectionLengthVariable = context.queryNextRegister();
@@ -24,7 +24,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	auto collectionElementOperand = collectionElement.operand();
 	auto bodyGroup = std::move(collectionElement);
 	bodyGroup.push(Instruction{ Command::ARR_ACCESS, collectionElementOperand, collectionContainer, iteratorRegisterOperand});
-	bodyGroup.push(generateNext({ context, node.GetStatement(), 1 }));
+	bodyGroup.push(generateNext(context.next(node.GetStatement(), 1)));
 
 	auto incrementGroup = InstructionOutput{ Instruction { Command::ADD_I, iteratorRegisterOperand, iteratorRegisterOperand, Operand{ 1l, OperandType::PURE } } };
 

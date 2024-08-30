@@ -12,7 +12,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 	const auto& originalType = node.GetOriginalType();
 	const auto& typeToConvertIn = node.GetCalledConverterType();
 
-	auto objectNodeGeneration = generateNext({ context, node.GetObjectNode() });
+	auto objectNodeGeneration = generateNext(context.next(node.GetObjectNode()));
 
 	if (originalType != typeToConvertIn) {
 		auto conversionResult = TypeConversion(LogicalOperator::EQUAL, originalType, typeToConvertIn);

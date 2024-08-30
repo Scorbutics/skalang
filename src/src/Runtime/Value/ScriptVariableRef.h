@@ -14,7 +14,6 @@ namespace ska {
 		virtual ~ScriptVariableRef();
 		std::size_t variable = 0;
 		std::size_t script = 0;
-		std::shared_ptr<PlainMemoryTable> captureEnvironment;
 	};
 
 	bool operator==(const VariableRef& lhs, const VariableRef& rhs);

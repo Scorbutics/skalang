@@ -11,8 +11,8 @@ SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(JUMP_MEMBER)(ExecutionContext& cont
 	const auto data = context.get<NodeValueFunctionMember>(jumpValue);
 	auto& thisPrivate = (*data.owner)[0];
 	context.push(thisPrivate);
-	const auto instructionIndex = data.functionMember->nodeval<ScriptVariableRef>();
-	LOG_DEBUG << "Jumping (absolute) to instruction index " << instructionIndex << " in script " << instructionIndex.script;
-	context.jumpAbsolute(instructionIndex);
+	auto& instruction = *data.functionMember;
+	LOG_DEBUG << "Jumping (absolute) to instruction " << instruction;
+	context.jumpAbsolute(instruction);
 	return {};
 }

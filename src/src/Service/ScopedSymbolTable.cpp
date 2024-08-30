@@ -3,7 +3,7 @@
 #include "NodeValue/ScriptAST.h"
 #include "NodeValue/ScriptHandleAST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::ScopedSymbolTable)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::ScopedSymbolTable)
 
 const std::string ska::ScopedSymbolTable::EMPTY_STR = "";
 

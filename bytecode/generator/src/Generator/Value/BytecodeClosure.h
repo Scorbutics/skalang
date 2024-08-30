@@ -14,7 +14,7 @@ namespace ska {
 		class Closure {
 		public:
 			Closure() = default;
-			Closure(const ASTNode& scopeNode);
+			Closure(const ASTNode& scopeNode, Closure* parent = nullptr);
 
 			InstructionOutput checkAndCapture(GenerationContext& context, const ScopedSymbolTable* variable, Operand variableOperand);
 			InstructionOutput generate(const GenerationContext& context) const;
@@ -22,7 +22,7 @@ namespace ska {
 		private:
 			const ASTNode* m_scopeNode = nullptr;
 			EnvironmentContainer m_environment;
-			InstructionOutput m_usageEnvironment;
+			Closure* m_parent = nullptr;
 		};
 	}
 }

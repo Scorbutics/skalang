@@ -15,7 +15,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	std::size_t childIndex = 0;
 	for(auto& field: node) {
-		auto valueGroup = generateNext({ context, *field, 1 });
+		auto valueGroup = generateNext(context.next(*field, 1));
 
 		auto* oldSymbolInfo = context.getSymbolInfo(*field);
 		auto symbolInfo = SymbolInfo { context.scope() + 1, field->name(), context.scriptIndex() };

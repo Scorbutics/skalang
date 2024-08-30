@@ -30,8 +30,8 @@ namespace ska {
 				environment.push(dest.variable, std::move(value));
 			}
 
-			void popEnv(ScriptVariableRef& dest) {
-				dest.captureEnvironment = std::make_shared<PlainMemoryTable>(std::move(environment));
+			void popEnv(NodeValue& dest) {
+				dest.ownEnv(std::make_shared<PlainMemoryTable>(std::move(environment)));
 				environment = {};
 			}
 

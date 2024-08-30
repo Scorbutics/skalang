@@ -13,8 +13,8 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::ARRAY_USE>::generate(OperateOn node, GenerationContext& context) {
 	auto result = InstructionOutput{ };
 
-	auto arrayAccessedComputing = generateNext({ context, node.GetArray() });
-	auto arrayIndexComputing = generateNext({ context, node.GetArrayIndex() });
+	auto arrayAccessedComputing = generateNext(context.next(node.GetArray()));
+	auto arrayIndexComputing = generateNext(context.next(node.GetArrayIndex()));
 
 	auto arrayIndex = arrayIndexComputing.operand();
 	auto arrayAccessed = arrayAccessedComputing.operand();

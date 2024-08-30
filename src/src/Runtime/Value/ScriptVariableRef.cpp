@@ -3,7 +3,7 @@
 #include "ScriptVariableRef.h"
 
 std::ostream& ska::operator<<(std::ostream& stream, const ScriptVariableRef& var) {
-	stream << var.variable;
+	stream << var.variable << ":" << var.script;
 	return stream;
 }
 

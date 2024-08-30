@@ -20,6 +20,7 @@ SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(ARR_ACCESS)(ExecutionContext& conte
   }
   auto& result = (*array)[index];
   LOG_INFO << "[Cell content : " << result.convertString() << "]";
-
-  return &result;
+	// TODO make env "copy" (it's not a copy as it's a shared_ptr) automatic when NodeValue is a recursive container (NodeValueArray, NodeValueMap, NodeValue*)
+	result.copyEnv(context.getCell(left));
+  return result;
 }

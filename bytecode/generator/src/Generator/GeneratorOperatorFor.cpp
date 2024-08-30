@@ -7,11 +7,11 @@
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FOR_LOOP>::generate(OperateOn node, GenerationContext& context) {
 
-	auto initGroup = generateNext({ context, node.GetInitialization() });
+	auto initGroup = generateNext(context.next(node.GetInitialization()));
 
-	auto conditionGroup = generateNext({ context, node.GetCondition() });
-	auto bodyGroup = generateNext({ context, node.GetStatement(), 1 });
-	auto incrementGroup = generateNext({ context, node.GetIncrement() });
+	auto conditionGroup = generateNext(context.next(node.GetCondition() ));
+	auto bodyGroup = generateNext(context.next(node.GetStatement(), 1));
+	auto incrementGroup = generateNext(context.next(node.GetIncrement() ));
 
 	if (!incrementGroup.operand().empty()) {
 		conditionGroup.push(Instruction{ Command::JUMP_NIF, Operand { static_cast<long>(bodyGroup.size() + incrementGroup.size() + 1), OperandType::PURE }, conditionGroup.operand() });

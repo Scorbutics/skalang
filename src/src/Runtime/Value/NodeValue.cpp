@@ -4,7 +4,7 @@
 #include "NodeValue.h"
 #include "StringShared.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::NodeValue);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::NodeValue);
 
 double ska::NodeValue::convertNumeric() const {
 	double numeric = 0.0;
@@ -73,7 +73,7 @@ std::string ska::NodeValue::convertString() const {
 			} else if constexpr (std::is_same<T, bool>::value) {
 				result = arg ? "true" : "false";
 			} else if constexpr (std::is_same<T, StringShared>::value) {
-				result = *arg;
+				result = arg ? *arg : "";
 			} else if constexpr (std::is_same_v<T, ObjectMemory> || std::is_same_v<T, NativeFunctionPtr>) {
 				result = "__complex memory object__";
 			} else {
@@ -84,6 +84,22 @@ std::string ska::NodeValue::convertString() const {
 		result = "__container__";
 	}
 	return result;
+}
+
+void ska::NodeValue::ownEnv(std::shared_ptr<PlainMemoryTable> env) {
+	captureEnvironment = std::move(env);
+}
+
+void ska::NodeValue::copyEnv(const NodeValue& node) {
+	captureEnvironment = node.captureEnvironment;
+}
+
+const ska::PlainMemoryTable* ska::NodeValue::env() const {
+	return captureEnvironment.get();
+}
+
+ska::PlainMemoryTable* ska::NodeValue::env() {
+	return captureEnvironment.get();
 }
 
 ska::NodeValue& ska::NodeValue::dereference(const NodeValueVariant_& variant) {
@@ -110,7 +126,7 @@ void ska::NodeValue::transferValueToOwned(NodeValueVariant_ arg) {
 		if (isReference(arg)) {
 			dereference(m_variant) = dereference(arg);
 		} else {
-			dereference(m_variant) = arg;
+			dereference(m_variant) = NodeValue { arg };
 		}
 	} else {
 		if(isReference(arg) && std::get<NodeValue*>(arg) == this) {
@@ -119,7 +135,10 @@ void ska::NodeValue::transferValueToOwned(NodeValueVariant_ arg) {
 		}
 		m_variant = std::move(arg);
 
-		SLOG(LogLevel::Debug) << "%10cAssigning direct value " << convertString();
+		SLOG(LogLevel::Debug) << "%10cAssigning direct value \"" << convertString() << "\"";
+		if (captureEnvironment) {
+			SLOG(LogLevel::Debug) << "  with capture env " << *captureEnvironment;
+		}
 	}
 }
 
@@ -130,5 +149,10 @@ bool ska::NodeValue::isReference(const NodeValueVariant_& arg) {
 namespace ska {
 	bool operator==(const NodeValue& lhs, const NodeValue& rhs) {
 		return lhs.m_variant == rhs.m_variant;
+	}
+
+	std::ostream& operator<<(std::ostream& stream, const NodeValue& value) {
+		stream << value.convertString();
+		return stream;
 	}
 }

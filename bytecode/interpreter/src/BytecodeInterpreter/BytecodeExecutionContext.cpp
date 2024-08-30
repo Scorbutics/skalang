@@ -6,7 +6,7 @@
 
 #include "Service/StatementParser.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::ExecutionContext);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::ExecutionContext);
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::ExecutionContext)
 
 ska::bytecode::ExecutionContext::ExecutionContext(Executor& container, std::size_t scriptIndex, GenerationOutput& instructions) :
@@ -40,40 +40,53 @@ ska::bytecode::ExecutionContext ska::bytecode::ExecutionContext::getContext(cons
 	return ExecutionContext{ *this, value.script };
 }
 
-void ska::bytecode::ExecutionContext::jumpAbsolute(const ScriptVariableRef& value) {
-	auto context = getContext(value);
+void ska::bytecode::ExecutionContext::jumpAbsolute(NodeValue& value) {
+	const auto& variable = value.nodeval<ScriptVariableRef>();
+	auto context = getContext(variable);
 	m_out.callstack.push_back(TokenVariant{ m_current->snapshot() });
-	m_out.closureEnvironment.push_back(value.captureEnvironment.get());
+	m_out.closureEnvironment.push_back(value.env());
 	m_current = context.m_current;
 	checkCurrentExecutionOrThrow();
-	m_current->jumpAbsolute(value.variable - 1);
+	m_current->jumpAbsolute(variable.variable - 1);
 }
 
-const ska::NodeValue* ska::bytecode::ExecutionContext::useFromCurrentEnv(const ScriptVariableRef& dest) const {
+const ska::NodeValue *ska::bytecode::ExecutionContext::useFromCurrentEnv(const ScriptVariableRef &dest) const {
 	if (m_out.closureEnvironment.empty()) {
 		return nullptr;
 	}
 
 	// TODO store env in script and access it with scriptFromOperand?
 	auto* currentEnvironment = m_out.closureEnvironment.back();
-	return currentEnvironment == nullptr ? nullptr : &(*currentEnvironment)[dest.variable];
+	return currentEnvironment == nullptr ? nullptr : currentEnvironment->get_if(dest.variable);
 }
 
-const ska::ScriptVariableRef& ska::bytecode::ExecutionContext::getReturn() {
-	assert(!m_out.callstack.empty());
-	const auto& scriptVariableRef = m_out.callstack.back().nodeval<ScriptVariableRef>();
+ska::NodeValue ska::bytecode::ExecutionContext::getCell(const Operand &variable) const {
+	const auto* value = variable.type() == OperandType::VAR || variable.type() == OperandType::REG ? useFromCurrentEnv(variable.as<ScriptVariableRef>()) : nullptr;
+	return value == nullptr || value->empty() ? scriptFromOperand(variable).getCell(variable) : *value;
+	//return scriptFromOperand(variable).getCell(variable);
+}
+
+ska::NodeValue ska::bytecode::ExecutionContext::getReturn() {
+    assert(!m_out.callstack.empty());
+	auto result = m_out.callstack.back();
+	m_out.popEnv(result);
 	m_out.callstack.pop_back();
+	if (m_out.closureEnvironment.back() != nullptr) {
+		LOG_DEBUG << "Poping env: " << *m_out.closureEnvironment.back();
+	}
 	m_out.closureEnvironment.pop_back();
-	return scriptVariableRef;
+	return result;
 }
 
-void ska::bytecode::ExecutionContext::jumpReturn() {
-	auto whereToGo = getReturn();
+ska::NodeValue ska::bytecode::ExecutionContext::jumpReturn() {
+	auto ret = getReturn();
+	auto whereToGo = ret.nodeval<ScriptVariableRef>();
 	LOG_DEBUG << "Returning to instruction index " << whereToGo.variable << " in script " << whereToGo.script;
 	auto context = getContext(whereToGo);
 	m_current = context.m_current;
 	checkCurrentExecutionOrThrow();
 	m_current->jumpAbsolute(whereToGo.variable);
+	return ret;
 }
 
 ska::bytecode::ScriptExecution& ska::bytecode::ExecutionContext::scriptFromOperand(const Operand& v) {

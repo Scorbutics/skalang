@@ -12,7 +12,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	std::size_t childIndex = 0;
 	for (const auto& child : node) {
-		auto childCellGroup = generateNext({ context, *child, 1});
+		auto childCellGroup = generateNext(context.next(*child, 1));
 		if(child->isSymbolicLeaf() && childCellGroup.operand().type() == OperandType::VAR) {
 			auto* oldSymbolInfo = context.getSymbolInfo(*child);
 			auto symbolInfo = SymbolInfo { context.scope() + 1, child->name(), context.scriptIndex() };

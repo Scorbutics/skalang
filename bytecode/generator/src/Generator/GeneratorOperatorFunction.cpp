@@ -5,7 +5,7 @@
 #include "Generator/Value/BytecodeScriptGenerationHelper.h"
 #include "Generator/ComputingOperations/BytecodeNLengthOperations.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>);
+SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>);
 
 #define LOG_DEBUG SLOG_STATIC(ska::LogLevel::Debug, ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>) << "%01c"
 
@@ -16,8 +16,6 @@ namespace ska {
 			auto result = InstructionOutput{ std::move(jumpInstruction) };
 			result.push(std::move(output));
 			const auto retOperand = result.operand();
-			// TODO rename?
-			result.push(context.close());
 			result.push(retOperand);
 			return result;
 		}
@@ -40,13 +38,13 @@ namespace ska {
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_DECLARATION>::generate(OperateOn node, GenerationContext& context) {
 	LOG_DEBUG << "Generating prototype of \"" << node.GetFunctionName() << "\"...";
-	auto valueGroup = generateNext({ context, node.GetFunctionPrototype() });
+	auto valueGroup = generateNext(context.next(node.GetFunctionPrototype()));
 
 	LOG_DEBUG << "Generating body...";
 	const auto* functionSymbolInfo = context.getSymbolInfo(node.GetFunction());
 	LOG_DEBUG << "Function Call symbol info : " << (functionSymbolInfo == nullptr || functionSymbolInfo->binding == std::numeric_limits<std::size_t>::max() ? "none" : "with binding");
 	if (functionSymbolInfo == nullptr || functionSymbolInfo->binding == std::numeric_limits<std::size_t>::max() || functionSymbolInfo->bindingPassThrough) {
-		valueGroup.push(generateNext({ context, node.GetFunctionBody(), 1 }));
+		valueGroup.push(generateNext(context.next(node.GetFunctionBody(), 1)));
 	}
 
 	LOG_DEBUG << "\nGenerated " << valueGroup << " with value " << valueGroup.operand();
@@ -69,6 +67,8 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 	auto returnValueOperand = valueGroup.operand();
 	valueGroup.push(std::move(cleanUpInstructions));
+	// TODO rename?
+	valueGroup.push(context.close());
 	valueGroup.push(Instruction{ Command::RET, isVoidReturningFunction ? Operand{} : returnValueOperand });
 
 	auto fullFunction = AddRelativeJumpInstruction(context, std::move(valueGroup));
@@ -106,7 +106,7 @@ static bool IsInstructionCommandClosed(const ska::bytecode::InstructionOutput& p
 }
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_MEMBER_CALL>::generate(OperateOn node, GenerationContext& context) {
-	auto preCallValue = generateNext({context, node.GetFunctionNameNode()});
+	auto preCallValue = generateNext(context.next(node.GetFunctionNameNode()));
 	LOG_DEBUG << "Function member call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
 
 	const auto* functionTypeSymbol = node.GetFunctionNameNode().symbol();
@@ -137,7 +137,7 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 }
 
 ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator::FUNCTION_CALL>::generate(OperateOn node, GenerationContext& context) {
-	auto preCallValue = generateNext({context, node.GetFunctionNameNode()});
+	auto preCallValue = generateNext(context.next(node.GetFunctionNameNode()));
 	LOG_DEBUG << "Function call : "<< node.GetFunctionNameNode().name() << " of type " << node.GetFunctionType();
 
 	// Handle built-in type functions traduced directly to a bytecode instruction

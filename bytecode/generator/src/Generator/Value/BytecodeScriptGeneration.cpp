@@ -39,7 +39,7 @@ std::ostream& ska::bytecode::operator<<(std::ostream& stream, const ScriptGenera
 
 void ska::bytecode::ScriptGeneration::generate(ScriptCache& cache, Generator& generator) {
 	if (m_generated.empty()) {
-		auto context = GenerationContext{ cache, m_origin.program() };
+		auto context = GenerationContext{ cache, ScriptGenerationHelper{cache, m_origin.program()} };
 		m_generated = generator.generatePart(context);
 	} else {
 		LOG_WARN << "Script already generated";

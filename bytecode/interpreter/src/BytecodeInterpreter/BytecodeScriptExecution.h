@@ -96,8 +96,7 @@ namespace ska {
 			void release(const Operand& dest) {
 				auto* memory = selectMemory(dest);
 				if (memory == nullptr) { throw std::runtime_error("invalid bytecode destination cell"); }
-				auto* value = memory->get_if(dest.as<ScriptVariableRef>().variable);
-				if (value != nullptr) { value->release(); }
+				memory->release(dest.as<ScriptVariableRef>().variable);
 			}
 
 		private:

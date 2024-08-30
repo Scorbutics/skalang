@@ -5,7 +5,7 @@
 #include "Service/SymbolTable.h"
 #include "NodeValue/ScriptAST.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::TypeBuilderOperator<ska::Operator::TYPE>)
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::TypeBuilderOperator<ska::Operator::TYPE>)
 
 ska::TypeHierarchy ska::TypeBuilderOperator<ska::Operator::TYPE>::build(const ScriptAST& script, OperateOn node) {
 	auto result = Type{};
