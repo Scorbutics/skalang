@@ -29,7 +29,9 @@ ska::bytecode::InstructionOutput ska::bytecode::GeneratorOperator<ska::Operator:
 
 		context.setSymbolInfo(*field, std::move(symbolInfo));
 
-		valueGroup.push(Instruction { Command::PUSH, valueGroup.operand() });
+		if (valueGroup.operand().type() == OperandType::VAR) {
+			valueGroup.push(Instruction { Command::PUSH, valueGroup.operand() });
+		}
 		objectResult.push(std::move(valueGroup));
 		childIndex++;
 	}
