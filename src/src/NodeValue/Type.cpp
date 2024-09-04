@@ -12,9 +12,40 @@ ska::Type ska::Type::crossTypes(const TypeCrosser& crosser, std::string op, cons
 	return crosser.cross(op, *this, type2);
 }
 
+bool ska::Type::isAssignableFrom(const Type& type) const {
+	if (*this == type) {
+		return true;
+	}
+	const auto* currentRefClass = m_type == ExpressionType::FUNCTION ? this : getParentClass();
+	const auto* typeRefClass = type == ExpressionType::FUNCTION ? &type : type.getParentClass();
+	return typeRefClass == nullptr && currentRefClass == nullptr || *typeRefClass == *currentRefClass;
+}
+
 ska::Type::Type(const ScopedSymbolTable* symbolTable, ExpressionType t) :
 	m_type(t),
 	m_symbolTable(symbolTable == nullptr || symbolTable->symbol() == nullptr ? nullptr : symbolTable) {
+}
+
+const ska::Type *ska::Type::getParentClass() const {
+	if (m_symbolTable == nullptr) {
+		return nullptr;
+	}
+
+	if (m_symbolTable->symbol()->type() == ExpressionType::FUNCTION) {
+		return &m_symbolTable->symbol()->type();
+	}
+
+	if (m_symbolTable->classTable() == nullptr) {
+		return nullptr;
+	}
+
+	const auto& parentType = m_symbolTable->classTable()->symbol()->type();
+	if (parentType == ExpressionType::OBJECT) {
+		return parentType.getParentClass();
+	}
+
+	assert(parentType == ExpressionType::FUNCTION);
+	return &parentType;
 }
 
 bool ska::Type::operator==(const Type& t) const {

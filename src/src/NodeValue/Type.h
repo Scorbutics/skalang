@@ -105,6 +105,8 @@ namespace ska {
 
 		Type crossTypes(const TypeCrosser& crosser, std::string op, const Type& type2) const;
 
+		bool isAssignableFrom(const Type&) const;
+
 		std::size_t size() const;
 		bool empty() const;
 
@@ -127,6 +129,8 @@ namespace ska {
 		}
 
 		Type(const ScopedSymbolTable* symbolTable, ExpressionType t);
+		const Type* getParentClass() const;
+
 
 		ExpressionType m_type = ExpressionType::VOID;
     	const ScopedSymbolTable* m_symbolTable = nullptr;

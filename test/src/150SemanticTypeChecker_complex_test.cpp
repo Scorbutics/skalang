@@ -237,6 +237,24 @@ TEST_CASE("[SemanticTypeChecker Complex]") {
 		}
 	}
 
+	SUBCASE("assign new field object instead of created one") {
+		ASTFromInputSemanticComplexTC(scriptCache,
+		R"script(
+			PositionFcty = function(x: int, y: int): var do
+				return {
+					x = x
+					y = y
+				}
+			end
+			lvalFunc244 = function(i: int) : var do
+				return { pos = PositionFcty(i, i*2) }
+			end
+			object = lvalFunc244(3)
+			object.pos = PositionFcty(4, 3)
+			)script", data);
+		CHECK(true);
+	}
+
 	SUBCASE("Function 0 parameter creating custom object but forget to use it as a factory (direct use of function)") {
 		CHECK_THROWS_WITH(ASTFromInputSemanticComplexTC(scriptCache, "Dummy = function() : var do\n return { data= 3 }\n end\n Dummy.data\n ", data),
 		doctest::Contains("the variable \"Dummy\" is not registered as an object but as a \"function (var"));
