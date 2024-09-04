@@ -55,7 +55,7 @@ namespace ska {
 				if (callstack.empty() || dest.type() != OperandType::VAR) {
 					return;
 				}
-				callstack.back().captureInEnv(dest.as<ScriptVariableRef>(), std::forward<T>(src));
+				callstack.back().overrideInEnv(dest.as<ScriptVariableRef>(), std::forward<T>(src));
 			}
 
 			template <class T>

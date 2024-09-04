@@ -107,6 +107,13 @@ void ska::NodeValue::captureInEnv(ScriptVariableRef variable, NodeValue value) {
 	(*captureEnvironment)[variable] = std::move(value);
 }
 
+void ska::NodeValue::overrideInEnv(ScriptVariableRef index, NodeValue value) {
+	if (captureEnvironment == nullptr || captureEnvironment->find(index) == captureEnvironment->end()) {
+		return;
+	}
+	(*captureEnvironment)[index] = std::move(value);
+}
+
 void ska::NodeValue::stealEnv(NodeValue& value) {
 	captureEnvironment = std::move(value.captureEnvironment);
 	value.captureEnvironment = nullptr;

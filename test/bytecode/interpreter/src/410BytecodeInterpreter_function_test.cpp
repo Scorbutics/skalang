@@ -67,7 +67,7 @@ TEST_CASE("[BytecodeInterpreter] Custom object creation 2 (field function call)"
 
 	auto [script, data] = Interpret(progStr);
 	auto& gen = data.generator->generate(*data.storage, std::move(script));
-	
+
 	//ska::bytecode::InstructionsDebugInfo{ progStr, 50 }.print(std::cout, *data.storage, gen.id());
 
 	auto interpreted = data.interpreter->interpret(gen.id(), *data.storage);
@@ -166,7 +166,7 @@ TEST_CASE("[BytecodeInterpreter] using a callback function as a parameter withou
 	CHECK(firstCellValue == 789);
 }
 
-TEST_CASE("[BytecodeInterpreter] everything inside factory function is relative to object instance") {
+TEST_CASE("[BytecodeInterpreter] closure: everything inside factory function is relative to object instance") {
 	constexpr auto progStr =
 		"TestFcty = function(value_: string): var do\n"
 		"return {\n"
@@ -189,4 +189,84 @@ TEST_CASE("[BytecodeInterpreter] everything inside factory function is relative 
 	auto res = data.interpreter->interpret(gen.id(), *data.storage)->variable(0);
 	auto firstCellValue = res.nodeval<ska::StringShared>();
 	CHECK(*firstCellValue == "tototiti");
+}
+
+
+TEST_CASE("[BytecodeInterpreter] closure: can modify stored value in captured env.") {
+	constexpr auto progStr = R"script(
+		TestFcty = function(value_: string): var do
+			internal = value_
+			return {
+				value = function(): string do
+					return internal
+				end
+				setValue = function(v: string) do
+					internal = v
+				end
+			}
+		end
+
+		toto = TestFcty("toto")
+		toto.setValue("titi")
+		out = toto.value()
+	)script";
+
+	auto [script, data] = Interpret(progStr);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+#ifndef NDEBUG
+	ska::bytecode::InstructionsDebugInfo{ progStr, 50 }.print(std::cout, *data.storage, gen.id());
+#endif
+	auto res = data.interpreter->interpret(gen.id(), *data.storage)->variable(0);
+	auto firstCellValue = res.nodeval<ska::StringShared>();
+	CHECK(*firstCellValue == "titi");
+}
+
+TEST_CASE("[BytecodeInterpreter] can modify stored values in direct access") {
+	constexpr auto progStr = R"script(
+		TestFcty = function(value_: string): var do
+			return {
+				value = value_
+			}
+		end
+
+		toto = TestFcty("toto")
+		toto.value = "titi"
+		out = toto.value + ""
+	)script";
+
+	auto [script, data] = Interpret(progStr);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+#ifndef NDEBUG
+	ska::bytecode::InstructionsDebugInfo{ progStr, 50 }.print(std::cout, *data.storage, gen.id());
+#endif
+	auto res = data.interpreter->interpret(gen.id(), *data.storage)->variable(0);
+	auto firstCellValue = res.nodeval<ska::StringShared>();
+	CHECK(*firstCellValue == "titi");
+}
+
+
+TEST_CASE("[BytecodeInterpreter] can modify stored values in direct access and check using getter") {
+	constexpr auto progStr = R"script(
+		TestFcty = function(value_: string): var do
+			return {
+				value = value_
+				get = function(): string do
+					return value
+				end
+			}
+		end
+
+		toto = TestFcty("toto")
+		toto.value = "titi"
+		out = toto.get()
+	)script";
+
+	auto [script, data] = Interpret(progStr);
+	auto& gen = data.generator->generate(*data.storage, std::move(script));
+#ifndef NDEBUG
+	ska::bytecode::InstructionsDebugInfo{ progStr, 50 }.print(std::cout, *data.storage, gen.id());
+#endif
+	auto res = data.interpreter->interpret(gen.id(), *data.storage)->variable(0);
+	auto firstCellValue = res.nodeval<ska::StringShared>();
+	CHECK(*firstCellValue == "titi");
 }
