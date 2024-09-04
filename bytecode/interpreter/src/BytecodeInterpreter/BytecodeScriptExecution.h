@@ -62,7 +62,8 @@ namespace ska {
 						throw std::runtime_error("invalid get cell value usage by querying a variable container without a valid value provided");
 					}
 				}
-				return memory->template value<T>(v.as<ScriptVariableRef>().variable);
+				auto& nodeValue = (*memory)[v.as<ScriptVariableRef>().variable];
+				return nodeValue.nodeval<T>();
 			}
 
 			template <class T>
@@ -75,7 +76,8 @@ namespace ska {
 						throw std::runtime_error("invalid get cell value usage by querying a variable container without a valid value provided");
 					}
 				}
-				return memory->template value<T>(v.as<ScriptVariableRef>().variable);
+				auto& nodeValue = (*memory)[v.as<ScriptVariableRef>().variable];
+				return nodeValue.nodeval<T>();
 			}
 
 			template <class T>
@@ -86,7 +88,10 @@ namespace ska {
 			}
 
 			auto index() const { return scriptIndex; }
-			ScriptVariableRef snapshot() const { return ScriptVariableRef{ executionPointer, scriptIndex }; }
+
+			NodeValue snapshot(const NodeValue& origin) const {
+				return { origin, ScriptVariableRef{ executionPointer, scriptIndex } };
+			}
 
 			NodeValue lastVariable() const;
 
@@ -125,6 +130,7 @@ namespace ska {
 			NodeValueArray m_exportsSection;
 			PlainMemoryTable registers;
 			PlainMemoryTable variables;
+
 		};
 	}
 }

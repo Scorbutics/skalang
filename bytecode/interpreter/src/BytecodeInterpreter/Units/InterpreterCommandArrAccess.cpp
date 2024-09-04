@@ -16,11 +16,13 @@ SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(ARR_ACCESS)(ExecutionContext& conte
   LOG_INFO << "[Accessing cell at index " << index << "/" << array->size() << " of object " << left << "]";
 
   if(index >= array->size()) {
-	throw std::runtime_error("invalid array access at index " + std::to_string(index) + " on array size " + std::to_string(array->size()));
+		throw std::runtime_error("invalid array access at index " + std::to_string(index) + " on array size " + std::to_string(array->size()));
   }
   auto& result = (*array)[index];
   LOG_INFO << "[Cell content : " << result.convertString() << "]";
 	// TODO make env "copy" (it's not a copy as it's a shared_ptr) automatic when NodeValue is a recursive container (NodeValueArray, NodeValueMap, NodeValue*)
-	result.copyEnv(context.getCell(left));
+	// directly inside NodeValue class
+	result = NodeValue { context.getCell(left), result };
+	// TODO it was "return &result;"
   return result;
 }

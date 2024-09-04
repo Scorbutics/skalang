@@ -56,6 +56,12 @@ namespace ska {
 			NodeValue(static_cast<double>(f)) {
 		}
 
+		template <class Arg>
+		NodeValue(const NodeValue& origin, Arg&& arg):
+			NodeValue(std::forward<Arg>(arg)) {
+				captureEnvironment = origin.captureEnvironment;
+			}
+
 		NodeValue(NodeValueArray arg) :
 			m_variant(arg),
 			m_emptyVariant(false) {
@@ -84,12 +90,12 @@ namespace ska {
 
 		void release();
 
-		const PlainMemoryTable* env() const;
+		std::string printEnv() const;
 
-		// TODO remove this to avoid direct memory access
-		PlainMemoryTable* env();
-		void copyEnv(const NodeValue& node);
-		void ownEnv(std::shared_ptr<PlainMemoryTable> env);
+		void captureInEnv(ScriptVariableRef index, NodeValue value);
+		const NodeValue* resolveFromEnv(ScriptVariableRef index) const;
+		void stealEnv(NodeValue& value);
+		void stealEnv(NodeValue&& value);
 
 		NodeValue(const NodeValue&) = default;
 		~NodeValue() = default;
@@ -145,7 +151,7 @@ namespace ska {
 		static bool isReference(const NodeValueVariant_& arg);
 
 		NodeValueVariant_ m_variant;
-		std::shared_ptr<PlainMemoryTable> captureEnvironment = nullptr;
+		std::shared_ptr<std::unordered_map<ScriptVariableRef, NodeValue>> captureEnvironment = nullptr;
 		bool m_emptyVariant = false;
 		bool m_dirty = false;
 	};

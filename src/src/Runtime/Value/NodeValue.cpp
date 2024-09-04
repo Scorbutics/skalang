@@ -4,7 +4,7 @@
 #include "NodeValue.h"
 #include "StringShared.h"
 
-SKA_LOGC_CONFIG(ska::LogLevel::Debug, ska::NodeValue);
+SKA_LOGC_CONFIG(ska::LogLevel::Disabled, ska::NodeValue);
 
 double ska::NodeValue::convertNumeric() const {
 	double numeric = 0.0;
@@ -86,20 +86,34 @@ std::string ska::NodeValue::convertString() const {
 	return result;
 }
 
-void ska::NodeValue::ownEnv(std::shared_ptr<PlainMemoryTable> env) {
-	captureEnvironment = std::move(env);
+const ska::NodeValue* ska::NodeValue::resolveFromEnv(ScriptVariableRef variable) const {
+	return captureEnvironment == nullptr || captureEnvironment->find(variable) == captureEnvironment->end() ? nullptr : &captureEnvironment->at(variable);
 }
 
-void ska::NodeValue::copyEnv(const NodeValue& node) {
-	captureEnvironment = node.captureEnvironment;
+std::string ska::NodeValue::printEnv() const {
+	auto ss = std::stringstream {};
+	if (captureEnvironment) {
+		for (const auto& scriptMemory: (*captureEnvironment)) {
+			ss << scriptMemory.second;
+		}
+	}
+	return ss.str();
 }
 
-const ska::PlainMemoryTable* ska::NodeValue::env() const {
-	return captureEnvironment.get();
+void ska::NodeValue::captureInEnv(ScriptVariableRef variable, NodeValue value) {
+	if (captureEnvironment == nullptr) {
+		captureEnvironment = std::make_shared<std::remove_reference_t<decltype(*captureEnvironment)>>();
+	}
+	(*captureEnvironment)[variable] = std::move(value);
 }
 
-ska::PlainMemoryTable* ska::NodeValue::env() {
-	return captureEnvironment.get();
+void ska::NodeValue::stealEnv(NodeValue& value) {
+	captureEnvironment = std::move(value.captureEnvironment);
+	value.captureEnvironment = nullptr;
+}
+
+void ska::NodeValue::stealEnv(NodeValue&& value) {
+	captureEnvironment = std::move(value.captureEnvironment);
 }
 
 ska::NodeValue& ska::NodeValue::dereference(const NodeValueVariant_& variant) {
@@ -137,7 +151,10 @@ void ska::NodeValue::transferValueToOwned(NodeValueVariant_ arg) {
 
 		SLOG(LogLevel::Debug) << "%10cAssigning direct value \"" << convertString() << "\"";
 		if (captureEnvironment) {
-			SLOG(LogLevel::Debug) << "  with capture env " << *captureEnvironment;
+			SLOG(LogLevel::Debug) << "  with capture env ";
+			for(const auto& scriptMemory: *captureEnvironment) {
+				SLOG(LogLevel::Debug) << scriptMemory.second;
+			}
 		}
 	}
 }

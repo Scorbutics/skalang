@@ -12,8 +12,7 @@ SKALANG_BYTECODE_INTERPRETER_COMMAND_DECLARE(RET)(ExecutionContext& context, con
 	if (context.currentInstruction().dest().type() != OperandType::EMPTY) {
 		context.release(context.currentInstruction().dest());
 	}
-	auto returnedEnvNodeValue = context.jumpReturn();
-	returnedValue.copyEnv(returnedEnvNodeValue);
+	returnedValue = context.jumpReturn(returnedValue);
 	context.push(std::move(returnedValue));
 	return {};
 }

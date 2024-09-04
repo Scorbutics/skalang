@@ -142,7 +142,12 @@ void ska::bytecode::Interpreter::interpret(ExecutionContext& node) {
 		assert(builder != nullptr);
 		auto nodeValue = builder->interpret(node);
 		if (!nodeValue.empty()) {
-			LOG_DEBUG << "Setting " << nodeValue.convertString() << " for " << instruction.dest() << " with env " << (nodeValue.env() != nullptr ? *nodeValue.env() : PlainMemoryTable{});
+			LOG_DEBUG << "Setting " << nodeValue.convertString() << " for " << instruction.dest();
+			const auto& env = nodeValue.printEnv();
+			if (!env.empty()) {
+				LOG_DEBUG << "  - with env " << env;
+			}
+
 			node.set(instruction.dest(), std::move(nodeValue));
 		}
 	}

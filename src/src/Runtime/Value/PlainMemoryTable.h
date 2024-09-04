@@ -10,11 +10,6 @@ namespace ska {
 
 	class PlainMemoryTable {
 	public:
-		template <class T>
-		const T& value(std::size_t index) const {
-			return m_data[index].nodeval<T>();
-		}
-
 		const NodeValue& operator[](std::size_t index) const {
 			assert(m_data.size() > index);
 			return m_data[index];
